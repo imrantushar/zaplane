@@ -145,17 +145,60 @@ const Logs = () => {
   //     return <ZAPLoading />;
   // }
 
-  return <PageLayout title="Logs" heading="Logs" actions={<Button label={__("Clear logs", "zaplane")} size="sm" suffix=" p-[8px]" preset="border" onClick={handleClearLogs} isDisabled={loading || totalItems === 0} />}>
-    <ListTable columns={columns} isRowSelectable={false} data={data || []} showSubHeader={false} showColumnFilter={false} showPagination={totalItems >= 20} noDataText={__("No logs found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="logs-table" currentPageNumber={currentPage} perPage={perPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} />
-    <ZAPDrawer open={drawerOpen} arrowClose onClose={() => {
-      setDrawerOpen(false);
-      setActiveRunId(null);
-    }} closeOnOverlayClick title={__("Run Details", "zaplane")} placement="end" size="md">
-      {activeRunId && <LogDetails runId={activeRunId} onBack={() => {
-        setDrawerOpen(false);
-        setActiveRunId(null);
-      }} />}
-    </ZAPDrawer>
-  </PageLayout>;
+  return (
+    <PageLayout 
+      title="Logs" 
+      heading="Logs" 
+      actions={
+        <Button 
+          label={__("Clear logs", "zaplane")} 
+          size="sm" 
+          suffix=" p-[8px]" 
+          preset="border" 
+          onClick={handleClearLogs} 
+          isDisabled={loading || data.length === 0} />
+      }>
+        <ListTable 
+          columns={columns} 
+          isRowSelectable={false} 
+          data={data || []} 
+          showSubHeader={false} 
+          showColumnFilter={false} 
+          showPagination={totalItems >= 20} 
+          noDataText={__("No logs found", "zaplane")} 
+          totalItems={totalItems} 
+          dataFetchingStatus={loading} 
+          suffix="logs-table" 
+          currentPageNumber={currentPage} 
+          perPage={perPage} 
+          rowsPerPage={itemPerPage} 
+          onChangePage={handlePageChange} 
+          onChangeItemsPerPage={handlePerPageChange} 
+        />
+        <ZAPDrawer 
+          open={drawerOpen} 
+          arrowClose 
+          onClose={() => {
+            setDrawerOpen(false);
+            setActiveRunId(null);
+          }} 
+          closeOnOverlayClick 
+          title={__("Run Details", "zaplane")} 
+          placement="end" 
+          size="md"
+        >
+          {activeRunId && (
+            <LogDetails 
+              runId={activeRunId} 
+              onBack={() => {
+                setDrawerOpen(false);
+                setActiveRunId(null);
+              }} 
+            />
+        )}
+        </ZAPDrawer>
+    </PageLayout>
+  ) 
+  ;
 };
 export default Logs;

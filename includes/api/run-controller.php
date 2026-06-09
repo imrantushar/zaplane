@@ -103,10 +103,15 @@ class RunController extends WP_REST_Controller {
 	}
 
 	public function clear_runs( $request ) {
-		// Logs are runs + their node-runs (no separate logs table).
-		// Delete node-runs first, then the runs.
-		NodeRun::query()->delete();
-		Run::query()->delete();
+		// Logs are runs + their node-runs (no separate logs table). Delete
+		// node-runs first, then the runs. An always-true WHERE satisfies the
+		// ORM's "cannot delete without where clause" guard while removing all rows.
+		try {
+			NodeRun::query()->where( 'id', '>', 0 )->delete();
+			Run::query()->where( 'id', '>', 0 )->delete();
+		} catch ( \Throwable $e ) {
+			return new WP_Error( 'clear_failed', $e->getMessage(), [ 'status' => 500 ] );
+		}
 
 		return rest_ensure_response( [ 'deleted' => true ] );
 	}
