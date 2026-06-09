@@ -58,10 +58,10 @@ const Notification = () => {
   }, [isShowNotification]);
 
   const closeHandler = () => {
-    // dispatch(showNotification({
-    //   message: '',
-    //   isShow: false
-    // }));
+    dispatch(showNotification({
+      message: '',
+      isShow: false
+    }));
   };
   return <>
     {isShowNotification && createPortal(<div className={`zaplane-notification ${notification.type && `zaplane-notification--${notification.type}`}`} ref={notificationRef}>
