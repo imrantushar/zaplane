@@ -60,6 +60,12 @@ class RunController extends WP_REST_Controller {
 			'permission_callback' => [ $this, 'permissions' ]
 		]);
 
+		register_rest_route($ns, '/runs/(?P<id>\d+)', [
+			'methods' => 'DELETE',
+			'callback' => [ $this, 'delete_run' ],
+			'permission_callback' => [ $this, 'permissions' ]
+		]);
+
 		register_rest_route($ns, '/runs/(?P<id>\d+)/replay', [
 			'methods' => 'POST',
 			'callback' => [ $this, 'replay_run' ],
@@ -159,6 +165,26 @@ class RunController extends WP_REST_Controller {
 			'per_page' => $perPage,
 			'pages'    => $perPage > 0 ? (int) ceil( $total / $perPage ) : 1,
 		]);
+	}
+
+	public function delete_run( $req ) {
+		$id  = (int) $req['id'];
+		$run = Run::find( $id );
+
+		if ( ! $run ) {
+			return new WP_Error( 'not_found', 'Run not found', [ 'status' => 404 ] );
+		}
+
+		// Delete the run and its node-runs. The where() satisfies the ORM's
+		// "cannot delete without where clause" guard.
+		try {
+			NodeRun::where( 'run_id', $id )->delete();
+			$run->delete();
+		} catch ( \Throwable $e ) {
+			return new WP_Error( 'delete_failed', $e->getMessage(), [ 'status' => 500 ] );
+		}
+
+		return rest_ensure_response( [ 'deleted' => true, 'id' => $id ] );
 	}
 
 	public function get_run( $req ) {
