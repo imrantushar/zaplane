@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { __ } from "@wordpress/i18n";
-import { getRunsList, clearRuns } from "@ZAPRedux/Slices/logsSlice/logsSlice";
+import { getRunsList, clearRuns, deleteRun } from "@ZAPRedux/Slices/logsSlice/logsSlice";
 import Button from "@ZAPComponents/Button";
+import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
+import { FiTrash2 } from "react-icons/fi";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 import LogDetails from "@ZAPComponents/LogDetails";
 import ZAPDrawer from "@ZAPComponents/Drawer";
@@ -16,6 +18,7 @@ const Logs = () => {
   const dispatch = useDispatch();
   const [activeRunId, setActiveRunId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selection, setSelection] = useState([]);
   const {
     data = [],
     currentPage,
@@ -50,6 +53,25 @@ const Logs = () => {
     if (!result?.error) {
       handleRefresh(1, perPage);
     }
+  };
+  const handleDeleteRow = async row => {
+    if (!row?.id) return;
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(__("Are you sure you want to delete this log?", "zaplane"))) {
+      return;
+    }
+    const result = await dispatch(deleteRun(row.id));
+    if (!result?.error) {
+      handleRefresh(currentPage, perPage);
+    }
+  };
+  const handleDeleteSelected = async () => {
+    if (!selection.length) return;
+    await Promise.all(
+      selection.map(row => row?.id).filter(Boolean).map(id => dispatch(deleteRun(id)))
+    );
+    setSelection([]);
+    handleRefresh(currentPage, perPage);
   };
   const columns = [{
     name: <span>
@@ -136,6 +158,11 @@ const Logs = () => {
           <HistoryIcon style={{ height: "20px", width: "20px" }} />
         </div>
       </ZAPTooltip>
+      <ZAPTooltip content={__("Delete", 'zaplane')}>
+        <div role="button" onClick={() => handleDeleteRow(row)} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border cursor-pointer text-[#E2483D]">
+          <FiTrash2 style={{ height: "18px", width: "18px" }} />
+        </div>
+      </ZAPTooltip>
     </div>,
     // columnWidth: "100px",
     textAlign: "center"
@@ -160,7 +187,7 @@ const Logs = () => {
       }>
         <ListTable 
           columns={columns} 
-          isRowSelectable={false} 
+          isRowSelectable={true} 
           data={data || []} 
           showSubHeader={false} 
           showColumnFilter={false} 
@@ -172,10 +199,12 @@ const Logs = () => {
           currentPageNumber={currentPage} 
           perPage={perPage} 
           rowsPerPage={itemPerPage} 
-          onChangePage={handlePageChange} 
-          onChangeItemsPerPage={handlePerPageChange} 
+          onChangePage={handlePageChange}
+          onChangeItemsPerPage={handlePerPageChange}
+          getSelectRowValue={rows => setSelection(rows || [])}
         />
-        <ZAPDrawer 
+        <ZAPActionBar selection={selection} onDelete={handleDeleteSelected} onClose={() => setSelection([])} />
+        <ZAPDrawer
           open={drawerOpen} 
           arrowClose 
           onClose={() => {

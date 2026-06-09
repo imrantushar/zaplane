@@ -202,6 +202,60 @@
   color: #0F0E16 !important;
   background: #F5F5F5 !important;
 }
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/ZAPActionBar/styles.scss ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************/
+.zap-action-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--zaplane-background, #fff);
+  border: 1px solid var(--zaplane-border-color, #cbd1d7);
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  padding: 12px 16px;
+  z-index: 9999;
+}
+.zap-action-bar__count {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--zaplane-font-color, #141a24);
+}
+.zap-action-bar__divider {
+  width: 1px;
+  height: 20px;
+  background: #d1d5db;
+}
+.zap-action-bar__delete {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--zaplane-danger, #e44a3f);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #fca5a5;
+  background: transparent;
+  cursor: pointer;
+}
+.zap-action-bar__delete:hover {
+  background: #fef2f2;
+}
+.zap-action-bar__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+.zap-action-bar__close:hover {
+  color: #4b5563;
+}
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/@wordpress/scripts/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./dev_zaplane/components/OptionMenu/styles.scss ***!
   \******************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -2031,17 +2085,11 @@ h2.react-datepicker__current-month {
   top: 0px;
   bottom: 0px;
 }
-.zaplane-scope .bottom-6 {
-  bottom: 1.5rem;
-}
 .zaplane-scope .bottom-full {
   bottom: 100%;
 }
 .zaplane-scope .left-0 {
   left: 0px;
-}
-.zaplane-scope .left-1\/2 {
-  left: 50%;
 }
 .zaplane-scope .right-0 {
   right: 0px;
@@ -2328,9 +2376,6 @@ h2.react-datepicker__current-month {
 .zaplane-scope .w-full {
   width: 100%;
 }
-.zaplane-scope .w-px {
-  width: 1px;
-}
 .zaplane-scope .w-screen {
   width: 100vw;
 }
@@ -2402,10 +2447,6 @@ h2.react-datepicker__current-month {
 }
 .zaplane-scope .origin-top-right {
   transform-origin: top right;
-}
-.zaplane-scope .-translate-x-1\/2 {
-  --tw-translate-x: -50%;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 .zaplane-scope .-translate-x-full {
   --tw-translate-x: -100%;
@@ -3120,6 +3161,10 @@ h2.react-datepicker__current-month {
   --tw-text-opacity: 1;
   color: rgb(156 163 175 / var(--tw-text-opacity, 1));
 }
+.zaplane-scope .text-\[\#E2483D\] {
+  --tw-text-opacity: 1;
+  color: rgb(226 72 61 / var(--tw-text-opacity, 1));
+}
 .zaplane-scope .text-\[sm\] {
   color: sm;
 }
@@ -3689,7 +3734,7 @@ h2.react-datepicker__current-month {
     display: revert;
   }
 }
-.zaplaness-notification {
+.zaplane-notification {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3701,42 +3746,42 @@ h2.react-datepicker__current-month {
   z-index: 99999;
   background: #fff;
 }
-.zaplaness-notification--success {
+.zaplane-notification--success {
   background: #00AD6B;
   color: #fff;
 }
-.zaplaness-notification--dashboard {
+.zaplane-notification--dashboard {
   position: fixed;
   left: 40%;
   transform: translateX(-50%);
   bottom: 35px;
 }
-.zaplaness-notification--dashboard .zaplaness-btn {
+.zaplane-notification--dashboard .zaplaness-btn {
   background: transparent;
 }
-.zaplaness-notification--lesson {
+.zaplane-notification--lesson {
   position: fixed;
   left: 40%;
   transform: translateX(-50%);
   bottom: 35px;
   padding: 20px 32px;
 }
-.zaplaness-notification--lesson .zaplaness-btn--bg-red {
+.zaplane-notification--lesson .zaplaness-btn--bg-red {
   padding: 4px !important;
 }
-.zaplaness-notification--info {
+.zaplane-notification--info {
   background: #7B68EE;
   color: #fff;
 }
-.zaplaness-notification--warning {
+.zaplane-notification--warning {
   background: #FDB022;
   color: #fff;
 }
-.zaplaness-notification--error {
+.zaplane-notification--error {
   background: #FF4D4D;
   color: #fff;
 }
-.zaplaness-notification .zaplaness-icon {
+.zaplane-notification .zaplane-icon {
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -3744,49 +3789,50 @@ h2.react-datepicker__current-month {
   align-items: center;
   justify-content: center;
 }
-.zaplaness-notification .zaplaness-icon--check {
+.zaplane-notification .zaplane-icon--check {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.zaplaness-notification .zaplaness-icon--check::before {
+.zaplane-notification .zaplane-icon--check::before {
   font-size: 20px;
   color: #f8f8f8;
 }
-.zaplaness-notification .zaplaness-icon--success {
+.zaplane-notification .zaplane-icon--success {
   background: #00AD6B;
 }
-.zaplaness-notification .zaplaness-icon--info {
+.zaplane-notification .zaplane-icon--info {
   background: #7B68EE;
 }
-.zaplaness-notification .zaplaness-icon--warning {
+.zaplane-notification .zaplane-icon--warning {
   background: #FDB022;
 }
-.zaplaness-notification .zaplaness-icon--error {
+.zaplane-notification .zaplane-icon--error {
   background: #FFEDED;
 }
-.zaplaness-notification .zaplaness-icon--notification {
+.zaplane-notification .zaplane-icon--notification {
   font-size: 25px;
 }
-.zaplaness-notification .zaplaness-icon--information {
+.zaplane-notification .zaplane-icon--information {
   font-size: 22px;
 }
-.zaplaness-notification .zaplaness-icon--information::before {
+.zaplane-notification .zaplane-icon--information::before {
   color: #fff;
 }
-.zaplaness-notification .zaplaness-icon--information-error {
+.zaplane-notification .zaplane-icon--information-error {
   font-size: 22px;
 }
-.zaplaness-notification .zaplaness-btn {
+.zaplane-notification .zaplane-btn {
   padding: 12px 0;
 }
-.zaplaness-notification .zaplaness-btn .zaplaness-icon--close {
+.zaplane-notification .zaplane-btn .zaplane-icon--close-x {
   background: transparent;
 }
-.zaplaness-notification .zaplaness-btn .zaplaness-icon--close::before {
+.zaplane-notification .zaplane-btn .zaplane-icon--close-x::before {
   color: #fff;
+  font-size: 20px;
 }
-.zaplaness-notification__message {
+.zaplane-notification__message {
   display: flex;
   align-items: center;
   gap: 20px;
@@ -3797,11 +3843,11 @@ h2.react-datepicker__current-month {
 }
 
 @media screen and (max-width: 485px) {
-  .zaplaness-notification {
+  .zaplane-notification {
     min-width: 90%;
   }
 }
-.zaplaness-status {
+.zaplane-status {
   align-items: center;
   border-radius: 45px;
   display: flex;
@@ -3815,15 +3861,15 @@ h2.react-datepicker__current-month {
   text-align: center;
   text-transform: capitalize;
 }
-.zaplaness-status--passed {
+.zaplane-status--passed {
   background: rgba(22, 163, 74, 0.1);
   color: #16A34A;
 }
-.zaplaness-status--failed {
+.zaplane-status--failed {
   background: rgba(220, 38, 38, 0.1);
   color: #DC2626;
 }
-.zaplaness-status--pending {
+.zaplane-status--pending {
   background: rgba(234, 179, 8, 0.1);
   color: #EAB308;
 }
@@ -4536,10 +4582,6 @@ h2.react-datepicker__current-month {
   --tw-bg-opacity: 1;
   background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1));
 }
-.zaplane-scope .hover\:bg-red-50:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 242 242 / var(--tw-bg-opacity, 1));
-}
 .zaplane-scope .hover\:bg-slate-50:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1));
@@ -4551,10 +4593,6 @@ h2.react-datepicker__current-month {
   --tw-text-opacity: 1;
   color: rgb(107 114 128 / var(--tw-text-opacity, 1));
 }
-.zaplane-scope .hover\:text-gray-600:hover {
-  --tw-text-opacity: 1;
-  color: rgb(75 85 99 / var(--tw-text-opacity, 1));
-}
 .zaplane-scope .hover\:text-gray-700:hover {
   --tw-text-opacity: 1;
   color: rgb(55 65 81 / var(--tw-text-opacity, 1));
@@ -4562,10 +4600,6 @@ h2.react-datepicker__current-month {
 .zaplane-scope .hover\:text-indigo-500:hover {
   --tw-text-opacity: 1;
   color: rgb(99 102 241 / var(--tw-text-opacity, 1));
-}
-.zaplane-scope .hover\:text-red-700:hover {
-  --tw-text-opacity: 1;
-  color: rgb(185 28 28 / var(--tw-text-opacity, 1));
 }
 .zaplane-scope .hover\:underline:hover {
   text-decoration-line: underline;
