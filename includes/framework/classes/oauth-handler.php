@@ -23,7 +23,7 @@ class OAuthHandler {
 
 
 
-	public function init_flow( string $app, int $user_id, string $connection_name, array $credentials ): array {
+	public function init_flow( string $app, int $user_id, string $connection_name, array $credentials, ?string $icon = null ): array {
 
 		if ( ! IntegrationLoader::has( $app ) ) {
 			throw IntegrationException::notFound( esc_html( $app ) );
@@ -43,6 +43,7 @@ class OAuthHandler {
 				'app'         => $app,
 				'user_id'     => $user_id,
 				'name'        => $connection_name,
+				'icon'        => $icon,
 				'credentials' => $credentials,
 			]
 		);
@@ -71,6 +72,7 @@ class OAuthHandler {
 		$app = $state_data['app'];
 		$user_id = $state_data['user_id'];
 		$name = $state_data['name'];
+		$icon = $state_data['icon'] ?? null;
 		$credentials = $state_data['credentials'] ?? [];
 
 		if ( ! IntegrationLoader::has( $app ) ) {
@@ -97,7 +99,8 @@ class OAuthHandler {
 			$app,
 			$name,
 			'oauth2',
-			$credentials
+			$credentials,
+			$icon
 		);
 		$connection_id = $create_result['id'];
 
