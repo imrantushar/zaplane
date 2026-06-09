@@ -218,13 +218,27 @@ class RecipeRunner {
 	 * meaningfully (the args are placeholders), so the CLI skips them.
 	 */
 	public static function is_unfilled( array $recipe ): bool {
-		// A factory (even a stub) means it's being worked on — let it run so a stub
-		// can SKIP with its own "implement me" message instead of a generic skip.
-		if ( ! empty( $recipe['setup']['factory'] ) ) {
+		$setup = $recipe['setup'] ?? [];
+		// A factory/action (even a stub) means it's being worked on — let it run so a
+		// stub can SKIP with its own "implement me" message instead of a generic skip.
+		if ( ! empty( $setup['factory'] ) || ! empty( $setup['action'] ) ) {
 			return false;
 		}
-		$blob = wp_json_encode( $recipe['node'] ?? [] );
-		return is_string( $blob ) && (bool) preg_match( '/\{\{\s*arg\d+\s*\}\}/', $blob );
+
+		$node = $recipe['node'] ?? [];
+
+		// Still has generator {{argN}} placeholders → not filled in.
+		$blob = wp_json_encode( $node );
+		if ( is_string( $blob ) && preg_match( '/\{\{\s*arg\d+\s*\}\}/', $blob ) ) {
+			return true;
+		}
+
+		// A trigger with no input and nothing to seed it can't fire meaningfully.
+		if ( 'trigger' === ( $node['kind'] ?? '' ) && empty( $node['input'] ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

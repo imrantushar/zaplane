@@ -1,0 +1,22 @@
+{
+    "name": "woocommerce-delete_customer",
+    "integration": "woocommerce",
+    "required_plugins": [
+        "woocommerce/woocommerce.php"
+    ],
+    "setup": {
+        "factory": "create_woocommerce_delete_customer",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "delete_customer",
+        "config": {},
+        "input": [
+            "{{arg0}}"
+        ]
+    },
+    "expect": {
+        "not_false": true
+    }
+}

@@ -41,8 +41,11 @@ class RecipeCommand extends Command {
 			case 'exec-batch':
 				$this->exec_batch( array_slice( $args, 1 ), $assoc_args );
 				break;
+			case 'clean':
+				$this->clean_e2e( $assoc_args );
+				break;
 			default:
-				$this->error( "Unknown subcommand '{$sub}'. Use: run | generate | list" );
+				$this->error( "Unknown subcommand '{$sub}'. Use: run | generate | list | clean" );
 		}
 	}
 
@@ -58,6 +61,15 @@ class RecipeCommand extends Command {
 		}
 
 		$flags = [ 'e2e' => $e2e, 'keep_workflow' => isset( $assoc_args['keep-workflow'] ) ];
+
+		// E2E inserts temp workflows; clear any active leftovers from a crashed run
+		// before starting so they don't pollute hook matching.
+		if ( $e2e ) {
+			$purged = RecipeE2eRunner::purge_leftovers();
+			if ( $purged > 0 ) {
+				$this->warning( sprintf( 'Cleared %d leftover [recipe-e2e] workflow(s) from a previous run.', $purged ) );
+			}
+		}
 
 		$mode = $e2e ? 'end-to-end (real workflow + engine)' : 'direct';
 		$this->info( sprintf( 'Running %d recipe(s) — %s mode...', count( $files ), $mode ) );
@@ -91,7 +103,7 @@ class RecipeCommand extends Command {
 			}
 
 			if ( RecipeRunner::is_unfilled( $recipe ) ) {
-				$rows[] = [ $name, $slug, 'SKIP', 'scaffold not filled in ({{argN}} placeholders)' ];
+				$rows[] = [ $name, $slug, 'SKIP', 'not filled in — set node.input (and setup.factory/action if needed)' ];
 				++$skipped;
 				continue;
 			}
@@ -195,18 +207,45 @@ class RecipeCommand extends Command {
 	}
 
 	/**
-	 * Run a whole plugin-group of recipes in ONE child WP-CLI process. The plugin
-	 * (just activated by the parent) boots once for all of them, instead of once
-	 * per recipe. Results are returned positionally aligned to $files.
+	 * Run a plugin-group of recipes in child WP-CLI processes and return results
+	 * aligned positionally to $files.
+	 *
+	 * Direct mode batches all recipes into ONE subprocess (the plugin boots once —
+	 * fast, and only resolve_trigger/execute_node runs so there's no shared-state
+	 * risk). E2E mode fires REAL hooks that run the plugin's own listeners and can
+	 * fatal/mutate global state, so each recipe gets its OWN subprocess for clean
+	 * isolation.
 	 *
 	 * @return array<int, ?RecipeResult>
 	 */
 	protected function exec_batch_subprocess( array $files, array $flags = [] ): array {
 		$extra  = ! empty( $flags['e2e'] ) ? ' --e2e' : '';
 		$extra .= ! empty( $flags['keep_workflow'] ) ? ' --keep-workflow' : '';
-		$paths  = implode( ' ', array_map( 'escapeshellarg', $files ) );
 
-		$run = \WP_CLI::runcommand(
+		// E2E: one subprocess per recipe (isolation).
+		if ( ! empty( $flags['e2e'] ) ) {
+			$out = [];
+			foreach ( $files as $i => $file ) {
+				$out[ $i ] = $this->run_subprocess( [ $file ], $extra )[0]
+					?? ( new RecipeResult( basename( $file, '.json' ), '' ) )->abort( 'Subprocess produced no result.' );
+			}
+			return $out;
+		}
+
+		// Direct: one subprocess for the whole group.
+		$results = $this->run_subprocess( $files, $extra );
+		$out     = [];
+		foreach ( $files as $i => $file ) {
+			$out[ $i ] = $results[ $i ]
+				?? ( new RecipeResult( basename( $file, '.json' ), '' ) )->abort( 'Subprocess produced no result (batch may have crashed).' );
+		}
+		return $out;
+	}
+
+	/** Launch one child process for the given files; return parsed results in order. @return array<int,?RecipeResult> */
+	protected function run_subprocess( array $files, string $extra ): array {
+		$paths = implode( ' ', array_map( 'escapeshellarg', $files ) );
+		$run   = \WP_CLI::runcommand(
 			"zaplane recipe exec-batch {$paths}{$extra}",
 			[
 				'launch'     => true,
@@ -214,20 +253,7 @@ class RecipeCommand extends Command {
 				'exit_error' => false,
 			]
 		);
-
-		$results = RecipeResult::all_from_wire( (string) ( $run->stdout ?? '' ) );
-
-		$out = [];
-		foreach ( $files as $i => $file ) {
-			if ( isset( $results[ $i ] ) ) {
-				$out[ $i ] = $results[ $i ];
-				continue;
-			}
-			$fallback  = new RecipeResult( basename( $file, '.json' ), '' );
-			$stderr    = trim( (string) ( $run->stderr ?? '' ) );
-			$out[ $i ] = $fallback->abort( $stderr ?: 'Subprocess produced no result (batch may have crashed).' );
-		}
-		return $out;
+		return RecipeResult::all_from_wire( (string) ( $run->stdout ?? '' ) );
 	}
 
 	/**
@@ -446,6 +472,19 @@ class RecipeCommand extends Command {
 		$block .= "\t\t};\n\t\treturn \$factories;\n\t}\n);\n";
 
 		file_put_contents( $path, $block, FILE_APPEND );
+	}
+
+	/** `recipe clean [--all]` — remove leftover [recipe-e2e] temp workflows. */
+	protected function clean_e2e( array $assoc_args ): void {
+		$include_kept = isset( $assoc_args['all'] );
+		$removed      = RecipeE2eRunner::purge_leftovers( $include_kept );
+
+		if ( 0 === $removed ) {
+			$this->success( 'No leftover [recipe-e2e] workflows.' );
+			return;
+		}
+		$scope = $include_kept ? '' : ' active';
+		$this->success( sprintf( 'Removed %d%s [recipe-e2e] workflow(s).', $removed, $scope ) );
 	}
 
 	protected function list_recipes(): void {

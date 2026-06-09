@@ -1,0 +1,24 @@
+{
+    "name": "woocommerce-order_status_changed",
+    "integration": "woocommerce",
+    "required_plugins": [
+        "woocommerce/woocommerce.php"
+    ],
+    "setup": {
+        "factory": "create_woocommerce_order_status_changed",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "order_status_changed",
+        "config": {},
+        "input": [
+            "{{arg0}}",
+            "{{arg1}}",
+            "{{arg2}}"
+        ]
+    },
+    "expect": {
+        "not_false": true
+    }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "woocommerce-order_status_pending",
+  "integration": "woocommerce",
+  "required_plugins": ["woocommerce/woocommerce.php"],
+  "setup": { "factory": "create_wc_order", "args": { "status": "pending", "total": 50 } },
+  "node": {
+    "kind": "trigger",
+    "event": "order_status_pending",
+    "config": {},
+    "input": ["{{order_id}}", "{{order}}"]
+  },
+  "expect": { "not_false": true, "has_keys": ["order_id", "status"] }
+}

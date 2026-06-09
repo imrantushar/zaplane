@@ -1,0 +1,23 @@
+{
+    "name": "woocommerce-restore_order",
+    "integration": "woocommerce",
+    "required_plugins": [
+        "woocommerce/woocommerce.php"
+    ],
+    "setup": {
+        "factory": "create_woocommerce_restore_order",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "restore_order",
+        "config": {},
+        "input": [
+            "{{arg0}}",
+            "{{arg1}}"
+        ]
+    },
+    "expect": {
+        "not_false": true
+    }
+}

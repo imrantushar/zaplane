@@ -1,0 +1,20 @@
+{
+    "name": "woocommerce-product_added_to_cart",
+    "integration": "woocommerce",
+    "required_plugins": [
+        "woocommerce/woocommerce.php"
+    ],
+    "setup": {
+        "factory": "",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "product_added_to_cart",
+        "config": {},
+        "input": []
+    },
+    "expect": {
+        "not_false": true
+    }
+}

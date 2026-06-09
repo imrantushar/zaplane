@@ -1,0 +1,20 @@
+{
+    "name": "woocommerce-product_removed_from_cart",
+    "integration": "woocommerce",
+    "required_plugins": [
+        "woocommerce/woocommerce.php"
+    ],
+    "setup": {
+        "factory": "",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "product_removed_from_cart",
+        "config": {},
+        "input": []
+    },
+    "expect": {
+        "not_false": true
+    }
+}

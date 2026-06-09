@@ -334,6 +334,19 @@ Notes:
 
 - **E2E only applies to trigger recipes.** Action recipes are skipped (`SKIP`)
   because they aren't fired by a hook.
+- **A trigger with no `input` is SKIPped, not run.** E2E fires the real hook, and
+  the plugin's own listeners expect the real arguments — firing with nothing would
+  crash them. Fill `node.input` (or add a `setup.factory`/`action` that returns
+  the args) to enable it.
+- Each E2E recipe runs in its **own subprocess** for isolation (real hooks mutate
+  global state), and temp workflows are cleaned up after each one. If a run is
+  ever interrupted, `wp zaplane recipe clean` removes leftover `[recipe-e2e]`
+  workflows (`--all` also removes `--keep-workflow` ones); a normal E2E run also
+  auto-clears leftovers before starting.
+- **`--keep-workflow` keeps the workflow ACTIVE** (re-titled `[recipe-e2e-kept]`)
+  so you can trigger/edit it as a live workflow — intended for **test sites**,
+  since it will fire on real matching events (including later test runs). Auto-purge
+  leaves these alone; remove them with `wp zaplane recipe clean --all`.
 - **`input` must match the real hook signature.** A live `do_action` runs *every*
   listener on that hook (other plugins too), so pass all the args WordPress fires,
   not just what `resolve_trigger` needs — e.g. `woocommerce_new_order` fires

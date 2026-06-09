@@ -1,0 +1,20 @@
+{
+    "name": "woocommerce-update_customer",
+    "integration": "woocommerce",
+    "required_plugins": [
+        "woocommerce/woocommerce.php"
+    ],
+    "setup": {
+        "factory": "",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "update_customer",
+        "config": {},
+        "input": []
+    },
+    "expect": {
+        "not_false": true
+    }
+}

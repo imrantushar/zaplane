@@ -35,6 +35,41 @@ class RecipeE2eRunner {
 	 * @param array $recipe Decoded recipe (node.kind must be 'trigger').
 	 * @param array $opts   [ 'keep_workflow' => bool ]
 	 */
+	/** Title prefix for transient (auto-cleaned) temp workflows. */
+	public const TITLE_PREFIX = '[recipe-e2e]';
+	/** Title prefix for `--keep-workflow` ones, which stay ACTIVE and survive auto-purge. */
+	public const KEPT_PREFIX = '[recipe-e2e-kept]';
+
+	/**
+	 * Remove temp workflows this runner created. Always clears transient
+	 * `[recipe-e2e]` leftovers (crash debris). Only `$include_kept` also removes
+	 * the `[recipe-e2e-kept]` ones a user chose to keep.
+	 *
+	 * @return int Number of workflows removed.
+	 */
+	public static function purge_leftovers( bool $include_kept = false ): int {
+		$removed = 0;
+		foreach ( Workflow::where( 'title', 'LIKE', self::TITLE_PREFIX . '%' )->get() as $workflow ) {
+			$removed += self::delete_workflow( $workflow );
+		}
+		if ( $include_kept ) {
+			foreach ( Workflow::where( 'title', 'LIKE', self::KEPT_PREFIX . '%' )->get() as $workflow ) {
+				$removed += self::delete_workflow( $workflow );
+			}
+		}
+		return $removed;
+	}
+
+	private static function delete_workflow( Workflow $workflow ): int {
+		foreach ( Run::where( 'workflow_id', $workflow->id )->get() as $run ) {
+			NodeRun::where( 'run_id', $run->id )->delete();
+			$run->delete();
+		}
+		WorkflowVersion::where( 'workflow_id', $workflow->id )->delete();
+		$workflow->delete();
+		return 1;
+	}
+
 	public static function run( array $recipe, array $opts = [] ): RecipeResult {
 		$name        = (string) ( $recipe['name'] ?? 'unnamed' );
 		$integration = (string) ( $recipe['integration'] ?? '' );
@@ -68,6 +103,13 @@ class RecipeE2eRunner {
 			$vars   = RecipeRunner::seed_vars( $recipe );
 			$config = RecipeRunner::interpolate_value( (array) ( $node['config'] ?? [] ), $vars );
 			$input  = array_values( RecipeRunner::interpolate_value( (array) ( $node['input'] ?? [] ), $vars ) );
+
+			// E2E fires the REAL hook, and the plugin's own listeners expect the real
+			// arguments. Firing with no input would crash them, so a trigger with no
+			// resolved input isn't ready for E2E — skip it instead of corrupting state.
+			if ( empty( $input ) ) {
+				return $result->skip( 'E2E needs node.input (the real hook arguments); none provided. Fill node.input, or add a setup.factory/action that returns them.' );
+			}
 
 			// 2. Insert a real, active workflow: trigger -> optional action chain.
 			$graph    = self::build_graph( $integration, $event, $hook, $config, (array) ( $node['then'] ?? [] ) );
@@ -200,7 +242,7 @@ class RecipeE2eRunner {
 		$workflow = Workflow::create(
 			[
 				'user_id'           => get_current_user_id() ?: 1,
-				'title'             => "[recipe-e2e] {$integration}.{$event}",
+				'title'             => self::TITLE_PREFIX . " {$integration}.{$event}",
 				'status'            => 'active',
 				'layout'            => 'TB',
 				'integration_icons' => array_values( array_unique( $icons ) ),
@@ -270,10 +312,11 @@ class RecipeE2eRunner {
 	protected static function finish( RecipeResult $result, ?Workflow $workflow, ?Run $run, array $opts ): RecipeResult {
 		if ( ! empty( $opts['keep_workflow'] ) ) {
 			if ( $workflow ) {
-				// Pause it so it stays visible in the UI but won't fire on real events.
-				$workflow->status = 'paused';
+				// Keep it ACTIVE and re-title so auto-purge won't remove it. It will
+				// fire on real events on this site — intended for test sites only.
+				$workflow->title = str_replace( self::TITLE_PREFIX, self::KEPT_PREFIX, $workflow->title );
 				$workflow->save();
-				$result->log_lines[] = "kept workflow #{$workflow->id} (paused — inspect in the UI)";
+				$result->log_lines[] = "kept ACTIVE workflow #{$workflow->id} (live on this site; remove with: wp zaplane recipe clean --all)";
 			}
 			return $result->finalize();
 		}

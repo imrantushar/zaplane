@@ -1,0 +1,23 @@
+{
+    "name": "woocommerce-product_status_updated",
+    "integration": "woocommerce",
+    "required_plugins": [
+        "woocommerce/woocommerce.php"
+    ],
+    "setup": {
+        "factory": "create_woocommerce_product_status_updated",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "product_status_updated",
+        "config": {},
+        "input": [
+            "{{arg0}}",
+            "{{arg1}}"
+        ]
+    },
+    "expect": {
+        "not_false": true
+    }
+}

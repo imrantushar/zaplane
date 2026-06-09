@@ -1,0 +1,20 @@
+{
+    "name": "woocommerce-new_coupon",
+    "integration": "woocommerce",
+    "required_plugins": [
+        "woocommerce/woocommerce.php"
+    ],
+    "setup": {
+        "factory": "",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "new_coupon",
+        "config": {},
+        "input": []
+    },
+    "expect": {
+        "not_false": true
+    }
+}

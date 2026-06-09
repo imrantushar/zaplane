@@ -148,6 +148,17 @@ class RecipeRunnerTest extends TestCase {
 	}
 
 	/** @test */
+	public function trigger_with_empty_input_and_no_seed_is_unfilled(): void {
+		$this->assertTrue( RecipeRunner::is_unfilled( [ 'node' => [ 'kind' => 'trigger', 'input' => [] ] ] ) );
+		// ...but not if it's seeded by an action.
+		$this->assertFalse( RecipeRunner::is_unfilled(
+			[ 'setup' => [ 'action' => [ 'app' => 'woocommerce', 'event' => 'create_order' ] ], 'node' => [ 'kind' => 'trigger', 'input' => [ '{{order.order_id}}' ] ] ]
+		) );
+		// Actions use config, not input — empty input is fine for them.
+		$this->assertFalse( RecipeRunner::is_unfilled( [ 'node' => [ 'kind' => 'action', 'input' => [] ] ] ) );
+	}
+
+	/** @test */
 	public function skip_state_overrides_pass_in_finalize(): void {
 		$result = new \Zaplane\Testing\RecipeResult( 'r', 'x' );
 		$result->skip( 'stub' )->finalize();
