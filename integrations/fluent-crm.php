@@ -378,7 +378,7 @@ class FluentCrm extends IntegrationBase {
 		];
 	}
 
-	public static function select_tag(): array {
+	public static function select_tag( bool $required = true ): array {
 		return [
 			[
 				'key' => 'tags',
@@ -389,13 +389,13 @@ class FluentCrm extends IntegrationBase {
 					'query'       => 'tag_query',
 					'select'      => [ 'value', 'label' ],
 				],
-				'required' => true,
+				'required' => $required,
 				'multiple' => true
 			]
 		];
 	}
 
-	public static function select_list(): array {
+	public static function select_list( bool $required = true ): array {
 		return [
 			[
 				'key' => 'lists',
@@ -406,7 +406,7 @@ class FluentCrm extends IntegrationBase {
 					'query'       => 'list_query',
 					'select'      => [ 'value', 'label' ],
 				],
-				'required' => true,
+				'required' => $required,
 				'multiple' => true
 			]
 		];
@@ -423,7 +423,7 @@ class FluentCrm extends IntegrationBase {
 		];
 	}
 
-	public static function select_company(): array {
+	public static function select_company( bool $required = true ): array {
 		return [
 			[
 				'key' => 'company',
@@ -434,7 +434,7 @@ class FluentCrm extends IntegrationBase {
 					'query'       => 'company_query',
 					'select'      => [ 'value', 'label' ],
 				],
-				'required' => true,
+				'required' => $required,
 				'multiple' => true
 			]
 		];
@@ -504,13 +504,13 @@ class FluentCrm extends IntegrationBase {
 					'key' => 'first_name',
 					'label' => 'First Name',
 					'type' => 'text',
-					'required' => true,
+					'required' => false,
 				],
 				[
 					'key' => 'last_name',
 					'label' => 'Last Name',
 					'type' => 'text',
-					'required' => true,
+					'required' => false,
 				],
 				...self::contact_email(),
 				[
@@ -553,9 +553,9 @@ class FluentCrm extends IntegrationBase {
 					'label' => 'Postal Code',
 					'type' => 'number'
 				],
-				...self::select_list(),
-				...self::select_tag(),
-				...self::select_company(),
+				...self::select_list(false),
+				...self::select_tag(false),
+				...self::select_company(false),
 				...self::contact_status(),
 			],
 			'get_contact_id' => self::contact_id(),
