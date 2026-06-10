@@ -1,16 +1,14 @@
 {
-    "name": "woocommerce-new_coupon",
-    "integration": "woocommerce",
-    "required_plugins": [
-        "woocommerce/woocommerce.php"
-    ],
+    "name": "wordpress-user_register",
+    "integration": "wordpress",
+    "required_plugins": [],
     "setup": {
         "factory": "",
         "args": {}
     },
     "node": {
         "kind": "trigger",
-        "event": "new_coupon",
+        "event": "user_register",
         "config": {},
         "input": []
     },

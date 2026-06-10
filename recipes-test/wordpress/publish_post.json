@@ -1,16 +1,14 @@
 {
-    "name": "woocommerce-order_status_cancelled",
-    "integration": "woocommerce",
-    "required_plugins": [
-        "woocommerce/woocommerce.php"
-    ],
+    "name": "wordpress-publish_post",
+    "integration": "wordpress",
+    "required_plugins": [],
     "setup": {
         "factory": "",
         "args": {}
     },
     "node": {
         "kind": "trigger",
-        "event": "order_status_cancelled",
+        "event": "publish_post",
         "config": {},
         "input": []
     },

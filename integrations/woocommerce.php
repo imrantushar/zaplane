@@ -40,6 +40,67 @@ class Woocommerce extends IntegrationBase {
 		return 'woo.svg';
 	}
 
+	/** Trigger events the recipe tester can self-seed with real WooCommerce data. */
+	public static function get_seedable_triggers(): array {
+		return [
+			'new_order',
+			'order_status_pending',
+			'order_status_processing',
+			'order_status_on_hold',
+			'order_status_completed',
+			'order_status_cancelled',
+			'order_status_refunded',
+			'order_status_failed',
+			'order_status_changed',
+			'create_product',
+			'update_product',
+		];
+	}
+
+	/** Create real WooCommerce data and return the hook arguments for a trigger. */
+	public static function seed_trigger_args( string $event ): ?array {
+		if ( 'new_order' === $event || 0 === strpos( $event, 'order_status_' ) ) {
+			if ( ! function_exists( 'wc_create_order' ) ) {
+				return null;
+			}
+			$status = ( 0 === strpos( $event, 'order_status_' ) )
+				? str_replace( '_', '-', substr( $event, strlen( 'order_status_' ) ) )
+				: 'processing';
+
+			$order = wc_create_order();
+			$order->set_total( 50 );
+			$order->save();
+
+			if ( 'order_status_changed' === $event ) {
+				$old = $order->get_status();
+				$order->set_status( 'completed' );
+				$order->save();
+				// woocommerce_order_status_changed: ( $order_id, $from, $to, $order ).
+				return [ $order->get_id(), $old, 'completed', $order ];
+			}
+
+			$order->set_status( $status ?: 'processing' );
+			$order->save();
+			// new_order + woocommerce_order_status_*: ( $order_id, $order ).
+			return [ $order->get_id(), $order ];
+		}
+
+		if ( 'create_product' === $event || 'update_product' === $event ) {
+			if ( ! class_exists( '\WC_Product_Simple' ) ) {
+				return null;
+			}
+			$product = new \WC_Product_Simple();
+			$product->set_name( 'Zaplane Recipe Product' );
+			$product->set_regular_price( '10' );
+			$product->save();
+			$post = get_post( $product->get_id() );
+			// wp_after_insert_post: ( $post_id, $post, $update, $post_before ).
+			return [ $product->get_id(), $post, ( 'update_product' === $event ), null ];
+		}
+
+		return null;
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'new_order' => [

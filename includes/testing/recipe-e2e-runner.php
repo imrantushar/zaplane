@@ -103,6 +103,7 @@ class RecipeE2eRunner {
 			$vars   = RecipeRunner::seed_vars( $recipe );
 			$config = RecipeRunner::interpolate_value( (array) ( $node['config'] ?? [] ), $vars );
 			$input  = array_values( RecipeRunner::interpolate_value( (array) ( $node['input'] ?? [] ), $vars ) );
+			$input  = RecipeRunner::resolve_trigger_input( $recipe, $class, $event, $input );
 
 			// E2E fires the REAL hook, and the plugin's own listeners expect the real
 			// arguments. Firing with no input would crash them, so a trigger with no

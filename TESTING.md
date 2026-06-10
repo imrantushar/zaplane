@@ -412,9 +412,17 @@ composer test:smoke      # ParityTest only — registry/case/slug drift (<1s, mu
 composer test:all        # smoke + Utils + Testing + Integrations (~8 min under isolation)
 
 # 2. Live gate (real WP site) — integrations work against real plugins.
+wp zaplane recipe generate --all # sync the runnable suite from integration seeders
 wp zaplane recipe run            # direct mode — fast, non-zero exit on failure
 wp zaplane recipe run --e2e      # full engine: inserts workflow, fires hook, checks Run/NodeRun logs
 ```
+
+`recipe generate --all` regenerates one bare recipe per **seedable** trigger
+(those an integration declares in `get_seedable_triggers()`) — recipes are a
+generated artifact synced from the integrations, so you regenerate them at
+release time rather than hand-maintaining them. Integrations are the source of
+truth: to widen live coverage, add `seed_trigger_args()` cases to the
+integration (see the developer guide), not more recipe files.
 
 `composer test:all` is the single mock-side gate (smoke + the full suite).
 `wp zaplane recipe run` is the live gate — green here means each integration

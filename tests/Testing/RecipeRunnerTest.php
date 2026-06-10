@@ -22,6 +22,14 @@ class TestableRecipeRunner extends RecipeRunner {
 	}
 }
 
+/** A stand-in integration that self-seeds one trigger, for resolve_trigger_input tests. */
+class SeedingStubIntegration {
+
+	public static function seed_trigger_args( string $event ): ?array {
+		return 'thing_created' === $event ? [ 42, 'obj' ] : null;
+	}
+}
+
 class RecipeRunnerTest extends TestCase {
 
 	/** @test */
@@ -113,6 +121,24 @@ class RecipeRunnerTest extends TestCase {
 		// Recipe JSON numbers vs WC string totals should still match.
 		TestableRecipeRunner::pub_assert( $result, 'trigger', [ 'data' => [ 'total' => 50 ] ] );
 		$this->assertSame( [], $result->failures );
+	}
+
+	/** @test */
+	public function resolve_trigger_input_falls_back_to_integration_self_seed(): void {
+		$cls = SeedingStubIntegration::class;
+
+		// Explicit input wins.
+		$this->assertSame( [ 5 ], RecipeRunner::resolve_trigger_input( [], $cls, 'thing_created', [ 5 ] ) );
+
+		// Empty input + no factory/action → integration self-seeds.
+		$this->assertSame( [ 42, 'obj' ], RecipeRunner::resolve_trigger_input( [], $cls, 'thing_created', [] ) );
+
+		// Empty input but a factory is declared → don't override (respect author's choice).
+		$recipe = [ 'setup' => [ 'factory' => 'create_x' ] ];
+		$this->assertSame( [], RecipeRunner::resolve_trigger_input( $recipe, $cls, 'thing_created', [] ) );
+
+		// Unseedable event → unchanged.
+		$this->assertSame( [], RecipeRunner::resolve_trigger_input( [], $cls, 'other', [] ) );
 	}
 
 	/** @test */

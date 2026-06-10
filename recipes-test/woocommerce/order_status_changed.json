@@ -5,18 +5,14 @@
         "woocommerce/woocommerce.php"
     ],
     "setup": {
-        "factory": "create_woocommerce_order_status_changed",
+        "factory": "",
         "args": {}
     },
     "node": {
         "kind": "trigger",
         "event": "order_status_changed",
         "config": {},
-        "input": [
-            "{{arg0}}",
-            "{{arg1}}",
-            "{{arg2}}"
-        ]
+        "input": []
     },
     "expect": {
         "not_false": true

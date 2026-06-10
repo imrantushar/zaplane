@@ -169,6 +169,9 @@ class RecipeRunner {
 			$event      = (string) ( $node['event'] ?? '' );
 			$config     = self::interpolate( (array) ( $node['config'] ?? [] ), $vars );
 			$input      = self::interpolate( (array) ( $node['input'] ?? [] ), $vars );
+			if ( 'trigger' === $kind ) {
+				$input = self::resolve_trigger_input( $recipe, $class, $event, array_values( $input ) );
+			}
 			$node_array = [
 				'type'   => $kind,
 				'event'  => $event,
@@ -233,12 +236,22 @@ class RecipeRunner {
 			return true;
 		}
 
-		// A trigger with no input and nothing to seed it can't fire meaningfully.
+		// A trigger with no input and nothing to seed it can't fire meaningfully —
+		// unless the integration can self-seed this event (get_seedable_triggers).
 		if ( 'trigger' === ( $node['kind'] ?? '' ) && empty( $node['input'] ) ) {
-			return true;
+			return ! self::integration_can_seed( (string) ( $recipe['integration'] ?? '' ), (string) ( $node['event'] ?? '' ) );
 		}
 
 		return false;
+	}
+
+	/** Whether the integration declares it can create sample data for this trigger event. */
+	private static function integration_can_seed( string $slug, string $event ): bool {
+		if ( '' === $slug || '' === $event ) {
+			return false;
+		}
+		$instance = IntegrationLoader::get( $slug );
+		return $instance && in_array( $event, (array) get_class( $instance )::get_seedable_triggers(), true );
 	}
 
 	/**
@@ -284,6 +297,26 @@ class RecipeRunner {
 
 		$data = is_array( $out ) ? ( $out['data'] ?? $out ) : [];
 		return is_array( $data ) ? $data : [];
+	}
+
+	/**
+	 * Final positional input for a trigger. Uses the recipe's own input if it has
+	 * any; otherwise — when the recipe declares no factory/action — falls back to
+	 * the integration's own self-seeding (seed_trigger_args), which creates real
+	 * data and returns the hook args. This is what lets a bare recipe just run.
+	 */
+	public static function resolve_trigger_input( array $recipe, string $class, string $event, array $input ): array {
+		if ( ! empty( $input ) ) {
+			return $input;
+		}
+
+		$setup = $recipe['setup'] ?? [];
+		if ( ! empty( $setup['factory'] ) || ! empty( $setup['action'] ) ) {
+			return $input; // author picked an explicit seed; respect it.
+		}
+
+		$sample = $class::seed_trigger_args( $event );
+		return is_array( $sample ) ? array_values( $sample ) : $input;
 	}
 
 	/**

@@ -1,13 +1,20 @@
 {
-  "name": "woocommerce-order_status_processing",
-  "integration": "woocommerce",
-  "required_plugins": ["woocommerce/woocommerce.php"],
-  "setup": { "factory": "create_wc_order", "args": { "status": "processing", "total": 50 } },
-  "node": {
-    "kind": "trigger",
-    "event": "order_status_processing",
-    "config": {},
-    "input": ["{{order_id}}", "{{order}}"]
-  },
-  "expect": { "not_false": true, "has_keys": ["order_id", "status"] }
+    "name": "woocommerce-order_status_processing",
+    "integration": "woocommerce",
+    "required_plugins": [
+        "woocommerce/woocommerce.php"
+    ],
+    "setup": {
+        "factory": "",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "order_status_processing",
+        "config": {},
+        "input": []
+    },
+    "expect": {
+        "not_false": true
+    }
 }

@@ -1,16 +1,14 @@
 {
-    "name": "woocommerce-product_added_to_cart",
-    "integration": "woocommerce",
-    "required_plugins": [
-        "woocommerce/woocommerce.php"
-    ],
+    "name": "wordpress-save_post",
+    "integration": "wordpress",
+    "required_plugins": [],
     "setup": {
         "factory": "",
         "args": {}
     },
     "node": {
         "kind": "trigger",
-        "event": "product_added_to_cart",
+        "event": "save_post",
         "config": {},
         "input": []
     },

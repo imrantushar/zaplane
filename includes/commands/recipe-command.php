@@ -30,7 +30,11 @@ class RecipeCommand extends Command {
 				$this->run_recipes( $args[1] ?? null, $assoc_args );
 				break;
 			case 'generate':
-				$this->generate_recipe( $args[1] ?? null, $assoc_args );
+				if ( isset( $assoc_args['all'] ) && empty( $args[1] ) ) {
+					$this->generate_all( $assoc_args );
+				} else {
+					$this->generate_recipe( $args[1] ?? null, $assoc_args );
+				}
 				break;
 			case 'list':
 				$this->list_recipes();
@@ -317,9 +321,58 @@ class RecipeCommand extends Command {
 		}
 	}
 
+	/**
+	 * `recipe generate --all` — sync the runnable suite from the integrations:
+	 * for every integration that declares get_seedable_triggers(), generate one
+	 * bare recipe per seedable trigger. This is the "before release" step — the
+	 * recipes are a generated artifact, the integrations are the source of truth.
+	 */
+	protected function generate_all( array $assoc_args ): void {
+		$created = 0;
+		$skipped = 0;
+		$rows    = [];
+
+		foreach ( IntegrationLoader::getAllSlugs() as $slug ) {
+			$instance = IntegrationLoader::get( $slug );
+			if ( ! $instance ) {
+				continue;
+			}
+			$class    = get_class( $instance );
+			$seedable = array_values( array_intersect( array_keys( (array) $class::get_triggers() ), (array) $class::get_seedable_triggers() ) );
+			if ( empty( $seedable ) ) {
+				continue;
+			}
+
+			$dir = RecipeRunner::base_dir() . $slug . '/';
+			if ( ! is_dir( $dir ) ) {
+				wp_mkdir_p( $dir );
+			}
+			$made = 0;
+			foreach ( $seedable as $event ) {
+				if ( 'created' === $this->write_recipe_file( $slug, $class, 'trigger', $event, $dir ) ) {
+					++$created;
+					++$made;
+				} else {
+					++$skipped;
+				}
+			}
+			$rows[] = [ $slug, (string) count( $seedable ), (string) $made ];
+		}
+
+		if ( empty( $rows ) ) {
+			$this->warning( 'No integrations declare get_seedable_triggers() yet — nothing to generate.' );
+			return;
+		}
+
+		$this->table( [ 'Integration', 'Seedable triggers', 'Created' ], $rows );
+		$this->line();
+		$this->success( sprintf( '%d recipe(s) created, %d already existed.', $created, $skipped ) );
+		$this->line( 'Run the suite: wp zaplane recipe run   (add --e2e for the full engine)' );
+	}
+
 	protected function generate_recipe( ?string $integration, array $assoc_args ): void {
 		if ( ! $integration ) {
-			$this->error( 'Usage: wp zaplane recipe generate <integration> [--event=<e>] [--kind=trigger|action|all]' );
+			$this->error( 'Usage: wp zaplane recipe generate <integration> [--event=<e>] [--kind=trigger|action|all] | generate --all' );
 			return;
 		}
 
@@ -349,8 +402,17 @@ class RecipeCommand extends Command {
 				continue;
 			}
 
-			// No --event: generate one recipe per registered event of this kind.
-			foreach ( array_keys( $events ) as $event ) {
+			// No --event: by default generate only the triggers the integration can
+			// self-seed (they run green out of the box). Pass --all-events to also
+			// scaffold the non-seedable ones (as stubs). Actions are always all.
+			$keys = array_keys( $events );
+			if ( 'trigger' === $k && ! isset( $assoc_args['all-events'] ) ) {
+				$seedable = (array) $class::get_seedable_triggers();
+				if ( ! empty( $seedable ) ) {
+					$keys = array_values( array_intersect( $keys, $seedable ) );
+				}
+			}
+			foreach ( $keys as $event ) {
 				$targets[] = [ $k, $event ];
 			}
 		}
@@ -400,13 +462,13 @@ class RecipeCommand extends Command {
 			}
 		}
 
-		// Pre-fill `input` with one {{argN}} placeholder per positional hook arg the
-		// trigger reads (detected from its resolve_trigger), and — when there ARE
-		// args — scaffold a matching stub factory so you only fill the data-creation
-		// body instead of hand-writing factories.php from scratch.
+		// If the integration can self-seed this trigger (get_seedable_triggers), the
+		// recipe needs NOTHING — leave input empty and the runner asks the integration
+		// for real data at run time. Otherwise pre-fill {{argN}} placeholders and
+		// scaffold a stub factory so you only write the data-creation body.
 		$input   = [];
 		$factory = '';
-		if ( 'trigger' === $kind ) {
+		if ( 'trigger' === $kind && ! in_array( $event, (array) $class::get_seedable_triggers(), true ) ) {
 			$arity = $this->detect_input_arity( $class, $event );
 			for ( $i = 0; $i < $arity; $i++ ) {
 				$input[] = "{{arg{$i}}}";

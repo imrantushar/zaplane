@@ -34,6 +34,31 @@ abstract class IntegrationBase {
 		return array_values( (array) apply_filters( 'zaplane_integration_required_plugins', $required, $slug ) );
 	}
 
+	/**
+	 * Trigger events this integration can create sample data for, so the recipe
+	 * tester can fire them with real data and no per-recipe factory. Capability
+	 * declaration only — must have NO side effects.
+	 *
+	 * @return string[]
+	 */
+	public static function get_seedable_triggers(): array {
+		return [];
+	}
+
+	/**
+	 * Create the real data a trigger needs and return the positional hook
+	 * arguments to fire it with (matching what WordPress/the plugin really fires).
+	 * Called by the recipe tester when a recipe has no input/factory of its own.
+	 *
+	 * Return null when the event isn't seedable. Only override for events listed
+	 * in get_seedable_triggers().
+	 *
+	 * @return array|null Positional hook args, e.g. [ $order_id, $order ].
+	 */
+	public static function seed_trigger_args( string $event ): ?array {
+		return null;
+	}
+
 	public static function get_icon(): string {
 		return '';
 	}

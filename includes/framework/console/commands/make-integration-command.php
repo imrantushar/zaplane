@@ -109,6 +109,28 @@ class {$class} extends IntegrationBase {
 		return false;
 	}
 
+	// Self-seeding: list the triggers you can create sample data for, then create
+	// it in seed_trigger_args() and return the real hook arguments. This lets a
+	// bare recipe (no factory/input) just run. Leave empty if you'll seed recipes
+	// with a factory/setup.action instead.
+	public static function get_seedable_triggers(): array {
+		return [
+			// '{$trigger}',
+		];
+	}
+
+	public static function seed_trigger_args( string \$event ): ?array {
+		switch ( \$event ) {
+			case '{$trigger}':
+				// TODO: create real data and return the positional hook args, e.g.
+				// \$id = wp_insert_post( [...] );
+				// return [ \$id ];
+				return null;
+		}
+
+		return null;
+	}
+
 	public static function execute_node( array \$node, array \$input ): array {
 		\$config = \$node['data']['config'] ?? [];
 		\$event  = \$node['data']['event'] ?? '';

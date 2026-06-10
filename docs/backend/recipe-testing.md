@@ -143,6 +143,42 @@ touching integration files.
 
 ---
 
+## Best: make the integration self-seed (`seed_trigger_args`)
+
+The cleanest way to make a trigger testable is to teach the **integration itself**
+how to create its data — then *every* recipe for that trigger works with no
+factory, no `input`, nothing. Override two methods on the integration class:
+
+```php
+public static function get_seedable_triggers(): array {
+    return [ 'new_order', 'order_status_completed', /* … */ ];
+}
+
+public static function seed_trigger_args( string $event ): ?array {
+    if ( 'new_order' === $event || 0 === strpos( $event, 'order_status_' ) ) {
+        $order = wc_create_order();
+        $order->set_total( 50 );
+        $order->set_status( /* derived from $event */ 'completed' );
+        $order->save();
+        return [ $order->get_id(), $order ]; // the real hook args
+    }
+    return null;
+}
+```
+
+Now a **bare** recipe just runs:
+
+```json
+{ "integration": "woocommerce", "node": { "kind": "trigger", "event": "order_status_completed", "input": [] },
+  "expect": { "not_false": true, "has_keys": ["order_id", "status"] } }
+```
+
+`recipe generate` produces exactly this (empty `input`, no factory) for any event
+the integration lists in `get_seedable_triggers()` — so `wp zaplane recipe generate
+woocommerce` then `wp zaplane recipe run woocommerce --e2e` passes those triggers
+out of the box. `make:integration` scaffolds both methods. Precedence at run time:
+recipe `input` → `setup.factory`/`action` → the integration's `seed_trigger_args`.
+
 ## Seeding data without writing a factory (`setup.action`)
 
 Most CRM/commerce integrations already have an **action** that creates the entity

@@ -1,16 +1,14 @@
 {
-    "name": "woocommerce-product_removed_from_cart",
-    "integration": "woocommerce",
-    "required_plugins": [
-        "woocommerce/woocommerce.php"
-    ],
+    "name": "wordpress-profile_update",
+    "integration": "wordpress",
+    "required_plugins": [],
     "setup": {
         "factory": "",
         "args": {}
     },
     "node": {
         "kind": "trigger",
-        "event": "product_removed_from_cart",
+        "event": "profile_update",
         "config": {},
         "input": []
     },

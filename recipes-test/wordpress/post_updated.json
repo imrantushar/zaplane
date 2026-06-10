@@ -1,16 +1,14 @@
 {
-    "name": "woocommerce-update_customer",
-    "integration": "woocommerce",
-    "required_plugins": [
-        "woocommerce/woocommerce.php"
-    ],
+    "name": "wordpress-post_updated",
+    "integration": "wordpress",
+    "required_plugins": [],
     "setup": {
         "factory": "",
         "args": {}
     },
     "node": {
         "kind": "trigger",
-        "event": "update_customer",
+        "event": "post_updated",
         "config": {},
         "input": []
     },
