@@ -1,0 +1,18 @@
+{
+    "name": "wordpress-create_term",
+    "integration": "wordpress",
+    "required_plugins": [],
+    "setup": {
+        "factory": "",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "create_term",
+        "config": {},
+        "input": []
+    },
+    "expect": {
+        "not_false": true
+    }
+}

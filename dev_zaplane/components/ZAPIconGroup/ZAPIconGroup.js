@@ -3,7 +3,7 @@ const ZAPIconGroup = ({
   icons = [],
   maxVisible = 2
 }) => {
-  const safeIcons = Array.isArray(icons) ? icons : [];
+  const safeIcons = (Array.isArray(icons) ? icons : []).filter(Boolean);
   const visibleIcons = safeIcons.slice(0, maxVisible);
   const remaining = Math.max(0, safeIcons.length - maxVisible);
 

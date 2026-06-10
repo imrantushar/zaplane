@@ -46,6 +46,88 @@ class Wordpress extends IntegrationBase {
 		return 'wordpress.svg';
 	}
 
+	/** Trigger events the recipe tester can self-seed with real WordPress data. */
+	public static function get_seedable_triggers(): array {
+		return [
+			'publish_post',
+			'save_post',
+			'post_updated',
+			'user_register',
+			'profile_update',
+			'comment_post',
+			'create_term',
+		];
+	}
+
+	/** Create real WordPress data and return the hook arguments for a trigger. */
+	public static function seed_trigger_args( string $event ): ?array {
+		switch ( $event ) {
+			case 'publish_post':
+			case 'save_post':
+			case 'post_updated':
+				$post_id = wp_insert_post(
+					[
+						'post_title'   => 'Zaplane Recipe Post',
+						'post_content' => 'Created by a recipe seeder.',
+						'post_status'  => 'publish',
+						'post_type'    => 'post',
+					]
+				);
+				if ( ! $post_id || is_wp_error( $post_id ) ) {
+					return null;
+				}
+				$post = get_post( $post_id );
+				if ( 'save_post' === $event ) {
+					return [ $post_id, $post, false ];          // save_post( $id, $post, $update )
+				}
+				if ( 'post_updated' === $event ) {
+					return [ $post_id, $post, $post ];          // post_updated( $id, $after, $before )
+				}
+				return [ $post_id, $post ];                     // publish_post( $id, $post )
+
+			case 'user_register':
+			case 'profile_update':
+				$suffix  = substr( md5( uniqid( 'u', true ) ), 0, 8 );
+				$user_id = wp_insert_user(
+					[
+						'user_login' => "recipe_{$suffix}",
+						'user_email' => "recipe_{$suffix}@example.test",
+						'user_pass'  => wp_generate_password( 16 ),
+					]
+				);
+				if ( is_wp_error( $user_id ) ) {
+					return null;
+				}
+				if ( 'profile_update' === $event ) {
+					return [ $user_id, new \WP_User( $user_id ) ]; // profile_update( $id, $old_user_data )
+				}
+				return [ $user_id ];                               // user_register( $id )
+
+			case 'comment_post':
+				$post_id    = wp_insert_post( [ 'post_title' => 'Recipe Post', 'post_status' => 'publish', 'post_type' => 'post' ] );
+				$comment_id = wp_insert_comment(
+					[
+						'comment_post_ID'      => $post_id,
+						'comment_author'       => 'Recipe',
+						'comment_author_email' => 'recipe@example.test',
+						'comment_content'      => 'Seeded comment.',
+						'comment_approved'     => 1,
+					]
+				);
+				return $comment_id ? [ $comment_id, 1 ] : null;    // comment_post( $comment_id, $approved )
+
+			case 'create_term':
+				$slug = 'recipe-' . substr( md5( uniqid( 't', true ) ), 0, 6 );
+				$term = wp_insert_term( 'Recipe ' . $slug, 'category', [ 'slug' => $slug ] );
+				if ( is_wp_error( $term ) ) {
+					return null;
+				}
+				return [ $term['term_id'], $term['term_taxonomy_id'], 'category' ]; // create_term( $term_id, $tt_id, $taxonomy )
+		}
+
+		return null;
+	}
+
 	public static function get_output_ports(): array {
 		return [ 'main', 'error' ];
 	}

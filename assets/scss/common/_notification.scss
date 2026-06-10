@@ -1,4 +1,4 @@
-.zaplaness-notification {
+.zaplane-notification {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -52,7 +52,7 @@
         color: #fff;
     }
     
-    .zaplaness-icon {
+    .zaplane-icon {
         width: 20px;
         height: 20px;
         border-radius: 50%;    
@@ -108,12 +108,13 @@
         }
     }
 
-    .zaplaness-btn {
+    .zaplane-btn {
         padding: 12px 0;
-        .zaplaness-icon--close {
+        .zaplane-icon--close-x {
             background: transparent;
             &::before{
                 color: #fff;
+                font-size: 20px;
             }
         }
     }
@@ -130,12 +131,12 @@
 }
 
 @media screen and (max-width: 485px) {
-    .zaplaness-notification {
+    .zaplane-notification {
         min-width: 90%;
     }
 }
 
-.zaplaness-status{
+.zaplane-status{
     align-items: center;
     border-radius: 45px;
     display: flex;

@@ -285,14 +285,15 @@ class ConnectionsController extends WP_REST_Controller {
 	}
 
 	public function init_oauth( $request ) {
-		$user_id     = get_current_user_id();
-		$app         = $request->get_param( 'app' );
-		$name        = $request->get_param( 'name' );
+		$user_id = get_current_user_id();
+		$app = $request->get_param( 'app' );
+		$name = $request->get_param( 'name' );
+		$icon = $request->get_param( 'icon' );
 		$credentials = $request->get_param( 'credentials' ) ?? [];
 		$oauth       = $this->get_oauth_handler();
 
 		try {
-			$result = $oauth->init_flow( $app, $user_id, $name, $credentials );
+			$result = $oauth->init_flow( $app, $user_id, $name, $credentials, $icon );
 			return rest_ensure_response( $result );
 		} catch ( \Exception $e ) {
 			return new WP_Error( 'oauth_init_failed', $e->getMessage(), [ 'status' => 400 ] );

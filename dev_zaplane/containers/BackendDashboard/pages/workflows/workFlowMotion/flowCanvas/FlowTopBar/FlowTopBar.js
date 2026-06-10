@@ -153,6 +153,7 @@ export default function FlowTopBar({
       <button
         onClick={toggleFullscreen}
         style={outlineBtn}
+        className="mt-[4px]"
       >
         {isFullscreen ? <LuMinimize size={18} /> : <LuFullscreen size={18} />}
       </button>

@@ -48,9 +48,21 @@ class RunController extends WP_REST_Controller {
 			],
 		]);
 
+		register_rest_route($ns, '/runs', [
+			'methods' => 'DELETE',
+			'callback' => [ $this, 'clear_runs' ],
+			'permission_callback' => [ $this, 'permissions' ]
+		]);
+
 		register_rest_route($ns, '/runs/(?P<id>\d+)', [
 			'methods' => 'GET',
 			'callback' => [ $this, 'get_run' ],
+			'permission_callback' => [ $this, 'permissions' ]
+		]);
+
+		register_rest_route($ns, '/runs/(?P<id>\d+)', [
+			'methods' => 'DELETE',
+			'callback' => [ $this, 'delete_run' ],
 			'permission_callback' => [ $this, 'permissions' ]
 		]);
 
@@ -96,6 +108,20 @@ class RunController extends WP_REST_Controller {
 		return current_user_can( 'manage_options' );
 	}
 
+	public function clear_runs( $request ) {
+		// Logs are runs + their node-runs (no separate logs table). Delete
+		// node-runs first, then the runs. An always-true WHERE satisfies the
+		// ORM's "cannot delete without where clause" guard while removing all rows.
+		try {
+			NodeRun::query()->where( 'id', '>', 0 )->delete();
+			Run::query()->where( 'id', '>', 0 )->delete();
+		} catch ( \Throwable $e ) {
+			return new WP_Error( 'clear_failed', $e->getMessage(), [ 'status' => 500 ] );
+		}
+
+		return rest_ensure_response( [ 'deleted' => true ] );
+	}
+
 	public function list_runs( $request ) {
 		$page    = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
 		$perPage = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
@@ -139,6 +165,26 @@ class RunController extends WP_REST_Controller {
 			'per_page' => $perPage,
 			'pages'    => $perPage > 0 ? (int) ceil( $total / $perPage ) : 1,
 		]);
+	}
+
+	public function delete_run( $req ) {
+		$id  = (int) $req['id'];
+		$run = Run::find( $id );
+
+		if ( ! $run ) {
+			return new WP_Error( 'not_found', 'Run not found', [ 'status' => 404 ] );
+		}
+
+		// Delete the run and its node-runs. The where() satisfies the ORM's
+		// "cannot delete without where clause" guard.
+		try {
+			NodeRun::where( 'run_id', $id )->delete();
+			$run->delete();
+		} catch ( \Throwable $e ) {
+			return new WP_Error( 'delete_failed', $e->getMessage(), [ 'status' => 500 ] );
+		}
+
+		return rest_ensure_response( [ 'deleted' => true, 'id' => $id ] );
 	}
 
 	public function get_run( $req ) {

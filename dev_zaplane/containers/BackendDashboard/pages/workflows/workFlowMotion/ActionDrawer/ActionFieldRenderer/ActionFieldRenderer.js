@@ -201,7 +201,7 @@ const ActionFieldRenderer = ({
             onChange={(e) => { setFieldValue(field.key, e.target.value); clearError(); }}
             placeholder={'{ "Header-Name": "value" }'}
             rows={5}
-            style={{ width: "100%", fontFamily: "monospace", fontSize: "13px", padding: "8px", borderRadius: "6px", border: "1px solid var(--zaplane-border-color)", resize: "vertical", boxSizing: "border-box" }}
+            style={{ width: "100%", fontFamily: "monospace", fontSize: "13px", padding: "8px", borderRadius: "6px", border: "1px solid var(--zaplane-border-color)", resize: "vertical", boxSizing: "border-box", color: "var(--zaplane-font-secondary-color)" }}
           />
           <ErrorMsg />
         </div>

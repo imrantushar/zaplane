@@ -1,6 +1,6 @@
 {
     "version": "0.0.3",
-    "generated_at": "2026-06-08 03:29:15",
+    "generated_at": "2026-06-10 10:39:30",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -6263,13 +6263,13 @@
                             "key": "first_name",
                             "label": "First Name",
                             "type": "text",
-                            "required": true
+                            "required": false
                         },
                         {
                             "key": "last_name",
                             "label": "Last Name",
                             "type": "text",
-                            "required": true
+                            "required": false
                         },
                         {
                             "key": "email",
@@ -6329,7 +6329,7 @@
                                     "label"
                                 ]
                             },
-                            "required": true,
+                            "required": false,
                             "multiple": true
                         },
                         {
@@ -6344,7 +6344,7 @@
                                     "label"
                                 ]
                             },
-                            "required": true,
+                            "required": false,
                             "multiple": true
                         },
                         {
@@ -6359,7 +6359,7 @@
                                     "label"
                                 ]
                             },
-                            "required": true,
+                            "required": false,
                             "multiple": true
                         },
                         {

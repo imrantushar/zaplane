@@ -122,7 +122,7 @@
         }
 
         &__single-value {
-            color: #141A24;
+            color: var(--zaplane-font-secondary-color);
         }
     }
 
@@ -218,7 +218,13 @@
 }
 // Custom radio button
 
-
+// Field text should render at normal weight in the standard font color
+// (these controls otherwise inherit a bold weight).
+.zaplane-input,
+.zaplane-textarea {
+    font-weight: 400;
+    color: var(--zaplane-font-secondary-color);
+}
 
 @media (max-width: 768px) {
     .zaplane-ticket-table td > p{

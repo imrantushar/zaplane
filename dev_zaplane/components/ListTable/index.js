@@ -66,7 +66,7 @@ const ListTable = props => {
   };
   const selectAllRow = changes => setCopyDataArr(prev => prev.map(prevData => ({
     ...prevData,
-    select: changes.checked
+    select: changes
   })));
   const checkedChange = ({
     id,
