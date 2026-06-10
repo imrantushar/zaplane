@@ -1,6 +1,6 @@
 {
     "version": "0.0.3",
-    "generated_at": "2026-06-10 10:39:30",
+    "generated_at": "2026-06-10 13:54:03",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -1834,6 +1834,133 @@
                 }
             },
             "actions": []
+        },
+        "brevo": {
+            "slug": "brevo",
+            "name": "Brevo",
+            "icon": "brevo.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "api_key",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "create_contact": {
+                    "key": "create_contact",
+                    "label": "Create Contact",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "List ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "attributes",
+                            "label": "Custom Attributes",
+                            "type": "key_value",
+                            "description": "Extra contact attributes sent under the \"attributes\" key (e.g. COMPANY \u2192 Acme)."
+                        },
+                        {
+                            "key": "email_blacklisted",
+                            "label": "Email Blacklisted",
+                            "type": "boolean",
+                            "default": false
+                        },
+                        {
+                            "key": "sms_blacklisted",
+                            "label": "SMS Blacklisted",
+                            "type": "boolean",
+                            "default": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_contact_to_list": {
+                    "key": "add_contact_to_list",
+                    "label": "Add Contact to List",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "List ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "emails",
+                            "label": "Email Address(es)",
+                            "type": "email",
+                            "required": true,
+                            "description": "Comma-separated list for multiple addresses."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_contact": {
+                    "key": "delete_contact",
+                    "label": "Delete Contact",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "email",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_contact_from_list": {
+                    "key": "remove_contact_from_list",
+                    "label": "Remove Contact From List",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "List ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "emails",
+                            "label": "Email Address(es)",
+                            "type": "email",
+                            "required": true,
+                            "description": "Comma-separated list for multiple addresses."
+                        },
+                        {
+                            "key": "remove_all",
+                            "label": "Remove All Contacts",
+                            "type": "boolean",
+                            "default": false,
+                            "description": "When enabled, every contact in the list is removed (emails field is ignored)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         },
         "buddyboss": {
             "slug": "buddyboss",
@@ -4682,7 +4809,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
+                            "value": "https://almsdev.test/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -8799,7 +8926,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
+                            "value": "https://almsdev.test/wp-json/zaplane/v1/incoming/jotform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Jotform \u2192 Your Form \u2192 Settings \u2192 Integrations \u2192 Webhooks \u2192 Paste & Save."
                         }
@@ -14034,7 +14161,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
+                            "value": "https://almsdev.test/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -23303,7 +23430,7 @@
             "category": "app",
             "requires_connection": true,
             "auth_type": "oauth2",
-            "supports_webhook": false,
+            "supports_webhook": true,
             "triggers": {
                 "meeting_started": {
                     "key": "meeting_started",
@@ -23349,9 +23476,9 @@
                             "key": "start_time",
                             "type": "text",
                             "label": "Start Time",
-                            "placeholder": "2026-05-01T10:00:00",
+                            "placeholder": "2026-06-10T10:00:00",
                             "required": true,
-                            "help": "ISO 8601 format: YYYY-MM-DDTHH:MM:SS (local time in the chosen timezone)."
+                            "help": "ISO 8601 format: YYYY-MM-DDTHH:MM:SS \u2014 e.g. 2026-06-10T10:00:00"
                         },
                         {
                             "key": "duration",
@@ -23363,11 +23490,84 @@
                         },
                         {
                             "key": "timezone",
-                            "type": "text",
+                            "type": "select",
                             "label": "Timezone",
-                            "placeholder": "UTC",
                             "required": false,
-                            "help": "IANA timezone name (e.g. America/New_York). Default: UTC."
+                            "help": "Timezone for the meeting. Defaults to UTC.",
+                            "options": [
+                                {
+                                    "value": "UTC",
+                                    "label": "UTC"
+                                },
+                                {
+                                    "value": "Asia/Dhaka",
+                                    "label": "Asia/Dhaka (BD, UTC+6)"
+                                },
+                                {
+                                    "value": "Asia/Kolkata",
+                                    "label": "Asia/Kolkata (IST, UTC+5:30)"
+                                },
+                                {
+                                    "value": "Asia/Karachi",
+                                    "label": "Asia/Karachi (PKT, UTC+5)"
+                                },
+                                {
+                                    "value": "Asia/Dubai",
+                                    "label": "Asia/Dubai (GST, UTC+4)"
+                                },
+                                {
+                                    "value": "Asia/Riyadh",
+                                    "label": "Asia/Riyadh (AST, UTC+3)"
+                                },
+                                {
+                                    "value": "Europe/Istanbul",
+                                    "label": "Europe/Istanbul (TRT, UTC+3)"
+                                },
+                                {
+                                    "value": "Europe/Moscow",
+                                    "label": "Europe/Moscow (MSK, UTC+3)"
+                                },
+                                {
+                                    "value": "Europe/Berlin",
+                                    "label": "Europe/Berlin (CET, UTC+1)"
+                                },
+                                {
+                                    "value": "Europe/London",
+                                    "label": "Europe/London (GMT, UTC+0)"
+                                },
+                                {
+                                    "value": "America/New_York",
+                                    "label": "America/New_York (EST, UTC-5)"
+                                },
+                                {
+                                    "value": "America/Chicago",
+                                    "label": "America/Chicago (CST, UTC-6)"
+                                },
+                                {
+                                    "value": "America/Denver",
+                                    "label": "America/Denver (MST, UTC-7)"
+                                },
+                                {
+                                    "value": "America/Los_Angeles",
+                                    "label": "America/Los_Angeles (PST, UTC-8)"
+                                },
+                                {
+                                    "value": "America/Sao_Paulo",
+                                    "label": "America/Sao_Paulo (BRT, UTC-3)"
+                                },
+                                {
+                                    "value": "Asia/Singapore",
+                                    "label": "Asia/Singapore (SGT, UTC+8)"
+                                },
+                                {
+                                    "value": "Asia/Tokyo",
+                                    "label": "Asia/Tokyo (JST, UTC+9)"
+                                },
+                                {
+                                    "value": "Australia/Sydney",
+                                    "label": "Australia/Sydney (AEDT, UTC+11)"
+                                }
+                            ]
                         },
                         {
                             "key": "agenda",
@@ -23391,12 +23591,12 @@
                             "required": false,
                             "options": [
                                 {
-                                    "value": "true",
-                                    "label": "Enabled"
-                                },
-                                {
                                     "value": "false",
                                     "label": "Disabled"
+                                },
+                                {
+                                    "value": "true",
+                                    "label": "Enabled"
                                 }
                             ]
                         },
@@ -23422,7 +23622,7 @@
                             "label": "Host User ID / Email",
                             "placeholder": "me",
                             "required": false,
-                            "help": "Zoom user ID or email to create the meeting under. Default: me (authenticated user)."
+                            "help": "Zoom user ID or email. Default: me (authenticated user)."
                         }
                     ],
                     "outputs": [
@@ -23439,7 +23639,7 @@
                             "label": "Meeting ID",
                             "placeholder": "{{zoom_meeting_id}}",
                             "required": true,
-                            "help": "Numeric Zoom meeting ID. Use {{zoom_meeting_id}} from a Create Meeting node."
+                            "help": "Use {{zoom_meeting_id}} from a Create Meeting node."
                         },
                         {
                             "key": "topic",
@@ -23451,8 +23651,8 @@
                         {
                             "key": "start_time",
                             "type": "text",
-                            "label": "New Start Time",
-                            "placeholder": "2026-05-01T10:00:00",
+                            "label": "Start Time",
+                            "placeholder": "2026-06-10T10:00:00",
                             "required": false,
                             "help": "ISO 8601 format. Leave empty to keep existing."
                         },
@@ -23465,10 +23665,84 @@
                         },
                         {
                             "key": "timezone",
-                            "type": "text",
+                            "type": "select",
                             "label": "Timezone",
-                            "placeholder": "UTC",
-                            "required": false
+                            "required": false,
+                            "help": "Timezone for the meeting. Defaults to UTC.",
+                            "options": [
+                                {
+                                    "value": "UTC",
+                                    "label": "UTC"
+                                },
+                                {
+                                    "value": "Asia/Dhaka",
+                                    "label": "Asia/Dhaka (BD, UTC+6)"
+                                },
+                                {
+                                    "value": "Asia/Kolkata",
+                                    "label": "Asia/Kolkata (IST, UTC+5:30)"
+                                },
+                                {
+                                    "value": "Asia/Karachi",
+                                    "label": "Asia/Karachi (PKT, UTC+5)"
+                                },
+                                {
+                                    "value": "Asia/Dubai",
+                                    "label": "Asia/Dubai (GST, UTC+4)"
+                                },
+                                {
+                                    "value": "Asia/Riyadh",
+                                    "label": "Asia/Riyadh (AST, UTC+3)"
+                                },
+                                {
+                                    "value": "Europe/Istanbul",
+                                    "label": "Europe/Istanbul (TRT, UTC+3)"
+                                },
+                                {
+                                    "value": "Europe/Moscow",
+                                    "label": "Europe/Moscow (MSK, UTC+3)"
+                                },
+                                {
+                                    "value": "Europe/Berlin",
+                                    "label": "Europe/Berlin (CET, UTC+1)"
+                                },
+                                {
+                                    "value": "Europe/London",
+                                    "label": "Europe/London (GMT, UTC+0)"
+                                },
+                                {
+                                    "value": "America/New_York",
+                                    "label": "America/New_York (EST, UTC-5)"
+                                },
+                                {
+                                    "value": "America/Chicago",
+                                    "label": "America/Chicago (CST, UTC-6)"
+                                },
+                                {
+                                    "value": "America/Denver",
+                                    "label": "America/Denver (MST, UTC-7)"
+                                },
+                                {
+                                    "value": "America/Los_Angeles",
+                                    "label": "America/Los_Angeles (PST, UTC-8)"
+                                },
+                                {
+                                    "value": "America/Sao_Paulo",
+                                    "label": "America/Sao_Paulo (BRT, UTC-3)"
+                                },
+                                {
+                                    "value": "Asia/Singapore",
+                                    "label": "Asia/Singapore (SGT, UTC+8)"
+                                },
+                                {
+                                    "value": "Asia/Tokyo",
+                                    "label": "Asia/Tokyo (JST, UTC+9)"
+                                },
+                                {
+                                    "value": "Australia/Sydney",
+                                    "label": "Australia/Sydney (AEDT, UTC+11)"
+                                }
+                            ]
                         },
                         {
                             "key": "agenda",
@@ -23508,12 +23782,12 @@
                             "required": false,
                             "options": [
                                 {
-                                    "value": "true",
-                                    "label": "Yes \u2014 send cancellation email"
-                                },
-                                {
                                     "value": "false",
                                     "label": "No"
+                                },
+                                {
+                                    "value": "true",
+                                    "label": "Yes \u2014 send cancellation email"
                                 }
                             ]
                         }
