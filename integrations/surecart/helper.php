@@ -393,6 +393,7 @@ trait Helper {
 				'key' => 'mode',
 				'label' => 'Mode',
 				'type' => 'select',
+				'required' => true,
 				'options' => [
 					[
 						'label' => 'Live',
@@ -433,13 +434,13 @@ trait Helper {
 				'key' => 'limit',
 				'label' => 'Limit',
 				'type' => 'number',
-				'default' => 20
+				'required' => true
 			],
 			[
 				'key' => 'page',
 				'label' => 'Page',
 				'type' => 'number',
-				'default' => 1
+				'required' => true
 			],
 		];
 	}

@@ -9,7 +9,8 @@ import ZAPMenu from "@ZAPComponents/ZapMenu";
 import { outlineBtn, primaryBtn } from "../../../assets/scss/chakra/recipe";
 const FolderCell = ({
   row,
-  isFolder = false
+  isFolder = false,
+  menuPlacement = "bottom"
 }) => {
   const dispatch = useDispatch();
   const {
@@ -108,7 +109,7 @@ const FolderCell = ({
     );
   }
   return <>
-    {selectedFolder ? <ZAPMenu items={menuItems} trigger={<div onClick={e => e.stopPropagation()} className="flex flex-row items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white group hover:border-[#D1D5DB] transition-all cursor-pointer max-w-[160px]">
+    {selectedFolder ? <ZAPMenu items={menuItems} menuPlacement={menuPlacement} trigger={<div onClick={e => e.stopPropagation()} className="flex flex-row items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white group hover:border-[#D1D5DB] transition-all cursor-pointer max-w-[160px]">
       <LuFolderOpen size={14} className="text-[#6B7280] shrink-0" />
       <span className="text-[13px] font-semibold text-[#111827] truncate flex-[1]">
         {selectedFolder.title}
@@ -123,7 +124,7 @@ const FolderCell = ({
       >
         <LuMinus size={11} className="text-[#6B7280]" />
       </div>
-    </div>} /> : <ZAPMenu items={menuItems} trigger={<button
+    </div>} /> : <ZAPMenu items={menuItems} menuPlacement={menuPlacement} trigger={<button
       onClick={e => e.stopPropagation()}
       className="flex items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white text-[13px] font-semibold text-[#374151] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-all"
       aria-label={__("Add to folder", "zaplane")}

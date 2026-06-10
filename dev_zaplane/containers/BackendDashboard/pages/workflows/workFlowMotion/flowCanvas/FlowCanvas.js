@@ -121,12 +121,14 @@ export default function FlowCanvas({
 
   // console.log(nodes, 'all nodes',);
   // console.log(edges, 'all edges');
-  return <div ref={containerRef} height="100vh"
-    // marginRight={activeDrawer ? "600px" : "0px"}
-    transition="margin-right 0.4s ease" className="zaplane_flowcanvas flex-[1]">
+  return <div ref={containerRef}
+    transition="margin-right 0.4s ease"
+    className="zaplane_flowcanvas flex-[1]"
+    style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 32px)' }}>
 
     <FlowTopBar workFlow={workFlow} isFullscreen={isFullscreen} toggleFullscreen={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)} id={id} values={values} setFieldValue={setFieldValue} handleSubmit={handleSubmit} activeDrawer={activeDrawer} setActiveDrawer={setActiveDrawer} isFlowDirty={isFlowDirty} onNavigateBack={onNavigateBack} renderTopBar={renderTopBar} />
 
+    <div style={{ flex: 1, overflow: 'hidden' }}>
     {loading ? <ZAPLoading /> : <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} isValidConnection={isValidConnection} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect}
       // fitView
       // fitViewOnInit
@@ -164,6 +166,7 @@ export default function FlowCanvas({
       </div>
       <Controls position="top-left" className="zaplane-canvas-controls" />
     </ReactFlow>}
+    </div>
 
     <ActionDrawer open={drawerOpen} isFullscreen={isFullscreen} onClose={() => {
       setDrawerOpen(false);

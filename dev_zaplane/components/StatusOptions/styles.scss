@@ -16,24 +16,24 @@
         line-height: 18px;
     }
     &--completed, &--active, &--approved, &--pass, &--future {
-        color: #00AD6B;
+        color: #00AD6B !important;
         border: none;
-        background: rgba(36, 161, 72, 0.1);
+        background: rgba(36, 161, 72, 0.1) !important;
     }
     &--processing, &--paused, &--submitted {
-        color: #FDB022;
+        color: #FDB022  !important;
         border: none;
-        background: rgba(236, 152, 20, 0.12);
+        background: rgba(236, 152, 20, 0.12) !important;
     }
     &--draft, &--private ,&--inactive {
-        color: #0F0E16;
+        color: #0F0E16 !important;
         border: none;
-        background: rgba(114, 114, 114, .12);   
+        background: rgba(114, 114, 114, .12) !important;   
     }
     &--cancel,&--trash, &--failed {
-        color: #FF4D4D;
+        color: #FF4D4D !important;
         border: none;
-        background: rgba(244, 72, 63, 0.12);
+        background: rgba(244, 72, 63, 0.12) !important;
     }
     .zaplane-icon--angle-down {
         pointer-events: none;
@@ -73,8 +73,8 @@
                     margin-bottom: 0;
                 }
                 &:hover, &.active {
-                    color: #0F0E16;
-                    background:  #F5F5F5;
+                    color: #0F0E16 !important;
+                    background:  #F5F5F5 !important;
                 }
             }
         }

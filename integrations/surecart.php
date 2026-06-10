@@ -212,6 +212,7 @@ class Surecart extends IntegrationBase {
 					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Published',
@@ -266,7 +267,7 @@ class Surecart extends IntegrationBase {
 					'key' => 'recurring_interval_count',
 					'label' => 'Recurring Interval Count',
 					'type' => 'number',
-					'default' => 1
+					'required' => true
 				],
 				...self::field_mode(),
 				...self::field_expand(),
@@ -352,11 +353,6 @@ class Surecart extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
-	/**
-	 * =====================================================
-	 * DYNAMIC DATA QUERIES (API)
-	 * =====================================================
-	 */
 	public static function get_dynamic_queries(): array {
 		return [
 			'orders' => [ self::class, 'query_orders' ],

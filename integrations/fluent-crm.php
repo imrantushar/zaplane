@@ -112,39 +112,43 @@ class FluentCrm extends IntegrationBase {
 	}
 
 	private static function resolve_contact_payload( $contact ): array {
+		if ( is_array( $contact ) ) {
+			$contact = (object) $contact;
+		}
+
 		return [
-			'id'             => $contact->id,
-			'user_id'        => $contact->user_id,
-			'hash'           => $contact->hash,
-			'contact_owner'  => $contact->contact_owner,
-			'company_id'     => $contact->company_id,
-			'prefix'         => $contact->prefix,
-			'first_name'     => $contact->first_name,
-			'last_name'      => $contact->last_name,
-			'full_name'      => $contact->full_name,
-			'email'          => $contact->email,
-			'timezone'       => $contact->timezone,
-			'address_line_1' => $contact->address_line_1,
-			'address_line_2' => $contact->address_line_2,
-			'postal_code'    => $contact->postal_code,
-			'city'           => $contact->city,
-			'state'          => $contact->state,
-			'country'        => $contact->country,
-			'ip'             => $contact->ip,
-			'latitude'       => $contact->latitude,
-			'longitude'      => $contact->longitude,
-			'total_points'   => $contact->total_points,
-			'life_time_value' => $contact->life_time_value,
-			'phone'          => $contact->phone,
-			'status'         => $contact->status,
-			'contact_type'   => $contact->contact_type,
-			'source'         => $contact->source,
-			'avatar'         => $contact->avatar,
-			'date_of_birth'  => $contact->date_of_birth,
-			'created_at'     => $contact->created_at,
-			'last_activity'  => $contact->last_activity,
-			'updated_at'     => $contact->updated_at,
-			'photo'          => $contact->photo,
+			'id'             => $contact->id ?? null,
+			'user_id'        => $contact->user_id ?? null,
+			'hash'           => $contact->hash ?? null,
+			'contact_owner'  => $contact->contact_owner ?? null,
+			'company_id'     => $contact->company_id ?? null,
+			'prefix'         => $contact->prefix ?? null,
+			'first_name'     => $contact->first_name ?? null,
+			'last_name'      => $contact->last_name ?? null,
+			'full_name'      => $contact->full_name ?? null,
+			'email'          => $contact->email ?? null,
+			'timezone'       => $contact->timezone ?? null,
+			'address_line_1' => $contact->address_line_1 ?? null,
+			'address_line_2' => $contact->address_line_2 ?? null,
+			'postal_code'    => $contact->postal_code ?? null,
+			'city'           => $contact->city ?? null,
+			'state'          => $contact->state ?? null,
+			'country'        => $contact->country ?? null,
+			'ip'             => $contact->ip ?? null,
+			'latitude'       => $contact->latitude ?? null,
+			'longitude'      => $contact->longitude ?? null,
+			'total_points'   => $contact->total_points ?? null,
+			'life_time_value' => $contact->life_time_value ?? null,
+			'phone'          => $contact->phone ?? null,
+			'status'         => $contact->status ?? null,
+			'contact_type'   => $contact->contact_type ?? null,
+			'source'         => $contact->source ?? null,
+			'avatar'         => $contact->avatar ?? null,
+			'date_of_birth'  => $contact->date_of_birth ?? null,
+			'created_at'     => $contact->created_at ?? null,
+			'last_activity'  => $contact->last_activity ?? null,
+			'updated_at'     => $contact->updated_at ?? null,
+			'photo'          => $contact->photo ?? null,
 		];
 	}
 
@@ -185,38 +189,54 @@ class FluentCrm extends IntegrationBase {
 
 			case 'added_tag':
 			case 'removed_tag':
-				$contact = $args[0] ?? null;
-				$tag_ids = $args[1] ?? [];
+				$tag_ids = $args[0] ?? [];
+				$contact = $args[1] ?? null;
+
 				if ( ! $contact || empty( $tag_ids ) ) {
 					return false;
 				}
-				$tags = [];
-				if ( ! empty( $contact->tags ) ) {
-					foreach ( $contact->tags as $tag ) {
-						$tags[] = array_merge( self::resolve_tag_payload( $tag ), [ 'pivot' => self::resolve_pivot_payload( $tag ) ], );
+
+				$selected_tag_id = $node['config']['tag_id'] ?? null;
+
+				if ( ! empty( $selected_tag_id ) && $selected_tag_id !== 'any' ) {
+					$selected_ids = self::normalize_ids( $selected_tag_id );
+					$added_ids    = self::normalize_ids( $tag_ids );
+
+					if ( empty( array_intersect( $selected_ids, $added_ids ) ) ) {
+						return false;
 					}
 				}
+
 				return [
-					'success' => true,
-					'contact' => $tag_ids
+					'success'  => true,
+					'contact'  => self::resolve_contact_payload( $contact ),
+					'tag_ids'  => $tag_ids,
 				];
 
 			case 'added_list':
 			case 'removed_list':
-				$contact  = $args[0] ?? null;
-				$list_ids = $args[1] ?? [];
+				$list_ids = $args[0] ?? [];
+				$contact  = $args[1] ?? null;
+
 				if ( ! $contact || empty( $list_ids ) ) {
 					return false;
 				}
-				$lists = [];
-				if ( ! empty( $contact->lists ) ) {
-					foreach ( $contact->lists as $list ) {
-						$lists[] = self::resolve_list_payload( $list );
+
+				$selected_list_id = $node['config']['list_id'] ?? null;
+
+				if ( ! empty( $selected_list_id ) && $selected_list_id !== 'any' ) {
+					$selected_ids = self::normalize_ids( $selected_list_id );
+					$added_ids    = self::normalize_ids( $list_ids );
+
+					if ( empty( array_intersect( $selected_ids, $added_ids ) ) ) {
+						return false;
 					}
 				}
+
 				return [
-					'success' => true,
-					'contact' => $list_ids
+					'success'  => true,
+					'contact'  => self::resolve_contact_payload( $contact ),
+					'list_ids' => $list_ids,
 				];
 
 			case 'created_contact':
@@ -248,10 +268,10 @@ class FluentCrm extends IntegrationBase {
 					return false;
 				}
 				return [
-					'success' => true,
-					'company' => self::resolve_company_payload( $company ),
+					'success'    => true,
+					'company'    => self::resolve_company_payload( $company ),
 					'old_status' => $old_status,
-					'new_status' => $new_status
+					'new_status' => $new_status,
 				];
 		}//end switch
 		return false;
@@ -358,7 +378,7 @@ class FluentCrm extends IntegrationBase {
 		];
 	}
 
-	public static function select_tag(): array {
+	public static function select_tag( bool $required = true ): array {
 		return [
 			[
 				'key' => 'tags',
@@ -369,13 +389,13 @@ class FluentCrm extends IntegrationBase {
 					'query'       => 'tag_query',
 					'select'      => [ 'value', 'label' ],
 				],
-				'required' => true,
+				'required' => $required,
 				'multiple' => true
 			]
 		];
 	}
 
-	public static function select_list(): array {
+	public static function select_list( bool $required = true ): array {
 		return [
 			[
 				'key' => 'lists',
@@ -386,7 +406,7 @@ class FluentCrm extends IntegrationBase {
 					'query'       => 'list_query',
 					'select'      => [ 'value', 'label' ],
 				],
-				'required' => true,
+				'required' => $required,
 				'multiple' => true
 			]
 		];
@@ -403,7 +423,7 @@ class FluentCrm extends IntegrationBase {
 		];
 	}
 
-	public static function select_company(): array {
+	public static function select_company( bool $required = true ): array {
 		return [
 			[
 				'key' => 'company',
@@ -414,7 +434,7 @@ class FluentCrm extends IntegrationBase {
 					'query'       => 'company_query',
 					'select'      => [ 'value', 'label' ],
 				],
-				'required' => true,
+				'required' => $required,
 				'multiple' => true
 			]
 		];
@@ -483,12 +503,14 @@ class FluentCrm extends IntegrationBase {
 				[
 					'key' => 'first_name',
 					'label' => 'First Name',
-					'type' => 'text'
+					'type' => 'text',
+					'required' => false,
 				],
 				[
 					'key' => 'last_name',
 					'label' => 'Last Name',
-					'type' => 'text'
+					'type' => 'text',
+					'required' => false,
 				],
 				...self::contact_email(),
 				[
@@ -531,9 +553,9 @@ class FluentCrm extends IntegrationBase {
 					'label' => 'Postal Code',
 					'type' => 'number'
 				],
-				...self::select_list(),
-				...self::select_tag(),
-				...self::select_company(),
+				...self::select_list(false),
+				...self::select_tag(false),
+				...self::select_company(false),
 				...self::contact_status(),
 			],
 			'get_contact_id' => self::contact_id(),

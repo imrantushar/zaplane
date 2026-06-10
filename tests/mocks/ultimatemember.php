@@ -22,6 +22,7 @@ if ( ! function_exists( 'get_avatar_url' ) ) {
 }
 
 if ( ! class_exists( 'WP_User' ) ) {
+    #[\AllowDynamicProperties]
     class WP_User {
         public $ID = 0;
         public $role = '';
@@ -32,6 +33,8 @@ if ( ! class_exists( 'WP_User' ) ) {
         public $user_email = 'test@example.com';
         public $nickname = 'Tester';
         public $display_name = 'Test User';
+        public $first_name = 'Test';
+        public $last_name = 'User';
 
         public function __construct( $id = 0 ) {
             $this->ID = (int) $id;

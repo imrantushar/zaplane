@@ -13,9 +13,15 @@ class Essentialblocks extends IntegrationBase {
 	public static function get_slug(): string {
 		return 'essentialblocks';
 	}
+
+	public static function get_name(): string {
+		return 'Essential Blocks';
+	}
+
 	public static function get_icon(): string {
 		return 'essentialblocks.svg';
 	}
+
 	public static function get_triggers(): array {
 		return [
 			'eb_form_submit_before_email' => [
@@ -44,12 +50,5 @@ class Essentialblocks extends IntegrationBase {
 		}
 
 		return false;
-	}
-
-	public static function execute_node( array $node, array $input ): array {
-		return [
-			'port' => 'main',
-			'data' => $input
-		];
 	}
 }

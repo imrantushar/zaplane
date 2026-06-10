@@ -365,6 +365,28 @@ class GoogleMeet extends IntegrationBase {
 		];
 	}
 
+	public static function refresh_oauth_token( array $credentials ): array {
+    $response = wp_remote_post( 'https://oauth2.googleapis.com/token', [
+        'body' => [
+            'refresh_token' => $credentials['refresh_token'] ?? '',
+            'client_id'     => $credentials['client_id'] ?? '',
+            'client_secret' => $credentials['client_secret'] ?? '',
+            'grant_type'    => 'refresh_token',
+        ],
+    ] );
+
+    $body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+    if ( isset( $body['error'] ) ) {
+        throw new \Exception( $body['error_description'] ?? $body['error'] );
+    }
+
+    return [
+        'access_token' => $body['access_token'],
+        'expires_in'   => $body['expires_in'] ?? 3600,
+    ];
+}
+
 	public static function test_connection( array $credentials ): array {
 		$token = $credentials['access_token'] ?? '';
 
@@ -448,8 +470,6 @@ class GoogleMeet extends IntegrationBase {
 
 		return $result;
 	}
-
-	// ── Private action helpers ────────────────────────────────────────────────
 
 	private static function action_create_meeting( array $node, array $input, string $token ): array {
 		$config   = $node['data']['config'] ?? [];
@@ -664,13 +684,6 @@ class GoogleMeet extends IntegrationBase {
 		];
 	}
 
-	// ── Internal utility ─────────────────────────────────────────────────────
-
-	/**
-	 * Make an authenticated request to a Google API endpoint.
-	 *
-	 * @throws \Exception on WP_Error or API error response.
-	 */
 	private static function google_request( string $token, string $method, string $url, array $body = [] ): array {
 		$args = [
 			'headers' => [

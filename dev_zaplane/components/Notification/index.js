@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   X,
 } from "lucide-react";
+import Button from "@ZAPComponents/Button";
 
 // 🔹 Icon component
 const getIcon = (type) => {
@@ -46,6 +47,7 @@ const Notification = () => {
       }
     };
   }, [isShowNotification]);
+
   useEffect(() => {
     if (isShowNotification) {
       const timeout_id = setTimeout(() => {
@@ -54,6 +56,7 @@ const Notification = () => {
       return () => clearTimeout(timeout_id);
     }
   }, [isShowNotification]);
+
   const closeHandler = () => {
     dispatch(showNotification({
       message: '',
@@ -61,8 +64,8 @@ const Notification = () => {
     }));
   };
   return <>
-    {isShowNotification && createPortal(<div className={`zaplaness-notification ${notification.type && `zaplaness-notification--${notification.type}`}`} ref={notificationRef}>
-      <div className="zaplaness-notification__message">
+    {isShowNotification && createPortal(<div className={`zaplane-notification ${notification.type && `zaplane-notification--${notification.type}`}`} ref={notificationRef}>
+      <div className="zaplane-notification__message">
         <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100">
           {getIcon(notification.type)}
         </div>
@@ -70,9 +73,15 @@ const Notification = () => {
           __html: notification.message
         }} /> : notification.message}
       </div>
-      <button onClick={closeHandler} aria-label={__('Close notification', 'zaplaness')} className="bg-transparent">
-        <span className="zaplaness-icon zaplaness-icon--close has-zaplaness-blue-bg" />
-      </button>
+      <Button 
+        onClick={closeHandler} 
+        aria-label={__('Close notification', 'zaplaness')} 
+        preset='transparent' 
+        suffix="close"
+        icon={
+          <span className="zaplane-icon zaplane-icon--close-x" />
+        }
+      />
     </div>, document.body)}
   </>;
 };

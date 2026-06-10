@@ -137,6 +137,7 @@ class Filter extends IntegrationBase {
 		$result = self::evaluate_condition_group( $conditions, $input );
 
 		return [
+			'port' => 'main',
 			'pass' => $result,
 			'data' => $directInput,
 		];
@@ -215,8 +216,9 @@ class Filter extends IntegrationBase {
 
 		if ( ! is_array( $arr ) ) {
 			return [
+				'port' => 'main',
 				'pass' => false,
-				'data' => $directInput
+				'data' => $directInput,
 			];
 		}
 
@@ -241,8 +243,9 @@ class Filter extends IntegrationBase {
 
 		if ( empty( $filtered ) ) {
 			return [
+				'port' => 'main',
 				'pass' => false,
-				'data' => $directInput
+				'data' => $directInput,
 			];
 		}
 
@@ -274,8 +277,9 @@ class Filter extends IntegrationBase {
 		}//end if
 
 		return [
+			'port' => 'main',
 			'pass' => true,
-			'data' => $data
+			'data' => $data,
 		];
 	}
 
@@ -364,11 +368,16 @@ class Filter extends IntegrationBase {
 
 
 	protected static function compare( $left, $right, string $op ): bool {
+		if ( in_array( $op, [ '==', '!=' ], true ) && is_string( $left ) && is_string( $right )
+			&& is_numeric( $left ) && is_numeric( $right ) ) {
+			$left  = 0 + $left;
+			$right = 0 + $right;
+		}
 		switch ( $op ) {
 			case '==':
-				return $left == $right; // phpcs:ignore: WordPress.PHP.StrictComparisons.LooseComparison
+				return $left === $right;
 			case '!=':
-				return $left != $right; // phpcs:ignore: WordPress.PHP.StrictComparisons.LooseComparison
+				return $left !== $right;
 			case '<':
 				return $left < $right;
 			case '>':

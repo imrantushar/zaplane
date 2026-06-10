@@ -6,13 +6,18 @@
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
+    processIsolation="true"
 >
     <testsuites>
         <testsuite name="Integrations">
             <directory suffix="Test.php">./tests/Integrations</directory>
+            <exclude>./tests/Integrations/_pending</exclude>
         </testsuite>
         <testsuite name="Utils">
             <directory suffix="Test.php">./tests/Utils</directory>
+        </testsuite>
+        <testsuite name="Testing">
+            <directory suffix="Test.php">./tests/Testing</directory>
         </testsuite>
     </testsuites>
     <filter>

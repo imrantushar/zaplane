@@ -1,0 +1,18 @@
+{
+    "name": "wordpress-save_post",
+    "integration": "wordpress",
+    "required_plugins": [],
+    "setup": {
+        "factory": "",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "save_post",
+        "config": {},
+        "input": []
+    },
+    "expect": {
+        "not_false": true
+    }
+}

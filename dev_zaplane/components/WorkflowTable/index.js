@@ -139,7 +139,9 @@ const WorkflowTable = ({
   };
   const columns = [{
     name: <span>{__("Apps", "zaplane")}</span>,
-    cell: row => <ZAPIconGroup icons={row.integration_icons} maxVisible={2} />,
+    cell: row => {
+      return <ZAPIconGroup icons={row.integration_icons} maxVisible={2} />
+    },
     textAlign: "start",
     columnWidth: "120px"
   }, {
@@ -151,8 +153,12 @@ const WorkflowTable = ({
     columnWidth: "200px"
   }, {
     name: <span>{__("Folder", "zaplane")}</span>,
-    cell: row => <div className="flex justify-center">
-          <FolderCell row={row} isFolder={isFolder} />
+    cell: (row, rowIndex) => <div className="flex justify-center">
+          <FolderCell
+            row={row}
+            isFolder={isFolder}
+            menuPlacement={workflows.length <= 1 || rowIndex === workflows.length - 1 ? "top" : "bottom"}
+          />
         </div>,
     textAlign: "center"
   }, {

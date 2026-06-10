@@ -8,6 +8,7 @@ use WP_Error;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Models\Recipe;
 use Zaplane\Models\Workflow;
+use Zaplane\Models\WorkflowVersion;
 use Zaplane\Services\BlueprintService;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -195,12 +196,37 @@ class RecipeController extends WP_REST_Controller {
 
 		$blueprint = ( new BlueprintService() )->serialize( $workflow, 'active' );
 
+		// Derive integration icons from the active version graph nodes
+		// (each node carries data.icon). The workflow's cached
+		// integration_icons column can be stale/empty, so prefer the graph and
+		// fall back to the column only when no node icons are found.
+		$icons          = [];
+		$active_version = WorkflowVersion::where( 'workflow_id', $workflow->id )
+			->where( 'is_active', 1 )
+			->first();
+
+		if ( $active_version ) {
+			$graph = $active_version->getGraph();
+			foreach ( $graph['nodes'] ?? [] as $node ) {
+				$icon = $node['data']['icon'] ?? null;
+				if ( $icon ) {
+					$icons[] = $icon;
+				}
+			}
+		}
+
+		$icons = array_values( array_unique( $icons ) );
+
+		if ( empty( $icons ) ) {
+			$icons = $workflow->integration_icons ?? [];
+		}
+
 		$recipe = Recipe::create( [
 			'title'             => $title,
 			'description'       => $description,
 			'thumbnail_id'      => $thumbnailId ? (int) $thumbnailId : null,
 			'blueprint'         => wp_json_encode( $blueprint ),
-			'integration_icons' => wp_json_encode( $workflow->integration_icons ?? [] ),
+			'integration_icons' => wp_json_encode( $icons ),
 			'created_by'        => get_current_user_id(),
 		] );
 

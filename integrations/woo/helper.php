@@ -57,13 +57,18 @@ trait Helper {
 	}
 
 	protected static function get_order_from_args( array $args, int $id_index = 0, int $object_index = 1 ): ?\WC_Order {
+		$first_arg = $args[0] ?? null;
+		if ( $first_arg instanceof \WC_Order ) {
+			return $first_arg;
+		}
+
 		$order = $args[ $object_index ] ?? null;
 		if ( $order instanceof \WC_Order ) {
 			return $order;
 		}
 
 		$order_id = $args[ $id_index ] ?? 0;
-		return $order_id ? wc_get_order( $order_id ) : null;
+		return is_numeric( $order_id ) && $order_id > 0 ? wc_get_order( $order_id ) : null;
 	}
 
 	protected static function order_payload_from_args( array $args, array $extra = [], int $id_index = 0, int $object_index = 1 ): ?array {
@@ -87,12 +92,20 @@ trait Helper {
 
 	protected static function get_product_from_args( array $args, int $id_index = 0, int $object_index = 1 ): ?\WC_Product {
 		$product = $args[ $object_index ] ?? null;
+
 		if ( $product instanceof \WC_Product ) {
 			return $product;
 		}
 
 		$product_id = $args[ $id_index ] ?? 0;
-		return $product_id ? wc_get_product( $product_id ) : null;
+
+		if ( ! $product_id ) {
+			return null;
+		}
+
+		$product = wc_get_product( $product_id );
+
+		return $product instanceof \WC_Product ? $product : null;
 	}
 
 	protected static function product_payload_from_args( array $args, array $extra = [], int $id_index = 0, int $object_index = 1 ): ?array {
@@ -437,31 +450,31 @@ trait Helper {
 		return [
 			[
 				'label' => 'Pending',
-				'value' => 'wc_order_pending'
+				'value' => 'pending'
 			],
 			[
 				'label' => 'Processing',
-				'value' => 'wc_order_processing'
+				'value' => 'processing'
 			],
 			[
 				'label' => 'On-hold',
-				'value' => 'wc_order_on-hold'
+				'value' => 'on-hold'
 			],
 			[
 				'label' => 'Completed',
-				'value' => 'wc_order_completed'
+				'value' => 'completed'
 			],
 			[
 				'label' => 'Cancelled',
-				'value' => 'wc_order_cancelled'
+				'value' => 'cancelled'
 			],
 			[
 				'label' => 'Refunded',
-				'value' => 'wc_order_refunded'
+				'value' => 'refunded'
 			],
 			[
 				'label' => 'Failed',
-				'value' => 'wc_order_failed'
+				'value' => 'failed'
 			],
 		];
 	}
@@ -574,13 +587,13 @@ trait Helper {
 				'key' => 'limit',
 				'label' => 'Limit',
 				'type' => 'number',
-				'default' => 20
+				'required' => true
 			],
 			[
 				'key' => 'page',
 				'label' => 'Page',
 				'type' => 'number',
-				'default' => 1
+				'required' => true
 			],
 		];
 	}
