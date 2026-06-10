@@ -5,14 +5,19 @@
         "woocommerce/woocommerce.php"
     ],
     "setup": {
-        "factory": "",
+        "factory": "create_woocommerce_product_added_to_cart",
         "args": {}
     },
     "node": {
         "kind": "trigger",
         "event": "product_added_to_cart",
         "config": {},
-        "input": []
+        "input": [
+            "{{arg0}}",
+            "{{arg1}}",
+            "{{arg2}}",
+            "{{arg3}}"
+        ]
     },
     "expect": {
         "not_false": true

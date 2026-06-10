@@ -5,14 +5,17 @@
         "woocommerce/woocommerce.php"
     ],
     "setup": {
-        "factory": "",
+        "factory": "create_woocommerce_new_order",
         "args": {}
     },
     "node": {
         "kind": "trigger",
         "event": "new_order",
         "config": {},
-        "input": []
+        "input": [
+            "{{arg0}}",
+            "{{arg1}}"
+        ]
     },
     "expect": {
         "not_false": true

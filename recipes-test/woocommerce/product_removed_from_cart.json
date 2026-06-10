@@ -5,14 +5,17 @@
         "woocommerce/woocommerce.php"
     ],
     "setup": {
-        "factory": "",
+        "factory": "create_woocommerce_product_removed_from_cart",
         "args": {}
     },
     "node": {
         "kind": "trigger",
         "event": "product_removed_from_cart",
         "config": {},
-        "input": []
+        "input": [
+            "{{arg0}}",
+            "{{arg1}}"
+        ]
     },
     "expect": {
         "not_false": true

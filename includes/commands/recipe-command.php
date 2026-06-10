@@ -21,6 +21,7 @@ class RecipeCommand extends Command {
 
 	protected string $signature = 'recipe';
 	protected string $description = 'Run, generate, and list live integration test recipes';
+	protected string $last_subprocess_diagnostic = '';
 
 	public function handle( array $args, array $assoc_args ): void {
 		$sub = $args[0] ?? 'run';
@@ -227,7 +228,7 @@ class RecipeCommand extends Command {
 			$out = [];
 			foreach ( $files as $i => $file ) {
 				$out[ $i ] = $this->run_subprocess( [ $file ], $extra )[0]
-					?? ( new RecipeResult( basename( $file, '.json' ), '' ) )->abort( 'Subprocess produced no result.' );
+					?? ( new RecipeResult( basename( $file, '.json' ), '' ) )->abort( $this->no_result_message( 'Subprocess produced no result.' ) );
 			}
 			return $out;
 		}
@@ -237,23 +238,107 @@ class RecipeCommand extends Command {
 		$out     = [];
 		foreach ( $files as $i => $file ) {
 			$out[ $i ] = $results[ $i ]
-				?? ( new RecipeResult( basename( $file, '.json' ), '' ) )->abort( 'Subprocess produced no result (batch may have crashed).' );
+				?? ( new RecipeResult( basename( $file, '.json' ), '' ) )->abort( $this->no_result_message( 'Subprocess produced no result (batch may have crashed).' ) );
 		}
 		return $out;
 	}
 
 	/** Launch one child process for the given files; return parsed results in order. @return array<int,?RecipeResult> */
 	protected function run_subprocess( array $files, string $extra ): array {
+		$this->last_subprocess_diagnostic = '';
 		$paths = implode( ' ', array_map( 'escapeshellarg', $files ) );
-		$run   = \WP_CLI::runcommand(
-			"zaplane recipe exec-batch {$paths}{$extra}",
+		$run   = $this->launch_subprocess( "zaplane recipe exec-batch {$paths}{$extra}" );
+		$stdout  = (string) ( $run->stdout ?? '' );
+		$results = RecipeResult::all_from_wire( $stdout );
+
+		if ( empty( $results ) ) {
+			$this->last_subprocess_diagnostic = $this->format_subprocess_diagnostic( $run, $stdout );
+		}
+
+		return $results;
+	}
+
+	protected function launch_subprocess( string $command ) {
+		if ( defined( 'PHP_OS_FAMILY' ) && 'Windows' === PHP_OS_FAMILY ) {
+			return $this->launch_subprocess_windows( $command );
+		}
+
+		return \WP_CLI::runcommand(
+			$command,
 			[
 				'launch'     => true,
 				'return'     => 'all',
 				'exit_error' => false,
 			]
 		);
-		return RecipeResult::all_from_wire( (string) ( $run->stdout ?? '' ) );
+	}
+
+	protected function launch_subprocess_windows( string $command ): \stdClass {
+		$descriptors = [
+			0 => [ 'pipe', 'r' ],
+			1 => [ 'pipe', 'w' ],
+			2 => [ 'pipe', 'w' ],
+		];
+
+		$process = proc_open( 'wp ' . $command, $descriptors, $pipes, ABSPATH );
+		if ( ! is_resource( $process ) ) {
+			return (object) [
+				'stdout'      => '',
+				'stderr'      => 'Could not launch child WP-CLI process.',
+				'return_code' => 1,
+			];
+		}
+
+		fclose( $pipes[0] );
+		$stdout = stream_get_contents( $pipes[1] );
+		$stderr = stream_get_contents( $pipes[2] );
+		fclose( $pipes[1] );
+		fclose( $pipes[2] );
+
+		return (object) [
+			'stdout'      => is_string( $stdout ) ? $stdout : '',
+			'stderr'      => is_string( $stderr ) ? $stderr : '',
+			'return_code' => proc_close( $process ),
+		];
+	}
+
+	protected function no_result_message( string $message ): string {
+		if ( '' === $this->last_subprocess_diagnostic ) {
+			return $message;
+		}
+
+		return $message . ' ' . $this->last_subprocess_diagnostic;
+	}
+
+	protected function format_subprocess_diagnostic( $run, string $stdout ): string {
+		$parts = [];
+
+		if ( isset( $run->return_code ) && 0 !== (int) $run->return_code ) {
+			$parts[] = 'exit=' . (int) $run->return_code;
+		}
+
+		$stderr = trim( (string) ( $run->stderr ?? '' ) );
+		if ( '' !== $stderr ) {
+			$parts[] = 'stderr: ' . $this->compact_subprocess_text( $stderr );
+		}
+
+		$stdout = trim( $stdout );
+		if ( '' !== $stdout ) {
+			$parts[] = 'stdout: ' . $this->compact_subprocess_text( $stdout );
+		}
+
+		return empty( $parts ) ? '' : '(' . implode( '; ', $parts ) . ')';
+	}
+
+	protected function compact_subprocess_text( string $text ): string {
+		$text = preg_replace( '/\s+/', ' ', $text );
+		$text = is_string( $text ) ? trim( $text ) : '';
+
+		if ( strlen( $text ) > 220 ) {
+			return substr( $text, 0, 217 ) . '...';
+		}
+
+		return $text;
 	}
 
 	/**

@@ -5,14 +5,17 @@
         "woocommerce/woocommerce.php"
     ],
     "setup": {
-        "factory": "",
+        "factory": "create_woocommerce_update_customer",
         "args": {}
     },
     "node": {
         "kind": "trigger",
         "event": "update_customer",
         "config": {},
-        "input": []
+        "input": [
+            "{{arg0}}",
+            "{{arg1}}"
+        ]
     },
     "expect": {
         "not_false": true
