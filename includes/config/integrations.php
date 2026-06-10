@@ -289,6 +289,10 @@ $registry = [
 		'file'  => 'avadaform.php',
 		'class' => \Zaplane\Integrations\Avadaform::class,
 	],
+	'brevo'        => [
+		'file'  => 'brevo.php',
+		'class' => \Zaplane\Integrations\Brevo::class
+	],
 ];
 
 $priority = [
