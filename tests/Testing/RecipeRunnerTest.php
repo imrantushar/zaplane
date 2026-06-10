@@ -28,6 +28,10 @@ class SeedingStubIntegration {
 	public static function seed_trigger_args( string $event ): ?array {
 		return 'thing_created' === $event ? [ 42, 'obj' ] : null;
 	}
+
+	public static function get_sample_action_config( string $event ): ?array {
+		return 'create_thing' === $event ? [ 'name' => 'X' ] : null;
+	}
 }
 
 class RecipeRunnerTest extends TestCase {
@@ -139,6 +143,20 @@ class RecipeRunnerTest extends TestCase {
 
 		// Unseedable event → unchanged.
 		$this->assertSame( [], RecipeRunner::resolve_trigger_input( [], $cls, 'other', [] ) );
+	}
+
+	/** @test */
+	public function resolve_action_config_falls_back_to_integration_sample(): void {
+		$cls = SeedingStubIntegration::class;
+
+		// Explicit config wins.
+		$this->assertSame( [ 'a' => 1 ], RecipeRunner::resolve_action_config( [], $cls, 'create_thing', [ 'a' => 1 ] ) );
+
+		// Empty config + no factory/action → integration sample config.
+		$this->assertSame( [ 'name' => 'X' ], RecipeRunner::resolve_action_config( [], $cls, 'create_thing', [] ) );
+
+		// Non-testable action → unchanged.
+		$this->assertSame( [], RecipeRunner::resolve_action_config( [], $cls, 'other', [] ) );
 	}
 
 	/** @test */

@@ -59,6 +59,26 @@ abstract class IntegrationBase {
 		return null;
 	}
 
+	/**
+	 * Action events the recipe tester can run with sample config and assert a
+	 * successful result. Capability declaration only — no side effects.
+	 *
+	 * @return string[]
+	 */
+	public static function get_testable_actions(): array {
+		return [];
+	}
+
+	/**
+	 * A valid config to execute an action with for testing (creating any
+	 * prerequisite data first, e.g. an order id for update_order). Called by the
+	 * recipe tester when an action recipe has no config of its own. Null when the
+	 * action isn't testable. Only override for events in get_testable_actions().
+	 */
+	public static function get_sample_action_config( string $event ): ?array {
+		return null;
+	}
+
 	public static function get_icon(): string {
 		return '';
 	}

@@ -57,6 +57,27 @@ class Woocommerce extends IntegrationBase {
 		];
 	}
 
+	/** Action events the recipe tester can run with sample config. */
+	public static function get_testable_actions(): array {
+		return [ 'create_order', 'create_customer', 'create_product', 'create_coupon' ];
+	}
+
+	/** A valid config to execute a WooCommerce action with for testing. */
+	public static function get_sample_action_config( string $event ): ?array {
+		$rand = substr( md5( uniqid( 'r', true ) ), 0, 8 );
+		switch ( $event ) {
+			case 'create_order':
+				return [ 'status' => 'processing' ];
+			case 'create_customer':
+				return [ 'email' => "customer_{$rand}@example.test", 'first_name' => 'Recipe' ];
+			case 'create_product':
+				return [ 'name' => "Recipe Product {$rand}", 'regular_price' => '10' ];
+			case 'create_coupon':
+				return [ 'code' => "recipe_{$rand}", 'amount' => '10' ];
+		}
+		return null;
+	}
+
 	/** Create real WooCommerce data and return the hook arguments for a trigger. */
 	public static function seed_trigger_args( string $event ): ?array {
 		if ( 'new_order' === $event || 0 === strpos( $event, 'order_status_' ) ) {

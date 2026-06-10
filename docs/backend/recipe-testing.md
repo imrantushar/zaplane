@@ -179,6 +179,39 @@ woocommerce` then `wp zaplane recipe run woocommerce --e2e` passes those trigger
 out of the box. `make:integration` scaffolds both methods. Precedence at run time:
 recipe `input` → `setup.factory`/`action` → the integration's `seed_trigger_args`.
 
+## Testing actions (`get_testable_actions` / `get_sample_action_config`)
+
+Actions are the mirror of triggers: instead of reacting to a hook, an action
+*does* something (`execute_node` → `{ port, data }`). To test one you need valid
+**config** — and the integration provides it, exactly like trigger seeding:
+
+```php
+public static function get_testable_actions(): array {
+    return [ 'create_order', 'create_customer', 'create_product', 'create_coupon' ];
+}
+
+public static function get_sample_action_config( string $event ): ?array {
+    switch ( $event ) {
+        case 'create_order':    return [ 'status' => 'processing' ];
+        case 'create_customer': return [ 'email' => uniqid() . '@example.test' ];
+        // …create any prerequisite data here too (e.g. an order id for update_order)
+    }
+    return null;
+}
+```
+
+A bare action recipe then runs and asserts success (`port: main`):
+
+```json
+{ "integration": "woocommerce", "node": { "kind": "action", "event": "create_order", "config": {} },
+  "expect": { "not_false": true, "port": "main" } }
+```
+
+`recipe generate` (and `--all`) emit these for every event in
+`get_testable_actions()`. Actions run in **direct** mode only — they don't need
+the engine, so `--e2e` skips them. Precedence: recipe `config` →
+`setup.factory`/`action` → the integration's `get_sample_action_config`.
+
 ## Seeding data without writing a factory (`setup.action`)
 
 Most CRM/commerce integrations already have an **action** that creates the entity

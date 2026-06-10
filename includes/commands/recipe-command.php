@@ -338,8 +338,9 @@ class RecipeCommand extends Command {
 				continue;
 			}
 			$class    = get_class( $instance );
-			$seedable = array_values( array_intersect( array_keys( (array) $class::get_triggers() ), (array) $class::get_seedable_triggers() ) );
-			if ( empty( $seedable ) ) {
+			$triggers = array_values( array_intersect( array_keys( (array) $class::get_triggers() ), (array) $class::get_seedable_triggers() ) );
+			$actions  = array_values( array_intersect( array_keys( (array) $class::get_actions() ), (array) $class::get_testable_actions() ) );
+			if ( empty( $triggers ) && empty( $actions ) ) {
 				continue;
 			}
 
@@ -348,15 +349,17 @@ class RecipeCommand extends Command {
 				wp_mkdir_p( $dir );
 			}
 			$made = 0;
-			foreach ( $seedable as $event ) {
-				if ( 'created' === $this->write_recipe_file( $slug, $class, 'trigger', $event, $dir ) ) {
-					++$created;
-					++$made;
-				} else {
-					++$skipped;
+			foreach ( [ 'trigger' => $triggers, 'action' => $actions ] as $k => $events ) {
+				foreach ( $events as $event ) {
+					if ( 'created' === $this->write_recipe_file( $slug, $class, $k, $event, $dir ) ) {
+						++$created;
+						++$made;
+					} else {
+						++$skipped;
+					}
 				}
 			}
-			$rows[] = [ $slug, (string) count( $seedable ), (string) $made ];
+			$rows[] = [ $slug, count( $triggers ) . 't / ' . count( $actions ) . 'a', (string) $made ];
 		}
 
 		if ( empty( $rows ) ) {
@@ -364,7 +367,7 @@ class RecipeCommand extends Command {
 			return;
 		}
 
-		$this->table( [ 'Integration', 'Seedable triggers', 'Created' ], $rows );
+		$this->table( [ 'Integration', 'Triggers / Actions', 'Created' ], $rows );
 		$this->line();
 		$this->success( sprintf( '%d recipe(s) created, %d already existed.', $created, $skipped ) );
 		$this->line( 'Run the suite: wp zaplane recipe run   (add --e2e for the full engine)' );
@@ -402,14 +405,16 @@ class RecipeCommand extends Command {
 				continue;
 			}
 
-			// No --event: by default generate only the triggers the integration can
-			// self-seed (they run green out of the box). Pass --all-events to also
-			// scaffold the non-seedable ones (as stubs). Actions are always all.
+			// No --event: by default generate only the events the integration can
+			// run green out of the box — seedable triggers / testable actions. Pass
+			// --all-events to also scaffold the rest (triggers as stubs).
 			$keys = array_keys( $events );
-			if ( 'trigger' === $k && ! isset( $assoc_args['all-events'] ) ) {
-				$seedable = (array) $class::get_seedable_triggers();
-				if ( ! empty( $seedable ) ) {
-					$keys = array_values( array_intersect( $keys, $seedable ) );
+			if ( ! isset( $assoc_args['all-events'] ) ) {
+				$runnable = 'trigger' === $k
+					? (array) $class::get_seedable_triggers()
+					: (array) $class::get_testable_actions();
+				if ( ! empty( $runnable ) ) {
+					$keys = array_values( array_intersect( $keys, $runnable ) );
 				}
 			}
 			foreach ( $keys as $event ) {
@@ -450,8 +455,17 @@ class RecipeCommand extends Command {
 	/** Write one scaffold recipe file. Returns 'created' or 'exists'. */
 	protected function write_recipe_file( string $integration, string $class, string $kind, string $event, string $dir ): string {
 		$path = $dir . "{$event}.json";
+		// Some integrations name a trigger and an action the same (e.g. create_product).
+		// Disambiguate the action's filename so both can coexist.
 		if ( file_exists( $path ) ) {
-			return 'exists';
+			$existing = json_decode( (string) file_get_contents( $path ), true );
+			if ( is_array( $existing ) && ( $existing['node']['kind'] ?? '' ) === $kind ) {
+				return 'exists';
+			}
+			$path = $dir . "{$event}-{$kind}.json";
+			if ( file_exists( $path ) ) {
+				return 'exists';
+			}
 		}
 
 		$expect = [ 'not_false' => true ];
@@ -460,6 +474,9 @@ class RecipeCommand extends Command {
 			if ( ! empty( $sample ) ) {
 				$expect['has_keys'] = array_slice( array_keys( $sample ), 0, 3 );
 			}
+		} else {
+			// Actions return { port, data }; a successful run uses the 'main' port.
+			$expect['port'] = 'main';
 		}
 
 		// If the integration can self-seed this trigger (get_seedable_triggers), the

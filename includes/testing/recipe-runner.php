@@ -171,6 +171,8 @@ class RecipeRunner {
 			$input      = self::interpolate( (array) ( $node['input'] ?? [] ), $vars );
 			if ( 'trigger' === $kind ) {
 				$input = self::resolve_trigger_input( $recipe, $class, $event, array_values( $input ) );
+			} else {
+				$config = self::resolve_action_config( $recipe, $class, $event, $config );
 			}
 			$node_array = [
 				'type'   => $kind,
@@ -317,6 +319,25 @@ class RecipeRunner {
 
 		$sample = $class::seed_trigger_args( $event );
 		return is_array( $sample ) ? array_values( $sample ) : $input;
+	}
+
+	/**
+	 * Final config for an action. Uses the recipe's own config if any; otherwise —
+	 * when the recipe declares no factory/action — falls back to the integration's
+	 * own sample config (get_sample_action_config), so a bare action recipe runs.
+	 */
+	public static function resolve_action_config( array $recipe, string $class, string $event, array $config ): array {
+		if ( ! empty( $config ) ) {
+			return $config;
+		}
+
+		$setup = $recipe['setup'] ?? [];
+		if ( ! empty( $setup['factory'] ) || ! empty( $setup['action'] ) ) {
+			return $config;
+		}
+
+		$sample = $class::get_sample_action_config( $event );
+		return is_array( $sample ) ? $sample : $config;
 	}
 
 	/**
