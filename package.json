@@ -1,7 +1,7 @@
 {
   "name": "zaplane",
-  "version": "0.0.3",
-  "description": "A Simple WordPress Quiz Plugin",
+  "version": "0.0.4",
+  "description": "A Simple WordPress Automation Plugin",
   "main": "index.js",
   "scripts": {
     "build": "wp-scripts build",
