@@ -164,10 +164,21 @@ class BlueprintService {
 			'layout'  => sanitize_text_field( $data['layout'] ?? 'LR' ),
 		] );
 
+		$icons = [];
+
 		foreach ( $data['versions'] as $versionData ) {
 			$graph = $versionData['graph_json'] ?? [ 'nodes' => [], 'edges' => [] ];
 			$graph = $this->strip_connection_ids( $graph );
 			$hash  = hash( 'sha256', wp_json_encode( $graph ) );
+
+			// Collect integration icons from the graph nodes (each node carries
+			// data.icon) so the imported workflow's integration_icons is populated.
+			foreach ( $graph['nodes'] ?? [] as $node ) {
+				$icon = $node['data']['icon'] ?? null;
+				if ( $icon ) {
+					$icons[] = $icon;
+				}
+			}
 
 			$version = WorkflowVersion::create( [
 				'workflow_id'    => $workflow->id,
@@ -181,6 +192,9 @@ class BlueprintService {
 				$this->import_runs( $versionData['runs'], $workflow->id, $version->id );
 			}
 		}
+
+		$workflow->integration_icons = array_values( array_unique( $icons ) );
+		$workflow->save();
 
 		// Ensure at least one version is active.
 		$hasActive = WorkflowVersion::where( 'workflow_id', $workflow->id )->where( 'is_active', 1 )->first();
