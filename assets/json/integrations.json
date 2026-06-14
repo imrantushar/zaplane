@@ -1,6 +1,6 @@
 {
-    "version": "0.0.4",
-    "generated_at": "2026-06-14 13:50:03",
+    "version": "1.0.1",
+    "generated_at": "2026-06-14 14:15:05",
     "apps": {
         "academy": {
             "slug": "academy",
