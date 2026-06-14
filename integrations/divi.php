@@ -36,7 +36,6 @@ class Divi extends IntegrationBase {
 		switch ( $node['event'] ) {
 
 			case 'contact_form_submit':
-
 				$form_fields = $args[0] ?? [];
 				$form_meta   = $args[2] ?? [];
 
@@ -56,7 +55,7 @@ class Divi extends IntegrationBase {
 				}
 
 				return $data;
-		}
+		}//end switch
 
 		return false;
 	}
