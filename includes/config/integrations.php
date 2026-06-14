@@ -293,6 +293,10 @@ $registry = [
 		'file'  => 'brevo.php',
 		'class' => \Zaplane\Integrations\Brevo::class
 	],
+	'trello'        => [
+		'file'  => 'trello.php',
+		'class' => \Zaplane\Integrations\Trello::class
+	],
 ];
 
 $priority = [
