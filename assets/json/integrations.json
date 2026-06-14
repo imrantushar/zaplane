@@ -1,6 +1,6 @@
 {
-    "version": "0.0.3",
-    "generated_at": "2026-06-10 14:06:12",
+    "version": "0.0.4",
+    "generated_at": "2026-06-14 10:00:01",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -3640,9 +3640,9 @@
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "divi_contact_form_submitted": {
-                    "key": "divi_contact_form_submitted",
-                    "label": "Form Submitted",
+                "contact_form_submit": {
+                    "key": "contact_form_submit",
+                    "label": "Contact Form Submitted",
                     "hook": "et_pb_contact_form_submit",
                     "schema": [],
                     "outputs": [
@@ -4809,7 +4809,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10003/index.php?rest_route=/zaplane/v1/incoming/fillout",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -8926,7 +8926,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10003/index.php?rest_route=/zaplane/v1/incoming/jotform",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Jotform \u2192 Your Form \u2192 Settings \u2192 Integrations \u2192 Webhooks \u2192 Paste & Save."
                         }
@@ -14161,7 +14161,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://localhost:10003/index.php?rest_route=/zaplane/v1/incoming/typeform",
+                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
