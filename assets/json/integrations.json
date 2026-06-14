@@ -1,6 +1,6 @@
 {
     "version": "0.0.4",
-    "generated_at": "2026-06-14 10:00:01",
+    "generated_at": "2026-06-14 13:50:03",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -4809,7 +4809,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
+                            "value": "zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -8926,7 +8926,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
+                            "value": "zaplane/v1/incoming/jotform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Jotform \u2192 Your Form \u2192 Settings \u2192 Integrations \u2192 Webhooks \u2192 Paste & Save."
                         }
@@ -14161,7 +14161,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
+                            "value": "zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
