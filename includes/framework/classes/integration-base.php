@@ -284,4 +284,8 @@ abstract class IntegrationBase {
 		$status = (int) wp_remote_retrieve_response_code( $response );
 		return [ $body, $status ];
 	}
+
+	public static function get_webhook_url(): string {
+		return 'zaplane/v1/incoming/' . static::get_slug();
+	}
 }
