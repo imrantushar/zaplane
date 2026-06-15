@@ -8,7 +8,7 @@ import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
-import { reactDebounce } from "@ZAPUtils/helper";
+import { reactDebounce, rest_url } from "@ZAPUtils/helper";
 import CopyInput from "./CopyInput";
 
 const ActionFieldRenderer = ({
@@ -52,13 +52,18 @@ const ActionFieldRenderer = ({
   switch (field.type) {
     case "copy": {
       let displayValue = field.value || value || "";
-      // Dynamically force the URL to match the current live site's origin
-      if (typeof displayValue === "string" && displayValue.startsWith("http")) {
-        try {
-          const urlObj = new URL(displayValue);
-          displayValue = displayValue.replace(urlObj.origin, window.location.origin);
-        } catch (e) {
-          // Ignore invalid URLs
+      if (typeof displayValue === "string" && displayValue) {
+        if (displayValue.startsWith("http")) {
+          // Legacy: an absolute URL was stored — force it to the live origin.
+          try {
+            const urlObj = new URL(displayValue);
+            displayValue = displayValue.replace(urlObj.origin, window.location.origin);
+          } catch (e) {
+            // Ignore invalid URLs
+          }
+        } else {
+          // Relative REST path -> prefix the current site's REST domain.
+          displayValue = `${rest_url}${displayValue.replace(/^\/+/, "")}`;
         }
       }
 
