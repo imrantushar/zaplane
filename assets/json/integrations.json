@@ -1,6 +1,6 @@
 {
     "version": "1.0.1",
-    "generated_at": "2026-06-14 14:15:05",
+    "generated_at": "2026-06-18 12:17:22",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -4019,6 +4019,150 @@
                     "key": "withdraw_status_updated",
                     "label": "Withdraw Status Updated",
                     "hook": "dokan_withdraw_status_updated",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "vendor_add": {
+                    "key": "vendor_add",
+                    "label": "Vendor Added (before create)",
+                    "hook": "dokan_before_create_vendor",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "vendor_update": {
+                    "key": "vendor_update",
+                    "label": "Vendor Updated (before update)",
+                    "hook": "dokan_before_update_vendor",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "vendor_delete": {
+                    "key": "vendor_delete",
+                    "label": "Vendor Deleted",
+                    "hook": "delete_user",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "refund_request": {
+                    "key": "refund_request",
+                    "label": "Refund Requested",
+                    "hook": "dokan_refund_request_created",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "refund_approved": {
+                    "key": "refund_approved",
+                    "label": "Refund Approved",
+                    "hook": "dokan_pro_refund_approved",
+                    "schema": [
+                        {
+                            "key": "vendor_id",
+                            "label": "Vendor",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "dokan",
+                                "query": "vendors",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "refund_cancelled": {
+                    "key": "refund_cancelled",
+                    "label": "Refund Cancelled",
+                    "hook": "dokan_pro_refund_cancelled",
                     "schema": [
                         {
                             "key": "vendor_id",
