@@ -5,6 +5,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( trait_exists( __NAMESPACE__ . '\AbandonedCartActionsTrait' ) ) {
+	return;
+}
+
 if ( ! class_exists( 'GemCrm\Addons\AbandonedCart\Database\Models\AbandonedCart' ) ) {
 	// Trait methods become no-ops when GemCRM addon is unavailable.
 	trait AbandonedCartActionsTrait {
