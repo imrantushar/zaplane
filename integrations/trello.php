@@ -1,29 +1,43 @@
 <?php
 namespace Zaplane\Integrations;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Classes\ConnectionManager;
 use Zaplane\Traits\ActionResponseTrait;
+use Zaplane\Integrations\Trello\QueryTrait;
+use Zaplane\Integrations\Trello\Helper;
+
 class Trello extends IntegrationBase {
 	use ActionResponseTrait;
+	use QueryTrait;
+	use Helper;
+
 	private const API_BASE_URL = 'https://api.trello.com/1';
+
 	public static function get_slug(): string {
 		return 'trello';
 	}
+
 	public static function get_name(): string {
 		return 'Trello';
 	}
+
 	public static function get_icon(): string {
 		return 'trello-icon.svg';
 	}
+
 	public static function requires_connection(): bool {
 		return true;
 	}
+
 	public static function get_auth_type(): string {
 		return 'token_key';
 	}
+
 	public static function get_auth_fields( ?string $auth_type = null ): array {
 		return [
 			'api_key' => [
@@ -85,166 +99,7 @@ class Trello extends IntegrationBase {
 			],
 		];
 	}
-	// -------------------------------------------------------------------------
-	// Triggers
-	// -------------------------------------------------------------------------
-	public static function get_triggers(): array {
-		return [
-			'new_card'    => [
-				'label' => 'New Card',
-				'hook'  => 'zaplane_trello_webhook_new_card',
-			],
-			'update_card' => [
-				'label' => 'Update Card',
-				'hook'  => 'zaplane_trello_webhook_update_card',
-			],
-			'card_moved'  => [
-				'label' => 'Card Move to List',
-				'hook'  => 'zaplane_trello_webhook_card_moved',
-			],
-			'new_label'   => [
-				'label' => 'New Label',
-				'hook'  => 'zaplane_trello_webhook_new_label',
-			],
-		];
-	}
-	public static function get_trigger_config_schema( string $trigger ): array {
-		switch ( $trigger ) {
-			case 'new_card':
-			case 'update_card':
-				return array_merge(
-					self::field_board(),
-					[
-						[
-							'key'      => 'list_id',
-							'label'    => 'List (optional)',
-							'type'     => 'select',
-							'required' => false,
-							'dynamic'  => [
-								'integration' => 'trello',
-								'query'       => 'list_query',
-								'select'      => [ 'value', 'label' ],
-								'depends_on'  => [ 'board_id' ],
-							],
-						],
-					]
-				);
-			case 'card_moved':
-				return array_merge(
-					self::field_board(),
-					[
-						[
-							'key'      => 'list_id',
-							'label'    => 'Destination List',
-							'type'     => 'select',
-							'required' => true,
-							'dynamic'  => [
-								'integration' => 'trello',
-								'query'       => 'list_query',
-								'select'      => [ 'value', 'label' ],
-								'depends_on'  => [ 'board_id' ],
-							],
-						],
-					]
-				);
-			case 'new_label':
-				return self::field_board();
-		}
-		return [];
-	}
-	public static function resolve_trigger( array $node, array $args ) {
-		$payload     = $args[0] ?? [];
-		$action      = $payload['action'] ?? [];
-		$action_type = $action['type'] ?? '';
-		$data        = $action['data'] ?? [];
-		$card        = $data['card'] ?? [];
-		$board       = $data['board'] ?? [];
-		$list        = $data['list'] ?? $data['listAfter'] ?? $data['listBefore'] ?? [];
-		$label       = $data['label'] ?? [];
-		$selected_board = $node['data']['config']['board_id'] ?? '';
-		$selected_list  = $node['data']['config']['list_id'] ?? '';
-		if ( ! empty( $selected_board ) && $selected_board !== ( $board['id'] ?? '' ) ) {
-			return false;
-		}
-		switch ( $node['event'] ) {
-			case 'new_card':
-				if ( 'createCard' !== $action_type ) {
-					return false;
-				}
-				if ( ! empty( $selected_list ) && $selected_list !== ( $list['id'] ?? '' ) ) {
-					return false;
-				}
-				return [
-					'trello_card_id'    => $card['id'] ?? '',
-					'trello_card_name'  => $card['name'] ?? '',
-					'trello_card_url'   => 'https://trello.com/c/' . ( $card['shortLink'] ?? '' ),
-					'trello_list_id'    => $list['id'] ?? '',
-					'trello_list_name'  => $list['name'] ?? '',
-					'trello_board_id'   => $board['id'] ?? '',
-					'trello_board_name' => $board['name'] ?? '',
-					'trello_member_id'  => $action['idMemberCreator'] ?? '',
-					'trello_date'       => $action['date'] ?? '',
-				];
-			case 'update_card':
-				if ( 'updateCard' !== $action_type ) {
-					return false;
-				}
-				if ( ! empty( $data['listAfter'] ) ) {
-					return false;
-				}
-				if ( ! empty( $selected_list ) && $selected_list !== ( $list['id'] ?? '' ) ) {
-					return false;
-				}
-				return [
-					'trello_card_id'    => $card['id'] ?? '',
-					'trello_card_name'  => $card['name'] ?? '',
-					'trello_card_url'   => 'https://trello.com/c/' . ( $card['shortLink'] ?? '' ),
-					'trello_list_id'    => $list['id'] ?? '',
-					'trello_list_name'  => $list['name'] ?? '',
-					'trello_board_id'   => $board['id'] ?? '',
-					'trello_board_name' => $board['name'] ?? '',
-					'trello_member_id'  => $action['idMemberCreator'] ?? '',
-					'trello_date'       => $action['date'] ?? '',
-					'trello_old_desc'   => $data['old']['desc'] ?? '',
-					'trello_old_name'   => $data['old']['name'] ?? '',
-				];
-			case 'card_moved':
-				if ( 'updateCard' !== $action_type || empty( $data['listAfter'] ) ) {
-					return false;
-				}
-				if ( ! empty( $selected_list ) && $selected_list !== ( $data['listAfter']['id'] ?? '' ) ) {
-					return false;
-				}
-				return [
-					'trello_card_id'        => $card['id'] ?? '',
-					'trello_card_name'      => $card['name'] ?? '',
-					'trello_card_url'       => 'https://trello.com/c/' . ( $card['shortLink'] ?? '' ),
-					'trello_list_before_id' => $data['listBefore']['id'] ?? '',
-					'trello_list_before'    => $data['listBefore']['name'] ?? '',
-					'trello_list_after_id'  => $data['listAfter']['id'] ?? '',
-					'trello_list_after'     => $data['listAfter']['name'] ?? '',
-					'trello_board_id'       => $board['id'] ?? '',
-					'trello_board_name'     => $board['name'] ?? '',
-					'trello_date'           => $action['date'] ?? '',
-				];
-			case 'new_label':
-				if ( 'createLabel' !== $action_type ) {
-					return false;
-				}
-				return [
-					'trello_label_id'    => $label['id'] ?? '',
-					'trello_label_name'  => $label['name'] ?? '',
-					'trello_label_color' => $label['color'] ?? '',
-					'trello_board_id'    => $board['id'] ?? '',
-					'trello_board_name'  => $board['name'] ?? '',
-					'trello_date'        => $action['date'] ?? '',
-				];
-		}
-		return false;
-	}
-	// -------------------------------------------------------------------------
-	// Actions
-	// -------------------------------------------------------------------------
+
 	public static function get_actions(): array {
 		return [
 			'create_card'           => [ 'label' => 'Create Card' ],
@@ -318,10 +173,10 @@ class Trello extends IntegrationBase {
 					]
 				);
 			case 'get_card':
-				return self::field_card_id();
+				return self::field_card_select();
 			case 'update_card':
 				return array_merge(
-					self::field_card_id(),
+					self::field_card_select(),
 					[
 						[
 							'key'         => 'card_name',
@@ -348,14 +203,20 @@ class Trello extends IntegrationBase {
 							'label'    => 'Archive Card?',
 							'required' => false,
 							'options'  => [
-								[ 'label' => 'No', 'value' => 'false' ],
-								[ 'label' => 'Yes', 'value' => 'true' ],
+								[
+									'label' => 'No',
+									'value' => 'false'
+								],
+								[
+									'label' => 'Yes',
+									'value' => 'true'
+								],
 							],
 						],
 					]
 				);
 			case 'delete_card':
-				return self::field_card_id();
+				return self::field_card_select();
 			case 'create_board':
 				return [
 					[
@@ -370,28 +231,30 @@ class Trello extends IntegrationBase {
 						'label'    => 'Description',
 						'required' => false,
 					],
-					[
-						'key'      => 'org_id',
-						'type'     => 'text',
-						'label'    => 'Organization/Workspace ID',
-						'required' => false,
-					],
+					// org_id: dynamic dropdown from /members/me/organizations
+					self::field_org_select_inline(),
 					[
 						'key'      => 'default_lists',
 						'type'     => 'select',
 						'label'    => 'Create Default Lists?',
 						'required' => false,
 						'options'  => [
-							[ 'label' => 'Yes', 'value' => 'true' ],
-							[ 'label' => 'No', 'value' => 'false' ],
+							[
+								'label' => 'Yes',
+								'value' => 'true'
+							],
+							[
+								'label' => 'No',
+								'value' => 'false'
+							],
 						],
 					],
 				];
 			case 'get_board':
-				return self::field_board_raw();
+				return self::field_board();
 			case 'update_board':
 				return array_merge(
-					self::field_board_raw(),
+					self::field_board(),
 					[
 						[
 							'key'      => 'board_name',
@@ -411,14 +274,20 @@ class Trello extends IntegrationBase {
 							'label'    => 'Close/Archive Board?',
 							'required' => false,
 							'options'  => [
-								[ 'label' => 'No', 'value' => 'false' ],
-								[ 'label' => 'Yes', 'value' => 'true' ],
+								[
+									'label' => 'No',
+									'value' => 'false'
+								],
+								[
+									'label' => 'Yes',
+									'value' => 'true'
+								],
 							],
 						],
 					]
 				);
 			case 'delete_board':
-				return self::field_board_raw();
+				return self::field_board();
 			case 'create_label':
 				return array_merge(
 					self::field_board(),
@@ -433,23 +302,11 @@ class Trello extends IntegrationBase {
 					self::field_label_color()
 				);
 			case 'get_label':
-				return [
-					[
-						'key'      => 'label_id',
-						'type'     => 'text',
-						'label'    => 'Label ID',
-						'required' => true,
-					],
-				];
+				return self::field_label_select();
 			case 'update_label':
 				return array_merge(
+					self::field_label_select(),
 					[
-						[
-							'key'      => 'label_id',
-							'type'     => 'text',
-							'label'    => 'Label ID',
-							'required' => true,
-						],
 						[
 							'key'      => 'label_name',
 							'type'     => 'text',
@@ -460,33 +317,18 @@ class Trello extends IntegrationBase {
 					self::field_label_color()
 				);
 			case 'delete_label':
-				return [
-					[
-						'key'      => 'label_id',
-						'type'     => 'text',
-						'label'    => 'Label ID',
-						'required' => true,
-					],
-				];
+				return self::field_label_select();
 			case 'list_labels':
 				return self::field_board();
 			case 'add_label_to_card':
 				return array_merge(
-					self::field_card_id(),
-					self::field_board(),
+					self::field_card_select(),
 					self::field_label()
 				);
 			case 'remove_label_card':
 				return array_merge(
-					self::field_card_id(),
-					[
-						[
-							'key'      => 'label_id',
-							'type'     => 'text',
-							'label'    => 'Label ID',
-							'required' => true,
-						],
-					]
+					self::field_card_select(),
+					self::field_label()
 				);
 			case 'add_board_member':
 				return array_merge(
@@ -498,15 +340,26 @@ class Trello extends IntegrationBase {
 							'label'    => 'Member ID or Username',
 							'required' => true,
 						],
+					],
+					[
 						[
 							'key'      => 'member_type',
 							'type'     => 'select',
 							'label'    => 'Member Type',
 							'required' => false,
 							'options'  => [
-								[ 'label' => 'Normal', 'value' => 'normal' ],
-								[ 'label' => 'Admin', 'value' => 'admin' ],
-								[ 'label' => 'Observer', 'value' => 'observer' ],
+								[
+									'label' => 'Normal',
+									'value' => 'normal'
+								],
+								[
+									'label' => 'Admin',
+									'value' => 'admin'
+								],
+								[
+									'label' => 'Observer',
+									'value' => 'observer'
+								],
 							],
 						],
 					]
@@ -535,9 +388,18 @@ class Trello extends IntegrationBase {
 							'label'    => 'Member Type',
 							'required' => false,
 							'options'  => [
-								[ 'label' => 'Normal', 'value' => 'normal' ],
-								[ 'label' => 'Admin', 'value' => 'admin' ],
-								[ 'label' => 'Observer', 'value' => 'observer' ],
+								[
+									'label' => 'Normal',
+									'value' => 'normal'
+								],
+								[
+									'label' => 'Admin',
+									'value' => 'admin'
+								],
+								[
+									'label' => 'Observer',
+									'value' => 'observer'
+								],
 							],
 						],
 					]
@@ -545,18 +407,11 @@ class Trello extends IntegrationBase {
 			case 'remove_board_member':
 				return array_merge(
 					self::field_board(),
-					[
-						[
-							'key'      => 'member_id',
-							'type'     => 'text',
-							'label'    => 'Member ID',
-							'required' => true,
-						],
-					]
+					self::field_member_select()
 				);
 			case 'create_attachment':
 				return array_merge(
-					self::field_card_id(),
+					self::field_card_select(),
 					[
 						[
 							'key'      => 'attachment_url',
@@ -574,33 +429,19 @@ class Trello extends IntegrationBase {
 				);
 			case 'get_attachment':
 				return array_merge(
-					self::field_card_id(),
-					[
-						[
-							'key'      => 'attachment_id',
-							'type'     => 'text',
-							'label'    => 'Attachment ID',
-							'required' => true,
-						],
-					]
+					self::field_card_select(),
+					self::field_attachment_select()
 				);
 			case 'get_attachments':
-				return self::field_card_id();
+				return self::field_card_select();
 			case 'delete_attachment':
 				return array_merge(
-					self::field_card_id(),
-					[
-						[
-							'key'      => 'attachment_id',
-							'type'     => 'text',
-							'label'    => 'Attachment ID',
-							'required' => true,
-						],
-					]
+					self::field_card_select(),
+					self::field_attachment_select()
 				);
 			case 'create_checklist':
 				return array_merge(
-					self::field_card_id(),
+					self::field_card_select(),
 					[
 						[
 							'key'      => 'checklist_name',
@@ -611,99 +452,74 @@ class Trello extends IntegrationBase {
 					]
 				);
 			case 'create_checklist_item':
-				return [
-					[
-						'key'      => 'checklist_id',
-						'type'     => 'text',
-						'label'    => 'Checklist ID',
-						'required' => true,
-					],
-					[
-						'key'      => 'item_name',
-						'type'     => 'text',
-						'label'    => 'Item Name',
-						'required' => true,
-					],
-					[
-						'key'      => 'pos',
-						'type'     => 'text',
-						'label'    => 'Position (top, bottom, or number)',
-						'required' => false,
-					],
-					[
-						'key'      => 'checked',
-						'type'     => 'select',
-						'label'    => 'Checked?',
-						'required' => false,
-						'options'  => [
-							[ 'label' => 'No', 'value' => 'false' ],
-							[ 'label' => 'Yes', 'value' => 'true' ],
-						],
-					],
-				];
-			case 'delete_checklist':
-				return [
-					[
-						'key'      => 'checklist_id',
-						'type'     => 'text',
-						'label'    => 'Checklist ID',
-						'required' => true,
-					],
-				];
-			case 'delete_checklist_item':
-				return [
-					[
-						'key'      => 'checklist_id',
-						'type'     => 'text',
-						'label'    => 'Checklist ID',
-						'required' => true,
-					],
-					[
-						'key'      => 'item_id',
-						'type'     => 'text',
-						'label'    => 'Checklist Item ID',
-						'required' => true,
-					],
-				];
-			case 'get_checklist':
-				return [
-					[
-						'key'      => 'checklist_id',
-						'type'     => 'text',
-						'label'    => 'Checklist ID',
-						'required' => true,
-					],
-				];
-			case 'get_checklist_items':
-				return [
-					[
-						'key'      => 'checklist_id',
-						'type'     => 'text',
-						'label'    => 'Checklist ID',
-						'required' => true,
-					],
-				];
-			case 'get_completed_items':
-				return [
-					[
-						'key'      => 'checklist_id',
-						'type'     => 'text',
-						'label'    => 'Checklist ID',
-						'required' => true,
-					],
-				];
-			case 'get_many_checklists':
-				return self::field_card_id();
-			case 'update_checklist_item':
 				return array_merge(
-					self::field_card_id(),
+					self::field_card_select(),
+					self::field_checklist_select(),
 					[
 						[
-							'key'      => 'item_id',
+							'key'      => 'item_name',
 							'type'     => 'text',
-							'label'    => 'Checklist Item ID',
+							'label'    => 'Item Name',
 							'required' => true,
 						],
+						[
+							'key'      => 'pos',
+							'type'     => 'text',
+							'label'    => 'Position (top, bottom, or number)',
+							'required' => false,
+						],
+						[
+							'key'      => 'checked',
+							'type'     => 'select',
+							'label'    => 'Checked?',
+							'required' => false,
+							'options'  => [
+								[
+									'label' => 'No',
+									'value' => 'false'
+								],
+								[
+									'label' => 'Yes',
+									'value' => 'true'
+								],
+							],
+						],
+					]
+				);
+			case 'delete_checklist':
+				return array_merge(
+					self::field_card_select(),
+					self::field_checklist_select()
+				);
+			case 'delete_checklist_item':
+				return array_merge(
+					self::field_card_select(),
+					self::field_checklist_select(),
+					self::field_checklist_item_select()
+				);
+			case 'get_checklist':
+				return array_merge(
+					self::field_card_select(),
+					self::field_checklist_select()
+				);
+			case 'get_checklist_items':
+				return array_merge(
+					self::field_card_select(),
+					self::field_checklist_select()
+				);
+			case 'get_completed_items':
+				return array_merge(
+					self::field_card_select(),
+					self::field_checklist_select()
+				);
+			case 'get_many_checklists':
+				return self::field_card_select();
+			case 'update_checklist_item':
+				return array_merge(
+					self::field_card_select(),
+					self::field_checklist_select(),
+					self::field_checklist_item_select(),
+					[
 						[
 							'key'      => 'item_name',
 							'type'     => 'text',
@@ -716,13 +532,19 @@ class Trello extends IntegrationBase {
 							'label'    => 'State',
 							'required' => false,
 							'options'  => [
-								[ 'label' => 'Incomplete', 'value' => 'incomplete' ],
-								[ 'label' => 'Complete', 'value' => 'complete' ],
+								[
+									'label' => 'Incomplete',
+									'value' => 'incomplete'
+								],
+								[
+									'label' => 'Complete',
+									'value' => 'complete'
+								],
 							],
 						],
 					]
 				);
-		}
+		}//end switch
 		return [];
 	}
 	public static function execute_node( array $node, array $input ): array {
@@ -838,9 +660,7 @@ class Trello extends IntegrationBase {
 				if ( empty( $name ) ) {
 					return self::error( __( 'Trello: board_name is required.', 'zaplane' ), $input );
 				}
-				$payload = [
-					'name' => $name,
-				];
+				$payload = [ 'name' => $name ];
 				if ( ! empty( $config['board_desc'] ) ) {
 					$payload['desc'] = $config['board_desc'];
 				}
@@ -1264,10 +1084,10 @@ class Trello extends IntegrationBase {
 						$payload
 					);
 					return self::success( array_merge( $input, [
-						'trello_item_id'     => $body['id'] ?? '',
-						'trello_item_name'   => $body['name'] ?? '',
-						'trello_item_state'  => $body['state'] ?? 'incomplete',
-						'trello_checklist_id'=> $body['idChecklist'] ?? $checklist_id,
+						'trello_item_id'      => $body['id'] ?? '',
+						'trello_item_name'    => $body['name'] ?? '',
+						'trello_item_state'   => $body['state'] ?? 'incomplete',
+						'trello_checklist_id' => $body['idChecklist'] ?? $checklist_id,
 					] ) );
 				} catch ( \Exception $error ) {
 					return self::error( $error->getMessage(), $input );
@@ -1373,7 +1193,7 @@ class Trello extends IntegrationBase {
 					] ) );
 				} catch ( \Exception $error ) {
 					return self::error( $error->getMessage(), $input );
-				}
+				}//end try
 			case 'get_many_checklists':
 				$card_id = $config['card_id'] ?? '';
 				if ( empty( $card_id ) ) {
@@ -1421,361 +1241,31 @@ class Trello extends IntegrationBase {
 				} catch ( \Exception $error ) {
 					return self::error( $error->getMessage(), $input );
 				}
-		}
+		}//end switch
 		return [
 			'port' => 'main',
 			'data' => $input,
 		];
 	}
-	// -------------------------------------------------------------------------
-	// Field helpers (reusable blocks)
-	// -------------------------------------------------------------------------
-	private static function field_board(): array {
-		return [
-			[
-				'key'      => 'board_id',
-				'type'     => 'select',
-				'label'    => 'Board',
-				'required' => true,
-				'dynamic'  => [
-					'integration' => 'trello',
-					'query'       => 'board_query',
-					'select'      => [ 'value', 'label' ],
-				],
-			],
-		];
-	}
-	private static function field_board_raw(): array {
-		return [
-			[
-				'key'         => 'board_id',
-				'type'        => 'text',
-				'label'       => 'Board ID',
-				'placeholder' => '{{trello_board_id}}',
-				'required'    => true,
-			],
-		];
-	}
-	private static function field_list(): array {
-		return [
-			[
-				'key'      => 'list_id',
-				'type'     => 'select',
-				'label'    => 'List',
-				'required' => true,
-				'dynamic'  => [
-					'integration' => 'trello',
-					'query'       => 'list_query',
-					'select'      => [ 'value', 'label' ],
-					'depends_on'  => [ 'board_id' ],
-				],
-			],
-		];
-	}
-	private static function field_card_id(): array {
-		return [
-			[
-				'key'         => 'card_id',
-				'type'        => 'text',
-				'label'       => 'Card ID',
-				'placeholder' => '{{trello_card_id}}',
-				'required'    => true,
-			],
-		];
-	}
-	private static function field_card_name(): array {
-		return [
-			[
-				'key'         => 'card_name',
-				'type'        => 'text',
-				'label'       => 'Card Name',
-				'placeholder' => 'New Task',
-				'required'    => true,
-			],
-		];
-	}
-	private static function field_label(): array {
-		return [
-			[
-				'key'      => 'label_id',
-				'type'     => 'select',
-				'label'    => 'Label',
-				'required' => true,
-				'dynamic'  => [
-					'integration' => 'trello',
-					'query'       => 'label_query',
-					'select'      => [ 'value', 'label' ],
-					'depends_on'  => [ 'board_id' ],
-				],
-			],
-		];
-	}
-	private static function field_label_color(): array {
-		return [
-			[
-				'key'      => 'label_color',
-				'type'     => 'select',
-				'label'    => 'Label Color',
-				'required' => false,
-				'options'  => [
-					[ 'label' => 'None', 'value' => '' ],
-					[ 'label' => 'Yellow', 'value' => 'yellow' ],
-					[ 'label' => 'Purple', 'value' => 'purple' ],
-					[ 'label' => 'Blue', 'value' => 'blue' ],
-					[ 'label' => 'Green', 'value' => 'green' ],
-					[ 'label' => 'Orange', 'value' => 'orange' ],
-					[ 'label' => 'Red', 'value' => 'red' ],
-					[ 'label' => 'Black', 'value' => 'black' ],
-					[ 'label' => 'Sky', 'value' => 'sky' ],
-					[ 'label' => 'Pink', 'value' => 'pink' ],
-					[ 'label' => 'Lime', 'value' => 'lime' ],
-				],
-			],
-		];
-	}
-	// -------------------------------------------------------------------------
-	// Dynamic queries
-	// -------------------------------------------------------------------------
+
 	public static function get_dynamic_queries(): array {
 		return [
-			'board_query' => [ self::class, 'query_board' ],
-			'list_query'  => [ self::class, 'query_list' ],
-			'label_query' => [ self::class, 'query_label' ],
+			'board_query'          => [ self::class, 'query_board' ],
+			'list_query'           => [ self::class, 'query_list' ],
+			'label_query'          => [ self::class, 'query_label' ],
+			'card_query'           => [ self::class, 'query_card' ],
+			'checklist_query'      => [ self::class, 'query_checklist' ],
+			'checklist_item_query' => [ self::class, 'query_checklist_item' ],
+			'attachment_query'     => [ self::class, 'query_attachment' ],
+			'member_query'         => [ self::class, 'query_member' ],
+			'org_query'            => [ self::class, 'query_org' ],
 		];
 	}
+
 	public static function get_dynamic_fields(): array {
 		return self::get_dynamic_queries();
 	}
-	public static function query_board( array $query ): array {
-		$options = [];
-		$creds   = self::extract_credentials( $query );
-		$api_key = $creds['api_key'] ?? '';
-		$token   = $creds['token'] ?? '';
-		if ( empty( $api_key ) || empty( $token ) ) {
-			return $options;
-		}
-		$response = wp_remote_get(
-			self::API_BASE_URL . '/members/me/boards?' . http_build_query(
-				[
-					'key'    => $api_key,
-					'token'  => $token,
-					'filter' => 'open',
-					'fields' => 'id,name',
-				]
-			),
-			[ 'timeout' => 15 ]
-		);
-		if ( is_wp_error( $response ) ) {
-			return $options;
-		}
-		$code   = (int) wp_remote_retrieve_response_code( $response );
-		$boards = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
-		if ( 200 !== $code ) {
-			return $options;
-		}
-		foreach ( $boards as $board ) {
-			if ( empty( $board['id'] ) ) {
-				continue;
-			}
-			$options[] = [
-				'label' => $board['name'] ?? 'Untitled Board',
-				'value' => $board['id'],
-			];
-		}
-		return $options;
-	}
-	public static function query_list( array $query ): array {
-		$options  = [];
-		$creds    = self::extract_credentials( $query );
-		$api_key  = $creds['api_key'] ?? '';
-		$token    = $creds['token'] ?? '';
-		$board_id = $query['where']['board_id'] ?? $query['board_id'] ?? '';
-		if ( empty( $api_key ) || empty( $token ) || empty( $board_id ) ) {
-			return $options;
-		}
-		$response = wp_remote_get(
-			self::API_BASE_URL . '/boards/' . rawurlencode( $board_id ) . '/lists?' . http_build_query(
-				[
-					'key'    => $api_key,
-					'token'  => $token,
-					'filter' => 'open',
-					'fields' => 'id,name',
-				]
-			),
-			[ 'timeout' => 15 ]
-		);
-		if ( is_wp_error( $response ) ) {
-			return $options;
-		}
-		$code  = (int) wp_remote_retrieve_response_code( $response );
-		$lists = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
-		if ( 200 !== $code ) {
-			return $options;
-		}
-		foreach ( $lists as $list ) {
-			if ( empty( $list['id'] ) ) {
-				continue;
-			}
 
-			$options[] = [
-				'label' => $list['name'] ?? 'Untitled List',
-				'value' => $list['id'],
-			];
-		}
-
-		return $options;
-	}
-	public static function query_label( array $query ): array {
-		$options  = [];
-		$creds    = self::extract_credentials( $query );
-		$api_key  = $creds['api_key'] ?? '';
-		$token    = $creds['token'] ?? '';
-		$board_id = $query['where']['board_id'] ?? $query['board_id'] ?? '';
-		if ( empty( $api_key ) || empty( $token ) || empty( $board_id ) ) {
-			return $options;
-		}
-		$response = wp_remote_get(
-			self::API_BASE_URL . '/boards/' . rawurlencode( $board_id ) . '/labels?' . http_build_query(
-				[
-					'key'    => $api_key,
-					'token'  => $token,
-					'fields' => 'id,name,color',
-				]
-			),
-			[ 'timeout' => 15 ]
-		);
-		if ( is_wp_error( $response ) ) {
-			return $options;
-		}
-		$code   = (int) wp_remote_retrieve_response_code( $response );
-		$labels = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
-		if ( 200 !== $code ) {
-			return $options;
-		}
-		foreach ( $labels as $label ) {
-			if ( empty( $label['id'] ) ) {
-				continue;
-			}
-			$label_name = ! empty( $label['name'] ) ? $label['name'] : ucfirst( $label['color'] ?? 'Label' );
-			$options[] = [
-				'label' => $label_name,
-				'value' => $label['id'],
-			];
-		}
-		return $options;
-	}
-	// -------------------------------------------------------------------------
-	// Webhook
-	// -------------------------------------------------------------------------
-	public static function supports_webhook(): bool {
-		return true;
-	}
-	public static function get_webhook_url(): string {
-		$url = rest_url( 'zaplane/v1/incoming/' . self::get_slug() );
-		return set_url_scheme( $url, 'https' );
-	}
-	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
-		if ( 'HEAD' === $request->get_method() ) {
-			return null;
-		}
-		$payload = $request->get_json_params();
-		if ( empty( $payload ) ) {
-			$body = $request->get_body();
-			if ( ! empty( $body ) ) {
-				$payload = json_decode( $body, true );
-			}
-		}
-		if ( empty( $payload ) || empty( $payload['action']['type'] ) ) {
-			return null;
-		}
-		$action_type = $payload['action']['type'];
-		if ( 'createCard' === $action_type ) {
-			return [
-				'event'   => 'new_card',
-				'payload' => $payload,
-			];
-		}
-		if ( 'updateCard' === $action_type ) {
-			if ( ! empty( $payload['action']['data']['listAfter'] ) ) {
-				return [
-					'event'   => 'card_moved',
-					'payload' => $payload,
-				];
-			} else {
-				return [
-					'event'   => 'update_card',
-					'payload' => $payload,
-				];
-			}
-		}
-		if ( 'createLabel' === $action_type ) {
-			return [
-				'event'   => 'new_label',
-				'payload' => $payload,
-			];
-		}
-		return null;
-	}
-	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
-		return true;
-	}
-	public static function register_webhook_for_board( string $board_id ): array {
-		$connection_id = self::get_trello_connection_id();
-		$creds         = self::get_decrypted_credentials( $connection_id );
-		$api_key       = $creds['api_key'] ?? '';
-		$token         = $creds['token'] ?? '';
-		if ( empty( $api_key ) || empty( $token ) ) {
-			return [ 'error' => 'No active Trello connection found.' ];
-		}
-		if ( self::is_local_environment() ) {
-			return [
-				'board_id' => $board_id,
-				'status'   => 'skipped_local',
-			];
-		}
-		try {
-			self::trello_request(
-				$api_key,
-				$token,
-				'POST',
-				'/webhooks',
-				[
-					'callbackURL' => self::get_webhook_url(),
-					'idModel'     => $board_id,
-					'description' => 'Zaplane webhook for board ' . $board_id,
-					'active'      => true,
-				]
-			);
-			return [
-				'board_id' => $board_id,
-				'status'   => 'webhook_registered',
-			];
-		} catch ( \Exception $error ) {
-			return [
-				'board_id' => $board_id,
-				'status'   => 'failed: ' . $error->getMessage(),
-			];
-		}
-	}
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
-	private static function is_local_environment(): bool {
-		$host = wp_parse_url( home_url(), PHP_URL_HOST );
-		return (
-			'localhost' === $host
-			|| '127.0.0.1' === $host
-			|| self::string_ends_with( (string) $host, '.local' )
-			|| self::string_ends_with( (string) $host, '.test' )
-			|| self::string_ends_with( (string) $host, '.localhost' )
-		);
-	}
-	private static function string_ends_with( string $haystack, string $needle ): bool {
-		if ( '' === $needle ) {
-			return true;
-		}
-		return substr( $haystack, -strlen( $needle ) ) === $needle;
-	}
 	private static function get_connection_credentials( array $node ): array {
 		$connection_id = (int) (
 			$node['data']['connection_id']
@@ -1811,7 +1301,7 @@ class Trello extends IntegrationBase {
 			}
 		} catch ( \Throwable $error ) {
 			unset( $error );
-		}
+		}//end try
 		return [];
 	}
 	private static function get_trello_connection_id(): int {
@@ -1831,19 +1321,16 @@ class Trello extends IntegrationBase {
 			'key'   => $api_key,
 			'token' => $token,
 		];
-
 		$is_get = 'GET' === strtoupper( $method );
 		if ( $is_get && ! empty( $payload ) ) {
 			$auth_params = array_merge( $auth_params, $payload );
 		}
-
 		$url  = self::API_BASE_URL . $endpoint . '?' . http_build_query( $auth_params );
 		$args = [
 			'method'  => strtoupper( $method ),
 			'timeout' => 20,
 			'headers' => [ 'Content-Type' => 'application/json' ],
 		];
-
 		if ( ! $is_get && ! empty( $payload ) ) {
 			$args['body'] = wp_json_encode( $payload );
 		}
@@ -1863,7 +1350,7 @@ class Trello extends IntegrationBase {
 			$decoded = json_decode( $body_raw, true );
 			$message = is_array( $decoded )
 				? ( $decoded['message'] ?? $decoded['error'] ?? ( 'HTTP ' . $code ) )
-				: ( $body_raw ?: 'HTTP ' . $code );
+				: ( ! empty( $body_raw ) ? $body_raw : 'HTTP ' . $code );
 			throw new \Exception( 'Trello API error: ' . esc_html( $message ) );
 		}
 		return json_decode( $body_raw, true ) ?? [];
