@@ -1,6 +1,6 @@
 {
     "version": "1.0.1",
-    "generated_at": "2026-06-14 14:15:05",
+    "generated_at": "2026-06-21 16:47:59",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -4377,8 +4377,8 @@
                                     "value": "edd_customer_active"
                                 },
                                 {
-                                    "label": "Inactive",
-                                    "value": "edd_customer_inactive"
+                                    "label": "Disabled",
+                                    "value": "edd_customer_disabled"
                                 }
                             ]
                         }
@@ -4514,7 +4514,7 @@
                                 },
                                 {
                                     "label": "On Hold",
-                                    "value": "edd_payment_on_hold"
+                                    "value": "edd_payment_onhold"
                                 }
                             ]
                         }
