@@ -1,0 +1,21 @@
+{
+    "name": "woocommerce-create_order",
+    "integration": "woocommerce",
+    "required_plugins": [
+        "woocommerce/woocommerce.php"
+    ],
+    "setup": {
+        "factory": "",
+        "args": {}
+    },
+    "node": {
+        "kind": "action",
+        "event": "create_order",
+        "config": {},
+        "input": []
+    },
+    "expect": {
+        "not_false": true,
+        "port": "main"
+    }
+}

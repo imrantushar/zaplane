@@ -61,6 +61,19 @@ class AcademyTest extends IntegrationTestCase {
 		return Academy::class;
 	}
 
+	protected function setupMockData(): void {
+		parent::setupMockData();
+
+		global $zaplane_wp_posts;
+		$zaplane_wp_posts = $zaplane_wp_posts ?? [];
+		$zaplane_wp_posts[1] = (object) [
+			'ID'         => 1,
+			'post_title' => 'Sample Course',
+			'post_type'  => 'academy_courses',
+			'post_status' => 'publish',
+		];
+	}
+
 	// -------------------------------------------------------------------------
 	// Helpers
 	// -------------------------------------------------------------------------

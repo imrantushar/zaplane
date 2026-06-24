@@ -11,7 +11,7 @@ class Eventscalendar extends IntegrationBase {
     public static function get_slug(): string { return 'eventscalendar'; }
 
 	public static function get_name(): string {
-		return 'Events Calendar';
+		return 'The Events Calendar';
 	}
 
 	public static function get_icon(): string {
@@ -20,16 +20,28 @@ class Eventscalendar extends IntegrationBase {
 
     public static function get_triggers(): array {
         return [
-            'attendEvent' => ['label' => 'User attended an event',  'hook' => 'event_tickets_checkin'],
-             'attendeeRegistered' => ['label' => 'Attendee registered for an event',  'hook' => 'event_tickets_rsvp_attendee_created'],
-             'newAttendee' => ['label' => 'New attendee registered',  'hook' => 'event_tickets_rsvp_tickets_generated_for_product'],
-            'attendeeRegisteredWc' => ['label' => 'Attendee registered via WooCommerce',  'hook' => 'tribe_tickets_attendee_repository_create_attendee_for_ticket_after_create'],
+            'attendEvent'          => [
+                'label' => 'User attended an event',
+                'hook'  => 'event_tickets_checkin'
+            ],
+             'attendeeRegistered'  => [
+                'label' => 'Attendee registered for an event',
+                'hook' => 'event_tickets_rsvp_attendee_created'
+            ],
+             'newAttendee'         => [
+                'label' => 'New attendee registered',
+                'hook' => 'event_tickets_rsvp_tickets_generated_for_product'
+            ],
+            'attendeeRegisteredWc' => [
+                'label' => 'Attendee registered via WooCommerce',
+                'hook' => 'tribe_tickets_attendee_repository_create_attendee_for_ticket_after_create'
+            ],
         ];
     }
 
     public static function resolve_trigger(array $node, array $args) {
         switch ($node['event']) {
-            
+
             case 'attendEvent':
                 $attendee_id = $args[0] ?? 0;
                 if ( ! $attendee_id ) {
@@ -83,9 +95,5 @@ class Eventscalendar extends IntegrationBase {
         }
 
         return false;
-    }
-
-    public static function execute_node(array $node, array $input): array {
-        return ['port' => 'main', 'data' => $input];
     }
 }

@@ -191,7 +191,7 @@ class FluentCart extends IntegrationBase {
 						'query'       => 'orders',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 				[
 					'key'      => 'customer_id',
@@ -202,7 +202,7 @@ class FluentCart extends IntegrationBase {
 						'query'       => 'customers',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 			];
 		}
@@ -218,7 +218,7 @@ class FluentCart extends IntegrationBase {
 						'query'       => 'subscriptions',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 				[
 					'key'      => 'order_id',
@@ -229,7 +229,7 @@ class FluentCart extends IntegrationBase {
 						'query'       => 'orders',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 				[
 					'key'      => 'customer_id',
@@ -240,7 +240,7 @@ class FluentCart extends IntegrationBase {
 						'query'       => 'customers',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 			];
 		}
@@ -256,7 +256,7 @@ class FluentCart extends IntegrationBase {
 						'query'       => 'products',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 			];
 		}
@@ -272,7 +272,7 @@ class FluentCart extends IntegrationBase {
 						'query'       => 'products',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 			];
 		}
@@ -341,13 +341,13 @@ class FluentCart extends IntegrationBase {
 					'key'     => 'limit',
 					'label'   => 'Limit',
 					'type'    => 'number',
-					'default' => 20,
+					'required' => true,
 				],
 				[
 					'key'     => 'page',
 					'label'   => 'Page',
 					'type'    => 'number',
-					'default' => 1,
+					'required' => true,
 				],
 				[
 					'key'   => 'search',
@@ -365,29 +365,29 @@ class FluentCart extends IntegrationBase {
 					],
 					'required' => false,
 				],
-					[
-						'key'      => 'order_status',
-						'label'    => 'Order Status',
-						'type'     => 'select',
-						'dynamic'  => [
-							'integration' => 'fluentcart',
-							'query'       => 'order_statuses',
-							'select'      => [ 'name', 'label' ],
-						],
-						'required' => false,
+				[
+					'key'      => 'order_status',
+					'label'    => 'Order Status',
+					'type'     => 'select',
+					'dynamic'  => [
+						'integration' => 'fluentcart',
+						'query'       => 'order_statuses',
+						'select'      => [ 'name', 'label' ],
 					],
-					[
-						'key'      => 'payment_status',
-						'label'    => 'Payment Status',
-						'type'     => 'select',
-						'dynamic'  => [
-							'integration' => 'fluentcart',
-							'query'       => 'payment_statuses',
-							'select'      => [ 'name', 'label' ],
-						],
-						'required' => false,
-					],
+					'required' => true,
 				],
+				[
+					'key'      => 'payment_status',
+					'label'    => 'Payment Status',
+					'type'     => 'select',
+					'dynamic'  => [
+						'integration' => 'fluentcart',
+						'query'       => 'payment_statuses',
+						'select'      => [ 'name', 'label' ],
+					],
+					'required' => true,
+				],
+			],
 			'get_customer_single' => [
 				[
 					'key'      => 'customer_id',
@@ -406,31 +406,31 @@ class FluentCart extends IntegrationBase {
 					'key'     => 'limit',
 					'label'   => 'Limit',
 					'type'    => 'number',
-					'default' => 20,
+					'required' => true,
 				],
 				[
 					'key'     => 'page',
 					'label'   => 'Page',
 					'type'    => 'number',
-					'default' => 1,
+					'required' => true,
 				],
 				[
 					'key'   => 'search',
 					'label' => 'Search',
 					'type'  => 'text',
 				],
-					[
-						'key'      => 'customer_status',
-						'label'    => 'Customer Status',
-						'type'     => 'select',
-						'dynamic'  => [
-							'integration' => 'fluentcart',
-							'query'       => 'customer_statuses',
-							'select'      => [ 'name', 'label' ],
-						],
-						'required' => false,
+				[
+					'key'      => 'customer_status',
+					'label'    => 'Customer Status',
+					'type'     => 'select',
+					'dynamic'  => [
+						'integration' => 'fluentcart',
+						'query'       => 'customer_statuses',
+						'select'      => [ 'name', 'label' ],
 					],
+					'required' => true,
 				],
+			],
 			'get_subscription_single' => [
 				[
 					'key'      => 'subscription_id',
@@ -444,47 +444,47 @@ class FluentCart extends IntegrationBase {
 					'required' => true,
 				],
 			],
-				'get_subscriptions_all' => [
-					[
+			'get_subscriptions_all' => [
+				[
 					'key'     => 'limit',
 					'label'   => 'Limit',
 					'type'    => 'number',
-					'default' => 20,
+					'required' => true,
 				],
 				[
 					'key'     => 'page',
 					'label'   => 'Page',
 					'type'    => 'number',
-					'default' => 1,
+					'required' => true,
 				],
-					[
-						'key'   => 'search',
-						'label' => 'Search',
-						'type'  => 'text',
-					],
-					[
-						'key'      => 'customer_id',
-						'label'    => 'Customer',
-						'type'     => 'select',
+				[
+					'key'   => 'search',
+					'label' => 'Search',
+					'type'  => 'text',
+				],
+				[
+					'key'      => 'customer_id',
+					'label'    => 'Customer',
+					'type'     => 'select',
 					'dynamic'  => [
 						'integration' => 'fluentcart',
 						'query'       => 'customers',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
-					[
-						'key'      => 'subscription_status',
-						'label'    => 'Subscription Status',
-						'type'     => 'select',
-						'dynamic'  => [
-							'integration' => 'fluentcart',
-							'query'       => 'subscription_statuses',
-							'select'      => [ 'name', 'label' ],
-						],
-						'required' => false,
+				[
+					'key'      => 'subscription_status',
+					'label'    => 'Subscription Status',
+					'type'     => 'select',
+					'dynamic'  => [
+						'integration' => 'fluentcart',
+						'query'       => 'subscription_statuses',
+						'select'      => [ 'name', 'label' ],
 					],
+					'required' => true,
 				],
+			],
 			'get_product_single' => [
 				[
 					'key'      => 'product_id',
@@ -498,39 +498,39 @@ class FluentCart extends IntegrationBase {
 					'required' => true,
 				],
 			],
-				'get_products_all' => [
+			'get_products_all' => [
 				[
 					'key'     => 'limit',
 					'label'   => 'Limit',
 					'type'    => 'number',
-					'default' => 20,
+					'required' => true,
 				],
 				[
 					'key'     => 'page',
 					'label'   => 'Page',
 					'type'    => 'number',
-					'default' => 1,
+					'required' => true,
 				],
-					[
-						'key'   => 'search',
-						'label' => 'Search',
-						'type'  => 'text',
+				[
+					'key'   => 'search',
+					'label' => 'Search',
+					'type'  => 'text',
+				],
+				[
+					'key'      => 'post_status',
+					'label'    => 'Post Status',
+					'type'     => 'select',
+					'dynamic'  => [
+						'integration' => 'fluentcart',
+						'query'       => 'post_statuses',
+						'select'      => [ 'name', 'label' ],
 					],
-					[
-						'key'      => 'post_status',
-						'label'    => 'Post Status',
-						'type'     => 'select',
-						'dynamic'  => [
-							'integration' => 'fluentcart',
-							'query'       => 'post_statuses',
-							'select'      => [ 'name', 'label' ],
-						],
-						'required' => false,
-					],
+					'required' => false,
 				],
-				'create_product' => [
-					...self::create_product_schema_fields(),
-				],
+			],
+			'create_product' => [
+				...self::create_product_schema_fields(),
+			],
 			'update_product' => [
 				[
 					'key'      => 'product_id',
@@ -548,18 +548,18 @@ class FluentCart extends IntegrationBase {
 					'label' => 'Product Title',
 					'type'  => 'text',
 				],
-					[
-						'key'      => 'post_status',
-						'label'    => 'Post Status',
-						'type'     => 'select',
-						'dynamic'  => [
-							'integration' => 'fluentcart',
-							'query'       => 'post_statuses',
-							'select'      => [ 'name', 'label' ],
-						],
-						'required' => false,
+				[
+					'key'      => 'post_status',
+					'label'    => 'Post Status',
+					'type'     => 'select',
+					'dynamic'  => [
+						'integration' => 'fluentcart',
+						'query'       => 'post_statuses',
+						'select'      => [ 'name', 'label' ],
 					],
+					'required' => true,
 				],
+			],
 			'add_action' => [
 				[
 					'key'      => 'hook_name',

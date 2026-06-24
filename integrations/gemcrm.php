@@ -63,9 +63,9 @@ class Gemcrm extends IntegrationBase {
 				return [
 					[
 						'key'         => 'tag_id',
-						'label'       => 'Tag (optional)',
+						'label'       => 'Tag',
 						'type'        => 'select',
-						'required'    => false,
+						'required'    => true,
 						'placeholder' => 'Leave empty to trigger for any tag',
 						'dynamic'     => [
 							'integration' => 'gemcrm',
@@ -80,9 +80,9 @@ class Gemcrm extends IntegrationBase {
 				return [
 					[
 						'key'         => 'list_id',
-						'label'       => 'List (optional)',
+						'label'       => 'List',
 						'type'        => 'select',
-						'required'    => false,
+						'required'    => true,
 						'placeholder' => 'Leave empty to trigger for any list',
 						'dynamic'     => [
 							'integration' => 'gemcrm',
@@ -194,8 +194,11 @@ class Gemcrm extends IntegrationBase {
 					return false;
 				}
 
-				// If the user configured a specific tag filter, enforce it.
-				$filter_tag_id = isset( $node['data']['config']['tag_id'] ) ? (int) $node['data']['config']['tag_id'] : null;
+				$config        = $node['data']['config'] ?? $node['config'] ?? [];
+				$filter_tag_id = ! empty( $config['tag_id'] )
+					? (int) $config['tag_id']
+					: null;
+
 				if ( $filter_tag_id && ! in_array( $filter_tag_id, array_map( 'intval', (array) $tag_ids ), true ) ) {
 					return false;
 				}
@@ -214,8 +217,11 @@ class Gemcrm extends IntegrationBase {
 					return false;
 				}
 
-				// If the user configured a specific list filter, enforce it.
-				$filter_list_id = isset( $node['data']['config']['list_id'] ) ? (int) $node['data']['config']['list_id'] : null;
+				$config         = $node['data']['config'] ?? $node['config'] ?? [];
+				$filter_list_id = ! empty( $config['list_id'] )
+					? (int) $config['list_id']
+					: null;
+
 				if ( $filter_list_id && ! in_array( $filter_list_id, array_map( 'intval', (array) $list_ids ), true ) ) {
 					return false;
 				}
@@ -285,7 +291,7 @@ class Gemcrm extends IntegrationBase {
 					[
 						'key'      => 'tag_id',
 						'label'    => 'Tag',
-						'type'     => 'select',
+						'type'     => 'multi-select',
 						'required' => true,
 						'dynamic'  => [
 							'integration' => 'gemcrm',
@@ -376,7 +382,6 @@ class Gemcrm extends IntegrationBase {
 
 	private static function send_email_fields(): array {
 		return [
-			// ── Recipient ────────────────────────────────────────────────────
 			[
 				'key'      => 'recipient_type',
 				'label'    => 'Send To',
@@ -389,7 +394,6 @@ class Gemcrm extends IntegrationBase {
 					[ 'value' => 'custom',  'label' => 'Custom Email'     ],
 				],
 			],
-			// Shown when recipient_type = contact
 			[
 				'key'        => 'contact_id',
 				'label'      => 'Contact',
@@ -402,7 +406,6 @@ class Gemcrm extends IntegrationBase {
 					'select'      => [ 'value', 'label' ],
 				],
 			],
-			// Shown when recipient_type = list
 			[
 				'key'        => 'list_id',
 				'label'      => 'Contact List',
@@ -415,7 +418,6 @@ class Gemcrm extends IntegrationBase {
 					'select'      => [ 'value', 'label' ],
 				],
 			],
-			// Shown when recipient_type = custom
 			[
 				'key'        => 'custom_email',
 				'label'      => 'Email Address',
@@ -425,7 +427,6 @@ class Gemcrm extends IntegrationBase {
 				'depends_on' => [ 'recipient_type' => 'custom' ],
 				'placeholder' => 'someone@example.com or use @ to pick a variable',
 			],
-			// ── Content ──────────────────────────────────────────────────────
 			[
 				'key'      => 'subject',
 				'label'    => 'Subject',
@@ -436,7 +437,7 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'         => 'body',
 				'label'       => 'Email Body',
-				'type'        => 'richtext',  // frontend renders a rich text / HTML editor
+				'type'        => 'richtext',
 				'required'    => true,
 				'placeholder' => 'Write your email here…',
 			],
@@ -447,7 +448,6 @@ class Gemcrm extends IntegrationBase {
 				'required' => false,
 				'placeholder' => 'Short preview text shown in inbox…',
 			],
-			// ── Sender ───────────────────────────────────────────────────────
 			[
 				'key'      => 'from_email',
 				'label'    => 'From Email',
@@ -519,7 +519,7 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'      => 'phone',
 				'label'    => 'Phone',
-				'type'     => 'expression',
+				'type'     => 'number',
 				'required' => false,
 			],
 			[
@@ -748,20 +748,26 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		$contact_id = (int) ( $config['contact_id'] ?? 0 );
-		$tag_id     = (int) ( $config['tag_id'] ?? 0 );
+		$raw_tag    = $config['tag_id'] ?? null;
+		$tag_ids    = array_filter( array_map( 'intval', (array) ( $raw_tag ?? [] ) ) );
 
 		if ( ! $contact_id ) {
 			return self::action_error( 'Contact ID is required', $input );
 		}
-		if ( ! $tag_id ) {
+		if ( empty( $tag_ids ) ) {
 			return self::action_error( 'Tag is required', $input );
 		}
 
-		\GemCrm\Database\Models\Tag::attach_single( $contact_id, $tag_id );
+		foreach ( $tag_ids as $tag_id ) {
+			\GemCrm\Database\Models\Tag::attach_single( $contact_id, $tag_id );
+		}
+
+		// Preserve the original key shape: scalar in → scalar out, array → array.
+		$tag_payload = is_array( $raw_tag ) ? array_values( $tag_ids ) : reset( $tag_ids );
 
 		return self::action_success( array_merge( $input, [
 			'contact_id' => $contact_id,
-			'tag_id'     => $tag_id,
+			'tag_id'     => $tag_payload,
 		] ) );
 	}
 
@@ -794,20 +800,26 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		$contact_id = (int) ( $config['contact_id'] ?? 0 );
-		$tag_id     = (int) ( $config['tag_id'] ?? 0 );
+		$raw_tag    = $config['tag_id'] ?? null;
+		$tag_ids    = array_filter( array_map( 'intval', (array) ( $raw_tag ?? [] ) ) );
 
 		if ( ! $contact_id ) {
 			return self::action_error( 'Contact ID is required', $input );
 		}
-		if ( ! $tag_id ) {
+		if ( empty( $tag_ids ) ) {
 			return self::action_error( 'Tag is required', $input );
 		}
 
-		\GemCrm\Database\Models\Tag::detach_single( $contact_id, $tag_id );
+		foreach ( $tag_ids as $tag_id ) {
+			\GemCrm\Database\Models\Tag::detach_single( $contact_id, $tag_id );
+		}
+
+		// Preserve the original key shape: scalar in → scalar out, array → array.
+		$tag_payload = is_array( $raw_tag ) ? array_values( $tag_ids ) : reset( $tag_ids );
 
 		return self::action_success( array_merge( $input, [
 			'contact_id' => $contact_id,
-			'tag_id'     => $tag_id,
+			'tag_id'     => $tag_payload,
 		] ) );
 	}
 

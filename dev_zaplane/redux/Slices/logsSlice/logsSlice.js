@@ -85,6 +85,48 @@ export const retryNodeRun = createAsyncThunk(
 );
 
 
+export const clearRuns = createAsyncThunk(
+  'zaplane/clearRuns',
+  async (_, thunkAPI) => {
+    try {
+      const res = await API.delete(namespace + `runs`);
+
+      thunkAPI.dispatch(
+        showNotification({
+          message: __('Logs cleared successfully', 'workflow'),
+          isShow: true,
+          type: 'success',
+        })
+      );
+
+      return res?.data;
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
+);
+
+export const deleteRun = createAsyncThunk(
+  'zaplane/deleteRun',
+  async (id, thunkAPI) => {
+    try {
+      const res = await API.delete(namespace + `runs/${parseInt(id)}`);
+
+      thunkAPI.dispatch(
+        showNotification({
+          message: __('Log deleted successfully', 'workflow'),
+          isShow: true,
+          type: 'success',
+        })
+      );
+
+      return res?.data;
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
+);
+
 const logSlice = createSlice({
 	name: 'logs',
 	initialState: {

@@ -3,7 +3,7 @@
  * Plugin Name:     Zaplane
  * Plugin URI:      http://zaplane.pro
  * Description:     WordPress Automation Plugin
- * Version:0.0.2
+ * Version:         1.0.1
  * Author:          kodezen
  * Author URI:      http://kodezen.com
  * License:         GPL-3.0+
@@ -61,7 +61,7 @@ final class Zaplane {
 	}
 
 	public function define_constants(): void {
-		define( 'ZAPLANE_VERSION', '0.0.2' );
+		define( 'ZAPLANE_VERSION', '1.0.1' );
 		define( 'ZAPLANE_ALLOW_LOGS', true );
 		define( 'ZAPLANE_PLUGIN_SLUG', 'zaplane' );
 		define( 'ZAPLANE_PLUGIN_FILE', __FILE__ );
@@ -70,7 +70,7 @@ final class Zaplane {
 		define( 'ZAPLANE_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 		define( 'ZAPLANE_INCLUDES_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/' );
 		define( 'ZAPLANE_FRAMEWORK_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/framework/' );
-		define( 'ZAPLANE_INTEGRATION_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'integration/' );
+		define( 'ZAPLANE_INTEGRATION_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'integrations/' );
 		define( 'ZAPLANE_ASSETS_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'assets/' );
 		define( 'ZAPLANE_ASSETS_URI', ZAPLANE_PLUGIN_ROOT_URI . 'assets/' );
 	}

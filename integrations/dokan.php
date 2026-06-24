@@ -96,7 +96,7 @@ class Dokan extends IntegrationBase {
 					'query'       => 'vendors',
 					'select'      => [ 'name', 'label' ],
 				],
-				'required' => false,
+				'required' => true,
 			],
 		];
 
@@ -110,7 +110,7 @@ class Dokan extends IntegrationBase {
 					'query'       => 'products',
 					'select'      => [ 'name', 'label' ],
 				],
-				'required' => false,
+				'required' => true,
 			],
 		];
 
@@ -369,13 +369,13 @@ class Dokan extends IntegrationBase {
 					'key'     => 'limit',
 					'label'   => 'Limit',
 					'type'    => 'number',
-					'default' => 20,
+					'required' => true,
 				],
 				[
 					'key'     => 'page',
 					'label'   => 'Page',
 					'type'    => 'number',
-					'default' => 1,
+					'required' => true,
 				],
 				[
 					'key'   => 'search',
@@ -406,7 +406,7 @@ class Dokan extends IntegrationBase {
 						'query'       => 'vendors',
 						'select'      => [ 'name', 'label' ],
 					],
-					'required' => false,
+					'required' => true,
 				],
 				[
 					'key'     => 'withdraw_status',
@@ -435,13 +435,13 @@ class Dokan extends IntegrationBase {
 					'key'     => 'limit',
 					'label'   => 'Limit',
 					'type'    => 'number',
-					'default' => 20,
+					'required' => true,
 				],
 				[
 					'key'     => 'page',
 					'label'   => 'Page',
 					'type'    => 'number',
-					'default' => 1,
+					'required' => true,
 				],
 			],
 			'add_action' => [

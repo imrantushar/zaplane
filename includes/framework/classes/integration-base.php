@@ -14,6 +14,71 @@ abstract class IntegrationBase {
 		return ucfirst( static::get_slug() );
 	}
 
+	/**
+	 * Plugin basenames this integration needs active to function, e.g.
+	 * [ 'woocommerce/woocommerce.php' ]. Empty means it only relies on WP core.
+	 *
+	 * By default this reads the central map in config/integration-plugins.php
+	 * keyed by slug — so you declare dependencies in ONE place instead of editing
+	 * every integration. Override this method only when the dependency is
+	 * conditional/dynamic. Filterable via `zaplane_integration_required_plugins`.
+	 *
+	 * Used by the recipe testing CLI to auto-activate dependencies before a live
+	 * run, and available for the admin UI to surface "requires X".
+	 */
+	public static function get_required_plugins(): array {
+		$slug = static::get_slug();
+		$map  = function_exists( 'zaplane_config' ) ? (array) zaplane_config( 'integration-plugins', [] ) : [];
+		$required = isset( $map[ $slug ] ) ? (array) $map[ $slug ] : [];
+
+		return array_values( (array) apply_filters( 'zaplane_integration_required_plugins', $required, $slug ) );
+	}
+
+	/**
+	 * Trigger events this integration can create sample data for, so the recipe
+	 * tester can fire them with real data and no per-recipe factory. Capability
+	 * declaration only — must have NO side effects.
+	 *
+	 * @return string[]
+	 */
+	public static function get_seedable_triggers(): array {
+		return [];
+	}
+
+	/**
+	 * Create the real data a trigger needs and return the positional hook
+	 * arguments to fire it with (matching what WordPress/the plugin really fires).
+	 * Called by the recipe tester when a recipe has no input/factory of its own.
+	 *
+	 * Return null when the event isn't seedable. Only override for events listed
+	 * in get_seedable_triggers().
+	 *
+	 * @return array|null Positional hook args, e.g. [ $order_id, $order ].
+	 */
+	public static function seed_trigger_args( string $event ): ?array {
+		return null;
+	}
+
+	/**
+	 * Action events the recipe tester can run with sample config and assert a
+	 * successful result. Capability declaration only — no side effects.
+	 *
+	 * @return string[]
+	 */
+	public static function get_testable_actions(): array {
+		return [];
+	}
+
+	/**
+	 * A valid config to execute an action with for testing (creating any
+	 * prerequisite data first, e.g. an order id for update_order). Called by the
+	 * recipe tester when an action recipe has no config of its own. Null when the
+	 * action isn't testable. Only override for events in get_testable_actions().
+	 */
+	public static function get_sample_action_config( string $event ): ?array {
+		return null;
+	}
+
 	public static function get_icon(): string {
 		return '';
 	}
@@ -181,7 +246,7 @@ abstract class IntegrationBase {
 
 
 
-	public static function refresh_oauth_token( string $refresh_token ): array {
+	public static function refresh_oauth_token( array $credentials ): array {
 		return [];
 	}
 
@@ -218,5 +283,9 @@ abstract class IntegrationBase {
 		$body   = json_decode( wp_remote_retrieve_body( $response ), true ) ?? [];
 		$status = (int) wp_remote_retrieve_response_code( $response );
 		return [ $body, $status ];
+	}
+
+	public static function get_webhook_url(): string {
+		return 'zaplane/v1/incoming/' . static::get_slug();
 	}
 }

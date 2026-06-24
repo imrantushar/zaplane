@@ -124,7 +124,7 @@ class IncomingWebhookController extends WP_REST_Controller {
 
 		return rest_ensure_response([
 			'integration' => $slug,
-			'url'         => rest_url( 'zaplane/v1/incoming/' . $slug ),
+			'url'         => 'zaplane/v1/incoming/' . $slug,
 		]);
 	}
 }

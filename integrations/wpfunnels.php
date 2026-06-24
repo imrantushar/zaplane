@@ -36,18 +36,6 @@ class Wpfunnels extends IntegrationBase {
 
 	public static function get_triggers(): array {
 		return [
-			'loaded' => [
-				'label' => 'WPFunnels Loaded',
-				'hook'  => 'wpfunnels/loaded',
-			],
-			'init' => [
-				'label' => 'WPFunnels Initialized',
-				'hook'  => 'wpfunnels/init',
-			],
-			'pro_init' => [
-				'label' => 'WPFunnels Pro Initialized',
-				'hook'  => 'wpfunnels/pro_init',
-			],
 			'import_complete' => [
 				'label' => 'Import Complete',
 				'hook'  => 'wpfunnels/wpfnl_import_complete',
@@ -147,12 +135,12 @@ class Wpfunnels extends IntegrationBase {
 						'query'       => 'steps',
 						'select'      => [ 'name', 'label' ],
 					],
+					'required' => true,
 				],
 			];
 		}
 
 		$funnel_triggers = [
-			'after_funnel_creation',
 			'setup_wizard_complete',
 		];
 
@@ -167,6 +155,7 @@ class Wpfunnels extends IntegrationBase {
 						'query'       => 'funnels',
 						'select'      => [ 'name', 'label' ],
 					],
+					'required' => true,
 				],
 			];
 		}
@@ -298,4 +287,3 @@ class Wpfunnels extends IntegrationBase {
 		];
 	}
 }
-

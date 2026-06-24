@@ -4,6 +4,7 @@ import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "./helper";
 import VariableEditor from "@ZAPComponents/VariableEditor";
+import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
 export default function ConditionGroupField({
   value,
   field,
@@ -44,7 +45,7 @@ export default function ConditionGroupField({
                   }
                   return <VariableEditor containerStyle={{
                     width: '30%'
-                  }} label={f.label} placeholder={__('Type "@" here to...', "zaplane")} value={rule[f.key]} variables={variables} variableContext={variableContext} field={{
+                  }} label={f.label} placeholder={__('Type "@" here to...', "zaplane")} value={rule[f.key]} variables={variables} variableContext={variableContext} isRequired field={{
                     key: `${field.key}.${gIndex}.${rIndex}.${f.key}`
                   }} setFieldValue={(key, val) => {
                     ruleHelpers.replace(rIndex, {
@@ -55,9 +56,9 @@ export default function ConditionGroupField({
                 })}
 
                                                     <div className="flex items-center gap-2 mt-[27px] min-h-[30px]">
-                                                        <button type="button" style={{height:'34px', background:'var(--zaplane-secondary)', color:'var(--zaplane-font-color)'}} onClick={() => ruleHelpers.push({
+                                                        <button type="button" style={primaryBtn} onClick={() => ruleHelpers.push({
                     ...EMPTY_RULE
-                  })} className="bg-var(--zaplane-secondary) text-var(--zaplane-font-color)">
+                  })}>
                                                             {__("Add", "zaplane")}
                                                         </button>
 
@@ -76,9 +77,9 @@ export default function ConditionGroupField({
                                 </FieldArray>
                             </div>)}
 
-                        <button size="sm" width="140px" onClick={() => groupHelpers.push([{
+                        <button type="button" style={primaryBtn} onClick={() => groupHelpers.push([{
           ...EMPTY_RULE
-        }])} className="bg-var(--zaplane-secondary) text-var(--zaplane-font-color) font-[500]">
+        }])}>
                             {__("OR Group", "zaplane")}
                         </button>
                     </div>;

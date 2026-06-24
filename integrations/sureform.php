@@ -11,7 +11,6 @@ use Zaplane\Framework\Classes\IntegrationBase;
 class Sureform extends IntegrationBase
 {
 
-
     public static function get_slug(): string
     {
         return 'sureform';
@@ -93,28 +92,6 @@ class Sureform extends IntegrationBase
         ];
     }
 
-
-    public static function get_actions(): array
-    {
-        return [];
-    }
-
-    public static function get_action_config_schema(string $action): array
-    {
-
-        $schemas = [];
-
-        return $schemas[$action] ?? [];
-    }
-
-    public static function execute_node(array $node, array $input): array
-    {
-        return [
-            'port' => 'main',
-            'data' => $input
-        ];
-    }
-
     public static function get_dynamic_queries(): array
     {
         return [
@@ -146,8 +123,9 @@ class Sureform extends IntegrationBase
         );
 
         foreach ($forms as $form) {
+            $label = !empty(trim($form->post_title)) ? $form->post_title : '(no title)';
             $options[] = [
-                'label' => $form->post_title,
+                'label' => $label,
                 'value' => $form->ID,
             ];
         }

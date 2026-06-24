@@ -1,0 +1,18 @@
+{
+    "name": "wordpress-user_register",
+    "integration": "wordpress",
+    "required_plugins": [],
+    "setup": {
+        "factory": "",
+        "args": {}
+    },
+    "node": {
+        "kind": "trigger",
+        "event": "user_register",
+        "config": {},
+        "input": []
+    },
+    "expect": {
+        "not_false": true
+    }
+}

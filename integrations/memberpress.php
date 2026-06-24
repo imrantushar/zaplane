@@ -305,12 +305,14 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'username',
 					'label' => 'Username',
-					'type' => 'text'
+					'type' => 'text',
+					'required' => true
 				],
 				[
 					'key' => 'password',
 					'label' => 'Password',
-					'type' => 'text'
+					'type' => 'text',
+					'required' => true
 				],
 				[
 					'key' => 'first_name',
@@ -459,7 +461,8 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'price',
 					'label' => 'Price',
-					'type' => 'number'
+					'type' => 'number',
+					'required' => true
 				],
 				[
 					'key' => 'period',
@@ -769,11 +772,6 @@ class Memberpress extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
-	/**
-	 * =====================================================
-	 * DYNAMIC DATA QUERIES (API)
-	 * =====================================================
-	 */
 	public static function get_dynamic_queries(): array {
 		return [
 			'memberships' => [ self::class, 'query_memberships' ],

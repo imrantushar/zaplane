@@ -139,7 +139,9 @@ const WorkflowTable = ({
   };
   const columns = [{
     name: <span>{__("Apps", "zaplane")}</span>,
-    cell: row => <ZAPIconGroup icons={row.integration_icons} maxVisible={2} />,
+    cell: row => {
+      return <ZAPIconGroup icons={row.integration_icons} maxVisible={2} />
+    },
     textAlign: "start",
     columnWidth: "120px"
   }, {

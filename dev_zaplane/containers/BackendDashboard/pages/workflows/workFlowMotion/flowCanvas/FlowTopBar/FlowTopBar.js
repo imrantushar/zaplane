@@ -110,6 +110,12 @@ export default function FlowTopBar({
     }
   };
   const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
+  const toolbarButtonStyle = {
+    border: "1px solid var(--zaplane-border-color)",
+  };
+  const activeToolbarButtonStyle = {
+    border: "1px solid var(--zaplane-primary)",
+  };
   const rightActions = <div className="flex items-center gap-3">
     {!apiRequestRunning ? (
       <button
@@ -147,6 +153,7 @@ export default function FlowTopBar({
       <button
         onClick={toggleFullscreen}
         style={outlineBtn}
+        className="mt-[4px]"
       >
         {isFullscreen ? <LuMinimize size={18} /> : <LuFullscreen size={18} />}
       </button>
@@ -161,6 +168,7 @@ export default function FlowTopBar({
       trigger={
         <button
           onClick={() => setActiveDrawer("logs")}
+          style={activeDrawer === "logs" ? activeToolbarButtonStyle : toolbarButtonStyle}
           className={`h-9 px-4 border rounded-[4px] text-sm font-medium transition-all ${activeDrawer === 'logs'
             ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
             : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
@@ -202,6 +210,7 @@ export default function FlowTopBar({
         <ZAPTooltip content={'History'}>
           <button
             onClick={() => setActiveDrawer("history")}
+            style={activeDrawer === "history" ? activeToolbarButtonStyle : toolbarButtonStyle}
             className={`flex items-center justify-center w-9 h-9 border rounded-[4px] transition-all ${activeDrawer === 'history'
               ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
               : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
@@ -224,6 +233,12 @@ export default function FlowTopBar({
       isSearchable={false}
       placeholder="Select status"
       className="zaplane-selete"
+      formatOptionLabel={(opt) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: opt.color, flexShrink: 0, display: 'inline-block' }} />
+          {opt.label}
+        </div>
+      )}
     />
 
     <button

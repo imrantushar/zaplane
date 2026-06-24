@@ -45,11 +45,12 @@ export const fetchAuthFields = createAsyncThunk(
 // Initialize OAuth flow
 export const initOAuth = createAsyncThunk(
   'connections/initOAuth',
-  async ({ app, name, credentials }, thunkAPI) => {
+  async ({ app, name, icon, credentials }, thunkAPI) => {
     try {
       const res = await API.post(namespace + 'connections/oauth/init', {
         app,
         name,
+        icon,
         credentials,
       });
       return res.data;

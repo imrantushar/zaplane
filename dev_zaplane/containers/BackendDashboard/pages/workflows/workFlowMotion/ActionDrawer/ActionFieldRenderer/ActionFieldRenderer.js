@@ -8,7 +8,7 @@ import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
-import { reactDebounce } from "@ZAPUtils/helper";
+import { reactDebounce, rest_url } from "@ZAPUtils/helper";
 import CopyInput from "./CopyInput";
 
 const ActionFieldRenderer = ({
@@ -52,13 +52,18 @@ const ActionFieldRenderer = ({
   switch (field.type) {
     case "copy": {
       let displayValue = field.value || value || "";
-      // Dynamically force the URL to match the current live site's origin
-      if (typeof displayValue === "string" && displayValue.startsWith("http")) {
-        try {
-          const urlObj = new URL(displayValue);
-          displayValue = displayValue.replace(urlObj.origin, window.location.origin);
-        } catch (e) {
-          // Ignore invalid URLs
+      if (typeof displayValue === "string" && displayValue) {
+        if (displayValue.startsWith("http")) {
+          // Legacy: an absolute URL was stored — force it to the live origin.
+          try {
+            const urlObj = new URL(displayValue);
+            displayValue = displayValue.replace(urlObj.origin, window.location.origin);
+          } catch (e) {
+            // Ignore invalid URLs
+          }
+        } else {
+          // Relative REST path -> prefix the current site's REST domain.
+          displayValue = `${rest_url}${displayValue.replace(/^\/+/, "")}`;
         }
       }
 
@@ -79,8 +84,10 @@ const ActionFieldRenderer = ({
         <ZAPInput
           type={field.type}
           label={field.label}
+          required={!!field.required}
           value={value || ""}
           inputRef={inputRef}
+          isRequired={!!field.required}
           onChange={(e) => { setFieldValue(field.key, e.target.value); clearError(); }}
         />
         <ErrorMsg />
@@ -94,6 +101,7 @@ const ActionFieldRenderer = ({
         <div>
           <VariableEditor
             label={field.label}
+            required={!!field.required}
             value={value || ""}
             setValue={(val) => { setFieldValue(field.key, val); clearError(); }}
             variables={workflowVariables?.data || []}
@@ -101,6 +109,7 @@ const ActionFieldRenderer = ({
             field={field}
             setFieldValue={setFieldValue}
             placeholder={__('Type "@" here to add dynamic', "zaplane")}
+            isRequired={!!field.required}
           />
           <ErrorMsg />
         </div>
@@ -111,6 +120,7 @@ const ActionFieldRenderer = ({
         <div>
           <ZAPDatePicker
             label={field.label}
+            required={!!field.required}
             value={value}
             onChange={(date) => {
               setFieldValue(field.key, date?.toISOString().split("T")[0]);
@@ -135,11 +145,13 @@ const ActionFieldRenderer = ({
         <div>
           <ZAPSelect
             label={field.label}
+            required={!!field.required}
             options={options}
             value={value}
             onChange={(opt) => { setFieldValue(field.key, opt?.value); clearError(); }}
             placeholder={field.placeholder || `Select ${field.label}`}
             isClearable
+            isRequired={!!field.required}
             isLoading={field.dynamic ? loadingFields[key] : false}
             onMenuOpen={
               field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
@@ -165,12 +177,14 @@ const ActionFieldRenderer = ({
         <div>
           <ZAPSelect
             label={field.label}
+            required={!!field.required}
             options={options}
             value={value || []}
             onChange={(vals) => { setFieldValue(field.key, vals); clearError(); }}
             placeholder={field.placeholder || `Select ${field.label}`}
             isClearable
             isMulti
+            isRequired={!!field.required}
             isLoading={field.dynamic ? loadingFields[key] : false}
             onMenuOpen={
               field.dynamic ? () => fetchDynamicOptions(field, searchTerm) : undefined
@@ -182,6 +196,21 @@ const ActionFieldRenderer = ({
         </div>
       );
     }
+
+    case "json":
+      return (
+        <div>
+          <label className="zaplane-label">{__(field.label, "zaplane")}{field.required && <span style={{ color: 'red', marginLeft: '2px' }}>*</span>}</label>
+          <textarea
+            value={value || ""}
+            onChange={(e) => { setFieldValue(field.key, e.target.value); clearError(); }}
+            placeholder={'{ "Header-Name": "value" }'}
+            rows={5}
+            style={{ width: "100%", fontFamily: "monospace", fontSize: "13px", padding: "8px", borderRadius: "6px", border: "1px solid var(--zaplane-border-color)", resize: "vertical", boxSizing: "border-box", color: "var(--zaplane-font-secondary-color)" }}
+          />
+          <ErrorMsg />
+        </div>
+      );
 
     case "condition_group":
       return (

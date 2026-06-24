@@ -13,7 +13,7 @@ if ( ! defined( 'ZAPLANE_INCLUDES_DIR_PATH' ) ) {
 	define( 'ZAPLANE_INCLUDES_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/' );
 }
 if ( ! defined( 'ZAPLANE_INTEGRATION_DIR_PATH' ) ) {
-	define( 'ZAPLANE_INTEGRATION_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'integration/' );
+	define( 'ZAPLANE_INTEGRATION_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'integrations/' );
 }
 if ( ! defined( 'ZAPLANE_PLUGIN_SLUG' ) ) {
 	define( 'ZAPLANE_PLUGIN_SLUG', 'zaplane' );

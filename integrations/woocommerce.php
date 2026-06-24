@@ -36,16 +36,100 @@ class Woocommerce extends IntegrationBase {
 		return 'woocommerce';
 	}
 
+	public static function get_name(): string {
+		return 'WooCommerce';
+	}
+
 	public static function get_icon(): string {
 		return 'woo.svg';
 	}
 
+	/** Trigger events the recipe tester can self-seed with real WooCommerce data. */
+	public static function get_seedable_triggers(): array {
+		return [
+			'new_order',
+			'order_status_pending',
+			'order_status_processing',
+			'order_status_on_hold',
+			'order_status_completed',
+			'order_status_cancelled',
+			'order_status_refunded',
+			'order_status_failed',
+			'order_status_changed',
+			'create_product',
+			'update_product',
+		];
+	}
 
+	/** Action events the recipe tester can run with sample config. */
+	public static function get_testable_actions(): array {
+		return [ 'create_order', 'create_customer', 'create_product', 'create_coupon' ];
+	}
+
+	/** A valid config to execute a WooCommerce action with for testing. */
+	public static function get_sample_action_config( string $event ): ?array {
+		$rand = substr( md5( uniqid( 'r', true ) ), 0, 8 );
+		switch ( $event ) {
+			case 'create_order':
+				return [ 'status' => 'processing' ];
+			case 'create_customer':
+				return [ 'email' => "customer_{$rand}@example.test", 'first_name' => 'Recipe' ];
+			case 'create_product':
+				return [ 'name' => "Recipe Product {$rand}", 'regular_price' => '10' ];
+			case 'create_coupon':
+				return [ 'code' => "recipe_{$rand}", 'amount' => '10' ];
+		}
+		return null;
+	}
+
+	/** Create real WooCommerce data and return the hook arguments for a trigger. */
+	public static function seed_trigger_args( string $event ): ?array {
+		if ( 'new_order' === $event || 0 === strpos( $event, 'order_status_' ) ) {
+			if ( ! function_exists( 'wc_create_order' ) ) {
+				return null;
+			}
+			$status = ( 0 === strpos( $event, 'order_status_' ) )
+				? str_replace( '_', '-', substr( $event, strlen( 'order_status_' ) ) )
+				: 'processing';
+
+			$order = wc_create_order();
+			$order->set_total( 50 );
+			$order->save();
+
+			if ( 'order_status_changed' === $event ) {
+				$old = $order->get_status();
+				$order->set_status( 'completed' );
+				$order->save();
+				// woocommerce_order_status_changed: ( $order_id, $from, $to, $order ).
+				return [ $order->get_id(), $old, 'completed', $order ];
+			}
+
+			$order->set_status( $status ?: 'processing' );
+			$order->save();
+			// new_order + woocommerce_order_status_*: ( $order_id, $order ).
+			return [ $order->get_id(), $order ];
+		}
+
+		if ( 'create_product' === $event || 'update_product' === $event ) {
+			if ( ! class_exists( '\WC_Product_Simple' ) ) {
+				return null;
+			}
+			$product = new \WC_Product_Simple();
+			$product->set_name( 'Zaplane Recipe Product' );
+			$product->set_regular_price( '10' );
+			$product->save();
+			$post = get_post( $product->get_id() );
+			// wp_after_insert_post: ( $post_id, $post, $update, $post_before ).
+			return [ $product->get_id(), $post, ( 'update_product' === $event ), null ];
+		}
+
+		return null;
+	}
 
 	public static function get_triggers(): array {
 		return [
 			'new_order' => [
-				'label' => 'New Order',
+				'label' => 'New Order Created',
 				'hook' => 'woocommerce_new_order'
 			],
 			'restore_order' => [
@@ -86,39 +170,39 @@ class Woocommerce extends IntegrationBase {
 			],
 			'new_coupon' => [
 				'label' => 'New Coupon Created',
-				'hook' => 'woocommerce_new_coupon'
+				'hook' => 'woocommerce_update_coupon'
 			],
 			'create_customer' => [
 				'label' => 'Create Customer',
-				'hook' => 'woocommerce_created_customer'
+				'hook' => 'user_register'
 			],
 			'update_customer' => [
 				'label' => 'Update Customer',
-				'hook' => 'woocommerce_update_customer'
+				'hook' => 'profile_update'
 			],
 			'delete_customer' => [
 				'label' => 'Delete Customer',
-				'hook' => 'woocommerce_delete_customer'
+				'hook' => 'delete_user'
 			],
 			'create_product' => [
 				'label' => 'Create Product',
-				'hook' => 'woocommerce_new_product'
+				'hook' => 'wp_after_insert_post'
 			],
 			'update_product' => [
 				'label' => 'Update Product',
-				'hook' => 'woocommerce_update_product'
+				'hook' => 'wp_after_insert_post'
 			],
 			'delete_product' => [
-				'label' => 'Delete Product',
-				'hook' => 'before_delete_post'
+				'label' => 'Trash Product',
+				'hook' => 'transition_post_status'
 			],
 			'restore_product' => [
 				'label' => 'Restore Product',
-				'hook' => 'untrashed_post'
+				'hook' => 'transition_post_status'
 			],
 			'product_status_updated' => [
 				'label' => 'Product Status Updated',
-				'hook' => 'woocommerce_product_set_stock_status'
+				'hook' => 'transition_post_status'
 			],
 			'product_status_changed' => [
 				'label' => 'Product Status Changed',
@@ -189,6 +273,17 @@ class Woocommerce extends IntegrationBase {
 		];
 	}
 
+	public static function get_trigger_hooks( string $trigger, array $node = [] ): array {
+		if ( in_array( $trigger, [ 'new_order' ], true ) ) {
+			return [
+				'woocommerce_new_order',
+				'woocommerce_checkout_order_created',
+			];
+		}
+
+		return parent::get_trigger_hooks( $trigger, $node );
+	}
+
 
 
 	public static function resolve_trigger( array $node, array $args ) {
@@ -236,9 +331,31 @@ class Woocommerce extends IntegrationBase {
 				$payload = self::product_payload_from_args( $args );
 				return $payload ? $payload : false;
 			case 'delete_product':
+				$new_status = $args[0] ?? '';
+				$old_status = $args[1] ?? '';
+				$post       = $args[2] ?? null;
+				if (
+					$post instanceof \WP_Post &&
+					$post->post_type === 'product' &&
+					'trash' === $new_status &&
+					'trash' !== $old_status
+				) {
+					return self::product_payload_from_post( $post );
+				}
+				return false;
 			case 'restore_product':
-				$payload = self::product_payload_from_post( $args[0] ?? 0 );
-				return $payload ? $payload : false;
+				$new_status = $args[0] ?? '';
+				$old_status = $args[1] ?? '';
+				$post       = $args[2] ?? null;
+				if (
+					$post instanceof \WP_Post &&
+					$post->post_type === 'product' &&
+					'trash' === $old_status &&
+					'trash' !== $new_status
+				) {
+					return self::product_payload_from_post( $post );
+				}
+				return false;
 			case 'product_status_updated':
 				$payload = self::product_payload_from_args($args, [
 					'stock_status' => $args[1] ?? '',
@@ -267,103 +384,95 @@ class Woocommerce extends IntegrationBase {
 		return false;
 	}
 
-
 	public static function get_actions(): array {
 		return [
-			'create_order' => [ 'label' => 'Create Order' ],
-			'update_order' => [ 'label' => 'Update Order' ],
-			'update_order_status' => [ 'label' => 'Update Order Status' ],
-			'add_or_update_order_meta' => [ 'label' => 'Add or Update Order Custom Fields (Meta Data)' ],
-			'get_total_orders_count' => [ 'label' => 'Get Total Orders Count' ],
-			'get_refunded_orders' => [ 'label' => 'Get a List of Refunded Orders' ],
-			'get_orders_all' => [ 'label' => 'Get Order (All)' ],
-			'get_orders_by_status' => [ 'label' => 'Get Order (By Status)' ],
-			'get_orders_by_billing_email' => [ 'label' => 'Get Order (By Billing Email Address)' ],
-			'get_orders_by_customer_id' => [ 'label' => 'Get Order (By Customer Id)' ],
-			'get_order_single' => [ 'label' => 'Get Order (Single)' ],
-			'get_customer_total_spent' => [ 'label' => 'Get Customer Total Spent' ],
-			'get_customer_last_order' => [ 'label' => 'Get Customer Last Order' ],
-			'add_order_note' => [ 'label' => 'Add Order Note' ],
-			'get_customers_all' => [ 'label' => 'Get Customer (All)' ],
-			'get_customer_single' => [ 'label' => 'Get Customer (Single)' ],
-			'get_customer_by_email' => [ 'label' => 'Get Customer (By Email Address)' ],
-			'create_customer' => [ 'label' => 'Create New Customer' ],
-			'create_product' => [ 'label' => 'Create Product' ],
-			'create_product_variation' => [ 'label' => 'Create Product Variation' ],
-			'update_product' => [ 'label' => 'Update Product' ],
-			'get_products_all' => [ 'label' => 'Get All Products' ],
-			'get_products_by_category' => [ 'label' => 'Get All Products (By Category)' ],
-			'get_products_simple' => [ 'label' => 'Get All Simple Products' ],
-			'get_products_variable' => [ 'label' => 'Get All Variable Products' ],
-			'get_products_grouped' => [ 'label' => 'Get All Grouped Products' ],
-			'get_products_external' => [ 'label' => 'Get All External or Affiliate Products' ],
-			'get_products_variation' => [ 'label' => 'Get All Variation Products' ],
-			'get_products_subscription' => [ 'label' => 'Get All Subscription Products' ],
-			'get_product_by_id' => [ 'label' => 'Get Product by ID' ],
-			'get_product_by_sku' => [ 'label' => 'Get Product by SKU' ],
-			'update_product_stock' => [ 'label' => 'Update Product Stock' ],
-			'delete_product_permanently' => [ 'label' => 'Delete Product (Permanently)' ],
-			'delete_product_soft' => [ 'label' => 'Delete Product (Soft Delete)' ],
-			'get_products_totals' => [ 'label' => 'Get Products Totals' ],
-			'get_product_sales_count_by_id' => [ 'label' => 'Get Product Sales Count by ID' ],
-			'update_product_status' => [ 'label' => 'Update Product Status' ],
-			'create_product_category' => [ 'label' => 'Create Product Category' ],
-			'update_product_category' => [ 'label' => 'Update Product Category' ],
-			'delete_product_category' => [ 'label' => 'Delete Product Category' ],
-			'get_product_category_all' => [ 'label' => 'Get Product Category (All)' ],
-			'get_product_category_single' => [ 'label' => 'Get Product Category (Single)' ],
-			'create_product_tag' => [ 'label' => 'Create Product Tag' ],
-			'update_product_tag' => [ 'label' => 'Update Product Tag' ],
-			'delete_product_tag' => [ 'label' => 'Delete Product Tag' ],
-			'get_product_tag_all' => [ 'label' => 'Get Product Tag (All)' ],
-			'get_product_tag_single' => [ 'label' => 'Get Product Tag (Single)' ],
-			'create_product_type' => [ 'label' => 'Create Product Type' ],
-			'update_product_type' => [ 'label' => 'Update Product Type' ],
-			'delete_product_type' => [ 'label' => 'Delete Product Type' ],
-			'get_product_type_all' => [ 'label' => 'Get Product Type (All)' ],
-			'get_product_type_single' => [ 'label' => 'Get Product Type (Single)' ],
-			'create_product_brand' => [ 'label' => 'Create Product Brand' ],
-			'update_product_brand' => [ 'label' => 'Update Product Brand' ],
-			'delete_product_brand' => [ 'label' => 'Delete Product Brand' ],
-			'get_product_brand_all' => [ 'label' => 'Get Product Brand (All)' ],
-			'get_product_brand_single' => [ 'label' => 'Get Product Brand (Single)' ],
-			'create_product_shipping_class' => [ 'label' => 'Create Product Shipping Class' ],
-			'update_product_shipping_class' => [ 'label' => 'Update Product Shipping Class' ],
-			'delete_product_shipping_class' => [ 'label' => 'Delete Product Shipping Class' ],
-			'get_product_shipping_class_all' => [ 'label' => 'Get Product Shipping Class (All)' ],
-			'get_product_shipping_class_single' => [ 'label' => 'Get Product Shipping Class (Single)' ],
+			'create_order'                    => [ 'label' => 'Create Order' ],
+			'update_order'                    => [ 'label' => 'Update Order' ],
+			'update_order_status'             => [ 'label' => 'Update Order Status' ],
+			'add_or_update_order_meta'        => [ 'label' => 'Add or Update Order Custom Fields (Meta Data)' ],
+			'get_total_orders_count'          => [ 'label' => 'Get Total Orders Count' ],
+			'get_refunded_orders'             => [ 'label' => 'Get Refunded Orders' ],
+			'get_orders_all'                  => [ 'label' => 'Get All Orders' ],
+			'get_orders_by_status'            => [ 'label' => 'Get Orders by Status' ],
+			'get_orders_by_billing_email'     => [ 'label' => 'Get Orders by Billing Email' ],
+			'get_orders_by_customer_id'       => [ 'label' => 'Get Orders by Customer ID' ],
+			'get_order_single'                => [ 'label' => 'Get Single Order' ],
+			'add_order_note'                  => [ 'label' => 'Add Order Note' ],
+			'get_customers_all'               => [ 'label' => 'Get All Customers' ],
+			'get_customer_single'             => [ 'label' => 'Get Single Customer' ],
+			'get_customer_by_email'           => [ 'label' => 'Get Customer by Email' ],
+			'get_customer_total_spent'        => [ 'label' => 'Get Customer Total Spent' ],
+			'get_customer_last_order'         => [ 'label' => 'Get Customer Last Order' ],
+			'create_customer'                 => [ 'label' => 'Create Customer' ],
+			'create_product'                  => [ 'label' => 'Create Product' ],
+			'create_product_variation'        => [ 'label' => 'Create Product Variation' ],
+			'update_product'                  => [ 'label' => 'Update Product' ],
+			'update_product_stock'            => [ 'label' => 'Update Product Stock' ],
+			'update_product_status'           => [ 'label' => 'Update Product Status' ],
+			'delete_product_permanently'      => [ 'label' => 'Delete Product Permanently' ],
+			'delete_product_soft'             => [ 'label' => 'Soft Delete Product' ],
+			'get_products_all'                => [ 'label' => 'Get All Products' ],
+			'get_products_by_category'        => [ 'label' => 'Get Products by Category' ],
+			'get_products_simple'             => [ 'label' => 'Get Simple Products' ],
+			'get_products_variable'           => [ 'label' => 'Get Variable Products' ],
+			'get_products_grouped'            => [ 'label' => 'Get Grouped Products' ],
+			'get_products_external'           => [ 'label' => 'Get External/Affiliate Products' ],
+			'get_products_variation'          => [ 'label' => 'Get Variation Products' ],
+			'get_products_subscription'       => [ 'label' => 'Get Subscription Products' ],
+			'get_product_by_id'               => [ 'label' => 'Get Product by ID' ],
+			'get_product_by_sku'              => [ 'label' => 'Get Product by SKU' ],
+			'get_products_totals'             => [ 'label' => 'Get Products Totals' ],
+			'get_product_sales_count_by_id'   => [ 'label' => 'Get Product Sales Count by ID' ],
+			'create_product_category'         => [ 'label' => 'Create Product Category' ],
+			'update_product_category'         => [ 'label' => 'Update Product Category' ],
+			'delete_product_category'         => [ 'label' => 'Delete Product Category' ],
+			'get_product_category_all'        => [ 'label' => 'Get All Product Categories' ],
+			'get_product_category_single'     => [ 'label' => 'Get Single Product Category' ],
+			'create_product_tag'              => [ 'label' => 'Create Product Tag' ],
+			'update_product_tag'              => [ 'label' => 'Update Product Tag' ],
+			'delete_product_tag'              => [ 'label' => 'Delete Product Tag' ],
+			'get_product_tag_all'             => [ 'label' => 'Get All Product Tags' ],
+			'get_product_tag_single'          => [ 'label' => 'Get Single Product Tag' ],
+			'create_product_type'             => [ 'label' => 'Create Product Type' ],
+			'update_product_type'             => [ 'label' => 'Update Product Type' ],
+			'delete_product_type'             => [ 'label' => 'Delete Product Type' ],
+			'get_product_type_all'            => [ 'label' => 'Get All Product Types' ],
+			'get_product_type_single'         => [ 'label' => 'Get Single Product Type' ],
+			'create_product_brand'            => [ 'label' => 'Create Product Brand' ],
+			'update_product_brand'            => [ 'label' => 'Update Product Brand' ],
+			'delete_product_brand'            => [ 'label' => 'Delete Product Brand' ],
+			'get_product_brand_all'           => [ 'label' => 'Get All Product Brands' ],
+			'get_product_brand_single'        => [ 'label' => 'Get Single Product Brand' ],
+			'create_product_shipping_class'   => [ 'label' => 'Create Shipping Class' ],
+			'update_product_shipping_class'   => [ 'label' => 'Update Shipping Class' ],
+			'delete_product_shipping_class'   => [ 'label' => 'Delete Shipping Class' ],
+			'get_product_shipping_class_all'  => [ 'label' => 'Get All Shipping Classes' ],
+			'get_product_shipping_class_single' => [ 'label' => 'Get Single Shipping Class' ],
 			'add_or_update_product_attribute' => [ 'label' => 'Add or Update Product Attribute' ],
-			'remove_product_attribute' => [ 'label' => 'Remove Product Attribute' ],
-			'create_attribute' => [ 'label' => 'Create Attribute' ],
-			'update_attribute' => [ 'label' => 'Update Attribute' ],
-			'get_attribute' => [ 'label' => 'Get Attribute' ],
-			'delete_attribute' => [ 'label' => 'Delete Attribute' ],
-			'get_cart_items_all' => [ 'label' => 'Get All Cart Items' ],
-			'get_cart_totals' => [ 'label' => 'Get Cart Totals' ],
-			'add_product_to_cart' => [ 'label' => 'Add Product to Cart' ],
-			'remove_product_from_cart' => [ 'label' => 'Remove Product from Cart' ],
-			'create_coupon' => [ 'label' => 'Create Coupon' ],
-			'update_coupon_data' => [ 'label' => 'Update Coupon Data' ],
-			'update_coupon_code' => [ 'label' => 'Update Coupon Code' ],
-			'add_coupon_emails' => [ 'label' => 'Add Emails to Coupon' ],
-			'apply_coupon_to_cart' => [ 'label' => 'Apply Coupon to Cart' ],
-			'get_applied_coupons_from_cart' => [ 'label' => 'Get Applied Coupons from Cart' ],
-			'remove_coupon_from_cart' => [ 'label' => 'Remove Coupon from Cart' ],
-			'delete_coupon' => [ 'label' => 'Delete Coupon' ],
-			'get_coupons_all' => [ 'label' => 'Get Coupon (All)' ],
-			'get_coupon_single' => [ 'label' => 'Get Coupon (Single)' ],
-			'get_coupon_totals_by_discount_type' => [ 'label' => 'Get Coupon Totals By Discount Type' ],
-			'get_reviews_all' => [ 'label' => 'Get All Reviews' ],
-			'top_selling_products_report' => [ 'label' => 'Top Selling Products Report' ],
-			'get_abandoned_cart' => [ 'label' => 'Get Abandoned Cart by ID' ],
-			'get_abandoned_cart_by_email' => [ 'label' => 'Get Abandoned Cart by Email' ],
-			'get_abandoned_carts' => [ 'label' => 'Get Abandoned Carts List' ],
-			'update_abandoned_cart_status' => [ 'label' => 'Update Abandoned Cart Status' ],
-			'get_abandoned_cart_report' => [ 'label' => 'Get Abandoned Cart Report' ],
+			'remove_product_attribute'        => [ 'label' => 'Remove Product Attribute' ],
+			'create_attribute'                => [ 'label' => 'Create Attribute' ],
+			'update_attribute'                => [ 'label' => 'Update Attribute' ],
+			'get_attribute'                   => [ 'label' => 'Get Attribute' ],
+			'delete_attribute'                => [ 'label' => 'Delete Attribute' ],
+			'get_cart_items_all'              => [ 'label' => 'Get All Cart Items' ],
+			'get_cart_totals'                 => [ 'label' => 'Get Cart Totals' ],
+			'add_product_to_cart'             => [ 'label' => 'Add Product to Cart' ],
+			'remove_product_from_cart'        => [ 'label' => 'Remove Product from Cart' ],
+			'create_coupon'                   => [ 'label' => 'Create Coupon' ],
+			'update_coupon_data'              => [ 'label' => 'Update Coupon Data' ],
+			'update_coupon_code'              => [ 'label' => 'Update Coupon Code' ],
+			'add_coupon_emails'               => [ 'label' => 'Add Emails to Coupon' ],
+			'apply_coupon_to_cart'            => [ 'label' => 'Apply Coupon to Cart' ],
+			'get_applied_coupons_from_cart'   => [ 'label' => 'Get Applied Cart Coupons' ],
+			'remove_coupon_from_cart'         => [ 'label' => 'Remove Coupon from Cart' ],
+			'delete_coupon'                   => [ 'label' => 'Delete Coupon' ],
+			'get_coupons_all'                 => [ 'label' => 'Get All Coupons' ],
+			'get_coupon_single'               => [ 'label' => 'Get Single Coupon' ],
+			'get_coupon_totals_by_discount_type' => [ 'label' => 'Get Coupon Totals by Discount Type' ],
+			'get_reviews_all'                 => [ 'label' => 'Get All Reviews' ],
+			'top_selling_products_report'     => [ 'label' => 'Top Selling Products Report' ],
 		];
 	}
-
-
 
 	public static function get_action_config_schema( string $action ): array {
 		$schemas = [
@@ -372,12 +481,14 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key' => 'customer_id',
 					'label' => 'Customer ID',
-					'type' => 'expression'
+					'type' => 'expression',
+					'required' => true,
 				],
 				[
 					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::order_status_options()
 				],
 				[
@@ -402,6 +513,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::order_status_options()
 				],
 				[
@@ -469,6 +581,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'order_status',
 					'label' => 'Order Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::order_status_options()
 				],
 			],
@@ -595,6 +708,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::product_status_options()
 				],
 				[
@@ -701,6 +815,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::product_status_options()
 				],
 			],
@@ -715,6 +830,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'product_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => self::product_status_options()
 				],
 				[
@@ -1169,7 +1285,7 @@ class Woocommerce extends IntegrationBase {
 					'key' => 'limit',
 					'label' => 'Limit',
 					'type' => 'number',
-					'default' => 10
+					'required' => true
 				],
 			],
 			'get_abandoned_cart' => [
@@ -1248,11 +1364,6 @@ class Woocommerce extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
-	/**
-	 * =====================================================
-	 * DYNAMIC DATA QUERIES (API)
-	 * =====================================================
-	 */
 	public static function get_dynamic_queries(): array {
 		return [
 			'orders' => [ self::class, 'query_dynamic_orders' ],

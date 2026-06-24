@@ -52,32 +52,32 @@ class Jetengine extends IntegrationBase {
 
 	private static function resolve_payload( $post, $meta_key, $meta_value ) {
 		return [
-			'ID'                   => $post->ID,
-			'post_author'          => $post->post_author,
-			'post_date'            => $post->post_date,
-			'post_date_gmt'        => $post->post_date_gmt,
-			'post_content'         => $post->post_content,
-			'post_title'           => $post->post_title,
-			'post_excerpt'         => $post->post_excerpt,
-			'post_status'          => $post->post_status,
-			'comment_status'       => $post->comment_status,
-			'ping_status'          => $post->ping_status,
-			'post_password'        => $post->post_password,
-			'post_name'            => $post->post_name,
-			'to_ping'              => $post->to_ping,
-			'pinged'               => $post->pinged,
-			'post_modified'        => $post->post_modified,
-			'post_modified_gmt'    => $post->post_modified_gmt,
-			'post_content_filtered' => $post->post_content_filtered,
-			'post_parent'          => $post->post_parent,
-			'guid'                 => $post->guid,
-			'menu_order'           => $post->menu_order,
-			'post_type'            => $post->post_type,
-			'post_mime_type'       => $post->post_mime_type,
-			'comment_count'        => $post->comment_count,
-			'filter'               => 'raw',
-			'meta_key'             => $meta_key,
-			'meta_value'           => $meta_value,
+			'ID'                    => $post->ID ?? 0,
+			'post_author'           => $post->post_author ?? null,
+			'post_date'             => $post->post_date ?? null,
+			'post_date_gmt'         => $post->post_date_gmt ?? null,
+			'post_content'          => $post->post_content ?? null,
+			'post_title'            => $post->post_title ?? null,
+			'post_excerpt'          => $post->post_excerpt ?? null,
+			'post_status'           => $post->post_status ?? null,
+			'comment_status'        => $post->comment_status ?? null,
+			'ping_status'           => $post->ping_status ?? null,
+			'post_password'         => $post->post_password ?? null,
+			'post_name'             => $post->post_name ?? null,
+			'to_ping'               => $post->to_ping ?? null,
+			'pinged'                => $post->pinged ?? null,
+			'post_modified'         => $post->post_modified ?? null,
+			'post_modified_gmt'     => $post->post_modified_gmt ?? null,
+			'post_content_filtered' => $post->post_content_filtered ?? null,
+			'post_parent'           => $post->post_parent ?? null,
+			'guid'                  => $post->guid ?? null,
+			'menu_order'            => $post->menu_order ?? null,
+			'post_type'             => $post->post_type ?? null,
+			'post_mime_type'        => $post->post_mime_type ?? null,
+			'comment_count'         => $post->comment_count ?? null,
+			'filter'                => 'raw',
+			'meta_key'              => $meta_key,
+			'meta_value'            => $meta_value,
 		];
 	}
 
@@ -115,19 +115,22 @@ class Jetengine extends IntegrationBase {
 				$processed[ $unique_key ] = true;
 
 				$post = get_post( $post_id );
-				if ( ! $post ) {
-					return false;
-				}
 
-				$config_post_type = $node['data']['config']['post_type'] ?? 'any';
-				if ( 'any' !== $config_post_type && $config_post_type !== $post->post_type ) {
-					return false;
+				if ( $post ) {
+					$data = self::resolve_payload( $post, $meta_key, $meta_value );
+					$data['ID'] = (int) $post_id;
+				} else {
+					$data = [
+						'ID'         => (int) $post_id,
+						'meta_key'   => $meta_key,
+						'meta_value' => $meta_value,
+					];
 				}
 
 				return [
 					'success'   => true,
 					'timestamp' => current_time( 'mysql' ),
-					'data'      => self::resolve_payload( $post, $meta_key, $meta_value ),
+					'data'      => $data,
 				];
 
 		}//end switch

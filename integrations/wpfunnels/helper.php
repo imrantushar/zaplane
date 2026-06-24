@@ -9,9 +9,6 @@ trait Helper {
 
 	private static function resolve_wpfunnels_trigger( string $event, array $args, array $config ) {
 		switch ( $event ) {
-			case 'loaded':
-			case 'init':
-			case 'pro_init':
 			case 'import_complete':
 			case 'template_body_top':
 			case 'template_container_top':

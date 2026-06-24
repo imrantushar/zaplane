@@ -82,6 +82,22 @@ const {
   const validateRequiredFields = () => {
     let hasError = false;
     visibleFields.forEach((field) => {
+      if (field.type === 'condition_group') {
+        const groups = values?.[field.key] || [];
+        groups.forEach((group, gIndex) => {
+          (group || []).forEach((rule, rIndex) => {
+            (field.fields || []).forEach((rf) => {
+              if (rf.type === 'select') return;
+              const val = rule[rf.key];
+              if (!val || String(val).trim() === '') {
+                setFieldError(`${field.key}[${gIndex}][${rIndex}].${rf.key}`, __('This field is required', 'zaplane'));
+                hasError = true;
+              }
+            });
+          });
+        });
+        return;
+      }
       if (!field.required) return;
       const val = values?.[field.key];
       const isEmpty =
