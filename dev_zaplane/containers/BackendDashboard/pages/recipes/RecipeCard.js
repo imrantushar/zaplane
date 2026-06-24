@@ -68,52 +68,52 @@ const RecipeCard = ({
     setIsUpdating(false);
   };
   return <>
-    <div className="flex flex-col rounded-[12px] p-5 bg-white border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all duration-200 group h-full">
+    <div className="flex flex-col rounded-xl p-5 bg-[var(--zaplane-background)] border border-[var(--zaplane-border-color)] shadow-sm hover:shadow-md transition-all duration-200 group h-full">
       <div className="flex justify-between items-center mb-4">
         <ZAPIconGroup icons={recipe?.integration_icons} maxVisible={3} />
 
-        <div className="flex flex-row items-center gap-2">
-          <ZAPTooltip content='Use Recipe'>
-            <button
-              onClick={() => setIsConvertOpen(true)}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#E5E7EB] text-[13px] font-semibold text-[#374151] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-all"
-            >
-              <IoIosPlay className="text-[#6366F1]" size={14} />
-              {__('Try now', 'zaplane')}
-            </button>
-          </ZAPTooltip>
-
-          <ZAPMenu isIcon items={[{
-            label: __("Rename", "zaplane"),
-            onClick: () => setIsRenameOpen(true)
-          }, {
-            label: __("Delete", "zaplane"),
-            onClick: handleDelete
-          }]} />
-        </div>
+        <ZAPMenu isIcon items={[{
+          label: __("Rename", "zaplane"),
+          onClick: () => setIsRenameOpen(true)
+        }, {
+          label: __("Delete", "zaplane"),
+          onClick: handleDelete
+        }]} />
       </div>
 
-      <div className="border-t border-[#F3F4F6] -mx-5 mb-4"></div>
+      <div className="border-t border-[var(--zaplane-border-color)] -mx-5 mb-4 opacity-60"></div>
 
       <div className="flex flex-col gap-2 flex-grow">
         <h3 className='zaplane-label' title={recipe?.title}>
           {recipe?.title}
         </h3>
 
-        <div className="flex flex-col gap-[16px]">
-          <p className={`text-[13px] text-[#6B7280] leading-relaxed ${!showFullDesc ? 'line-clamp-2' : ''}`} title={recipe?.description}>
+        <div className="flex flex-col gap-2">
+          <p className={`text-[13px] text-[var(--zaplane-font-secondary-color)] leading-relaxed ${!showFullDesc ? 'line-clamp-2' : ''}`} title={recipe?.description}>
             {recipe?.description || __('No description', 'zaplane')}
           </p>
 
           {recipe?.description && recipe.description.length > 100 && (
             <button
               onClick={() => setShowFullDesc(prev => !prev)}
-              className="text-[12px] text-[#6366F1] hover:underline self-end font-semibold mt-1"
+              className="text-[12px] text-[var(--zaplane-primary)] hover:underline self-end font-semibold mt-1"
             >
               {showFullDesc ? __('See less', 'zaplane') : __('See more', 'zaplane')}
             </button>
           )}
         </div>
+      </div>
+
+      <div className="mt-5">
+        <ZAPTooltip content='Use Recipe'>
+          <button
+            onClick={() => setIsConvertOpen(true)}
+            className="flex w-full items-center justify-center gap-2 px-4 py-2 rounded-md border border-[var(--zaplane-border-color)] text-[13px] font-semibold text-[var(--zaplane-primary)] hover:bg-[var(--zaplane-second-primary)] hover:border-[var(--zaplane-primary)] transition-all"
+          >
+            <IoIosPlay size={14} />
+            {__('Use Recipe', 'zaplane')}
+          </button>
+        </ZAPTooltip>
       </div>
     </div>
 
