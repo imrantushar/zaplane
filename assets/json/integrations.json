@@ -1,6 +1,6 @@
 {
     "version": "1.0.1",
-    "generated_at": "2026-06-14 14:15:05",
+    "generated_at": "2026-06-24 10:48:12",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -1086,9 +1086,718 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "create_access_group": {
+                    "key": "create_access_group",
+                    "label": "Create Access Group",
+                    "hook": "save_post_storeengine_groups",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_access_group": {
+                    "key": "update_access_group",
+                    "label": "Update Access Group",
+                    "hook": "save_post_storeengine_groups",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_access_group": {
+                    "key": "delete_access_group",
+                    "label": "Delete Access Group",
+                    "hook": "delete_post_storeengine_groups",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_to_access_group": {
+                    "key": "add_user_to_access_group",
+                    "label": "Add User to Access Group",
+                    "hook": "storeengine/membership/user_added_to_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_from_access_group": {
+                    "key": "remove_user_from_access_group",
+                    "label": "Remove User from Access Group",
+                    "hook": "storeengine/membership/user_removed_from_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
-            "actions": []
+            "actions": {
+                "create_product": {
+                    "key": "create_product",
+                    "label": "Create Product",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Product Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "product_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "publish"
+                        },
+                        {
+                            "key": "shipping_type",
+                            "label": "Shipping Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "shipping_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "digital"
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "price_name",
+                            "label": "Price Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "price_type",
+                            "label": "Price Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "price_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "onetime"
+                        },
+                        {
+                            "key": "price",
+                            "label": "Price Amount",
+                            "type": "number"
+                        },
+                        {
+                            "key": "compare_price",
+                            "label": "Compare Price",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_product": {
+                    "key": "update_product",
+                    "label": "Update Product",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Product Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "product_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "shipping_type",
+                            "label": "Shipping Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "shipping_types",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text"
+                        },
+                        {
+                            "key": "price_id",
+                            "label": "Price",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "product_prices",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "product_id"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "price_name",
+                            "label": "Price Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "price",
+                            "label": "Price Amount",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_product": {
+                    "key": "delete_product",
+                    "label": "Delete Product",
+                    "schema": [
+                        {
+                            "key": "product_id",
+                            "label": "Product",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "force_delete",
+                            "label": "Force Delete",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Yes",
+                                    "value": "1"
+                                },
+                                {
+                                    "label": "No",
+                                    "value": "0"
+                                }
+                            ],
+                            "default": "1"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_order": {
+                    "key": "create_order",
+                    "label": "Create Order",
+                    "schema": [
+                        {
+                            "key": "status",
+                            "label": "Order Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "order_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "default": "pending_payment"
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer ID",
+                            "type": "number"
+                        },
+                        {
+                            "key": "billing_email",
+                            "label": "Billing Email",
+                            "type": "text"
+                        },
+                        {
+                            "key": "billing_first_name",
+                            "label": "Billing First Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "billing_last_name",
+                            "label": "Billing Last Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "product_id",
+                            "label": "Product (for price lookup)",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "price_id",
+                            "label": "Price",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "product_prices",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "product_id"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "quantity",
+                            "label": "Quantity",
+                            "type": "number",
+                            "default": 1
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_order": {
+                    "key": "update_order",
+                    "label": "Update Order",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "Order Status",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "order_statuses",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Customer ID",
+                            "type": "number"
+                        },
+                        {
+                            "key": "billing_email",
+                            "label": "Billing Email",
+                            "type": "text"
+                        },
+                        {
+                            "key": "billing_first_name",
+                            "label": "Billing First Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "billing_last_name",
+                            "label": "Billing Last Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "product_id",
+                            "label": "Product (for line item)",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "products",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "price_id",
+                            "label": "Price",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "product_prices",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "product_id"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "quantity",
+                            "label": "Line Item Quantity",
+                            "type": "number",
+                            "default": 1
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_order": {
+                    "key": "delete_order",
+                    "label": "Delete Order",
+                    "schema": [
+                        {
+                            "key": "order_id",
+                            "label": "Order",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "orders",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "force_delete",
+                            "label": "Force Delete",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "No (move to trash)",
+                                    "value": "0"
+                                },
+                                {
+                                    "label": "Yes (permanent)",
+                                    "value": "1"
+                                }
+                            ],
+                            "default": "0"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "active_membership_addons": {
+                    "key": "active_membership_addons",
+                    "label": "Active Membership Add-ons",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_access_group": {
+                    "key": "create_access_group",
+                    "label": "Create Access Group",
+                    "schema": [
+                        {
+                            "key": "group_title",
+                            "label": "Access Group Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "group_content",
+                            "label": "Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                }
+                            ],
+                            "default": "publish"
+                        },
+                        {
+                            "key": "user_roles",
+                            "label": "User Roles (granted access)",
+                            "type": "multi-select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "user_roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "priority",
+                            "label": "Priority",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_access_group": {
+                    "key": "update_access_group",
+                    "label": "Update Access Group",
+                    "schema": [
+                        {
+                            "key": "access_group_id",
+                            "label": "Access Group",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "access_groups_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "group_title",
+                            "label": "Access Group Title",
+                            "type": "text"
+                        },
+                        {
+                            "key": "group_content",
+                            "label": "Description",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "user_roles",
+                            "label": "User Roles (granted access)",
+                            "type": "multi-select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "user_roles",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "priority",
+                            "label": "Priority",
+                            "type": "number"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_access_group": {
+                    "key": "delete_access_group",
+                    "label": "Delete Access Group",
+                    "schema": [
+                        {
+                            "key": "access_group_id",
+                            "label": "Access Group",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "access_groups_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "force_delete",
+                            "label": "Force Delete",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "label": "No (move to trash)",
+                                    "value": "0"
+                                },
+                                {
+                                    "label": "Yes (permanent)",
+                                    "value": "1"
+                                }
+                            ],
+                            "default": "1"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_user_to_access_group": {
+                    "key": "add_user_to_access_group",
+                    "label": "Add User to Access Group",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "users_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "access_group_id",
+                            "label": "Access Group",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "access_groups_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_from_access_group": {
+                    "key": "remove_user_from_access_group",
+                    "label": "Remove User from Access Group",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "users_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "access_group_id",
+                            "label": "Access Group",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "access_groups_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         },
         "activecampaign": {
             "slug": "activecampaign",
