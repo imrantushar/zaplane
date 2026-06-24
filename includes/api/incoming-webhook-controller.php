@@ -58,7 +58,7 @@ class IncomingWebhookController extends WP_REST_Controller {
 		);
 	}
 
-	public function handle_incoming( \WP_REST_Request $request ): mixed {
+	public function handle_incoming( \WP_REST_Request $request ) {
 		$slug = $request->get_param( 'slug' );
 
 		$integration = IntegrationLoader::get( $slug );
@@ -119,7 +119,7 @@ class IncomingWebhookController extends WP_REST_Controller {
 		]);
 	}
 
-	public function get_webhook_url( \WP_REST_Request $request ): mixed {
+	public function get_webhook_url( \WP_REST_Request $request ) {
 		$slug = $request->get_param( 'slug' );
 
 		return rest_ensure_response([

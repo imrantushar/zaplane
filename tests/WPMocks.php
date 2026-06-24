@@ -3,30 +3,60 @@
 namespace Zaplane\Tests {
 	class WPMocks {
 
-		private static array $options    = [];
-		private static array $transients = [];
-		private static array $posts      = [];
-		private static array $users      = [];
-		private static array $comments   = [];
-		private static array $terms      = [];
-		private static array $taxonomies = [];
-		private static array $postTypes  = [];
-		private static array $roles      = [];
-		private static int   $lastInsertId  = 100;
-		private static array $httpResponses = [];
+		private static array $options          = [];
+		private static array $transients       = [];
+		private static array $posts            = [];
+		private static array $users            = [];
+		private static array $comments         = [];
+		private static array $terms            = [];
+		private static array $taxonomies       = [];
+		private static array $postTypes        = [];
+		private static array $roles            = [];
+		private static int   $lastInsertId     = 100;
+		private static array $httpResponses    = [];
+		private static array $wcOrders           = [];
+		private static array $scheduledActions   = [];
+		private static array $enqueuedNodeRuns   = [];
 
 		public static function reset(): void {
-			self::$options      = [];
-			self::$transients   = [];
-			self::$posts        = [];
-			self::$users        = [];
-			self::$comments     = [];
-			self::$terms        = [];
-			self::$taxonomies   = [];
-			self::$postTypes    = [];
-			self::$roles        = [];
-			self::$lastInsertId = 100;
-			self::$httpResponses = [];
+			self::$options          = [];
+			self::$transients       = [];
+			self::$posts            = [];
+			self::$users            = [];
+			self::$comments         = [];
+			self::$terms            = [];
+			self::$taxonomies       = [];
+			self::$postTypes        = [];
+			self::$roles            = [];
+			self::$lastInsertId     = 100;
+			self::$httpResponses    = [];
+			self::$wcOrders         = [];
+			self::$scheduledActions = [];
+			self::$enqueuedNodeRuns = [];
+		}
+
+		public static function recordEnqueuedNodeRun( array $args ): void {
+			self::$enqueuedNodeRuns[] = $args;
+		}
+
+		public static function getEnqueuedNodeRuns(): array {
+			return self::$enqueuedNodeRuns;
+		}
+
+		public static function setWcOrders( array $orders ): void {
+			self::$wcOrders = $orders;
+		}
+
+		public static function getWcOrders(): array {
+			return self::$wcOrders;
+		}
+
+		public static function scheduleAction( string $hook, int $timestamp ): void {
+			self::$scheduledActions[ $hook ] = $timestamp;
+		}
+
+		public static function getScheduledAction( string $hook ) {
+			return self::$scheduledActions[ $hook ] ?? false;
 		}
 
 		public static function setHttpResponse( array $body, int $status = 200 ): void {
@@ -1525,6 +1555,60 @@ namespace {
 
 	if ( ! function_exists( 'get_current_blog_id' ) ) {
 		function get_current_blog_id(): int {
+			return 1;
+		}
+	}
+
+	// ── URL helpers ───────────────────────────────────────────────────────────
+
+	if ( ! function_exists( 'home_url' ) ) {
+		function home_url( $path = '', $scheme = null ): string {
+			return 'http://example.com' . ( $path ? '/' . ltrim( (string) $path, '/' ) : '' );
+		}
+	}
+
+	if ( ! function_exists( 'add_query_arg' ) ) {
+		function add_query_arg( $key, $value = '', $url = '' ): string {
+			if ( is_array( $key ) ) {
+				$url   = (string) $value;
+				$query = http_build_query( $key );
+			} else {
+				$query = urlencode( (string) $key ) . '=' . urlencode( (string) $value );
+				$url   = (string) $url;
+			}
+			$sep = strpos( $url, '?' ) !== false ? '&' : '?';
+			return $url . $sep . $query;
+		}
+	}
+
+	// ── WooCommerce stubs ─────────────────────────────────────────────────────
+
+	if ( ! function_exists( 'wc_get_orders' ) ) {
+		function wc_get_orders( $args = [] ): array {
+			return \Zaplane\Tests\WPMocks::getWcOrders();
+		}
+	}
+
+	// ── Action Scheduler stubs ────────────────────────────────────────────────
+
+	if ( ! function_exists( 'as_next_scheduled_action' ) ) {
+		function as_next_scheduled_action( string $hook, array $args = [], string $group = '' ) {
+			return \Zaplane\Tests\WPMocks::getScheduledAction( $hook );
+		}
+	}
+
+	if ( ! function_exists( 'as_schedule_recurring_action' ) ) {
+		function as_schedule_recurring_action( int $timestamp, int $interval, string $hook, array $args = [], string $group = '' ): int {
+			\Zaplane\Tests\WPMocks::scheduleAction( $hook, $timestamp );
+			return 1;
+		}
+	}
+
+	if ( ! function_exists( 'as_enqueue_async_action' ) ) {
+		function as_enqueue_async_action( string $hook, array $args = [], string $group = '' ): int {
+			if ( $hook === 'zaplane_execute_node_run' ) {
+				\Zaplane\Tests\WPMocks::recordEnqueuedNodeRun( $args );
+			}
 			return 1;
 		}
 	}

@@ -927,7 +927,7 @@ class GemcrmTest extends IntegrationTestCase {
 		$this->assertContains( 'list_id',    $keys );
 	}
 
-	public function test_action_schema_send_email_has_recipient_type_and_body_richtext(): void {
+	public function test_action_schema_send_email_has_recipient_type_and_richtext_body(): void {
 		$schema = Gemcrm::get_action_config_schema( 'send_email' );
 		$byKey  = array_column( $schema, null, 'key' );
 
@@ -939,9 +939,12 @@ class GemcrmTest extends IntegrationTestCase {
 		$this->assertArrayHasKey( 'body',           $byKey );
 
 		$this->assertEquals( 'select',   $byKey['recipient_type']['type'] );
+		// Inline body is a simple rich-text field; the full builder lives on the
+		// dedicated Email Templates page.
 		$this->assertEquals( 'richtext', $byKey['body']['type'] );
 		$this->assertTrue( $byKey['subject']['required'] );
-		$this->assertTrue( $byKey['body']['required'] );
+		// Body is optional now — a selected template can supply it instead.
+		$this->assertFalse( $byKey['body']['required'] );
 	}
 
 	public function test_action_schema_send_email_fields_have_depends_on_hints(): void {

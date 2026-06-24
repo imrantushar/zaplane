@@ -11,6 +11,7 @@ import settingReducer from './Slices/settingSlice/settingSlice';
 import notificationReducer from './Slices/notificationSlice/notificationSlice';
 import recipeReducer from './Slices/recipeSlice/recipeSlice';
 import folderReducer from './Slices/folderSlice/folderSlice';
+import emailTemplatesReducer from './Slices/emailTemplatesSlice/emailTemplatesSlice';
 
 import logger from 'redux-logger'
 /**
@@ -32,7 +33,8 @@ export const store = configureStore({
         setting:settingReducer,
         dashboard:dashboardReducer,
         recipes: recipeReducer,
-        folder: folderReducer
+        folder: folderReducer,
+        emailTemplates: emailTemplatesReducer,
         // Future reducers will be added here (e.g., points, settings)
     },
     middleware: (getDefaultMiddleware) =>

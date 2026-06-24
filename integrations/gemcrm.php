@@ -4,6 +4,7 @@ namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Integrations\Gemcrm\QueryTrait;
+use Zaplane\Integrations\Gemcrm\BirthdayCronTrait;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -12,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Gemcrm extends IntegrationBase {
 
 	use QueryTrait;
+	use BirthdayCronTrait;
 
 	public static function get_slug(): string {
 		return 'gemcrm';
@@ -46,6 +48,10 @@ class Gemcrm extends IntegrationBase {
 			'contact_list_removed' => [
 				'label' => 'Contact Removed From List',
 				'hook'  => 'gemcrm/contact/list/removed',
+			],
+			'contact_birthday' => [
+				'label' => 'Contact Birthday',
+				'hook'  => 'zaplane_gemcrm_contact_birthday',
 			],
 		];
 	}
@@ -85,6 +91,22 @@ class Gemcrm extends IntegrationBase {
 						],
 					],
 				];
+
+			case 'contact_birthday':
+				return [
+					[
+						'key'         => 'purchase_tag_id',
+						'label'       => 'Apply Tag on Purchase (optional)',
+						'type'        => 'select',
+						'required'    => false,
+						'placeholder' => 'Leave empty to skip tag on purchase',
+						'dynamic'     => [
+							'integration' => 'gemcrm',
+							'query'       => 'gemcrm_tag_query',
+							'select'      => [ 'value', 'label' ],
+						],
+					],
+				];
 		}
 
 		return [];
@@ -119,6 +141,10 @@ class Gemcrm extends IntegrationBase {
 			'contact_tag_removed'   => [ 'contact_id' => 1, 'tag_ids' => [ 1 ] ],
 			'contact_list_attached' => [ 'contact_id' => 1, 'list_ids' => [ 1 ] ],
 			'contact_list_removed'  => [ 'contact_id' => 1, 'list_ids' => [ 1 ] ],
+			'contact_birthday'      => array_merge( $contact_base, [
+				'dob'               => '1990-03-15',
+				'_zaplane_birthday' => true,
+			] ),
 		];
 
 		return $samples[ $trigger ] ?? [];
@@ -203,6 +229,26 @@ class Gemcrm extends IntegrationBase {
 				return [
 					'contact_id' => (int) $contact_id,
 					'list_ids'   => array_map( 'intval', (array) $list_ids ),
+				];
+
+			case 'contact_birthday':
+				$data = $args[0] ?? [];
+
+				if ( empty( $data ) || empty( $data['id'] ) ) {
+					return false;
+				}
+
+				return [
+					'contact_id'        => (int) ( $data['id'] ?? 0 ),
+					'first_name'        => $data['first_name'] ?? '',
+					'last_name'         => $data['last_name'] ?? '',
+					'email'             => $data['email'] ?? '',
+					'phone'             => $data['phone'] ?? '',
+					'dob'               => $data['meta']['dob'] ?? '',
+					'meta'              => $data['meta'] ?? [],
+					'lists'             => $data['lists'] ?? [],
+					'tags'              => $data['tags'] ?? [],
+					'_zaplane_birthday' => true,
 				];
 		}//end switch
 
@@ -316,6 +362,7 @@ class Gemcrm extends IntegrationBase {
 			'gemcrm_list_query'     => [ self::class, 'query_lists' ],
 			'gemcrm_campaign_query' => [ self::class, 'query_campaigns' ],
 			'gemcrm_sequence_query' => [ self::class, 'query_sequences' ],
+			'gemcrm_email_template_query' => [ self::class, 'query_email_templates' ],
 		];
 	}
 
@@ -386,14 +433,40 @@ class Gemcrm extends IntegrationBase {
 				'label'    => 'Subject',
 				'type'     => 'expression',
 				'required' => true,
-				'placeholder' => 'Your subject line…',
+				'placeholder' => 'Your subject line… (leave empty to use the template subject)',
+			],
+			[
+				'key'      => 'content_source',
+				'label'    => 'Email Content',
+				'type'     => 'select',
+				'required' => true,
+				'default'  => 'custom',
+				'options'  => [
+					[ 'value' => 'custom',   'label' => 'Custom Email'      ],
+					[ 'value' => 'template', 'label' => 'Existing Template' ],
+				],
+			],
+			[
+				'key'         => 'template_id',
+				'label'       => 'Email Template',
+				'type'        => 'select',
+				'required'    => false,
+				'depends_on'  => [ 'content_source' => 'template' ],
+				'help'        => 'Pick a saved template (designed on the Zaplane → Email Templates page). Its design is used as the email body.',
+				'dynamic'     => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_email_template_query',
+					'select'      => [ 'value', 'label' ],
+				],
 			],
 			[
 				'key'         => 'body',
 				'label'       => 'Email Body',
 				'type'        => 'richtext',
-				'required'    => true,
+				'required'    => false,
+				'depends_on'  => [ 'content_source' => 'custom' ],
 				'placeholder' => 'Write your email here…',
+				'merge_tags'  => self::email_merge_tags(),
 			],
 			[
 				'key'      => 'pre_header',
@@ -430,6 +503,24 @@ class Gemcrm extends IntegrationBase {
 				'type'     => 'expression',
 				'required' => false,
 			],
+		];
+	}
+
+	/**
+	 * Contact merge tags offered inside the email designer. Mirrors GemCRM's
+	 * own contactShortcodes; these {{contact.*}} tags are left untouched by
+	 * Zaplane's variable resolver (reserved prefixes) and resolved per-recipient
+	 * by GemCRM's send pipeline.
+	 */
+	private static function email_merge_tags(): array {
+		return [
+			[ 'value' => '{{contact.first_name}}', 'label' => 'First Name' ],
+			[ 'value' => '{{contact.last_name}}',  'label' => 'Last Name' ],
+			[ 'value' => '{{contact.email}}',      'label' => 'Email' ],
+			[ 'value' => '{{contact.phone}}',      'label' => 'Phone' ],
+			[ 'value' => '{{contact.id}}',         'label' => 'Contact ID' ],
+			[ 'value' => '{{unsubscribe_link}}',        'label' => 'Unsubscribe Link' ],
+			[ 'value' => '{{update_preferences_link}}', 'label' => 'Update Preferences Link' ],
 		];
 	}
 
@@ -800,19 +891,102 @@ class Gemcrm extends IntegrationBase {
 		] ) );
 	}
 
+	/**
+	 * Resolve the email subject/body/pre-header from the action config.
+	 *
+	 * Inline source: `body` is the editor's JSON tree (array) rendered to an
+	 * HTML fragment via EmailTreeRenderer; a legacy string body is used as-is.
+	 * Template source: load the chosen email_templates post, render its tree,
+	 * and use its subject/pre_header meta as defaults the action can override.
+	 *
+	 * @return array{subject:string,body:string,pre_header:?string}|array{error:string}
+	 */
+	private static function resolve_email_content( array $config ): array {
+		$subject    = trim( (string) ( $config['subject'] ?? '' ) );
+		$pre_header = $config['pre_header'] ?? null;
+		// Default to 'custom' so configs saved before this field existed (which
+		// only have an inline body) keep working.
+		$source      = $config['content_source'] ?? ( ! empty( $config['template_id'] ) ? 'template' : 'custom' );
+		$template_id = 'template' === $source ? (int) ( $config['template_id'] ?? 0 ) : 0;
+
+		// A selected template takes precedence over the inline body.
+		if ( $template_id ) {
+			if ( ! class_exists( \Zaplane\Models\EmailTemplate::class ) ) {
+				return [ 'error' => 'Email templates are unavailable' ];
+			}
+
+			$template = \Zaplane\Models\EmailTemplate::find( $template_id );
+			if ( ! $template ) {
+				return [ 'error' => 'Selected email template was not found' ];
+			}
+
+			$body = self::render_email_tree( $template->getTree() );
+			if ( '' === $body ) {
+				return [ 'error' => 'Email template has no renderable content' ];
+			}
+
+			// The action's own subject/pre-header win; otherwise fall back to
+			// the template's stored values.
+			if ( '' === $subject ) {
+				$subject = (string) ( $template->subject ?? '' );
+			}
+			if ( null === $pre_header || '' === $pre_header ) {
+				$pre_header = $template->pre_header ?: null;
+			}
+
+			return [ 'subject' => $subject, 'body' => $body, 'pre_header' => $pre_header ];
+		}
+
+		// Inline: an HTML string from the simple editor (a legacy editor tree
+		// array is rendered to HTML for backward compatibility).
+		$raw  = $config['body'] ?? '';
+		$body = is_array( $raw ) ? self::render_email_tree( $raw ) : (string) $raw;
+
+		return [ 'subject' => $subject, 'body' => $body, 'pre_header' => $pre_header ];
+	}
+
+	/**
+	 * Render an EMB editor tree (array or JSON string) to an HTML fragment using
+	 * GemCRM's standalone renderer. Returns '' when the tree is empty/invalid or
+	 * the renderer is unavailable.
+	 */
+	private static function render_email_tree( $tree ): string {
+		if ( is_string( $tree ) ) {
+			$decoded = json_decode( $tree, true );
+			$tree    = is_array( $decoded ) ? $decoded : null;
+		}
+
+		if ( ! is_array( $tree ) || empty( $tree['root'] ) ) {
+			return '';
+		}
+
+		if ( ! class_exists( \GemCrm\Classes\EmailTreeRenderer::class ) ) {
+			return '';
+		}
+
+		return (string) \GemCrm\Classes\EmailTreeRenderer::render_content( $tree );
+	}
+
 	protected static function action_send_email( array $config, array $input ): array {
 		if ( ! class_exists( \GemCrm\Classes\EmailSender::class ) ) {
 			return self::action_error( 'GemCRM EmailSender is not available', $input );
 		}
 
-		$subject        = trim( $config['subject'] ?? '' );
-		$body           = $config['body'] ?? '';
-		$pre_header     = $config['pre_header'] ?? null;
 		$from_email     = $config['from_email'] ?? null;
 		$from_name      = $config['from_name'] ?? null;
 		$reply_to_email = $config['reply_to_email'] ?? null;
 		$reply_to_name  = $config['reply_to_name'] ?? null;
 		$recipient_type = $config['recipient_type'] ?? 'contact';
+
+		// Resolve the body + subject from either the inline designer (an editor
+		// JSON tree, rendered to HTML server-side) or a saved GemCRM template.
+		$content = self::resolve_email_content( $config );
+		if ( isset( $content['error'] ) ) {
+			return self::action_error( $content['error'], $input );
+		}
+		$subject    = $content['subject'];
+		$body       = $content['body'];
+		$pre_header = $content['pre_header'];
 
 		if ( ! $subject ) {
 			return self::action_error( 'Email subject is required', $input );
