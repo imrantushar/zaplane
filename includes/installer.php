@@ -33,7 +33,6 @@ class Installer {
 
 	public function run(): void {
 		$this->migrate();
-		$this->create_feedback_page();
 		( new DefaultRecipesSeeder() )->run();
 		( new BirthdayRecipeSeeder() )->run();
 		( new InactiveCustomerRecipeSeeder() )->run();
@@ -54,36 +53,6 @@ class Installer {
 	protected function migrate(): void {
 		$migrator = Migrator::getInstance();
 		$migrator->run();
-	}
-
-	public function create_feedback_page(): void {
-		if ( get_option( 'zaplane_feedback_page_id' ) ) {
-			return;
-		}
-
-		$existing = get_posts( [
-			'post_type'      => 'page',
-			'post_status'    => 'publish',
-			'name'           => 'feedback',
-			'posts_per_page' => 1,
-		] );
-
-		if ( $existing ) {
-			update_option( 'zaplane_feedback_page_id', $existing[0]->ID );
-			return;
-		}
-
-		$page_id = wp_insert_post( [
-			'post_title'   => 'Feedback',
-			'post_name'    => 'feedback',
-			'post_content' => '[zaplane_feedback]',
-			'post_status'  => 'publish',
-			'post_type'    => 'page',
-		] );
-
-		if ( $page_id && ! is_wp_error( $page_id ) ) {
-			update_option( 'zaplane_feedback_page_id', $page_id );
-		}
 	}
 
 	public static function uninstall(): void {

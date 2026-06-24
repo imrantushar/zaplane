@@ -34,7 +34,9 @@ trait Helper {
 	}
 
 	private static function build_feedback_page_url( \WC_Order $order ): string {
-		$page_id = (int) get_option( 'zaplane_feedback_page_id', 0 );
+		// The feedback page/data now lives in GemCRM (the [gemcrm_feedback]
+		// shortcode page). Zaplane only owns the automation that links here.
+		$page_id = (int) get_option( 'gemcrm_feedback_page_id', 0 );
 		$base    = $page_id ? get_permalink( $page_id ) : home_url( '/feedback/' );
 		if ( ! $base ) {
 			$base = home_url( '/feedback/' );

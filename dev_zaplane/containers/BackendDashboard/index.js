@@ -12,7 +12,6 @@ import { __ } from '@wordpress/i18n';
 import RecipesPage from './pages/recipes';
 import Folders from './pages/Folders';
 import Folder from './pages/Folders/Folder';
-import FeedbackPage from './pages/feedback';
 
 
 
@@ -39,8 +38,6 @@ const renderSwitch = (page, id, action, path) => {
 			return <Folders />;
 		case 'zaplane-settings':
 			return <Setting />;
-		case 'zaplane-feedback':
-			return <FeedbackPage />;
 
 		default:
 			return <>{__('No page found', 'zaplane')}</>;

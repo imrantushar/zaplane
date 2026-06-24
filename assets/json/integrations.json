@@ -1,6 +1,6 @@
 {
     "version": "1.0.1",
-    "generated_at": "2026-06-14 14:15:05",
+    "generated_at": "2026-06-24 08:04:18",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -247,6 +247,31 @@
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_birthday": {
+                    "key": "contact_birthday",
+                    "label": "Contact Birthday",
+                    "hook": "zaplane_gemcrm_contact_birthday",
+                    "schema": [
+                        {
+                            "key": "purchase_tag_id",
+                            "label": "Apply Tag on Purchase (optional)",
+                            "type": "select",
+                            "required": false,
+                            "placeholder": "Leave empty to skip tag on purchase",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -15063,6 +15088,78 @@
                     "label": "Product Removed from Cart",
                     "hook": "woocommerce_cart_item_removed",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cart_abandoned": {
+                    "key": "cart_abandoned",
+                    "label": "Cart Abandoned",
+                    "hook": "zaplane/abandoned_cart/started",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cart_recovered": {
+                    "key": "cart_recovered",
+                    "label": "Cart Recovered",
+                    "hook": "zaplane/abandoned_cart/recovered",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cart_lost": {
+                    "key": "cart_lost",
+                    "label": "Cart Lost",
+                    "hook": "zaplane/abandoned_cart/lost",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "inactive_customer": {
+                    "key": "inactive_customer",
+                    "label": "Inactive Customer",
+                    "hook": "zaplane_woo_inactive_customer",
+                    "schema": [
+                        {
+                            "key": "days",
+                            "label": "Days Since Last Order",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "e.g. 30"
+                        },
+                        {
+                            "key": "tag_ids",
+                            "label": "Apply Tags to Contact (optional)",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "list_ids",
+                            "label": "Add Contact to Lists (optional)",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]

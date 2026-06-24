@@ -24,7 +24,7 @@ if ( ! function_exists( 'zaplane_run_workflow' ) ) {
 	 * @param array $data         Custom trigger payload passed to every node.
 	 * @return int|false          The Run ID on success, false on failure.
 	 */
-	function zaplane_run_workflow( int $workflow_id, array $data = [] ): int|false {
+	function zaplane_run_workflow( int $workflow_id, array $data = [] ) {
 		$automation = Automation::get_instance();
 		if ( ! $automation ) {
 			return false;

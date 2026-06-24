@@ -35,7 +35,6 @@ class ModuleManager {
 			\Zaplane\Modules\AbandonedCart\AbandonedCartModule::class,
 			\Zaplane\Modules\BirthdayCron\BirthdayCronModule::class,
 			\Zaplane\Modules\InactiveCustomer\InactiveCustomerModule::class,
-			\Zaplane\Modules\Feedback\FeedbackModule::class,
 		];
 
 		foreach ( $module_classes as $class ) {

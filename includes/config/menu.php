@@ -35,10 +35,5 @@ return [
 			'title'       => __( 'Logs', 'zaplane' ),
 			'capability'  => 'manage_options',
 		],
-ZAPLANE_PLUGIN_SLUG . '-feedback' => [
-			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
-			'title'       => __( 'Feedback', 'zaplane' ),
-			'capability'  => 'manage_options',
-		],
 	],
 ];

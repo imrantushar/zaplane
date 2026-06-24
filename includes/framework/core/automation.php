@@ -201,7 +201,7 @@ class Automation {
 	 * Returns the Run ID on success, or false if the workflow or its active
 	 * version/trigger node could not be found.
 	 */
-	public function run_workflow( int $workflow_id, array $data = [] ): int|false {
+	public function run_workflow( int $workflow_id, array $data = [] ) {
 		$workflow = \Zaplane\Models\Workflow::find( $workflow_id );
 		if ( ! $workflow ) {
 			return false;
