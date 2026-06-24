@@ -1,6 +1,6 @@
 {
     "version": "1.0.1",
-    "generated_at": "2026-06-24 08:04:18",
+    "generated_at": "2026-06-24 14:34:30",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -912,14 +912,82 @@
                             "label": "Subject",
                             "type": "expression",
                             "required": true,
-                            "placeholder": "Your subject line\u2026"
+                            "placeholder": "Your subject line\u2026 (leave empty to use the template subject)"
+                        },
+                        {
+                            "key": "content_source",
+                            "label": "Email Content",
+                            "type": "select",
+                            "required": true,
+                            "default": "custom",
+                            "options": [
+                                {
+                                    "value": "custom",
+                                    "label": "Custom Email"
+                                },
+                                {
+                                    "value": "template",
+                                    "label": "Existing Template"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "template_id",
+                            "label": "Email Template",
+                            "type": "select",
+                            "required": false,
+                            "depends_on": {
+                                "content_source": "template"
+                            },
+                            "help": "Pick a saved template (designed on the Zaplane \u2192 Email Templates page). Its design is used as the email body.",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_email_template_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "body",
                             "label": "Email Body",
                             "type": "richtext",
-                            "required": true,
-                            "placeholder": "Write your email here\u2026"
+                            "required": false,
+                            "depends_on": {
+                                "content_source": "custom"
+                            },
+                            "placeholder": "Write your email here\u2026",
+                            "merge_tags": [
+                                {
+                                    "value": "{{contact.first_name}}",
+                                    "label": "First Name"
+                                },
+                                {
+                                    "value": "{{contact.last_name}}",
+                                    "label": "Last Name"
+                                },
+                                {
+                                    "value": "{{contact.email}}",
+                                    "label": "Email"
+                                },
+                                {
+                                    "value": "{{contact.phone}}",
+                                    "label": "Phone"
+                                },
+                                {
+                                    "value": "{{contact.id}}",
+                                    "label": "Contact ID"
+                                },
+                                {
+                                    "value": "{{unsubscribe_link}}",
+                                    "label": "Unsubscribe Link"
+                                },
+                                {
+                                    "value": "{{update_preferences_link}}",
+                                    "label": "Update Preferences Link"
+                                }
+                            ]
                         },
                         {
                             "key": "pre_header",
