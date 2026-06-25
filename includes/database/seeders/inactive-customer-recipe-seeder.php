@@ -141,7 +141,7 @@ class InactiveCustomerRecipeSeeder {
 			'title'             => $title,
 			'description'       => 'Re-engage WooCommerce customers who have not ordered in a configurable number of days. Sends a reminder email, waits 7 days, creates a personal discount coupon, then sends the coupon by email. Tags are automatically removed from the GemCRM contact as soon as the customer places a new order.',
 			'blueprint'         => wp_json_encode( $blueprint ),
-			'integration_icons' => wp_json_encode( [ 'woocommerce', 'gemcrm' ] ),
+			'integration_icons' => wp_json_encode( [ 'woo.svg', 'crm.svg' ] ),
 			'created_by'        => 0,
 		] );
 	}

@@ -115,7 +115,7 @@ class OrderCompleteFeedbackRecipeSeeder {
 			'title'             => $title,
 			'description'       => 'Automatically request customer feedback after a WooCommerce order is completed. Waits 2 days, sends a personalised feedback request email with a unique link, then adds an internal note to the order recording that the request was sent.',
 			'blueprint'         => wp_json_encode( $blueprint ),
-			'integration_icons' => wp_json_encode( [ 'woocommerce', 'gemcrm' ] ),
+			'integration_icons' => wp_json_encode( [ 'woo.svg', 'crm.svg' ] ),
 			'created_by'        => 0,
 		] );
 	}

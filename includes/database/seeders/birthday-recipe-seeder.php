@@ -139,7 +139,7 @@ class BirthdayRecipeSeeder {
 			'title'             => $title,
 			'description'       => 'Automatically reward GemCRM contacts on their birthday. Sends a personalized discount coupon, waits 7 days, then sends a reminder email. Optionally applies a tag when the contact makes a purchase.',
 			'blueprint'         => wp_json_encode( $blueprint ),
-			'integration_icons' => wp_json_encode( [ 'gemcrm', 'woocommerce' ] ),
+			'integration_icons' => wp_json_encode( [ 'crm.svg', 'woo.svg' ] ),
 			'created_by'        => 0,
 		] );
 	}
