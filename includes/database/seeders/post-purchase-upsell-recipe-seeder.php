@@ -101,7 +101,7 @@ class PostPurchaseUpsellRecipeSeeder {
 			'title'             => $title,
 			'description'       => 'Automatically reward customers immediately after a WooCommerce order is placed. Creates a personalised discount coupon and sends it to the customer by email, encouraging a repeat purchase.',
 			'blueprint'         => wp_json_encode( $blueprint ),
-			'integration_icons' => wp_json_encode( [ 'woocommerce', 'gemcrm' ] ),
+			'integration_icons' => wp_json_encode( [ 'woo.svg', 'crm.svg' ] ),
 			'created_by'        => 0,
 		] );
 	}
