@@ -24,6 +24,9 @@
     "scripts": {
         "format": "phpcbf",
         "lint": "phpcs",
+        "build": "@build:production",
+        "build:production": "bash build.sh",
+        "build:assets": "npm run build",
         "test": "vendor/bin/phpunit",
         "test:integrations": "vendor/bin/phpunit --testsuite=Integrations",
         "test:utils": "vendor/bin/phpunit --testsuite=Utils",
@@ -38,6 +41,11 @@
             "@composer test:smoke",
             "@composer test:release"
         ]
+    },
+    "scripts-descriptions": {
+        "build": "Build a production release zip (alias of build:production). Optionally bump version: composer build 1.2.3",
+        "build:production": "Full production build: compile assets, install no-dev composer deps, create the dist zip, then restore dev deps.",
+        "build:assets": "Compile the production JS/CSS bundles (npm run build) only."
     },
     "config": {
         "platform": {
