@@ -20,7 +20,7 @@ const DrawerSearchList = ({
         <button
           key={`${item.type}-${item.id}`}
           onClick={() => {
-            setMode(item.type);
+            setMode?.(item.type);
             setSelectedItem(item);
             setSearch("");
           }}

@@ -198,6 +198,46 @@
     border-color: var(--zaplane-primary-color);
 }
 
+// Custom checkbox (boolean / checkbox field types)
+.zaplane-checkbox {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--zaplane-border-color);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.zaplane-checkbox:checked {
+    border-color: var(--zaplane-primary);
+    background-color: var(--zaplane-primary);
+}
+
+.zaplane-checkbox:checked::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%) rotate(45deg);
+    width: 4px;
+    height: 8px;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+}
+
+.zaplane-checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.zaplane-checkbox:hover {
+    border-color: var(--zaplane-primary);
+}
+
 .zaplane-radio-label {
     font-size: 14px;
     font-weight: 500;

@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name:     Zaplane
- * Plugin URI:      http://zaplane.pro
+ * Plugin URI:      https://zaplane.app/
  * Description:     WordPress Automation Plugin
  * Version:         1.0.1
  * Author:          kodezen
- * Author URI:      http://kodezen.com
+ * Author URI:      https://kodezen.com
  * License:         GPL-3.0+
  * Text Domain:     zaplane
  *
