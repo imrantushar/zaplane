@@ -32,6 +32,9 @@ class ModuleManager {
 			\Zaplane\Admin::class,
 			\Zaplane\Ajax::class,
 			\Zaplane\API::class,
+			\Zaplane\Modules\AbandonedCart\AbandonedCartModule::class,
+			\Zaplane\Modules\BirthdayCron\BirthdayCronModule::class,
+			\Zaplane\Modules\InactiveCustomer\InactiveCustomerModule::class,
 		];
 
 		foreach ( $module_classes as $class ) {
