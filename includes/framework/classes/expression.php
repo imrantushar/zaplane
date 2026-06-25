@@ -21,16 +21,43 @@ class Expression {
 		}
 
 		if ( preg_match( '/^\{\{([^}]+)\}\}$/', trim( $expr ), $m ) ) {
-			return self::compute( trim( $m[1] ), $data );
+			$code = trim( $m[1] );
+			// Reserved tokens (e.g. {{contact.*}}) belong to an integration's own
+			// per-recipient merge engine — pass them through untouched.
+			if ( self::is_reserved( $code ) ) {
+				return '{{' . $code . '}}';
+			}
+			return self::compute( $code, $data );
 		}
 
 		return preg_replace_callback('/\{\{(.*?)\}\}/', function ( $m ) use ( $data ) {
-			$val = self::compute( trim( $m[1] ), $data );
+			$code = trim( $m[1] );
+			if ( self::is_reserved( $code ) ) {
+				return $m[0];
+			}
+			$val = self::compute( $code, $data );
 			if ( is_array( $val ) ) {
 				return implode( ', ', array_filter( $val, 'is_scalar' ) );
 			}
 			return null !== $val ? (string) $val : '';
 		}, $expr);
+	}
+
+	/**
+	 * Whether a token's root segment is reserved by an integration's own merge
+	 * engine and must be left literal by Zaplane's resolver. Extensible via the
+	 * `zaplane_reserved_merge_tag_roots` filter.
+	 */
+	private static function is_reserved( string $code ): bool {
+		$roots = [ 'contact', 'unsubscribe_link', 'update_preferences_link' ];
+
+		if ( function_exists( 'apply_filters' ) ) {
+			$roots = (array) apply_filters( 'zaplane_reserved_merge_tag_roots', $roots );
+		}
+
+		$root = explode( '.', trim( $code ) )[0];
+
+		return in_array( $root, $roots, true );
 	}
 
 

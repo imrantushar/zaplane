@@ -48,6 +48,35 @@ trait QueryTrait {
 	}
 
 	/**
+	 * Returns Zaplane's own email templates for the "Use saved template"
+	 * dropdown. Newest first; search narrows by title. These are designed with
+	 * the drag-and-drop builder on the Zaplane Email Templates page.
+	 */
+	public static function query_email_templates( $q = null ): array {
+		if ( ! class_exists( \Zaplane\Models\EmailTemplate::class ) ) {
+			return [];
+		}
+
+		$query = \Zaplane\Models\EmailTemplate::orderBy( 'updated_at', 'desc' );
+
+		if ( ! empty( $q['search'] ?? '' ) ) {
+			$query = $query->where( 'title', 'like', '%' . $q['search'] . '%' );
+		}
+
+		$result = [];
+
+		foreach ( $query->forPage( 1, 50 )->get() as $template ) {
+			$title    = (string) $template->title;
+			$result[] = [
+				'value' => (int) $template->id,
+				'label' => '' !== $title ? $title : sprintf( '#%d', $template->id ),
+			];
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Returns the latest 10 tags by default; search narrows results.
 	 */
 	public static function query_tags( $q = null ): array {
