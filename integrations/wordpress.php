@@ -1726,9 +1726,8 @@ class Wordpress extends IntegrationBase {
 				[
 					'key'      => 'post_tags',
 					'label'    => 'Select Post Tags',
-					'type'     => 'select',
+					'type'     => 'multi-select',
 					'required' => false,
-					'multiple' => true,
 					'dynamic'  => [
 						'integration' => 'wordpress',
 						'query'       => 'tags',
@@ -1876,9 +1875,8 @@ class Wordpress extends IntegrationBase {
 				[
 					'key'      => 'post_tags',
 					'label'    => 'Select Post Tags',
-					'type'     => 'select',
+					'type'     => 'multi-select',
 					'required' => false,
-					'multiple' => true,
 					'dynamic'  => [
 						'integration' => 'wordpress',
 						'query'       => 'tags',

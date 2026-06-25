@@ -96,7 +96,6 @@ const ActionFieldRenderer = ({
 
     case "text":
     case "expression":
-
     case "textarea":
       return (
         <div>
@@ -111,6 +110,7 @@ const ActionFieldRenderer = ({
             setFieldValue={setFieldValue}
             placeholder={__('Type "@" here to add dynamic', "zaplane")}
             isRequired={!!field.required}
+            multiline={field.type === "textarea"}
           />
           <ErrorMsg />
         </div>
