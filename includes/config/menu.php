@@ -25,6 +25,11 @@ return [
 			'title'       => __( 'Recipes', 'zaplane' ),
 			'capability'  => 'manage_options',
 		],
+		ZAPLANE_PLUGIN_SLUG . '-email-templates' => [
+			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
+			'title'       => __( 'Email Templates', 'zaplane' ),
+			'capability'  => 'manage_options',
+		],
 		ZAPLANE_PLUGIN_SLUG . '-folders' => [
 			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
 			'title'       => __( 'Folders', 'zaplane' ),
