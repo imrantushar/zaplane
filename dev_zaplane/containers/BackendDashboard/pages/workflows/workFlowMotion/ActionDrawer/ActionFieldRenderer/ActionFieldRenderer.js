@@ -4,13 +4,20 @@ import { useSelector } from "react-redux";
 import ZAPInput from "@ZAPComponents/ZAPInput";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
+import ZAPCheckbox from "@ZAPComponents/ZAPCheckbox";
 import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
+import RepeaterField from "../RepeaterField/RepeaterField";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
 import RichTextField from "@ZAPComponents/RichTextField";
 import { reactDebounce, rest_url } from "@ZAPUtils/helper";
 import CopyInput from "./CopyInput";
+
+const pad = (n) => String(n).padStart(2, "0");
+const formatTime = (date) => `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+const formatDateTime = (date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${formatTime(date)}`;
 
 const ActionFieldRenderer = ({
   field,
@@ -226,6 +233,63 @@ const ActionFieldRenderer = ({
           />
           <ErrorMsg />
         </div>
+      );
+
+    case "boolean":
+    case "checkbox":
+      return (
+        <div>
+          <ZAPCheckbox
+            label={field.label}
+            isRequired={!!field.required}
+            checked={value ?? field.default ?? false}
+            onChange={(checked) => { setFieldValue(field.key, checked); clearError(); }}
+          />
+          <ErrorMsg />
+        </div>
+      );
+
+    case "time":
+      return (
+        <div>
+          <ZAPDatePicker
+            label={field.label}
+            required={!!field.required}
+            mode="time"
+            value={value}
+            onChange={(date) => { setFieldValue(field.key, date ? formatTime(date) : ""); clearError(); }}
+            placeholder={field.placeholder}
+          />
+          <ErrorMsg />
+        </div>
+      );
+
+    case "datetime":
+      return (
+        <div>
+          <ZAPDatePicker
+            label={field.label}
+            required={!!field.required}
+            mode="datetime"
+            value={value}
+            onChange={(date) => { setFieldValue(field.key, date ? formatDateTime(date) : ""); clearError(); }}
+            placeholder={field.placeholder}
+          />
+          <ErrorMsg />
+        </div>
+      );
+
+    case "map":
+    case "repeater":
+      return (
+        <RepeaterField
+          field={field}
+          value={value || []}
+          getKey={getKey}
+          dynamicOptions={dynamicOptions}
+          loadingFields={loadingFields}
+          fetchDynamicOptions={fetchDynamicOptions}
+        />
       );
 
     case "condition_group":

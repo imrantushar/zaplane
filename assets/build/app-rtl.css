@@ -2071,9 +2071,6 @@ h2.react-datepicker__current-month {
 .zaplane-scope .collapse {
   visibility: collapse;
 }
-.zaplane-scope .static {
-  position: static;
-}
 .zaplane-scope .fixed {
   position: fixed;
 }
@@ -3711,6 +3708,47 @@ h2.react-datepicker__current-month {
   border-color: var(--zaplane-primary-color);
 }
 
+.zaplane-checkbox {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--zaplane-border-color);
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.zaplane-checkbox:checked {
+  border-color: var(--zaplane-primary);
+  background-color: var(--zaplane-primary);
+}
+
+.zaplane-checkbox:checked::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -60%) rotate(-45deg);
+  width: 4px;
+  height: 8px;
+  border-left: 2px solid white;
+  border-bottom: 2px solid white;
+}
+
+.zaplane-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.zaplane-checkbox:hover {
+  border-color: var(--zaplane-primary);
+}
+
 .zaplane-radio-label {
   font-size: 14px;
   font-weight: 500;
@@ -4651,6 +4689,9 @@ h2.react-datepicker__current-month {
 }
 .zaplane-scope .disabled\:cursor-not-allowed:disabled {
   cursor: not-allowed;
+}
+.zaplane-scope .disabled\:opacity-40:disabled {
+  opacity: 0.4;
 }
 .zaplane-scope .disabled\:opacity-50:disabled {
   opacity: 0.5;
