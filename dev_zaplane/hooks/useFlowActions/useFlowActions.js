@@ -39,6 +39,16 @@ export const useFlowActions = ({
         }));
     };
 
+    const resetTrigger = (nodeId) => {
+        setNodes((nds) =>
+            nds.map((n) =>
+                n.id === nodeId
+                    ? { ...n, data: { icon: "plus", app: "Select an app", action: "trigger", config: {} } }
+                    : n
+            )
+        );
+    };
+
     const deleteNode = (nodeId) => {
         const childNodes = nodes.filter((n) => n.parentNodeId === nodeId);
         const childIds = childNodes.map((n) => n.id);
@@ -115,6 +125,7 @@ export const useFlowActions = ({
     return {
         updateNodeData,
         deleteNode,
+        resetTrigger,
         handleAddAction,
         onAddNode,
         openDrawerForNode,

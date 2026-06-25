@@ -70,6 +70,7 @@ export default function FlowCanvas({
   const {
     updateNodeData,
     deleteNode,
+    resetTrigger,
     handleAddAction,
     openDrawerForNode,
     openDrawerFromAdd,
@@ -112,7 +113,8 @@ export default function FlowCanvas({
       ...props.data,
       onOpenDrawer: () => openDrawerForNode(props),
       openDrawerFromAdd: () => openDrawerFromAdd(props),
-      deleteNode: () => deleteNode(props.id)
+      deleteNode: () => deleteNode(props.id),
+      resetTrigger: () => resetTrigger(props.id)
     }} canvasLayout={canvasLayout} nodes={nodes} />
   };
   const edgeTypes = {
