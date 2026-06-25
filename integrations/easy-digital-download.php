@@ -89,8 +89,16 @@ class EasyDigitalDownload extends IntegrationBase {
 	public static function resolve_trigger( array $node, array $args ) {
 		switch ( $node['event'] ) {
 			case 'purchase_product':
-				return self::payload_with_id('payment_id', $args[0] ?? 0, [
-					'customer_id' => self::extract_id( $args[2] ?? null ),
+				// edd_complete_purchase fires with a single arg: ( $payment_id ).
+				// customer_id is not available from the hook args, so we look it
+				// up from the payment record itself.
+				$payment_id = self::extract_id( $args[0] ?? 0 );
+				if ( ! $payment_id ) {
+					return false;
+				}
+
+				return self::payload_with_id('payment_id', $payment_id, [
+					'customer_id' => self::get_customer_id_for_payment( $payment_id ),
 				]);
 
 			case 'payment_status_changed':
@@ -116,11 +124,13 @@ class EasyDigitalDownload extends IntegrationBase {
 				return self::payload_with_id( 'customer_id', $args[0] ?? 0 );
 
 			case 'discount_created':
-				return self::payload_with_id('discount_id', $args[1] ?? ( $args[0] ?? 0 ), [
+				// edd_post_insert_discount fires as: ( $discount_details, $discount_id )
+				return self::payload_with_id('discount_id', $args[1] ?? 0, [
 					'data' => $args[0] ?? [],
 				]);
 
 			case 'discount_updated':
+				// edd_post_update_discount fires as: ( $discount_details, $discount_id )
 				return self::payload_with_id('discount_id', $args[1] ?? 0, [
 					'data' => $args[0] ?? [],
 				]);
@@ -212,8 +222,10 @@ class EasyDigitalDownload extends IntegrationBase {
 							'value' => 'edd_customer_active'
 						],
 						[
-							'label' => 'Inactive',
-							'value' => 'edd_customer_inactive'
+							// EDD customer statuses are only "active" / "disabled" —
+							// there is no "inactive" status in EDD core.
+							'label' => 'Disabled',
+							'value' => 'edd_customer_disabled'
 						],
 					]
 				],
@@ -331,8 +343,9 @@ class EasyDigitalDownload extends IntegrationBase {
 							'value' => 'edd_payment_abandoned'
 						],
 						[
+							// EDD's real order status key is "onhold" (no underscore).
 							'label' => 'On Hold',
-							'value' => 'edd_payment_on_hold'
+							'value' => 'edd_payment_onhold'
 						],
 					]
 				],
