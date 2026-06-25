@@ -7,6 +7,7 @@ class WPDBMock {
 	public string $prefix = 'wp_';
 	public ?int $insert_id = null;
 	public array $tables = [];
+	public array $preparedQueries = [];
 	private array $lastQuery = [];
 	private int $resultsIndex = 0;
 
@@ -15,10 +16,11 @@ class WPDBMock {
 	}
 
 	public function reset(): void {
-		$this->tables = [];
-		$this->insert_id = null;
-		$this->lastQuery = [];
-		$this->resultsIndex = 0;
+		$this->tables         = [];
+		$this->insert_id      = null;
+		$this->lastQuery      = [];
+		$this->resultsIndex   = 0;
+		$this->preparedQueries = [];
 	}
 
 	public function setTable( string $name, array $rows ): void {
@@ -35,15 +37,18 @@ class WPDBMock {
 	public function prepare( string $query, ...$args ): string {
 		$this->lastQuery = [
 			'query' => $query,
-			'args' => $args
+			'args'  => $args,
 		];
 
-		$i = 0;
-		return preg_replace_callback('/%[sd]/', function ( $m ) use ( $args, &$i ) {
+		$i      = 0;
+		$result = preg_replace_callback( '/%[sd]/', function ( $m ) use ( $args, &$i ) {
 			$val = $args[ $i ] ?? '';
 			$i++;
 			return is_string( $val ) ? "'" . addslashes( $val ) . "'" : $val;
-		}, $query);
+		}, $query );
+
+		$this->preparedQueries[] = $result;
+		return $result;
 	}
 
 	public function get_results( string $query, $output = OBJECT ): array {

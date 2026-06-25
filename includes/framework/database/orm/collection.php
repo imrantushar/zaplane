@@ -710,7 +710,8 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 		return isset( $this->items[ $offset ] );
 	}
 
-	public function offsetGet( $offset ): mixed {
+	#[\ReturnTypeWillChange]
+	public function offsetGet( $offset ) {
 		return $this->items[ $offset ];
 	}
 

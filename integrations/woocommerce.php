@@ -11,6 +11,8 @@ use Zaplane\Integrations\Woo\AttributeActionsTrait;
 use Zaplane\Integrations\Woo\CartActionsTrait;
 use Zaplane\Integrations\Woo\CouponActionsTrait;
 use Zaplane\Integrations\Woo\ReviewActionsTrait;
+use Zaplane\Integrations\Woo\AbandonedCartActionsTrait;
+use Zaplane\Integrations\Woo\InactiveCustomerCronTrait;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -27,6 +29,8 @@ class Woocommerce extends IntegrationBase {
 	use CartActionsTrait;
 	use CouponActionsTrait;
 	use ReviewActionsTrait;
+	use AbandonedCartActionsTrait;
+	use InactiveCustomerCronTrait;
 
 	public static function get_slug(): string {
 		return 'woocommerce';
@@ -212,6 +216,60 @@ class Woocommerce extends IntegrationBase {
 				'label' => 'Product Removed from Cart',
 				'hook' => 'woocommerce_cart_item_removed'
 			],
+			'cart_abandoned' => [
+				'label' => 'Cart Abandoned',
+				'hook'  => 'zaplane/abandoned_cart/started',
+			],
+			'cart_recovered' => [
+				'label' => 'Cart Recovered',
+				'hook'  => 'zaplane/abandoned_cart/recovered',
+			],
+			'cart_lost' => [
+				'label' => 'Cart Lost',
+				'hook'  => 'zaplane/abandoned_cart/lost',
+			],
+			'inactive_customer' => [
+				'label' => 'Inactive Customer',
+				'hook'  => 'zaplane_woo_inactive_customer',
+			],
+		];
+	}
+
+	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( 'inactive_customer' !== $trigger ) {
+			return [];
+		}
+
+		return [
+			[
+				'key'         => 'days',
+				'label'       => 'Days Since Last Order',
+				'type'        => 'expression',
+				'required'    => true,
+				'placeholder' => 'e.g. 30',
+			],
+			[
+				'key'      => 'tag_ids',
+				'label'    => 'Apply Tags to Contact (optional)',
+				'type'     => 'multi-select',
+				'required' => false,
+				'dynamic'  => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_tag_query',
+					'select'      => [ 'value', 'label' ],
+				],
+			],
+			[
+				'key'      => 'list_ids',
+				'label'    => 'Add Contact to Lists (optional)',
+				'type'     => 'multi-select',
+				'required' => false,
+				'dynamic'  => [
+					'integration' => 'gemcrm',
+					'query'       => 'gemcrm_list_query',
+					'select'      => [ 'value', 'label' ],
+				],
+			],
 		];
 	}
 
@@ -313,6 +371,14 @@ class Woocommerce extends IntegrationBase {
 				return self::build_cart_add_payload( $args );
 			case 'product_removed_from_cart':
 				return self::build_cart_item_payload( $args );
+			case 'cart_abandoned':
+			case 'cart_recovered':
+			case 'cart_lost':
+				$payload = self::abandoned_cart_trigger_payload( $args );
+				return $payload ? $payload : false;
+			case 'inactive_customer':
+				$data = $args[0] ?? [];
+				return is_array( $data ) && ! empty( $data['email'] ) ? $data : false;
 		}//end switch
 
 		return false;
@@ -1222,6 +1288,77 @@ class Woocommerce extends IntegrationBase {
 					'required' => true
 				],
 			],
+			'get_abandoned_cart' => [
+				[
+					'key'      => 'cart_id',
+					'label'    => 'Cart ID',
+					'type'     => 'text',
+					'required' => true,
+				],
+			],
+			'get_abandoned_cart_by_email' => [
+				[
+					'key'      => 'email',
+					'label'    => 'Email Address',
+					'type'     => 'text',
+					'required' => true,
+				],
+			],
+			'get_abandoned_carts' => [
+				[
+					'key'     => 'status',
+					'label'   => 'Status Filter',
+					'type'    => 'select',
+					'options' => [
+						[ 'label' => 'All', 'value' => '' ],
+						[ 'label' => 'Draft', 'value' => 'draft' ],
+						[ 'label' => 'Processing (Abandoned)', 'value' => 'processing' ],
+						[ 'label' => 'Recovered', 'value' => 'recovered' ],
+						[ 'label' => 'Lost', 'value' => 'lost' ],
+						[ 'label' => 'Opt Out', 'value' => 'opt_out' ],
+					],
+				],
+				[
+					'key'     => 'limit',
+					'label'   => 'Limit',
+					'type'    => 'number',
+					'default' => 20,
+				],
+			],
+			'update_abandoned_cart_status' => [
+				[
+					'key'      => 'cart_id',
+					'label'    => 'Cart ID',
+					'type'     => 'text',
+					'required' => true,
+				],
+				[
+					'key'      => 'status',
+					'label'    => 'New Status',
+					'type'     => 'select',
+					'required' => true,
+					'options'  => [
+						[ 'label' => 'Draft', 'value' => 'draft' ],
+						[ 'label' => 'Processing', 'value' => 'processing' ],
+						[ 'label' => 'Recovered', 'value' => 'recovered' ],
+						[ 'label' => 'Lost', 'value' => 'lost' ],
+						[ 'label' => 'Opt Out', 'value' => 'opt_out' ],
+						[ 'label' => 'Skipped', 'value' => 'skipped' ],
+					],
+				],
+			],
+			'get_abandoned_cart_report' => [
+				[
+					'key'   => 'date_from',
+					'label' => 'Date From (YYYY-MM-DD)',
+					'type'  => 'text',
+				],
+				[
+					'key'   => 'date_to',
+					'label' => 'Date To (YYYY-MM-DD)',
+					'type'  => 'text',
+				],
+			],
 		];
 
 		return $schemas[ $action ] ?? [];
@@ -1252,5 +1389,46 @@ class Woocommerce extends IntegrationBase {
 			'port' => 'main',
 			'data' => $input
 		];
+	} 
+
+	public static function get_trigger_sample_output( string $trigger ): array {
+		if ( in_array( $trigger, [ 'cart_abandoned', 'cart_recovered', 'cart_lost' ], true ) ) {
+			return \Zaplane\Integrations\AbandonedCart::get_trigger_sample_output( $trigger );
+		}
+
+		if ( 'inactive_customer' === $trigger ) {
+			return [
+				'user_id'         => 1,
+				'email'           => 'john.doe@example.com',
+				'first_name'      => 'John',
+				'last_name'       => 'Doe',
+				'phone'           => '+1234567890',
+				'last_order_date' => '2024-01-01',
+				'contact_id'      => 1,
+				'days'            => 30,
+				'tag_ids'         => [],
+				'list_ids'        => [],
+			];
+		}
+
+		if ( in_array( $trigger, self::$order_status_events, true ) ) {
+			return [
+				'order_id'          => 123,
+				'order_number'      => '123',
+				'order_key'         => 'wc_order_abc123',
+				'status'            => 'completed',
+				'total'             => 49.99,
+				'currency'          => 'USD',
+				'customer_id'       => 1,
+				'email'             => 'customer@example.com',
+				'first_name'        => 'Jane',
+				'last_name'         => 'Smith',
+				'feedback_page_url' => home_url( '/feedback/?order_id=123&key=wc_order_abc123' ),
+				'old_status'        => 'processing',
+				'new_status'        => 'completed',
+			];
+		}
+
+		return [];
 	}
 }

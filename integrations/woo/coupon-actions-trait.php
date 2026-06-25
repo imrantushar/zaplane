@@ -8,10 +8,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 trait CouponActionsTrait {
 
 	private static function action_create_coupon( array $config, array $input ): array {
-		$code = $config['code'] ?? '';
+		$is_birthday = ! empty( $input['_zaplane_birthday'] );
+		$contact_id  = (int) ( $input['contact_id'] ?? 0 );
+		$code        = $config['code'] ?? '';
+
 		if ( '' === $code ) {
-			return self::error( 'Coupon code is required' );
+			if ( $is_birthday && $contact_id > 0 ) {
+				$code = 'BDAY-' . $contact_id . '-' . wp_generate_password( 4, false );
+			} else {
+				return self::error( 'Coupon code is required' );
+			}
 		}
+
 		$coupon = new \WC_Coupon();
 		$coupon->set_code( $code );
 		if ( ! empty( $config['discount_type'] ) ) {
@@ -42,6 +50,10 @@ trait CouponActionsTrait {
 		$coupon_id = $coupon->save();
 		if ( ! $coupon_id ) {
 			return self::error( 'Failed to create coupon' );
+		}
+
+		if ( $is_birthday && $contact_id > 0 ) {
+			update_post_meta( $coupon_id, '_zaplane_birthday_contact_id', $contact_id );
 		}
 
 		return self::respond([

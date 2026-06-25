@@ -19,6 +19,12 @@ use Zaplane\Framework\Classes\OAuthHandler;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Core\ModuleManager;
+use Zaplane\Database\Seeders\BirthdayRecipeSeeder;
+use Zaplane\Database\Seeders\InactiveCustomerRecipeSeeder;
+use Zaplane\Database\Seeders\OrderCompleteFeedbackRecipeSeeder;
+use Zaplane\Database\Seeders\PostPurchaseUpsellRecipeSeeder;
+use Zaplane\Database\Seeders\ProductRecommendationRecipeSeeder;
+use Zaplane\Integrations\Gemcrm;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -115,10 +121,19 @@ final class Zaplane {
 		$automation = $this->container->get( 'automation' );
 		$automation->boot();
 
+		( new BirthdayRecipeSeeder() )->run();
+		( new InactiveCustomerRecipeSeeder() )->run();
+		( new OrderCompleteFeedbackRecipeSeeder() )->run();
+		( new PostPurchaseUpsellRecipeSeeder() )->run();
+		( new ProductRecommendationRecipeSeeder() )->run();
+
 		do_action( 'zaplane_init' );
 	}
 
-	public function deactivate_plugin(): void {}
+	public function deactivate_plugin(): void {
+		Gemcrm::unschedule_birthday_cron();
+		\Zaplane\Integrations\Woocommerce::unschedule_inactive_customer_cron();
+	}
 }
 
 // Bootstrap plugin

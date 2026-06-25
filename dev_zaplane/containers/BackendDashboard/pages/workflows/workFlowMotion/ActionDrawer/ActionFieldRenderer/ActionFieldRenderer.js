@@ -8,6 +8,7 @@ import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
+import RichTextField from "@ZAPComponents/RichTextField";
 import { reactDebounce, rest_url } from "@ZAPUtils/helper";
 import CopyInput from "./CopyInput";
 
@@ -110,6 +111,21 @@ const ActionFieldRenderer = ({
             setFieldValue={setFieldValue}
             placeholder={__('Type "@" here to add dynamic', "zaplane")}
             isRequired={!!field.required}
+          />
+          <ErrorMsg />
+        </div>
+      );
+
+    // Simple rich-text email body (HTML in / HTML out). The full drag-and-drop
+    // builder lives on the dedicated Email Templates page, not inline here.
+    case "richtext":
+      return (
+        <div>
+          <RichTextField
+            field={field}
+            value={value}
+            setFieldValue={(key, val) => { setFieldValue(key, val); clearError(); }}
+            workflowVariables={workflowVariables}
           />
           <ErrorMsg />
         </div>
