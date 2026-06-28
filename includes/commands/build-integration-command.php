@@ -56,7 +56,10 @@ class BuildIntegrationCommand extends Command {
 					continue;
 				}
 
-				$integration['triggers'][ $key ] = [
+				// Merge the raw definition first so optional flags an integration
+				// sets on an item (e.g. disabled, disabled_reason, requires_addon)
+				// survive into the manifest, then enforce the canonical fields.
+				$integration['triggers'][ $key ] = array_merge( $trigger, [
 					'key'     => $key,
 					'label'   => $trigger['label'],
 					'hook'    => $trigger['hook'],
@@ -64,18 +67,18 @@ class BuildIntegrationCommand extends Command {
 						? $class::get_trigger_config_schema( $key )
 						: [],
 					'outputs' => $class::get_output_ports(),
-				];
+				] );
 			}
 
 			foreach ( $class::get_actions() as $key => $action ) {
-				$integration['actions'][ $key ] = [
+				$integration['actions'][ $key ] = array_merge( $action, [
 					'key'     => $key,
 					'label'   => $action['label'],
 					'schema'  => method_exists( $class, 'get_action_config_schema' )
 						? $class::get_action_config_schema( $key )
 						: [],
 					'outputs' => $class::get_output_ports(),
-				];
+				] );
 			}
 
 			if ( 'tool' === $category ) {
