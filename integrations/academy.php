@@ -340,13 +340,13 @@ class Academy extends IntegrationBase
     public static function get_actions(): array
     {
         return [
-            'enroll_user_in_course'    => [
+            'enroll_user_in_course'     => [
                 'label' => 'Enroll user in a course',
             ],
             'unenroll_user_from_course' => [
                 'label' => 'Unenroll user from a course',
             ],
-            'mark_lesson_complete'     => [
+            'mark_lesson_complete'      => [
                 'label' => 'Mark a lesson as complete for a user',
             ],
         ];
@@ -359,8 +359,13 @@ class Academy extends IntegrationBase
             'enroll_user_in_course' => [
                 [
                     'key'      => 'user_id',
-                    'label'    => 'User ID',
-                    'type'     => 'text',
+                    'label'    => 'User',
+                    'type'     => 'select',
+                    'dynamic'  => [
+                        'integration' => 'academy',
+                        'query'       => 'user',
+                        'select'      => [ 'name', 'label' ],
+                    ],
                     'required' => true,
                 ],
                 [
@@ -379,8 +384,13 @@ class Academy extends IntegrationBase
             'unenroll_user_from_course' => [
                 [
                     'key'      => 'user_id',
-                    'label'    => 'User ID',
-                    'type'     => 'text',
+                    'label'    => 'User',
+                    'type'     => 'select',
+                    'dynamic'  => [
+                        'integration' => 'academy',
+                        'query'       => 'user',
+                        'select'      => [ 'name', 'label' ],
+                    ],
                     'required' => true,
                 ],
                 [
@@ -399,8 +409,13 @@ class Academy extends IntegrationBase
             'mark_lesson_complete' => [
                 [
                     'key'      => 'user_id',
-                    'label'    => 'User ID',
-                    'type'     => 'text',
+                    'label'    => 'User',
+                    'type'     => 'select',
+                    'dynamic'  => [
+                        'integration' => 'academy',
+                        'query'       => 'user',
+                        'select'      => [ 'name', 'label' ],
+                    ],
                     'required' => true,
                 ],
                 [
@@ -431,42 +446,25 @@ class Academy extends IntegrationBase
         return $schemas[ $action ] ?? [];
     }
 
-    public static function execute_node(array $node, array $input): array
-    {
-        $action = $node['action'] ?? null;
-
-        switch ($action) {
-
-            case 'enroll_user_in_course':
-                return self::action_enroll_user($node, $input);
-
-            case 'unenroll_user_from_course':
-                return self::action_unenroll_user($node, $input);
-
-            case 'mark_lesson_complete':
-                return self::action_mark_lesson_complete($node, $input);
-        }
-
-        // Default pass-through (trigger nodes).
-        return [
-            'port' => 'main',
-            'data' => $input,
-        ];
-    }
-
     // -------------------------------------------------------------------------
     // Action: Enroll user in a course
+    //
+    // FIX (Bug 1): Renamed from private action_enroll_user() and made public
+    //              so Zaplane can call Academy::enroll_user_in_course() directly.
+    // FIX (Bug 2): Academy LMS stores enrollments as posts with post_parent set
+    //              to the course ID. Replaced meta_query + update_post_meta with
+    //              post_parent in both the duplicate-check query and wp_insert_post.
     // -------------------------------------------------------------------------
 
-    private static function action_enroll_user(array $node, array $input): array
+    public static function enroll_user_in_course(array $node, array $input): array
     {
         $user_id   = (int) ($node['data']['config']['user_id']   ?? 0);
         $course_id = (int) ($node['data']['config']['course_id'] ?? 0);
 
         if (! $user_id || ! $course_id) {
             return [
-                'port'  => 'main',
-                'data'  => array_merge($input, [
+                'port' => 'main',
+                'data' => array_merge($input, [
                     'success' => false,
                     'message' => 'user_id and course_id are required.',
                 ]),
@@ -493,19 +491,13 @@ class Academy extends IntegrationBase
             ];
         }
 
-        // Check if the user is already enrolled to avoid duplicates.
+        // Check for an existing enrollment via post_parent (Academy LMS convention).
         $existing = get_posts([
             'post_type'      => 'academy_enrollment',
             'post_status'    => 'publish',
             'posts_per_page' => 1,
             'author'         => $user_id,
-            'meta_query'     => [
-                [
-                    'key'   => '_academy_course_id',
-                    'value' => $course_id,
-                    'type'  => 'NUMERIC',
-                ],
-            ],
+            'post_parent'    => $course_id,   // FIX: was meta_query on _academy_course_id
         ]);
 
         if (! empty($existing)) {
@@ -521,10 +513,12 @@ class Academy extends IntegrationBase
             ];
         }
 
+        // Create enrollment post with post_parent = course_id (Academy LMS convention).
         $enroll_id = wp_insert_post([
             'post_type'   => 'academy_enrollment',
             'post_status' => 'publish',
             'post_author' => $user_id,
+            'post_parent' => $course_id,      // FIX: was missing; meta saved separately before
             'post_title'  => 'Enrollment: user ' . $user_id . ' — course ' . $course_id,
         ]);
 
@@ -537,8 +531,6 @@ class Academy extends IntegrationBase
                 ]),
             ];
         }
-
-        update_post_meta($enroll_id, '_academy_course_id', $course_id);
 
         // Fire the same hook the plugin uses so other integrations stay in sync.
         do_action('academy/course/after_enroll', $course_id, $enroll_id, $user_id);
@@ -556,9 +548,12 @@ class Academy extends IntegrationBase
 
     // -------------------------------------------------------------------------
     // Action: Unenroll user from a course
+    //
+    // FIX (Bug 1): Renamed from private action_unenroll_user() and made public.
+    // FIX (Bug 2): Query uses post_parent instead of meta_query.
     // -------------------------------------------------------------------------
 
-    private static function action_unenroll_user(array $node, array $input): array
+    public static function unenroll_user_from_course(array $node, array $input): array
     {
         $user_id   = (int) ($node['data']['config']['user_id']   ?? 0);
         $course_id = (int) ($node['data']['config']['course_id'] ?? 0);
@@ -578,13 +573,7 @@ class Academy extends IntegrationBase
             'post_status'    => 'any',
             'posts_per_page' => -1,
             'author'         => $user_id,
-            'meta_query'     => [
-                [
-                    'key'   => '_academy_course_id',
-                    'value' => $course_id,
-                    'type'  => 'NUMERIC',
-                ],
-            ],
+            'post_parent'    => $course_id,   // FIX: was meta_query on _academy_course_id
         ]);
 
         if (empty($enrollments)) {
@@ -621,9 +610,11 @@ class Academy extends IntegrationBase
 
     // -------------------------------------------------------------------------
     // Action: Mark lesson complete for a user
+    //
+    // FIX (Bug 1): Renamed from private action_mark_lesson_complete() and made public.
     // -------------------------------------------------------------------------
 
-    private static function action_mark_lesson_complete(array $node, array $input): array
+    public static function mark_lesson_complete(array $node, array $input): array
     {
         $user_id   = (int) ($node['data']['config']['user_id']   ?? 0);
         $lesson_id = (int) ($node['data']['config']['lesson_id'] ?? 0);
@@ -690,6 +681,7 @@ class Academy extends IntegrationBase
             'quiz'           => [ self::class, 'query_quiz' ],
             'lesson'         => [ self::class, 'query_lesson' ],
             'lesson_no_any'  => [ self::class, 'query_lesson_no_any' ],
+            'user'           => [ self::class, 'query_users' ],
         ];
     }
 
@@ -819,6 +811,27 @@ class Academy extends IntegrationBase
                     ];
                 }
             }
+        }
+    }
+    /**
+     * WordPress users list — action config-এ User dropdown-এর জন্য।
+     */
+    public static function query_users(): array
+    {
+        $options = [];
+
+        $users = get_users([
+            'fields'  => [ 'ID', 'display_name', 'user_email' ],
+            'orderby' => 'display_name',
+            'order'   => 'ASC',
+            'number'  => 200,
+        ]);
+
+        foreach ($users as $user) {
+            $options[] = [
+                'label' => $user->display_name . ' (' . $user->user_email . ')',
+                'name'  => $user->ID,
+            ];
         }
 
         return $options;

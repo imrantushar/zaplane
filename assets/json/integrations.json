@@ -1,6 +1,6 @@
 {
     "version": "1.0.1",
-    "generated_at": "2026-06-24 14:34:30",
+    "generated_at": "2026-06-28 08:12:03",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -138,7 +138,133 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": {
+                "enroll_user_in_course": {
+                    "key": "enroll_user_in_course",
+                    "label": "Enroll user in a course",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "user",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unenroll_user_from_course": {
+                    "key": "unenroll_user_from_course",
+                    "label": "Unenroll user from a course",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "user",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "mark_lesson_complete": {
+                    "key": "mark_lesson_complete",
+                    "label": "Mark a lesson as complete for a user",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "user",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "lesson_id",
+                            "label": "Lesson",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "lesson_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         },
         "gemcrm": {
             "slug": "gemcrm",
