@@ -136,9 +136,12 @@ const {
     }
   };
 
-  // get global variable
+  // Fetch the variables (upstream node outputs) available for field mapping.
+  // The condition-variables endpoint doesn't need the version hash, so don't
+  // gate on it. Refetch whenever the drawer opens or the version changes so a
+  // trigger captured via "Test Trigger" shows up without reloading the editor.
   useEffect(() => {
-    if (!node?.id || !workFlow?.version?.hash) return;
+    if (!open || !node?.id || !workFlow?.workflow?.id) return;
     const payload = {
       workflow_id: workFlow.workflow?.id,
       workflow_hash: workFlow.version?.hash,
@@ -151,7 +154,7 @@ const {
     };
 
     dispatch(conditionVariables(payload));
-  }, [node?.id]);
+  }, [node?.id, open, workFlow?.version?.hash]);
   return <ZAPDrawer open={open} isFullscreen={isFullscreen} onClose={resetAll}
     arrowClose={['tools', 'app'].includes(mode)}
     maxWidth={['filter', 'if'].includes(values?.actionType) ? 'max-w-[700px]' : 'max-w-[500px]'}

@@ -152,6 +152,46 @@ abstract class IntegrationBase {
 		return null;
 	}
 
+	/**
+	 * Handle the provider's webhook-subscription verification handshake.
+	 *
+	 * Meta (WhatsApp Cloud API / Messenger) pings the callback URL with a GET
+	 * carrying hub.mode / hub.verify_token / hub.challenge — PHP turns the dots
+	 * into underscores, so they arrive as hub_mode / hub_verify_token /
+	 * hub_challenge. Return the challenge string to echo back on success, or
+	 * null to reject. Override per integration to source the token elsewhere
+	 * (e.g. a stored connection credential).
+	 */
+	public static function verify_webhook_challenge( \WP_REST_Request $request ): ?string {
+		$mode      = $request->get_param( 'hub_mode' );
+		$token     = $request->get_param( 'hub_verify_token' );
+		$challenge = $request->get_param( 'hub_challenge' );
+
+		if ( 'subscribe' !== $mode || null === $challenge ) {
+			return null;
+		}
+
+		$expected = static::get_webhook_verify_token();
+
+		if ( '' !== $expected && hash_equals( $expected, (string) $token ) ) {
+			return (string) $challenge;
+		}
+
+		return null;
+	}
+
+	/**
+	 * The verify token this integration expects during the webhook handshake.
+	 * Stored per integration as an option and filterable; integrations may
+	 * override to pull it from a connection credential instead.
+	 */
+	public static function get_webhook_verify_token(): string {
+		$slug  = static::get_slug();
+		$token = (string) get_option( 'zaplane_webhook_verify_token_' . $slug, '' );
+
+		return (string) apply_filters( 'zaplane_webhook_verify_token', $token, $slug );
+	}
+
 	public static function supports_polling(): bool {
 		return false;
 	}

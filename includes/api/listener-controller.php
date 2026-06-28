@@ -268,7 +268,13 @@ class ListenerController extends WP_REST_Controller {
 			'status' => 'running',
 			'trigger_data' => $payload,
 			'start_node_key' => (int) $triggerNode['id'],
-			'target_node_key' => null,
+			// Mark as a test run keyed to the trigger node so the captured
+			// payload is discoverable by the condition-variables picker
+			// (Run::latestTestNodeRunsByWorkflow filters is_test=1 AND
+			// target_node_key IN previousNodeIds). Without this the trigger's
+			// fields never show up for downstream action mapping.
+			'is_test' => true,
+			'target_node_key' => (int) $triggerNode['id'],
 			'started_at' => current_time( 'mysql' ),
 		]);
 
@@ -287,6 +293,14 @@ class ListenerController extends WP_REST_Controller {
 			'started_at'         => current_time( 'mysql' ),
 			'finished_at'        => current_time( 'mysql' ),
 		]);
+
+		// Make this capture reusable as sample data in other workflows that use
+		// the same trigger (app+event), so they don't have to capture again.
+		\Zaplane\Framework\Core\Automation::store_trigger_sample(
+			$triggerNode['data']['app'] ?? '',
+			$triggerNode['data']['event'] ?? '',
+			$payload
+		);
 
 		$graph      = $version->getGraph();
 		$graphNodeMap = [];

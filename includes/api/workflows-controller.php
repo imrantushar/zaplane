@@ -587,15 +587,26 @@ class WorkflowsController extends WP_REST_Controller {
 				$isSample  = false;
 
 				if ( $nodeType === 'trigger' ) {
-					$integration = $node['data']['integration'] ?? '';
-					$event       = $node['data']['event'] ?? '';
-					$instance    = IntegrationLoader::get( $integration );
-					if ( $instance ) {
-						$sample = get_class( $instance )::get_trigger_sample_output( $event );
-						if ( ! empty( $sample ) ) {
-							$variables = VariableExtractor::extract( $sample );
-							$isSample  = true;
+					// Trigger nodes store the integration slug under 'app'
+					// (mapNodesForBackend never sets 'integration').
+					$app   = $node['data']['app'] ?? ( $node['data']['integration'] ?? '' );
+					$event = $node['data']['event'] ?? '';
+
+					// 1) Reuse the most recent capture of this same trigger from
+					//    ANY workflow, so a new workflow inherits its fields.
+					$sample = \Zaplane\Framework\Core\Automation::get_trigger_sample( $app, $event );
+
+					// 2) Fall back to the integration's declared sample output.
+					if ( empty( $sample ) && $app ) {
+						$instance = IntegrationLoader::get( $app );
+						if ( $instance ) {
+							$sample = get_class( $instance )::get_trigger_sample_output( $event );
 						}
+					}
+
+					if ( ! empty( $sample ) ) {
+						$variables = VariableExtractor::extract( $sample );
+						$isSample  = true;
 					}
 				}
 
