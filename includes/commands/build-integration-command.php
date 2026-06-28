@@ -42,6 +42,7 @@ class BuildIntegrationCommand extends Command {
 				'requires_connection' => $class::requires_connection(),
 				'auth_type'          => $class::get_auth_type(),
 				'supports_webhook'   => $class::supports_webhook(),
+				'webhook_url'        => $class::supports_webhook() ? rest_url( $class::get_webhook_url() ) : '',
 				'triggers'           => [],
 				'actions'            => [],
 			];

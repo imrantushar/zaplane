@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-06-28 07:08:23",
+    "generated_at": "2026-06-28 13:30:25",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -10,6 +10,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -148,6 +149,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "contact_created": {
                     "label": "Contact Created",
@@ -1062,6 +1064,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "product_purchased": {
                     "label": "Product Purchased",
@@ -2084,6 +2087,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -2387,6 +2391,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "acf_save_post": {
                     "label": "ACF Fields Saved",
@@ -2629,6 +2634,182 @@
                 }
             }
         },
+        "ai": {
+            "slug": "ai",
+            "name": "AI",
+            "icon": "ai.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "api_key",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "generate_response": {
+                    "label": "Generate AI Response",
+                    "key": "generate_response",
+                    "schema": [
+                        {
+                            "key": "model",
+                            "label": "Model",
+                            "type": "select",
+                            "required": true,
+                            "default": "claude-opus-4-8",
+                            "options": [
+                                {
+                                    "value": "claude-opus-4-8",
+                                    "label": "Claude Opus 4.8 (most capable)"
+                                },
+                                {
+                                    "value": "claude-sonnet-4-6",
+                                    "label": "Claude Sonnet 4.6 (balanced)"
+                                },
+                                {
+                                    "value": "claude-haiku-4-5",
+                                    "label": "Claude Haiku 4.5 (fastest)"
+                                },
+                                {
+                                    "value": "gpt-4o",
+                                    "label": "OpenAI GPT-4o"
+                                },
+                                {
+                                    "value": "gpt-4o-mini",
+                                    "label": "OpenAI GPT-4o mini"
+                                }
+                            ],
+                            "help": "Pick a model that matches the connected provider."
+                        },
+                        {
+                            "key": "system_prompt",
+                            "label": "System Prompt (persona / business context)",
+                            "type": "textarea",
+                            "required": false,
+                            "placeholder": "You are a helpful support assistant for Acme Co. Be concise and friendly."
+                        },
+                        {
+                            "key": "user_message",
+                            "label": "User Message",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.text}}",
+                            "help": "The incoming message to respond to."
+                        },
+                        {
+                            "key": "history",
+                            "label": "Conversation History (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "A JSON array of prior turns ([{\"role\":\"user|assistant\",\"content\":\"...\"}]) from a memory node."
+                        },
+                        {
+                            "key": "max_tokens",
+                            "label": "Max Tokens",
+                            "type": "number",
+                            "required": false,
+                            "default": 2048
+                        },
+                        {
+                            "key": "temperature",
+                            "label": "Temperature (OpenAI / Sonnet / Haiku only)",
+                            "type": "number",
+                            "required": false,
+                            "help": "Ignored for Claude Opus / Fable models, which do not accept it."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "ai-agent": {
+            "slug": "ai-agent",
+            "name": "AI Agent",
+            "icon": "ai-agent.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "api_key",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "run_agent": {
+                    "label": "Run AI Agent",
+                    "key": "run_agent",
+                    "schema": [
+                        {
+                            "key": "model",
+                            "label": "Model",
+                            "type": "select",
+                            "required": true,
+                            "default": "claude-opus-4-8",
+                            "options": [
+                                {
+                                    "value": "claude-opus-4-8",
+                                    "label": "Claude Opus 4.8"
+                                },
+                                {
+                                    "value": "claude-sonnet-4-6",
+                                    "label": "Claude Sonnet 4.6"
+                                },
+                                {
+                                    "value": "gpt-4o",
+                                    "label": "OpenAI GPT-4o"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "system_prompt",
+                            "label": "Agent Instructions",
+                            "type": "textarea",
+                            "required": false,
+                            "placeholder": "You are a support agent for Acme. Use the tools to find answers before replying."
+                        },
+                        {
+                            "key": "task",
+                            "label": "Task / Message",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.text}}"
+                        },
+                        {
+                            "key": "business_key",
+                            "label": "Knowledge Business Key (enables knowledge search tool)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "business_a"
+                        },
+                        {
+                            "key": "enable_http",
+                            "label": "Allow HTTP Request tool",
+                            "type": "select",
+                            "required": false,
+                            "default": "no",
+                            "options": [
+                                {
+                                    "value": "no",
+                                    "label": "No"
+                                },
+                                {
+                                    "value": "yes",
+                                    "label": "Yes"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "max_steps",
+                            "label": "Max Tool Steps",
+                            "type": "number",
+                            "required": false,
+                            "default": 5
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "arform": {
             "slug": "arform",
             "name": "AR Form",
@@ -2637,6 +2818,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit (Lite)",
@@ -2699,6 +2881,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -2735,6 +2918,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "contact_form_submission": {
                     "label": "Contact Form Submission",
@@ -2774,6 +2958,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -2810,6 +2995,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -2831,6 +3017,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "create_contact": {
@@ -2958,6 +3145,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "account_activated": {
                     "label": "Account Activated",
@@ -3801,6 +3989,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "coblocks_form_submit": {
                     "label": "Form Submission",
@@ -3822,6 +4011,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -3876,6 +4066,7 @@
             "requires_connection": true,
             "auth_type": "bot_token",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "create_channel": {
@@ -4627,6 +4818,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "contact_form_submit": {
                     "label": "Contact Form Submitted",
@@ -4648,6 +4840,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "new_seller_created": {
                     "label": "New Seller Created",
@@ -5358,6 +5551,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "purchase_product": {
                     "label": "Product Purchased",
@@ -5827,6 +6021,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "elementor_pro/forms/new_record": {
                     "label": "Form New Record",
@@ -5848,6 +6043,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "eb_form_submit_before_email": {
                     "label": "Form Submission",
@@ -5869,6 +6065,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "attendEvent": {
                     "label": "User attended an event",
@@ -5917,6 +6114,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
+            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/fillout",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -5961,6 +6159,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "order_created": {
                     "label": "Order Created",
@@ -7374,6 +7573,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "added_tag": {
                     "label": "Tag Added To Contact",
@@ -8343,6 +8543,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "submission_inserted": {
                     "label": "Form Submitted",
@@ -8379,6 +8580,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "email_sent": {
                     "label": "Email Sent",
@@ -8521,6 +8723,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -8557,6 +8760,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "woofunnels_loaded": {
                     "label": "WooFunnels Loaded",
@@ -9192,6 +9396,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "user_earns_rank": {
                     "label": "User Earns Rank",
@@ -9343,6 +9548,7 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "send_email": {
@@ -9620,6 +9826,7 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "create_meeting": {
@@ -9893,6 +10100,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -9929,6 +10137,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "created_contact": {
                     "label": "Created Contact",
@@ -9998,6 +10207,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "post_type_field_update": {
                     "label": "Updated JetEngine field on post type",
@@ -10034,6 +10244,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
+            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/jotform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10360,6 +10571,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "kadence_blocks_advanced_form_submission": {
                     "label": "Form Submission",
@@ -10381,6 +10593,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "user_enroll_course": {
                     "label": "User Is Enrolled In A Course",
@@ -10641,6 +10854,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -10749,6 +10963,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": true,
+            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/mailchimp",
             "triggers": {
                 "subscribed": {
                     "label": "Subscriber Added",
@@ -11109,6 +11324,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "user_enroll_course": {
                     "label": "User Is Enrolled In A Course",
@@ -11255,6 +11471,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "member_added": {
                     "label": "Member Added",
@@ -12423,6 +12640,53 @@
                 }
             }
         },
+        "messenger": {
+            "slug": "messenger",
+            "name": "Facebook Messenger",
+            "icon": "messenger.svg",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "api_key",
+            "supports_webhook": true,
+            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/messenger",
+            "triggers": {
+                "message_received": {
+                    "label": "Message Received",
+                    "hook": "zaplane/messenger/message_received",
+                    "key": "message_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "send_text": {
+                    "label": "Send Message",
+                    "key": "send_text",
+                    "schema": [
+                        {
+                            "key": "recipient_id",
+                            "label": "Recipient PSID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.sender_id}}",
+                            "help": "The Page-scoped ID of the person to message."
+                        },
+                        {
+                            "key": "text",
+                            "label": "Message Text",
+                            "type": "textarea",
+                            "required": true,
+                            "placeholder": "Type your reply... use {{variable}} for dynamic values"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "metabox": {
             "slug": "metabox",
             "name": "MetaBox",
@@ -12431,6 +12695,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "form_submission": {
                     "label": "Form Submission",
@@ -12467,6 +12732,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "metform_after_store_form_data": {
                     "label": "Form Submitted",
@@ -12488,6 +12754,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "process_ninja_form": {
                     "label": "Form Submit",
@@ -12524,6 +12791,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "admin_assigns_membership": {
                     "label": "Admin Assigns a Membership Level to a User",
@@ -12756,6 +13024,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -13116,6 +13385,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "user_registration": {
                     "label": "User Registration",
@@ -13174,6 +13444,70 @@
             },
             "actions": []
         },
+        "schedule": {
+            "slug": "schedule",
+            "name": "Schedule",
+            "icon": "schedule.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": {
+                "interval": {
+                    "label": "On a Schedule",
+                    "hook": "zaplane/schedule/tick",
+                    "key": "interval",
+                    "schema": [
+                        {
+                            "key": "frequency",
+                            "label": "Frequency",
+                            "type": "select",
+                            "required": true,
+                            "default": "every_minutes",
+                            "options": [
+                                {
+                                    "value": "every_minutes",
+                                    "label": "Every X minutes"
+                                },
+                                {
+                                    "value": "hourly",
+                                    "label": "Hourly"
+                                },
+                                {
+                                    "value": "daily",
+                                    "label": "Daily at a time"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "interval_minutes",
+                            "label": "Every (minutes)",
+                            "type": "number",
+                            "required": false,
+                            "default": 15,
+                            "depends_on": {
+                                "frequency": "every_minutes"
+                            }
+                        },
+                        {
+                            "key": "time",
+                            "label": "Time (HH:MM, site timezone)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "09:00",
+                            "depends_on": {
+                                "frequency": "daily"
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
         "slack": {
             "slug": "slack",
             "name": "Slack",
@@ -13182,6 +13516,7 @@
             "requires_connection": true,
             "auth_type": "both",
             "supports_webhook": true,
+            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/slack",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -13413,6 +13748,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "uagb_form_success": {
                     "label": "Form Submission",
@@ -13434,6 +13770,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "purchase_created": {
                     "label": "Purchase Created",
@@ -14601,6 +14938,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -14637,6 +14975,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "email_sent_successfully": {
                     "label": "Email Sent Successfully",
@@ -14667,6 +15006,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "access_group": {
                     "label": "User Added To Access Group",
@@ -14810,6 +15150,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -15155,6 +15496,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "create_card": {
@@ -16881,6 +17223,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -16995,6 +17338,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
+            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/typeform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -17093,6 +17437,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "user_login": {
                     "label": "User Login",
@@ -17171,6 +17516,36 @@
                 }
             }
         },
+        "webhook": {
+            "slug": "webhook",
+            "name": "Webhook",
+            "icon": "webhook.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": {
+                "catch_hook": {
+                    "label": "Catch Webhook",
+                    "hook": "zaplane/webhook/catch",
+                    "key": "catch_hook",
+                    "schema": [
+                        {
+                            "key": "secret",
+                            "label": "Secret (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "If set, requests must include ?secret=... (or an X-Zaplane-Secret header) that matches."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
         "weforms": {
             "slug": "weforms",
             "name": "We Forms",
@@ -17179,6 +17554,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "weforms_entry_submission": {
                     "label": "Form Submission",
@@ -17214,8 +17590,19 @@
             "category": "app",
             "requires_connection": true,
             "auth_type": "api_key",
-            "supports_webhook": false,
-            "triggers": [],
+            "supports_webhook": true,
+            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/whatsapp",
+            "triggers": {
+                "message_received": {
+                    "label": "Message Received",
+                    "hook": "zaplane/whatsapp/message_received",
+                    "key": "message_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
             "actions": {
                 "send_text": {
                     "label": "Send Text Message",
@@ -17466,6 +17853,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "booking_created": {
                     "label": "Booking Created",
@@ -17726,6 +18114,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "new_order": {
                     "label": "New Order Created",
@@ -20938,6 +21327,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "publish_post": {
                     "label": "Post Published",
@@ -25677,6 +26067,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -25713,6 +26104,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "import_complete": {
                     "label": "Import Complete",
@@ -26284,6 +26676,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": {
                 "post_form_submission": {
                     "label": "Post Form Submission",
@@ -26359,6 +26752,7 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": true,
+            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/zoom",
             "triggers": {
                 "meeting_started": {
                     "label": "Meeting Started",
@@ -26787,6 +27181,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "if": {
@@ -26890,6 +27285,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "wait": {
@@ -26934,6 +27330,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "filter": {
@@ -27028,6 +27425,180 @@
                 }
             }
         },
+        "formatter": {
+            "slug": "formatter",
+            "name": "Formatter",
+            "icon": "formatter.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "format_text": {
+                    "label": "Format Text",
+                    "key": "format_text",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "Input",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "operation",
+                            "label": "Operation",
+                            "type": "select",
+                            "required": true,
+                            "default": "uppercase",
+                            "options": [
+                                {
+                                    "value": "uppercase",
+                                    "label": "Uppercase"
+                                },
+                                {
+                                    "value": "lowercase",
+                                    "label": "Lowercase"
+                                },
+                                {
+                                    "value": "capitalize",
+                                    "label": "Capitalize first"
+                                },
+                                {
+                                    "value": "title",
+                                    "label": "Title Case"
+                                },
+                                {
+                                    "value": "trim",
+                                    "label": "Trim whitespace"
+                                },
+                                {
+                                    "value": "replace",
+                                    "label": "Find & Replace"
+                                },
+                                {
+                                    "value": "truncate",
+                                    "label": "Truncate"
+                                },
+                                {
+                                    "value": "slug",
+                                    "label": "Slugify"
+                                },
+                                {
+                                    "value": "length",
+                                    "label": "Length"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "find",
+                            "label": "Find",
+                            "type": "expression",
+                            "required": false,
+                            "depends_on": {
+                                "operation": "replace"
+                            }
+                        },
+                        {
+                            "key": "replace",
+                            "label": "Replace with",
+                            "type": "expression",
+                            "required": false,
+                            "depends_on": {
+                                "operation": "replace"
+                            }
+                        },
+                        {
+                            "key": "length",
+                            "label": "Max length",
+                            "type": "number",
+                            "required": false,
+                            "depends_on": {
+                                "operation": "truncate"
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "format_number": {
+                    "label": "Format Number",
+                    "key": "format_number",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "Input",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "operation",
+                            "label": "Operation",
+                            "type": "select",
+                            "required": true,
+                            "default": "round",
+                            "options": [
+                                {
+                                    "value": "round",
+                                    "label": "Round"
+                                },
+                                {
+                                    "value": "ceil",
+                                    "label": "Round up"
+                                },
+                                {
+                                    "value": "floor",
+                                    "label": "Round down"
+                                },
+                                {
+                                    "value": "format",
+                                    "label": "Format (decimals + thousands)"
+                                },
+                                {
+                                    "value": "abs",
+                                    "label": "Absolute value"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "decimals",
+                            "label": "Decimals",
+                            "type": "number",
+                            "required": false,
+                            "default": 2
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "format_date": {
+                    "label": "Format Date",
+                    "key": "format_date",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "Input date (blank = now)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "format",
+                            "label": "Output format",
+                            "type": "expression",
+                            "required": true,
+                            "default": "Y-m-d H:i:s",
+                            "help": "PHP date format, e.g. Y-m-d, \"F j, Y\", H:i"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "http": {
             "slug": "http",
             "name": "HTTP Request",
@@ -27036,6 +27607,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "request": {
@@ -27096,6 +27668,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "iterator": {
@@ -27116,6 +27689,377 @@
                 }
             }
         },
+        "knowledge": {
+            "slug": "knowledge",
+            "name": "Business Knowledge",
+            "icon": "knowledge.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "retrieve": {
+                    "label": "Retrieve Business Knowledge",
+                    "key": "retrieve",
+                    "schema": [
+                        {
+                            "key": "business_key",
+                            "label": "Business Key",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "business_a",
+                            "help": "Identifies which business this knowledge belongs to."
+                        },
+                        {
+                            "key": "query",
+                            "label": "Query",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{1.text}}",
+                            "help": "The customer message \u2014 used to find the most relevant entries."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Max Results",
+                            "type": "number",
+                            "required": false,
+                            "default": 5
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_entry": {
+                    "label": "Add / Update Knowledge Entry",
+                    "key": "add_entry",
+                    "schema": [
+                        {
+                            "key": "business_key",
+                            "label": "Business Key",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "business_a",
+                            "help": "Identifies which business this knowledge belongs to."
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "Returns policy"
+                        },
+                        {
+                            "key": "content",
+                            "label": "Content",
+                            "type": "textarea",
+                            "required": true,
+                            "help": "A product (name + price + details) or an FAQ/policy entry."
+                        },
+                        {
+                            "key": "ref_id",
+                            "label": "Reference ID (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "If set, re-adding with the same ref updates the entry instead of duplicating."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "sync_storeengine": {
+                    "label": "Sync StoreEngine Products",
+                    "key": "sync_storeengine",
+                    "schema": [
+                        {
+                            "key": "business_key",
+                            "label": "Business Key",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "business_a",
+                            "help": "Identifies which business this knowledge belongs to."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Max Products (0 = all)",
+                            "type": "number",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "prune",
+                            "label": "Remove deleted products",
+                            "type": "select",
+                            "required": false,
+                            "default": "yes",
+                            "options": [
+                                {
+                                    "value": "yes",
+                                    "label": "Yes \u2014 mirror the catalog (full sync only)"
+                                },
+                                {
+                                    "value": "no",
+                                    "label": "No \u2014 only add/update"
+                                }
+                            ],
+                            "help": "When on (and syncing all products), removes synced entries whose product no longer exists. Manual entries are never touched."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "clear": {
+                    "label": "Clear Business Knowledge",
+                    "key": "clear",
+                    "schema": [
+                        {
+                            "key": "business_key",
+                            "label": "Business Key",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "business_a",
+                            "help": "Identifies which business this knowledge belongs to."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "mcp-client": {
+            "slug": "mcp-client",
+            "name": "MCP Client",
+            "icon": "mcp.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "list_tools": {
+                    "label": "List MCP Tools",
+                    "key": "list_tools",
+                    "schema": [
+                        {
+                            "key": "server_url",
+                            "label": "MCP Server URL",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "https://mcp.example.com/mcp"
+                        },
+                        {
+                            "key": "auth_token",
+                            "label": "Bearer Token (optional)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "call_tool": {
+                    "label": "Call MCP Tool",
+                    "key": "call_tool",
+                    "schema": [
+                        {
+                            "key": "server_url",
+                            "label": "MCP Server URL",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "https://mcp.example.com/mcp"
+                        },
+                        {
+                            "key": "auth_token",
+                            "label": "Bearer Token (optional)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "tool_name",
+                            "label": "Tool Name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "arguments",
+                            "label": "Arguments (JSON)",
+                            "type": "textarea",
+                            "required": false,
+                            "placeholder": "{\"query\":\"hello\"}"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "memory": {
+            "slug": "memory",
+            "name": "Conversation Memory",
+            "icon": "memory.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "get_history": {
+                    "label": "Get Conversation History",
+                    "key": "get_history",
+                    "schema": [
+                        {
+                            "key": "conversation_key",
+                            "label": "Conversation Key",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "whatsapp:{{trigger.from}}",
+                            "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Max Messages",
+                            "type": "number",
+                            "required": false,
+                            "default": 10,
+                            "help": "How many recent turns to return (oldest\u2192newest)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "append": {
+                    "label": "Append Message To Conversation",
+                    "key": "append",
+                    "schema": [
+                        {
+                            "key": "conversation_key",
+                            "label": "Conversation Key",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "whatsapp:{{trigger.from}}",
+                            "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "required": true,
+                            "default": "user",
+                            "options": [
+                                {
+                                    "value": "user",
+                                    "label": "User"
+                                },
+                                {
+                                    "value": "assistant",
+                                    "label": "Assistant"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "content",
+                            "label": "Content",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "channel",
+                            "label": "Channel (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "whatsapp"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "clear": {
+                    "label": "Clear Conversation",
+                    "key": "clear",
+                    "schema": [
+                        {
+                            "key": "conversation_key",
+                            "label": "Conversation Key",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "whatsapp:{{trigger.from}}",
+                            "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "router": {
+            "slug": "router",
+            "name": "Router",
+            "icon": "router.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "route": {
+                    "label": "Route By Value",
+                    "key": "route",
+                    "schema": [
+                        {
+                            "key": "value",
+                            "label": "Value to route on",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{1.type}}"
+                        },
+                        {
+                            "key": "case_1",
+                            "label": "Path 1 equals",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "case_2",
+                            "label": "Path 2 equals",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "case_3",
+                            "label": "Path 3 equals",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "case_4",
+                            "label": "Path 4 equals",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "path_1",
+                        "path_2",
+                        "path_3",
+                        "path_4",
+                        "fallback"
+                    ]
+                }
+            }
+        },
         "variable": {
             "slug": "variable",
             "name": "Set Variable",
@@ -27124,6 +28068,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
+            "webhook_url": "",
             "triggers": [],
             "actions": {
                 "set": {

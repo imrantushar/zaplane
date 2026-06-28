@@ -69,6 +69,46 @@ $registry = [
 		'file'  => 'http.php',
 		'class' => \Zaplane\Integrations\Http::class,
 	],
+	'ai'                  => [
+		'file'  => 'ai.php',
+		'class' => \Zaplane\Integrations\Ai::class,
+	],
+	'memory'              => [
+		'file'  => 'memory.php',
+		'class' => \Zaplane\Integrations\Memory::class,
+	],
+	'knowledge'           => [
+		'file'  => 'knowledge.php',
+		'class' => \Zaplane\Integrations\Knowledge::class,
+	],
+	'formatter'           => [
+		'file'  => 'formatter.php',
+		'class' => \Zaplane\Integrations\Formatter::class,
+	],
+	'mcp-client'          => [
+		'file'  => 'mcpclient.php',
+		'class' => \Zaplane\Integrations\Mcpclient::class,
+	],
+	'schedule'            => [
+		'file'  => 'schedule.php',
+		'class' => \Zaplane\Integrations\Schedule::class,
+	],
+	'router'              => [
+		'file'  => 'router.php',
+		'class' => \Zaplane\Integrations\Router::class,
+	],
+	'webhook'             => [
+		'file'  => 'webhook.php',
+		'class' => \Zaplane\Integrations\Webhook::class,
+	],
+	'ai-agent'            => [
+		'file'  => 'aiagent.php',
+		'class' => \Zaplane\Integrations\Aiagent::class,
+	],
+	'messenger'           => [
+		'file'  => 'messenger.php',
+		'class' => \Zaplane\Integrations\Messenger::class,
+	],
 	'learndash'           => [
 		'file'  => 'learndash.php',
 		'class' => \Zaplane\Integrations\Learndash::class,
