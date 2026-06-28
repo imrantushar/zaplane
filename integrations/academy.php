@@ -461,89 +461,53 @@ class Academy extends IntegrationBase
         $user_id   = (int) ($node['data']['config']['user_id']   ?? 0);
         $course_id = (int) ($node['data']['config']['course_id'] ?? 0);
 
+        $fail = static function (string $message) use ($input): array {
+            return ['port' => 'main', 'data' => array_merge($input, [
+                'success' => false,
+                'message' => $message,
+            ])];
+        };
+
         if (! $user_id || ! $course_id) {
-            return [
-                'port' => 'main',
-                'data' => array_merge($input, [
-                    'success' => false,
-                    'message' => 'user_id and course_id are required.',
-                ]),
-            ];
+            return $fail('user_id and course_id are required.');
         }
-
+        if (! class_exists('\Academy\Helper') || ! method_exists('\Academy\Helper', 'do_enroll')) {
+            return $fail('Academy LMS is not active.');
+        }
         if (! get_userdata($user_id)) {
-            return [
-                'port' => 'main',
-                'data' => array_merge($input, [
-                    'success' => false,
-                    'message' => 'User not found.',
-                ]),
-            ];
+            return $fail('User not found.');
+        }
+        if (get_post_type($course_id) !== 'academy_courses') {
+            return $fail('Course not found.');
         }
 
-        if (! get_post($course_id)) {
-            return [
-                'port' => 'main',
-                'data' => array_merge($input, [
-                    'success' => false,
-                    'message' => 'Course not found.',
-                ]),
-            ];
-        }
-
-        // Check for an existing enrollment via post_parent (Academy LMS convention).
-        $existing = get_posts([
-            'post_type'      => 'academy_enrollment',
-            'post_status'    => 'publish',
-            'posts_per_page' => 1,
-            'author'         => $user_id,
-            'post_parent'    => $course_id,   // FIX: was meta_query on _academy_course_id
-        ]);
-
-        if (! empty($existing)) {
-            return [
-                'port' => 'main',
-                'data' => array_merge($input, [
-                    'success'   => false,
-                    'message'   => 'User is already enrolled in this course.',
-                    'enroll_id' => $existing[0]->ID,
-                    'user_id'   => $user_id,
-                    'course_id' => $course_id,
-                ]),
-            ];
-        }
-
-        // Create enrollment post with post_parent = course_id (Academy LMS convention).
-        $enroll_id = wp_insert_post([
-            'post_type'   => 'academy_enrollment',
-            'post_status' => 'publish',
-            'post_author' => $user_id,
-            'post_parent' => $course_id,      // FIX: was missing; meta saved separately before
-            'post_title'  => 'Enrollment: user ' . $user_id . ' — course ' . $course_id,
-        ]);
-
-        if (is_wp_error($enroll_id)) {
-            return [
-                'port' => 'main',
-                'data' => array_merge($input, [
-                    'success' => false,
-                    'message' => $enroll_id->get_error_message(),
-                ]),
-            ];
-        }
-
-        // Fire the same hook the plugin uses so other integrations stay in sync.
-        do_action('academy/course/after_enroll', $course_id, $enroll_id, $user_id);
-
-        return [
-            'port' => 'main',
-            'data' => array_merge($input, [
-                'success'   => true,
-                'enroll_id' => $enroll_id,
+        // Academy stores enrollment as the `academy_enrolled` CPT (status `completed`).
+        // Check via the plugin's own helper so we match its exact convention.
+        $existing = \Academy\Helper::is_enrolled($course_id, $user_id, 'any');
+        if ($existing && 'cancel' !== ($existing->enrolled_status ?? '')) {
+            return ['port' => 'main', 'data' => array_merge($input, [
+                'success'   => false,
+                'message'   => 'User is already enrolled in this course.',
+                'enroll_id' => (int) $existing->ID,
                 'user_id'   => $user_id,
                 'course_id' => $course_id,
-            ]),
-        ];
+            ])];
+        }
+
+        // Canonical enrollment: correct CPT/status, marks the user as an
+        // academy_student, clears caches, and fires academy/course/after_enroll.
+        $enroll_id = \Academy\Helper::do_enroll($course_id, $user_id);
+
+        if (! $enroll_id) {
+            return $fail('Enrollment failed.');
+        }
+
+        return ['port' => 'main', 'data' => array_merge($input, [
+            'success'   => true,
+            'enroll_id' => (int) $enroll_id,
+            'user_id'   => $user_id,
+            'course_id' => $course_id,
+        ])];
     }
 
     // -------------------------------------------------------------------------
