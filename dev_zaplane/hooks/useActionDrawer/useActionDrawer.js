@@ -136,7 +136,14 @@ export const useActionDrawer = ({
   const list = useMemo(() => {
     const base = mode === "app" ? APPS : mode === "tools" ? TOOLS : [];
 
-    if (isTrigger) return base;
+    if (isTrigger) {
+      return base.filter((item) => {
+        const triggers = integrations.apps?.[item.id]?.triggers;
+        if (!triggers) return false;
+        if (Array.isArray(triggers)) return triggers.length > 0;
+        return Object.keys(triggers).length > 0;
+      });
+    }
 
     return base.filter((item) => {
       const integration =
@@ -152,7 +159,12 @@ export const useActionDrawer = ({
     if (!search) return [];
     const q = search.toLowerCase();
     const combined = isTrigger
-      ? APPS
+      ? APPS.filter((item) => {
+          const triggers = integrations.apps?.[item.id]?.triggers;
+          if (!triggers) return false;
+          if (Array.isArray(triggers)) return triggers.length > 0;
+          return Object.keys(triggers).length > 0;
+        })
       : APPS.concat(TOOLS.map(t => ({ ...t, type: "tools" })));
 
     return combined.filter(item => item.name.toLowerCase().includes(q));
