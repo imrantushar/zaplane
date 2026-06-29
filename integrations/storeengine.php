@@ -21,12 +21,6 @@ class Storeengine extends IntegrationBase {
 		return 'storeengine.svg';
 	}
 
-	/**
-	 * Whether a StoreEngine addon is active.
-	 *
-	 * StoreEngine exposes addon status via \StoreEngine\Utils\Helper::get_addon_active_status().
-	 * Guarded so the integration never fatals when StoreEngine (or the helper) is missing.
-	 */
 	private static function addon_active( string $addon ): bool {
 		if (
 			class_exists( '\StoreEngine\Utils\Helper' ) &&
@@ -38,33 +32,15 @@ class Storeengine extends IntegrationBase {
 		return false;
 	}
 
-	/**
-	 * Always expose addon-specific triggers/actions, but flag them as disabled
-	 * (with a reason) when the underlying StoreEngine addon is not active. The
-	 * admin UI keeps the label visible and greys the item out, surfacing the
-	 * "Requires the StoreEngine X addon" hint instead of hiding it entirely.
-	 *
-	 * @param array  $items Map of slug => definition.
-	 * @param string $addon StoreEngine addon key (e.g. 'subscription').
-	 * @param string $label Human readable addon name for the hint.
-	 */
 	private static function gate( array $items, string $addon, string $label ): array {
 		$active = self::addon_active( $addon );
 
 		foreach ( $items as &$item ) {
-			// Static dependency marker — deterministic in the built manifest,
-			// independent of the build machine's addon status. The picker can
-			// use this to re-evaluate availability live against the site's
-			// active addons if desired.
 			$item['requires_addon'] = $addon;
 
-			// Build-time snapshot of availability for the picker, captured when
-			// `wp build:integration` runs. Re-run the build after activating the
-			// addon to flip the item from disabled to enabled.
 			if ( ! $active ) {
 				$item['disabled']        = true;
 				$item['disabled_reason'] = sprintf(
-					/* translators: %s: StoreEngine addon name. */
 					__( 'Requires the StoreEngine %s addon to be active.', 'zaplane' ),
 					$label
 				);
@@ -75,15 +51,8 @@ class Storeengine extends IntegrationBase {
 		return $items;
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| TRIGGERS
-	|--------------------------------------------------------------------------
-	*/
-
 	public static function get_triggers(): array {
 		$triggers = [
-			// --- Orders ---
 			'product_purchased' => [
 				'label' => 'Product Purchased',
 				'hook'  => 'storeengine/checkout/after_place_order',
@@ -172,14 +141,10 @@ class Storeengine extends IntegrationBase {
 				'label' => 'Customer Note Deleted From Order',
 				'hook'  => 'storeengine/order/note_deleted',
 			],
-
-			// --- Customers ---
 			'customer_created' => [
 				'label' => 'Customer Created',
 				'hook'  => 'storeengine/checkout/customer_created',
 			],
-
-			// --- Products / Inventory ---
 			'product_created' => [
 				'label' => 'Product Created',
 				'hook'  => 'storeengine/product/after/object_save',
@@ -200,8 +165,6 @@ class Storeengine extends IntegrationBase {
 				'label' => 'Product Back In Stock',
 				'hook'  => 'storeengine/stock_status_changed',
 			],
-
-			// --- Cart / Checkout ---
 			'checkout_order_processed' => [
 				'label' => 'Checkout Order Processed',
 				'hook'  => 'storeengine/checkout/order_processed',
@@ -211,9 +174,28 @@ class Storeengine extends IntegrationBase {
 				'hook'  => 'storeengine/cart/add_to_cart',
 			],
 		];
-
-		// Addon triggers are always listed; gate() flags them disabled (with a
-		// reason) when the relevant StoreEngine addon is inactive.
+		$triggers += self::gate( [
+			'user_added_to_group' => [
+				'label' => 'User Added To Access Group',
+				'hook'  => 'storeengine/membership/user_added_to_group',
+			],
+			'user_removed_from_group' => [
+				'label' => 'User Removed From Access Group',
+				'hook'  => 'storeengine/membership/user_removed_from_group',
+			],
+			'access_group_created' => [
+				'label' => 'Access Group Created',
+				'hook'  => 'save_post_storeengine_groups',
+			],
+			'access_group_updated' => [
+				'label' => 'Access Group Updated',
+				'hook'  => 'save_post_storeengine_groups',
+			],
+			'access_group_deleted' => [
+				'label' => 'Access Group Deleted',
+				'hook'  => 'delete_post_storeengine_groups',
+			],
+		], 'membership', 'Membership' );
 		$triggers += self::gate( [
 			'subscription_created' => [
 				'label' => 'Subscription Created',
@@ -260,7 +242,6 @@ class Storeengine extends IntegrationBase {
 				'hook'  => 'storeengine/api/after_create_renewal_order',
 			],
 		], 'subscription', 'Subscription' );
-
 		$triggers += self::gate( [
 			'vendor_registered' => [
 				'label' => 'Vendor Registered',
@@ -287,7 +268,6 @@ class Storeengine extends IntegrationBase {
 				'hook'  => 'storeengine/multi_vendor/withdrawal_status_changed',
 			],
 		], 'multi_vendor', 'Multi-Vendor' );
-
 		$triggers += self::gate( [
 			'affiliate_registered' => [
 				'label' => 'Affiliate Registered',
@@ -309,12 +289,6 @@ class Storeengine extends IntegrationBase {
 
 		return $triggers;
 	}
-
-	/*
-	|--------------------------------------------------------------------------
-	| TRIGGER PAYLOAD RESOLVERS
-	|--------------------------------------------------------------------------
-	*/
 
 	private static function resolve_order_payload( $order, array $extra = [] ) {
 		if ( is_object( $order ) && method_exists( $order, 'get_id' ) ) {
@@ -435,17 +409,32 @@ class Storeengine extends IntegrationBase {
 		return array_merge( $data, $extra );
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| TRIGGER DISPATCH
-	|--------------------------------------------------------------------------
-	*/
+	private static function resolve_access_group_payload( int $group_id, array $extra = [] ) {
+		$post = get_post( $group_id );
+		if ( ! $post || 'storeengine_groups' !== $post->post_type ) {
+			return false;
+		}
+
+		$user_roles_meta = get_post_meta( $group_id, '_storeengine_membership_user_roles', true );
+		$roles           = [];
+		if ( is_array( $user_roles_meta ) ) {
+			foreach ( $user_roles_meta as $role ) {
+				$roles[] = $role['value'] ?? $role['label'] ?? '';
+			}
+		}
+
+		return array_merge( [
+			'group_id'     => $group_id,
+			'group_name'   => $post->post_title,
+			'status'       => $post->post_status,
+			'user_roles'   => $roles,
+			'expiration'   => get_post_meta( $group_id, '_storeengine_membership_expiration', true ) ?: [],
+		], $extra );
+	}
 
 	public static function resolve_trigger( array $node, array $args ) {
 
 		switch ( $node['event'] ) {
-
-			/* ---------------- Orders ---------------- */
 
 			case 'product_purchased':
 			case 'checkout_order_processed':
@@ -485,7 +474,6 @@ class Storeengine extends IntegrationBase {
 				return self::resolve_order_payload( $order_id, $extra );
 
 			case 'order_restored':
-				// storeengine/order/status_changed: ( order_id, old_status, new_status, order )
 				$order_id = $args[0] ?? 0;
 				$old      = $args[1] ?? '';
 				$new      = $args[2] ?? '';
@@ -568,8 +556,6 @@ class Storeengine extends IntegrationBase {
 					'deleted_note'    => $note_obj->content ?? '',
 				] );
 
-			/* ---------------- Customers ---------------- */
-
 			case 'customer_created':
 				$user_id  = $args[0] ?? 0;
 				$userdata = $args[1] ?? [];
@@ -585,14 +571,11 @@ class Storeengine extends IntegrationBase {
 					'username'    => $user ? $user->user_login : '',
 				];
 
-			/* ---------------- Products / Inventory ---------------- */
-
 			case 'product_created':
-				// storeengine/product/after/object_save: ( product, $create )
 				$product = $args[0] ?? null;
 				$created = $args[1] ?? false;
 				if ( ! $created ) {
-					return false; // only fire on creation
+					return false;
 				}
 				return self::resolve_product_payload( $product );
 
@@ -621,8 +604,6 @@ class Storeengine extends IntegrationBase {
 					'new_status'   => $new_status,
 				] );
 
-			/* ---------------- Cart ---------------- */
-
 			case 'add_to_cart':
 				return [
 					'cart_id'      => $args[0] ?? '',
@@ -632,7 +613,49 @@ class Storeengine extends IntegrationBase {
 					'quantity'     => $args[4] ?? '',
 				];
 
-			/* ---------------- Subscriptions ---------------- */
+			case 'user_added_to_group':
+			case 'user_removed_from_group':
+				$user_id  = $args[0] ?? 0;
+				$group_id = $args[1] ?? 0;
+				if ( ! $user_id || ! $group_id ) {
+					return false;
+				}
+				$user = get_userdata( $user_id );
+				return [
+					'user_id'    => (int) $user_id,
+					'user_email' => $user ? $user->user_email : '',
+					'group_id'   => (int) $group_id,
+					'group_name' => get_the_title( $group_id ),
+				];
+
+			case 'access_group_created':
+				$group_id = $args[0] ?? 0;
+				$update   = $args[2] ?? false;
+				if ( ! $group_id || $update ) {
+					return false;
+				}
+				if ( wp_is_post_revision( $group_id ) || wp_is_post_autosave( $group_id ) ) {
+					return false;
+				}
+				return self::resolve_access_group_payload( $group_id );
+
+			case 'access_group_updated':
+				$group_id = $args[0] ?? 0;
+				$update   = $args[2] ?? false;
+				if ( ! $group_id || ! $update ) {
+					return false;
+				}
+				if ( wp_is_post_revision( $group_id ) || wp_is_post_autosave( $group_id ) ) {
+					return false;
+				}
+				return self::resolve_access_group_payload( $group_id );
+
+			case 'access_group_deleted':
+				$group_id = $args[0] ?? 0;
+				if ( ! $group_id ) {
+					return false;
+				}
+				return [ 'group_id' => (int) $group_id ];
 
 			case 'subscription_created':
 			case 'subscription_activated':
@@ -660,7 +683,7 @@ class Storeengine extends IntegrationBase {
 				return self::resolve_subscription_payload( $sub, [ 'renewal_order_id' => $order_id ] );
 
 			case 'subscription_renewal_failed':
-				$sub = $args[1] ?? null; // ( $type|$order, $subscription )
+				$sub = $args[1] ?? null;
 				return self::resolve_subscription_payload( $sub );
 
 			case 'subscription_trial_ended':
@@ -670,8 +693,6 @@ class Storeengine extends IntegrationBase {
 			case 'subscription_renewal_order_created':
 				$order = $args[0] ?? null;
 				return self::resolve_order_payload( $order, [ 'is_renewal' => true ] );
-
-			/* ---------------- Multi-Vendor ---------------- */
 
 			case 'vendor_registered':
 			case 'vendor_approved':
@@ -707,8 +728,6 @@ class Storeengine extends IntegrationBase {
 					'new_status'    => $args[1] ?? '',
 					'old_status'    => $args[2] ?? '',
 				];
-
-			/* ---------------- Affiliate ---------------- */
 
 			case 'affiliate_registered':
 				return [ 'affiliate_id' => $args[0] ?? '' ];
@@ -761,42 +780,36 @@ class Storeengine extends IntegrationBase {
 			'subscription_status_changed' => [ 'subscription_id' => 9, 'status' => 'active', 'old_status' => 'pending', 'new_status' => 'active', 'customer_id' => 5, 'total' => '49.00' ],
 			'vendor_registered'           => [ 'vendor_id' => 3, 'store_name' => 'Acme Store' ],
 			'affiliate_registered'        => [ 'affiliate_id' => 7 ],
+			'user_added_to_group'         => [ 'user_id' => 5, 'user_email' => 'john@example.com', 'group_id' => 12, 'group_name' => 'Gold Members' ],
+			'user_removed_from_group'     => [ 'user_id' => 5, 'user_email' => 'john@example.com', 'group_id' => 12, 'group_name' => 'Gold Members' ],
+			'access_group_created'        => [ 'group_id' => 12, 'group_name' => 'Gold Members', 'status' => 'publish', 'user_roles' => [ 'subscriber' ], 'expiration' => [] ],
+			'access_group_updated'        => [ 'group_id' => 12, 'group_name' => 'Gold Members', 'status' => 'publish', 'user_roles' => [ 'subscriber' ], 'expiration' => [] ],
+			'access_group_deleted'        => [ 'group_id' => 12 ],
 		];
 
 		return $samples[ $trigger ] ?? [];
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| ACTIONS
-	|--------------------------------------------------------------------------
-	*/
-
 	public static function get_actions(): array {
 		$actions = [
-			// Orders
 			'update_order_status' => [ 'label' => 'Update Order Status' ],
 			'add_order_note'      => [ 'label' => 'Add Order Note' ],
 			'refund_order'        => [ 'label' => 'Refund Order' ],
-			// Customers
 			'create_customer'     => [ 'label' => 'Create Customer' ],
 			'update_customer'     => [ 'label' => 'Update Customer' ],
-			// Products / Inventory
 			'adjust_stock'        => [ 'label' => 'Adjust Product Stock' ],
 			'set_stock_status'    => [ 'label' => 'Set Product Stock Status' ],
-			// Coupons
 			'create_coupon'       => [ 'label' => 'Create Coupon' ],
 		];
-
-		// Addon actions are always listed; gate() flags them disabled (with a
-		// reason) when the relevant StoreEngine addon is inactive.
 		$actions += self::gate( [
 			'update_subscription_status' => [ 'label' => 'Update Subscription Status' ],
 		], 'subscription', 'Subscription' );
-
 		$actions += self::gate( [
-			'grant_membership'  => [ 'label' => 'Grant Membership' ],
-			'revoke_membership' => [ 'label' => 'Revoke Membership' ],
+			'grant_membership'      => [ 'label' => 'Grant Membership (Add User To Group)' ],
+			'revoke_membership'     => [ 'label' => 'Revoke Membership (Remove User From Group)' ],
+			'create_access_group'   => [ 'label' => 'Create Access Group' ],
+			'update_access_group'   => [ 'label' => 'Update Access Group' ],
+			'delete_access_group'   => [ 'label' => 'Delete Access Group' ],
 		], 'membership', 'Membership' );
 
 		return $actions;
@@ -1004,16 +1017,81 @@ class Storeengine extends IntegrationBase {
 						],
 					],
 				];
+
+			case 'create_access_group':
+				return [
+					[ 'key' => 'name', 'label' => 'Access Group Name', 'type' => 'expression', 'required' => true ],
+					[ 'key' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ],
+					[
+						'key'      => 'group_status',
+						'label'    => 'Status',
+						'type'     => 'select',
+						'required' => false,
+						'default'  => 'publish',
+						'options'  => [
+							[ 'value' => 'publish', 'label' => 'Published' ],
+							[ 'value' => 'draft', 'label' => 'Draft' ],
+						],
+					],
+					[ 'key' => 'user_roles', 'label' => 'User Roles (comma-separated, e.g. subscriber,customer)', 'type' => 'expression', 'required' => false ],
+					[ 'key' => 'enable_expiration', 'label' => 'Enable Expiration', 'type' => 'select', 'required' => false, 'default' => 'no', 'options' => [
+						[ 'value' => 'no', 'label' => 'No' ],
+						[ 'value' => 'yes', 'label' => 'Yes' ],
+					] ],
+					[ 'key' => 'expiration_date', 'label' => 'Specific Expiration Date (Y-m-d, optional)', 'type' => 'expression', 'required' => false ],
+				];
+
+			case 'update_access_group':
+				return [
+					[
+						'key'      => 'group_id',
+						'label'    => 'Access Group',
+						'type'     => 'select',
+						'required' => true,
+						'dynamic'  => [
+							'integration' => 'storeengine',
+							'query'       => 'storeengine_membership_group_query',
+							'select'      => [ 'value', 'label' ],
+						],
+					],
+					[ 'key' => 'name', 'label' => 'New Name (leave empty to keep)', 'type' => 'expression', 'required' => false ],
+					[ 'key' => 'description', 'label' => 'New Description (leave empty to keep)', 'type' => 'textarea', 'required' => false ],
+					[
+						'key'      => 'group_status',
+						'label'    => 'Status',
+						'type'     => 'select',
+						'required' => false,
+						'options'  => [
+							[ 'value' => '', 'label' => '— Keep current —' ],
+							[ 'value' => 'publish', 'label' => 'Published' ],
+							[ 'value' => 'draft', 'label' => 'Draft' ],
+						],
+					],
+					[ 'key' => 'user_roles', 'label' => 'User Roles (comma-separated, leave empty to keep)', 'type' => 'expression', 'required' => false ],
+				];
+
+			case 'delete_access_group':
+				return [
+					[
+						'key'      => 'group_id',
+						'label'    => 'Access Group',
+						'type'     => 'select',
+						'required' => true,
+						'dynamic'  => [
+							'integration' => 'storeengine',
+							'query'       => 'storeengine_membership_group_query',
+							'select'      => [ 'value', 'label' ],
+						],
+					],
+					[ 'key' => 'force_delete', 'label' => 'Permanently Delete (skip trash)', 'type' => 'select', 'required' => false, 'default' => 'no', 'options' => [
+						[ 'value' => 'no', 'label' => 'No — Move to Trash' ],
+						[ 'value' => 'yes', 'label' => 'Yes — Permanently Delete' ],
+					] ],
+				];
 		}//end switch
 
 		return [];
 	}
-
-	/*
-	|--------------------------------------------------------------------------
-	| DYNAMIC QUERIES
-	|--------------------------------------------------------------------------
-	*/
 
 	public static function get_dynamic_queries(): array {
 		return [
@@ -1053,12 +1131,6 @@ class Storeengine extends IntegrationBase {
 		}, $posts );
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| ACTION DISPATCH
-	|--------------------------------------------------------------------------
-	*/
-
 	public static function execute_node( array $node, array $input ): array {
 		$event  = $node['data']['event'] ?? '';
 		$config = $node['data']['config'] ?? [];
@@ -1075,40 +1147,38 @@ class Storeengine extends IntegrationBase {
 		return [ 'port' => 'main', 'data' => $data ];
 	}
 
-	private static function action_error( string $message, array $input = [] ): array {
+	private static function action_error( string $message ): array {
 		return self::respond( [
 			'success' => false,
 			'error'   => $message,
 		] );
 	}
 
-	private static function action_success( array $data, array $input = [] ): array {
+	private static function action_success( array $data ): array {
 		return self::respond( array_merge( [ 'success' => true ], $data ) );
 	}
-
-	/* ---------------- Order actions ---------------- */
 
 	private static function action_update_order_status( array $config, array $input ): array {
 		$order_id = absint( $config['order_id'] ?? 0 );
 		$status   = sanitize_text_field( $config['order_status'] ?? '' );
 
 		if ( ! $order_id || ! $status || ! function_exists( 'storeengine_get_order' ) ) {
-			return self::action_error( 'A valid order ID and status are required.', $input );
+			return self::action_error( 'A valid order ID and status are required.' );
 		}
 
 		$order = storeengine_get_order( $order_id );
 		if ( ! $order || is_wp_error( $order ) ) {
-			return self::action_error( 'Order not found.', $input );
+			return self::action_error( 'Order not found.' );
 		}
 
 		try {
 			$order->set_status( $status, (string) ( $config['note'] ?? '' ), true );
 			$order->save();
 		} catch ( \Throwable $e ) {
-			return self::action_error( 'Failed to update status: ' . $e->getMessage(), $input );
+			return self::action_error( 'Failed to update status: ' . $e->getMessage() );
 		}
 
-		return self::action_success( [ 'order_id' => $order_id, 'order_status' => $order->get_status() ], $input );
+		return self::action_success( [ 'order_id' => $order_id, 'order_status' => $order->get_status() ] );
 	}
 
 	private static function action_add_order_note( array $config, array $input ): array {
@@ -1116,38 +1186,42 @@ class Storeengine extends IntegrationBase {
 		$note     = (string) ( $config['note'] ?? '' );
 
 		if ( ! $order_id || '' === trim( $note ) || ! function_exists( 'storeengine_get_order' ) ) {
-			return self::action_error( 'A valid order ID and note are required.', $input );
+			return self::action_error( 'A valid order ID and note are required.' );
 		}
 
 		$order = storeengine_get_order( $order_id );
 		if ( ! $order || is_wp_error( $order ) ) {
-			return self::action_error( 'Order not found.', $input );
+			return self::action_error( 'Order not found.' );
+		}
+
+		if ( ! method_exists( $order, 'add_order_note' ) ) {
+			return self::action_error( sprintf( 'ID %d is not a valid order (resolved to %s).', $order_id, get_class( $order ) ) );
 		}
 
 		$is_customer_note = ( 'customer' === ( $config['note_type'] ?? 'private' ) ) ? 1 : 0;
 		$comment_id       = $order->add_order_note( $note, $is_customer_note );
 
 		if ( ! $comment_id ) {
-			return self::action_error( 'Failed to add order note.', $input );
+			return self::action_error( 'Failed to add order note.' );
 		}
 
-		return self::action_success( [ 'order_id' => $order_id, 'note_id' => $comment_id ], $input );
+		return self::action_success( [ 'order_id' => $order_id, 'note_id' => $comment_id ] );
 	}
 
 	private static function action_refund_order( array $config, array $input ): array {
 		$order_id = absint( $config['order_id'] ?? 0 );
 
 		if ( ! $order_id || ! function_exists( 'storeengine_get_order' ) ) {
-			return self::action_error( 'A valid order ID is required.', $input );
+			return self::action_error( 'A valid order ID is required.' );
 		}
 
 		if ( ! class_exists( '\StoreEngine\Utils\Helper' ) || ! method_exists( '\StoreEngine\Utils\Helper', 'create_refund' ) ) {
-			return self::action_error( 'StoreEngine refund API is unavailable.', $input );
+			return self::action_error( 'StoreEngine refund API is unavailable.' );
 		}
 
 		$order = storeengine_get_order( $order_id );
 		if ( ! $order || is_wp_error( $order ) ) {
-			return self::action_error( 'Order not found.', $input );
+			return self::action_error( 'Order not found.' );
 		}
 
 		$amount = $config['amount'] ?? '';
@@ -1163,23 +1237,21 @@ class Storeengine extends IntegrationBase {
 		] );
 
 		if ( is_wp_error( $result ) ) {
-			return self::action_error( $result->get_error_message(), $input );
+			return self::action_error( $result->get_error_message() );
 		}
 
-		return self::action_success( [ 'order_id' => $order_id, 'refunded_amount' => (float) $amount ], $input );
+		return self::action_success( [ 'order_id' => $order_id, 'refunded_amount' => (float) $amount ] );
 	}
-
-	/* ---------------- Customer actions ---------------- */
 
 	private static function action_create_customer( array $config, array $input ): array {
 		$email = sanitize_email( $config['email'] ?? '' );
 
 		if ( ! is_email( $email ) || ! class_exists( '\StoreEngine\Classes\Customer' ) ) {
-			return self::action_error( 'A valid email is required.', $input );
+			return self::action_error( 'A valid email is required.' );
 		}
 
 		if ( email_exists( $email ) ) {
-			return self::action_error( 'A user with this email already exists.', $input );
+			return self::action_error( 'A user with this email already exists.' );
 		}
 
 		try {
@@ -1188,21 +1260,21 @@ class Storeengine extends IntegrationBase {
 			self::apply_customer_fields( $customer, $config );
 			$result = $customer->save();
 		} catch ( \Throwable $e ) {
-			return self::action_error( 'Failed to create customer: ' . $e->getMessage(), $input );
+			return self::action_error( 'Failed to create customer: ' . $e->getMessage() );
 		}
 
 		if ( is_wp_error( $result ) ) {
-			return self::action_error( $result->get_error_message(), $input );
+			return self::action_error( $result->get_error_message() );
 		}
 
-		return self::action_success( [ 'customer_id' => $customer->get_id(), 'email' => $email ], $input );
+		return self::action_success( [ 'customer_id' => $customer->get_id(), 'email' => $email ] );
 	}
 
 	private static function action_update_customer( array $config, array $input ): array {
 		$user_id = absint( $config['customer_id'] ?? 0 );
 
 		if ( ! $user_id || ! get_userdata( $user_id ) || ! class_exists( '\StoreEngine\Classes\Customer' ) ) {
-			return self::action_error( 'A valid customer (user) ID is required.', $input );
+			return self::action_error( 'A valid customer (user) ID is required.' );
 		}
 
 		try {
@@ -1210,10 +1282,10 @@ class Storeengine extends IntegrationBase {
 			self::apply_customer_fields( $customer, $config );
 			$customer->save();
 		} catch ( \Throwable $e ) {
-			return self::action_error( 'Failed to update customer: ' . $e->getMessage(), $input );
+			return self::action_error( 'Failed to update customer: ' . $e->getMessage() );
 		}
 
-		return self::action_success( [ 'customer_id' => $user_id ], $input );
+		return self::action_success( [ 'customer_id' => $user_id ] );
 	}
 
 	private static function apply_customer_fields( $customer, array $config ): void {
@@ -1232,8 +1304,6 @@ class Storeengine extends IntegrationBase {
 		}
 	}
 
-	/* ---------------- Product / inventory actions ---------------- */
-
 	private static function action_adjust_stock( array $config, array $input ): array {
 		$product_id = absint( $config['product_id'] ?? 0 );
 		$mode       = $config['mode'] ?? 'set';
@@ -1241,11 +1311,11 @@ class Storeengine extends IntegrationBase {
 
 		$product = self::get_product_object( $product_id );
 		if ( ! $product ) {
-			return self::action_error( 'Product not found.', $input );
+			return self::action_error( 'Product not found.' );
 		}
 
 		if ( ! method_exists( $product, 'set_stock_quantity' ) ) {
-			return self::action_error( 'This product does not support stock management.', $input );
+			return self::action_error( 'This product does not support stock management.' );
 		}
 
 		$current = method_exists( $product, 'get_stock_quantity' ) ? (int) $product->get_stock_quantity() : 0;
@@ -1265,10 +1335,10 @@ class Storeengine extends IntegrationBase {
 			$product->set_stock_quantity( $new );
 			$product->save();
 		} catch ( \Throwable $e ) {
-			return self::action_error( 'Failed to adjust stock: ' . $e->getMessage(), $input );
+			return self::action_error( 'Failed to adjust stock: ' . $e->getMessage() );
 		}
 
-		return self::action_success( [ 'product_id' => $product_id, 'stock_quantity' => $new ], $input );
+		return self::action_success( [ 'product_id' => $product_id, 'stock_quantity' => $new ] );
 	}
 
 	private static function action_set_stock_status( array $config, array $input ): array {
@@ -1277,21 +1347,21 @@ class Storeengine extends IntegrationBase {
 
 		$product = self::get_product_object( $product_id );
 		if ( ! $product ) {
-			return self::action_error( 'Product not found.', $input );
+			return self::action_error( 'Product not found.' );
 		}
 
 		if ( ! method_exists( $product, 'set_stock_status' ) ) {
-			return self::action_error( 'This product does not support stock status.', $input );
+			return self::action_error( 'This product does not support stock status.' );
 		}
 
 		try {
 			$product->set_stock_status( $status );
 			$product->save();
 		} catch ( \Throwable $e ) {
-			return self::action_error( 'Failed to set stock status: ' . $e->getMessage(), $input );
+			return self::action_error( 'Failed to set stock status: ' . $e->getMessage() );
 		}
 
-		return self::action_success( [ 'product_id' => $product_id, 'stock_status' => $status ], $input );
+		return self::action_success( [ 'product_id' => $product_id, 'stock_status' => $status ] );
 	}
 
 	private static function get_product_object( int $product_id ) {
@@ -1315,13 +1385,11 @@ class Storeengine extends IntegrationBase {
 		return null;
 	}
 
-	/* ---------------- Coupon actions ---------------- */
-
 	private static function action_create_coupon( array $config, array $input ): array {
 		$code = sanitize_text_field( $config['code'] ?? '' );
 
 		if ( '' === $code || ! class_exists( '\StoreEngine\Utils\Helper' ) ) {
-			return self::action_error( 'A coupon code is required.', $input );
+			return self::action_error( 'A coupon code is required.' );
 		}
 
 		$post_type = \StoreEngine\Utils\Helper::COUPON_POST_TYPE;
@@ -1333,7 +1401,7 @@ class Storeengine extends IntegrationBase {
 		] );
 
 		if ( is_wp_error( $post_id ) || ! $post_id ) {
-			return self::action_error( 'Failed to create coupon.', $input );
+			return self::action_error( 'Failed to create coupon.' );
 		}
 
 		update_post_meta( $post_id, '_storeengine_coupon_name', $code );
@@ -1344,17 +1412,15 @@ class Storeengine extends IntegrationBase {
 			update_post_meta( $post_id, '_storeengine_coupon_usage_limit', absint( $config['usage_limit'] ) );
 		}
 
-		return self::action_success( [ 'coupon_id' => $post_id, 'code' => $code ], $input );
+		return self::action_success( [ 'coupon_id' => $post_id, 'code' => $code ] );
 	}
-
-	/* ---------------- Subscription actions (addon) ---------------- */
 
 	private static function action_update_subscription_status( array $config, array $input ): array {
 		$subscription_id = absint( $config['subscription_id'] ?? 0 );
 		$status          = sanitize_text_field( $config['subscription_status'] ?? '' );
 
 		if ( ! $subscription_id || ! $status || ! class_exists( '\StoreEngine\Addons\Subscription\Classes\Subscription' ) ) {
-			return self::action_error( 'A valid subscription ID and status are required.', $input );
+			return self::action_error( 'A valid subscription ID and status are required.' );
 		}
 
 		try {
@@ -1362,13 +1428,11 @@ class Storeengine extends IntegrationBase {
 			$subscription->set_status( $status, '', true );
 			$subscription->save();
 		} catch ( \Throwable $e ) {
-			return self::action_error( 'Failed to update subscription: ' . $e->getMessage(), $input );
+			return self::action_error( 'Failed to update subscription: ' . $e->getMessage() );
 		}
 
-		return self::action_success( [ 'subscription_id' => $subscription_id, 'status' => $subscription->get_status() ], $input );
+		return self::action_success( [ 'subscription_id' => $subscription_id, 'status' => $subscription->get_status() ] );
 	}
-
-	/* ---------------- Membership actions (addon) ---------------- */
 
 	private static function action_grant_membership( array $config, array $input ): array {
 		$user_id  = absint( $config['user_id'] ?? 0 );
@@ -1420,5 +1484,90 @@ class Storeengine extends IntegrationBase {
 		}
 
 		return self::action_success( [ 'user_id' => $user_id, 'group_id' => $group_id ], $input );
+	}
+
+	private static function action_create_access_group( array $config, array $input ): array {
+		$name = sanitize_text_field( $config['name'] ?? '' );
+
+		if ( '' === $name ) {
+			return self::action_error( 'Access Group name is required.' );
+		}
+
+		$post_id = wp_insert_post( [
+			'post_title'   => $name,
+			'post_content' => (string) ( $config['description'] ?? '' ),
+			'post_type'    => 'storeengine_groups',
+			'post_status'  => in_array( $config['group_status'] ?? 'publish', [ 'publish', 'draft' ], true )
+				? $config['group_status']
+				: 'publish',
+		] );
+
+		if ( is_wp_error( $post_id ) || ! $post_id ) {
+			return self::action_error( 'Failed to create Access Group.' );
+		}
+
+		if ( ! empty( $config['user_roles'] ) ) {
+			$roles = array_filter( array_map( 'trim', explode( ',', (string) $config['user_roles'] ) ) );
+			$meta  = array_map( static fn( $role ) => [ 'value' => $role, 'label' => $role ], $roles );
+			update_post_meta( $post_id, '_storeengine_membership_user_roles', $meta );
+		}
+
+		if ( 'yes' === ( $config['enable_expiration'] ?? 'no' ) ) {
+			update_post_meta( $post_id, '_storeengine_membership_expiration', [
+				'is_enable_expiration' => 1,
+				'specific_date'        => sanitize_text_field( $config['expiration_date'] ?? '' ),
+			] );
+		}
+		return self::action_success( [ 'group_id' => $post_id, 'name' => $name ] );
+	}
+
+	private static function action_update_access_group( array $config, array $input ): array {
+		$group_id = absint( $config['group_id'] ?? 0 );
+
+		if ( ! $group_id || ! get_post( $group_id ) || 'storeengine_groups' !== get_post_type( $group_id ) ) {
+			return self::action_error( 'A valid Access Group is required.' );
+		}
+
+		$update_args = [ 'ID' => $group_id ];
+
+		if ( ! empty( $config['name'] ) ) {
+			$update_args['post_title'] = sanitize_text_field( $config['name'] );
+		}
+		if ( isset( $config['description'] ) && '' !== $config['description'] ) {
+			$update_args['post_content'] = (string) $config['description'];
+		}
+		if ( ! empty( $config['group_status'] ) && in_array( $config['group_status'], [ 'publish', 'draft' ], true ) ) {
+			$update_args['post_status'] = $config['group_status'];
+		}
+
+		if ( count( $update_args ) > 1 ) {
+			$result = wp_update_post( $update_args, true );
+			if ( is_wp_error( $result ) ) {
+				return self::action_error( $result->get_error_message() );
+			}
+		}
+
+		if ( ! empty( $config['user_roles'] ) ) {
+			$roles = array_filter( array_map( 'trim', explode( ',', (string) $config['user_roles'] ) ) );
+			$meta  = array_map( static fn( $role ) => [ 'value' => $role, 'label' => $role ], $roles );
+			update_post_meta( $group_id, '_storeengine_membership_user_roles', $meta );
+		}
+		return self::action_success( [ 'group_id' => $group_id ] );
+	}
+
+	private static function action_delete_access_group( array $config, array $input ): array {
+		$group_id = absint( $config['group_id'] ?? 0 );
+
+		if ( ! $group_id || ! get_post( $group_id ) || 'storeengine_groups' !== get_post_type( $group_id ) ) {
+			return self::action_error( 'A valid Access Group is required.' );
+		}
+
+		$force  = 'yes' === ( $config['force_delete'] ?? 'no' );
+		$result = wp_delete_post( $group_id, $force );
+
+		if ( ! $result ) {
+			return self::action_error( 'Failed to delete Access Group.' );
+		}
+		return self::action_success( [ 'group_id' => $group_id, 'force_deleted' => $force ] );
 	}
 }

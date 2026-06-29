@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-06-29 08:53:25",
+    "generated_at": "2026-06-29 11:53:54",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -1336,6 +1336,56 @@
                         "main"
                     ]
                 },
+                "user_added_to_group": {
+                    "label": "User Added To Access Group",
+                    "hook": "storeengine/membership/user_added_to_group",
+                    "requires_addon": "membership",
+                    "key": "user_added_to_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_removed_from_group": {
+                    "label": "User Removed From Access Group",
+                    "hook": "storeengine/membership/user_removed_from_group",
+                    "requires_addon": "membership",
+                    "key": "user_removed_from_group",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "access_group_created": {
+                    "label": "Access Group Created",
+                    "hook": "save_post_storeengine_groups",
+                    "requires_addon": "membership",
+                    "key": "access_group_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "access_group_updated": {
+                    "label": "Access Group Updated",
+                    "hook": "save_post_storeengine_groups",
+                    "requires_addon": "membership",
+                    "key": "access_group_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "access_group_deleted": {
+                    "label": "Access Group Deleted",
+                    "hook": "delete_post_storeengine_groups",
+                    "requires_addon": "membership",
+                    "key": "access_group_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "subscription_created": {
                     "label": "Subscription Created",
                     "hook": "storeengine/after_create_subscription",
@@ -1976,7 +2026,7 @@
                     ]
                 },
                 "grant_membership": {
-                    "label": "Grant Membership",
+                    "label": "Grant Membership (Add User To Group)",
                     "requires_addon": "membership",
                     "key": "grant_membership",
                     "schema": [
@@ -2012,7 +2062,7 @@
                     ]
                 },
                 "revoke_membership": {
-                    "label": "Revoke Membership",
+                    "label": "Revoke Membership (Remove User From Group)",
                     "requires_addon": "membership",
                     "key": "revoke_membership",
                     "schema": [
@@ -2035,6 +2085,339 @@
                                     "label"
                                 ]
                             }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_access_group": {
+                    "label": "Create Access Group",
+                    "requires_addon": "membership",
+                    "key": "create_access_group",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Access Group Name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "group_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "publish",
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "user_roles",
+                            "label": "User Roles (comma-separated, e.g. subscriber,customer)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "authorization_type",
+                            "label": "Unauthorized Access Behavior",
+                            "type": "select",
+                            "required": false,
+                            "default": "message",
+                            "options": [
+                                {
+                                    "value": "message",
+                                    "label": "Show Message"
+                                },
+                                {
+                                    "value": "redirect",
+                                    "label": "Redirect To URL"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "unauthorized_message",
+                            "label": "Unauthorized Access Message",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "redirect_url",
+                            "label": "Redirect URL (if Redirect selected)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "protect_content_type",
+                            "label": "Protect Content Type",
+                            "type": "select",
+                            "required": false,
+                            "default": "basic-singulars",
+                            "options": [
+                                {
+                                    "value": "basic-global",
+                                    "label": "All Content (Global)"
+                                },
+                                {
+                                    "value": "basic-singulars",
+                                    "label": "Singular Posts/Pages"
+                                },
+                                {
+                                    "value": "basic-archives",
+                                    "label": "Archives"
+                                },
+                                {
+                                    "value": "special-blog",
+                                    "label": "Blog Home"
+                                },
+                                {
+                                    "value": "special-front",
+                                    "label": "Front Page"
+                                },
+                                {
+                                    "value": "special-search",
+                                    "label": "Search Results"
+                                },
+                                {
+                                    "value": "special-404",
+                                    "label": "404 Page"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "features",
+                            "label": "Features (JSON array, e.g. [{\"label\":\"Unlimited Access\",\"icon\":\"check\"}])",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "attachments",
+                            "label": "Download Attachment IDs (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "enable_expiration",
+                            "label": "Enable Expiration",
+                            "type": "select",
+                            "required": false,
+                            "default": "no",
+                            "options": [
+                                {
+                                    "value": "no",
+                                    "label": "No"
+                                },
+                                {
+                                    "value": "yes",
+                                    "label": "Yes"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "expiration_date",
+                            "label": "Specific Expiration Date (Y-m-d, optional)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_access_group": {
+                    "label": "Update Access Group",
+                    "requires_addon": "membership",
+                    "key": "update_access_group",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Access Group",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "storeengine_membership_group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "name",
+                            "label": "New Name (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "New Description (leave empty to keep)",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "group_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "\u2014 Keep current \u2014"
+                                },
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "user_roles",
+                            "label": "User Roles (comma-separated, leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "authorization_type",
+                            "label": "Unauthorized Access Behavior",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "\u2014 Keep current \u2014"
+                                },
+                                {
+                                    "value": "message",
+                                    "label": "Show Message"
+                                },
+                                {
+                                    "value": "redirect",
+                                    "label": "Redirect To URL"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "unauthorized_message",
+                            "label": "Unauthorized Access Message (leave empty to keep)",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "redirect_url",
+                            "label": "Redirect URL (if Redirect selected, leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "protect_content_type",
+                            "label": "Protect Content Type (leave empty to keep)",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "\u2014 Keep current \u2014"
+                                },
+                                {
+                                    "value": "basic-global",
+                                    "label": "All Content (Global)"
+                                },
+                                {
+                                    "value": "basic-singulars",
+                                    "label": "Singular Posts/Pages"
+                                },
+                                {
+                                    "value": "basic-archives",
+                                    "label": "Archives"
+                                },
+                                {
+                                    "value": "special-blog",
+                                    "label": "Blog Home"
+                                },
+                                {
+                                    "value": "special-front",
+                                    "label": "Front Page"
+                                },
+                                {
+                                    "value": "special-search",
+                                    "label": "Search Results"
+                                },
+                                {
+                                    "value": "special-404",
+                                    "label": "404 Page"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "features",
+                            "label": "Features (JSON array, leave empty to keep)",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "attachments",
+                            "label": "Download Attachment IDs (comma-separated, leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_access_group": {
+                    "label": "Delete Access Group",
+                    "requires_addon": "membership",
+                    "key": "delete_access_group",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Access Group",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "storeengine",
+                                "query": "storeengine_membership_group_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "force_delete",
+                            "label": "Permanently Delete (skip trash)",
+                            "type": "select",
+                            "required": false,
+                            "default": "no",
+                            "options": [
+                                {
+                                    "value": "no",
+                                    "label": "No \u2014 Move to Trash"
+                                },
+                                {
+                                    "value": "yes",
+                                    "label": "Yes \u2014 Permanently Delete"
+                                }
+                            ]
                         }
                     ],
                     "outputs": [
