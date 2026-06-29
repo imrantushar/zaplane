@@ -1076,14 +1076,14 @@ class Storeengine extends IntegrationBase {
 	}
 
 	private static function action_error( string $message, array $input = [] ): array {
-		return self::respond( array_merge( $input, [
+		return self::respond( [
 			'success' => false,
 			'error'   => $message,
-		] ) );
+		] );
 	}
 
 	private static function action_success( array $data, array $input = [] ): array {
-		return self::respond( array_merge( $input, array_merge( [ 'success' => true ], $data ) ) );
+		return self::respond( array_merge( [ 'success' => true ], $data ) );
 	}
 
 	/* ---------------- Order actions ---------------- */
