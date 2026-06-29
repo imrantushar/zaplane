@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-06-28 13:30:25",
+    "generated_at": "2026-06-29 08:53:25",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -1340,8 +1340,6 @@
                     "label": "Subscription Created",
                     "hook": "storeengine/after_create_subscription",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_created",
                     "schema": [],
                     "outputs": [
@@ -1352,8 +1350,6 @@
                     "label": "Subscription Status Changed (any)",
                     "hook": "storeengine/subscription/status_changed",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_status_changed",
                     "schema": [],
                     "outputs": [
@@ -1364,8 +1360,6 @@
                     "label": "Subscription Activated",
                     "hook": "storeengine/subscription/status_active",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_activated",
                     "schema": [],
                     "outputs": [
@@ -1376,8 +1370,6 @@
                     "label": "Subscription Paused (On Hold)",
                     "hook": "storeengine/subscription/status_on_hold",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_on_hold",
                     "schema": [],
                     "outputs": [
@@ -1388,8 +1380,6 @@
                     "label": "Subscription Cancelled",
                     "hook": "storeengine/subscription/status_cancelled",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_cancelled",
                     "schema": [],
                     "outputs": [
@@ -1400,8 +1390,6 @@
                     "label": "Subscription Expired",
                     "hook": "storeengine/subscription/status_expired",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_expired",
                     "schema": [],
                     "outputs": [
@@ -1412,8 +1400,6 @@
                     "label": "Subscription Renewal Payment Complete",
                     "hook": "storeengine/subscription/renewal_payment_complete",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewed",
                     "schema": [],
                     "outputs": [
@@ -1424,8 +1410,6 @@
                     "label": "Subscription Payment Complete",
                     "hook": "storeengine/subscription/payment_complete",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_payment_complete",
                     "schema": [],
                     "outputs": [
@@ -1436,8 +1420,6 @@
                     "label": "Subscription Renewal Failed",
                     "hook": "storeengine/subscription/failed_to_create_renewal_order",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_failed",
                     "schema": [],
                     "outputs": [
@@ -1448,8 +1430,6 @@
                     "label": "Subscription Trial Ended",
                     "hook": "storeengine/subscription/trial_ended",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_trial_ended",
                     "schema": [],
                     "outputs": [
@@ -1460,8 +1440,6 @@
                     "label": "Subscription Renewal Order Created",
                     "hook": "storeengine/api/after_create_renewal_order",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_order_created",
                     "schema": [],
                     "outputs": [
@@ -1544,8 +1522,6 @@
                     "label": "Affiliate Registered",
                     "hook": "storeengine/addons/affiliate/after_registration",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_registered",
                     "schema": [],
                     "outputs": [
@@ -1556,8 +1532,6 @@
                     "label": "Affiliate Status Updated",
                     "hook": "storeengine/addons/affiliate/update_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1568,8 +1542,6 @@
                     "label": "Affiliate Commission Status Updated",
                     "hook": "storeengine/addons/affiliate/update_commission_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_commission_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1580,8 +1552,6 @@
                     "label": "Affiliate Payout Status Updated",
                     "hook": "storeengine/addons/affiliate/update_payout_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_payout_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1601,7 +1571,7 @@
                             "required": true
                         },
                         {
-                            "key": "status",
+                            "key": "order_status",
                             "label": "New Status",
                             "type": "select",
                             "required": true,
@@ -1889,7 +1859,7 @@
                             }
                         },
                         {
-                            "key": "status",
+                            "key": "stock_status",
                             "label": "Stock Status",
                             "type": "select",
                             "required": true,
@@ -1964,8 +1934,6 @@
                 "update_subscription_status": {
                     "label": "Update Subscription Status",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "update_subscription_status",
                     "schema": [
                         {
@@ -1975,7 +1943,7 @@
                             "required": true
                         },
                         {
-                            "key": "status",
+                            "key": "subscription_status",
                             "label": "New Status",
                             "type": "select",
                             "required": true,
@@ -2010,8 +1978,6 @@
                 "grant_membership": {
                     "label": "Grant Membership",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "grant_membership",
                     "schema": [
                         {
@@ -2048,8 +2014,6 @@
                 "revoke_membership": {
                     "label": "Revoke Membership",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "revoke_membership",
                     "schema": [
                         {
@@ -6114,7 +6078,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/fillout",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10244,7 +10208,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/jotform",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10963,7 +10927,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": true,
-            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/mailchimp",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/mailchimp",
             "triggers": {
                 "subscribed": {
                     "label": "Subscriber Added",
@@ -12648,7 +12612,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/messenger",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/messenger",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -13516,7 +13480,7 @@
             "requires_connection": true,
             "auth_type": "both",
             "supports_webhook": true,
-            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/slack",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/slack",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -17338,7 +17302,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/typeform",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -17591,7 +17555,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/whatsapp",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/whatsapp",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -26752,7 +26716,7 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": true,
-            "webhook_url": "http://dev.test/wp-json/zaplane/v1/incoming/zoom",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/zoom",
             "triggers": {
                 "meeting_started": {
                     "label": "Meeting Started",

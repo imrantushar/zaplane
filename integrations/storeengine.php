@@ -809,7 +809,7 @@ class Storeengine extends IntegrationBase {
 				return [
 					[ 'key' => 'order_id', 'label' => 'Order ID', 'type' => 'expression', 'required' => true ],
 					[
-						'key'      => 'status',
+						'key'      => 'order_status',
 						'label'    => 'New Status',
 						'type'     => 'select',
 						'required' => true,
@@ -923,7 +923,7 @@ class Storeengine extends IntegrationBase {
 						],
 					],
 					[
-						'key'      => 'status',
+						'key'      => 'stock_status',
 						'label'    => 'Stock Status',
 						'type'     => 'select',
 						'required' => true,
@@ -958,7 +958,7 @@ class Storeengine extends IntegrationBase {
 				return [
 					[ 'key' => 'subscription_id', 'label' => 'Subscription ID', 'type' => 'expression', 'required' => true ],
 					[
-						'key'      => 'status',
+						'key'      => 'subscription_status',
 						'label'    => 'New Status',
 						'type'     => 'select',
 						'required' => true,
@@ -1090,7 +1090,7 @@ class Storeengine extends IntegrationBase {
 
 	private static function action_update_order_status( array $config, array $input ): array {
 		$order_id = absint( $config['order_id'] ?? 0 );
-		$status   = sanitize_text_field( $config['status'] ?? '' );
+		$status   = sanitize_text_field( $config['order_status'] ?? '' );
 
 		if ( ! $order_id || ! $status || ! function_exists( 'storeengine_get_order' ) ) {
 			return self::action_error( 'A valid order ID and status are required.', $input );
@@ -1273,7 +1273,7 @@ class Storeengine extends IntegrationBase {
 
 	private static function action_set_stock_status( array $config, array $input ): array {
 		$product_id = absint( $config['product_id'] ?? 0 );
-		$status     = sanitize_text_field( $config['status'] ?? '' );
+		$status     = sanitize_text_field( $config['stock_status'] ?? '' );
 
 		$product = self::get_product_object( $product_id );
 		if ( ! $product ) {
@@ -1351,7 +1351,7 @@ class Storeengine extends IntegrationBase {
 
 	private static function action_update_subscription_status( array $config, array $input ): array {
 		$subscription_id = absint( $config['subscription_id'] ?? 0 );
-		$status          = sanitize_text_field( $config['status'] ?? '' );
+		$status          = sanitize_text_field( $config['subscription_status'] ?? '' );
 
 		if ( ! $subscription_id || ! $status || ! class_exists( '\StoreEngine\Addons\Subscription\Classes\Subscription' ) ) {
 			return self::action_error( 'A valid subscription ID and status are required.', $input );
