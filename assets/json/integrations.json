@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-06-25 13:01:40",
+    "generated_at": "2026-06-30 11:33:40",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -138,7 +138,159 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": {
+                "enroll-course": {
+                    "key": "enroll-course",
+                    "label": "Enroll in Course",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User Email",
+                            "type": "text",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
+                            "required": false
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Courses",
+                            "type": "select",
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "all_courses",
+                            "label": "Enroll in all courses",
+                            "type": "checkbox",
+                            "help": "If checked, all published courses will be enrolled, ignoring the selection above."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unenroll-course": {
+                    "key": "unenroll-course",
+                    "label": "Unenroll from Course",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User Email",
+                            "type": "text",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
+                            "required": false
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Courses",
+                            "type": "select",
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "all_courses",
+                            "label": "Unenroll from all courses",
+                            "type": "checkbox",
+                            "help": "If checked, all courses will be unenrolled, ignoring the selection above."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "complete-lesson": {
+                    "key": "complete-lesson",
+                    "label": "Complete Lesson",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User Email",
+                            "type": "text",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
+                            "required": false
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Course",
+                            "type": "select",
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "selectedLesson",
+                            "label": "Lesson",
+                            "type": "select",
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "lesson_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "complete-course": {
+                    "key": "complete-course",
+                    "label": "Complete Course",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User Email",
+                            "type": "text",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
+                            "required": false
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Course",
+                            "type": "select",
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         },
         "gemcrm": {
             "slug": "gemcrm",
