@@ -44,13 +44,13 @@ export const getRunsList = createAsyncThunk(
 					params: { page, per_page },
 				}
 			);
-			const { runs = [], pagination = {} } = res.data;
+			const { runs = [], ...pagination } = res.data;
 			return {
 				data: runs,
-				currentPage: pagination.page || 1,
-				itemPerPage: pagination.per_page || 20,
-				totalItems: pagination.total || 0,
-				totalPages: pagination.total_pages || 0,
+				currentPage: pagination?.page || 1,
+				itemPerPage: pagination?.per_page || 20,
+				totalItems: pagination?.total || 0,
+				totalPages: pagination?.total_pages || 0,
 			}; 
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);

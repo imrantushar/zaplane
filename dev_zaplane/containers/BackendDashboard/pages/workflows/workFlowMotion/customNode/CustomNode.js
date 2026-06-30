@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Handle, Position, NodeToolbar, useReactFlow } from "@xyflow/react";
+import { Handle, Position, useReactFlow } from "@xyflow/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy, FaPlus } from "react-icons/fa";
 import FloatingEdge from "../floatingEdge/FloatingEdge";
@@ -24,6 +24,8 @@ export default function CustomNode({
   const isCondition = data?.app === "condition";
   const node = nodes.find(n => n.id === id);
   const hasPort = node?.port === undefined;
+  const isTrigger = data?.action === "trigger";
+  const canRemove = isTrigger ? !isSelectApp : hasPort;
 
   const handleStyle = {
     width: 8,
@@ -48,17 +50,29 @@ export default function CustomNode({
         {formattedAction || "Action"}
       </div>
 
-      {/* DELETE TOOLBAR */}
-      {data.action !== "trigger" && hasPort && (
-        <NodeToolbar isVisible={hovered} position={Position.Bottom} align="center" offset={-3}>
-          <div style={{ marginTop: '4px', marginLeft: isLR ? '0' : '100px', pointerEvents: 'auto', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} className="flex flex-row items-center bg-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)] p-[6px] rounded-[4px] cursor-pointer">
-            <RiDeleteBin5Line style={{ width: "16px", height: "16px" }} onClick={e => {
-              e.stopPropagation();
+      {/* DELETE BUTTON */}
+      {canRemove && hovered && (
+        <div
+          style={{
+            position: 'absolute',
+            top: -10,
+            right: -10,
+            zIndex: 10,
+            pointerEvents: 'auto',
+            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+          }}
+          className="flex flex-row items-center bg-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)] p-[6px] rounded-[4px] cursor-pointer"
+        >
+          <RiDeleteBin5Line style={{ width: "16px", height: "16px" }} onClick={e => {
+            e.stopPropagation();
+            if (isTrigger) {
+              data?.resetTrigger(id);
+            } else {
               data?.deleteNode(id);
-            }} className="cursor-pointer" />
-            {!data?.action && <FaRegCopy style={{ width: "16px", height: "16px" }} />}
-          </div>
-        </NodeToolbar>
+            }
+          }} className="cursor-pointer" />
+          {!data?.action && <FaRegCopy style={{ width: "16px", height: "16px" }} />}
+        </div>
       )}
 
       {/* NODE BODY */}

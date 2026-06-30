@@ -9,7 +9,7 @@ import { route_path } from "@ZAPUtils/helper";
 import { primaryBtn } from "../../../assets/scss/chakra/recipe";
 import ZAPDivider from "@ZAPComponents/ZAPDivider";
 import { addWorkflowToFolder, getFolders } from "@ZAPRedux/Slices/folderSlice/folderSlice";
-import Select from "react-select";
+import ZAPSelect from "@ZAPComponents/ZAPSelect";
 const CreateWorkflowModal = ({
   isOpen,
   onClose,
@@ -34,9 +34,6 @@ const CreateWorkflowModal = ({
       value: f.id
     }));
   }, [allFolders]);
-  const selectedOption = useMemo(() => {
-    return options.find(opt => opt.value === effectiveFolderId) || null;
-  }, [options, effectiveFolderId]);
   const handleCreate = async () => {
     if (!workflowName.trim()) return;
     const payload = {
@@ -71,16 +68,13 @@ const CreateWorkflowModal = ({
       <ZAPInput label={__("Workflow Name", "zaplane")} placeholder={__("Enter workflow name", "zaplane")} value={workflowName} onChange={e => setWorkflowName(e.target.value)} />
       {!!allFolders.length && <div direction="column" gap={2} className="flex">
         <div className="flex flex-col gap-2 w-full">
-               <span className="zaplane-label">
-                {__("Select Folder", "zaplane")}
-              </span>
-
-              <Select className="zaplane-select" options={options} isClearable value={selectedOption} onChange={val => setFolderId(val?.value || null)} styles={{
-          menu: base => ({
-            ...base,
-            position: "static"
-          })
-        }} />
+          <ZAPSelect
+            label={__("Select Folder", "zaplane")}
+            options={options}
+            isClearable
+            value={effectiveFolderId}
+            onChange={opt => setFolderId(opt?.value || null)}
+          />
         </div>
       </div>}
 

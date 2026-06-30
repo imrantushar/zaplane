@@ -1,9 +1,19 @@
-import { plugin_root_url } from "@ZAPUtils/helper";
+import { plugin_root_url, integrations } from "@ZAPUtils/helper";
+
+// Some callers (e.g. recipe seeders) store a bare integration slug (e.g. "woocommerce")
+// instead of the actual icon filename (e.g. "woo.svg"). Resolve those against the
+// integrations manifest so stale/legacy values still render correctly.
+const resolveIconFilename = (icon) => {
+  if (!icon) return icon;
+  if (icon.endsWith(".svg")) return icon;
+  return integrations?.apps?.[icon]?.icon || integrations?.tools?.[icon]?.icon || icon;
+};
+
 const ZAPIconGroup = ({
   icons = [],
   maxVisible = 2
 }) => {
-  const safeIcons = (Array.isArray(icons) ? icons : []).filter(Boolean);
+  const safeIcons = (Array.isArray(icons) ? icons : []).filter(Boolean).map(resolveIconFilename);
   const visibleIcons = safeIcons.slice(0, maxVisible);
   const remaining = Math.max(0, safeIcons.length - maxVisible);
 

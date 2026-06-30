@@ -99,7 +99,7 @@ class ProductRecommendationRecipeSeeder {
 			'title'             => $title,
 			'description'       => 'Automatically send personalised product recommendations to customers after their WooCommerce order is completed. Fetches products from a chosen category and emails them directly to the customer to drive repeat purchases.',
 			'blueprint'         => wp_json_encode( $blueprint ),
-			'integration_icons' => wp_json_encode( [ 'woocommerce', 'gemcrm' ] ),
+			'integration_icons' => wp_json_encode( [ 'woo.svg', 'crm.svg' ] ),
 			'created_by'        => 0,
 		] );
 	}

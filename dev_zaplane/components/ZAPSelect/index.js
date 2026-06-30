@@ -65,7 +65,7 @@ const ZAPSelect = ({
         styles={{
           menuPortal: (base) => ({
             ...base,
-            zIndex: 9999
+            zIndex: 100001
           }),
           menuList: (base) => ({
             ...base,
