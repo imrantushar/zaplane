@@ -1,6 +1,6 @@
 {
     "version": "1.0.1",
-    "generated_at": "2026-06-29 12:06:56",
+    "generated_at": "2026-06-30 10:42:21",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -262,37 +262,6 @@
                 "complete-course": {
                     "key": "complete-course",
                     "label": "Complete Course",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User Email",
-                            "type": "text",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
-                            "required": false
-                        },
-                        {
-                            "key": "selectedCourse",
-                            "label": "Course",
-                            "type": "select",
-                            "multiple": false,
-                            "dynamic": {
-                                "integration": "academy",
-                                "query": "acourse_no_any",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "reset-course": {
-                    "key": "reset-course",
-                    "label": "Reset Course Progress",
                     "schema": [
                         {
                             "key": "user_id",

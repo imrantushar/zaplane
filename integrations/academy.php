@@ -355,7 +355,6 @@ class Academy extends IntegrationBase
             'unenroll-course',
             'complete-lesson',
             'complete-course',
-            'reset-course',
         ];
     }
 
@@ -701,84 +700,6 @@ class Academy extends IntegrationBase
         return 'Course marked as completed.';
     }
 
-    /**
-     * Reset all progress for a course.
-     */
-    private static function reset_course(int $course_id, int $user_id): string
-    {
-        global $wpdb;
-
-        $meta_key = "academy_course_{$course_id}_completed_topics";
-
-        // Delete curriculum meta.
-        $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s",
-                $course_id,
-                'academy_course_curriculum'
-            )
-        );
-
-        // Delete completed topics user meta.
-        $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM {$wpdb->usermeta} WHERE user_id = %d AND meta_key = %s",
-                $user_id,
-                $meta_key
-            )
-        );
-
-        // Delete enrollment post.
-        $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM {$wpdb->posts} WHERE post_author = %d AND post_parent = %d AND post_type = %s",
-                $user_id,
-                $course_id,
-                'academy_enrolled'
-            )
-        );
-
-        // Delete quiz attempts and their answers.
-        $quiz_ids = $wpdb->get_col(
-            $wpdb->prepare(
-                "SELECT quiz_id FROM {$wpdb->prefix}academy_quiz_attempts WHERE user_id = %d AND course_id = %d",
-                $user_id,
-                $course_id
-            )
-        );
-
-        if (! empty($quiz_ids)) {
-            $wpdb->query(
-                $wpdb->prepare(
-                    "DELETE FROM {$wpdb->prefix}academy_quiz_attempts WHERE user_id = %d AND course_id = %d",
-                    $user_id,
-                    $course_id
-                )
-            );
-
-            $placeholders = implode(',', array_fill(0, count($quiz_ids), '%d'));
-            $query = sprintf(
-                "DELETE FROM {$wpdb->prefix}academy_quiz_attempt_answers WHERE user_id = %%d AND quiz_id IN ({$placeholders})"
-            );
-            $wpdb->query($wpdb->prepare($query, $user_id, ...$quiz_ids));
-        }
-
-        // Delete course completion comment.
-        $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM {$wpdb->comments}
-                WHERE comment_agent = 'academy'
-                  AND comment_type = 'course_completed'
-                  AND comment_post_ID = %d
-                  AND user_id = %d",
-                $course_id,
-                $user_id
-            )
-        );
-
-        return 'Course progress has been reset.';
-    }
-
     // -------------------------------------------------------------------------
     // ACTIONS – DEFINITIONS AND EXECUTION
     // -------------------------------------------------------------------------
@@ -801,10 +722,6 @@ class Academy extends IntegrationBase
             'complete-course'  => [
                 'label'       => 'Complete Course',
                 'description' => 'Mark an entire course as completed for the user.',
-            ],
-            'reset-course'     => [
-                'label'       => 'Reset Course Progress',
-                'description' => 'Reset all progress (lessons, quizzes, completion status) for a course.',
             ],
         ];
     }
@@ -888,10 +805,7 @@ class Academy extends IntegrationBase
                 $user_field,
                 $single_course_field,
             ],
-            'reset-course'    => [
-                $user_field,
-                $single_course_field,
-            ],
+
         ];
 
         return $schemas[ $action ] ?? [];
@@ -970,15 +884,6 @@ class Academy extends IntegrationBase
                 }
                 $course_id = $course_ids[0];
                 $message = self::complete_course($course_id, $user_id);
-                break;
-
-            case 'reset-course':
-                $course_ids = self::extract_course_ids($config);
-                if (empty($course_ids)) {
-                    throw new \Exception('No course selected for reset. Config: ' . wp_json_encode($config));
-                }
-                $course_id = $course_ids[0];
-                $message = self::reset_course($course_id, $user_id);
                 break;
 
             default:
