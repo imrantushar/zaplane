@@ -48,10 +48,8 @@ class BuildIntegrationCommand extends Command {
 			];
 
 			foreach ( $class::get_triggers() as $key => $trigger ) {
-				if ( 'tool' === $category ) {
-					continue;
-				}
-
+				// Tools may expose triggers too (e.g. Schedule) — keep them so the
+				// picker can list tool-category triggers, not just app triggers.
 				if ( ! isset( $trigger['hook'] ) ) {
 					$this->warning( "⚠️  Trigger '{$key}' in {$slug} is missing 'hook' field - skipping" );
 					continue;
@@ -85,7 +83,7 @@ class BuildIntegrationCommand extends Command {
 			if ( 'tool' === $category ) {
 				$manifest['tools'][ $slug ] = $integration;
 				$toolCount++;
-				$this->line( "  ✓ {$slug} (tool) - " . count( $integration['actions'] ) . ' actions' );
+				$this->line( "  ✓ {$slug} (tool) - " . count( $integration['triggers'] ) . ' triggers, ' . count( $integration['actions'] ) . ' actions' );
 			} else {
 				$manifest['apps'][ $slug ] = $integration;
 				$appCount++;

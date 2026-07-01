@@ -45,6 +45,16 @@ class Webhook extends IntegrationBase {
 
 		return [
 			[
+				// Read-only URL to POST to. The `{workflow_id}` token is resolved
+				// on the client from the open workflow, then prefixed with the
+				// site's REST base (the CopyInput renderer handles both).
+				'key'   => 'webhook_url',
+				'label' => 'Webhook URL',
+				'type'  => 'copy',
+				'value' => 'zaplane/v1/hook/{workflow_id}',
+				'help'  => 'Send a GET or POST request (JSON body and/or query params) to this URL to trigger the workflow. Available after the workflow is saved.',
+			],
+			[
 				'key'      => 'secret',
 				'label'    => 'Secret (optional)',
 				'type'     => 'expression',

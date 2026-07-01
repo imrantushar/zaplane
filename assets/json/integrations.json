@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-06-29 11:53:54",
+    "generated_at": "2026-07-01 09:35:00",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -2132,84 +2132,6 @@
                             "required": false
                         },
                         {
-                            "key": "authorization_type",
-                            "label": "Unauthorized Access Behavior",
-                            "type": "select",
-                            "required": false,
-                            "default": "message",
-                            "options": [
-                                {
-                                    "value": "message",
-                                    "label": "Show Message"
-                                },
-                                {
-                                    "value": "redirect",
-                                    "label": "Redirect To URL"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "unauthorized_message",
-                            "label": "Unauthorized Access Message",
-                            "type": "textarea",
-                            "required": false
-                        },
-                        {
-                            "key": "redirect_url",
-                            "label": "Redirect URL (if Redirect selected)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "protect_content_type",
-                            "label": "Protect Content Type",
-                            "type": "select",
-                            "required": false,
-                            "default": "basic-singulars",
-                            "options": [
-                                {
-                                    "value": "basic-global",
-                                    "label": "All Content (Global)"
-                                },
-                                {
-                                    "value": "basic-singulars",
-                                    "label": "Singular Posts/Pages"
-                                },
-                                {
-                                    "value": "basic-archives",
-                                    "label": "Archives"
-                                },
-                                {
-                                    "value": "special-blog",
-                                    "label": "Blog Home"
-                                },
-                                {
-                                    "value": "special-front",
-                                    "label": "Front Page"
-                                },
-                                {
-                                    "value": "special-search",
-                                    "label": "Search Results"
-                                },
-                                {
-                                    "value": "special-404",
-                                    "label": "404 Page"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "features",
-                            "label": "Features (JSON array, e.g. [{\"label\":\"Unlimited Access\",\"icon\":\"check\"}])",
-                            "type": "textarea",
-                            "required": false
-                        },
-                        {
-                            "key": "attachments",
-                            "label": "Download Attachment IDs (comma-separated)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
                             "key": "enable_expiration",
                             "label": "Enable Expiration",
                             "type": "select",
@@ -2291,90 +2213,6 @@
                         {
                             "key": "user_roles",
                             "label": "User Roles (comma-separated, leave empty to keep)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "authorization_type",
-                            "label": "Unauthorized Access Behavior",
-                            "type": "select",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "",
-                                    "label": "\u2014 Keep current \u2014"
-                                },
-                                {
-                                    "value": "message",
-                                    "label": "Show Message"
-                                },
-                                {
-                                    "value": "redirect",
-                                    "label": "Redirect To URL"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "unauthorized_message",
-                            "label": "Unauthorized Access Message (leave empty to keep)",
-                            "type": "textarea",
-                            "required": false
-                        },
-                        {
-                            "key": "redirect_url",
-                            "label": "Redirect URL (if Redirect selected, leave empty to keep)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "protect_content_type",
-                            "label": "Protect Content Type (leave empty to keep)",
-                            "type": "select",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "",
-                                    "label": "\u2014 Keep current \u2014"
-                                },
-                                {
-                                    "value": "basic-global",
-                                    "label": "All Content (Global)"
-                                },
-                                {
-                                    "value": "basic-singulars",
-                                    "label": "Singular Posts/Pages"
-                                },
-                                {
-                                    "value": "basic-archives",
-                                    "label": "Archives"
-                                },
-                                {
-                                    "value": "special-blog",
-                                    "label": "Blog Home"
-                                },
-                                {
-                                    "value": "special-front",
-                                    "label": "Front Page"
-                                },
-                                {
-                                    "value": "special-search",
-                                    "label": "Search Results"
-                                },
-                                {
-                                    "value": "special-404",
-                                    "label": "404 Page"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "features",
-                            "label": "Features (JSON array, leave empty to keep)",
-                            "type": "textarea",
-                            "required": false
-                        },
-                        {
-                            "key": "attachments",
-                            "label": "Download Attachment IDs (comma-separated, leave empty to keep)",
                             "type": "expression",
                             "required": false
                         }
@@ -6461,7 +6299,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/fillout",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10591,7 +10429,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/jotform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -11310,7 +11148,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/mailchimp",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/mailchimp",
             "triggers": {
                 "subscribed": {
                     "label": "Subscriber Added",
@@ -12995,7 +12833,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/messenger",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/messenger",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -13791,70 +13629,6 @@
             },
             "actions": []
         },
-        "schedule": {
-            "slug": "schedule",
-            "name": "Schedule",
-            "icon": "schedule.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_url": "",
-            "triggers": {
-                "interval": {
-                    "label": "On a Schedule",
-                    "hook": "zaplane/schedule/tick",
-                    "key": "interval",
-                    "schema": [
-                        {
-                            "key": "frequency",
-                            "label": "Frequency",
-                            "type": "select",
-                            "required": true,
-                            "default": "every_minutes",
-                            "options": [
-                                {
-                                    "value": "every_minutes",
-                                    "label": "Every X minutes"
-                                },
-                                {
-                                    "value": "hourly",
-                                    "label": "Hourly"
-                                },
-                                {
-                                    "value": "daily",
-                                    "label": "Daily at a time"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "interval_minutes",
-                            "label": "Every (minutes)",
-                            "type": "number",
-                            "required": false,
-                            "default": 15,
-                            "depends_on": {
-                                "frequency": "every_minutes"
-                            }
-                        },
-                        {
-                            "key": "time",
-                            "label": "Time (HH:MM, site timezone)",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "09:00",
-                            "depends_on": {
-                                "frequency": "daily"
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": []
-        },
         "slack": {
             "slug": "slack",
             "name": "Slack",
@@ -13863,7 +13637,7 @@
             "requires_connection": true,
             "auth_type": "both",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/slack",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/slack",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -17685,7 +17459,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/typeform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -17879,6 +17653,13 @@
                     "key": "catch_hook",
                     "schema": [
                         {
+                            "key": "webhook_url",
+                            "label": "Webhook URL",
+                            "type": "copy",
+                            "value": "zaplane/v1/hook/{workflow_id}",
+                            "help": "Send a GET or POST request (JSON body and/or query params) to this URL to trigger the workflow. Available after the workflow is saved."
+                        },
+                        {
                             "key": "secret",
                             "label": "Secret (optional)",
                             "type": "expression",
@@ -17938,7 +17719,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/whatsapp",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/whatsapp",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -27099,7 +26880,7 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/zoom",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/zoom",
             "triggers": {
                 "meeting_started": {
                     "label": "Meeting Started",
@@ -28406,6 +28187,70 @@
                     ]
                 }
             }
+        },
+        "schedule": {
+            "slug": "schedule",
+            "name": "Schedule",
+            "icon": "schedule.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": {
+                "interval": {
+                    "label": "On a Schedule",
+                    "hook": "zaplane/schedule/tick",
+                    "key": "interval",
+                    "schema": [
+                        {
+                            "key": "frequency",
+                            "label": "Frequency",
+                            "type": "select",
+                            "required": true,
+                            "default": "every_minutes",
+                            "options": [
+                                {
+                                    "value": "every_minutes",
+                                    "label": "Every X minutes"
+                                },
+                                {
+                                    "value": "hourly",
+                                    "label": "Hourly"
+                                },
+                                {
+                                    "value": "daily",
+                                    "label": "Daily at a time"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "interval_minutes",
+                            "label": "Every (minutes)",
+                            "type": "number",
+                            "required": false,
+                            "default": 15,
+                            "depends_on": {
+                                "frequency": "every_minutes"
+                            }
+                        },
+                        {
+                            "key": "time",
+                            "label": "Time (HH:MM, site timezone)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "09:00",
+                            "depends_on": {
+                                "frequency": "daily"
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         },
         "variable": {
             "slug": "variable",

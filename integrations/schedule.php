@@ -22,6 +22,13 @@ class Schedule extends IntegrationBase {
 		return 'Schedule';
 	}
 
+	// A built-in, connection-less trigger — belongs with the Tools group in the
+	// picker rather than the third-party Apps list. Tool-category integrations
+	// may still expose triggers (the manifest builder keeps them).
+	public static function get_category(): string {
+		return 'tool';
+	}
+
 	public static function get_icon(): string {
 		return 'schedule.svg';
 	}

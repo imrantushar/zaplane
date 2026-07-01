@@ -27,6 +27,7 @@ const ActionFieldRenderer = ({
   dynamicOptions,
   loadingFields,
   fetchDynamicOptions,
+  workFlow,
 }) => {
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,6 +61,24 @@ const ActionFieldRenderer = ({
   switch (field.type) {
     case "copy": {
       let displayValue = field.value || value || "";
+
+      // Templates like `zaplane/v1/hook/{workflow_id}` are per-workflow, so the
+      // real id is only known here (and only after the workflow is saved).
+      if (typeof displayValue === "string" && displayValue.includes("{workflow_id}")) {
+        const workflowId = workFlow?.workflow?.id;
+        if (!workflowId) {
+          return (
+            <div className="flex flex-col gap-2">
+              {field.label && <span className="zaplane-label">{__(field.label, "zaplane")}</span>}
+              <p className="text-gray-500 text-xs">
+                {__("Save the workflow to generate its webhook URL.", "zaplane")}
+              </p>
+            </div>
+          );
+        }
+        displayValue = displayValue.replace("{workflow_id}", workflowId);
+      }
+
       if (typeof displayValue === "string" && displayValue) {
         if (displayValue.startsWith("http")) {
           // Legacy: an absolute URL was stored — force it to the live origin.

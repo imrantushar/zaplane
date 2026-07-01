@@ -1,28 +1,35 @@
 import DrawerItemButton from "./DrawerItemButton";
 import { IoIosArrowForward } from "react-icons/io";
+import { ACTION_TOOLS, TRIGGER_TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 
 const DrawerModeList = ({
   setMode,
   setSelectedItem,
   isTrigger,
-  source,
-  TOOLS
 }) => {
   return <div className="flex flex-col gap-4">
       <DrawerItemButton item={{
       name: "Apps"
     }} onClick={() => setMode("app")} arrowIcon={<IoIosArrowForward />} showType={false} icon={'apps'} />
 
-      {(!isTrigger || source === "add") && TOOLS.map(tool => <DrawerItemButton key={tool.id} item={{
-      ...tool,
-      type: "tools"
-    }} onClick={() => {
-      setMode("tools");
-      setSelectedItem({
-        ...tool,
-        mode: "tools"
-      });
-    }} icon={tool?.icon} />)}
+      {/* Triggers: Tools is a category listing only trigger-capable tools (e.g.
+          Schedule). Actions: tools stay as individual buttons for quick access. */}
+      {isTrigger
+        ? TRIGGER_TOOLS.length > 0 && (
+            <DrawerItemButton item={{
+              name: "Tools"
+            }} onClick={() => setMode("tools")} arrowIcon={<IoIosArrowForward />} showType={false} icon={'grid'} />
+          )
+        : ACTION_TOOLS.map(tool => <DrawerItemButton key={tool.id} item={{
+            ...tool,
+            type: "tools"
+          }} onClick={() => {
+            setMode("tools");
+            setSelectedItem({
+              ...tool,
+              mode: "tools"
+            });
+          }} icon={tool?.icon} />)}
     </div>;
 };
 export default DrawerModeList;
