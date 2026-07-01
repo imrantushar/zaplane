@@ -14,6 +14,7 @@ import Folders from './pages/Folders';
 import Folder from './pages/Folders/Folder';
 import EmailTemplatesPage from './pages/email-templates';
 import EmailTemplateEditor from './pages/email-templates/Editor';
+import CustomApps from './pages/custom-apps';
 
 
 
@@ -31,6 +32,8 @@ const renderSwitch = (page, id, action, path) => {
 			return <Logs />;
 		case 'zaplane-connections':
 			return <Connections />;
+		case 'zaplane-custom-apps':
+			return <CustomApps id={id} action={action} />;
 		case 'zaplane-recipes':
 			return <RecipesPage />;
 		case 'zaplane-email-templates':

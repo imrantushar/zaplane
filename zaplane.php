@@ -114,6 +114,11 @@ final class Zaplane {
 	}
 
 	public function init_plugin(): void {
+		// Register user-defined Custom Apps into the integration registry before
+		// anything reads it (automation boot below, and later REST controllers).
+		\Zaplane\CustomApps\Loader::boot();
+		\Zaplane\CustomApps\Poller::boot();
+
 		// Initialize modules first
 		$modules = $this->container->get( 'modules' );
 		$modules->boot();
@@ -133,6 +138,7 @@ final class Zaplane {
 	public function deactivate_plugin(): void {
 		Gemcrm::unschedule_birthday_cron();
 		\Zaplane\Integrations\Woocommerce::unschedule_inactive_customer_cron();
+		\Zaplane\CustomApps\Poller::unschedule();
 	}
 }
 
