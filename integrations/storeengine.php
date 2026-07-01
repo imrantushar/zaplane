@@ -1434,6 +1434,23 @@ class Storeengine extends IntegrationBase {
 		return self::action_success( [ 'subscription_id' => $subscription_id, 'status' => $subscription->get_status() ] );
 	}
 
+	/**
+	 * Roles an access group grants, normalized to plain slugs. StoreEngine
+	 * stores them as a list of [ 'value' => 'role_slug' ] items (select options).
+	 */
+	private static function membership_group_roles( int $group_id ): array {
+		$raw = get_post_meta( $group_id, '_storeengine_membership_user_roles', true );
+		$out = [];
+		foreach ( (array) $raw as $item ) {
+			$slug = is_array( $item ) ? ( $item['value'] ?? '' ) : (string) $item;
+			$slug = (string) $slug;
+			if ( '' !== $slug ) {
+				$out[] = $slug;
+			}
+		}
+		return $out;
+	}
+
 	private static function action_grant_membership( array $config, array $input ): array {
 		$user_id  = absint( $config['user_id'] ?? 0 );
 		$group_id = absint( $config['group_id'] ?? 0 );
@@ -1441,25 +1458,55 @@ class Storeengine extends IntegrationBase {
 		if ( ! $user_id || ! get_userdata( $user_id ) || ! $group_id ) {
 			return self::action_error( 'A valid user ID and membership group are required.', $input );
 		}
+		if ( 'storeengine_groups' !== get_post_type( $group_id ) ) {
+			return self::action_error( 'The selected group is not a StoreEngine access group.', $input );
+		}
 
+		// StoreEngine derives membership from the access group's own config.
+		$roles            = self::membership_group_roles( $group_id );
+		$content_protects = get_post_meta( $group_id, '_storeengine_membership_content_protect_types', true );
+		$expiration       = get_post_meta( $group_id, '_storeengine_membership_expiration', true );
+
+		// Access is role-based — Helper::current_user_can_access() intersects the
+		// group's roles with the user's roles, so the role MUST be added or the
+		// membership grants no real access.
+		$wp_user = new \WP_User( $user_id );
+		$added   = [];
+		foreach ( $roles as $role ) {
+			if ( ! in_array( $role, (array) $wp_user->roles, true ) ) {
+				$wp_user->add_role( $role );
+				$added[] = $role;
+			}
+		}
+
+		// Optional per-grant expiration override; otherwise use the group's.
+		$override         = sanitize_text_field( $config['expiration_date'] ?? '' );
+		$expiration_value = is_array( $expiration ) ? $expiration : [];
+		if ( '' !== $override ) {
+			$expiration_value = [ 'is_enable_expiration' => 1, 'specific_date' => $override ];
+		}
+
+		// Sync the membership meta (content protection + expiration) like StoreEngine,
+		// merging so other group memberships are preserved.
 		$meta_key = '_storeengine_user_membership_data';
 		$data     = get_user_meta( $user_id, $meta_key, true );
 		if ( ! is_array( $data ) ) {
 			$data = [];
 		}
-
-		$expiration = sanitize_text_field( $config['expiration_date'] ?? '' );
-
 		$data[ $group_id ] = [
-			'expiration_date' => [
-				'is_enable_expiration' => $expiration ? 1 : 0,
-				'specific_date'        => $expiration,
-			],
+			'content_protect_types' => is_array( $content_protects ) ? $content_protects : [],
+			'expiration_date'       => $expiration_value,
 		];
-
 		update_user_meta( $user_id, $meta_key, $data );
 
-		return self::action_success( [ 'user_id' => $user_id, 'group_id' => $group_id ], $input );
+		// Fire the membership trigger so chained workflows run.
+		do_action( 'storeengine/membership/user_added_to_group', $user_id, $group_id );
+
+		return self::action_success( [
+			'user_id'     => $user_id,
+			'group_id'    => $group_id,
+			'roles_added' => $added,
+		], $input );
 	}
 
 	private static function action_revoke_membership( array $config, array $input ): array {
@@ -1471,19 +1518,38 @@ class Storeengine extends IntegrationBase {
 		}
 
 		$meta_key = '_storeengine_user_membership_data';
+		$data     = get_user_meta( $user_id, $meta_key, true );
+		$data     = is_array( $data ) ? $data : [];
 
-		if ( ! $group_id ) {
-			delete_user_meta( $user_id, $meta_key );
-			return self::action_success( [ 'user_id' => $user_id, 'revoked' => 'all' ], $input );
+		// Revoke one group, or all the user currently has.
+		$groups = $group_id ? [ $group_id ] : array_map( 'absint', array_keys( $data ) );
+
+		$wp_user = new \WP_User( $user_id );
+		$removed = [];
+		foreach ( $groups as $gid ) {
+			$gid = absint( $gid );
+			if ( ! $gid ) {
+				continue;
+			}
+
+			// Remove the group's roles so access checks fail.
+			foreach ( self::membership_group_roles( $gid ) as $role ) {
+				if ( in_array( $role, (array) $wp_user->roles, true ) ) {
+					$wp_user->remove_role( $role );
+				}
+			}
+
+			unset( $data[ $gid ] );
+			do_action( 'storeengine/membership/user_removed_from_group', $user_id, $gid );
+			$removed[] = $gid;
 		}
 
-		$data = get_user_meta( $user_id, $meta_key, true );
-		if ( is_array( $data ) && isset( $data[ $group_id ] ) ) {
-			unset( $data[ $group_id ] );
-			update_user_meta( $user_id, $meta_key, $data );
-		}
+		update_user_meta( $user_id, $meta_key, $data );
 
-		return self::action_success( [ 'user_id' => $user_id, 'group_id' => $group_id ], $input );
+		return self::action_success( [
+			'user_id'        => $user_id,
+			'removed_groups' => $removed,
+		], $input );
 	}
 
 	private static function action_create_access_group( array $config, array $input ): array {
