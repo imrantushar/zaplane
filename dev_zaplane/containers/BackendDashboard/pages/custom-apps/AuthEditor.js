@@ -1,6 +1,6 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
-import { TextInput, SelectInput } from './parts';
+import { TextInput, SelectInput, SubLabel } from './parts';
 import FieldsEditor from './FieldsEditor';
 
 const AUTH_TYPES = [
@@ -36,9 +36,7 @@ const AuthEditor = ({ auth = { type: 'none' }, onChange }) => {
 			{type !== 'none' && (
 				<>
 					<div>
-						<p className="mb-1 text-xs font-medium text-gray-600">
-							{__('Connection fields (what the user enters)', 'zaplane')}
-						</p>
+						<SubLabel>{__('Connection fields (what the user enters)', 'zaplane')}</SubLabel>
 						<FieldsEditor
 							fields={auth.fields || []}
 							onChange={(fields) => patch({ fields })}

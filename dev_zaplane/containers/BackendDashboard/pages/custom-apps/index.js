@@ -129,15 +129,17 @@ const CustomApps = () => {
 	if (view === 'new' || view === 'edit') {
 		return (
 			<PageLayout title="Custom Apps" heading={view === 'new' ? __('New Custom App', 'zaplane') : __('Edit Custom App', 'zaplane')}>
-				<Editor
-					initial={editing}
-					isNew={view === 'new'}
-					onSave={save}
-					onCancel={backToList}
-					onDelete={remove}
-					saving={saving}
-					errors={errors}
-				/>
+				<div className="zaplane-custom-apps">
+					<Editor
+						initial={editing}
+						isNew={view === 'new'}
+						onSave={save}
+						onCancel={backToList}
+						onDelete={remove}
+						saving={saving}
+						errors={errors}
+					/>
+				</div>
 			</PageLayout>
 		);
 	}

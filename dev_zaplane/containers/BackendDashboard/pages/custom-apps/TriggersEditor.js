@@ -1,6 +1,6 @@
 import React from 'react';
 import { __ } from '@wordpress/i18n';
-import { TextInput, SelectInput, GhostButton } from './parts';
+import { TextInput, SelectInput, GhostButton, Card, SubLabel } from './parts';
 import RequestEditor from './RequestEditor';
 import FieldsEditor from './FieldsEditor';
 import { ArgsEditor } from './local';
@@ -17,9 +17,12 @@ const TriggerCard = ({ trigger, update, remove, kind }) => {
 	const patchWebhook = (p) => update({ webhook: { ...(trigger.webhook || {}), ...p } });
 
 	return (
-		<div className="rounded-lg border border-gray-200 p-4">
+		<Card>
 			<div className="mb-3 flex items-center justify-between">
-				<span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+				<span
+					className="text-xs font-semibold uppercase tracking-wide"
+					style={{ color: 'var(--zaplane-font-secondary-color)' }}
+				>
 					{__('Trigger', 'zaplane')}
 				</span>
 				<GhostButton tone="danger" onClick={remove}>
@@ -70,7 +73,7 @@ const TriggerCard = ({ trigger, update, remove, kind }) => {
 
 			{!isLocal && mode === 'polling' && (
 				<>
-					<p className="mb-1 text-xs font-medium text-gray-600">{__('Poll request', 'zaplane')}</p>
+					<SubLabel>{__('Poll request', 'zaplane')}</SubLabel>
 					<RequestEditor
 						request={trigger.polling?.request || { method: 'GET' }}
 						onChange={(request) => patchPolling({ request })}
@@ -123,11 +126,11 @@ const TriggerCard = ({ trigger, update, remove, kind }) => {
 
 			{!isLocal && (
 				<>
-					<p className="mb-1 mt-4 text-xs font-medium text-gray-600">{__('Output fields', 'zaplane')}</p>
+					<SubLabel className="mt-4">{__('Output fields', 'zaplane')}</SubLabel>
 					<FieldsEditor fields={trigger.fields || []} onChange={(fields) => update({ fields })} />
 				</>
 			)}
-		</div>
+		</Card>
 	);
 };
 

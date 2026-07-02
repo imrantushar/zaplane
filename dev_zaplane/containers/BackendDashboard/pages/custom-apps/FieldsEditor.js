@@ -46,7 +46,10 @@ const FieldsEditor = ({ fields = [], onChange }) => (
 					onChange={(v) => update({ type: v })}
 					options={FIELD_TYPES}
 				/>
-				<label className="mt-6 flex items-center gap-2 text-sm text-gray-600">
+				<label
+					className="mt-6 flex items-center gap-2 text-sm"
+					style={{ color: 'var(--zaplane-font-secondary-color)' }}
+				>
 					<input
 						type="checkbox"
 						checked={!!field.required}

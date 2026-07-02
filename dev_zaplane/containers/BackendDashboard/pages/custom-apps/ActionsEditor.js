@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { TextInput, GhostButton, RepeatableList } from './parts';
+import { TextInput, GhostButton, RepeatableList, Card, SubLabel } from './parts';
 import RequestEditor from './RequestEditor';
 import FieldsEditor from './FieldsEditor';
 import TestPanel from './TestPanel';
@@ -61,9 +61,12 @@ const ActionCard = ({ action, update, remove, manifest, kind }) => {
 	};
 
 	return (
-		<div className="rounded-lg border border-gray-200 p-4">
+		<Card>
 			<div className="mb-3 flex items-center justify-between">
-				<span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+				<span
+					className="text-xs font-semibold uppercase tracking-wide"
+					style={{ color: 'var(--zaplane-font-secondary-color)' }}
+				>
 					{__('Action', 'zaplane')}
 				</span>
 				<GhostButton tone="danger" onClick={remove}>
@@ -86,27 +89,27 @@ const ActionCard = ({ action, update, remove, manifest, kind }) => {
 				/>
 			</div>
 
-			<p className="mb-1 text-xs font-medium text-gray-600">{__('Input fields', 'zaplane')}</p>
+			<SubLabel>{__('Input fields', 'zaplane')}</SubLabel>
 			<FieldsEditor fields={action.fields || []} onChange={(fields) => update({ fields })} />
 
 			{isLocal ? (
 				<>
-					<p className="mb-1 mt-4 text-xs font-medium text-gray-600">{__('Handler', 'zaplane')}</p>
+					<SubLabel className="mt-4">{__('Handler', 'zaplane')}</SubLabel>
 					<HandlerEditor handler={action.handler || {}} onChange={(handler) => update({ handler })} />
 				</>
 			) : (
 				<>
-					<p className="mb-1 mt-4 text-xs font-medium text-gray-600">{__('Request', 'zaplane')}</p>
+					<SubLabel className="mt-4">{__('Request', 'zaplane')}</SubLabel>
 					<RequestEditor request={action.request || {}} onChange={(request) => update({ request })} />
 				</>
 			)}
 
-			<p className="mb-1 mt-4 text-xs font-medium text-gray-600">{__('Outputs', 'zaplane')}</p>
+			<SubLabel className="mt-4">{__('Outputs', 'zaplane')}</SubLabel>
 			<OutputEditor outputs={action.output || []} onChange={(output) => update({ output })} />
 
 			{!isLocal && (
 				<>
-					<p className="mb-1 mt-4 text-xs font-medium text-gray-600">{__('Test', 'zaplane')}</p>
+					<SubLabel className="mt-4">{__('Test', 'zaplane')}</SubLabel>
 					<SampleValues fields={action.fields || []} values={sample} onChange={setSample} />
 					<TestPanel
 						getPayload={() => ({
@@ -119,7 +122,7 @@ const ActionCard = ({ action, update, remove, manifest, kind }) => {
 					/>
 				</>
 			)}
-		</div>
+		</Card>
 	);
 };
 

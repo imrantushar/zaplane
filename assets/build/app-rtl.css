@@ -2670,6 +2670,9 @@ h2.react-datepicker__current-month {
 .zaplane-scope .rounded-\[4px\] {
   border-radius: 4px;
 }
+.zaplane-scope .rounded-\[6px\] {
+  border-radius: 6px;
+}
 .zaplane-scope .rounded-\[8px\] {
   border-radius: 8px;
 }
@@ -4592,6 +4595,66 @@ h2.react-datepicker__current-month {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.zaplane-custom-apps .zaplane-input,
+.zaplane-custom-apps .zaplane-textarea {
+  width: 100%;
+  border: 1px solid var(--zaplane-border-color) !important;
+  border-radius: 4px !important;
+  background-color: var(--zaplane-background) !important;
+  color: var(--zaplane-font-color);
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.zaplane-custom-apps .zaplane-input::-moz-placeholder, .zaplane-custom-apps .zaplane-textarea::-moz-placeholder {
+  color: var(--zaplane-placeholder);
+  opacity: 1;
+}
+.zaplane-custom-apps .zaplane-input::placeholder,
+.zaplane-custom-apps .zaplane-textarea::placeholder {
+  color: var(--zaplane-placeholder);
+  opacity: 1;
+}
+.zaplane-custom-apps .zaplane-input:focus,
+.zaplane-custom-apps .zaplane-textarea:focus {
+  outline: none !important;
+  border-color: var(--zaplane-primary) !important;
+  box-shadow: 0 0 0 1px var(--zaplane-primary) !important;
+}
+.zaplane-custom-apps .zaplane-input:disabled,
+.zaplane-custom-apps .zaplane-textarea:disabled {
+  background-color: var(--zaplane-secondary-color) !important;
+  cursor: not-allowed;
+}
+.zaplane-custom-apps .zaplane-input {
+  height: 40px !important;
+  min-height: 40px;
+  padding: 0 12px !important;
+}
+.zaplane-custom-apps .zaplane-textarea {
+  display: block;
+  min-height: 88px;
+  padding: 10px 12px !important;
+  resize: vertical;
+}
+.zaplane-custom-apps select.zaplane-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-left: 34px !important;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23737373%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpolyline points=%276 9 12 15 18 9%27/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+  background-size: 12px;
+}
+.zaplane-custom-apps input[type=checkbox] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
 }
 .zaplane-scope .before\:absolute::before {
   content: var(--tw-content);

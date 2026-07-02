@@ -59,6 +59,29 @@ export const SelectInput = ({ label, value, onChange, options, help }) => (
 	</Labeled>
 );
 
+/**
+ * A small section sub-label — the "Input fields", "Request", "Outputs" headings
+ * inside editor cards. Uses design tokens so it matches the rest of the plugin.
+ */
+export const SubLabel = ({ children, className = '' }) => (
+	<p
+		className={`mb-1 text-xs font-medium ${className}`}
+		style={{ color: 'var(--zaplane-font-secondary-color)' }}
+	>
+		{children}
+	</p>
+);
+
+/** A lightweight bordered card used to group a repeatable entry (an action, a trigger). */
+export const Card = ({ children, className = '' }) => (
+	<div
+		className={`rounded-lg p-4 ${className}`}
+		style={{ border: '1px solid var(--zaplane-border-color)', background: 'var(--zaplane-background)' }}
+	>
+		{children}
+	</div>
+);
+
 /** A titled card section. */
 export const Section = ({ title, description, right, children }) => (
 	<section
@@ -82,14 +105,14 @@ export const Section = ({ title, description, right, children }) => (
 	</section>
 );
 
-export const GhostButton = ({ onClick, children, tone = 'default' }) => {
+export const GhostButton = ({ onClick, children, tone = 'default', styles = {} }) => {
 	const toneVars = {
 		default: { color: 'var(--zaplane-font-color)', borderColor: 'var(--zaplane-border-color)' },
 		danger: { color: 'var(--zaplane-danger)', borderColor: 'var(--zaplane-danger)' },
 		primary: { color: 'var(--zaplane-primary)', borderColor: 'var(--zaplane-primary)' },
 	};
 	return (
-		<button type="button" onClick={onClick} style={{ ...transparentMiniBtn, borderRadius: '4px', ...toneVars[tone] }}>
+		<button type="button" onClick={onClick} style={{ ...transparentMiniBtn, borderRadius: '4px', ...toneVars[tone], ...styles }}>
 			{children}
 		</button>
 	);

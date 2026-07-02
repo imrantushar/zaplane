@@ -58,14 +58,20 @@ const Editor = ({ initial, isNew, onSave, onCancel, onDelete, saving, errors }) 
 		<div className="flex flex-col gap-4">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
-					<GhostButton onClick={onCancel}>← {__('Back', 'zaplane')}</GhostButton>
+					<GhostButton styles={{ 
+								padding: '4px 12px',
+							}} onClick={onCancel}>← {__('Back', 'zaplane')}</GhostButton>
 					<h2 className="text-lg font-semibold" style={{ color: 'var(--zaplane-font-color)' }}>
 						{manifest.name || __('New Custom App', 'zaplane')}
 					</h2>
 				</div>
 				<div className="flex items-center gap-2">
 					{!isNew && (
-						<GhostButton tone="danger" onClick={() => onDelete(manifest.slug)}>
+						<GhostButton
+							styles={{ 
+								padding: '9px 12px',
+							}}
+						tone="danger" onClick={() => onDelete(manifest.slug)}>
 							{__('Delete', 'zaplane')}
 						</GhostButton>
 					)}
