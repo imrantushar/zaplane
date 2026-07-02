@@ -9,6 +9,7 @@ use WP_Error;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\CustomApps\ManifestStore;
 use Zaplane\CustomApps\ManifestValidator;
+use Zaplane\CustomApps\WorkflowGenerator;
 use Zaplane\CustomApps\Template;
 use Zaplane\CustomApps\RequestBuilder;
 use Zaplane\CustomApps\HttpClient;
@@ -110,7 +111,14 @@ class CustomAppsController extends WP_REST_Controller {
 			return new WP_Error( 'exists', 'A custom app with that slug already exists.', [ 'status' => 409 ] );
 		}
 
-		return $this->save( $manifest );
+		$result = $this->save( $manifest );
+
+		// A new app gets a starter workflow so the user isn't left on a blank canvas.
+		if ( ! is_wp_error( $result ) ) {
+			WorkflowGenerator::generate_for_manifest( $manifest );
+		}
+
+		return $result;
 	}
 
 	public function update_item( $request ) {
@@ -137,8 +145,17 @@ class CustomAppsController extends WP_REST_Controller {
 		$manifest = $this->manifest_from_request( $request );
 		$manifest['slug'] = ManifestValidator::sanitize_slug( (string) ( $manifest['slug'] ?? '' ) );
 
-		// Importing over an existing slug replaces it (an explicit user action).
-		return $this->save( $manifest );
+		// Importing over an existing slug replaces it (an explicit user action); only
+		// a brand-new slug should also get its starter workflow.
+		$is_new = '' !== $manifest['slug'] && ! ManifestStore::exists( $manifest['slug'] );
+
+		$result = $this->save( $manifest );
+
+		if ( $is_new && ! is_wp_error( $result ) ) {
+			WorkflowGenerator::generate_for_manifest( $manifest );
+		}
+
+		return $result;
 	}
 
 	/**

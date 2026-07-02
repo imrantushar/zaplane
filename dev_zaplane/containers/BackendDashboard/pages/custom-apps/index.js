@@ -71,10 +71,11 @@ const CustomApps = () => {
 		try {
 			if (view === 'new') {
 				await createCustomApp(manifest);
+				notify('Custom app saved. A starter workflow was created for it.');
 			} else {
 				await updateCustomApp(manifest.slug, manifest);
+				notify('Custom app saved.');
 			}
-			notify('Custom app saved.');
 			await load();
 			backToList();
 		} catch (e) {

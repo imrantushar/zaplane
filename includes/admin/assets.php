@@ -47,9 +47,52 @@ class Assets {
 				'route_path'            => wp_parse_url( admin_url(), PHP_URL_PATH ),
 				'plugin_root_url'       => ZAPLANE_PLUGIN_ROOT_URI,
 				'menu'                  => wp_json_encode( Helper::get_admin_menu_list() ),
-				'integrations'          => json_decode( file_get_contents( ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json' ), true ) // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+				'integrations'          => $this->get_frontend_integrations(),
 			]);
 			wp_set_script_translations( 'zaplane-app-scripts', 'zaplane', ZAPLANE_ROOT_DIR_PATH . 'languages/' );
 		}//end if
+	}
+
+	/**
+	 * The integrations manifest sent to the dashboard: the pre-built built-in
+	 * catalogue from integrations.json, plus any user-defined Custom Apps merged
+	 * in live. Custom apps register at runtime (via the `zaplane_integrations`
+	 * filter) and are never written to the static file, so without this merge a
+	 * newly created custom app can't be picked when building a workflow.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function get_frontend_integrations(): array {
+		$integrations = [ 'apps' => [], 'tools' => [] ];
+
+		$file = ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json';
+		if ( is_readable( $file ) ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$decoded = json_decode( file_get_contents( $file ), true );
+			if ( is_array( $decoded ) ) {
+				$integrations = $decoded;
+			}
+		}
+
+		$integrations['apps']  = $integrations['apps'] ?? [];
+		$integrations['tools'] = $integrations['tools'] ?? [];
+
+		foreach ( \Zaplane\CustomApps\ManifestStore::all() as $slug => $manifest ) {
+			$slug        = (string) $slug;
+			$integration = \Zaplane\Framework\Core\IntegrationLoader::get( $slug );
+			if ( ! $integration ) {
+				continue;
+			}
+
+			$entry = \Zaplane\Framework\Core\IntegrationManifest::build_entry( get_class( $integration ), $slug );
+			if ( null === $entry ) {
+				continue;
+			}
+
+			$bucket = 'tool' === $entry['category'] ? 'tools' : 'apps';
+			$integrations[ $bucket ][ $slug ] = $entry;
+		}
+
+		return $integrations;
 	}
 }

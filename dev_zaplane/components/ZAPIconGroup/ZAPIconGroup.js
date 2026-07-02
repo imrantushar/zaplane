@@ -1,11 +1,16 @@
 import { plugin_root_url, integrations } from "@ZAPUtils/helper";
 
+// Custom apps store a full icon URL (or data URI); built-ins store a bare filename.
+// Absolute sources must be used verbatim rather than resolved/prefixed.
+const isAbsoluteIcon = (icon) =>
+  typeof icon === "string" && (/^https?:\/\//.test(icon) || icon.startsWith("data:") || icon.startsWith("//"));
+
 // Some callers (e.g. recipe seeders) store a bare integration slug (e.g. "woocommerce")
 // instead of the actual icon filename (e.g. "woo.svg"). Resolve those against the
 // integrations manifest so stale/legacy values still render correctly.
 const resolveIconFilename = (icon) => {
   if (!icon) return icon;
-  if (icon.endsWith(".svg")) return icon;
+  if (isAbsoluteIcon(icon) || icon.endsWith(".svg")) return icon;
   return integrations?.apps?.[icon]?.icon || integrations?.tools?.[icon]?.icon || icon;
 };
 
@@ -23,14 +28,16 @@ const ZAPIconGroup = ({
 
   return <div className="flex border border-[#E5E7EB] rounded-[4px] overflow-hidden bg-white w-fit">
     {visibleIcons.map((icon, index) => {
-      const isSvg = icon?.endsWith(".svg");
+      const isAbsolute = isAbsoluteIcon(icon);
+      const isImage = isAbsolute || icon?.endsWith(".svg");
+      const iconSrc = isAbsolute ? icon : `${plugin_root_url}assets/images/icons/${icon}`;
       const isLast = index === visibleIcons.length - 1 && remaining === 0;
 
       return <div key={index} style={{
         borderRight: isLast ? 'none' : '1px solid #E5E7EB',
         padding: '4px 10px'
       }} className="flex h-[36px] min-w-[40px] justify-center items-center bg-[#F9FAFB]">
-        {isSvg ? <img src={`${plugin_root_url}assets/images/icons/${icon}`} alt={icon} style={{
+        {isImage ? <img src={iconSrc} alt={icon} style={{
           width: '20px',
           height: '20px',
           objectFit: 'contain'

@@ -4,6 +4,7 @@ namespace Zaplane\Commands;
 
 use Zaplane\Framework\Console\Command;
 use Zaplane\Framework\Core\IntegrationLoader;
+use Zaplane\Framework\Core\IntegrationManifest;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,57 +29,13 @@ class BuildIntegrationCommand extends Command {
 		$toolCount = 0;
 
 		foreach ( IntegrationLoader::all() as $slug => $instance ) {
-			$class = get_class( $instance );
-
-			$category = method_exists( $class, 'get_category' )
-				? $class::get_category()
-				: 'app';
-
-			$integration = [
-				'slug'               => $slug,
-				'name'               => $class::get_name(),
-				'icon'               => $class::get_icon(),
-				'category'           => $category,
-				'requires_connection' => $class::requires_connection(),
-				'auth_type'          => $class::get_auth_type(),
-				'supports_webhook'   => $class::supports_webhook(),
-				'triggers'           => [],
-				'actions'            => [],
-			];
-
-			foreach ( $class::get_triggers() as $key => $trigger ) {
-				if ( 'tool' === $category ) {
-					continue;
-				}
-
-				if ( ! isset( $trigger['hook'] ) ) {
-					$this->warning( "⚠️  Trigger '{$key}' in {$slug} is missing 'hook' field - skipping" );
-					continue;
-				}
-
-				$integration['triggers'][ $key ] = [
-					'key'     => $key,
-					'label'   => $trigger['label'],
-					'hook'    => $trigger['hook'],
-					'schema'  => method_exists( $class, 'get_trigger_config_schema' )
-						? $class::get_trigger_config_schema( $key )
-						: [],
-					'outputs' => $class::get_output_ports(),
-				];
+			$integration = IntegrationManifest::build_entry( get_class( $instance ), (string) $slug );
+			if ( null === $integration ) {
+				$this->warning( "⚠️  Could not build manifest entry for {$slug} - skipping" );
+				continue;
 			}
 
-			foreach ( $class::get_actions() as $key => $action ) {
-				$integration['actions'][ $key ] = [
-					'key'     => $key,
-					'label'   => $action['label'],
-					'schema'  => method_exists( $class, 'get_action_config_schema' )
-						? $class::get_action_config_schema( $key )
-						: [],
-					'outputs' => $class::get_output_ports(),
-				];
-			}
-
-			if ( 'tool' === $category ) {
+			if ( 'tool' === $integration['category'] ) {
 				$manifest['tools'][ $slug ] = $integration;
 				$toolCount++;
 				$this->line( "  ✓ {$slug} (tool) - " . count( $integration['actions'] ) . ' actions' );
