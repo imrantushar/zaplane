@@ -80,7 +80,7 @@ const ConnectionTable = () => {
                 </span>,
     cell: row => {
       return <div className="flex items-center gap-3">
-                    <ZAPIconGroup icons={[row?.icon]} />
+                    <ZAPIconGroup icons={[row?.icon || row?.app]} />
                     <span textOverflow="ellipsis" className="zaplane-label font-[400]">
                         {row.name}
                     </span>
