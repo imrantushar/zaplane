@@ -41,6 +41,7 @@ class API implements ModuleInterface {
 		( new \Zaplane\API\RecipeController( $this->container ) )->register_routes();
 		( new \Zaplane\API\EmailTemplateController( $this->container ) )->register_routes();
 		( new \Zaplane\API\CustomAppsController( $this->container ) )->register_routes();
+		( new \Zaplane\API\HitlController( $this->container ) )->register_routes();
 
 		register_rest_route('zaplane/v1', '/runs/(?P<id>\d+)', [
 			'methods'  => 'GET',

@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-06-25 13:01:40",
+    "generated_at": "2026-07-05 08:50:18",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -25881,6 +25881,27 @@
                     ]
                 }
             }
+        },
+        "custom_app": {
+            "slug": "custom_app",
+            "name": "Custom App",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "zap_form_submit": {
+                    "key": "zap_form_submit",
+                    "label": "Form Submit",
+                    "hook": "test_hook",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
@@ -26189,6 +26210,110 @@
                     ],
                     "outputs": [
                         "main"
+                    ]
+                }
+            }
+        },
+        "human_approval": {
+            "slug": "human_approval",
+            "name": "Human Approval",
+            "icon": "condition",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "request_approval": {
+                    "key": "request_approval",
+                    "label": "Request Approval",
+                    "schema": [
+                        {
+                            "key": "approver_emails",
+                            "label": "Approver email(s)",
+                            "type": "expression",
+                            "required": true,
+                            "help": "Comma-separated. Supports variables, e.g. {{ manager_email }}."
+                        },
+                        {
+                            "key": "subject",
+                            "label": "Email subject",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "required": true,
+                            "help": "Shown to the approver. Supports variables."
+                        },
+                        {
+                            "key": "approve_label",
+                            "label": "Approve button label",
+                            "type": "text",
+                            "default": "Approve"
+                        },
+                        {
+                            "key": "reject_label",
+                            "label": "Reject button label",
+                            "type": "text",
+                            "default": "Reject"
+                        },
+                        {
+                            "key": "allow_reject",
+                            "label": "Show a Reject button",
+                            "type": "checkbox",
+                            "default": true
+                        },
+                        {
+                            "key": "slack_webhook",
+                            "label": "Slack incoming webhook URL (optional)",
+                            "type": "text",
+                            "help": "If set, the request is also posted to Slack with the same links."
+                        },
+                        {
+                            "key": "timeout_amount",
+                            "label": "Timeout (0 = wait forever)",
+                            "type": "number",
+                            "default": 0
+                        },
+                        {
+                            "key": "timeout_unit",
+                            "label": "Timeout unit",
+                            "type": "select",
+                            "default": "days",
+                            "options": [
+                                {
+                                    "value": "hours",
+                                    "label": "Hours"
+                                },
+                                {
+                                    "value": "days",
+                                    "label": "Days"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "on_timeout",
+                            "label": "If it times out",
+                            "type": "select",
+                            "default": "rejected",
+                            "options": [
+                                {
+                                    "value": "approved",
+                                    "label": "Treat as approved"
+                                },
+                                {
+                                    "value": "rejected",
+                                    "label": "Treat as rejected"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "approved",
+                        "rejected"
                     ]
                 }
             }

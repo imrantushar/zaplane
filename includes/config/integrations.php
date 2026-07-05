@@ -17,6 +17,10 @@ $registry = [
 		'file'  => 'delay.php',
 		'class' => \Zaplane\Integrations\Delay::class,
 	],
+	'human_approval'      => [
+		'file'  => 'human-approval.php',
+		'class' => \Zaplane\Integrations\HumanApproval::class,
+	],
 	'iterator'            => [
 		'file'  => 'iterator.php',
 		'class' => \Zaplane\Integrations\Iterator::class,
