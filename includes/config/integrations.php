@@ -21,6 +21,10 @@ $registry = [
 		'file'  => 'human-approval.php',
 		'class' => \Zaplane\Integrations\HumanApproval::class,
 	],
+	'manual'              => [
+		'file'  => 'manual.php',
+		'class' => \Zaplane\Integrations\Manual::class,
+	],
 	'csv'                 => [
 		'file'  => 'csv.php',
 		'class' => \Zaplane\Integrations\Csv::class,

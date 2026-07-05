@@ -116,6 +116,14 @@ class WorkflowsController extends WP_REST_Controller {
 			],
 		]);
 
+		register_rest_route($namespace, '/' . $rest_base . '/(?P<id>\d+)/trigger', [
+			[
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => [ $this, 'trigger_workflow' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		]);
+
 		register_rest_route($namespace, '/condition-variables', [
 			[
 				'methods' => WP_REST_Server::CREATABLE,
@@ -127,6 +135,38 @@ class WorkflowsController extends WP_REST_Controller {
 
 	public function permissions_check() {
 		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * Run a workflow on demand (the "Run"/Manual trigger). Starts a run from the
+	 * workflow's trigger node with any posted data, via the automation engine.
+	 */
+	public function trigger_workflow( $request ) {
+		$workflow_id = (int) $request['id'];
+
+		$workflow = Workflow::find( $workflow_id );
+		if ( ! $workflow ) {
+			return new WP_Error( 'not_found', 'Workflow not found.', [ 'status' => 404 ] );
+		}
+
+		$body = $request->get_json_params();
+		$data = isset( $body['data'] ) && is_array( $body['data'] ) ? $body['data'] : [];
+
+		$automation = $this->container ? $this->container->get( 'automation' ) : \Zaplane\Framework\Core\Automation::get_instance();
+		if ( ! $automation ) {
+			return new WP_Error( 'unavailable', 'Automation engine is not available.', [ 'status' => 500 ] );
+		}
+
+		$run_id = $automation->run_workflow( $workflow_id, $data );
+		if ( ! $run_id ) {
+			return new WP_Error(
+				'no_trigger',
+				'This workflow has no active version or trigger node to run.',
+				[ 'status' => 422 ]
+			);
+		}
+
+		return rest_ensure_response( [ 'triggered' => true, 'run_id' => (int) $run_id ] );
 	}
 
 	public function get_workflow_items( $request ) {

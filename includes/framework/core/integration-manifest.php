@@ -73,14 +73,14 @@ class IntegrationManifest {
 		// Tools expose actions only — never triggers.
 		if ( 'tool' !== $category ) {
 			foreach ( $class::get_triggers() as $key => $trigger ) {
-				if ( ! isset( $trigger['hook'] ) ) {
-					continue;
-				}
-
+				// A missing hook is valid: manual/scheduled triggers don't fire from
+				// a WP event (resolve_hook returns empty, so they're never auto-
+				// registered) — they run on demand. Hook-based triggers still carry
+				// their hook here.
 				$entry['triggers'][ $key ] = [
 					'key'     => $key,
 					'label'   => $trigger['label'],
-					'hook'    => $trigger['hook'],
+					'hook'    => $trigger['hook'] ?? '',
 					'schema'  => method_exists( $class, 'get_trigger_config_schema' )
 						? $class::get_trigger_config_schema( $key )
 						: [],

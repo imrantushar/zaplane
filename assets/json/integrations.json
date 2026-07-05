@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-05 09:01:47",
+    "generated_at": "2026-07-05 10:21:01",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -10205,6 +10205,34 @@
                     ]
                 }
             }
+        },
+        "manual": {
+            "slug": "manual",
+            "name": "Manual",
+            "icon": "manual.svg",
+            "category": "core",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "run_manually": {
+                    "key": "run_manually",
+                    "label": "Run Manually",
+                    "hook": "",
+                    "schema": [
+                        {
+                            "key": "note",
+                            "label": "How it runs",
+                            "type": "copy",
+                            "value": "This workflow runs when you click \u201cRun\u201d, or via zaplane_run_workflow( id, data )."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         },
         "masterstudy": {
             "slug": "masterstudy",
