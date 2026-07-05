@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-05 08:50:18",
+    "generated_at": "2026-07-05 09:01:47",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -26008,6 +26008,257 @@
                 }
             }
         },
+        "csv": {
+            "slug": "csv",
+            "name": "CSV",
+            "icon": "csv.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "parse": {
+                    "key": "parse",
+                    "label": "Parse CSV",
+                    "schema": [
+                        {
+                            "key": "csv",
+                            "label": "CSV text",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "delimiter",
+                            "label": "Delimiter",
+                            "type": "text",
+                            "default": ","
+                        },
+                        {
+                            "key": "has_header",
+                            "label": "First row is a header",
+                            "type": "checkbox",
+                            "default": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "build": {
+                    "key": "build",
+                    "label": "Build CSV",
+                    "schema": [
+                        {
+                            "key": "items",
+                            "label": "Rows (array of objects)",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "delimiter",
+                            "label": "Delimiter",
+                            "type": "text",
+                            "default": ","
+                        },
+                        {
+                            "key": "include_header",
+                            "label": "Include header row",
+                            "type": "checkbox",
+                            "default": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "datetime": {
+            "slug": "datetime",
+            "name": "Date / Time",
+            "icon": "datetime.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "now": {
+                    "key": "now",
+                    "label": "Current Date/Time",
+                    "schema": [
+                        {
+                            "key": "format",
+                            "label": "Output format (PHP date)",
+                            "type": "text",
+                            "default": "Y-m-d H:i:s"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "format": {
+                    "key": "format",
+                    "label": "Format Date",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "Date input",
+                            "type": "expression",
+                            "required": true,
+                            "help": "Any parseable date, e.g. 2026-07-05 or {{ order_date }}."
+                        },
+                        {
+                            "key": "format",
+                            "label": "Output format (PHP date)",
+                            "type": "text",
+                            "default": "Y-m-d H:i:s"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "modify": {
+                    "key": "modify",
+                    "label": "Add / Subtract",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "Date input",
+                            "type": "expression",
+                            "default": "now"
+                        },
+                        {
+                            "key": "operation",
+                            "label": "Operation",
+                            "type": "select",
+                            "default": "add",
+                            "options": [
+                                {
+                                    "value": "add",
+                                    "label": "Add"
+                                },
+                                {
+                                    "value": "subtract",
+                                    "label": "Subtract"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "amount",
+                            "label": "Amount",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "unit",
+                            "label": "Unit",
+                            "type": "select",
+                            "default": "days",
+                            "options": [
+                                {
+                                    "value": "seconds",
+                                    "label": "Seconds"
+                                },
+                                {
+                                    "value": "minutes",
+                                    "label": "Minutes"
+                                },
+                                {
+                                    "value": "hours",
+                                    "label": "Hours"
+                                },
+                                {
+                                    "value": "days",
+                                    "label": "Days"
+                                },
+                                {
+                                    "value": "weeks",
+                                    "label": "Weeks"
+                                },
+                                {
+                                    "value": "months",
+                                    "label": "Months"
+                                },
+                                {
+                                    "value": "years",
+                                    "label": "Years"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "format",
+                            "label": "Output format (PHP date)",
+                            "type": "text",
+                            "default": "Y-m-d H:i:s"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "diff": {
+                    "key": "diff",
+                    "label": "Difference",
+                    "schema": [
+                        {
+                            "key": "start",
+                            "label": "Start date",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "end",
+                            "label": "End date",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "unit",
+                            "label": "Difference in",
+                            "type": "select",
+                            "default": "days",
+                            "options": [
+                                {
+                                    "value": "seconds",
+                                    "label": "Seconds"
+                                },
+                                {
+                                    "value": "minutes",
+                                    "label": "Minutes"
+                                },
+                                {
+                                    "value": "hours",
+                                    "label": "Hours"
+                                },
+                                {
+                                    "value": "days",
+                                    "label": "Days"
+                                },
+                                {
+                                    "value": "weeks",
+                                    "label": "Weeks"
+                                },
+                                {
+                                    "value": "months",
+                                    "label": "Months"
+                                },
+                                {
+                                    "value": "years",
+                                    "label": "Years"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "delay": {
             "slug": "delay",
             "name": "Delay",
@@ -26318,6 +26569,64 @@
                 }
             }
         },
+        "image_helper": {
+            "slug": "image_helper",
+            "name": "Image Helper",
+            "icon": "image-helper.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "info": {
+                    "key": "info",
+                    "label": "Get Image Info",
+                    "schema": [
+                        {
+                            "key": "source",
+                            "label": "Image (URL, path, or attachment ID)",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "resize": {
+                    "key": "resize",
+                    "label": "Resize Image",
+                    "schema": [
+                        {
+                            "key": "source",
+                            "label": "Image (URL, path, or attachment ID)",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "width",
+                            "label": "Max width (px)",
+                            "type": "number"
+                        },
+                        {
+                            "key": "height",
+                            "label": "Max height (px)",
+                            "type": "number"
+                        },
+                        {
+                            "key": "crop",
+                            "label": "Crop to exact size",
+                            "type": "checkbox",
+                            "default": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "iterator": {
             "slug": "iterator",
             "name": "Iterator",
@@ -26346,6 +26655,105 @@
                 }
             }
         },
+        "json_parser": {
+            "slug": "json_parser",
+            "name": "JSON Parser",
+            "icon": "json.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "parse": {
+                    "key": "parse",
+                    "label": "Parse JSON",
+                    "schema": [
+                        {
+                            "key": "json",
+                            "label": "JSON text",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "stringify": {
+                    "key": "stringify",
+                    "label": "Stringify JSON",
+                    "schema": [
+                        {
+                            "key": "data",
+                            "label": "Data",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "pretty",
+                            "label": "Pretty-print",
+                            "type": "checkbox",
+                            "default": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "sticky_note": {
+            "slug": "sticky_note",
+            "name": "Sticky Note",
+            "icon": "sticky-note.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "note": {
+                    "key": "note",
+                    "label": "Sticky Note",
+                    "schema": [
+                        {
+                            "key": "content",
+                            "label": "Note",
+                            "type": "textarea",
+                            "help": "Free-form notes for your team. Not executed."
+                        },
+                        {
+                            "key": "color",
+                            "label": "Colour",
+                            "type": "select",
+                            "default": "yellow",
+                            "options": [
+                                {
+                                    "value": "yellow",
+                                    "label": "Yellow"
+                                },
+                                {
+                                    "value": "blue",
+                                    "label": "Blue"
+                                },
+                                {
+                                    "value": "green",
+                                    "label": "Green"
+                                },
+                                {
+                                    "value": "pink",
+                                    "label": "Pink"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "variable": {
             "slug": "variable",
             "name": "Set Variable",
@@ -26370,6 +26778,54 @@
                             "key": "value",
                             "label": "Value",
                             "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "xml": {
+            "slug": "xml",
+            "name": "XML",
+            "icon": "xml.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "parse": {
+                    "key": "parse",
+                    "label": "Parse XML",
+                    "schema": [
+                        {
+                            "key": "xml",
+                            "label": "XML text",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "build": {
+                    "key": "build",
+                    "label": "Build XML",
+                    "schema": [
+                        {
+                            "key": "data",
+                            "label": "Data",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "root",
+                            "label": "Root element",
+                            "type": "text",
+                            "default": "root"
                         }
                     ],
                     "outputs": [
