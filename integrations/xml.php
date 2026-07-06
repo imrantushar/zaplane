@@ -7,9 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * XML tool — parse an XML string into data, or build XML from data.
- */
 class Xml extends IntegrationBase {
 
 	public static function get_slug(): string {
@@ -38,13 +35,28 @@ class Xml extends IntegrationBase {
 	public static function get_action_config_schema( string $action ): array {
 		if ( 'build' === $action ) {
 			return [
-				[ 'key' => 'data', 'label' => 'Data', 'type' => 'expression', 'required' => true ],
-				[ 'key' => 'root', 'label' => 'Root element', 'type' => 'text', 'default' => 'root' ],
+				[
+					'key' => 'data',
+					'label' => 'Data',
+					'type' => 'textarea',
+					'required' => true
+				],
+				[
+					'key' => 'root',
+					'label' => 'Root element',
+					'type' => 'text',
+					'default' => 'root'
+				],
 			];
 		}
 
 		return [
-			[ 'key' => 'xml', 'label' => 'XML text', 'type' => 'textarea', 'required' => true ],
+			[
+				'key' => 'xml',
+				'label' => 'XML text',
+				'type' => 'textarea',
+				'required' => true
+			],
 		];
 	}
 
@@ -58,14 +70,14 @@ class Xml extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * @param array<string,mixed> $config
-	 * @return array<string,mixed>
-	 */
 	protected static function parse( array $config ): array {
 		$text = (string) ( $config['xml'] ?? '' );
 		if ( '' === trim( $text ) ) {
-			return [ 'data' => null, 'success' => false, 'error' => 'Empty XML.' ];
+			return [
+				'data' => null,
+				'success' => false,
+				'error' => 'Empty XML.'
+			];
 		}
 
 		$previous = libxml_use_internal_errors( true );
@@ -74,19 +86,23 @@ class Xml extends IntegrationBase {
 		libxml_use_internal_errors( $previous );
 
 		if ( false === $xml ) {
-			return [ 'data' => null, 'success' => false, 'error' => 'Invalid XML.' ];
+			return [
+				'data' => null,
+				'success' => false,
+				'error' => 'Invalid XML.'
+			];
 		}
 
 		// Normalise to plain nested arrays via JSON round-trip.
 		$data = json_decode( (string) wp_json_encode( $xml ), true );
 
-		return [ 'data' => $data, 'success' => true, 'error' => null ];
+		return [
+			'data' => $data,
+			'success' => true,
+			'error' => null
+		];
 	}
 
-	/**
-	 * @param array<string,mixed> $config
-	 * @return array<string,mixed>
-	 */
 	protected static function build( array $config ): array {
 		$data = $config['data'] ?? [];
 		if ( is_string( $data ) ) {
@@ -102,11 +118,6 @@ class Xml extends IntegrationBase {
 		return [ 'xml' => $xml->asXML() ];
 	}
 
-	/**
-	 * Recursively append array data to a SimpleXMLElement.
-	 *
-	 * @param array<string,mixed> $data
-	 */
 	protected static function array_to_xml( array $data, \SimpleXMLElement $node ): void {
 		foreach ( $data as $key => $value ) {
 			$tag = is_numeric( $key ) ? 'item' : self::tag( (string) $key );
@@ -119,9 +130,6 @@ class Xml extends IntegrationBase {
 		}
 	}
 
-	/**
-	 * Sanitise a string into a valid XML tag name.
-	 */
 	protected static function tag( string $name ): string {
 		$name = preg_replace( '/[^a-zA-Z0-9_-]/', '_', $name );
 		if ( '' === $name || ! preg_match( '/^[a-zA-Z_]/', $name ) ) {

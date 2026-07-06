@@ -12,50 +12,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * Runtime for user-defined "Custom Apps".
- *
- * This ONE class implements the full IntegrationBase contract by reading a
- * manifest at call time. Because the engine and controllers invoke integration
- * methods statically (e.g. `$integration::execute_node(...)`), each custom app
- * gets its own tiny generated subclass whose only job is to pin `$slug` — every
- * method below then resolves the right manifest via `static::get_slug()`.
- *
- * @see \Zaplane\CustomApps\Loader for how per-slug subclasses are created.
- */
 abstract class CustomAppBase extends IntegrationBase {
 
-	/**
-	 * Pinned by each generated subclass.
-	 */
 	protected static string $slug = '';
 
 	public static function get_slug(): string {
 		return static::$slug;
 	}
 
-	/**
-	 * The manifest backing this app (empty array if it has been deleted).
-	 *
-	 * @return array<string,mixed>
-	 */
 	protected static function manifest(): array {
 		$manifest = ManifestStore::get( static::get_slug() );
 		return is_array( $manifest ) ? $manifest : [];
 	}
 
-	/**
-	 * "http" — talks to a REST API (default). "local" — integrates with another
-	 * plugin on the same site via WP hooks and PHP callables.
-	 */
 	protected static function kind(): string {
 		$kind = (string) ( self::manifest()['kind'] ?? 'http' );
 		return 'local' === $kind ? 'local' : 'http';
 	}
-
-	/* ---------------------------------------------------------------------
-	 * Identity
-	 * ------------------------------------------------------------------ */
 
 	public static function get_name(): string {
 		$manifest = self::manifest();
@@ -70,10 +43,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return (string) ( self::manifest()['category'] ?? 'app' );
 	}
 
-	/* ---------------------------------------------------------------------
-	 * Actions
-	 * ------------------------------------------------------------------ */
-
 	public static function get_actions(): array {
 		return self::index_events( self::manifest()['actions'] ?? [] );
 	}
@@ -82,10 +51,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		$def = self::find_event( self::manifest()['actions'] ?? [], $action );
 		return is_array( $def['fields'] ?? null ) ? $def['fields'] : [];
 	}
-
-	/* ---------------------------------------------------------------------
-	 * Triggers (schema only here; firing lives in the trigger milestone)
-	 * ------------------------------------------------------------------ */
 
 	public static function get_triggers(): array {
 		$triggers = self::manifest()['triggers'] ?? [];
@@ -118,9 +83,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return $indexed;
 	}
 
-	/**
-	 * The synthetic WordPress hook name a trigger dispatches on.
-	 */
 	public static function trigger_hook( string $key ): string {
 		return 'zaplane_ca_' . static::get_slug() . '_' . $key;
 	}
@@ -145,15 +107,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return is_array( $payload ) ? $payload : false;
 	}
 
-	/**
-	 * Map the positional args of a real WordPress hook onto the named payload the
-	 * trigger declares in `args`. E.g. a hook fired as do_action( 'x', $id, $obj )
-	 * with args ["order_id", "order"] yields [ 'order_id' => $id, 'order' => $obj ].
-	 *
-	 * @param array<string,mixed> $node      The trigger node's data array.
-	 * @param array<int,mixed>    $hook_args Positional hook arguments.
-	 * @return array<string,mixed>|false
-	 */
 	protected static function resolve_local_trigger( array $node, array $hook_args ) {
 		$event   = (string) ( $node['event'] ?? '' );
 		$trigger = self::find_event( self::manifest()['triggers'] ?? [], $event );
@@ -177,19 +130,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return $payload;
 	}
 
-	/* ---------------------------------------------------------------------
-	 * Local actions (WP hooks + PHP callables)
-	 * ------------------------------------------------------------------ */
-
-	/**
-	 * Run a local action: fire a WordPress hook or call an allow-listed function
-	 * with interpolated arguments, then map the return value into outputs.
-	 *
-	 * @param array<string,mixed> $action
-	 * @param array<string,mixed> $config
-	 * @param array<string,mixed> $credentials
-	 * @return array{port:string,data:array}
-	 */
 	protected static function execute_local_action( array $action, string $event, array $config, array $credentials ): array {
 		$handler = is_array( $action['handler'] ?? null ) ? $action['handler'] : [];
 		$type    = (string) ( $handler['type'] ?? '' );
@@ -234,7 +174,7 @@ abstract class CustomAppBase extends IntegrationBase {
 			}
 
 			$result = call_user_func_array( $callable, $args );
-		}
+		}//end if
 
 		$outputs = ResponseMapper::map_outputs( self::normalize_arg( $result ), is_array( $action['output'] ?? null ) ? $action['output'] : [] );
 
@@ -244,26 +184,35 @@ abstract class CustomAppBase extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * Functions a local custom app may never call, regardless of manifest. These
-	 * are the classic RCE / code-eval / filesystem primitives — blocking them
-	 * stops an imported manifest from becoming one-click remote code execution
-	 * while leaving every ordinary plugin/WordPress function callable. Filterable
-	 * so a site can tighten or (deliberately) loosen it.
-	 */
 	protected const BLOCKED_CALLABLES = [
-		'eval', 'assert', 'exec', 'system', 'passthru', 'shell_exec', 'proc_open',
-		'popen', 'pcntl_exec', 'proc_close', 'create_function', 'call_user_func',
-		'call_user_func_array', 'array_map', 'array_walk', 'array_filter',
-		'array_reduce', 'register_shutdown_function', 'unlink', 'file_put_contents',
-		'fwrite', 'fputs', 'fopen', 'move_uploaded_file', 'rename', 'copy',
+		'eval',
+		'assert',
+		'exec',
+		'system',
+		'passthru',
+		'shell_exec',
+		'proc_open',
+		'popen',
+		'pcntl_exec',
+		'proc_close',
+		'create_function',
+		'call_user_func',
+		'call_user_func_array',
+		'array_map',
+		'array_walk',
+		'array_filter',
+		'array_reduce',
+		'register_shutdown_function',
+		'unlink',
+		'file_put_contents',
+		'fwrite',
+		'fputs',
+		'fopen',
+		'move_uploaded_file',
+		'rename',
+		'copy',
 	];
 
-	/**
-	 * Return a human-readable reason the callable can't be invoked, or null when
-	 * it is safe to call. Never throws — the caller turns a reason into a failed
-	 * node result rather than a fatal.
-	 */
 	protected static function callable_error( string $callable ): ?string {
 		if ( '' === $callable ) {
 			return 'No function name was provided.';
@@ -284,14 +233,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return null;
 	}
 
-	/**
-	 * Coerce hook args / return values into JSON-safe data. Objects (e.g. a
-	 * WC_Order) are flattened to their public shape so they survive being stored
-	 * as run data; unrepresentable values become null.
-	 *
-	 * @param mixed $value
-	 * @return mixed
-	 */
 	protected static function normalize_arg( $value ) {
 		if ( is_scalar( $value ) || null === $value || is_array( $value ) ) {
 			return $value;
@@ -300,10 +241,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		$decoded = false !== $encoded ? json_decode( $encoded, true ) : null;
 		return null !== $decoded ? $decoded : null;
 	}
-
-	/* ---------------------------------------------------------------------
-	 * Webhook triggers (dispatched by IncomingWebhookController)
-	 * ------------------------------------------------------------------ */
 
 	public static function supports_webhook(): bool {
 		foreach ( self::manifest()['triggers'] ?? [] as $trigger ) {
@@ -355,19 +292,11 @@ abstract class CustomAppBase extends IntegrationBase {
 				'event'   => (string) $trigger['key'],
 				'payload' => is_array( $payload ) ? $payload : [ 'value' => $payload ],
 			];
-		}
+		}//end foreach
 
 		return null;
 	}
 
-	/**
-	 * Verify a single webhook trigger's rule. Supports a shared-secret token
-	 * compared against a header/query param, or an HMAC-SHA256 of the raw body.
-	 * The secret is read from a per-app option. When no rule is configured (or no
-	 * secret is stored yet) the request is accepted.
-	 *
-	 * @param array<string,mixed> $webhook
-	 */
 	protected static function verify_webhook_rule( array $webhook, \WP_REST_Request $request ): bool {
 		$verify = is_array( $webhook['verify'] ?? null ) ? $webhook['verify'] : [];
 		$type   = (string) ( $verify['type'] ?? 'none' );
@@ -397,10 +326,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return false;
 	}
 
-	/* ---------------------------------------------------------------------
-	 * Dynamic dropdowns (M5) — resolved by the /dynamic REST endpoint
-	 * ------------------------------------------------------------------ */
-
 	public static function get_dynamic_queries(): array {
 		$queries = self::manifest()['queries'] ?? [];
 		if ( ! is_array( $queries ) ) {
@@ -424,13 +349,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return $map;
 	}
 
-	/**
-	 * Execute one manifest-defined query and shape the result as
-	 * [ { value, label }, ... ] for an async select.
-	 *
-	 * @param array<string,mixed> $params Posted by the frontend (may carry connection_id).
-	 * @return array<int,array{value:mixed,label:string}>
-	 */
 	public static function run_query( string $key, array $params ): array {
 		$def = self::find_event( self::manifest()['queries'] ?? [], $key );
 		if ( empty( $def ) || empty( $def['request'] ) ) {
@@ -463,12 +381,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return $options;
 	}
 
-	/**
-	 * Resolve connection credentials for a dynamic query from a posted connection_id.
-	 *
-	 * @param array<string,mixed> $params
-	 * @return array<string,mixed>
-	 */
 	protected static function credentials_from_params( array $params ): array {
 		$connection_id = (int) ( $params['connection_id'] ?? 0 );
 		if ( $connection_id <= 0 ) {
@@ -480,10 +392,6 @@ abstract class CustomAppBase extends IntegrationBase {
 			return [];
 		}
 	}
-
-	/* ---------------------------------------------------------------------
-	 * Execution
-	 * ------------------------------------------------------------------ */
 
 	public static function execute_node( array $node, array $input ): array {
 		$manifest = self::manifest();
@@ -535,10 +443,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		];
 	}
 
-	/* ---------------------------------------------------------------------
-	 * Auth (connection metadata; OAuth flow lands in the auth milestone)
-	 * ------------------------------------------------------------------ */
-
 	public static function requires_connection(): bool {
 		$type = (string) ( self::manifest()['auth']['type'] ?? 'none' );
 		return 'none' !== $type;
@@ -582,10 +486,6 @@ abstract class CustomAppBase extends IntegrationBase {
 			'details' => [ 'status' => $response['status'] ],
 		];
 	}
-
-	/* ---------------------------------------------------------------------
-	 * OAuth2 (driven entirely by the manifest auth.oauth2 block)
-	 * ------------------------------------------------------------------ */
 
 	protected static function oauth_config(): array {
 		$oauth = self::manifest()['auth']['oauth2'] ?? [];
@@ -655,14 +555,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return self::token_request( $url, $params, $oauth );
 	}
 
-	/**
-	 * POST a token request (form-encoded, as OAuth token endpoints expect) and
-	 * normalise the response into access_token/refresh_token/expires_in.
-	 *
-	 * @param array<string,mixed> $params
-	 * @param array<string,mixed> $oauth
-	 * @return array<string,mixed>
-	 */
 	protected static function token_request( string $url, array $params, array $oauth ): array {
 		$headers = [
 			'Content-Type' => 'application/x-www-form-urlencoded',
@@ -678,15 +570,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return self::map_tokens( $response['body'], $oauth );
 	}
 
-	/**
-	 * Apply an optional token_map so providers that name their fields differently
-	 * still surface standard access_token/refresh_token/expires_in keys. The full
-	 * raw body is retained so manifests can inject other returned values.
-	 *
-	 * @param array<string,mixed> $body
-	 * @param array<string,mixed> $oauth
-	 * @return array<string,mixed>
-	 */
 	protected static function map_tokens( array $body, array $oauth ): array {
 		$map    = is_array( $oauth['token_map'] ?? null ) ? $oauth['token_map'] : [];
 		$tokens = $body;
@@ -701,17 +584,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return $tokens;
 	}
 
-	/* ---------------------------------------------------------------------
-	 * Helpers
-	 * ------------------------------------------------------------------ */
-
-	/**
-	 * Map a manifest events list ([ { key, label, ... } ]) into the
-	 * [ key => [ 'label' => ... ] ] shape the API/UI expects.
-	 *
-	 * @param mixed $events
-	 * @return array<string,array>
-	 */
 	protected static function index_events( $events ): array {
 		if ( ! is_array( $events ) ) {
 			return [];
@@ -730,13 +602,6 @@ abstract class CustomAppBase extends IntegrationBase {
 		return $indexed;
 	}
 
-	/**
-	 * Find one event definition by key in a manifest events list.
-	 *
-	 * @param mixed  $events
-	 * @param string $key
-	 * @return array<string,mixed>
-	 */
 	protected static function find_event( $events, string $key ): array {
 		if ( ! is_array( $events ) || '' === $key ) {
 			return [];

@@ -38,13 +38,28 @@ class JsonParser extends IntegrationBase {
 	public static function get_action_config_schema( string $action ): array {
 		if ( 'stringify' === $action ) {
 			return [
-				[ 'key' => 'data', 'label' => 'Data', 'type' => 'expression', 'required' => true ],
-				[ 'key' => 'pretty', 'label' => 'Pretty-print', 'type' => 'checkbox', 'default' => false ],
+				[
+					'key' => 'data',
+					'label' => 'Data',
+					'type' => 'textarea',
+					'required' => true
+				],
+				[
+					'key' => 'pretty',
+					'label' => 'Pretty-print',
+					'type' => 'checkbox',
+					'default' => false
+				],
 			];
 		}
 
 		return [
-			[ 'key' => 'json', 'label' => 'JSON text', 'type' => 'textarea', 'required' => true ],
+			[
+				'key' => 'json',
+				'label' => 'JSON text',
+				'type' => 'textarea',
+				'required' => true
+			],
 		];
 	}
 

@@ -41,17 +41,34 @@ class StickyNote extends IntegrationBase {
 
 	public static function get_action_config_schema( string $action ): array {
 		return [
-			[ 'key' => 'content', 'label' => 'Note', 'type' => 'textarea', 'help' => 'Free-form notes for your team. Not executed.' ],
+			[
+				'key' => 'content',
+				'label' => 'Note',
+				'type' => 'textarea',
+				'help' => 'Free-form notes for your team. Not executed.'
+			],
 			[
 				'key'     => 'color',
 				'label'   => 'Colour',
 				'type'    => 'select',
 				'default' => 'yellow',
 				'options' => [
-					[ 'value' => 'yellow', 'label' => 'Yellow' ],
-					[ 'value' => 'blue', 'label' => 'Blue' ],
-					[ 'value' => 'green', 'label' => 'Green' ],
-					[ 'value' => 'pink', 'label' => 'Pink' ],
+					[
+						'value' => 'yellow',
+						'label' => 'Yellow'
+					],
+					[
+						'value' => 'blue',
+						'label' => 'Blue'
+					],
+					[
+						'value' => 'green',
+						'label' => 'Green'
+					],
+					[
+						'value' => 'pink',
+						'label' => 'Pink'
+					],
 				],
 			],
 		];
@@ -59,6 +76,9 @@ class StickyNote extends IntegrationBase {
 
 	public static function execute_node( array $node, array $input ): array {
 		// Pure annotation — pass input through untouched.
-		return [ 'port' => 'main', 'data' => $input ];
+		return [
+			'port' => 'main',
+			'data' => $input
+		];
 	}
 }

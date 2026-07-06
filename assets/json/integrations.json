@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-05 10:21:01",
+    "generated_at": "2026-07-06 12:34:35",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -25910,19 +25910,114 @@
                 }
             }
         },
-        "custom_app": {
-            "slug": "custom_app",
-            "name": "Custom App",
+        "heppyforms": {
+            "slug": "heppyforms",
+            "name": "HeppyForms",
             "icon": "",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
             "triggers": {
-                "zap_form_submit": {
-                    "key": "zap_form_submit",
-                    "label": "Form Submit",
-                    "hook": "test_hook",
+                "form_submission": {
+                    "key": "form_submission",
+                    "label": "Form Submission",
+                    "hook": "happyforms_submission_success",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_form": {
+                    "key": "create_form",
+                    "label": "Create Form",
+                    "schema": [
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "tally_forms": {
+            "slug": "tally_forms",
+            "name": "Tally Forms",
+            "icon": "",
+            "category": "app",
+            "requires_connection": true,
+            "auth_type": "api_key",
+            "supports_webhook": false,
+            "triggers": {
+                "form_submission": {
+                    "key": "form_submission",
+                    "label": "Form Submission",
+                    "hook": "zaplane_ca_tally_forms_form_submission",
+                    "schema": [
+                        {
+                            "key": "data",
+                            "label": "Form Data",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "id",
+                            "label": "Submission ID",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "formId",
+                            "label": "Form ID",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "match": {
+            "slug": "match",
+            "name": "match",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "azi": {
+                    "key": "azi",
+                    "label": "AZI Key",
+                    "hook": "lnok[-mnkj kn",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -25930,6 +26025,69 @@
                 }
             },
             "actions": []
+        },
+        "jdsifo": {
+            "slug": "jdsifo",
+            "name": "jdsifo",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "fjhbfg": {
+                    "key": "fjhbfg",
+                    "label": "iut",
+                    "hook": "reiuwtrfvvc xc",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "wp": {
+            "slug": "wp",
+            "name": "Wp",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": [],
+            "actions": {
+                "create_post": {
+                    "key": "create_post",
+                    "label": "Create Post",
+                    "schema": [
+                        {
+                            "key": "post_title",
+                            "label": "Post Title",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_comment": {
+                    "key": "delete_comment",
+                    "label": "Delete Comment ",
+                    "schema": [
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         }
     },
     "tools": {
@@ -26080,7 +26238,7 @@
                         {
                             "key": "items",
                             "label": "Rows (array of objects)",
-                            "type": "expression",
+                            "type": "textarea",
                             "required": true
                         },
                         {
@@ -26715,7 +26873,7 @@
                         {
                             "key": "data",
                             "label": "Data",
-                            "type": "expression",
+                            "type": "textarea",
                             "required": true
                         },
                         {
@@ -26846,7 +27004,7 @@
                         {
                             "key": "data",
                             "label": "Data",
-                            "type": "expression",
+                            "type": "textarea",
                             "required": true
                         },
                         {

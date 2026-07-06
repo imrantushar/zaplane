@@ -7,9 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * CSV tool — parse CSV text into rows, or build CSV text from a list of rows.
- */
 class Csv extends IntegrationBase {
 
 	public static function get_slug(): string {
@@ -38,16 +35,46 @@ class Csv extends IntegrationBase {
 	public static function get_action_config_schema( string $action ): array {
 		if ( 'build' === $action ) {
 			return [
-				[ 'key' => 'items', 'label' => 'Rows (array of objects)', 'type' => 'expression', 'required' => true ],
-				[ 'key' => 'delimiter', 'label' => 'Delimiter', 'type' => 'text', 'default' => ',' ],
-				[ 'key' => 'include_header', 'label' => 'Include header row', 'type' => 'checkbox', 'default' => true ],
+				[
+					'key' => 'items',
+					'label' => 'Rows (array of objects)',
+					'type' => 'textarea',
+					'required' => true
+				],
+				[
+					'key' => 'delimiter',
+					'label' => 'Delimiter',
+					'type' => 'text',
+					'default' => ','
+				],
+				[
+					'key' => 'include_header',
+					'label' => 'Include header row',
+					'type' => 'checkbox',
+					'default' => true
+				],
 			];
-		}
+		}//end if
 
 		return [
-			[ 'key' => 'csv', 'label' => 'CSV text', 'type' => 'textarea', 'required' => true ],
-			[ 'key' => 'delimiter', 'label' => 'Delimiter', 'type' => 'text', 'default' => ',' ],
-			[ 'key' => 'has_header', 'label' => 'First row is a header', 'type' => 'checkbox', 'default' => true ],
+			[
+				'key' => 'csv',
+				'label' => 'CSV text',
+				'type' => 'textarea',
+				'required' => true
+			],
+			[
+				'key' => 'delimiter',
+				'label' => 'Delimiter',
+				'type' => 'text',
+				'default' => ','
+			],
+			[
+				'key' => 'has_header',
+				'label' => 'First row is a header',
+				'type' => 'checkbox',
+				'default' => true
+			],
 		];
 	}
 
@@ -57,13 +84,12 @@ class Csv extends IntegrationBase {
 
 		$data = 'build' === $action ? self::build( $config ) : self::parse( $config );
 
-		return [ 'port' => 'main', 'data' => $data ];
+		return [
+			'port' => 'main',
+			'data' => $data
+		];
 	}
 
-	/**
-	 * @param array<string,mixed> $config
-	 * @return array<string,mixed>
-	 */
 	protected static function parse( array $config ): array {
 		$text       = (string) ( $config['csv'] ?? '' );
 		$delimiter  = self::delimiter( $config );
@@ -71,11 +97,17 @@ class Csv extends IntegrationBase {
 
 		$lines = self::read_rows( $text, $delimiter );
 		if ( empty( $lines ) ) {
-			return [ 'rows' => [], 'count' => 0 ];
+			return [
+				'rows' => [],
+				'count' => 0
+			];
 		}
 
 		if ( ! $has_header ) {
-			return [ 'rows' => $lines, 'count' => count( $lines ) ];
+			return [
+				'rows' => $lines,
+				'count' => count( $lines )
+			];
 		}
 
 		$header = array_map( 'strval', array_shift( $lines ) );
@@ -88,13 +120,12 @@ class Csv extends IntegrationBase {
 			$rows[] = $row;
 		}
 
-		return [ 'rows' => $rows, 'count' => count( $rows ) ];
+		return [
+			'rows' => $rows,
+			'count' => count( $rows )
+		];
 	}
 
-	/**
-	 * @param array<string,mixed> $config
-	 * @return array<string,mixed>
-	 */
 	protected static function build( array $config ): array {
 		$items     = $config['items'] ?? [];
 		$delimiter = self::delimiter( $config );
@@ -108,7 +139,7 @@ class Csv extends IntegrationBase {
 			$items = [];
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- In-memory stream, not filesystem.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen -- In-memory stream, not filesystem.
 		$fh = fopen( 'php://temp', 'r+' );
 
 		$first = reset( $items );
@@ -122,42 +153,34 @@ class Csv extends IntegrationBase {
 
 		rewind( $fh );
 		$csv = stream_get_contents( $fh );
-		fclose( $fh ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+		fclose( $fh ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose -- In-memory stream, not filesystem.
 
 		return [ 'csv' => $csv ];
 	}
 
-	/**
-	 * Read CSV text into an array of arrays, honouring quoted fields/newlines.
-	 *
-	 * @return array<int,array<int,string>>
-	 */
 	protected static function read_rows( string $text, string $delimiter ): array {
 		if ( '' === trim( $text ) ) {
 			return [];
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- In-memory stream, not filesystem.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen -- In-memory stream, not filesystem.
 		$fh = fopen( 'php://temp', 'r+' );
-		fwrite( $fh, $text );
+		fwrite( $fh, $text ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fwrite -- In-memory stream, not filesystem.
 		rewind( $fh );
 
 		$rows = [];
+		// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Standard fgetcsv iteration pattern.
 		while ( ( $row = fgetcsv( $fh, 0, $delimiter ) ) !== false ) {
-			// Skip fully empty lines.
 			if ( [ null ] === $row || ( 1 === count( $row ) && '' === (string) $row[0] ) ) {
 				continue;
 			}
 			$rows[] = array_map( 'strval', $row );
 		}
-		fclose( $fh ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+		fclose( $fh ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose -- In-memory stream, not filesystem.
 
 		return $rows;
 	}
 
-	/**
-	 * @param array<string,mixed> $config
-	 */
 	protected static function delimiter( array $config ): string {
 		$delimiter = (string) ( $config['delimiter'] ?? ',' );
 		return '' === $delimiter ? ',' : substr( $delimiter, 0, 1 );

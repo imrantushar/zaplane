@@ -8,19 +8,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * Human-in-the-Loop approval node.
- *
- * Pauses the workflow run and asks a person to approve or reject before it
- * continues. The approver receives an email (and/or Slack message) with signed
- * approve/reject links; clicking one resumes the run down the matching output
- * branch. An optional timeout auto-resolves the request if nobody responds.
- *
- * Pausing reuses the same mechanism as the Delay node: execute_node returns a
- * `delayed` status, and the run is later resumed via
- * Automation::resume_delayed_run() — here triggered by the HitlController
- * endpoint (human click) or the Scheduler (timeout).
- */
 class HumanApproval extends IntegrationBase {
 
 	public const REST_ROUTE = 'zaplane/v1/hitl/respond';
@@ -47,9 +34,6 @@ class HumanApproval extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * Two branches: what runs when approved, and when rejected.
-	 */
 	public static function get_output_ports(): array {
 		return [ 'approved', 'rejected' ];
 	}
@@ -112,8 +96,14 @@ class HumanApproval extends IntegrationBase {
 				'type'    => 'select',
 				'default' => 'days',
 				'options' => [
-					[ 'value' => 'hours', 'label' => 'Hours' ],
-					[ 'value' => 'days', 'label' => 'Days' ],
+					[
+						'value' => 'hours',
+						'label' => 'Hours'
+					],
+					[
+						'value' => 'days',
+						'label' => 'Days'
+					],
 				],
 			],
 			[
@@ -122,8 +112,14 @@ class HumanApproval extends IntegrationBase {
 				'type'    => 'select',
 				'default' => 'rejected',
 				'options' => [
-					[ 'value' => 'approved', 'label' => 'Treat as approved' ],
-					[ 'value' => 'rejected', 'label' => 'Treat as rejected' ],
+					[
+						'value' => 'approved',
+						'label' => 'Treat as approved'
+					],
+					[
+						'value' => 'rejected',
+						'label' => 'Treat as rejected'
+					],
 				],
 			],
 		];
@@ -137,7 +133,10 @@ class HumanApproval extends IntegrationBase {
 
 		// No run context (e.g. a test invocation) — can't pause, so pass through.
 		if ( ! $run_id || ! $node_run_id ) {
-			return [ 'port' => 'approved', 'data' => array_merge( $input, [ 'approval_status' => 'approved' ] ) ];
+			return [
+				'port' => 'approved',
+				'data' => array_merge( $input, [ 'approval_status' => 'approved' ] )
+			];
 		}
 
 		$timeout = self::timeout_seconds( $config );
@@ -157,7 +156,10 @@ class HumanApproval extends IntegrationBase {
 				$run_id,
 				$node_run_id,
 				$node_key,
-				[ 'port' => $port, 'data' => array_merge( $input, [ 'approval_status' => 'timeout' ] ) ]
+				[
+					'port' => $port,
+					'data' => array_merge( $input, [ 'approval_status' => 'timeout' ] )
+				]
 			);
 		}
 
@@ -182,11 +184,6 @@ class HumanApproval extends IntegrationBase {
 		return $amount * $unit;
 	}
 
-	/**
-	 * A signed, self-contained response URL. The signature covers the run/node
-	 * identity, expiry, and decision so links can't be forged or flipped, and no
-	 * server-side pending record is needed.
-	 */
 	public static function response_url( int $run_id, int $node_run_id, int $node_key, string $decision, int $expires ): string {
 		$args = [
 			'run'      => $run_id,
@@ -200,11 +197,6 @@ class HumanApproval extends IntegrationBase {
 		return add_query_arg( $args, rest_url( self::REST_ROUTE ) );
 	}
 
-	/**
-	 * HMAC of the response params, keyed by the site's auth salt.
-	 *
-	 * @param array<string,mixed> $args
-	 */
 	public static function sign( array $args ): string {
 		$payload = implode(
 			':',
@@ -213,17 +205,19 @@ class HumanApproval extends IntegrationBase {
 		return hash_hmac( 'sha256', $payload, wp_salt( 'auth' ) );
 	}
 
-	/**
-	 * Notify the approver(s) over the configured channels.
-	 *
-	 * @param array<string,mixed> $config
-	 */
 	protected static function notify( array $config, string $approve_url, string $reject_url ): void {
-		$subject       = (string) ( $config['subject'] ?? '' ) ?: __( 'Approval required', 'zaplane' );
-		$message       = (string) ( $config['message'] ?? '' );
-		$approve_label = (string) ( $config['approve_label'] ?? '' ) ?: __( 'Approve', 'zaplane' );
-		$reject_label  = (string) ( $config['reject_label'] ?? '' ) ?: __( 'Reject', 'zaplane' );
-		$allow_reject  = ! empty( $config['allow_reject'] ) || ! isset( $config['allow_reject'] );
+		$subject = (string) ( $config['subject'] ?? '' );
+		$subject = '' !== $subject ? $subject : __( 'Approval required', 'zaplane' );
+
+		$message = (string) ( $config['message'] ?? '' );
+
+		$approve_label = (string) ( $config['approve_label'] ?? '' );
+		$approve_label = '' !== $approve_label ? $approve_label : __( 'Approve', 'zaplane' );
+
+		$reject_label = (string) ( $config['reject_label'] ?? '' );
+		$reject_label = '' !== $reject_label ? $reject_label : __( 'Reject', 'zaplane' );
+
+		$allow_reject = ! empty( $config['allow_reject'] ) || ! isset( $config['allow_reject'] );
 
 		$emails = array_filter( array_map( 'trim', explode( ',', (string) ( $config['approver_emails'] ?? '' ) ) ) );
 		if ( ! empty( $emails ) ) {
@@ -252,9 +246,6 @@ class HumanApproval extends IntegrationBase {
 		}
 	}
 
-	/**
-	 * Build the approval email body with inline-styled buttons (email-client safe).
-	 */
 	protected static function email_html( string $message, string $approve_url, string $approve_label, string $reject_url, string $reject_label, bool $allow_reject ): string {
 		$btn = 'display:inline-block;padding:11px 22px;border-radius:6px;color:#fff;text-decoration:none;font-weight:600;font-family:sans-serif;font-size:14px;';
 

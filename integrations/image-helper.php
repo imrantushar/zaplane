@@ -7,13 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * Image Helper tool — inspect an image, or resize it into the uploads folder.
- *
- * Sources may be an attachment ID, a local path, or a remote URL (downloaded to
- * a temp file first). Resizing uses WordPress's own image editor, so it works
- * with whichever backend (GD/Imagick) the site has.
- */
 class ImageHelper extends IntegrationBase {
 
 	public static function get_slug(): string {
@@ -40,16 +33,34 @@ class ImageHelper extends IntegrationBase {
 	}
 
 	public static function get_action_config_schema( string $action ): array {
-		$source = [ 'key' => 'source', 'label' => 'Image (URL, path, or attachment ID)', 'type' => 'expression', 'required' => true ];
+		$source = [
+			'key' => 'source',
+			'label' => 'Image (URL, path, or attachment ID)',
+			'type' => 'expression',
+			'required' => true
+		];
 
 		if ( 'resize' === $action ) {
 			return [
 				$source,
-				[ 'key' => 'width', 'label' => 'Max width (px)', 'type' => 'number' ],
-				[ 'key' => 'height', 'label' => 'Max height (px)', 'type' => 'number' ],
-				[ 'key' => 'crop', 'label' => 'Crop to exact size', 'type' => 'checkbox', 'default' => false ],
+				[
+					'key' => 'width',
+					'label' => 'Max width (px)',
+					'type' => 'number'
+				],
+				[
+					'key' => 'height',
+					'label' => 'Max height (px)',
+					'type' => 'number'
+				],
+				[
+					'key' => 'crop',
+					'label' => 'Crop to exact size',
+					'type' => 'checkbox',
+					'default' => false
+				],
 			];
-		}
+		}//end if
 
 		return [ $source ];
 	}
@@ -73,12 +84,12 @@ class ImageHelper extends IntegrationBase {
 			}
 		}
 
-		return [ 'port' => 'main', 'data' => $data ];
+		return [
+			'port' => 'main',
+			'data' => $data
+		];
 	}
 
-	/**
-	 * @return array<string,mixed>
-	 */
 	protected static function do_info( string $file ): array {
 		$size = @getimagesize( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- getimagesize warns on non-images; we handle false.
 		if ( false === $size ) {
@@ -94,13 +105,13 @@ class ImageHelper extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * @param array<string,mixed> $config
-	 * @return array<string,mixed>
-	 */
 	protected static function do_resize( string $file, array $config ): array {
-		$width  = (int) ( $config['width'] ?? 0 ) ?: null;
-		$height = (int) ( $config['height'] ?? 0 ) ?: null;
+		$width  = (int) ( $config['width'] ?? 0 );
+		$width  = $width > 0 ? $width : null;
+
+		$height = (int) ( $config['height'] ?? 0 );
+		$height = $height > 0 ? $height : null;
+
 		$crop   = ! empty( $config['crop'] );
 
 		$editor = wp_get_image_editor( $file );
@@ -133,11 +144,6 @@ class ImageHelper extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * Resolve a source to a readable local file path.
-	 *
-	 * @return array{0:?string,1:bool} [ path|null, is_temp ]
-	 */
 	protected static function resolve_local_file( string $source ): array {
 		$source = trim( $source );
 		if ( '' === $source ) {
@@ -166,10 +172,13 @@ class ImageHelper extends IntegrationBase {
 		return [ file_exists( $source ) ? $source : null, false ];
 	}
 
-	/**
-	 * @return array{port:string,data:array}
-	 */
 	protected static function error( string $message ): array {
-		return [ 'port' => 'main', 'data' => [ 'success' => false, 'error' => $message ] ];
+		return [
+			'port' => 'main',
+			'data' => [
+				'success' => false,
+				'error' => $message
+			]
+		];
 	}
 }
