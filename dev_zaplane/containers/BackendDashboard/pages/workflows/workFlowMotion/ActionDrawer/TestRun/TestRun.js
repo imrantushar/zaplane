@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { __ } from "@wordpress/i18n";
 import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
+import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
+import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import TestDetails from "../TestDetails/TestDetails";
 import ZAPAlert from "@ZAPComponents/ZAPAlert";
 import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
@@ -12,15 +14,27 @@ const TestRun = ({
   values
 }) => {
   const dispatch = useDispatch();
-  const [showWarning, setShowWarning] = useState(false);
+  const { apiRequestRunning } = useSelector(state => state.workflows);
   const [isLoading, setIsLoading] = useState(false);
+
+  const isTrigger = node?.data?.action === "trigger";
+  const workflowId = workFlow?.workflow?.id;
+
+  // Trigger nodes can't be "run" — instead we listen for the real WordPress
+  // event to fire and capture its payload as the trigger's sample output. This
+  // reuses the same node-listener backend the topbar "Test Flow Once" uses.
+  const handleListen = () => {
+    if (apiRequestRunning || !workflowId) return;
+    dispatch(startApiCountdown(120));
+    dispatch(workflowNodeListiner(workflowId));
+  };
+  const handleStopListen = () => {
+    if (!workflowId) return;
+    dispatch(workflowNodeListinerStop(workflowId));
+  };
+
   const handleTest = async () => {
     if (isLoading) return;
-    if (node.data.action === "trigger") {
-      setShowWarning(true);
-      return;
-    }
-    setShowWarning(false);
     setIsLoading(true);
     try {
       const {
@@ -43,12 +57,25 @@ const TestRun = ({
       setIsLoading(false);
     }
   };
+
+  if (isTrigger) {
+    return <>
+        {!apiRequestRunning ? <button style={primaryBtn} onClick={handleListen} className="mb-4">
+            {__("Test Trigger", "zaplane")}
+          </button> : <button onClick={handleStopListen} className="mb-4 flex items-center gap-2 h-9 px-4 bg-red-50 text-red-600 font-medium rounded-[4px] hover:bg-red-100 transition-all">
+            {__("Stop Listening", "zaplane")}
+          </button>}
+
+        {apiRequestRunning && <ZAPAlert status="info" title={__("Listening for trigger…", "zaplane")} description={__("Go perform the action that fires this trigger (for example, submit the form). The captured data will appear below.", "zaplane")} mt={4} />}
+
+        {source === "node" && <TestDetails id={node?.id} workFlow={workFlow} source={source} isLoading={apiRequestRunning} />}
+      </>;
+  }
+
   return <>
       <button style={primaryBtn} onClick={handleTest} className="mb-4">
         {__("Test Action", "zaplane")}
       </button>
-
-      {showWarning && <ZAPAlert status="warning" title={__("Trigger Node Cannot Be Tested", "zaplane")} description={__("This is a trigger node. Trigger nodes cannot be tested individually.", "zaplane")} mt={4} />}
 
       {source === "node" && <TestDetails id={node?.id} workFlow={workFlow} source={source} isLoading={isLoading} />}
     </>;

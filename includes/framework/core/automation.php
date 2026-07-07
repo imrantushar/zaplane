@@ -176,7 +176,41 @@ class Automation {
 		// NodeRun gets the clean payload — __wp_user_id must not appear in node outputs.
 		$this->spawn_node_run( $run->id, $nodeKey, $payload, null, $this->extract_node_meta( $trigger['graph_node'] ) );
 
+		// Remember this payload as the shared sample for the trigger (app+event)
+		// so other workflows using the same trigger can map its fields without
+		// re-capturing.
+		$gnode = $trigger['graph_node']['data'] ?? [];
+		self::store_trigger_sample( $gnode['app'] ?? '', $gnode['event'] ?? '', $payload );
+
 		return $run->id;
+	}
+
+	/**
+	 * Persist the most recent payload for a trigger, keyed by app+event (NOT by
+	 * workflow), so any workflow that uses the same trigger can reuse it as
+	 * sample data for field mapping without capturing again.
+	 */
+	public static function store_trigger_sample( string $app, string $event, array $payload ): void {
+		$app   = sanitize_key( $app );
+		$event = sanitize_key( $event );
+		if ( '' === $app || '' === $event || empty( $payload ) ) {
+			return;
+		}
+		Option::set( 'zaplane_trigger_sample_' . $app . '__' . $event, $payload, 'no' );
+	}
+
+	/**
+	 * Read the shared sample payload previously captured for a trigger (app+event).
+	 * Returns [] when nothing has been captured for it yet.
+	 */
+	public static function get_trigger_sample( string $app, string $event ): array {
+		$app   = sanitize_key( $app );
+		$event = sanitize_key( $event );
+		if ( '' === $app || '' === $event ) {
+			return [];
+		}
+		$value = Option::get( 'zaplane_trigger_sample_' . $app . '__' . $event );
+		return is_array( $value ) ? $value : [];
 	}
 
 	public static function get_instance(): ?self {

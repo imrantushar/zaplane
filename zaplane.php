@@ -126,6 +126,8 @@ final class Zaplane {
 		$automation = $this->container->get( 'automation' );
 		$automation->boot();
 
+		( new \Zaplane\Scheduler\Scheduler() )->boot();
+
 		( new BirthdayRecipeSeeder() )->run();
 		( new InactiveCustomerRecipeSeeder() )->run();
 		( new OrderCompleteFeedbackRecipeSeeder() )->run();

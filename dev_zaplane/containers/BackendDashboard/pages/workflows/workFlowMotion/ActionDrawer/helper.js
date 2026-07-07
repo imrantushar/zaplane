@@ -26,11 +26,12 @@ export const getActionOptions = (mode, selectedItem, isTrigger) => {
   const integration = getIntegration(mode, selectedItem);
   if (!integration) return [];
 
-  const list = mode === "tools"
-    ? Object.values(integration.actions || {})
-    : isTrigger
-      ? Object.values(integration.triggers || {})
-      : Object.values(integration.actions || {});
+  // Triggers come from `triggers`, actions from `actions` — regardless of
+  // whether the integration is an app or a tool (tools like Schedule can be
+  // triggers too).
+  const list = isTrigger
+    ? Object.values(integration.triggers || {})
+    : Object.values(integration.actions || {});
 
   return list.map(i => ({ label: i.label, value: i.key, hook: i.hook }));
 };
@@ -41,7 +42,6 @@ export const getActionOptions = (mode, selectedItem, isTrigger) => {
 export const getSelectedActionFields = (mode, selectedItem, actionType, isTrigger) => {
   const integration = getIntegration(mode, selectedItem);
   if (!integration || !actionType) return [];
-  if (mode === "tools") return integration.actions?.[actionType]?.schema || [];
   if (isTrigger) return integration.triggers?.[actionType]?.schema || [];
   return integration.actions?.[actionType]?.schema || [];
 };

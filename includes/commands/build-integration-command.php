@@ -38,7 +38,7 @@ class BuildIntegrationCommand extends Command {
 			if ( 'tool' === $integration['category'] ) {
 				$manifest['tools'][ $slug ] = $integration;
 				$toolCount++;
-				$this->line( "  ✓ {$slug} (tool) - " . count( $integration['actions'] ) . ' actions' );
+				$this->line( "  ✓ {$slug} (tool) - " . count( $integration['triggers'] ) . ' triggers, ' . count( $integration['actions'] ) . ' actions' );
 			} else {
 				$manifest['apps'][ $slug ] = $integration;
 				$appCount++;

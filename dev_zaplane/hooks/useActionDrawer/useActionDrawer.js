@@ -86,13 +86,19 @@ export const useActionDrawer = ({
     }
   }, [open, source]);
 
-  // ── Auto-set actionType if tool has only one action ──
+  // ── Auto-set actionType if the integration exposes only one item ──
+  // For a trigger drawer that means a single trigger (e.g. Schedule's
+  // "On a Schedule" or Webhook's "Catch Webhook"), otherwise a single action.
+  // Applies to both apps and tools so a lone required option is never left
+  // blank for the user to hunt for.
   useEffect(() => {
-    if (mode !== "tools" || !selectedItem) return;
-    const tool = integrations.tools?.[selectedItem.id];
-    const actions = Object.values(tool?.actions || {});
-    if (actions.length === 1) setFieldValue("actionType", actions[0].key);
-  }, [mode, selectedItem, setFieldValue]);
+    if (!selectedItem) return;
+    const integration = mode === "tools"
+      ? integrations.tools?.[selectedItem.id]
+      : integrations.apps?.[selectedItem.id];
+    const items = Object.values((isTrigger ? integration?.triggers : integration?.actions) || {});
+    if (items.length === 1) setFieldValue("actionType", items[0].key);
+  }, [mode, selectedItem, isTrigger, setFieldValue]);
 
   // ── Derived: integration object ──
   const selectedIntegration = useMemo(
@@ -136,7 +142,17 @@ export const useActionDrawer = ({
   const list = useMemo(() => {
     const base = mode === "app" ? APPS : mode === "tools" ? TOOLS : [];
 
-    if (isTrigger) return base;
+    if (isTrigger) {
+      // Look in the registry matching the current mode so tool triggers (e.g.
+      // Schedule) surface under Tools, and app triggers under Apps.
+      const registry = mode === "tools" ? integrations.tools : integrations.apps;
+      return base.filter((item) => {
+        const triggers = registry?.[item.id]?.triggers;
+        if (!triggers) return false;
+        if (Array.isArray(triggers)) return triggers.length > 0;
+        return Object.keys(triggers).length > 0;
+      });
+    }
 
     return base.filter((item) => {
       const integration =
@@ -151,9 +167,24 @@ export const useActionDrawer = ({
   const searchList = useMemo(() => {
     if (!search) return [];
     const q = search.toLowerCase();
+    const hasEntries = (registry, id, kind) => {
+      const items = registry?.[id]?.[kind];
+      if (!items) return false;
+      if (Array.isArray(items)) return items.length > 0;
+      return Object.keys(items).length > 0;
+    };
+    // Only surface integrations that actually have a matching option, so the
+    // user can never land on an empty Trigger/Action Type select (e.g. Webhook
+    // has no actions, most tools have no triggers).
     const combined = isTrigger
-      ? APPS
-      : APPS.concat(TOOLS.map(t => ({ ...t, type: "tools" })));
+      ? APPS.filter((item) => hasEntries(integrations.apps, item.id, "triggers")).concat(
+          TOOLS.filter((item) => hasEntries(integrations.tools, item.id, "triggers"))
+            .map(t => ({ ...t, type: "tools" }))
+        )
+      : APPS.filter((item) => hasEntries(integrations.apps, item.id, "actions")).concat(
+          TOOLS.filter((item) => hasEntries(integrations.tools, item.id, "actions"))
+            .map(t => ({ ...t, type: "tools" }))
+        );
 
     return combined.filter(item => item.name.toLowerCase().includes(q));
   }, [search, isTrigger]);

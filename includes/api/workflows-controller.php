@@ -642,15 +642,23 @@ class WorkflowsController extends WP_REST_Controller {
 					? IntegrationLoader::get( $integration )
 					: null;
 
-				if ( ! $instance ) {
-					continue;
+				$sample = [];
+
+				if ( 'trigger' === $nodeType ) {
+					// 1) Reuse the most recent real capture of this trigger from ANY
+					//    workflow, so a new workflow inherits its fields.
+					$sample = \Zaplane\Framework\Core\Automation::get_trigger_sample( $integration, $event );
+
+					// 2) Fall back to the integration's declared trigger sample.
+					if ( empty( $sample ) && $instance ) {
+						$sample = get_class( $instance )::get_trigger_sample_output( $event );
+					}
+				} elseif ( $instance ) {
+					// Actions/tools expose their fields via the action sample.
+					$sample = get_class( $instance )::get_action_sample_output( $event );
 				}
 
-				$sample = $nodeType === 'trigger'
-					? get_class( $instance )::get_trigger_sample_output( $event )
-					: get_class( $instance )::get_action_sample_output( $event );
-
-				// Skip nodes that expose nothing (e.g. a Sticky Note).
+				// Skip nodes that expose nothing (placeholder / Sticky Note).
 				if ( empty( $sample ) ) {
 					continue;
 				}

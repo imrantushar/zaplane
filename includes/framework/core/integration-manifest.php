@@ -66,38 +66,37 @@ class IntegrationManifest {
 			'requires_connection' => $class::requires_connection(),
 			'auth_type'           => $class::get_auth_type(),
 			'supports_webhook'    => $class::supports_webhook(),
+			'webhook_url'         => $class::supports_webhook() ? rest_url( $class::get_webhook_url() ) : '',
 			'triggers'            => [],
 			'actions'             => [],
 		];
 
-		// Tools expose actions only — never triggers.
-		if ( 'tool' !== $category ) {
-			foreach ( $class::get_triggers() as $key => $trigger ) {
-				// A missing hook is valid: manual/scheduled triggers don't fire from
-				// a WP event (resolve_hook returns empty, so they're never auto-
-				// registered) — they run on demand. Hook-based triggers still carry
-				// their hook here.
-				$entry['triggers'][ $key ] = [
-					'key'     => $key,
-					'label'   => $trigger['label'],
-					'hook'    => $trigger['hook'] ?? '',
-					'schema'  => method_exists( $class, 'get_trigger_config_schema' )
-						? $class::get_trigger_config_schema( $key )
-						: [],
-					'outputs' => $class::get_output_ports(),
-				];
-			}
+		// Triggers — tools may expose them too (e.g. Schedule / Manual). A missing
+		// hook is valid: manual/scheduled triggers don't fire from a WP event
+		// (resolve_hook returns empty, so they're never auto-registered) — they run
+		// on demand. Merge the raw definition first so optional flags an integration
+		// sets (disabled, requires_addon, …) survive, then enforce canonical fields.
+		foreach ( $class::get_triggers() as $key => $trigger ) {
+			$entry['triggers'][ $key ] = array_merge( $trigger, [
+				'key'     => $key,
+				'label'   => $trigger['label'],
+				'hook'    => $trigger['hook'] ?? '',
+				'schema'  => method_exists( $class, 'get_trigger_config_schema' )
+					? $class::get_trigger_config_schema( $key )
+					: [],
+				'outputs' => $class::get_output_ports(),
+			] );
 		}
 
 		foreach ( $class::get_actions() as $key => $action ) {
-			$entry['actions'][ $key ] = [
+			$entry['actions'][ $key ] = array_merge( $action, [
 				'key'     => $key,
 				'label'   => $action['label'],
 				'schema'  => method_exists( $class, 'get_action_config_schema' )
 					? $class::get_action_config_schema( $key )
 					: [],
 				'outputs' => $class::get_output_ports(),
-			];
+			] );
 		}
 
 		return $entry;

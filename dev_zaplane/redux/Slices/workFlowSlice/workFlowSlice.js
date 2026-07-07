@@ -150,10 +150,24 @@ const workflowsSlice = createSlice({
 			})
 
 
-			.addCase(workflowNodeListiner.fulfilled, (state) => {
+			.addCase(workflowNodeListiner.fulfilled, (state, action) => {
 				state.isLoading = false;
 				state.apiRequestRunning = false;
 				state.apiCountdown = 0;
+
+				// When a trigger is captured, surface its payload in the node's
+				// Test tab just like an action test result. Trigger nodes have no
+				// upstream input, so input stays empty and the captured payload is
+				// the output.
+				const data = action?.payload?.data;
+				const node_id = data?.node?.id;
+				if (node_id != null && data?.trigger_data) {
+					state.singleNodeExecution[node_id] = {
+						input: {},
+						output: data.trigger_data,
+						node: data.node,
+					};
+				}
 			})
 			.addCase(workflowNodeListiner.rejected, (state) => {
 				state.isLoading = false;
