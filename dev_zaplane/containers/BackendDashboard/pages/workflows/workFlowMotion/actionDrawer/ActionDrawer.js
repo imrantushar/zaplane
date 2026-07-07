@@ -136,13 +136,15 @@ const {
     }
   };
 
-  // get global variable
+  // Load the "@" dynamic variables for this node's upstream fields. The backend
+  // only needs the target node + graph, so don't gate on the version hash (it may
+  // not be ready yet, and gating on it without a dep meant the call never fired).
   useEffect(() => {
-    if (!node?.id || !workFlow?.version?.hash) return;
+    if (!node?.id) return;
     const payload = {
-      workflow_id: workFlow.workflow?.id,
-      workflow_hash: workFlow.version?.hash,
-      workflow_version_id: workFlow.version?.id,
+      workflow_id: workFlow?.workflow?.id,
+      workflow_hash: workFlow?.version?.hash,
+      workflow_version_id: workFlow?.version?.id,
       target_node_key: node?.id,
       graph: {
         nodes: mapNodesForBackend(nodes),
@@ -151,7 +153,7 @@ const {
     };
 
     dispatch(conditionVariables(payload));
-  }, [node?.id]);
+  }, [node?.id, workFlow?.version?.hash]);
   return <ZAPDrawer open={open} isFullscreen={isFullscreen} onClose={resetAll}
     arrowClose={['tools', 'app'].includes(mode)}
     maxWidth={['filter', 'if'].includes(values?.actionType) ? 'max-w-[700px]' : 'max-w-[500px]'}

@@ -65,6 +65,25 @@ class ImageHelper extends IntegrationBase {
 		return [ $source ];
 	}
 
+	public static function get_action_sample_output( string $action ): array {
+		if ( 'resize' === $action ) {
+			return [
+				'success' => true,
+				'url'     => 'https://example.com/wp-content/uploads/resized.png',
+				'path'    => '',
+				'width'   => 800,
+				'height'  => 600,
+			];
+		}
+		return [
+			'success'  => true,
+			'width'    => 1200,
+			'height'   => 800,
+			'mime'     => 'image/png',
+			'filesize' => 20480,
+		];
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$action = $node['data']['event'] ?? 'info';
 		$config = $node['data']['config'] ?? [];

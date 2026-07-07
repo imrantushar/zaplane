@@ -127,6 +127,17 @@ class DateTime_Tool extends IntegrationBase {
 		return [];
 	}
 
+	public static function get_action_sample_output( string $action ): array {
+		if ( 'diff' === $action ) {
+			return [ 'difference' => 5, 'unit' => 'days', 'seconds' => 432000 ];
+		}
+		return [
+			'formatted' => '2026-07-05 12:00:00',
+			'timestamp' => 1783252800,
+			'iso8601'   => '2026-07-05T12:00:00+00:00',
+		];
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$action = $node['data']['event'] ?? 'now';
 		$config = $node['data']['config'] ?? [];

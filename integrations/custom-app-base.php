@@ -52,6 +52,26 @@ abstract class CustomAppBase extends IntegrationBase {
 		return is_array( $def['fields'] ?? null ) ? $def['fields'] : [];
 	}
 
+	/**
+	 * Sample output for the "@" picker, built from the action's declared output
+	 * mappings so downstream nodes can reference them before any test run.
+	 */
+	public static function get_action_sample_output( string $action ): array {
+		$def    = self::find_event( self::manifest()['actions'] ?? [], $action );
+		$sample = [];
+
+		foreach ( (array) ( $def['output'] ?? [] ) as $output ) {
+			if ( is_array( $output ) && ! empty( $output['key'] ) ) {
+				$sample[ (string) $output['key'] ] = '';
+			}
+		}
+
+		$sample['success'] = true;
+		$sample['status']  = 200;
+
+		return $sample;
+	}
+
 	public static function get_triggers(): array {
 		$triggers = self::manifest()['triggers'] ?? [];
 		if ( ! is_array( $triggers ) ) {

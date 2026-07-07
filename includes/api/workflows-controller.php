@@ -592,7 +592,11 @@ class WorkflowsController extends WP_REST_Controller {
 
 		$previousNodeIds = $this->findPreviousNodes( $targetNodeKey, $edges );
 
+		// Prefer captured output from a dedicated "Test" run, but fall back to the
+		// latest real run (e.g. an actual form submission or a manual "Run") so the
+		// "@" picker shows real fields the user has already produced.
 		$nodeOutputs = Run::latestTestNodeRunsByWorkflow( $workflowId, $previousNodeIds );
+		$realOutputs = Run::latestNodeRunsByWorkflow( $workflowId, $previousNodeIds );
 
 		$data = [];
 		foreach ( $previousNodeIds as $nodeId ) {
@@ -601,12 +605,18 @@ class WorkflowsController extends WP_REST_Controller {
 				continue;
 			}
 
-			$nodeType = $node['type'] ?? '';
-			if ( ! in_array( $nodeType, [ 'trigger', 'action', 'condition', 'filter' ], true ) ) {
+			// The target node's own output is not a variable source for itself.
+			if ( (int) $nodeId === $targetNodeKey ) {
 				continue;
 			}
 
-			$nodeRun = $nodeOutputs[ $nodeId ] ?? null;
+			// The "type" the builder sends is the app slug for tools (csv, delay…)
+			// and 'trigger'/'action' otherwise, so a fixed whitelist would drop every
+			// tool node. Resolve by integration slug instead; trigger-vs-action comes
+			// from the graph type / data.action.
+			$nodeType = $node['type'] ?? '';
+
+			$nodeRun = $nodeOutputs[ $nodeId ] ?? $realOutputs[ $nodeId ] ?? null;
 
 			if ( $nodeRun ) {
 				$output = $nodeRun->getOutput();
@@ -623,28 +633,34 @@ class WorkflowsController extends WP_REST_Controller {
 					'is_sample'  => false,
 				];
 			} else {
-				$variables = [];
-				$isSample  = false;
+				// No test run — fall back to the integration's declared sample so
+				// fields still show in the "@" picker. Nodes store their integration
+				// under data.app (data.integration is a legacy fallback).
+				$integration = $node['data']['app'] ?? $node['data']['integration'] ?? '';
+				$event       = $node['data']['event'] ?? '';
+				$instance    = ( '' !== $integration && 'Select an app' !== $integration )
+					? IntegrationLoader::get( $integration )
+					: null;
 
-				if ( $nodeType === 'trigger' ) {
-					$integration = $node['data']['integration'] ?? '';
-					$event       = $node['data']['event'] ?? '';
-					$instance    = IntegrationLoader::get( $integration );
-					if ( $instance ) {
-						$sample = get_class( $instance )::get_trigger_sample_output( $event );
-						if ( ! empty( $sample ) ) {
-							$variables = VariableExtractor::extract( $sample );
-							$isSample  = true;
-						}
-					}
+				if ( ! $instance ) {
+					continue;
+				}
+
+				$sample = $nodeType === 'trigger'
+					? get_class( $instance )::get_trigger_sample_output( $event )
+					: get_class( $instance )::get_action_sample_output( $event );
+
+				// Skip nodes that expose nothing (e.g. a Sticky Note).
+				if ( empty( $sample ) ) {
+					continue;
 				}
 
 				$data[] = [
 					'node_id'    => $nodeId,
 					'node_name'  => $node['data']['name'] ?? '',
-					'node_event' => $node['data']['event'] ?? '',
-					'variables'  => $variables,
-					'is_sample'  => $isSample,
+					'node_event' => $event,
+					'variables'  => VariableExtractor::extract( $sample ),
+					'is_sample'  => true,
 				];
 			}//end if
 		}//end foreach

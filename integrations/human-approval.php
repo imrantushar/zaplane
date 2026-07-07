@@ -125,6 +125,13 @@ class HumanApproval extends IntegrationBase {
 		];
 	}
 
+	public static function get_action_sample_output( string $action ): array {
+		return [
+			'approval_status' => 'approved',
+			'decided_at'      => '2026-07-05 12:00:00',
+		];
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$run_id      = (int) ( $node['_run_id'] ?? 0 );
 		$node_run_id = (int) ( $node['_node_run_id'] ?? 0 );

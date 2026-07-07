@@ -60,6 +60,13 @@ class Xml extends IntegrationBase {
 		];
 	}
 
+	public static function get_action_sample_output( string $action ): array {
+		if ( 'build' === $action ) {
+			return [ 'xml' => '<root><item>value</item></root>' ];
+		}
+		return [ 'data' => [ 'item' => 'value' ], 'success' => true, 'error' => null ];
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$action = $node['data']['event'] ?? 'parse';
 		$config = $node['data']['config'] ?? [];

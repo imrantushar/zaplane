@@ -57,7 +57,8 @@ export default function VariablePopover({
           <Disclosure
             key={item.node_id || item.key}
             as="div"
-            className={`border border-gray-200 
+            defaultOpen
+            className={`border border-gray-200
                 ${index === 0 ? "rounded-t-md" : ""} 
                 ${index === items.length - 1 ? "rounded-b-md" : ""} 
                 ${index !== 0 ? "border-t-0" : ""}

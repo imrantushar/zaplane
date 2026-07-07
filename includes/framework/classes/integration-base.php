@@ -190,6 +190,19 @@ abstract class IntegrationBase {
 
 
 
+	/**
+	 * A sample of the data an action returns, so downstream nodes can offer its
+	 * output fields in the "@" variable picker before any test run has happened.
+	 *
+	 * Mirrors get_trigger_sample_output() for actions. Keys must match what
+	 * execute_node() actually returns under its `data`. Return [] to opt out.
+	 */
+	public static function get_action_sample_output( string $action ): array {
+		return [];
+	}
+
+
+
 	public static function get_dynamic_fields(): array {
 		return [];
 	}

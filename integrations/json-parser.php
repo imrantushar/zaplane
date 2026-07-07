@@ -63,6 +63,13 @@ class JsonParser extends IntegrationBase {
 		];
 	}
 
+	public static function get_action_sample_output( string $action ): array {
+		if ( 'stringify' === $action ) {
+			return [ 'json' => '{"key":"value"}' ];
+		}
+		return [ 'data' => [ 'key' => 'value' ], 'success' => true, 'error' => null ];
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$action = $node['data']['event'] ?? 'parse';
 		$config = $node['data']['config'] ?? [];

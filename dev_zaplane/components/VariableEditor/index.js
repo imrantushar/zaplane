@@ -68,10 +68,12 @@ const VariableEditor = ({
       return;
     }
     if (e.key === "@") {
-      setTimeout(() => {
-        setActiveRange(saveSelection());
-        setPopoverOpen(true);
-      }, 0);
+      // Don't insert the literal "@" — just open the picker at the current caret.
+      // Selecting a variable inserts it here; dismissing leaves nothing behind, so
+      // there's never a stray "@" to delete before triggering the picker again.
+      e.preventDefault();
+      setActiveRange(saveSelection());
+      setPopoverOpen(true);
     }
   };
 

@@ -78,6 +78,16 @@ class Csv extends IntegrationBase {
 		];
 	}
 
+	public static function get_action_sample_output( string $action ): array {
+		if ( 'build' === $action ) {
+			return [ 'csv' => "name,age\nAlice,30" ];
+		}
+		return [
+			'rows'  => [ [ 'column1' => 'value1', 'column2' => 'value2' ] ],
+			'count' => 2,
+		];
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$action = $node['data']['event'] ?? 'parse';
 		$config = $node['data']['config'] ?? [];
