@@ -4,6 +4,7 @@ namespace Zaplane\Commands;
 
 use Zaplane\Framework\Console\Command;
 use Zaplane\Framework\Core\IntegrationLoader;
+use Zaplane\Framework\Core\IntegrationManifest;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,59 +29,13 @@ class BuildIntegrationCommand extends Command {
 		$toolCount = 0;
 
 		foreach ( IntegrationLoader::all() as $slug => $instance ) {
-			$class = get_class( $instance );
-
-			$category = method_exists( $class, 'get_category' )
-				? $class::get_category()
-				: 'app';
-
-			$integration = [
-				'slug'               => $slug,
-				'name'               => $class::get_name(),
-				'icon'               => $class::get_icon(),
-				'category'           => $category,
-				'requires_connection' => $class::requires_connection(),
-				'auth_type'          => $class::get_auth_type(),
-				'supports_webhook'   => $class::supports_webhook(),
-				'webhook_url'        => $class::supports_webhook() ? rest_url( $class::get_webhook_url() ) : '',
-				'triggers'           => [],
-				'actions'            => [],
-			];
-
-			foreach ( $class::get_triggers() as $key => $trigger ) {
-				// Tools may expose triggers too (e.g. Schedule) — keep them so the
-				// picker can list tool-category triggers, not just app triggers.
-				if ( ! isset( $trigger['hook'] ) ) {
-					$this->warning( "⚠️  Trigger '{$key}' in {$slug} is missing 'hook' field - skipping" );
-					continue;
-				}
-
-				// Merge the raw definition first so optional flags an integration
-				// sets on an item (e.g. disabled, disabled_reason, requires_addon)
-				// survive into the manifest, then enforce the canonical fields.
-				$integration['triggers'][ $key ] = array_merge( $trigger, [
-					'key'     => $key,
-					'label'   => $trigger['label'],
-					'hook'    => $trigger['hook'],
-					'schema'  => method_exists( $class, 'get_trigger_config_schema' )
-						? $class::get_trigger_config_schema( $key )
-						: [],
-					'outputs' => $class::get_output_ports(),
-				] );
+			$integration = IntegrationManifest::build_entry( get_class( $instance ), (string) $slug );
+			if ( null === $integration ) {
+				$this->warning( "⚠️  Could not build manifest entry for {$slug} - skipping" );
+				continue;
 			}
 
-			foreach ( $class::get_actions() as $key => $action ) {
-				$integration['actions'][ $key ] = array_merge( $action, [
-					'key'     => $key,
-					'label'   => $action['label'],
-					'schema'  => method_exists( $class, 'get_action_config_schema' )
-						? $class::get_action_config_schema( $key )
-						: [],
-					'outputs' => $class::get_output_ports(),
-				] );
-			}
-
-			if ( 'tool' === $category ) {
+			if ( 'tool' === $integration['category'] ) {
 				$manifest['tools'][ $slug ] = $integration;
 				$toolCount++;
 				$this->line( "  ✓ {$slug} (tool) - " . count( $integration['triggers'] ) . ' triggers, ' . count( $integration['actions'] ) . ' actions' );

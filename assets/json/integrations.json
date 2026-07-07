@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-07 05:17:53",
+    "generated_at": "2026-07-07 11:37:08",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -1340,8 +1340,6 @@
                     "label": "User Added To Access Group",
                     "hook": "storeengine/membership/user_added_to_group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "user_added_to_group",
                     "schema": [],
                     "outputs": [
@@ -1352,8 +1350,6 @@
                     "label": "User Removed From Access Group",
                     "hook": "storeengine/membership/user_removed_from_group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "user_removed_from_group",
                     "schema": [],
                     "outputs": [
@@ -1364,8 +1360,6 @@
                     "label": "Access Group Created",
                     "hook": "save_post_storeengine_groups",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_created",
                     "schema": [],
                     "outputs": [
@@ -1376,8 +1370,6 @@
                     "label": "Access Group Updated",
                     "hook": "save_post_storeengine_groups",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_updated",
                     "schema": [],
                     "outputs": [
@@ -1388,8 +1380,6 @@
                     "label": "Access Group Deleted",
                     "hook": "delete_post_storeengine_groups",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_deleted",
                     "schema": [],
                     "outputs": [
@@ -1400,8 +1390,6 @@
                     "label": "Subscription Created",
                     "hook": "storeengine/after_create_subscription",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_created",
                     "schema": [],
                     "outputs": [
@@ -1412,8 +1400,6 @@
                     "label": "Subscription Status Changed (any)",
                     "hook": "storeengine/subscription/status_changed",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_status_changed",
                     "schema": [],
                     "outputs": [
@@ -1424,8 +1410,6 @@
                     "label": "Subscription Activated",
                     "hook": "storeengine/subscription/status_active",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_activated",
                     "schema": [],
                     "outputs": [
@@ -1436,8 +1420,6 @@
                     "label": "Subscription Paused (On Hold)",
                     "hook": "storeengine/subscription/status_on_hold",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_on_hold",
                     "schema": [],
                     "outputs": [
@@ -1448,8 +1430,6 @@
                     "label": "Subscription Cancelled",
                     "hook": "storeengine/subscription/status_cancelled",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_cancelled",
                     "schema": [],
                     "outputs": [
@@ -1460,8 +1440,6 @@
                     "label": "Subscription Expired",
                     "hook": "storeengine/subscription/status_expired",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_expired",
                     "schema": [],
                     "outputs": [
@@ -1472,8 +1450,6 @@
                     "label": "Subscription Renewal Payment Complete",
                     "hook": "storeengine/subscription/renewal_payment_complete",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewed",
                     "schema": [],
                     "outputs": [
@@ -1484,8 +1460,6 @@
                     "label": "Subscription Payment Complete",
                     "hook": "storeengine/subscription/payment_complete",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_payment_complete",
                     "schema": [],
                     "outputs": [
@@ -1496,8 +1470,6 @@
                     "label": "Subscription Renewal Failed",
                     "hook": "storeengine/subscription/failed_to_create_renewal_order",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_failed",
                     "schema": [],
                     "outputs": [
@@ -1508,8 +1480,6 @@
                     "label": "Subscription Trial Ended",
                     "hook": "storeengine/subscription/trial_ended",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_trial_ended",
                     "schema": [],
                     "outputs": [
@@ -1520,8 +1490,6 @@
                     "label": "Subscription Renewal Order Created",
                     "hook": "storeengine/api/after_create_renewal_order",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_order_created",
                     "schema": [],
                     "outputs": [
@@ -1604,8 +1572,6 @@
                     "label": "Affiliate Registered",
                     "hook": "storeengine/addons/affiliate/after_registration",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_registered",
                     "schema": [],
                     "outputs": [
@@ -1616,8 +1582,6 @@
                     "label": "Affiliate Status Updated",
                     "hook": "storeengine/addons/affiliate/update_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1628,8 +1592,6 @@
                     "label": "Affiliate Commission Status Updated",
                     "hook": "storeengine/addons/affiliate/update_commission_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_commission_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1640,8 +1602,6 @@
                     "label": "Affiliate Payout Status Updated",
                     "hook": "storeengine/addons/affiliate/update_payout_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_payout_status_updated",
                     "schema": [],
                     "outputs": [
@@ -2024,8 +1984,6 @@
                 "update_subscription_status": {
                     "label": "Update Subscription Status",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "update_subscription_status",
                     "schema": [
                         {
@@ -2070,8 +2028,6 @@
                 "grant_membership": {
                     "label": "Grant Membership (Add User To Group)",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "grant_membership",
                     "schema": [
                         {
@@ -2108,8 +2064,6 @@
                 "revoke_membership": {
                     "label": "Revoke Membership (Remove User From Group)",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "revoke_membership",
                     "schema": [
                         {
@@ -2140,8 +2094,6 @@
                 "create_access_group": {
                     "label": "Create Access Group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "create_access_group",
                     "schema": [
                         {
@@ -2210,8 +2162,6 @@
                 "update_access_group": {
                     "label": "Update Access Group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "update_access_group",
                     "schema": [
                         {
@@ -2274,8 +2224,6 @@
                 "delete_access_group": {
                     "label": "Delete Access Group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "delete_access_group",
                     "schema": [
                         {
@@ -6351,7 +6299,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/fillout",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10481,7 +10429,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/jotform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -11200,7 +11148,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/mailchimp",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/mailchimp",
             "triggers": {
                 "subscribed": {
                     "label": "Subscriber Added",
@@ -11552,6 +11500,35 @@
                     ]
                 }
             }
+        },
+        "manual": {
+            "slug": "manual",
+            "name": "Manual",
+            "icon": "manual.svg",
+            "category": "core",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": {
+                "run_manually": {
+                    "label": "Run Manually",
+                    "key": "run_manually",
+                    "hook": "",
+                    "schema": [
+                        {
+                            "key": "note",
+                            "label": "How it runs",
+                            "type": "copy",
+                            "value": "This workflow runs when you click \u201cRun\u201d, or via zaplane_run_workflow( id, data )."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         },
         "masterstudy": {
             "slug": "masterstudy",
@@ -12885,7 +12862,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/messenger",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/messenger",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -13689,7 +13666,7 @@
             "requires_connection": true,
             "auth_type": "both",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/slack",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/slack",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -17511,7 +17488,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/typeform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -17771,7 +17748,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/whatsapp",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/whatsapp",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -26932,7 +26909,7 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/zoom",
+            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/zoom",
             "triggers": {
                 "meeting_started": {
                     "label": "Meeting Started",
@@ -27350,6 +27327,28 @@
                     ]
                 }
             }
+        },
+        "custom_app": {
+            "slug": "custom_app",
+            "name": "Custom App",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": {
+                "zap_form_submit": {
+                    "label": "Form Submit",
+                    "hook": "test_hook",
+                    "key": "zap_form_submit",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
@@ -27453,6 +27452,259 @@
                     "outputs": [
                         "true",
                         "false"
+                    ]
+                }
+            }
+        },
+        "csv": {
+            "slug": "csv",
+            "name": "CSV",
+            "icon": "csv.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "parse": {
+                    "label": "Parse CSV",
+                    "key": "parse",
+                    "schema": [
+                        {
+                            "key": "csv",
+                            "label": "CSV text",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "delimiter",
+                            "label": "Delimiter",
+                            "type": "text",
+                            "default": ","
+                        },
+                        {
+                            "key": "has_header",
+                            "label": "First row is a header",
+                            "type": "checkbox",
+                            "default": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "build": {
+                    "label": "Build CSV",
+                    "key": "build",
+                    "schema": [
+                        {
+                            "key": "items",
+                            "label": "Rows (array of objects)",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "delimiter",
+                            "label": "Delimiter",
+                            "type": "text",
+                            "default": ","
+                        },
+                        {
+                            "key": "include_header",
+                            "label": "Include header row",
+                            "type": "checkbox",
+                            "default": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "datetime": {
+            "slug": "datetime",
+            "name": "Date / Time",
+            "icon": "datetime.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "now": {
+                    "label": "Current Date/Time",
+                    "key": "now",
+                    "schema": [
+                        {
+                            "key": "format",
+                            "label": "Output format (PHP date)",
+                            "type": "text",
+                            "default": "Y-m-d H:i:s"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "format": {
+                    "label": "Format Date",
+                    "key": "format",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "Date input",
+                            "type": "expression",
+                            "required": true,
+                            "help": "Any parseable date, e.g. 2026-07-05 or {{ order_date }}."
+                        },
+                        {
+                            "key": "format",
+                            "label": "Output format (PHP date)",
+                            "type": "text",
+                            "default": "Y-m-d H:i:s"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "modify": {
+                    "label": "Add / Subtract",
+                    "key": "modify",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "Date input",
+                            "type": "expression",
+                            "default": "now"
+                        },
+                        {
+                            "key": "operation",
+                            "label": "Operation",
+                            "type": "select",
+                            "default": "add",
+                            "options": [
+                                {
+                                    "value": "add",
+                                    "label": "Add"
+                                },
+                                {
+                                    "value": "subtract",
+                                    "label": "Subtract"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "amount",
+                            "label": "Amount",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "unit",
+                            "label": "Unit",
+                            "type": "select",
+                            "default": "days",
+                            "options": [
+                                {
+                                    "value": "seconds",
+                                    "label": "Seconds"
+                                },
+                                {
+                                    "value": "minutes",
+                                    "label": "Minutes"
+                                },
+                                {
+                                    "value": "hours",
+                                    "label": "Hours"
+                                },
+                                {
+                                    "value": "days",
+                                    "label": "Days"
+                                },
+                                {
+                                    "value": "weeks",
+                                    "label": "Weeks"
+                                },
+                                {
+                                    "value": "months",
+                                    "label": "Months"
+                                },
+                                {
+                                    "value": "years",
+                                    "label": "Years"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "format",
+                            "label": "Output format (PHP date)",
+                            "type": "text",
+                            "default": "Y-m-d H:i:s"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "diff": {
+                    "label": "Difference",
+                    "key": "diff",
+                    "schema": [
+                        {
+                            "key": "start",
+                            "label": "Start date",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "end",
+                            "label": "End date",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "unit",
+                            "label": "Difference in",
+                            "type": "select",
+                            "default": "days",
+                            "options": [
+                                {
+                                    "value": "seconds",
+                                    "label": "Seconds"
+                                },
+                                {
+                                    "value": "minutes",
+                                    "label": "Minutes"
+                                },
+                                {
+                                    "value": "hours",
+                                    "label": "Hours"
+                                },
+                                {
+                                    "value": "days",
+                                    "label": "Days"
+                                },
+                                {
+                                    "value": "weeks",
+                                    "label": "Weeks"
+                                },
+                                {
+                                    "value": "months",
+                                    "label": "Months"
+                                },
+                                {
+                                    "value": "years",
+                                    "label": "Years"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
                     ]
                 }
             }
@@ -27840,6 +28092,170 @@
                 }
             }
         },
+        "human_approval": {
+            "slug": "human_approval",
+            "name": "Human Approval",
+            "icon": "condition",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "request_approval": {
+                    "label": "Request Approval",
+                    "key": "request_approval",
+                    "schema": [
+                        {
+                            "key": "approver_emails",
+                            "label": "Approver email(s)",
+                            "type": "expression",
+                            "required": true,
+                            "help": "Comma-separated. Supports variables, e.g. {{ manager_email }}."
+                        },
+                        {
+                            "key": "subject",
+                            "label": "Email subject",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "required": true,
+                            "help": "Shown to the approver. Supports variables."
+                        },
+                        {
+                            "key": "approve_label",
+                            "label": "Approve button label",
+                            "type": "text",
+                            "default": "Approve"
+                        },
+                        {
+                            "key": "reject_label",
+                            "label": "Reject button label",
+                            "type": "text",
+                            "default": "Reject"
+                        },
+                        {
+                            "key": "allow_reject",
+                            "label": "Show a Reject button",
+                            "type": "checkbox",
+                            "default": true
+                        },
+                        {
+                            "key": "slack_webhook",
+                            "label": "Slack incoming webhook URL (optional)",
+                            "type": "text",
+                            "help": "If set, the request is also posted to Slack with the same links."
+                        },
+                        {
+                            "key": "timeout_amount",
+                            "label": "Timeout (0 = wait forever)",
+                            "type": "number",
+                            "default": 0
+                        },
+                        {
+                            "key": "timeout_unit",
+                            "label": "Timeout unit",
+                            "type": "select",
+                            "default": "days",
+                            "options": [
+                                {
+                                    "value": "hours",
+                                    "label": "Hours"
+                                },
+                                {
+                                    "value": "days",
+                                    "label": "Days"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "on_timeout",
+                            "label": "If it times out",
+                            "type": "select",
+                            "default": "rejected",
+                            "options": [
+                                {
+                                    "value": "approved",
+                                    "label": "Treat as approved"
+                                },
+                                {
+                                    "value": "rejected",
+                                    "label": "Treat as rejected"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "approved",
+                        "rejected"
+                    ]
+                }
+            }
+        },
+        "image_helper": {
+            "slug": "image_helper",
+            "name": "Image Helper",
+            "icon": "image-helper.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "info": {
+                    "label": "Get Image Info",
+                    "key": "info",
+                    "schema": [
+                        {
+                            "key": "source",
+                            "label": "Image (URL, path, or attachment ID)",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "resize": {
+                    "label": "Resize Image",
+                    "key": "resize",
+                    "schema": [
+                        {
+                            "key": "source",
+                            "label": "Image (URL, path, or attachment ID)",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "width",
+                            "label": "Max width (px)",
+                            "type": "number"
+                        },
+                        {
+                            "key": "height",
+                            "label": "Max height (px)",
+                            "type": "number"
+                        },
+                        {
+                            "key": "crop",
+                            "label": "Crop to exact size",
+                            "type": "checkbox",
+                            "default": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "iterator": {
             "slug": "iterator",
             "name": "Iterator",
@@ -27865,6 +28281,55 @@
                     "outputs": [
                         "loop",
                         "done"
+                    ]
+                }
+            }
+        },
+        "json_parser": {
+            "slug": "json_parser",
+            "name": "JSON Parser",
+            "icon": "json.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "parse": {
+                    "label": "Parse JSON",
+                    "key": "parse",
+                    "schema": [
+                        {
+                            "key": "json",
+                            "label": "JSON text",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "stringify": {
+                    "label": "Stringify JSON",
+                    "key": "stringify",
+                    "schema": [
+                        {
+                            "key": "data",
+                            "label": "Data",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "pretty",
+                            "label": "Pretty-print",
+                            "type": "checkbox",
+                            "default": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
                     ]
                 }
             }
@@ -28304,6 +28769,58 @@
             },
             "actions": []
         },
+        "sticky_note": {
+            "slug": "sticky_note",
+            "name": "Sticky Note",
+            "icon": "sticky-note.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "note": {
+                    "label": "Sticky Note",
+                    "key": "note",
+                    "schema": [
+                        {
+                            "key": "content",
+                            "label": "Note",
+                            "type": "textarea",
+                            "help": "Free-form notes for your team. Not executed."
+                        },
+                        {
+                            "key": "color",
+                            "label": "Colour",
+                            "type": "select",
+                            "default": "yellow",
+                            "options": [
+                                {
+                                    "value": "yellow",
+                                    "label": "Yellow"
+                                },
+                                {
+                                    "value": "blue",
+                                    "label": "Blue"
+                                },
+                                {
+                                    "value": "green",
+                                    "label": "Green"
+                                },
+                                {
+                                    "value": "pink",
+                                    "label": "Pink"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "variable": {
             "slug": "variable",
             "name": "Set Variable",
@@ -28329,6 +28846,55 @@
                             "key": "value",
                             "label": "Value",
                             "type": "expression"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "xml": {
+            "slug": "xml",
+            "name": "XML",
+            "icon": "xml.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "parse": {
+                    "label": "Parse XML",
+                    "key": "parse",
+                    "schema": [
+                        {
+                            "key": "xml",
+                            "label": "XML text",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "build": {
+                    "label": "Build XML",
+                    "key": "build",
+                    "schema": [
+                        {
+                            "key": "data",
+                            "label": "Data",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "root",
+                            "label": "Root element",
+                            "type": "text",
+                            "default": "root"
                         }
                     ],
                     "outputs": [

@@ -3,7 +3,8 @@ import { __ } from "@wordpress/i18n";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ListTable from "@ZAPComponents/ListTable";
-import { route_path } from "@ZAPUtils/helper";
+import { route_path, API, namespace } from "@ZAPUtils/helper";
+import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import { downloadJSON, statusOptions } from "./helper";
 import { deleteWorkFlow, getWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
@@ -21,7 +22,7 @@ import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LiaEditSolid } from "react-icons/lia";
 import { TbFileExport } from "react-icons/tb";
-import { FiLayers } from "react-icons/fi";
+import { FiLayers, FiPlay } from "react-icons/fi";
 import { HistoryIcon } from "@ZAPUtils/icons";
 import WorkflowsLogs from "@ZAPContainers/BackendDashboard/pages/workflows/WorkflowsLogs";
 import ImportWorkflow from "@ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/ImportWorkflow";
@@ -96,6 +97,24 @@ const WorkflowTable = ({
     if (!window.confirm(__("Are you sure you want to delete?", "zaplane"))) return;
     await dispatch(deleteWorkFlow(id));
     await handleRefresh(activePage, activePerPage);
+  };
+  const handleRun = async id => {
+    try {
+      const res = await API.post(`${namespace}workflows/${id}/trigger`, {});
+      dispatch(showNotification({
+        message: res?.data?.run_id
+          ? __("Workflow triggered.", "zaplane")
+          : __("Workflow could not be triggered.", "zaplane"),
+        isShow: true,
+        type: res?.data?.run_id ? "success" : "error"
+      }));
+    } catch (e) {
+      dispatch(showNotification({
+        message: e?.response?.data?.message || __("Failed to trigger workflow.", "zaplane"),
+        isShow: true,
+        type: "error"
+      }));
+    }
   };
   const handleDeleteSelected = async () => {
     if (!selection.length) return;
@@ -178,6 +197,11 @@ const WorkflowTable = ({
   }, {
     name: <span>{__("Action", "zaplane")}</span>,
     cell: row => <OptionMenu options={[{
+      label: __("Run", "zaplane"),
+      icon: <FiPlay />,
+      type: "button",
+      onClick: () => handleRun(row.id)
+    }, {
       label: __("Edit", "zaplane"),
       icon: <LiaEditSolid />,
       type: "button",

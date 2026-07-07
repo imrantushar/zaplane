@@ -150,9 +150,10 @@ export const insertVariableAtRange = ({
     if (range.startContainer.nodeType === Node.TEXT_NODE) {
         const textContent = range.startContainer.textContent;
         const startOffset = range.startOffset;
-        let atIndex = textContent.lastIndexOf("@", startOffset - 1);
-        if (atIndex !== -1) {
-            range.setStart(range.startContainer, atIndex);
+        // Only strip a legacy trigger "@" sitting immediately before the caret —
+        // never reach back and delete an unrelated earlier literal "@".
+        if (startOffset > 0 && textContent[startOffset - 1] === "@") {
+            range.setStart(range.startContainer, startOffset - 1);
         }
     }
 

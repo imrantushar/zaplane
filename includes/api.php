@@ -40,6 +40,8 @@ class API implements ModuleInterface {
 		( new \Zaplane\API\FolderController( $this->container ) )->register_routes();
 		( new \Zaplane\API\RecipeController( $this->container ) )->register_routes();
 		( new \Zaplane\API\EmailTemplateController( $this->container ) )->register_routes();
+		( new \Zaplane\API\CustomAppsController( $this->container ) )->register_routes();
+		( new \Zaplane\API\HitlController( $this->container ) )->register_routes();
 		( new \Zaplane\API\KnowledgeController( $this->container ) )->register_routes();
 		( new \Zaplane\API\McpController( $this->container ) )->register_routes();
 

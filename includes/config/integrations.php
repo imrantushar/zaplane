@@ -17,6 +17,38 @@ $registry = [
 		'file'  => 'delay.php',
 		'class' => \Zaplane\Integrations\Delay::class,
 	],
+	'human_approval'      => [
+		'file'  => 'human-approval.php',
+		'class' => \Zaplane\Integrations\HumanApproval::class,
+	],
+	'manual'              => [
+		'file'  => 'manual.php',
+		'class' => \Zaplane\Integrations\Manual::class,
+	],
+	'csv'                 => [
+		'file'  => 'csv.php',
+		'class' => \Zaplane\Integrations\Csv::class,
+	],
+	'datetime'            => [
+		'file'  => 'datetime.php',
+		'class' => \Zaplane\Integrations\DateTime_Tool::class,
+	],
+	'image_helper'        => [
+		'file'  => 'image-helper.php',
+		'class' => \Zaplane\Integrations\ImageHelper::class,
+	],
+	'json_parser'         => [
+		'file'  => 'json-parser.php',
+		'class' => \Zaplane\Integrations\JsonParser::class,
+	],
+	'sticky_note'         => [
+		'file'  => 'sticky-note.php',
+		'class' => \Zaplane\Integrations\StickyNote::class,
+	],
+	'xml'                 => [
+		'file'  => 'xml.php',
+		'class' => \Zaplane\Integrations\Xml::class,
+	],
 	'iterator'            => [
 		'file'  => 'iterator.php',
 		'class' => \Zaplane\Integrations\Iterator::class,

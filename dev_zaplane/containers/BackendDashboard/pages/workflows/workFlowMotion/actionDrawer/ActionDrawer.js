@@ -136,16 +136,15 @@ const {
     }
   };
 
-  // Fetch the variables (upstream node outputs) available for field mapping.
-  // The condition-variables endpoint doesn't need the version hash, so don't
-  // gate on it. Refetch whenever the drawer opens or the version changes so a
-  // trigger captured via "Test Trigger" shows up without reloading the editor.
+  // Load the "@" dynamic variables for this node's upstream fields. The backend
+  // only needs the target node + graph, so don't gate on the version hash (it may
+  // not be ready yet, and gating on it without a dep meant the call never fired).
   useEffect(() => {
-    if (!open || !node?.id || !workFlow?.workflow?.id) return;
+    if (!node?.id) return;
     const payload = {
-      workflow_id: workFlow.workflow?.id,
-      workflow_hash: workFlow.version?.hash,
-      workflow_version_id: workFlow.version?.id,
+      workflow_id: workFlow?.workflow?.id,
+      workflow_hash: workFlow?.version?.hash,
+      workflow_version_id: workFlow?.version?.id,
       target_node_key: node?.id,
       graph: {
         nodes: mapNodesForBackend(nodes),
@@ -154,7 +153,7 @@ const {
     };
 
     dispatch(conditionVariables(payload));
-  }, [node?.id, open, workFlow?.version?.hash]);
+  }, [node?.id, workFlow?.version?.hash]);
   return <ZAPDrawer open={open} isFullscreen={isFullscreen} onClose={resetAll}
     arrowClose={['tools', 'app'].includes(mode)}
     maxWidth={['filter', 'if'].includes(values?.actionType) ? 'max-w-[700px]' : 'max-w-[500px]'}
@@ -165,7 +164,7 @@ const {
       setFieldValue("actionType", "");
     }}
     // closeOnOverlayClick
-    title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')} placement="end"
+    title={!mode ? (isTrigger ? __('Add Trigger', 'zaplane') : __('Add Action', 'zaplane')) : selectedItem?.name || __('App', 'zaplane')} placement="end"
     // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
     footer={<div className="flex items-center justify-end gap-3">
       <button
