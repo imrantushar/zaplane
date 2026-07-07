@@ -87,8 +87,14 @@ class Memory extends IntegrationBase {
 						'required' => true,
 						'default'  => 'user',
 						'options'  => [
-							[ 'value' => 'user', 'label' => 'User' ],
-							[ 'value' => 'assistant', 'label' => 'Assistant' ],
+							[
+								'value' => 'user',
+								'label' => 'User'
+							],
+							[
+								'value' => 'assistant',
+								'label' => 'Assistant'
+							],
 						],
 					],
 					[
@@ -108,7 +114,7 @@ class Memory extends IntegrationBase {
 
 			case 'clear':
 				return [ $key_field ];
-		}
+		}//end switch
 
 		return [];
 	}
@@ -119,7 +125,10 @@ class Memory extends IntegrationBase {
 		$key    = trim( (string) ( $config['conversation_key'] ?? '' ) );
 
 		if ( '' === $key ) {
-			return self::respond( array_merge( $input, [ 'success' => false, 'error' => 'conversation_key is required.' ] ) );
+			return self::respond( array_merge( $input, [
+				'success' => false,
+				'error' => 'conversation_key is required.'
+			] ) );
 		}
 
 		switch ( $event ) {
@@ -170,7 +179,10 @@ class Memory extends IntegrationBase {
 		$content = (string) ( $config['content'] ?? '' );
 
 		if ( '' === trim( $content ) ) {
-			return self::respond( array_merge( $input, [ 'success' => false, 'error' => 'content is required.' ] ) );
+			return self::respond( array_merge( $input, [
+				'success' => false,
+				'error' => 'content is required.'
+			] ) );
 		}
 
 		$record = Conversation::create( [
@@ -208,6 +220,9 @@ class Memory extends IntegrationBase {
 	}
 
 	private static function respond( array $data ): array {
-		return [ 'port' => 'main', 'data' => $data ];
+		return [
+			'port' => 'main',
+			'data' => $data
+		];
 	}
 }

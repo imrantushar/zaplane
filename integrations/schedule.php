@@ -7,11 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-/**
- * Schedule — time-based trigger. Workflows using it are fired by the Scheduler
- * tick (see Zaplane\Scheduler\Scheduler), not by a WordPress hook. The hook
- * name only registers it as an active trigger so the scheduler can find it.
- */
 class Schedule extends IntegrationBase {
 
 	public static function get_slug(): string {
@@ -22,9 +17,6 @@ class Schedule extends IntegrationBase {
 		return 'Schedule';
 	}
 
-	// A built-in, connection-less trigger — belongs with the Tools group in the
-	// picker rather than the third-party Apps list. Tool-category integrations
-	// may still expose triggers (the manifest builder keeps them).
 	public static function get_category(): string {
 		return 'tool';
 	}
@@ -55,9 +47,18 @@ class Schedule extends IntegrationBase {
 				'required' => true,
 				'default'  => 'every_minutes',
 				'options'  => [
-					[ 'value' => 'every_minutes', 'label' => 'Every X minutes' ],
-					[ 'value' => 'hourly', 'label' => 'Hourly' ],
-					[ 'value' => 'daily', 'label' => 'Daily at a time' ],
+					[
+						'value' => 'every_minutes',
+						'label' => 'Every X minutes'
+					],
+					[
+						'value' => 'hourly',
+						'label' => 'Hourly'
+					],
+					[
+						'value' => 'daily',
+						'label' => 'Daily at a time'
+					],
 				],
 			],
 			[
@@ -89,6 +90,9 @@ class Schedule extends IntegrationBase {
 	}
 
 	public static function get_trigger_sample_output( string $trigger ): array {
-		return [ 'timestamp' => current_time( 'mysql' ), 'unix' => time() ];
+		return [
+			'timestamp' => current_time( 'mysql' ),
+			'unix' => time()
+		];
 	}
 }

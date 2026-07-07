@@ -49,7 +49,12 @@ class Formatter extends IntegrationBase {
 		switch ( $action ) {
 			case 'format_text':
 				return [
-					[ 'key' => 'input', 'label' => 'Input', 'type' => 'expression', 'required' => true ],
+					[
+						'key' => 'input',
+						'label' => 'Input',
+						'type' => 'expression',
+						'required' => true
+					],
 					[
 						'key'      => 'operation',
 						'label'    => 'Operation',
@@ -57,25 +62,75 @@ class Formatter extends IntegrationBase {
 						'required' => true,
 						'default'  => 'uppercase',
 						'options'  => [
-							[ 'value' => 'uppercase', 'label' => 'Uppercase' ],
-							[ 'value' => 'lowercase', 'label' => 'Lowercase' ],
-							[ 'value' => 'capitalize', 'label' => 'Capitalize first' ],
-							[ 'value' => 'title', 'label' => 'Title Case' ],
-							[ 'value' => 'trim', 'label' => 'Trim whitespace' ],
-							[ 'value' => 'replace', 'label' => 'Find & Replace' ],
-							[ 'value' => 'truncate', 'label' => 'Truncate' ],
-							[ 'value' => 'slug', 'label' => 'Slugify' ],
-							[ 'value' => 'length', 'label' => 'Length' ],
+							[
+								'value' => 'uppercase',
+								'label' => 'Uppercase'
+							],
+							[
+								'value' => 'lowercase',
+								'label' => 'Lowercase'
+							],
+							[
+								'value' => 'capitalize',
+								'label' => 'Capitalize first'
+							],
+							[
+								'value' => 'title',
+								'label' => 'Title Case'
+							],
+							[
+								'value' => 'trim',
+								'label' => 'Trim whitespace'
+							],
+							[
+								'value' => 'replace',
+								'label' => 'Find & Replace'
+							],
+							[
+								'value' => 'truncate',
+								'label' => 'Truncate'
+							],
+							[
+								'value' => 'slug',
+								'label' => 'Slugify'
+							],
+							[
+								'value' => 'length',
+								'label' => 'Length'
+							],
 						],
 					],
-					[ 'key' => 'find', 'label' => 'Find', 'type' => 'expression', 'required' => false, 'depends_on' => [ 'operation' => 'replace' ] ],
-					[ 'key' => 'replace', 'label' => 'Replace with', 'type' => 'expression', 'required' => false, 'depends_on' => [ 'operation' => 'replace' ] ],
-					[ 'key' => 'length', 'label' => 'Max length', 'type' => 'number', 'required' => false, 'depends_on' => [ 'operation' => 'truncate' ] ],
+					[
+						'key' => 'find',
+						'label' => 'Find',
+						'type' => 'expression',
+						'required' => false,
+						'depends_on' => [ 'operation' => 'replace' ]
+					],
+					[
+						'key' => 'replace',
+						'label' => 'Replace with',
+						'type' => 'expression',
+						'required' => false,
+						'depends_on' => [ 'operation' => 'replace' ]
+					],
+					[
+						'key' => 'length',
+						'label' => 'Max length',
+						'type' => 'number',
+						'required' => false,
+						'depends_on' => [ 'operation' => 'truncate' ]
+					],
 				];
 
 			case 'format_number':
 				return [
-					[ 'key' => 'input', 'label' => 'Input', 'type' => 'expression', 'required' => true ],
+					[
+						'key' => 'input',
+						'label' => 'Input',
+						'type' => 'expression',
+						'required' => true
+					],
 					[
 						'key'      => 'operation',
 						'label'    => 'Operation',
@@ -83,22 +138,55 @@ class Formatter extends IntegrationBase {
 						'required' => true,
 						'default'  => 'round',
 						'options'  => [
-							[ 'value' => 'round', 'label' => 'Round' ],
-							[ 'value' => 'ceil', 'label' => 'Round up' ],
-							[ 'value' => 'floor', 'label' => 'Round down' ],
-							[ 'value' => 'format', 'label' => 'Format (decimals + thousands)' ],
-							[ 'value' => 'abs', 'label' => 'Absolute value' ],
+							[
+								'value' => 'round',
+								'label' => 'Round'
+							],
+							[
+								'value' => 'ceil',
+								'label' => 'Round up'
+							],
+							[
+								'value' => 'floor',
+								'label' => 'Round down'
+							],
+							[
+								'value' => 'format',
+								'label' => 'Format (decimals + thousands)'
+							],
+							[
+								'value' => 'abs',
+								'label' => 'Absolute value'
+							],
 						],
 					],
-					[ 'key' => 'decimals', 'label' => 'Decimals', 'type' => 'number', 'required' => false, 'default' => 2 ],
+					[
+						'key' => 'decimals',
+						'label' => 'Decimals',
+						'type' => 'number',
+						'required' => false,
+						'default' => 2
+					],
 				];
 
 			case 'format_date':
 				return [
-					[ 'key' => 'input', 'label' => 'Input date (blank = now)', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'format', 'label' => 'Output format', 'type' => 'expression', 'required' => true, 'default' => 'Y-m-d H:i:s', 'help' => 'PHP date format, e.g. Y-m-d, "F j, Y", H:i' ],
+					[
+						'key' => 'input',
+						'label' => 'Input date (blank = now)',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'format',
+						'label' => 'Output format',
+						'type' => 'expression',
+						'required' => true,
+						'default' => 'Y-m-d H:i:s',
+						'help' => 'PHP date format, e.g. Y-m-d, "F j, Y", H:i'
+					],
 				];
-		}
+		}//end switch
 
 		return [];
 	}
@@ -118,10 +206,16 @@ class Formatter extends IntegrationBase {
 				$result = self::do_date( $config );
 				break;
 			default:
-				return [ 'port' => 'main', 'data' => $input ];
+				return [
+					'port' => 'main',
+					'data' => $input
+				];
 		}
 
-		return [ 'port' => 'main', 'data' => array_merge( $input, [ 'result' => $result ] ) ];
+		return [
+			'port' => 'main',
+			'data' => array_merge( $input, [ 'result' => $result ] )
+		];
 	}
 
 	private static function do_text( array $c ) {
@@ -147,7 +241,7 @@ class Formatter extends IntegrationBase {
 			case 'uppercase':
 			default:
 				return function_exists( 'mb_strtoupper' ) ? mb_strtoupper( $in ) : strtoupper( $in );
-		}
+		}//end switch
 	}
 
 	private static function do_number( array $c ) {

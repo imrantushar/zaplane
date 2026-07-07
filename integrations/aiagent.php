@@ -7,14 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-/**
- * AI Agent — an agentic tool-use loop. The model is given a goal and a set of
- * tools (business-knowledge search, HTTP requests) and decides which to call,
- * iterating until it produces a final answer.
- *
- * Supports Anthropic (Claude) and OpenAI via their native tool/function calling.
- * Calls go through wp_remote_post (no SDK), like the rest of Zaplane.
- */
 class Aiagent extends IntegrationBase {
 
 	private const ANTHROPIC_URL     = 'https://api.anthropic.com/v1/messages';
@@ -55,8 +47,14 @@ class Aiagent extends IntegrationBase {
 				'required' => true,
 				'default'  => 'anthropic',
 				'options'  => [
-					[ 'value' => 'anthropic', 'label' => 'Anthropic (Claude)' ],
-					[ 'value' => 'openai', 'label' => 'OpenAI' ],
+					[
+						'value' => 'anthropic',
+						'label' => 'Anthropic (Claude)'
+					],
+					[
+						'value' => 'openai',
+						'label' => 'OpenAI'
+					],
 				],
 				'help'     => 'The AI Agent needs tool-calling, so it uses an Anthropic or OpenAI key (not WordPress Core AI).',
 			],
@@ -87,9 +85,18 @@ class Aiagent extends IntegrationBase {
 				'required' => true,
 				'default'  => self::DEFAULT_MODEL,
 				'options'  => [
-					[ 'value' => 'claude-opus-4-8', 'label' => 'Claude Opus 4.8' ],
-					[ 'value' => 'claude-sonnet-4-6', 'label' => 'Claude Sonnet 4.6' ],
-					[ 'value' => 'gpt-4o', 'label' => 'OpenAI GPT-4o' ],
+					[
+						'value' => 'claude-opus-4-8',
+						'label' => 'Claude Opus 4.8'
+					],
+					[
+						'value' => 'claude-sonnet-4-6',
+						'label' => 'Claude Sonnet 4.6'
+					],
+					[
+						'value' => 'gpt-4o',
+						'label' => 'OpenAI GPT-4o'
+					],
 				],
 			],
 			[
@@ -120,8 +127,14 @@ class Aiagent extends IntegrationBase {
 				'required' => false,
 				'default'  => 'no',
 				'options'  => [
-					[ 'value' => 'no', 'label' => 'No' ],
-					[ 'value' => 'yes', 'label' => 'Yes' ],
+					[
+						'value' => 'no',
+						'label' => 'No'
+					],
+					[
+						'value' => 'yes',
+						'label' => 'Yes'
+					],
 				],
 			],
 			[
@@ -180,8 +193,6 @@ class Aiagent extends IntegrationBase {
 		];
 	}
 
-	/* ----------------------------- Tools ---------------------------------- */
-
 	private static function tool_specs( array $ctx ): array {
 		$tools = [];
 
@@ -191,7 +202,12 @@ class Aiagent extends IntegrationBase {
 				'description' => 'Search the business knowledge base (products, prices, FAQs) for relevant info. Use this before answering questions about the business.',
 				'schema'      => [
 					'type'       => 'object',
-					'properties' => [ 'query' => [ 'type' => 'string', 'description' => 'What to look up.' ] ],
+					'properties' => [
+						'query' => [
+							'type' => 'string',
+							'description' => 'What to look up.'
+						]
+					],
 					'required'   => [ 'query' ],
 				],
 			];
@@ -204,14 +220,20 @@ class Aiagent extends IntegrationBase {
 				'schema'      => [
 					'type'       => 'object',
 					'properties' => [
-						'method' => [ 'type' => 'string', 'description' => 'GET or POST.' ],
+						'method' => [
+							'type' => 'string',
+							'description' => 'GET or POST.'
+						],
 						'url'    => [ 'type' => 'string' ],
-						'body'   => [ 'type' => 'string', 'description' => 'Optional request body.' ],
+						'body'   => [
+							'type' => 'string',
+							'description' => 'Optional request body.'
+						],
 					],
 					'required'   => [ 'url' ],
 				],
 			];
-		}
+		}//end if
 
 		return $tools;
 	}
@@ -221,11 +243,16 @@ class Aiagent extends IntegrationBase {
 			if ( ! class_exists( '\Zaplane\Integrations\Knowledge' ) ) {
 				return 'Knowledge unavailable.';
 			}
-			$res = \Zaplane\Integrations\Knowledge::execute_node( [ 'data' => [ 'event' => 'retrieve', 'config' => [
-				'business_key' => $ctx['business_key'],
-				'query'        => (string) ( $args['query'] ?? '' ),
-				'limit'        => 5,
-			] ] ], [] );
+			$res = \Zaplane\Integrations\Knowledge::execute_node( [
+				'data' => [
+					'event' => 'retrieve',
+					'config' => [
+						'business_key' => $ctx['business_key'],
+						'query'        => (string) ( $args['query'] ?? '' ),
+						'limit'        => 5,
+					]
+				]
+			], [] );
 			$context = $res['data']['context'] ?? '';
 			return '' !== $context ? $context : 'No matching knowledge found.';
 		}
@@ -253,12 +280,10 @@ class Aiagent extends IntegrationBase {
 				$body = substr( $body, 0, 2000 ) . '…';
 			}
 			return "Status: {$code}\n{$body}";
-		}
+		}//end if
 
 		return 'Unknown tool: ' . $name;
 	}
-
-	/* --------------------------- Anthropic loop --------------------------- */
 
 	private static function run_anthropic( string $api_key, string $model, string $system, string $task, array $ctx, int $max_steps ): array {
 		$tools = array_map( static fn( $t ) => [
@@ -267,7 +292,12 @@ class Aiagent extends IntegrationBase {
 			'input_schema' => $t['schema'],
 		], self::tool_specs( $ctx ) );
 
-		$messages   = [ [ 'role' => 'user', 'content' => $task ] ];
+		$messages   = [
+			[
+				'role' => 'user',
+				'content' => $task
+			]
+		];
 		$tool_calls = [];
 
 		for ( $step = 0; $step <= $max_steps; $step++ ) {
@@ -294,17 +324,27 @@ class Aiagent extends IntegrationBase {
 			}
 
 			$content = $resp['content'] ?? [];
-			$messages[] = [ 'role' => 'assistant', 'content' => $content ];
+			$messages[] = [
+				'role' => 'assistant',
+				'content' => $content
+			];
 
 			if ( ( $resp['stop_reason'] ?? '' ) !== 'tool_use' ) {
-				return [ 'reply' => self::text_from_blocks( $content ), 'steps' => $step, 'tool_calls' => $tool_calls ];
+				return [
+					'reply' => self::text_from_blocks( $content ),
+					'steps' => $step,
+					'tool_calls' => $tool_calls
+				];
 			}
 
 			$tool_results = [];
 			foreach ( $content as $block ) {
 				if ( ( $block['type'] ?? '' ) === 'tool_use' ) {
 					$out          = self::run_tool( $block['name'], (array) ( $block['input'] ?? [] ), $ctx );
-					$tool_calls[] = [ 'tool' => $block['name'], 'input' => $block['input'] ?? [] ];
+					$tool_calls[] = [
+						'tool' => $block['name'],
+						'input' => $block['input'] ?? []
+					];
 					$tool_results[] = [
 						'type'        => 'tool_result',
 						'tool_use_id' => $block['id'],
@@ -312,8 +352,11 @@ class Aiagent extends IntegrationBase {
 					];
 				}
 			}
-			$messages[] = [ 'role' => 'user', 'content' => $tool_results ];
-		}
+			$messages[] = [
+				'role' => 'user',
+				'content' => $tool_results
+			];
+		}//end for
 
 		return [ 'error' => 'Agent reached the max step limit without finishing.' ];
 	}
@@ -328,23 +371,35 @@ class Aiagent extends IntegrationBase {
 		return $out;
 	}
 
-	/* ---------------------------- OpenAI loop ----------------------------- */
-
 	private static function run_openai( string $api_key, string $model, string $system, string $task, array $ctx, int $max_steps ): array {
 		$tools = array_map( static fn( $t ) => [
 			'type'     => 'function',
-			'function' => [ 'name' => $t['name'], 'description' => $t['description'], 'parameters' => $t['schema'] ],
+			'function' => [
+				'name' => $t['name'],
+				'description' => $t['description'],
+				'parameters' => $t['schema']
+			],
 		], self::tool_specs( $ctx ) );
 
 		$messages = [];
 		if ( '' !== trim( $system ) ) {
-			$messages[] = [ 'role' => 'system', 'content' => $system ];
+			$messages[] = [
+				'role' => 'system',
+				'content' => $system
+			];
 		}
-		$messages[] = [ 'role' => 'user', 'content' => $task ];
+		$messages[] = [
+			'role' => 'user',
+			'content' => $task
+		];
 		$tool_calls = [];
 
 		for ( $step = 0; $step <= $max_steps; $step++ ) {
-			$body = [ 'model' => $model, 'messages' => $messages, 'max_tokens' => 2048 ];
+			$body = [
+				'model' => $model,
+				'messages' => $messages,
+				'max_tokens' => 2048
+			];
 			if ( ! empty( $tools ) ) {
 				$body['tools'] = $tools;
 			}
@@ -363,22 +418,31 @@ class Aiagent extends IntegrationBase {
 
 			$calls = $message['tool_calls'] ?? [];
 			if ( empty( $calls ) ) {
-				return [ 'reply' => (string) ( $message['content'] ?? '' ), 'steps' => $step, 'tool_calls' => $tool_calls ];
+				return [
+					'reply' => (string) ( $message['content'] ?? '' ),
+					'steps' => $step,
+					'tool_calls' => $tool_calls
+				];
 			}
 
 			foreach ( $calls as $call ) {
 				$name = $call['function']['name'] ?? '';
 				$args = json_decode( (string) ( $call['function']['arguments'] ?? '{}' ), true );
 				$out  = self::run_tool( $name, is_array( $args ) ? $args : [], $ctx );
-				$tool_calls[] = [ 'tool' => $name, 'input' => $args ];
-				$messages[]   = [ 'role' => 'tool', 'tool_call_id' => $call['id'] ?? '', 'content' => $out ];
+				$tool_calls[] = [
+					'tool' => $name,
+					'input' => $args
+				];
+				$messages[]   = [
+					'role' => 'tool',
+					'tool_call_id' => $call['id'] ?? '',
+					'content' => $out
+				];
 			}
-		}
+		}//end for
 
 		return [ 'error' => 'Agent reached the max step limit without finishing.' ];
 	}
-
-	/* ------------------------------ HTTP ---------------------------------- */
 
 	private static function http_json( string $url, array $headers, array $body ): array {
 		$resp = wp_remote_post( $url, [
@@ -401,6 +465,12 @@ class Aiagent extends IntegrationBase {
 	}
 
 	private static function err( string $message, array $input ): array {
-		return [ 'port' => 'main', 'data' => array_merge( $input, [ 'success' => false, 'error' => $message ] ) ];
+		return [
+			'port' => 'main',
+			'data' => array_merge( $input, [
+				'success' => false,
+				'error' => $message
+			] )
+		];
 	}
 }

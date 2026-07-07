@@ -766,24 +766,80 @@ class Storeengine extends IntegrationBase {
 			'customer_email' => 'john@example.com',
 			'customer_name'  => 'John Doe',
 			'items'          => [
-				[ 'product_id' => 12, 'name' => 'Pro Plan', 'quantity' => 1, 'total' => '49.00' ],
+				[
+					'product_id' => 12,
+					'name' => 'Pro Plan',
+					'quantity' => 1,
+					'total' => '49.00'
+				],
 			],
 		];
 
 		$samples = [
 			'order_paid'                  => array_merge( $order_sample, [ 'transaction_id' => 'txn_123' ] ),
-			'order_status_update'         => array_merge( $order_sample, [ 'old_status' => 'processing', 'new_status' => 'completed' ] ),
+			'order_status_update'         => array_merge( $order_sample, [
+				'old_status' => 'processing',
+				'new_status' => 'completed'
+			] ),
 			'order_fully_refunded'        => array_merge( $order_sample, [ 'refund_id' => 55 ] ),
-			'customer_created'            => [ 'customer_id' => 5, 'email' => 'john@example.com', 'first_name' => 'John', 'last_name' => 'Doe', 'username' => 'john' ],
-			'product_updated'             => [ 'product_id' => 12, 'name' => 'Pro Plan', 'stock_quantity' => 20, 'stock_status' => 'instock' ],
-			'product_out_of_stock'        => [ 'product_id' => 12, 'name' => 'Pro Plan', 'old_status' => 'instock', 'new_status' => 'outofstock' ],
-			'subscription_status_changed' => [ 'subscription_id' => 9, 'status' => 'active', 'old_status' => 'pending', 'new_status' => 'active', 'customer_id' => 5, 'total' => '49.00' ],
-			'vendor_registered'           => [ 'vendor_id' => 3, 'store_name' => 'Acme Store' ],
+			'customer_created'            => [
+				'customer_id' => 5,
+				'email' => 'john@example.com',
+				'first_name' => 'John',
+				'last_name' => 'Doe',
+				'username' => 'john'
+			],
+			'product_updated'             => [
+				'product_id' => 12,
+				'name' => 'Pro Plan',
+				'stock_quantity' => 20,
+				'stock_status' => 'instock'
+			],
+			'product_out_of_stock'        => [
+				'product_id' => 12,
+				'name' => 'Pro Plan',
+				'old_status' => 'instock',
+				'new_status' => 'outofstock'
+			],
+			'subscription_status_changed' => [
+				'subscription_id' => 9,
+				'status' => 'active',
+				'old_status' => 'pending',
+				'new_status' => 'active',
+				'customer_id' => 5,
+				'total' => '49.00'
+			],
+			'vendor_registered'           => [
+				'vendor_id' => 3,
+				'store_name' => 'Acme Store'
+			],
 			'affiliate_registered'        => [ 'affiliate_id' => 7 ],
-			'user_added_to_group'         => [ 'user_id' => 5, 'user_email' => 'john@example.com', 'group_id' => 12, 'group_name' => 'Gold Members' ],
-			'user_removed_from_group'     => [ 'user_id' => 5, 'user_email' => 'john@example.com', 'group_id' => 12, 'group_name' => 'Gold Members' ],
-			'access_group_created'        => [ 'group_id' => 12, 'group_name' => 'Gold Members', 'status' => 'publish', 'user_roles' => [ 'subscriber' ], 'expiration' => [] ],
-			'access_group_updated'        => [ 'group_id' => 12, 'group_name' => 'Gold Members', 'status' => 'publish', 'user_roles' => [ 'subscriber' ], 'expiration' => [] ],
+			'user_added_to_group'         => [
+				'user_id' => 5,
+				'user_email' => 'john@example.com',
+				'group_id' => 12,
+				'group_name' => 'Gold Members'
+			],
+			'user_removed_from_group'     => [
+				'user_id' => 5,
+				'user_email' => 'john@example.com',
+				'group_id' => 12,
+				'group_name' => 'Gold Members'
+			],
+			'access_group_created'        => [
+				'group_id' => 12,
+				'group_name' => 'Gold Members',
+				'status' => 'publish',
+				'user_roles' => [ 'subscriber' ],
+				'expiration' => []
+			],
+			'access_group_updated'        => [
+				'group_id' => 12,
+				'group_name' => 'Gold Members',
+				'status' => 'publish',
+				'user_roles' => [ 'subscriber' ],
+				'expiration' => []
+			],
 			'access_group_deleted'        => [ 'group_id' => 12 ],
 		];
 
@@ -820,29 +876,70 @@ class Storeengine extends IntegrationBase {
 
 			case 'update_order_status':
 				return [
-					[ 'key' => 'order_id', 'label' => 'Order ID', 'type' => 'expression', 'required' => true ],
+					[
+						'key' => 'order_id',
+						'label' => 'Order ID',
+						'type' => 'expression',
+						'required' => true
+					],
 					[
 						'key'      => 'order_status',
 						'label'    => 'New Status',
 						'type'     => 'select',
 						'required' => true,
 						'options'  => [
-							[ 'value' => 'pending_payment', 'label' => 'Pending Payment' ],
-							[ 'value' => 'processing', 'label' => 'Processing' ],
-							[ 'value' => 'on_hold', 'label' => 'On Hold' ],
-							[ 'value' => 'completed', 'label' => 'Completed' ],
-							[ 'value' => 'cancelled', 'label' => 'Cancelled' ],
-							[ 'value' => 'refunded', 'label' => 'Refunded' ],
-							[ 'value' => 'payment_failed', 'label' => 'Payment Failed' ],
+							[
+								'value' => 'pending_payment',
+								'label' => 'Pending Payment'
+							],
+							[
+								'value' => 'processing',
+								'label' => 'Processing'
+							],
+							[
+								'value' => 'on_hold',
+								'label' => 'On Hold'
+							],
+							[
+								'value' => 'completed',
+								'label' => 'Completed'
+							],
+							[
+								'value' => 'cancelled',
+								'label' => 'Cancelled'
+							],
+							[
+								'value' => 'refunded',
+								'label' => 'Refunded'
+							],
+							[
+								'value' => 'payment_failed',
+								'label' => 'Payment Failed'
+							],
 						],
 					],
-					[ 'key' => 'note', 'label' => 'Status Note', 'type' => 'expression', 'required' => false ],
+					[
+						'key' => 'note',
+						'label' => 'Status Note',
+						'type' => 'expression',
+						'required' => false
+					],
 				];
 
 			case 'add_order_note':
 				return [
-					[ 'key' => 'order_id', 'label' => 'Order ID', 'type' => 'expression', 'required' => true ],
-					[ 'key' => 'note', 'label' => 'Note', 'type' => 'textarea', 'required' => true ],
+					[
+						'key' => 'order_id',
+						'label' => 'Order ID',
+						'type' => 'expression',
+						'required' => true
+					],
+					[
+						'key' => 'note',
+						'label' => 'Note',
+						'type' => 'textarea',
+						'required' => true
+					],
 					[
 						'key'      => 'note_type',
 						'label'    => 'Note Type',
@@ -850,17 +947,38 @@ class Storeengine extends IntegrationBase {
 						'required' => true,
 						'default'  => 'private',
 						'options'  => [
-							[ 'value' => 'private', 'label' => 'Private (admin only)' ],
-							[ 'value' => 'customer', 'label' => 'Customer Note (visible & emailed)' ],
+							[
+								'value' => 'private',
+								'label' => 'Private (admin only)'
+							],
+							[
+								'value' => 'customer',
+								'label' => 'Customer Note (visible & emailed)'
+							],
 						],
 					],
 				];
 
 			case 'refund_order':
 				return [
-					[ 'key' => 'order_id', 'label' => 'Order ID', 'type' => 'expression', 'required' => true ],
-					[ 'key' => 'amount', 'label' => 'Refund Amount (leave empty for full refund)', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'reason', 'label' => 'Reason', 'type' => 'expression', 'required' => false ],
+					[
+						'key' => 'order_id',
+						'label' => 'Order ID',
+						'type' => 'expression',
+						'required' => true
+					],
+					[
+						'key' => 'amount',
+						'label' => 'Refund Amount (leave empty for full refund)',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'reason',
+						'label' => 'Reason',
+						'type' => 'expression',
+						'required' => false
+					],
 					[
 						'key'      => 'restock_items',
 						'label'    => 'Restock Items',
@@ -868,30 +986,97 @@ class Storeengine extends IntegrationBase {
 						'required' => false,
 						'default'  => 'no',
 						'options'  => [
-							[ 'value' => 'no', 'label' => 'No' ],
-							[ 'value' => 'yes', 'label' => 'Yes' ],
+							[
+								'value' => 'no',
+								'label' => 'No'
+							],
+							[
+								'value' => 'yes',
+								'label' => 'Yes'
+							],
 						],
 					],
 				];
 
 			case 'create_customer':
 				return [
-					[ 'key' => 'email', 'label' => 'Email', 'type' => 'expression', 'subtype' => 'email', 'required' => true ],
-					[ 'key' => 'first_name', 'label' => 'First Name', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'last_name', 'label' => 'Last Name', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'phone', 'label' => 'Billing Phone', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'billing_city', 'label' => 'Billing City', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'billing_country', 'label' => 'Billing Country (2-letter code)', 'type' => 'expression', 'required' => false ],
+					[
+						'key' => 'email',
+						'label' => 'Email',
+						'type' => 'expression',
+						'subtype' => 'email',
+						'required' => true
+					],
+					[
+						'key' => 'first_name',
+						'label' => 'First Name',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'last_name',
+						'label' => 'Last Name',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'phone',
+						'label' => 'Billing Phone',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'billing_city',
+						'label' => 'Billing City',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'billing_country',
+						'label' => 'Billing Country (2-letter code)',
+						'type' => 'expression',
+						'required' => false
+					],
 				];
 
 			case 'update_customer':
 				return [
-					[ 'key' => 'customer_id', 'label' => 'Customer (User) ID', 'type' => 'expression', 'required' => true ],
-					[ 'key' => 'first_name', 'label' => 'First Name', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'last_name', 'label' => 'Last Name', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'phone', 'label' => 'Billing Phone', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'billing_city', 'label' => 'Billing City', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'billing_country', 'label' => 'Billing Country (2-letter code)', 'type' => 'expression', 'required' => false ],
+					[
+						'key' => 'customer_id',
+						'label' => 'Customer (User) ID',
+						'type' => 'expression',
+						'required' => true
+					],
+					[
+						'key' => 'first_name',
+						'label' => 'First Name',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'last_name',
+						'label' => 'Last Name',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'phone',
+						'label' => 'Billing Phone',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'billing_city',
+						'label' => 'Billing City',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'billing_country',
+						'label' => 'Billing Country (2-letter code)',
+						'type' => 'expression',
+						'required' => false
+					],
 				];
 
 			case 'adjust_stock':
@@ -914,12 +1099,26 @@ class Storeengine extends IntegrationBase {
 						'required' => true,
 						'default'  => 'set',
 						'options'  => [
-							[ 'value' => 'set', 'label' => 'Set To' ],
-							[ 'value' => 'increase', 'label' => 'Increase By' ],
-							[ 'value' => 'decrease', 'label' => 'Decrease By' ],
+							[
+								'value' => 'set',
+								'label' => 'Set To'
+							],
+							[
+								'value' => 'increase',
+								'label' => 'Increase By'
+							],
+							[
+								'value' => 'decrease',
+								'label' => 'Decrease By'
+							],
 						],
 					],
-					[ 'key' => 'quantity', 'label' => 'Quantity', 'type' => 'expression', 'required' => true ],
+					[
+						'key' => 'quantity',
+						'label' => 'Quantity',
+						'type' => 'expression',
+						'required' => true
+					],
 				];
 
 			case 'set_stock_status':
@@ -941,16 +1140,30 @@ class Storeengine extends IntegrationBase {
 						'type'     => 'select',
 						'required' => true,
 						'options'  => [
-							[ 'value' => 'instock', 'label' => 'In Stock' ],
-							[ 'value' => 'outofstock', 'label' => 'Out Of Stock' ],
-							[ 'value' => 'onbackorder', 'label' => 'On Backorder' ],
+							[
+								'value' => 'instock',
+								'label' => 'In Stock'
+							],
+							[
+								'value' => 'outofstock',
+								'label' => 'Out Of Stock'
+							],
+							[
+								'value' => 'onbackorder',
+								'label' => 'On Backorder'
+							],
 						],
 					],
 				];
 
 			case 'create_coupon':
 				return [
-					[ 'key' => 'code', 'label' => 'Coupon Code', 'type' => 'expression', 'required' => true ],
+					[
+						'key' => 'code',
+						'label' => 'Coupon Code',
+						'type' => 'expression',
+						'required' => true
+					],
 					[
 						'key'      => 'coupon_type',
 						'label'    => 'Discount Type',
@@ -958,36 +1171,80 @@ class Storeengine extends IntegrationBase {
 						'required' => true,
 						'default'  => 'percentage',
 						'options'  => [
-							[ 'value' => 'percentage', 'label' => 'Percentage' ],
-							[ 'value' => 'fixed_cart', 'label' => 'Fixed Cart Discount' ],
-							[ 'value' => 'fixed_product', 'label' => 'Fixed Product Discount' ],
+							[
+								'value' => 'percentage',
+								'label' => 'Percentage'
+							],
+							[
+								'value' => 'fixed_cart',
+								'label' => 'Fixed Cart Discount'
+							],
+							[
+								'value' => 'fixed_product',
+								'label' => 'Fixed Product Discount'
+							],
 						],
 					],
-					[ 'key' => 'amount', 'label' => 'Amount', 'type' => 'expression', 'required' => true ],
-					[ 'key' => 'usage_limit', 'label' => 'Usage Limit (total)', 'type' => 'expression', 'required' => false ],
+					[
+						'key' => 'amount',
+						'label' => 'Amount',
+						'type' => 'expression',
+						'required' => true
+					],
+					[
+						'key' => 'usage_limit',
+						'label' => 'Usage Limit (total)',
+						'type' => 'expression',
+						'required' => false
+					],
 				];
 
 			case 'update_subscription_status':
 				return [
-					[ 'key' => 'subscription_id', 'label' => 'Subscription ID', 'type' => 'expression', 'required' => true ],
+					[
+						'key' => 'subscription_id',
+						'label' => 'Subscription ID',
+						'type' => 'expression',
+						'required' => true
+					],
 					[
 						'key'      => 'subscription_status',
 						'label'    => 'New Status',
 						'type'     => 'select',
 						'required' => true,
 						'options'  => [
-							[ 'value' => 'active', 'label' => 'Active' ],
-							[ 'value' => 'on_hold', 'label' => 'On Hold (Pause)' ],
-							[ 'value' => 'pending', 'label' => 'Pending' ],
-							[ 'value' => 'cancelled', 'label' => 'Cancelled' ],
-							[ 'value' => 'expired', 'label' => 'Expired' ],
+							[
+								'value' => 'active',
+								'label' => 'Active'
+							],
+							[
+								'value' => 'on_hold',
+								'label' => 'On Hold (Pause)'
+							],
+							[
+								'value' => 'pending',
+								'label' => 'Pending'
+							],
+							[
+								'value' => 'cancelled',
+								'label' => 'Cancelled'
+							],
+							[
+								'value' => 'expired',
+								'label' => 'Expired'
+							],
 						],
 					],
 				];
 
 			case 'grant_membership':
 				return [
-					[ 'key' => 'user_id', 'label' => 'User ID', 'type' => 'expression', 'required' => true ],
+					[
+						'key' => 'user_id',
+						'label' => 'User ID',
+						'type' => 'expression',
+						'required' => true
+					],
 					[
 						'key'      => 'group_id',
 						'label'    => 'Membership Group',
@@ -999,12 +1256,22 @@ class Storeengine extends IntegrationBase {
 							'select'      => [ 'value', 'label' ],
 						],
 					],
-					[ 'key' => 'expiration_date', 'label' => 'Expiration Date (Y-m-d, optional)', 'type' => 'expression', 'required' => false ],
+					[
+						'key' => 'expiration_date',
+						'label' => 'Expiration Date (Y-m-d, optional)',
+						'type' => 'expression',
+						'required' => false
+					],
 				];
 
 			case 'revoke_membership':
 				return [
-					[ 'key' => 'user_id', 'label' => 'User ID', 'type' => 'expression', 'required' => true ],
+					[
+						'key' => 'user_id',
+						'label' => 'User ID',
+						'type' => 'expression',
+						'required' => true
+					],
 					[
 						'key'      => 'group_id',
 						'label'    => 'Membership Group (leave empty to revoke all)',
@@ -1020,8 +1287,18 @@ class Storeengine extends IntegrationBase {
 
 			case 'create_access_group':
 				return [
-					[ 'key' => 'name', 'label' => 'Access Group Name', 'type' => 'expression', 'required' => true ],
-					[ 'key' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => false ],
+					[
+						'key' => 'name',
+						'label' => 'Access Group Name',
+						'type' => 'expression',
+						'required' => true
+					],
+					[
+						'key' => 'description',
+						'label' => 'Description',
+						'type' => 'textarea',
+						'required' => false
+					],
 					[
 						'key'      => 'group_status',
 						'label'    => 'Status',
@@ -1029,16 +1306,45 @@ class Storeengine extends IntegrationBase {
 						'required' => false,
 						'default'  => 'publish',
 						'options'  => [
-							[ 'value' => 'publish', 'label' => 'Published' ],
-							[ 'value' => 'draft', 'label' => 'Draft' ],
+							[
+								'value' => 'publish',
+								'label' => 'Published'
+							],
+							[
+								'value' => 'draft',
+								'label' => 'Draft'
+							],
 						],
 					],
-					[ 'key' => 'user_roles', 'label' => 'User Roles (comma-separated, e.g. subscriber,customer)', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'enable_expiration', 'label' => 'Enable Expiration', 'type' => 'select', 'required' => false, 'default' => 'no', 'options' => [
-						[ 'value' => 'no', 'label' => 'No' ],
-						[ 'value' => 'yes', 'label' => 'Yes' ],
-					] ],
-					[ 'key' => 'expiration_date', 'label' => 'Specific Expiration Date (Y-m-d, optional)', 'type' => 'expression', 'required' => false ],
+					[
+						'key' => 'user_roles',
+						'label' => 'User Roles (comma-separated, e.g. subscriber,customer)',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'enable_expiration',
+						'label' => 'Enable Expiration',
+						'type' => 'select',
+						'required' => false,
+						'default' => 'no',
+						'options' => [
+							[
+								'value' => 'no',
+								'label' => 'No'
+							],
+							[
+								'value' => 'yes',
+								'label' => 'Yes'
+							],
+						]
+					],
+					[
+						'key' => 'expiration_date',
+						'label' => 'Specific Expiration Date (Y-m-d, optional)',
+						'type' => 'expression',
+						'required' => false
+					],
 				];
 
 			case 'update_access_group':
@@ -1054,20 +1360,44 @@ class Storeengine extends IntegrationBase {
 							'select'      => [ 'value', 'label' ],
 						],
 					],
-					[ 'key' => 'name', 'label' => 'New Name (leave empty to keep)', 'type' => 'expression', 'required' => false ],
-					[ 'key' => 'description', 'label' => 'New Description (leave empty to keep)', 'type' => 'textarea', 'required' => false ],
+					[
+						'key' => 'name',
+						'label' => 'New Name (leave empty to keep)',
+						'type' => 'expression',
+						'required' => false
+					],
+					[
+						'key' => 'description',
+						'label' => 'New Description (leave empty to keep)',
+						'type' => 'textarea',
+						'required' => false
+					],
 					[
 						'key'      => 'group_status',
 						'label'    => 'Status',
 						'type'     => 'select',
 						'required' => false,
 						'options'  => [
-							[ 'value' => '', 'label' => '— Keep current —' ],
-							[ 'value' => 'publish', 'label' => 'Published' ],
-							[ 'value' => 'draft', 'label' => 'Draft' ],
+							[
+								'value' => '',
+								'label' => '— Keep current —'
+							],
+							[
+								'value' => 'publish',
+								'label' => 'Published'
+							],
+							[
+								'value' => 'draft',
+								'label' => 'Draft'
+							],
 						],
 					],
-					[ 'key' => 'user_roles', 'label' => 'User Roles (comma-separated, leave empty to keep)', 'type' => 'expression', 'required' => false ],
+					[
+						'key' => 'user_roles',
+						'label' => 'User Roles (comma-separated, leave empty to keep)',
+						'type' => 'expression',
+						'required' => false
+					],
 				];
 
 			case 'delete_access_group':
@@ -1083,10 +1413,23 @@ class Storeengine extends IntegrationBase {
 							'select'      => [ 'value', 'label' ],
 						],
 					],
-					[ 'key' => 'force_delete', 'label' => 'Permanently Delete (skip trash)', 'type' => 'select', 'required' => false, 'default' => 'no', 'options' => [
-						[ 'value' => 'no', 'label' => 'No — Move to Trash' ],
-						[ 'value' => 'yes', 'label' => 'Yes — Permanently Delete' ],
-					] ],
+					[
+						'key' => 'force_delete',
+						'label' => 'Permanently Delete (skip trash)',
+						'type' => 'select',
+						'required' => false,
+						'default' => 'no',
+						'options' => [
+							[
+								'value' => 'no',
+								'label' => 'No — Move to Trash'
+							],
+							[
+								'value' => 'yes',
+								'label' => 'Yes — Permanently Delete'
+							],
+						]
+					],
 				];
 		}//end switch
 
@@ -1113,7 +1456,10 @@ class Storeengine extends IntegrationBase {
 		] );
 
 		return array_map( function ( $post ) {
-			return [ 'value' => $post->ID, 'label' => $post->post_title ];
+			return [
+				'value' => $post->ID,
+				'label' => $post->post_title
+			];
 		}, $posts );
 	}
 
@@ -1127,7 +1473,10 @@ class Storeengine extends IntegrationBase {
 		] );
 
 		return array_map( function ( $post ) {
-			return [ 'value' => $post->ID, 'label' => $post->post_title ];
+			return [
+				'value' => $post->ID,
+				'label' => $post->post_title
+			];
 		}, $posts );
 	}
 
@@ -1144,7 +1493,10 @@ class Storeengine extends IntegrationBase {
 	}
 
 	private static function respond( array $data ): array {
-		return [ 'port' => 'main', 'data' => $data ];
+		return [
+			'port' => 'main',
+			'data' => $data
+		];
 	}
 
 	private static function action_error( string $message ): array {
@@ -1178,7 +1530,10 @@ class Storeengine extends IntegrationBase {
 			return self::action_error( 'Failed to update status: ' . $e->getMessage() );
 		}
 
-		return self::action_success( [ 'order_id' => $order_id, 'order_status' => $order->get_status() ] );
+		return self::action_success( [
+			'order_id' => $order_id,
+			'order_status' => $order->get_status()
+		] );
 	}
 
 	private static function action_add_order_note( array $config, array $input ): array {
@@ -1205,7 +1560,10 @@ class Storeengine extends IntegrationBase {
 			return self::action_error( 'Failed to add order note.' );
 		}
 
-		return self::action_success( [ 'order_id' => $order_id, 'note_id' => $comment_id ] );
+		return self::action_success( [
+			'order_id' => $order_id,
+			'note_id' => $comment_id
+		] );
 	}
 
 	private static function action_refund_order( array $config, array $input ): array {
@@ -1240,7 +1598,10 @@ class Storeengine extends IntegrationBase {
 			return self::action_error( $result->get_error_message() );
 		}
 
-		return self::action_success( [ 'order_id' => $order_id, 'refunded_amount' => (float) $amount ] );
+		return self::action_success( [
+			'order_id' => $order_id,
+			'refunded_amount' => (float) $amount
+		] );
 	}
 
 	private static function action_create_customer( array $config, array $input ): array {
@@ -1267,7 +1628,10 @@ class Storeengine extends IntegrationBase {
 			return self::action_error( $result->get_error_message() );
 		}
 
-		return self::action_success( [ 'customer_id' => $customer->get_id(), 'email' => $email ] );
+		return self::action_success( [
+			'customer_id' => $customer->get_id(),
+			'email' => $email
+		] );
 	}
 
 	private static function action_update_customer( array $config, array $input ): array {
@@ -1338,7 +1702,10 @@ class Storeengine extends IntegrationBase {
 			return self::action_error( 'Failed to adjust stock: ' . $e->getMessage() );
 		}
 
-		return self::action_success( [ 'product_id' => $product_id, 'stock_quantity' => $new ] );
+		return self::action_success( [
+			'product_id' => $product_id,
+			'stock_quantity' => $new
+		] );
 	}
 
 	private static function action_set_stock_status( array $config, array $input ): array {
@@ -1361,7 +1728,10 @@ class Storeengine extends IntegrationBase {
 			return self::action_error( 'Failed to set stock status: ' . $e->getMessage() );
 		}
 
-		return self::action_success( [ 'product_id' => $product_id, 'stock_status' => $status ] );
+		return self::action_success( [
+			'product_id' => $product_id,
+			'stock_status' => $status
+		] );
 	}
 
 	private static function get_product_object( int $product_id ) {
@@ -1412,7 +1782,10 @@ class Storeengine extends IntegrationBase {
 			update_post_meta( $post_id, '_storeengine_coupon_usage_limit', absint( $config['usage_limit'] ) );
 		}
 
-		return self::action_success( [ 'coupon_id' => $post_id, 'code' => $code ] );
+		return self::action_success( [
+			'coupon_id' => $post_id,
+			'code' => $code
+		] );
 	}
 
 	private static function action_update_subscription_status( array $config, array $input ): array {
@@ -1431,7 +1804,10 @@ class Storeengine extends IntegrationBase {
 			return self::action_error( 'Failed to update subscription: ' . $e->getMessage() );
 		}
 
-		return self::action_success( [ 'subscription_id' => $subscription_id, 'status' => $subscription->get_status() ] );
+		return self::action_success( [
+			'subscription_id' => $subscription_id,
+			'status' => $subscription->get_status()
+		] );
 	}
 
 	/**
@@ -1483,7 +1859,10 @@ class Storeengine extends IntegrationBase {
 		$override         = sanitize_text_field( $config['expiration_date'] ?? '' );
 		$expiration_value = is_array( $expiration ) ? $expiration : [];
 		if ( '' !== $override ) {
-			$expiration_value = [ 'is_enable_expiration' => 1, 'specific_date' => $override ];
+			$expiration_value = [
+				'is_enable_expiration' => 1,
+				'specific_date' => $override
+			];
 		}
 
 		// Sync the membership meta (content protection + expiration) like StoreEngine,
@@ -1574,7 +1953,10 @@ class Storeengine extends IntegrationBase {
 
 		if ( ! empty( $config['user_roles'] ) ) {
 			$roles = array_filter( array_map( 'trim', explode( ',', (string) $config['user_roles'] ) ) );
-			$meta  = array_map( static fn( $role ) => [ 'value' => $role, 'label' => $role ], $roles );
+			$meta  = array_map( static fn( $role ) => [
+				'value' => $role,
+				'label' => $role
+			], $roles );
 			update_post_meta( $post_id, '_storeengine_membership_user_roles', $meta );
 		}
 
@@ -1584,7 +1966,10 @@ class Storeengine extends IntegrationBase {
 				'specific_date'        => sanitize_text_field( $config['expiration_date'] ?? '' ),
 			] );
 		}
-		return self::action_success( [ 'group_id' => $post_id, 'name' => $name ] );
+		return self::action_success( [
+			'group_id' => $post_id,
+			'name' => $name
+		] );
 	}
 
 	private static function action_update_access_group( array $config, array $input ): array {
@@ -1615,7 +2000,10 @@ class Storeengine extends IntegrationBase {
 
 		if ( ! empty( $config['user_roles'] ) ) {
 			$roles = array_filter( array_map( 'trim', explode( ',', (string) $config['user_roles'] ) ) );
-			$meta  = array_map( static fn( $role ) => [ 'value' => $role, 'label' => $role ], $roles );
+			$meta  = array_map( static fn( $role ) => [
+				'value' => $role,
+				'label' => $role
+			], $roles );
 			update_post_meta( $group_id, '_storeengine_membership_user_roles', $meta );
 		}
 		return self::action_success( [ 'group_id' => $group_id ] );
@@ -1634,6 +2022,9 @@ class Storeengine extends IntegrationBase {
 		if ( ! $result ) {
 			return self::action_error( 'Failed to delete Access Group.' );
 		}
-		return self::action_success( [ 'group_id' => $group_id, 'force_deleted' => $force ] );
+		return self::action_success( [
+			'group_id' => $group_id,
+			'force_deleted' => $force
+		] );
 	}
 }

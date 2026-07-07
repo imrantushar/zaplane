@@ -64,10 +64,30 @@ class Router extends IntegrationBase {
 				'required'    => true,
 				'placeholder' => '{{1.type}}',
 			],
-			[ 'key' => 'case_1', 'label' => 'Path 1 equals', 'type' => 'expression', 'required' => false ],
-			[ 'key' => 'case_2', 'label' => 'Path 2 equals', 'type' => 'expression', 'required' => false ],
-			[ 'key' => 'case_3', 'label' => 'Path 3 equals', 'type' => 'expression', 'required' => false ],
-			[ 'key' => 'case_4', 'label' => 'Path 4 equals', 'type' => 'expression', 'required' => false ],
+			[
+				'key' => 'case_1',
+				'label' => 'Path 1 equals',
+				'type' => 'expression',
+				'required' => false
+			],
+			[
+				'key' => 'case_2',
+				'label' => 'Path 2 equals',
+				'type' => 'expression',
+				'required' => false
+			],
+			[
+				'key' => 'case_3',
+				'label' => 'Path 3 equals',
+				'type' => 'expression',
+				'required' => false
+			],
+			[
+				'key' => 'case_4',
+				'label' => 'Path 4 equals',
+				'type' => 'expression',
+				'required' => false
+			],
 		];
 	}
 
@@ -86,7 +106,10 @@ class Router extends IntegrationBase {
 
 		return [
 			'port' => $port,
-			'data' => array_merge( $input, [ 'matched_path' => $port, 'routed_value' => $value ] ),
+			'data' => array_merge( $input, [
+				'matched_path' => $port,
+				'routed_value' => $value
+			] ),
 		];
 	}
 }

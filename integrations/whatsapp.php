@@ -96,7 +96,7 @@ class Whatsapp extends IntegrationBase {
 					'help'        => 'Optional JSON array of template component parameters.',
 				],
 			];
-		}
+		}//end if
 
 		if ( 'send_image' === $action ) {
 			return [
@@ -146,7 +146,7 @@ class Whatsapp extends IntegrationBase {
 					'required'    => false,
 				],
 			];
-		}
+		}//end if
 
 		if ( 'send_video' === $action ) {
 			return [
@@ -215,7 +215,7 @@ class Whatsapp extends IntegrationBase {
 					'required'    => false,
 				],
 			];
-		}
+		}//end if
 
 		return [];
 	}
@@ -260,17 +260,10 @@ class Whatsapp extends IntegrationBase {
 		return [];
 	}
 
-	// ── Incoming webhook (Meta WhatsApp Cloud API) ────────────────────────────
-
 	public static function supports_webhook(): bool {
 		return true;
 	}
 
-	/**
-	 * Verify Meta's X-Hub-Signature-256 over the raw request body using the
-	 * app secret. When no app secret is configured we allow the request through
-	 * so first-time setup isn't blocked; once set, the HMAC must match.
-	 */
 	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
 		$secret = self::get_webhook_app_secret();
 
@@ -289,11 +282,6 @@ class Whatsapp extends IntegrationBase {
 		return hash_equals( $expected, $signature );
 	}
 
-	/**
-	 * Parse a WhatsApp Cloud API webhook into a normalized trigger payload.
-	 * Returns null for non-message events (e.g. delivery/read status updates),
-	 * which the controller treats as "skipped".
-	 */
 	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
 		$data = json_decode( $request->get_body(), true );
 
@@ -349,10 +337,6 @@ class Whatsapp extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * App secret used to verify incoming webhook signatures. Stored as an option
-	 * (the webhook receiver has no connection context) and filterable.
-	 */
 	public static function get_webhook_app_secret(): string {
 		$secret = (string) get_option( 'zaplane_webhook_app_secret_whatsapp', '' );
 
@@ -502,8 +486,6 @@ class Whatsapp extends IntegrationBase {
 			],
 		];
 	}
-
-	// ── Private action helpers ────────────────────────────────────────────────
 
 	private static function action_send_text( array $node, array $input, string $token, string $phone_number_id, string $api_version ): array {
 		$to   = $node['data']['config']['to'] ?? '';
@@ -661,11 +643,11 @@ class Whatsapp extends IntegrationBase {
 			throw new \Exception( 'WhatsApp: recipient phone number (to) is required' );
 		}
 
-		if ( $latitude === '' || $latitude === null ) {
+		if ( '' === $latitude || null === $latitude ) {
 			throw new \Exception( 'WhatsApp: latitude is required' );
 		}
 
-		if ( $longitude === '' || $longitude === null ) {
+		if ( '' === $longitude || null === $longitude ) {
 			throw new \Exception( 'WhatsApp: longitude is required' );
 		}
 
@@ -706,11 +688,6 @@ class Whatsapp extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * Send a request to the WhatsApp Business Cloud API.
-	 *
-	 * @throws \Exception on WP_Error or API error response.
-	 */
 	private static function whatsapp_request( string $token, string $phone_number_id, string $api_version, array $body ): array {
 		$url = self::API_BASE_URL . '/' . $api_version . '/' . $phone_number_id . '/messages';
 

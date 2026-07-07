@@ -7,13 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-/**
- * AI integration — generate replies with Claude (Anthropic) or OpenAI.
- *
- * Provider-agnostic at the node level: a connection stores the provider +
- * API key, and the "Generate Response" action routes to the right HTTP API.
- * Calls go through wp_remote_post (no SDK), matching the rest of Zaplane.
- */
 class Ai extends IntegrationBase {
 
 	private const ANTHROPIC_URL      = 'https://api.anthropic.com/v1/messages';
@@ -42,12 +35,6 @@ class Ai extends IntegrationBase {
 		return [];
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| CONNECTION / AUTH
-	|--------------------------------------------------------------------------
-	*/
-
 	public static function requires_connection(): bool {
 		return true;
 	}
@@ -59,16 +46,25 @@ class Ai extends IntegrationBase {
 	public static function get_auth_fields( ?string $auth_type = null ): array {
 		return [
 			'provider' => [
-				'type'    => 'select',
-				'label'   => 'Provider',
+				'type'     => 'select',
+				'label'    => 'Provider',
 				'required' => true,
-				'default' => 'wordpress',
-				'options' => [
-					[ 'value' => 'wordpress', 'label' => 'WordPress Core AI (uses site-configured connection)' ],
-					[ 'value' => 'anthropic', 'label' => 'Anthropic (Claude)' ],
-					[ 'value' => 'openai', 'label' => 'OpenAI' ],
+				'default'  => 'wordpress',
+				'options'  => [
+					[
+						'value' => 'wordpress',
+						'label' => 'WordPress Core AI (uses site-configured connection)',
+					],
+					[
+						'value' => 'anthropic',
+						'label' => 'Anthropic (Claude)',
+					],
+					[
+						'value' => 'openai',
+						'label' => 'OpenAI',
+					],
 				],
-				'help'    => 'WordPress Core AI uses the provider/credentials configured in WordPress (no key needed here). Choose Anthropic/OpenAI to use your own key.',
+				'help'     => 'WordPress Core AI uses the provider/credentials configured in WordPress (no key needed here). Choose Anthropic/OpenAI to use your own key.',
 			],
 			'api_key'  => [
 				'type'        => 'password',
@@ -81,47 +77,77 @@ class Ai extends IntegrationBase {
 	}
 
 	public static function test_connection( array $credentials ): array {
-		$provider = $credentials['provider'] ?? 'wordpress';
+		$provider = $credentials['provider'] ?? 'WordPress';
 		$api_key  = $credentials['api_key'] ?? '';
 
-		if ( 'wordpress' === $provider ) {
+		if ( 'WordPress' === $provider ) {
 			if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
-				return [ 'success' => false, 'message' => 'WordPress Core AI is unavailable (requires WordPress 7.0+).', 'details' => [] ];
+				return [
+					'success' => false,
+					'message' => 'WordPress Core AI is unavailable (requires WordPress 7.0+).',
+					'details' => [],
+				];
 			}
 			if ( function_exists( 'wp_supports_ai' ) && ! wp_supports_ai() ) {
-				return [ 'success' => false, 'message' => 'AI features are disabled in this WordPress environment.', 'details' => [] ];
+				return [
+					'success' => false,
+					'message' => 'AI features are disabled in this WordPress environment.',
+					'details' => [],
+				];
 			}
-			return [ 'success' => true, 'message' => 'Using WordPress Core AI connection', 'details' => [ 'provider' => 'wordpress' ] ];
-		}
+			return [
+				'success' => true,
+				'message' => 'Using WordPress Core AI connection',
+				'details' => [ 'provider' => 'wordpress' ],
+			];
+		}//end if
 
 		if ( '' === $api_key ) {
-			return [ 'success' => false, 'message' => 'API key is required', 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => 'API key is required',
+				'details' => [],
+			];
 		}
 
 		if ( 'openai' === $provider ) {
-			$response = wp_remote_get( 'https://api.openai.com/v1/models', [
-				'headers' => [ 'Authorization' => 'Bearer ' . $api_key ],
-				'timeout' => 20,
-			] );
+			$response = wp_remote_get(
+				'https://api.openai.com/v1/models',
+				[
+					'headers' => [ 'Authorization' => 'Bearer ' . $api_key ],
+					'timeout' => 20,
+				]
+			);
 		} else {
-			$response = wp_remote_get( 'https://api.anthropic.com/v1/models', [
-				'headers' => [
-					'x-api-key'         => $api_key,
-					'anthropic-version' => self::ANTHROPIC_VERSION,
-				],
-				'timeout' => 20,
-			] );
+			$response = wp_remote_get(
+				'https://api.anthropic.com/v1/models',
+				[
+					'headers' => [
+						'x-api-key'         => $api_key,
+						'anthropic-version' => self::ANTHROPIC_VERSION,
+					],
+					'timeout' => 20,
+				]
+			);
 		}
 
 		if ( is_wp_error( $response ) ) {
-			return [ 'success' => false, 'message' => $response->get_error_message(), 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => $response->get_error_message(),
+				'details' => [],
+			];
 		}
 
 		$code = wp_remote_retrieve_response_code( $response );
 		if ( $code < 200 || $code >= 300 ) {
 			$body = json_decode( wp_remote_retrieve_body( $response ), true );
 			$msg  = $body['error']['message'] ?? ( 'Connection test failed (HTTP ' . $code . ')' );
-			return [ 'success' => false, 'message' => $msg, 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => $msg,
+				'details' => [],
+			];
 		}
 
 		return [
@@ -130,12 +156,6 @@ class Ai extends IntegrationBase {
 			'details' => [ 'provider' => $provider ],
 		];
 	}
-
-	/*
-	|--------------------------------------------------------------------------
-	| ACTIONS
-	|--------------------------------------------------------------------------
-	*/
 
 	public static function get_actions(): array {
 		return [
@@ -156,11 +176,26 @@ class Ai extends IntegrationBase {
 				'required' => true,
 				'default'  => self::DEFAULT_MODEL,
 				'options'  => [
-					[ 'value' => 'claude-opus-4-8', 'label' => 'Claude Opus 4.8 (most capable)' ],
-					[ 'value' => 'claude-sonnet-4-6', 'label' => 'Claude Sonnet 4.6 (balanced)' ],
-					[ 'value' => 'claude-haiku-4-5', 'label' => 'Claude Haiku 4.5 (fastest)' ],
-					[ 'value' => 'gpt-4o', 'label' => 'OpenAI GPT-4o' ],
-					[ 'value' => 'gpt-4o-mini', 'label' => 'OpenAI GPT-4o mini' ],
+					[
+						'value' => 'claude-opus-4-8',
+						'label' => 'Claude Opus 4.8 (most capable)',
+					],
+					[
+						'value' => 'claude-sonnet-4-6',
+						'label' => 'Claude Sonnet 4.6 (balanced)',
+					],
+					[
+						'value' => 'claude-haiku-4-5',
+						'label' => 'Claude Haiku 4.5 (fastest)',
+					],
+					[
+						'value' => 'gpt-4o',
+						'label' => 'OpenAI GPT-4o',
+					],
+					[
+						'value' => 'gpt-4o-mini',
+						'label' => 'OpenAI GPT-4o mini',
+					],
 				],
 				'help'     => 'Pick a model that matches the connected provider.',
 			],
@@ -180,11 +215,11 @@ class Ai extends IntegrationBase {
 				'help'        => 'The incoming message to respond to.',
 			],
 			[
-				'key'         => 'history',
-				'label'       => 'Conversation History (optional)',
-				'type'        => 'expression',
-				'required'    => false,
-				'help'        => 'A JSON array of prior turns ([{"role":"user|assistant","content":"..."}]) from a memory node.',
+				'key'      => 'history',
+				'label'    => 'Conversation History (optional)',
+				'type'     => 'expression',
+				'required' => false,
+				'help'     => 'A JSON array of prior turns ([{"role":"user|assistant","content":"..."}]) from a memory node.',
 			],
 			[
 				'key'      => 'max_tokens',
@@ -207,11 +242,11 @@ class Ai extends IntegrationBase {
 		$config      = $node['data']['config'] ?? [];
 		$credentials = $node['_connection_credentials'] ?? [];
 
-		$provider = $credentials['provider'] ?? 'wordpress';
+		$provider = $credentials['provider'] ?? 'WordPress';
 		$api_key  = $credentials['api_key'] ?? '';
 
 		// WordPress Core AI uses the site's configured connection — no key here.
-		if ( 'wordpress' !== $provider && '' === $api_key ) {
+		if ( 'WordPress' !== $provider && '' === $api_key ) {
 			return self::error( 'No AI connection credentials available.', $input );
 		}
 
@@ -227,7 +262,7 @@ class Ai extends IntegrationBase {
 
 		$messages = self::build_messages( $config['history'] ?? '', $user_msg );
 
-		if ( 'wordpress' === $provider ) {
+		if ( 'WordPress' === $provider ) {
 			$result = self::call_wordpress( $system, $messages, $max_tokens, $temperature );
 		} elseif ( 'openai' === $provider ) {
 			$result = self::call_openai( $api_key, $model, $system, $messages, $max_tokens, $temperature );
@@ -241,25 +276,18 @@ class Ai extends IntegrationBase {
 
 		return [
 			'port' => 'main',
-			'data' => array_merge( $input, [
-				'success'  => true,
-				'reply'    => $result['reply'],
-				'provider' => $provider,
-				'model'    => $model,
-			] ),
+			'data' => array_merge(
+				$input,
+				[
+					'success'  => true,
+					'reply'    => $result['reply'],
+					'provider' => $provider,
+					'model'    => $model,
+				]
+			),
 		];
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| PROVIDERS
-	|--------------------------------------------------------------------------
-	*/
-
-	/**
-	 * Build the chat message array: optional prior history + the new user turn.
-	 * History may arrive as a JSON string (from a memory node) or an array.
-	 */
 	private static function build_messages( $history, string $user_msg ): array {
 		$messages = [];
 
@@ -278,20 +306,22 @@ class Ai extends IntegrationBase {
 				$role    = ( 'assistant' === ( $turn['role'] ?? '' ) ) ? 'assistant' : 'user';
 				$content = (string) ( $turn['content'] ?? '' );
 				if ( '' !== $content ) {
-					$messages[] = [ 'role' => $role, 'content' => $content ];
+					$messages[] = [
+						'role'    => $role,
+						'content' => $content,
+					];
 				}
 			}
 		}
 
-		$messages[] = [ 'role' => 'user', 'content' => $user_msg ];
+		$messages[] = [
+			'role'    => 'user',
+			'content' => $user_msg,
+		];
 
 		return $messages;
 	}
 
-	/**
-	 * Models that reject sampling params (temperature/top_p/top_k) — Opus 4.7+,
-	 * Fable. Temperature is only forwarded to models that accept it.
-	 */
 	private static function model_accepts_temperature( string $model ): bool {
 		$model = strtolower( $model );
 		if ( false !== strpos( $model, 'opus' ) || false !== strpos( $model, 'fable' ) ) {
@@ -300,12 +330,6 @@ class Ai extends IntegrationBase {
 		return true;
 	}
 
-	/**
-	 * WordPress Core AI (WP 7.0+) via wp_ai_client_prompt() — routes to whatever
-	 * provider/credentials the site has configured. The model field is ignored
-	 * (core's default registry chooses). History is folded into the system
-	 * instruction as a transcript to stay robust without building Message DTOs.
-	 */
 	private static function call_wordpress( string $system, array $messages, int $max_tokens, ?float $temperature ): array {
 		if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
 			return [ 'error' => 'WordPress Core AI is unavailable (requires WordPress 7.0+).' ];
@@ -374,15 +398,18 @@ class Ai extends IntegrationBase {
 			$body['temperature'] = $temperature;
 		}
 
-		$response = wp_remote_post( self::ANTHROPIC_URL, [
-			'headers' => [
-				'x-api-key'         => $api_key,
-				'anthropic-version' => self::ANTHROPIC_VERSION,
-				'content-type'      => 'application/json',
-			],
-			'body'    => wp_json_encode( $body ),
-			'timeout' => 120,
-		] );
+		$response = wp_remote_post(
+			self::ANTHROPIC_URL,
+			[
+				'headers' => [
+					'x-api-key'         => $api_key,
+					'anthropic-version' => self::ANTHROPIC_VERSION,
+					'content-type'      => 'application/json',
+				],
+				'body'    => wp_json_encode( $body ),
+				'timeout' => 120,
+			]
+		);
 
 		if ( is_wp_error( $response ) ) {
 			return [ 'error' => 'Anthropic request failed: ' . $response->get_error_message() ];
@@ -418,7 +445,10 @@ class Ai extends IntegrationBase {
 	private static function call_openai( string $api_key, string $model, string $system, array $messages, int $max_tokens, ?float $temperature ): array {
 		$chat = [];
 		if ( '' !== trim( $system ) ) {
-			$chat[] = [ 'role' => 'system', 'content' => $system ];
+			$chat[] = [
+				'role'    => 'system',
+				'content' => $system,
+			];
 		}
 		foreach ( $messages as $m ) {
 			$chat[] = $m;
@@ -434,14 +464,17 @@ class Ai extends IntegrationBase {
 			$body['temperature'] = $temperature;
 		}
 
-		$response = wp_remote_post( self::OPENAI_URL, [
-			'headers' => [
-				'Authorization' => 'Bearer ' . $api_key,
-				'Content-Type'  => 'application/json',
-			],
-			'body'    => wp_json_encode( $body ),
-			'timeout' => 120,
-		] );
+		$response = wp_remote_post(
+			self::OPENAI_URL,
+			[
+				'headers' => [
+					'Authorization' => 'Bearer ' . $api_key,
+					'Content-Type'  => 'application/json',
+				],
+				'body'    => wp_json_encode( $body ),
+				'timeout' => 120,
+			]
+		);
 
 		if ( is_wp_error( $response ) ) {
 			return [ 'error' => 'OpenAI request failed: ' . $response->get_error_message() ];
@@ -465,10 +498,13 @@ class Ai extends IntegrationBase {
 	private static function error( string $message, array $input ): array {
 		return [
 			'port' => 'main',
-			'data' => array_merge( $input, [
-				'success' => false,
-				'error'   => $message,
-			] ),
+			'data' => array_merge(
+				$input,
+				[
+					'success' => false,
+					'error'   => $message,
+				]
+			),
 		];
 	}
 }

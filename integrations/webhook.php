@@ -70,6 +70,9 @@ class Webhook extends IntegrationBase {
 	}
 
 	public static function get_trigger_sample_output( string $trigger ): array {
-		return [ 'example' => 'value', 'nested' => [ 'a' => 1 ] ];
+		return [
+			'example' => 'value',
+			'nested' => [ 'a' => 1 ]
+		];
 	}
 }

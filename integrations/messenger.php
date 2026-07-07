@@ -7,16 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-/**
- * Facebook Messenger integration.
- *
- * Inbound: Meta webhook → message_received trigger (parsed from entry[].messaging[]).
- * Outbound: Send Message via the Graph API (POST /me/messages with a Page token).
- *
- * Mirrors the WhatsApp integration: GET verify handshake (base class), POST
- * signature verification (HMAC), idempotency dedup, and an echo guard so a
- * reply the Page sends doesn't loop back into the workflow.
- */
 class Messenger extends IntegrationBase {
 
 	private const API_BASE_URL        = 'https://graph.facebook.com';
@@ -33,12 +23,6 @@ class Messenger extends IntegrationBase {
 	public static function get_icon(): string {
 		return 'messenger.svg';
 	}
-
-	/*
-	|--------------------------------------------------------------------------
-	| TRIGGERS
-	|--------------------------------------------------------------------------
-	*/
 
 	public static function get_triggers(): array {
 		return [
@@ -80,12 +64,6 @@ class Messenger extends IntegrationBase {
 
 		return [];
 	}
-
-	/*
-	|--------------------------------------------------------------------------
-	| INCOMING WEBHOOK
-	|--------------------------------------------------------------------------
-	*/
 
 	public static function supports_webhook(): bool {
 		return true;
@@ -161,12 +139,6 @@ class Messenger extends IntegrationBase {
 		return (string) apply_filters( 'zaplane_webhook_app_secret', $secret, 'messenger' );
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| CONNECTION / AUTH
-	|--------------------------------------------------------------------------
-	*/
-
 	public static function requires_connection(): bool {
 		return true;
 	}
@@ -198,7 +170,11 @@ class Messenger extends IntegrationBase {
 		$api_version = $credentials['api_version'] ?? self::DEFAULT_API_VERSION;
 
 		if ( '' === $token ) {
-			return [ 'success' => false, 'message' => 'page_access_token is required', 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => 'page_access_token is required',
+				'details' => []
+			];
 		}
 
 		$response = wp_remote_get(
@@ -207,12 +183,20 @@ class Messenger extends IntegrationBase {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return [ 'success' => false, 'message' => $response->get_error_message(), 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => $response->get_error_message(),
+				'details' => []
+			];
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( isset( $body['error'] ) ) {
-			return [ 'success' => false, 'message' => $body['error']['message'] ?? 'Unknown API error', 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => $body['error']['message'] ?? 'Unknown API error',
+				'details' => []
+			];
 		}
 
 		return [
@@ -221,12 +205,6 @@ class Messenger extends IntegrationBase {
 			'details' => [ 'page_id' => $body['id'] ?? '' ],
 		];
 	}
-
-	/*
-	|--------------------------------------------------------------------------
-	| ACTIONS
-	|--------------------------------------------------------------------------
-	*/
 
 	public static function get_actions(): array {
 		return [
@@ -270,7 +248,10 @@ class Messenger extends IntegrationBase {
 			return self::action_send_text( $node, $input, $credentials );
 		}
 
-		return [ 'port' => 'main', 'data' => $input ];
+		return [
+			'port' => 'main',
+			'data' => $input
+		];
 	}
 
 	private static function action_send_text( array $node, array $input, array $credentials ): array {
