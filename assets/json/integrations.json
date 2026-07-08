@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-06-30 11:33:40",
+    "generated_at": "2026-07-08 04:13:02",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -26033,6 +26033,36 @@
                     ]
                 }
             }
+        },
+        "gemcrm-email-inbox": {
+            "slug": "gemcrm-email-inbox",
+            "name": "GemCRM Email Inbox",
+            "icon": "crm.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "triggers": {
+                "email_received": {
+                    "key": "email_received",
+                    "label": "Email Received",
+                    "hook": "gemcrm/email_inbox/received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_received_unmatched": {
+                    "key": "email_received_unmatched",
+                    "label": "Email Received (Unmatched)",
+                    "hook": "gemcrm/email_inbox/received_unmatched",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
