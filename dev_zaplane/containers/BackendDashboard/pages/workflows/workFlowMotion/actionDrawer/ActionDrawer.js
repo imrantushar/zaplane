@@ -113,8 +113,19 @@ const {
     return hasError;
   };
 
+  // Apps that require a connection (e.g. AI) must have one picked before moving
+  // past the Select step. Returns true when a required connection is missing.
+  const validateConnection = () => {
+    if (selectedIntegration?.requires_connection === true && !values?.connection_id) {
+      setFieldError("connection_id", __("A connection is required", "zaplane"));
+      return true;
+    }
+    return false;
+  };
+
   const handleContinue = () => {
     if (step === "select") {
+      if (validateConnection()) return;
       return setStep("configure");
     }
     if (step === "configure") {
@@ -195,6 +206,9 @@ const {
       {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={(item) => setSelectedItem(mode === "tools" ? { ...item, mode: "tools" } : item)} setMode={setMode} />}
 
       {selectedItem && <ZAPTab value={step} onChange={values?.actionType ? (newStep) => {
+        if (step === "select" && newStep !== "select") {
+          if (validateConnection()) return;
+        }
         if (step === "configure" && newStep === "test") {
           if (validateRequiredFields()) return;
         }

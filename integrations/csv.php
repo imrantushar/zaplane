@@ -78,10 +78,29 @@ class Csv extends IntegrationBase {
 
 		return [
 			[
-				'key' => 'csv',
-				'label' => 'CSV text',
-				'type' => 'textarea',
-				'required' => true
+				'key'     => 'source',
+				'label'   => 'CSV Source',
+				'type'    => 'select',
+				'default' => 'text',
+				'options' => [
+					[ 'value' => 'text', 'label' => 'Paste / map CSV text' ],
+					[ 'value' => 'file', 'label' => 'Upload or select a file' ],
+				],
+			],
+			[
+				'key'        => 'csv',
+				'label'      => 'CSV text',
+				'type'       => 'textarea',
+				'required'   => false,
+				'depends_on' => [ 'source' => 'text' ],
+			],
+			[
+				'key'        => 'file_url',
+				'label'      => 'CSV file',
+				'type'       => 'file',
+				'required'   => false,
+				'depends_on' => [ 'source' => 'file' ],
+				'help'       => 'Upload a .csv or pick one from the Media Library. You can also pass a file URL from an earlier step with @.',
 			],
 			[
 				'key' => 'delimiter',
@@ -127,7 +146,10 @@ class Csv extends IntegrationBase {
 	}
 
 	protected static function parse( array $config ): array {
-		$text       = (string) ( $config['csv'] ?? '' );
+		$text = 'file' === ( $config['source'] ?? 'text' )
+			? self::fetch_file_contents( (string) ( $config['file_url'] ?? '' ) )
+			: (string) ( $config['csv'] ?? '' );
+
 		$delimiter  = self::delimiter( $config );
 		$has_header = ! isset( $config['has_header'] ) || ! empty( $config['has_header'] );
 
@@ -276,5 +298,45 @@ class Csv extends IntegrationBase {
 	protected static function delimiter( array $config ): string {
 		$delimiter = (string) ( $config['delimiter'] ?? ',' );
 		return '' === $delimiter ? ',' : substr( $delimiter, 0, 1 );
+	}
+
+	/**
+	 * Read CSV contents from a Media Library file, an attachment ID, a local
+	 * uploads URL, or a remote URL — whatever the file field resolved to.
+	 */
+	protected static function fetch_file_contents( string $location ): string {
+		$location = trim( $location );
+		if ( '' === $location ) {
+			return '';
+		}
+
+		// Attachment ID.
+		if ( ctype_digit( $location ) ) {
+			$path = get_attached_file( (int) $location );
+			return ( $path && is_readable( $path ) )
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading a local uploads file.
+				? (string) file_get_contents( $path )
+				: '';
+		}
+
+		// Local uploads URL — read straight from disk, no HTTP round trip.
+		$uploads = wp_get_upload_dir();
+		if ( ! empty( $uploads['baseurl'] ) && ! empty( $uploads['basedir'] ) && 0 === strpos( $location, $uploads['baseurl'] ) ) {
+			$path = $uploads['basedir'] . substr( $location, strlen( $uploads['baseurl'] ) );
+			if ( is_readable( $path ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading a local uploads file.
+				return (string) file_get_contents( $path );
+			}
+		}
+
+		// Remote URL.
+		if ( preg_match( '#^https?://#i', $location ) ) {
+			$response = wp_remote_get( $location, [ 'timeout' => 20 ] );
+			if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+				return (string) wp_remote_retrieve_body( $response );
+			}
+		}
+
+		return '';
 	}
 }

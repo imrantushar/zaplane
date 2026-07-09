@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-09 08:52:25",
+    "generated_at": "2026-07-09 09:18:53",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -2975,6 +2975,23 @@
                             "type": "number",
                             "required": false,
                             "default": 5
+                        },
+                        {
+                            "key": "response_format",
+                            "label": "Response Format",
+                            "type": "select",
+                            "default": "text",
+                            "options": [
+                                {
+                                    "value": "text",
+                                    "label": "Text"
+                                },
+                                {
+                                    "value": "json",
+                                    "label": "JSON (structured)"
+                                }
+                            ],
+                            "help": "Text returns the reply as-is. JSON asks the model for a structured JSON object and parses it into a `json` output field."
                         }
                     ],
                     "outputs": [
@@ -27460,10 +27477,39 @@
                     "key": "parse",
                     "schema": [
                         {
+                            "key": "source",
+                            "label": "CSV Source",
+                            "type": "select",
+                            "default": "text",
+                            "options": [
+                                {
+                                    "value": "text",
+                                    "label": "Paste / map CSV text"
+                                },
+                                {
+                                    "value": "file",
+                                    "label": "Upload or select a file"
+                                }
+                            ]
+                        },
+                        {
                             "key": "csv",
                             "label": "CSV text",
                             "type": "textarea",
-                            "required": true
+                            "required": false,
+                            "depends_on": {
+                                "source": "text"
+                            }
+                        },
+                        {
+                            "key": "file_url",
+                            "label": "CSV file",
+                            "type": "file",
+                            "required": false,
+                            "depends_on": {
+                                "source": "file"
+                            },
+                            "help": "Upload a .csv or pick one from the Media Library. You can also pass a file URL from an earlier step with @."
                         },
                         {
                             "key": "delimiter",

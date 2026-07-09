@@ -59,6 +59,36 @@ class CsvTest extends IntegrationTestCase {
 		$this->assertArrayNotHasKey( 'file_url', $out['data'] );
 	}
 
+	/** Parse now offers a source toggle plus an upload/file field. */
+	public function test_parse_schema_has_source_and_file_fields() {
+		$schema = Csv::get_action_config_schema( 'parse' );
+		$byKey  = [];
+		foreach ( $schema as $field ) {
+			$byKey[ $field['key'] ] = $field;
+		}
+
+		$this->assertArrayHasKey( 'source', $byKey );
+		$this->assertArrayHasKey( 'file_url', $byKey );
+		$this->assertSame( 'file', $byKey['file_url']['type'] );
+		$this->assertSame( [ 'source' => 'file' ], $byKey['file_url']['depends_on'] );
+		$this->assertSame( [ 'source' => 'text' ], $byKey['csv']['depends_on'] );
+	}
+
+	/** File source with no location resolves to an empty result (no fatals). */
+	public function test_file_source_without_location_yields_no_rows() {
+		$node = [
+			'data' => [
+				'event'  => 'parse',
+				'config' => [ 'source' => 'file', 'file_url' => '' ],
+			],
+		];
+
+		$out = Csv::execute_node( $node, [] );
+
+		$this->assertSame( 0, $out['data']['count'] );
+		$this->assertSame( [], $out['data']['rows'] );
+	}
+
 	/** Parsing a header CSV yields keyed rows. */
 	public function test_parse_maps_header_to_rows() {
 		$node = [

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useFormikContext } from "formik";
 import Select, { components } from "react-select";
 import { fetchConnectionsByApp } from "@ZAPRedux/Slices/workFlowSlice/actions/connectionsSlice";
 import ConnectionPopaver from "./ConnectionPopaver";
@@ -14,6 +15,8 @@ const ConnectionSelector = ({
   const {
     appConnections
   } = useSelector(state => state.workflows);
+  const { errors, setFieldError } = useFormikContext();
+  const error = errors?.connection_id;
   const [isPopoverOpen, setPopoverOpen] = useState(false);
   useEffect(() => {
     if (appSlug) {
@@ -23,6 +26,7 @@ const ConnectionSelector = ({
   const handleConnected = connection => {
     dispatch(fetchConnectionsByApp(appSlug));
     setFieldValue("connection_id", String(connection?.payload?.id));
+    if (error) setFieldError("connection_id", undefined);
   };
   const options = appConnections?.filter(c => c.app === appSlug)?.map(c => ({
     label: c.name,
@@ -40,10 +44,11 @@ const ConnectionSelector = ({
         </components.MenuList>;
   return <>
             <div className="flex flex-col gap-2">
-                <span>{__("Select Connection", "zaplane")}</span>
-                <Select className="zaplane-select" classNamePrefix="zaplane-select" options={options} value={options?.find(o => o.value === values?.connection_id) || null} onChange={val => setFieldValue("connection_id", val?.value)} placeholder={__("Select a connection", "zaplane")} isClearable components={{
+                <span>{__("Select Connection", "zaplane")}<span className="text-red-500 ml-[2px]">*</span></span>
+                <Select className="zaplane-select" classNamePrefix="zaplane-select" options={options} value={options?.find(o => o.value === values?.connection_id) || null} onChange={val => { setFieldValue("connection_id", val?.value); if (error) setFieldError("connection_id", undefined); }} placeholder={__("Select a connection", "zaplane")} isClearable components={{
         MenuList: CustomMenuList
       }} />
+                {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </div>
 
             <ConnectionPopaver appSlug={appSlug} isOpen={isPopoverOpen} onClose={() => setPopoverOpen(false)} onConnected={handleConnected} />

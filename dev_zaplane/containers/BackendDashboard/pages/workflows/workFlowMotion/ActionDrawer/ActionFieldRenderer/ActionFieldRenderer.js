@@ -142,6 +142,55 @@ const ActionFieldRenderer = ({
         </div>
       );
 
+    // File picker: opens the WP Media Library to upload/select a file and stores
+    // its URL. Still accepts a dynamic value (e.g. a file URL from a prior step)
+    // via the @ variable editor, so both upload and pass-through work.
+    case "file": {
+      const openMediaLibrary = () => {
+        const media = window.wp && window.wp.media;
+        if (!media) {
+          console.warn("WP media library is not available.");
+          return;
+        }
+        const frame = media({
+          title: __("Select a file", "zaplane"),
+          button: { text: __("Use this file", "zaplane") },
+          multiple: false,
+        });
+        frame.on("select", () => {
+          const attachment = frame.state().get("selection").first().toJSON();
+          setFieldValue(field.key, attachment.url || "");
+          clearError();
+        });
+        frame.open();
+      };
+
+      return (
+        <div>
+          <VariableEditor
+            label={field.label}
+            required={!!field.required}
+            value={value || ""}
+            setValue={(val) => { setFieldValue(field.key, val); clearError(); }}
+            variables={workflowVariables?.data || []}
+            variableContext={workflowVariables?.context || {}}
+            field={field}
+            setFieldValue={setFieldValue}
+            placeholder={__("Upload a file or type @ for a file URL", "zaplane")}
+            isRequired={!!field.required}
+          />
+          <button
+            type="button"
+            onClick={openMediaLibrary}
+            className="mt-2 inline-flex items-center gap-1.5 rounded border border-[var(--zaplane-border-color)] bg-transparent px-3 py-1.5 text-[13px] cursor-pointer"
+          >
+            {__("Upload / Media Library", "zaplane")}
+          </button>
+          <ErrorMsg />
+        </div>
+      );
+    }
+
     // Simple rich-text email body (HTML in / HTML out). The full drag-and-drop
     // builder lives on the dedicated Email Templates page, not inline here.
     case "richtext":

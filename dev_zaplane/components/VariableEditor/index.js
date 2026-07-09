@@ -89,11 +89,20 @@ const VariableEditor = ({
     const range = saveSelection();
     setActiveRange(range);
   };
+
+  // Clicking into any field opens the variable picker directly — no need to type
+  // "@" (which still works too). Clicks on an existing variable's remove (×)
+  // button are ignored so deleting a chip doesn't pop the picker.
+  const handleEditorClick = e => {
+    if (e.target.classList.contains("zaplane-variable-remove")) return;
+    setActiveRange(saveSelection());
+    setPopoverOpen(true);
+  };
   return <>
       <div className="zaplane-label" style={{display:'flex', flexDirection:'column', gap:'8px', ...containerStyle}}>
         <span>{__(label, "zaplane")}{isRequired && <span style={{ color: 'red', marginLeft: '2px' }}>*</span>}</span>
 
-        <div ref={editorRef} onInput={handleInput} className={`zaplane-variable-editor ${multiline ? "zaplane-variable-editor-multiline" : "zaplane-variable-editor-singleline"} ${isEmpty ? "zaplane-empty" : ""}`} contentEditable suppressContentEditableWarning onKeyDown={handleKeyDown} onPaste={multiline ? undefined : handlePaste} onClick={handleCursorSave} onKeyUp={handleCursorSave} onBlur={() => syncValue(editorRef, field.key, setFieldValue)} data-placeholder={placeholder} />
+        <div ref={editorRef} onInput={handleInput} className={`zaplane-variable-editor ${multiline ? "zaplane-variable-editor-multiline" : "zaplane-variable-editor-singleline"} ${isEmpty ? "zaplane-empty" : ""}`} contentEditable suppressContentEditableWarning onKeyDown={handleKeyDown} onPaste={multiline ? undefined : handlePaste} onClick={handleEditorClick} onKeyUp={handleCursorSave} onBlur={() => syncValue(editorRef, field.key, setFieldValue)} data-placeholder={placeholder} />
       </div>
 
       <VariablePopover isOpen={isPopoverOpen} prefix="zaplane-variables-popover" onClose={() => setPopoverOpen(false)} data={variables} contextData={variableContext} onSelectVariable={variable => {

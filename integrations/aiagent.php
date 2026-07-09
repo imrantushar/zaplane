@@ -144,6 +144,17 @@ class Aiagent extends IntegrationBase {
 				'required' => false,
 				'default'  => self::DEFAULT_MAX_STEPS,
 			],
+			[
+				'key'     => 'response_format',
+				'label'   => 'Response Format',
+				'type'    => 'select',
+				'default' => 'text',
+				'options' => [
+					[ 'value' => 'text', 'label' => 'Text' ],
+					[ 'value' => 'json', 'label' => 'JSON (structured)' ],
+				],
+				'help'    => 'Text returns the reply as-is. JSON asks the model for a structured JSON object and parses it into a `json` output field.',
+			],
 		];
 	}
 
@@ -171,9 +182,15 @@ class Aiagent extends IntegrationBase {
 		$model     = sanitize_text_field( (string) ( $config['model'] ?? self::DEFAULT_MODEL ) );
 		$system    = (string) ( $config['system_prompt'] ?? '' );
 		$max_steps = max( 1, (int) ( $config['max_steps'] ?? self::DEFAULT_MAX_STEPS ) );
+		$format    = ( 'json' === ( $config['response_format'] ?? 'text' ) ) ? 'json' : 'text';
+
+		// Nudge the model toward pure JSON on top of any provider-native setting.
+		if ( 'json' === $format ) {
+			$system = trim( $system . "\n\nReturn ONLY a single valid JSON object as your final answer — no prose, no markdown code fences." );
+		}
 
 		if ( 'openai' === $provider ) {
-			$result = self::run_openai( $api_key, $model, $system, $task, $ctx, $max_steps );
+			$result = self::run_openai( $api_key, $model, $system, $task, $ctx, $max_steps, 'json' === $format );
 		} else {
 			$result = self::run_anthropic( $api_key, $model, $system, $task, $ctx, $max_steps );
 		}
@@ -182,15 +199,35 @@ class Aiagent extends IntegrationBase {
 			return self::err( $result['error'], $input );
 		}
 
+		$data = array_merge( $input, [
+			'success'    => true,
+			'reply'      => $result['reply'],
+			'steps'      => $result['steps'],
+			'tool_calls' => $result['tool_calls'],
+			'format'     => $format,
+		] );
+
+		if ( 'json' === $format ) {
+			$data['json'] = self::decode_json_reply( $result['reply'] );
+		}
+
 		return [
 			'port' => 'main',
-			'data' => array_merge( $input, [
-				'success'    => true,
-				'reply'      => $result['reply'],
-				'steps'      => $result['steps'],
-				'tool_calls' => $result['tool_calls'],
-			] ),
+			'data' => $data,
 		];
+	}
+
+	/**
+	 * Best-effort decode of a model's JSON reply: strips ```json fences and
+	 * returns the decoded array, or null when it isn't valid JSON.
+	 *
+	 * @return mixed
+	 */
+	private static function decode_json_reply( string $reply ) {
+		$trimmed = trim( $reply );
+		$trimmed = preg_replace( '/^```(?:json)?\s*|\s*```$/i', '', $trimmed );
+		$decoded = json_decode( (string) $trimmed, true );
+		return ( JSON_ERROR_NONE === json_last_error() ) ? $decoded : null;
 	}
 
 	private static function tool_specs( array $ctx ): array {
@@ -371,7 +408,7 @@ class Aiagent extends IntegrationBase {
 		return $out;
 	}
 
-	private static function run_openai( string $api_key, string $model, string $system, string $task, array $ctx, int $max_steps ): array {
+	private static function run_openai( string $api_key, string $model, string $system, string $task, array $ctx, int $max_steps, bool $json = false ): array {
 		$tools = array_map( static fn( $t ) => [
 			'type'     => 'function',
 			'function' => [
@@ -402,6 +439,12 @@ class Aiagent extends IntegrationBase {
 			];
 			if ( ! empty( $tools ) ) {
 				$body['tools'] = $tools;
+			}
+			// Native JSON mode only when no tools are wired — combining json_object
+			// with tool-calling turns is unreliable, so with tools we lean on the
+			// system-prompt instruction instead.
+			if ( $json && empty( $tools ) ) {
+				$body['response_format'] = [ 'type' => 'json_object' ];
 			}
 
 			$resp = self::http_json( self::OPENAI_URL, [

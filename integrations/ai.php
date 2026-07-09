@@ -72,7 +72,10 @@ class Ai extends IntegrationBase {
 				'label'       => 'API Key',
 				'required'    => false,
 				'placeholder' => 'sk-...',
-				'help'        => 'Required for Anthropic (sk-ant-...) or OpenAI (sk-...). Leave blank for WordPress Core AI.',
+				// Only asked for when using your own provider — WordPress Core AI
+				// authenticates through the site's own AI settings, no key here.
+				'depends_on'  => [ 'provider' => [ 'anthropic', 'openai' ] ],
+				'help'        => 'Required for Anthropic (sk-ant-...) or OpenAI (sk-...).',
 			],
 		];
 	}
