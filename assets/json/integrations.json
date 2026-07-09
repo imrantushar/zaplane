@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-09 09:18:53",
+    "generated_at": "2026-07-09 09:49:17",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -27509,7 +27509,7 @@
                             "depends_on": {
                                 "source": "file"
                             },
-                            "help": "Upload a .csv or pick one from the Media Library. You can also pass a file URL from an earlier step with @."
+                            "help": "Upload a .csv or pick one from the Media Library."
                         },
                         {
                             "key": "delimiter",

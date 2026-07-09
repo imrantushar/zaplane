@@ -100,7 +100,7 @@ class Csv extends IntegrationBase {
 				'type'       => 'file',
 				'required'   => false,
 				'depends_on' => [ 'source' => 'file' ],
-				'help'       => 'Upload a .csv or pick one from the Media Library. You can also pass a file URL from an earlier step with @.',
+				'help'       => 'Upload a .csv or pick one from the Media Library.',
 			],
 			[
 				'key' => 'delimiter',

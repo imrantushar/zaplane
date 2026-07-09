@@ -142,9 +142,8 @@ const ActionFieldRenderer = ({
         </div>
       );
 
-    // File picker: opens the WP Media Library to upload/select a file and stores
-    // its URL. Still accepts a dynamic value (e.g. a file URL from a prior step)
-    // via the @ variable editor, so both upload and pass-through work.
+    // File picker: opens the WP Media Library to upload/select a file, stores its
+    // URL, and shows the chosen file's name with Change / Remove controls.
     case "file": {
       const openMediaLibrary = () => {
         const media = window.wp && window.wp.media;
@@ -165,27 +164,57 @@ const ActionFieldRenderer = ({
         frame.open();
       };
 
+      let fileName = "";
+      if (value) {
+        try {
+          fileName = decodeURIComponent(String(value).split("/").pop().split("?")[0]);
+        } catch (e) {
+          fileName = String(value).split("/").pop();
+        }
+      }
+
       return (
-        <div>
-          <VariableEditor
-            label={field.label}
-            required={!!field.required}
-            value={value || ""}
-            setValue={(val) => { setFieldValue(field.key, val); clearError(); }}
-            variables={workflowVariables?.data || []}
-            variableContext={workflowVariables?.context || {}}
-            field={field}
-            setFieldValue={setFieldValue}
-            placeholder={__("Upload a file or type @ for a file URL", "zaplane")}
-            isRequired={!!field.required}
-          />
-          <button
-            type="button"
-            onClick={openMediaLibrary}
-            className="mt-2 inline-flex items-center gap-1.5 rounded border border-[var(--zaplane-border-color)] bg-transparent px-3 py-1.5 text-[13px] cursor-pointer"
-          >
-            {__("Upload / Media Library", "zaplane")}
-          </button>
+        <div className="flex flex-col gap-2">
+          <span className="zaplane-label">
+            {__(field.label, "zaplane")}
+            {field.required && <span className="text-red-500 ml-[2px]">*</span>}
+          </span>
+
+          {value ? (
+            <div className="flex items-center justify-between gap-3 rounded-md border border-[var(--zaplane-border-color)] px-3 py-2">
+              <span className="truncate text-sm" title={fileName}>{fileName}</span>
+              <div className="flex items-center gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={openMediaLibrary}
+                  className="text-[13px] text-[var(--zaplane-primary)] bg-transparent border-0 cursor-pointer p-0"
+                >
+                  {__("Change", "zaplane")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setFieldValue(field.key, ""); }}
+                  className="text-[13px] text-red-500 bg-transparent border-0 cursor-pointer p-0"
+                >
+                  {__("Remove", "zaplane")}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={openMediaLibrary}
+              className="flex items-center justify-center gap-1.5 rounded-md border border-dashed border-[var(--zaplane-border-color)] bg-transparent px-3 py-3 text-[13px] text-[var(--zaplane-text-muted)] cursor-pointer hover:border-[var(--zaplane-primary)]"
+            >
+              {__("Upload or select a file", "zaplane")}
+            </button>
+          )}
+
+          {field.help && (
+            <span className="text-[13px] text-[var(--zaplane-text-muted)] leading-relaxed mt-0.5">
+              {__(field.help, "zaplane")}
+            </span>
+          )}
           <ErrorMsg />
         </div>
       );
