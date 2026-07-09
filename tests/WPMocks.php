@@ -475,6 +475,12 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'esc_url' ) ) {
+		function esc_url( $url ) {
+			return htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
+		}
+	}
+
 	if ( ! function_exists( 'wp_strip_all_tags' ) ) {
 		function wp_strip_all_tags( string $text, bool $remove_breaks = false ): string {
 			$text = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
@@ -1354,6 +1360,12 @@ namespace {
 	if ( ! function_exists( 'wp_mail' ) ) {
 		function wp_mail( $to, $subject, $message, $headers = '', $attachments = [] ): bool {
 			return true;
+		}
+	}
+
+	if ( ! function_exists( 'wp_salt' ) ) {
+		function wp_salt( string $scheme = 'auth' ): string {
+			return 'test-salt-' . $scheme;
 		}
 	}
 
