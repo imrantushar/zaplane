@@ -138,6 +138,30 @@ class Jetengine extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		if ( 'post_type_field_update' !== $event ) {
+			return [];
+		}
+
+		return [
+			'success'   => true,
+			'timestamp' => '2026-07-09 12:00:00',
+			'data'      => [
+				'ID'          => 101,
+				'post_author' => '1',
+				'post_date'   => '2026-07-09 12:00:00',
+				'post_title'  => 'Sample Project',
+				'post_status' => 'publish',
+				'post_name'   => 'sample-project',
+				'post_type'   => 'project',
+				'guid'        => 'https://example.com/?post_type=project&p=101',
+				'filter'      => 'raw',
+				'meta_key'    => 'project_status',
+				'meta_value'  => 'active',
+			],
+		];
+	}
+
 	public static function get_dynamic_queries(): array {
 		return [
 			'post_type' => [ self::class, 'post_type_query' ],

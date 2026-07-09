@@ -279,6 +279,58 @@ class ActiveCampaign extends IntegrationBase
 		];
 	}
 
+	public static function get_trigger_sample_output(string $event): array
+	{
+		$contact = [
+			'id'         => '318',
+			'email'      => 'jane.doe@example.com',
+			'first_name' => 'Jane',
+			'last_name'  => 'Doe',
+			'phone'      => '+12025550143',
+			'fields'     => ['1' => 'VIP'],
+		];
+
+		$lists = [
+			['id' => '12'],
+			['id' => '15'],
+		];
+
+		$build = static function (string $event, string $action) use ($contact, $lists): array {
+			return [
+				'event'   => $event,
+				'form_id' => '7',
+				'action'  => $action,
+				'contact' => $contact,
+				'lists'   => $lists,
+				'message' => '',
+				'raw'     => [
+					'form'    => ['id' => '7'],
+					'action'  => $action,
+					'sync'    => 1,
+					'contact' => $contact,
+					'lists'   => $lists,
+					'message' => '',
+				],
+			];
+		};
+
+		$samples = [
+			'form_submitted'       => $build('form_submitted', 'sub'),
+			'contact_subscribed'   => $build('contact_subscribed', 'sub'),
+			'contact_unsubscribed' => $build('contact_unsubscribed', 'unsub'),
+		];
+
+		if (isset($samples[$event])) {
+			return $samples[$event];
+		}
+
+		if (false !== strpos($event, 'unsub')) {
+			return $build($event, 'unsub');
+		}
+
+		return $build('' !== $event ? $event : 'form_submitted', 'sub');
+	}
+
 	public static function execute_node(array $node, array $input): array
 	{
 		$action      = self::resolve_event($node);

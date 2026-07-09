@@ -282,6 +282,44 @@ class Zoom extends IntegrationBase {
 		return $base;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$base = [
+			'zoom_meeting_id' => '89012345678',
+			'zoom_topic'      => 'Weekly Team Standup',
+			'zoom_host_id'    => 'u8Kx3vT2Rn2h9abcDEfghi',
+			'zoom_start_time' => '2026-07-10T10:00:00Z',
+			'zoom_end_time'   => '2026-07-10T10:45:00Z',
+			'zoom_duration'   => 45,
+			'zoom_uuid'       => 'aB1cD2eF3gH4iJ5kL6mN7w==',
+		];
+
+		$participant = array_merge(
+			$base,
+			[
+				'zoom_participant_id'    => '16778240',
+				'zoom_participant_name'  => 'Jane Doe',
+				'zoom_participant_email' => 'jane.doe@example.com',
+				'zoom_join_time'         => '2026-07-10T10:02:15Z',
+			]
+		);
+
+		$samples = [
+			'meeting_started'    => $base,
+			'meeting_ended'      => $base,
+			'participant_joined' => $participant,
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'participant' ) ) {
+			return $participant;
+		}
+
+		return $base;
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$action      = $node['data']['event'] ?? '';
 		$credentials = $node['_connection_credentials'] ?? null;

@@ -269,6 +269,87 @@ class Gamipress extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$user = [
+			'user_id'      => 42,
+			'first_name'   => 'Jane',
+			'last_name'    => 'Doe',
+			'user_login'   => 'janedoe',
+			'user_email'   => 'jane.doe@example.com',
+			'nickname'     => 'jane',
+			'display_name' => 'Jane Doe',
+			'avatar_url'   => 'https://secure.gravatar.com/avatar/0123456789abcdef?s=96&d=mm&r=g',
+			'user_roles'   => [ 'subscriber' ],
+			'completed_at' => current_time( 'mysql' ),
+		];
+
+		$rank = [
+			'success'   => true,
+			'user'      => $user,
+			'rank_type' => 'rank_type',
+			'rank'      => 'gold-member',
+			'rank_id'   => 310,
+		];
+
+		$points = [
+			'success'        => true,
+			'user'           => $user,
+			'new_points'     => 50,
+			'total_points'   => 1250,
+			'points_type'    => 'credits',
+			'admin_id'       => 0,
+			'achievement_id' => 204,
+		];
+
+		$achievement = [
+			'success'          => true,
+			'user'             => $user,
+			'achievement_type' => 'badge',
+			'achievement'      => 'first-purchase',
+			'achievement_id'   => 204,
+		];
+
+		$samples = [
+			'user_earns_rank'   => $rank,
+			'user_earns_points' => $points,
+
+			'user_earns_specific_achievement_type' => $achievement,
+			'user_gains_achievement'               => $achievement,
+
+			'user_achievement_revoked' => [
+				'success'        => true,
+				'user'           => $user,
+				'post_id'        => 204,
+				'post_title'     => 'First Purchase',
+				'post_type'      => 'badge',
+				'post_author_id' => 1,
+				'post_content'   => 'Awarded for completing your first purchase.',
+				'post_parent_id' => 0,
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( 0 === strpos( $event, 'user_earns_rank' ) ) {
+			return $rank;
+		}
+
+		if ( 0 === strpos( $event, 'user_earns_points' ) ) {
+			return $points;
+		}
+
+		if ( false !== strpos( $event, 'achievement' ) ) {
+			return $achievement;
+		}
+
+		return [
+			'success' => true,
+			'user'    => $user,
+		];
+	}
+
 	public static function get_dynamic_queries(): array {
 		return [
 			'rank_type_query'        => [ self::class, 'query_rank_type' ],

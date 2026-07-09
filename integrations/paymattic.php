@@ -46,6 +46,105 @@ class Paymattic extends IntegrationBase {
 		];
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$submission = [
+			'id'               => 55,
+			'form_id'          => 12,
+			'user_id'          => 3,
+			'customer_name'    => 'John Carter',
+			'customer_email'   => 'john.carter@example.com',
+			'payment_total'    => 4900,
+			'payment_status'   => 'paid',
+			'currency'         => 'USD',
+			'payment_mode'     => 'live',
+			'payment_method'   => 'stripe',
+			'transaction_hash' => 'txn_1Pb2c3D4e5F6g7H8',
+			'created_at'       => '2026-07-09 14:30:00',
+			'updated_at'       => '2026-07-09 14:31:12',
+		];
+
+		$transaction = [
+			'id'             => 88,
+			'form_id'        => 12,
+			'submission_id'  => 55,
+			'transaction_id' => 'ch_3Pb2c3D4e5F6g7H8',
+			'payment_total'  => 4900,
+			'status'         => 'paid',
+			'currency'       => 'USD',
+			'payment_method' => 'stripe',
+			'created_at'     => '2026-07-09 14:31:00',
+		];
+
+		$refund = [
+			'submission_id' => 55,
+			'form_id'       => 12,
+			'refund_amount' => 4900,
+			'currency'      => 'USD',
+			'reason'        => 'Customer requested a refund',
+			'refund_id'     => 're_3Pb2c3D4e5F6g7H8',
+			'created_at'    => '2026-07-09 15:00:00',
+		];
+
+		$samples = [
+			'form_submitted'         => [
+				'event'         => 'form_submitted',
+				'submission_id' => 55,
+				'form_id'       => 12,
+				'submission'    => $submission,
+			],
+			'payment_success'        => [
+				'event'         => 'payment_success',
+				'submission_id' => 55,
+				'form_id'       => 12,
+				'submission'    => $submission,
+				'transaction'   => $transaction,
+				'update_data'   => [ 'payment_status' => 'paid' ],
+			],
+			'payment_failed'         => [
+				'event'         => 'payment_failed',
+				'submission_id' => 55,
+				'form_id'       => 12,
+				'status'        => 'failed',
+				'submission'    => array_merge( $submission, [ 'payment_status' => 'failed' ] ),
+				'transaction'   => array_merge( $transaction, [ 'status' => 'failed' ] ),
+				'raw_args'      => [ 55, 'failed' ],
+			],
+			'payment_status_changed' => [
+				'event'          => 'payment_status_changed',
+				'submission_id'  => 55,
+				'form_id'        => 12,
+				'payment_status' => 'refunded',
+				'submission'     => array_merge( $submission, [ 'payment_status' => 'refunded' ] ),
+			],
+			'payment_refunded'       => [
+				'event'         => 'payment_refunded',
+				'submission_id' => 55,
+				'form_id'       => 12,
+				'refund'        => $refund,
+				'submission'    => array_merge( $submission, [ 'payment_status' => 'refunded' ] ),
+				'charge'        => $transaction,
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( 0 === strpos( $event, 'form' ) ) {
+			return $samples['form_submitted'];
+		}
+		if ( 0 === strpos( $event, 'payment' ) ) {
+			return $samples['payment_success'];
+		}
+
+		return [
+			'event'         => $event,
+			'submission_id' => 55,
+			'form_id'       => 12,
+			'submission'    => $submission,
+		];
+	}
+
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( ! in_array( $trigger, [ 'form_submitted', 'payment_success', 'payment_failed', 'payment_status_changed', 'payment_refunded' ], true ) ) {
 			return [];

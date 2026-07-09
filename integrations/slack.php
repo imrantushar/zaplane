@@ -51,6 +51,109 @@ class Slack extends IntegrationBase {
 		];
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$user_id    = 'U012AB3CD';
+		$channel_id = 'C012AB3CD';
+
+		$meta = [
+			'team_id'    => 'T012AB3CD',
+			'api_app_id' => 'A012XYZ99',
+		];
+
+		$message = array_merge(
+			[
+				'type'         => 'message',
+				'channel'      => $channel_id,
+				'channel_type' => 'channel',
+				'user'         => $user_id,
+				'text'         => 'Hello team, the deploy is complete!',
+				'ts'           => '1720535405.001200',
+				'event_ts'     => '1720535405.001200',
+			],
+			$meta
+		);
+
+		$app_mention = array_merge(
+			[
+				'type'     => 'app_mention',
+				'user'     => $user_id,
+				'text'     => '<@U0LAN0Z01> can you run the report?',
+				'ts'       => '1720535410.002200',
+				'channel'  => $channel_id,
+				'event_ts' => '1720535410.002200',
+			],
+			$meta
+		);
+
+		$reaction_added = array_merge(
+			[
+				'type'      => 'reaction_added',
+				'user'      => $user_id,
+				'reaction'  => 'thumbsup',
+				'item_user' => 'U024BE7LH',
+				'item'      => [
+					'type'    => 'message',
+					'channel' => $channel_id,
+					'ts'      => '1720535405.001200',
+				],
+				'event_ts'  => '1720535420.003200',
+			],
+			$meta
+		);
+
+		$channel_created = array_merge(
+			[
+				'type'    => 'channel_created',
+				'channel' => [
+					'id'      => 'C0987NEW1',
+					'name'    => 'project-launch',
+					'created' => 1720535430,
+					'creator' => $user_id,
+				],
+			],
+			$meta
+		);
+
+		$file_shared = array_merge(
+			[
+				'type'       => 'file_shared',
+				'file_id'    => 'F012AB3CD',
+				'user_id'    => $user_id,
+				'file'       => [ 'id' => 'F012AB3CD' ],
+				'channel_id' => $channel_id,
+				'event_ts'   => '1720535440.004200',
+			],
+			$meta
+		);
+
+		$samples = [
+			'message_received' => $message,
+			'app_mention'      => $app_mention,
+			'reaction_added'   => $reaction_added,
+			'channel_created'  => $channel_created,
+			'file_shared'      => $file_shared,
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( 0 === strpos( $event, 'message' ) ) {
+			return $message;
+		}
+		if ( 0 === strpos( $event, 'reaction' ) ) {
+			return $reaction_added;
+		}
+		if ( 0 === strpos( $event, 'channel' ) ) {
+			return $channel_created;
+		}
+		if ( 0 === strpos( $event, 'file' ) ) {
+			return $file_shared;
+		}
+
+		return $message;
+	}
+
 	public static function get_actions(): array {
 		return [
 			'send_message'      => [ 'label' => 'Send Message' ],

@@ -843,7 +843,65 @@ class Storeengine extends IntegrationBase {
 			'access_group_deleted'        => [ 'group_id' => 12 ],
 		];
 
-		return $samples[ $trigger ] ?? [];
+		if ( isset( $samples[ $trigger ] ) ) {
+			return $samples[ $trigger ];
+		}
+
+		// Category fallback so every trigger exposes fields in the "@" picker even
+		// before a capture, matching the shape resolve_trigger actually emits.
+		if ( 0 === strpos( $trigger, 'order_status_' ) ) {
+			return array_merge( $order_sample, [ 'old_status' => 'processing', 'new_status' => 'completed' ] );
+		}
+		if ( 0 === strpos( $trigger, 'order' ) || 0 === strpos( $trigger, 'checkout' )
+			|| in_array( $trigger, [ 'product_purchased', 'add_to_cart', 'payment_refunded' ], true ) ) {
+			return $order_sample;
+		}
+		if ( 0 === strpos( $trigger, 'product' ) ) {
+			return [
+				'product_id'     => 12,
+				'name'           => 'Pro Plan',
+				'price'          => '49.00',
+				'stock_quantity' => 20,
+				'stock_status'   => 'instock',
+			];
+		}
+		if ( 0 === strpos( $trigger, 'subscription' ) ) {
+			return [
+				'subscription_id' => 9,
+				'status'          => 'active',
+				'old_status'      => 'pending',
+				'new_status'      => 'active',
+				'customer_id'     => 5,
+				'total'           => '49.00',
+			];
+		}
+		if ( 0 === strpos( $trigger, 'customer' ) ) {
+			return [
+				'customer_id' => 5,
+				'email'       => 'john@example.com',
+				'first_name'  => 'John',
+				'last_name'   => 'Doe',
+			];
+		}
+		if ( 0 === strpos( $trigger, 'vendor' ) ) {
+			return [
+				'vendor_id'   => 3,
+				'store_name'  => 'Acme Store',
+				'status'      => 'active',
+				'commission'  => '5.00',
+				'amount'      => '25.00',
+			];
+		}
+		if ( 0 === strpos( $trigger, 'affiliate' ) ) {
+			return [
+				'affiliate_id' => 7,
+				'status'       => 'active',
+				'commission'   => '5.00',
+				'amount'       => '25.00',
+			];
+		}
+
+		return [];
 	}
 
 	public static function get_actions(): array {

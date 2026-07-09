@@ -134,6 +134,73 @@ class Suremembers extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$user = [
+			'user_id'      => 42,
+			'first_name'   => 'Jane',
+			'last_name'    => 'Doe',
+			'user_login'   => 'janedoe',
+			'user_email'   => 'jane.doe@example.com',
+			'nickname'     => 'jane',
+			'display_name' => 'Jane Doe',
+			'avatar_url'   => 'https://secure.gravatar.com/avatar/0123456789abcdef?s=96&d=mm&r=g',
+			'user_roles'   => [ 'subscriber' ],
+			'completed_at' => current_time( 'mysql' ),
+		];
+
+		$group = [
+			'ID'                    => 310,
+			'post_author'           => 1,
+			'post_date'             => '2026-01-10 09:30:00',
+			'post_date_gmt'         => '2026-01-10 03:30:00',
+			'post_content'          => '',
+			'post_title'            => 'Premium Membership',
+			'post_excerpt'          => '',
+			'post_status'           => 'publish',
+			'comment_status'        => 'closed',
+			'ping_status'           => 'closed',
+			'post_password'         => '',
+			'post_name'             => 'premium-membership',
+			'to_ping'               => '',
+			'pinged'                => '',
+			'post_modified'         => '2026-07-09 08:00:00',
+			'post_modified_gmt'     => '2026-07-09 02:00:00',
+			'post_content_filtered' => '',
+			'post_parent'           => 0,
+			'guid'                  => 'https://example.com/?post_type=suremembers_access&p=310',
+			'menu_order'            => 0,
+			'post_type'             => 'suremembers_access',
+			'post_mime_type'        => '',
+			'comment_count'         => 0,
+			'filter'                => 'raw',
+		];
+
+		$member_change = [
+			'success' => true,
+			'user'    => $user,
+			'group'   => $group,
+		];
+
+		$samples = [
+			'access_group'  => $member_change,
+			'remove_group'  => $member_change,
+			'updated_group' => [
+				'success' => true,
+				'data'    => $group,
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'updated' ) ) {
+			return $samples['updated_group'];
+		}
+
+		return $member_change;
+	}
+
 	public static function get_actions(): array {
 		return [
 			'add_user'    => [ 'label' => 'Add User To Access Group' ],

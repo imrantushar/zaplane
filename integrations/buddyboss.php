@@ -372,6 +372,145 @@ class Buddyboss extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+
+		// Shared entity shapes mirroring resolve_user_payload() and the
+		// object_to_array() output for BP groups / messages / friendships.
+		$user = [
+			'user_id'      => '42',
+			'first_name'   => 'Jane',
+			'last_name'    => 'Doe',
+			'user_login'   => 'janedoe',
+			'user_email'   => 'jane.doe@example.com',
+			'nickname'     => 'jane',
+			'avatar_url'   => 'https://example.com/wp-content/uploads/avatars/42/avatar.jpg',
+			'display_name' => 'Jane Doe',
+			'user_roles'   => [ 'subscriber' ],
+		];
+
+		$group = [
+			'id'                 => 7,
+			'creator_id'         => 42,
+			'name'               => 'Design Team',
+			'slug'               => 'design-team',
+			'description'        => 'A group for the design team.',
+			'status'             => 'public',
+			'parent_id'          => 0,
+			'enable_forum'       => 1,
+			'date_created'       => '2026-07-09 10:00:00',
+			'total_member_count' => 12,
+			'type'               => 'community',
+			'cover_url'          => 'https://example.com/wp-content/uploads/group-cover.jpg',
+			'avatar_url'         => 'https://example.com/wp-content/uploads/group-avatar.jpg',
+			'creator_data'       => $user,
+		];
+
+		$friendship = [
+			'id'                => 15,
+			'initiator_user_id' => 42,
+			'friend_user_id'    => 43,
+			'is_confirmed'      => 1,
+			'is_limited'        => 0,
+			'date_created'      => '2026-07-09 10:00:00',
+		];
+
+		$message = [
+			'id'        => 88,
+			'thread_id' => 12,
+			'sender_id' => 42,
+			'subject'   => 'Welcome aboard',
+			'message'   => 'This is a private message.',
+			'date_sent' => '2026-07-09 10:00:00',
+		];
+
+		$user_and_group = [
+			'user'  => $user,
+			'group' => $group,
+		];
+
+		$friend_request = [
+			'friendship_id' => 15,
+			'initiator'     => $user,
+			'friend'        => $user,
+		];
+
+		// Per-event samples matching the exact keys resolve_trigger() returns.
+		$samples = [
+			'account_activated' => $user,
+
+			'follower_gained' => [
+				'follower' => $user,
+				'leader'   => $user,
+			],
+
+			'sent_friend_request' => $friend_request,
+
+			'accepted_friend_request' => array_merge(
+				$friend_request,
+				[ 'friendship' => $friendship ]
+			),
+
+			'create_groups' => $group,
+
+			'received_private_message' => [
+				'message'    => $message,
+				'sender'     => $user,
+				'recipients' => [ $user ],
+			],
+
+			'profile_type_change' => array_merge(
+				$user,
+				[
+					'member_type' => 'moderator',
+					'append'      => false,
+				]
+			),
+
+			'updated_profile' => [
+				'user'             => $user,
+				'posted_field_ids' => [ 1, 2 ],
+				'errors'           => [],
+				'old_values'       => [ 1 => 'Old Name' ],
+				'new_values'       => [ 1 => 'Jane Doe' ],
+				'posted_fields'    => [ 'Name' => 'Jane Doe' ],
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		// Prefix / category fallbacks for any trigger not listed above.
+		if (
+			false !== strpos( $event, 'group' )
+			|| 0 === strpos( $event, 'access_requested' )
+		) {
+			return $user_and_group;
+		}
+
+		if ( false !== strpos( $event, 'friend' ) ) {
+			return $friend_request;
+		}
+
+		if ( false !== strpos( $event, 'message' ) ) {
+			return [
+				'message' => $message,
+				'sender'  => $user,
+			];
+		}
+
+		if (
+			false !== strpos( $event, 'profile' )
+			|| false !== strpos( $event, 'follow' )
+			|| false !== strpos( $event, 'account' )
+		) {
+			return $user;
+		}
+
+		// Non-empty catch-all so no trigger ever returns an empty picker.
+		return $user;
+	}
+
 	public static function get_actions(): array {
 		return [
 			'create_activity_post'       => [ 'label' => 'Create Activity Post' ],

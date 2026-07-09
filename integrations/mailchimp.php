@@ -216,6 +216,141 @@ class Mailchimp extends IntegrationBase
         return $payload;
     }
 
+    public static function get_trigger_sample_output(string $event): array
+    {
+        $merges = [
+            'EMAIL' => 'jane@example.com',
+            'FNAME' => 'Jane',
+            'LNAME' => 'Doe',
+        ];
+
+        $subscriber_data = [
+            'id'         => 'abc123def456',
+            'list_id'    => 'a6b5da1054',
+            'email'      => 'jane@example.com',
+            'email_type' => 'html',
+            'ip_opt'     => '203.0.113.10',
+            'ip_signup'  => '203.0.113.10',
+            'merges'     => $merges,
+        ];
+
+        $base = [
+            'type'                  => 'subscribe',
+            'fired_at'              => '2026-07-09 10:15:00',
+            'data'                  => $subscriber_data,
+            'mailchimp_event'       => 'subscribe',
+            'mailchimp_event_name'  => 'subscribed',
+            'mailchimp_member_id'   => 'abc123def456',
+            'mailchimp_list_id'     => 'a6b5da1054',
+            'mailchimp_email'       => 'jane@example.com',
+            'mailchimp_old_email'   => '',
+            'mailchimp_new_email'   => 'jane@example.com',
+            'mailchimp_email_type'  => 'html',
+            'mailchimp_reason'      => '',
+            'mailchimp_action'      => '',
+            'mailchimp_campaign_id' => '',
+            'mailchimp_merges'      => $merges,
+        ];
+
+        $samples = [
+            'subscribed'      => $base,
+            'unsubscribed'    => array_merge(
+                $base,
+                [
+                    'type'                 => 'unsubscribe',
+                    'mailchimp_event'      => 'unsubscribe',
+                    'mailchimp_event_name' => 'unsubscribed',
+                    'mailchimp_reason'     => 'manual',
+                    'mailchimp_action'     => 'unsub',
+                    'data'                 => array_merge(
+                        $subscriber_data,
+                        [
+                            'action' => 'unsub',
+                            'reason' => 'manual',
+                        ]
+                    ),
+                ]
+            ),
+            'profile_updated' => array_merge(
+                $base,
+                [
+                    'type'                 => 'profile',
+                    'mailchimp_event'      => 'profile',
+                    'mailchimp_event_name' => 'profile_updated',
+                ]
+            ),
+            'cleaned'         => array_merge(
+                $base,
+                [
+                    'type'                 => 'cleaned',
+                    'mailchimp_event'      => 'cleaned',
+                    'mailchimp_event_name' => 'cleaned',
+                    'mailchimp_reason'     => 'hard',
+                    'data'                 => [
+                        'list_id' => 'a6b5da1054',
+                        'email'   => 'jane@example.com',
+                        'reason'  => 'hard',
+                    ],
+                ]
+            ),
+            'email_changed'   => array_merge(
+                $base,
+                [
+                    'type'                 => 'upemail',
+                    'mailchimp_event'      => 'upemail',
+                    'mailchimp_event_name' => 'email_changed',
+                    'mailchimp_member_id'  => 'newid789',
+                    'mailchimp_old_email'  => 'jane@example.com',
+                    'mailchimp_new_email'  => 'jane.new@example.com',
+                    'mailchimp_email'      => '',
+                    'mailchimp_merges'     => [],
+                    'data'                 => [
+                        'list_id'   => 'a6b5da1054',
+                        'new_id'    => 'newid789',
+                        'new_email' => 'jane.new@example.com',
+                        'old_email' => 'jane@example.com',
+                    ],
+                ]
+            ),
+            'campaign_sent'   => array_merge(
+                $base,
+                [
+                    'type'                  => 'campaign',
+                    'mailchimp_event'       => 'campaign',
+                    'mailchimp_event_name'  => 'campaign_sent',
+                    'mailchimp_member_id'   => '',
+                    'mailchimp_email'       => '',
+                    'mailchimp_new_email'   => '',
+                    'mailchimp_email_type'  => '',
+                    'mailchimp_merges'      => [],
+                    'mailchimp_campaign_id' => 'campaign_abc123',
+                    'data'                  => [
+                        'id'          => 'campaign_abc123',
+                        'campaign_id' => 'campaign_abc123',
+                        'subject'     => 'Our July Newsletter',
+                        'status'      => 'sent',
+                        'reason'      => 'completed',
+                        'list_id'     => 'a6b5da1054',
+                    ],
+                ]
+            ),
+        ];
+
+        if (isset($samples[ $event ])) {
+            return $samples[ $event ];
+        }
+
+        if (false !== strpos($event, 'campaign')) {
+            return $samples['campaign_sent'];
+        }
+
+        if (false !== strpos($event, 'email')) {
+            return $samples['email_changed'];
+        }
+
+        return $base;
+    }
+
     public static function query_lists($q): array
     {
         $q = is_array($q) ? $q : [];

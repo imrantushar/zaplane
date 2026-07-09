@@ -79,6 +79,40 @@ class Suremail extends IntegrationBase
         ];
     }
 
+    public static function get_trigger_sample_output(string $event): array
+    {
+        $mailData = [
+            'to'          => 'jane.doe@example.com',
+            'subject'     => 'Your receipt from Acme',
+            'message'     => '<p>Thanks for your order!</p>',
+            'headers'     => ['Content-Type: text/html; charset=UTF-8'],
+            'attachments' => ['/var/www/uploads/invoice-1042.pdf'],
+        ];
+
+        $build = static function (string $event) use ($mailData): array {
+            return [
+                'mail_data'   => $mailData,
+                'event'       => $event,
+                'to'          => $mailData['to'],
+                'subject'     => $mailData['subject'],
+                'message'     => $mailData['message'],
+                'headers'     => $mailData['headers'],
+                'attachments' => $mailData['attachments'],
+            ];
+        };
+
+        $samples = [
+            'email_sent_successfully' => $build('email_sent_successfully'),
+            'email_sent_failed'       => $build('email_sent_failed'),
+        ];
+
+        if (isset($samples[$event])) {
+            return $samples[$event];
+        }
+
+        return $build('' !== $event ? $event : 'email_sent_successfully');
+    }
+
     public static function get_actions(): array
     {
         return [];

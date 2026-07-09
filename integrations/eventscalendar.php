@@ -39,6 +39,90 @@ class Eventscalendar extends IntegrationBase {
         ];
     }
 
+    public static function get_trigger_sample_output( string $event ): array {
+        $event_data = [
+            'event_id'    => 410,
+            'event_title' => 'Annual Tech Conference 2026',
+            'event_url'   => 'https://example.com/events/annual-tech-conference-2026/',
+        ];
+
+        $attendee = [
+            'attendee_id'   => 720,
+            'attendee_name' => 'Sarah Johnson',
+            'user_id'       => 15,
+            'user_email'    => 'sarah.johnson@example.com',
+            'display_name'  => 'Sarah Johnson',
+        ];
+
+        $venue = [
+            'venue_id'   => 88,
+            'venue_name' => 'Downtown Convention Center',
+            'address'    => '123 Main Street, Springfield',
+        ];
+
+        $samples = [
+            'attendEvent'          => [
+                'attendee_id'   => $attendee['attendee_id'],
+                'attendee_name' => $attendee['attendee_name'],
+                'event_id'      => $event_data['event_id'],
+                'event_title'   => $event_data['event_title'],
+                'event_url'     => $event_data['event_url'],
+                'user_id'       => $attendee['user_id'],
+                'user_email'    => $attendee['user_email'],
+                'display_name'  => $attendee['display_name'],
+                'checked_in_at' => '2026-07-09 09:15:00',
+            ],
+            'attendeeRegistered'   => [
+                'attendee_id' => $attendee['attendee_id'],
+                'post_id'     => $event_data['event_id'],
+                'order_id'    => 9001,
+                'product_id'  => 512,
+            ],
+            'newAttendee'          => [
+                'product_id' => 512,
+                'order_id'   => 9001,
+                'attendees'  => [
+                    [
+                        'attendee_id' => $attendee['attendee_id'],
+                        'full_name'   => $attendee['attendee_name'],
+                        'email'       => $attendee['user_email'],
+                    ],
+                ],
+            ],
+            'attendeeRegisteredWc' => [
+                'attendee_id'   => $attendee['attendee_id'],
+                'ticket'        => [
+                    'ticket_id' => 512,
+                    'name'      => 'General Admission',
+                    'price'     => 49.00,
+                ],
+                'order'         => [
+                    'order_id' => 9001,
+                    'total'    => 49.00,
+                    'status'   => 'completed',
+                ],
+                'attendee_data' => [
+                    'full_name' => $attendee['attendee_name'],
+                    'email'     => $attendee['user_email'],
+                    'venue'     => $venue,
+                ],
+            ],
+        ];
+
+        if ( isset( $samples[ $event ] ) ) {
+            return $samples[ $event ];
+        }
+
+        if ( 0 === strpos( $event, 'new' ) ) {
+            return $samples['newAttendee'];
+        }
+        if ( 0 === strpos( $event, 'attend' ) ) {
+            return $samples['attendEvent'];
+        }
+
+        return $samples['attendEvent'];
+    }
+
     public static function resolve_trigger(array $node, array $args) {
         switch ($node['event']) {
 

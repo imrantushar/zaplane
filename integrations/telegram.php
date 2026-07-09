@@ -290,6 +290,44 @@ class Telegram extends IntegrationBase {
 		return $base;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$base = [
+			'telegram_message_id'      => 1042,
+			'telegram_text'            => 'Hello from Zaplane!',
+			'telegram_chat_id'         => 987654321,
+			'telegram_chat_type'       => 'private',
+			'telegram_from_id'         => 123456789,
+			'telegram_from_first_name' => 'Jane',
+			'telegram_from_last_name'  => 'Doe',
+			'telegram_from_username'   => 'janedoe',
+			'telegram_date'            => 1782633600,
+		];
+
+		$command = array_merge(
+			$base,
+			[
+				'telegram_text'         => '/start welcome',
+				'telegram_command'      => '/start',
+				'telegram_command_args' => 'welcome',
+			]
+		);
+
+		$samples = [
+			'message_received' => $base,
+			'command_received' => $command,
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'command' ) ) {
+			return $command;
+		}
+
+		return $base;
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$action      = $node['data']['event'] ?? '';
 		$credentials = $node['_connection_credentials'] ?? null;

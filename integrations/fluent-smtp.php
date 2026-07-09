@@ -145,6 +145,75 @@ class FluentSmtp extends IntegrationBase {
 		return self::{$resolver}( $args, $config );
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$recipient_emails = [ 'jane.doe@example.com' ];
+		$subject          = 'Your receipt from Acme';
+		$message          = '<p>Thanks for your order!</p>';
+		$headers          = [ 'Content-Type: text/html; charset=UTF-8', 'From: Acme <no-reply@acme.example.com>' ];
+		$attachments      = [ '/var/www/uploads/invoice-1042.pdf' ];
+
+		$payload = [
+			'recipient_emails' => $recipient_emails,
+			'subject'          => $subject,
+			'message'          => $message,
+			'headers'          => $headers,
+			'attachments'      => $attachments,
+			'mail'             => [
+				'to'          => $recipient_emails,
+				'subject'     => $subject,
+				'message'     => $message,
+				'headers'     => $headers,
+				'attachments' => $attachments,
+			],
+		];
+
+		$samples = [
+			'email_sent' => array_merge(
+				[
+					'success' => true,
+					'status'  => 'sent',
+				],
+				$payload
+			),
+			'email_failed' => array_merge(
+				[
+					'success'       => true,
+					'status'        => 'failed',
+					'error_code'    => 'wp_mail_failed',
+					'error_message' => 'The email could not be sent. SMTP connect() failed.',
+				],
+				$payload
+			),
+			'delivery_failed_no_fallback' => array_merge(
+				[
+					'success'  => true,
+					'status'   => 'failed',
+					'log_id'   => 4521,
+					'provider' => 'smtp',
+				],
+				array_merge(
+					$payload,
+					[
+						'response' => [
+							'code'    => 535,
+							'message' => 'Authentication failed',
+						],
+					]
+				)
+			),
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'fail' ) ) {
+			return $samples['email_failed'];
+		}
+
+		return $samples['email_sent'];
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$event  = self::get_node_event( $node );
 		$config = self::get_node_config( $node );

@@ -101,6 +101,85 @@ class WooBookings extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$booking = [
+			'booking_id'  => 128,
+			'status'      => 'confirmed',
+			'order_id'    => 3417,
+			'product_id'  => 55,
+			'customer_id' => 12,
+			'start_date'  => '2026-07-15 10:00:00',
+			'end_date'    => '2026-07-15 11:00:00',
+			'all_day'     => false,
+		];
+
+		$order = [
+			'order_id'       => 3417,
+			'order_status'   => 'processing',
+			'order_total'    => '75.00',
+			'currency'       => 'USD',
+			'payment_method' => 'stripe',
+		];
+
+		$product = [
+			'product_id'    => 55,
+			'product_name'  => 'Guided City Tour',
+			'resource_id'   => 9,
+			'resource_name' => 'Tour Guide A',
+		];
+
+		$customer = [
+			'customer_id'    => 12,
+			'customer_email' => 'jane.doe@example.com',
+			'customer_name'  => 'Jane Doe',
+		];
+
+		$context = array_merge( $product, $customer, [ 'order' => $order ] );
+
+		$samples = [
+			'booking_created' => array_merge(
+				$booking,
+				[ 'event' => 'booking_created', 'order_id' => 3417 ],
+				$context
+			),
+			'booking_confirmed' => array_merge(
+				$booking,
+				[ 'event' => 'booking_confirmed', 'order_id' => 3417 ],
+				$context
+			),
+			'booking_paid' => array_merge(
+				$booking,
+				[ 'event' => 'booking_paid', 'order_id' => 3417 ],
+				$context
+			),
+			'booking_cancelled' => array_merge(
+				$booking,
+				[ 'event' => 'booking_cancelled', 'status' => 'cancelled', 'order_id' => 3417 ],
+				$context
+			),
+			'booking_unpaid' => array_merge(
+				$booking,
+				[ 'event' => 'booking_unpaid', 'status' => 'unpaid', 'order_id' => 3417 ],
+				$context
+			),
+			'booking_status_changed' => array_merge(
+				$booking,
+				[ 'new_status' => 'confirmed', 'old_status' => 'pending-confirmation' ],
+				$context
+			),
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( 0 === strpos( $event, 'booking_' ) ) {
+			return array_merge( $booking, [ 'event' => $event ], $context );
+		}
+
+		return array_merge( $booking, $context );
+	}
+
 	public static function get_actions(): array {
 		return [
 			'get_bookings_all' => [ 'label' => 'Get Bookings (All)' ],

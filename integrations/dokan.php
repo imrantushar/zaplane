@@ -124,6 +124,294 @@ class Dokan extends IntegrationBase
 	}
 
 	// -------------------------------------------------------------------------
+	// Sample output (feeds the "@" variable picker before any test capture)
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Return a non-empty sample payload for every Dokan trigger.
+	 *
+	 * Keys mirror what resolve_trigger() emits for the same event. Explicit
+	 * samples are provided per trigger; anything not listed falls back to a
+	 * category sample keyed off the event-name prefix so newly added triggers
+	 * still expose fields in the "@" picker.
+	 */
+	public static function get_trigger_sample_output( string $trigger ): array
+	{
+		// Shared base arrays (mirror the payload builders).
+		$vendor_sample = [
+			'vendor_id'    => 3,
+			'user_id'      => 3,
+			'store_name'   => 'Acme Store',
+			'store_url'    => 'https://example.com/store/acme-store',
+			'display_name' => 'Jane Vendor',
+			'user_login'   => 'acme',
+			'user_email'   => 'vendor@example.com',
+			'store_phone'  => '+1-555-0100',
+			'is_enabled'   => true,
+			'store_info'   => [
+				'store_name' => 'Acme Store',
+				'phone'      => '+1-555-0100',
+				'address'    => [
+					'street_1' => '123 Main St',
+					'city'     => 'Springfield',
+					'country'  => 'US',
+				],
+			],
+		];
+
+		$product_sample = [
+			'product_id'    => 12,
+			'vendor_id'     => 3,
+			'vendor'        => $vendor_sample,
+			'post_author'   => 3,
+			'post_title'    => 'Sample Product',
+			'post_status'   => 'publish',
+			'post_type'     => 'product',
+			'post_date'     => '2026-07-09 12:00:00',
+			'post_modified' => '2026-07-09 12:00:00',
+		];
+
+		$order_sample = [
+			'order_id'    => 101,
+			'vendor_id'   => 3,
+			'vendor'      => $vendor_sample,
+			'status'      => 'processing',
+			'total'       => 49.00,
+			'currency'    => 'USD',
+			'customer_id' => 5,
+		];
+
+		$withdraw_sample = [
+			'withdraw_id' => 21,
+			'vendor_id'   => 3,
+			'vendor'      => $vendor_sample,
+			'status'      => 'pending',
+			'status_code' => 0,
+			'amount'      => 150.00,
+			'method'      => 'paypal',
+			'date'        => '2026-07-09 12:00:00',
+			'note'        => 'Monthly payout',
+			'details'     => [ 'email' => 'vendor@example.com' ],
+		];
+
+		$refund_sample = [
+			'refund_id'                   => 31,
+			'refund_amount'               => 20.00,
+			'refund_reason'               => 'Item damaged',
+			'refund_date'                 => '2026-07-09 12:00:00',
+			'order_id'                    => 101,
+			'order_status'                => 'processing',
+			'order_currency'              => 'USD',
+			'order_subtotal'              => 49.00,
+			'order_total'                 => 49.00,
+			'order_total_tax'             => 0.00,
+			'order_payment_method_title'  => 'Stripe',
+			'order_transaction_id'        => 'txn_123',
+			'order_total_refunded'        => 20.00,
+			'vendor_id'                   => 3,
+			'vendor_store_name'           => 'Acme Store',
+			'vendor_shop_url'             => 'https://example.com/store/acme-store',
+			'vendor_first_name'           => 'Jane',
+			'vendor_last_name'            => 'Vendor',
+			'vendor_email'                => 'vendor@example.com',
+			'vendor_phone'                => '+1-555-0100',
+			'vendor'                      => $vendor_sample,
+		];
+
+		$event_time = '2026-07-09 12:00:00';
+
+		$samples = [
+			'new_seller_created'          => [
+				'event'          => $trigger,
+				'event_time'     => $event_time,
+				'vendor_id'      => 3,
+				'vendor'         => $vendor_sample,
+				'dokan_settings' => [ 'store_name' => 'Acme Store' ],
+			],
+			'store_profile_saved'         => [
+				'event'          => $trigger,
+				'event_time'     => $event_time,
+				'vendor_id'      => 3,
+				'vendor'         => $vendor_sample,
+				'store_info'     => $vendor_sample['store_info'],
+				'previous_store' => $vendor_sample['store_info'],
+			],
+			'vendor_enabled'              => [
+				'event'      => $trigger,
+				'event_time' => $event_time,
+				'vendor_id'  => 3,
+				'vendor'     => $vendor_sample,
+			],
+			'vendor_disabled'             => [
+				'event'      => $trigger,
+				'event_time' => $event_time,
+				'vendor_id'  => 3,
+				'vendor'     => $vendor_sample,
+			],
+			'vendor_add'                  => [
+				'event'      => $trigger,
+				'event_time' => $event_time,
+				'vendor_id'  => 3,
+				'vendor'     => $vendor_sample,
+				'enabled'    => true,
+				'trusted'    => false,
+				'featured'   => false,
+			],
+			'vendor_update'               => [
+				'event'      => $trigger,
+				'event_time' => $event_time,
+				'vendor_id'  => 3,
+				'vendor'     => $vendor_sample,
+				'enabled'    => true,
+				'trusted'    => false,
+				'featured'   => false,
+			],
+			'vendor_delete'               => [
+				'event'      => $trigger,
+				'event_time' => $event_time,
+				'vendor_id'  => 3,
+				'vendor'     => $vendor_sample,
+			],
+			'new_product_added'           => [
+				'event'      => $trigger,
+				'event_time' => $event_time,
+				'product_id' => 12,
+				'vendor_id'  => 3,
+				'product'    => $product_sample,
+			],
+			'product_updated'             => [
+				'event'      => $trigger,
+				'event_time' => $event_time,
+				'product_id' => 12,
+				'vendor_id'  => 3,
+				'product'    => $product_sample,
+			],
+			'product_deleted'             => [
+				'event'      => $trigger,
+				'event_time' => $event_time,
+				'product_id' => 12,
+				'vendor_id'  => 3,
+				'product'    => $product_sample,
+			],
+			'checkout_update_order_meta'  => [
+				'event'      => $trigger,
+				'event_time' => $event_time,
+				'order_id'   => 101,
+				'vendor_id'  => 3,
+				'order'      => $order_sample,
+			],
+			'withdraw_request_created'    => [
+				'event'       => $trigger,
+				'event_time'  => $event_time,
+				'vendor_id'   => 3,
+				'withdraw_id' => 21,
+				'amount'      => 150.00,
+				'method'      => 'paypal',
+				'vendor'      => $vendor_sample,
+				'withdraw'    => $withdraw_sample,
+			],
+			'withdraw_created'            => [
+				'event'       => $trigger,
+				'event_time'  => $event_time,
+				'withdraw_id' => 21,
+				'vendor_id'   => 3,
+				'withdraw'    => $withdraw_sample,
+			],
+			'withdraw_request_pending'    => [
+				'event'       => $trigger,
+				'event_time'  => $event_time,
+				'withdraw_id' => 21,
+				'vendor_id'   => 3,
+				'withdraw'    => $withdraw_sample,
+			],
+			'withdraw_request_approved'   => [
+				'event'       => $trigger,
+				'event_time'  => $event_time,
+				'withdraw_id' => 21,
+				'vendor_id'   => 3,
+				'withdraw'    => array_merge( $withdraw_sample, [ 'status' => 'approved', 'status_code' => 1 ] ),
+			],
+			'withdraw_request_cancelled'  => [
+				'event'       => $trigger,
+				'event_time'  => $event_time,
+				'withdraw_id' => 21,
+				'vendor_id'   => 3,
+				'withdraw'    => array_merge( $withdraw_sample, [ 'status' => 'cancelled', 'status_code' => 2 ] ),
+			],
+			'withdraw_status_updated'     => [
+				'event'           => $trigger,
+				'event_time'      => $event_time,
+				'vendor_id'       => 3,
+				'withdraw_id'     => 21,
+				'withdraw_status' => 'approved',
+				'withdraw'        => array_merge( $withdraw_sample, [ 'status' => 'approved', 'status_code' => 1 ] ),
+			],
+			'refund_request'              => array_merge( [ 'event' => $trigger, 'event_time' => $event_time ], $refund_sample ),
+			'refund_approved'             => array_merge( [ 'event' => $trigger, 'event_time' => $event_time ], $refund_sample ),
+			'refund_cancelled'            => array_merge( [ 'event' => $trigger, 'event_time' => $event_time ], $refund_sample ),
+		];
+
+		if ( isset( $samples[ $trigger ] ) ) {
+			return $samples[ $trigger ];
+		}
+
+		// Category fallbacks by event-name prefix so any newly added trigger
+		// still exposes fields in the "@" picker.
+		if ( 0 === strpos( $trigger, 'vendor_' ) || 0 === strpos( $trigger, 'seller_' )
+			|| 0 === strpos( $trigger, 'store_' ) ) {
+			return [
+				'vendor_id'  => 3,
+				'store_name' => 'Acme Store',
+				'email'      => 'vendor@example.com',
+				'status'     => 'active',
+			];
+		}
+		if ( 0 === strpos( $trigger, 'order_' ) || 0 === strpos( $trigger, 'checkout' ) ) {
+			return [
+				'order_id'       => 101,
+				'total'          => 49.00,
+				'status'         => 'processing',
+				'vendor_id'      => 3,
+				'customer_email' => 'john@example.com',
+			];
+		}
+		if ( 0 === strpos( $trigger, 'product_' ) ) {
+			return [
+				'product_id' => 12,
+				'name'       => 'Sample Product',
+				'price'      => 49.00,
+				'vendor_id'  => 3,
+			];
+		}
+		if ( 0 === strpos( $trigger, 'withdraw_' ) ) {
+			return [
+				'withdraw_id' => 21,
+				'amount'      => 150.00,
+				'status'      => 'pending',
+				'vendor_id'   => 3,
+			];
+		}
+		if ( 0 === strpos( $trigger, 'review_' ) ) {
+			return [
+				'review_id' => 41,
+				'rating'    => 5,
+				'vendor_id' => 3,
+			];
+		}
+		if ( 0 === strpos( $trigger, 'refund_' ) ) {
+			return $refund_sample;
+		}
+
+		// Generic non-empty fallback so no trigger ever returns an empty array.
+		return [
+			'vendor_id'  => 3,
+			'store_name' => 'Acme Store',
+			'email'      => 'vendor@example.com',
+			'status'     => 'active',
+		];
+	}
+
+	// -------------------------------------------------------------------------
 	// Resolve Trigger
 	// -------------------------------------------------------------------------
 

@@ -253,6 +253,79 @@ class Lifter extends IntegrationBase
         return false;
     }
 
+    public static function get_trigger_sample_output(string $event): array
+    {
+        $user = [
+            'user_id'      => 1,
+            'user_email'   => 'john@example.com',
+            'first_name'   => 'John',
+            'last_name'    => 'Doe',
+            'display_name' => 'John Doe',
+        ];
+
+        $course = [
+            'course_id'    => 10,
+            'course_title' => 'Introduction to WordPress',
+            'course_url'   => 'https://example.com/course/introduction-to-wordpress',
+        ];
+
+        $lesson = [
+            'lesson_id'    => 20,
+            'lesson_title' => 'Getting Started',
+        ];
+
+        $quiz = [
+            'quiz_id'    => 30,
+            'quiz_title' => 'Module 1 Quiz',
+        ];
+
+        $samples = [
+            'user_enroll_course' => array_merge(
+                ['success' => true],
+                $course,
+                $user
+            ),
+            'course_complete' => array_merge(
+                ['success' => true],
+                $course,
+                $user
+            ),
+            'lesson_complete' => array_merge(
+                ['success' => true],
+                $lesson,
+                $user
+            ),
+            'lifter_quiz_course_attempt' => array_merge(
+                ['success' => true],
+                $quiz,
+                $user,
+                [
+                    'score'      => 8,
+                    'total'      => 10,
+                    'percentage' => 80.0,
+                ]
+            ),
+        ];
+
+        if (isset($samples[$event])) {
+            return $samples[$event];
+        }
+
+        // Prefix / keyword fallbacks so no trigger returns [].
+        if (strpos($event, 'quiz') !== false) {
+            return $samples['lifter_quiz_course_attempt'];
+        }
+        if (strpos($event, 'lesson') !== false) {
+            return $samples['lesson_complete'];
+        }
+        if (strpos($event, 'course') !== false || strpos($event, 'enroll') !== false) {
+            return $samples['user_enroll_course'];
+        }
+
+        // Catch-all: always non-empty.
+        return array_merge(['success' => true], $course, $user);
+    }
+
     public static function get_dynamic_queries(): array
     {
         return [

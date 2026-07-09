@@ -188,6 +188,228 @@ class Funnelkit extends IntegrationBase {
 		return [];
 	}
 
+	public static function get_trigger_sample_output( string $trigger ): array {
+		$sample_time = '2026-01-05 12:30:00';
+
+		// Base payload every trigger emits via resolve_generic_trigger_payload().
+		$base = [
+			'event'      => $trigger,
+			'event_time' => $sample_time,
+			'args'       => [],
+		];
+
+		// Shape mirrors resolve_step_payload().
+		$step = [
+			'step_id'      => 105,
+			'funnel_id'    => 21,
+			'step_type'    => 'wc_checkout',
+			'step_title'   => 'Checkout',
+			'step_status'  => 'publish',
+			'step_url'     => 'https://example.com/checkout',
+			'next_step_id' => 106,
+			'created_at'   => $sample_time,
+			'updated_at'   => $sample_time,
+		];
+
+		// Shape mirrors resolve_funnel_payload().
+		$funnel = [
+			'funnel_id'          => 21,
+			'funnel_title'       => 'Black Friday Funnel',
+			'funnel_description' => 'High-converting sales funnel',
+			'funnel_status'      => 'live',
+			'total_steps'        => 3,
+			'steps'              => [ $step ],
+			'created_at'         => $sample_time,
+			'updated_at'         => $sample_time,
+		];
+
+		$samples = [
+			'woofunnels_loaded' => array_merge( $base, [ 'path' => '/plugins/funnelkit' ] ),
+
+			'funnel_created'    => array_merge(
+				$base,
+				[
+					'funnel_id'   => 21,
+					'funnel'      => $funnel,
+					'steps'       => [ $step ],
+					'total_steps' => 1,
+				]
+			),
+
+			'duplicate_funnel'  => array_merge(
+				$base,
+				[
+					'new_funnel_id'    => 22,
+					'source_funnel_id' => 21,
+					'new_funnel'       => array_merge( $funnel, [ 'funnel_id' => 22, 'funnel_title' => 'Black Friday Funnel (Copy)' ] ),
+					'source_funnel'    => $funnel,
+				]
+			),
+
+			'funnel_imported'   => array_merge(
+				$base,
+				[
+					'funnel_id'      => 21,
+					'funnel'         => $funnel,
+					'funnel_changes' => [ 'name' => 'Black Friday Funnel' ],
+				]
+			),
+
+			'funnel_updated'    => array_merge(
+				$base,
+				[
+					'funnel_id'      => 21,
+					'funnel'         => $funnel,
+					'funnel_changes' => [ 'name' => 'Black Friday Funnel' ],
+				]
+			),
+
+			'step_duplicated'   => array_merge(
+				$base,
+				[
+					'step_id'   => 105,
+					'funnel_id' => 21,
+					'step'      => $step,
+					'funnel'    => $funnel,
+				]
+			),
+
+			'step_viewed'       => array_merge(
+				$base,
+				[
+					'step_id'      => 105,
+					'funnel_id'    => 21,
+					'step'         => $step,
+					'funnel'       => $funnel,
+					'step_context' => [ 'contact_id' => 9, 'device' => 'desktop' ],
+				]
+			),
+
+			'step_converted'    => array_merge(
+				$base,
+				[
+					'step_id'      => 105,
+					'funnel_id'    => 21,
+					'step'         => $step,
+					'funnel'       => $funnel,
+					'step_context' => [ 'contact_id' => 9, 'order_id' => 501 ],
+				]
+			),
+
+			'funnel_ended'      => array_merge(
+				$base,
+				[
+					'step_id'      => 105,
+					'funnel_id'    => 21,
+					'current_step' => $step,
+					'step'         => $step,
+					'funnel'       => $funnel,
+				]
+			),
+
+			'ty_funnel_ended'   => array_merge(
+				$base,
+				[
+					'funnel_id' => 21,
+					'funnel'    => $funnel,
+					'order_id'  => 501,
+				]
+			),
+
+			'import_completed'  => array_merge(
+				$base,
+				[
+					'module_id' => 21,
+					'step'      => $step,
+					'builder'   => 'gutenberg',
+					'slug'      => 'sales-page',
+					'funnel_id' => 21,
+					'funnel'    => $funnel,
+				]
+			),
+
+			'template_import_remote' => array_merge(
+				$base,
+				[
+					'module_id' => 21,
+					'builder'   => 'gutenberg',
+					'slug'      => 'sales-page',
+					'step'      => $step,
+					'funnel_id' => 21,
+					'funnel'    => $funnel,
+				]
+			),
+		];
+
+		if ( isset( $samples[ $trigger ] ) ) {
+			return $samples[ $trigger ];
+		}
+
+		// Category fallbacks by event-name prefix so every trigger still exposes
+		// fields in the "@" picker, matching the shape resolve_trigger emits.
+		if ( 0 === strpos( $trigger, 'contact' ) ) {
+			return array_merge(
+				$base,
+				[
+					'contact_id' => 9,
+					'email'      => 'john@example.com',
+					'first_name' => 'John',
+					'last_name'  => 'Doe',
+					'tags'       => [ 'lead' ],
+				]
+			);
+		}
+
+		if ( 0 === strpos( $trigger, 'order' ) ) {
+			return array_merge(
+				$base,
+				[
+					'order_id'       => 501,
+					'total'          => '49.00',
+					'status'         => 'completed',
+					'customer_email' => 'john@example.com',
+				]
+			);
+		}
+
+		if ( 0 === strpos( $trigger, 'optin' ) ) {
+			return array_merge(
+				$base,
+				[
+					'optin_id'   => 105,
+					'funnel_id'  => 21,
+					'optin_name' => 'Lead Magnet Optin',
+					'funnel'     => $funnel,
+				]
+			);
+		}
+
+		if ( 0 === strpos( $trigger, 'step' ) ) {
+			return array_merge(
+				$base,
+				[
+					'step_id'   => 105,
+					'funnel_id' => 21,
+					'step'      => $step,
+					'funnel'    => $funnel,
+				]
+			);
+		}
+
+		if ( 0 === strpos( $trigger, 'funnel' ) || 0 === strpos( $trigger, 'ty_funnel' ) || 0 === strpos( $trigger, 'duplicate_funnel' ) ) {
+			return array_merge(
+				$base,
+				[
+					'funnel_id' => 21,
+					'funnel'    => $funnel,
+				]
+			);
+		}
+
+		// Lifecycle / container / template hooks emit only the generic base payload.
+		return $base;
+	}
+
 	public static function resolve_trigger( array $node, array $args ) {
 		if ( ! self::is_funnelkit_available() ) {
 			return false;
