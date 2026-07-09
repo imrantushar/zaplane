@@ -4,8 +4,33 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy, FaPlus } from "react-icons/fa";
 import FloatingEdge from "../floatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
-import { formatLabel } from "@ZAPUtils/helper";
+import { formatLabel, integrations } from "@ZAPUtils/helper";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
+
+const addPortBtnStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 16,
+  height: 16,
+  borderRadius: "50%",
+  border: "1px solid #9CA3AF",
+  background: "#fff",
+  color: "#6B7280",
+  cursor: "pointer",
+  padding: 0,
+  pointerEvents: "auto",
+  flexShrink: 0,
+};
+
+// Ports (output branches) declared by the node's action in the manifest, e.g.
+// router → path_1..fallback, condition → true/false, iterator → loop/done.
+const getNodePorts = (data) => {
+  const integ = integrations?.apps?.[data?.app] || integrations?.tools?.[data?.app];
+  const outputs = integ?.actions?.[data?.event]?.outputs || [];
+  // "main" is the implicit single output — not a branch.
+  return outputs.filter((p) => p && p !== "main");
+};
 export default function CustomNode({
   id,
   data,
@@ -21,7 +46,16 @@ export default function CustomNode({
   const isLR = canvasLayout === "LR";
   const isSelectApp = data.app === "Select an app";
   const formattedAction = data?.action?.charAt(0).toUpperCase() + data?.action?.slice(1);
-  const isCondition = data?.app === "condition";
+  const ports = getNodePorts(data);
+  const isMultiPort = ports.length > 1;
+  // The AI Agent accepts sub-nodes wired into its bottom: a chat model, a memory
+  // store, and any number of tool (action) nodes.
+  const isAgent = data?.app === "ai-agent";
+  const SUB_PORTS = [
+    { id: "ai_model", label: "Chat Model" },
+    { id: "ai_memory", label: "Memory" },
+    { id: "ai_tool", label: "Tools" },
+  ];
   const node = nodes.find(n => n.id === id);
   const hasPort = node?.port === undefined;
   const isTrigger = data?.action === "trigger";
@@ -150,41 +184,107 @@ export default function CustomNode({
           </div>
         </div>
 
-        {/* SOURCE HANDLES */}
-        {isCondition ? (
-          <>
-            <Handle 
-              type="source" 
-              id="true" 
-              position={isLR ? Position.Right : Position.Bottom} 
-              style={{
-                ...handleStyle,
-                top: isLR ? "40%" : undefined,
-                left: !isLR ? "40%" : undefined,
-              }} 
-            />
-            <Handle 
-              type="source" 
-              id="false" 
-              position={isLR ? Position.Right : Position.Bottom} 
-              style={{
-                ...handleStyle,
-                top: isLR ? "60%" : undefined,
-                left: !isLR ? "60%" : undefined,
-              }} 
-            />
-          </>
+        {/* SOURCE HANDLES — one connectable, labelled handle per output branch */}
+        {isMultiPort ? (
+          ports.map((port, i) => {
+            const pos = `${((i + 1) / (ports.length + 1)) * 100}%`;
+            const portHasEdge = edges.some((e) => e.source === id && e.sourceHandle === port);
+            return (
+              <div key={port}>
+                <Handle
+                  type="source"
+                  id={port}
+                  position={isLR ? Position.Right : Position.Bottom}
+                  style={{
+                    ...handleStyle,
+                    top: isLR ? pos : undefined,
+                    left: !isLR ? pos : undefined,
+                  }}
+                />
+                <span
+                  className="zaplane-port-label"
+                  style={{
+                    position: "absolute",
+                    fontSize: 10,
+                    color: "#6B7280",
+                    whiteSpace: "nowrap",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    ...(isLR
+                      ? { top: pos, left: "100%", marginLeft: 10, transform: "translateY(-50%)" }
+                      : { left: pos, top: "100%", marginTop: 10, transform: "translateX(-50%)" }),
+                  }}
+                >
+                  {formatLabel(port)}
+                  {!portHasEdge && (
+                    <button
+                      type="button"
+                      title={__("Add step", "zaplane")}
+                      onClick={(e) => { e.stopPropagation(); data.openDrawerFromAdd?.({ id: port, type: "source" }); }}
+                      style={addPortBtnStyle}
+                    >
+                      <FaPlus size={8} />
+                    </button>
+                  )}
+                </span>
+              </div>
+            );
+          })
         ) : (
-          <Handle 
-            type="source" 
-            position={isLR ? Position.Right : Position.Bottom} 
-            style={handleStyle} 
+          <Handle
+            type="source"
+            position={isLR ? Position.Right : Position.Bottom}
+            style={handleStyle}
           />
         )}
+
+        {/* AI AGENT SUB-INPUT HANDLES — wire a chat model / memory / tools here */}
+        {isAgent &&
+          SUB_PORTS.map((sp, i) => {
+            const pos = `${((i + 1) / (SUB_PORTS.length + 1)) * 100}%`;
+            return (
+              <div key={sp.id}>
+                <Handle
+                  type="target"
+                  id={sp.id}
+                  position={Position.Bottom}
+                  style={{ ...handleStyle, background: "#a855f7", left: pos }}
+                />
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: pos,
+                    transform: "translateX(-50%)",
+                    marginTop: 10,
+                    fontSize: 9,
+                    color: "#a855f7",
+                    whiteSpace: "nowrap",
+                    display: "inline-flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
+                  {sp.label}
+                  <button
+                    type="button"
+                    title={__("Add", "zaplane")}
+                    onClick={(e) => { e.stopPropagation(); data.openDrawerFromAdd?.({ id: sp.id, type: "target" }); }}
+                    style={{ ...addPortBtnStyle, borderColor: "#a855f7", color: "#a855f7" }}
+                  >
+                    <FaPlus size={8} />
+                  </button>
+                </span>
+              </div>
+            );
+          })}
       </div>
 
-      {/* ADD NODE BUTTON */}
-      {!hasOutgoingEdge && !isCondition && (
+      {/* ADD NODE BUTTON — single-output nodes get the inline "+"; multi-port
+          nodes are wired by dragging from each branch handle. */}
+      {!hasOutgoingEdge && !isMultiPort && (
         <FloatingEdge openDrawerFromAdd={data.openDrawerFromAdd} canvasLayout={canvasLayout} />
       )}
     </div>

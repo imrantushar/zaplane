@@ -33,7 +33,7 @@ export const createActionNode = ({
     const LRGap = 300;
     const TBGap = 140;
 
-    const { edge, node } = drawerContext;
+    const { edge, node, port } = drawerContext;
 
     let sourceNode = null;
     let targetNode = null;
@@ -48,8 +48,19 @@ export const createActionNode = ({
     }
 
     const newNodeId = getNewNodeId();
-    const newX = layoutLR ? sourceNode.position.x + LRGap : sourceNode.position.x;
-    const newY = layoutLR ? sourceNode.position.y : sourceNode.position.y + TBGap;
+    // A "target" sub-handle (AI Agent tools/memory/model) places the new node
+    // BELOW the anchor; everything else places it to the side/below as usual.
+    const isSubInput = port?.type === "target";
+    // Spread stacked sub-nodes so a 2nd/3rd tool doesn't land on the first.
+    const subCount = isSubInput
+        ? edges.filter((e) => e.target === sourceNode.id && e.targetHandle === port.id).length
+        : 0;
+    const newX = isSubInput
+        ? sourceNode.position.x + subCount * 220
+        : (layoutLR ? sourceNode.position.x + LRGap : sourceNode.position.x);
+    const newY = isSubInput
+        ? sourceNode.position.y + 180
+        : (layoutLR ? sourceNode.position.y : sourceNode.position.y + TBGap);
 
     const isTools = actionData?.mode === "tools";
 
@@ -82,6 +93,12 @@ export const createActionNode = ({
             { id: `e${edge.source}-${newNodeId}`, source: edge.source, target: newNodeId, type: "custom" },
             { id: `e${newNodeId}-${edge.target}`, source: newNodeId, target: edge.target, type: "custom" },
         ];
+    } else if (port?.type === "target") {
+        // Sub-node feeds INTO the anchor's input handle (e.g. agent tools).
+        newEdges.push({ id: `e${newNodeId}-${sourceNode.id}-${port.id}`, source: newNodeId, target: sourceNode.id, targetHandle: port.id, type: "custom" });
+    } else if (port?.type === "source") {
+        // Child of a specific output branch (e.g. iterator loop, router path).
+        newEdges.push({ id: `e${sourceNode.id}-${newNodeId}-${port.id}`, source: sourceNode.id, target: newNodeId, sourceHandle: port.id, type: "custom" });
     } else {
         newEdges.push({ id: `e${sourceNode.id}-${newNodeId}`, source: sourceNode.id, target: newNodeId, type: "custom" });
     }

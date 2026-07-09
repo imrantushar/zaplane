@@ -92,8 +92,12 @@ export const useFlowActions = ({
         setDrawerOpen(true);
     };
 
-    const openDrawerFromAdd = (node) => {
-        setDrawerContext({ source: "add", node, edge: null });
+    // `port` (optional) targets a specific branch/sub-handle:
+    //   { id, type: "source" } → new node is a child of this node's output port
+    //   { id, type: "target" } → new node feeds INTO this node's input handle
+    //                            (AI Agent tool/memory/model sub-nodes)
+    const openDrawerFromAdd = (node, port = null) => {
+        setDrawerContext({ source: "add", node, edge: null, port });
         setDrawerOpen(true);
     };
 

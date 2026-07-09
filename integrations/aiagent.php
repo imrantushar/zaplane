@@ -138,6 +138,20 @@ class Aiagent extends IntegrationBase {
 				],
 			],
 			[
+				'key'         => 'mcp_server_url',
+				'label'       => 'MCP Server URL (enables MCP tools)',
+				'type'        => 'expression',
+				'required'    => false,
+				'placeholder' => 'https://your-mcp-server/mcp',
+				'help'        => 'Connect an MCP server and every tool it exposes becomes callable by the agent.',
+			],
+			[
+				'key'      => 'mcp_auth_token',
+				'label'    => 'MCP Bearer token (optional)',
+				'type'     => 'expression',
+				'required' => false,
+			],
+			[
 				'key'      => 'max_steps',
 				'label'    => 'Max Tool Steps',
 				'type'     => 'number',
@@ -177,9 +191,52 @@ class Aiagent extends IntegrationBase {
 		$ctx = [
 			'business_key' => trim( (string) ( $config['business_key'] ?? '' ) ),
 			'enable_http'  => ( 'yes' === ( $config['enable_http'] ?? 'no' ) ),
+			'mcp_server'   => trim( (string) ( $config['mcp_server_url'] ?? '' ) ),
+			'mcp_token'    => trim( (string) ( $config['mcp_auth_token'] ?? '' ) ),
+			'mcp_tools'    => [],
+			'mcp_name_map' => [],
 		];
 
+		// Discover MCP tools once so they can be offered to the model and routed
+		// back on call. Any tool the connected MCP server exposes becomes callable.
+		if ( '' !== $ctx['mcp_server'] ) {
+			$mcp_seen = [];
+			foreach ( self::mcp_list_tools( $ctx['mcp_server'], $ctx['mcp_token'] ) as $tool ) {
+				$name = (string) ( $tool['name'] ?? '' );
+				if ( '' === $name ) {
+					continue;
+				}
+				$agent_name = 'mcp_' . preg_replace( '/[^a-zA-Z0-9_-]/', '_', $name );
+				// Keep tool names unique — providers reject duplicates.
+				$base = $agent_name;
+				$j    = 2;
+				while ( isset( $mcp_seen[ $agent_name ] ) ) {
+					$agent_name = $base . '_' . $j++;
+				}
+				$mcp_seen[ $agent_name ] = true;
+
+				$ctx['mcp_tools'][] = [
+					'name'        => $agent_name,
+					'description' => (string) ( $tool['description'] ?? ( 'MCP tool: ' . $name ) ),
+					'schema'      => ( isset( $tool['inputSchema'] ) && is_array( $tool['inputSchema'] ) )
+						? $tool['inputSchema']
+						: [ 'type' => 'object', 'properties' => (object) [] ],
+				];
+				$ctx['mcp_name_map'][ $agent_name ] = $name;
+			}
+		}
+
+		// Sub-nodes wired into the agent on the canvas (Tools / Memory / Chat
+		// Model). Any connected action node becomes a callable tool; a memory node
+		// supplies history; a chat-model node overrides the model.
+		$sub               = $node['_sub_nodes'] ?? [];
+		$ctx['tool_nodes'] = self::build_tool_nodes( $sub['ai_tool'] ?? [] );
+		$history           = empty( $sub['ai_memory'] ) ? [] : self::load_memory_history( $sub['ai_memory'] );
+
 		$model     = sanitize_text_field( (string) ( $config['model'] ?? self::DEFAULT_MODEL ) );
+		if ( ! empty( $sub['ai_model']['data']['config']['model'] ) ) {
+			$model = sanitize_text_field( (string) $sub['ai_model']['data']['config']['model'] );
+		}
 		$system    = (string) ( $config['system_prompt'] ?? '' );
 		$max_steps = max( 1, (int) ( $config['max_steps'] ?? self::DEFAULT_MAX_STEPS ) );
 		$format    = ( 'json' === ( $config['response_format'] ?? 'text' ) ) ? 'json' : 'text';
@@ -190,9 +247,9 @@ class Aiagent extends IntegrationBase {
 		}
 
 		if ( 'openai' === $provider ) {
-			$result = self::run_openai( $api_key, $model, $system, $task, $ctx, $max_steps, 'json' === $format );
+			$result = self::run_openai( $api_key, $model, $system, $task, $ctx, $max_steps, 'json' === $format, $history );
 		} else {
-			$result = self::run_anthropic( $api_key, $model, $system, $task, $ctx, $max_steps );
+			$result = self::run_anthropic( $api_key, $model, $system, $task, $ctx, $max_steps, $history );
 		}
 
 		if ( isset( $result['error'] ) ) {
@@ -272,6 +329,16 @@ class Aiagent extends IntegrationBase {
 			];
 		}//end if
 
+		// MCP server tools, discovered in execute_node.
+		foreach ( $ctx['mcp_tools'] ?? [] as $tool ) {
+			$tools[] = $tool;
+		}
+
+		// Tool sub-nodes wired into the agent on the canvas.
+		foreach ( $ctx['tool_nodes'] ?? [] as $tool ) {
+			$tools[] = $tool['spec'];
+		}
+
 		return $tools;
 	}
 
@@ -319,22 +386,252 @@ class Aiagent extends IntegrationBase {
 			return "Status: {$code}\n{$body}";
 		}//end if
 
+		// MCP tool — route back to the connected MCP server.
+		if ( isset( $ctx['mcp_name_map'][ $name ] ) ) {
+			return self::mcp_call_tool( $ctx['mcp_server'], $ctx['mcp_token'], $ctx['mcp_name_map'][ $name ], $args );
+		}
+
+		// Tool sub-node — run the connected action node with the model's args.
+		foreach ( $ctx['tool_nodes'] ?? [] as $tool ) {
+			if ( $tool['agent_name'] === $name ) {
+				return self::run_tool_node( $tool, $args );
+			}
+		}
+
 		return 'Unknown tool: ' . $name;
 	}
 
-	private static function run_anthropic( string $api_key, string $model, string $system, string $task, array $ctx, int $max_steps ): array {
+	/**
+	 * Turn nodes wired into the agent's Tools handle into callable tool specs.
+	 * Each connected action node's config schema becomes the tool's parameters.
+	 *
+	 * @param array<int,array<string,mixed>> $nodes
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function build_tool_nodes( array $nodes ): array {
+		if ( ! class_exists( '\Zaplane\Framework\Core\IntegrationLoader' ) ) {
+			return [];
+		}
+
+		$tools = [];
+		$seen  = [];
+		foreach ( $nodes as $n ) {
+			$app   = strtolower( (string) ( $n['data']['app'] ?? '' ) );
+			$event = (string) ( $n['data']['event'] ?? '' );
+			if ( '' === $app || '' === $event ) {
+				continue;
+			}
+
+			$instance = \Zaplane\Framework\Core\IntegrationLoader::get( $app );
+			if ( ! $instance ) {
+				continue;
+			}
+			$class  = get_class( $instance );
+			$schema = method_exists( $class, 'get_action_config_schema' ) ? $class::get_action_config_schema( $event ) : [];
+
+			$base = (string) ( $n['data']['name'] ?? ( $app . '_' . $event ) );
+			$name = 'tool_' . preg_replace( '/[^a-zA-Z0-9_-]/', '_', $base );
+			// Keep tool names unique across identically-named nodes.
+			$unique = $name;
+			$i      = 2;
+			while ( isset( $seen[ $unique ] ) ) {
+				$unique = $name . '_' . $i++;
+			}
+			$seen[ $unique ] = true;
+
+			$tools[] = [
+				'agent_name'   => $unique,
+				'event'        => $event,
+				'class'        => $class,
+				'saved_config' => is_array( $n['data']['config'] ?? null ) ? $n['data']['config'] : [],
+				'spec'         => [
+					'name'        => $unique,
+					'description' => sprintf( 'Run the %s "%s" action and return its output.', $app, $event ),
+					'schema'      => self::schema_to_json_schema( $schema ),
+				],
+			];
+		}//end foreach
+
+		return $tools;
+	}
+
+	/**
+	 * Map a Zaplane action config schema to a JSON Schema for tool parameters.
+	 *
+	 * @param array<int,array<string,mixed>> $schema
+	 * @return array<string,mixed>
+	 */
+	private static function schema_to_json_schema( array $schema ): array {
+		$props    = [];
+		$required = [];
+		foreach ( $schema as $f ) {
+			$key = (string) ( $f['key'] ?? '' );
+			if ( '' === $key ) {
+				continue;
+			}
+			$type = $f['type'] ?? 'text';
+			$json = 'number' === $type ? 'number' : ( in_array( $type, [ 'checkbox', 'boolean' ], true ) ? 'boolean' : 'string' );
+
+			$props[ $key ] = [ 'type' => $json ];
+			if ( ! empty( $f['label'] ) ) {
+				$props[ $key ]['description'] = (string) $f['label'];
+			}
+			if ( ! empty( $f['required'] ) ) {
+				$required[] = $key;
+			}
+		}
+
+		$out = [ 'type' => 'object', 'properties' => empty( $props ) ? (object) [] : $props ];
+		if ( ! empty( $required ) ) {
+			$out['required'] = $required;
+		}
+		return $out;
+	}
+
+	/**
+	 * Execute a connected tool node with the model-supplied arguments merged over
+	 * the node's saved config, and return its output as a string.
+	 *
+	 * @param array<string,mixed> $tool
+	 * @param array<string,mixed> $args
+	 */
+	private static function run_tool_node( array $tool, array $args ): string {
+		$config = array_merge( $tool['saved_config'], is_array( $args ) ? $args : [] );
+		try {
+			$out = $tool['class']::execute_node(
+				[ 'data' => [ 'event' => $tool['event'], 'config' => $config ] ],
+				[]
+			);
+		} catch ( \Throwable $e ) {
+			return 'Tool error: ' . $e->getMessage();
+		}
+
+		$data = $out['data'] ?? $out;
+		return is_scalar( $data ) ? (string) $data : (string) wp_json_encode( $data );
+	}
+
+	/**
+	 * Merge consecutive same-role text messages so the transcript strictly
+	 * alternates — Anthropic rejects two user (or two assistant) turns in a row.
+	 *
+	 * @param array<int,array{role:string,content:mixed}> $messages
+	 * @return array<int,array{role:string,content:mixed}>
+	 */
+	private static function normalize_roles( array $messages ): array {
+		$out = [];
+		foreach ( $messages as $m ) {
+			$n = count( $out );
+			if ( $n > 0 && $out[ $n - 1 ]['role'] === $m['role']
+				&& is_string( $out[ $n - 1 ]['content'] ) && is_string( $m['content'] ) ) {
+				$out[ $n - 1 ]['content'] = trim( $out[ $n - 1 ]['content'] . "\n\n" . $m['content'] );
+				continue;
+			}
+			$out[] = $m;
+		}
+		return $out;
+	}
+
+	/**
+	 * Load prior turns from a connected Memory sub-node as chat messages.
+	 *
+	 * @param array<string,mixed> $memory_node
+	 * @return array<int,array{role:string,content:string}>
+	 */
+	private static function load_memory_history( array $memory_node ): array {
+		if ( ! class_exists( '\Zaplane\Integrations\Memory' ) ) {
+			return [];
+		}
+		$config = is_array( $memory_node['data']['config'] ?? null ) ? $memory_node['data']['config'] : [];
+		$out     = \Zaplane\Integrations\Memory::execute_node(
+			[ 'data' => [ 'event' => 'get_history', 'config' => $config ] ],
+			[]
+		);
+		$history = $out['data']['history'] ?? [];
+
+		$messages = [];
+		if ( is_array( $history ) ) {
+			foreach ( $history as $turn ) {
+				if ( ! is_array( $turn ) ) {
+					continue;
+				}
+				$content = (string) ( $turn['content'] ?? '' );
+				if ( '' === $content ) {
+					continue;
+				}
+				$messages[] = [
+					'role'    => ( 'assistant' === ( $turn['role'] ?? '' ) ) ? 'assistant' : 'user',
+					'content' => $content,
+				];
+			}
+		}
+		return $messages;
+	}
+
+	/**
+	 * List the tools a connected MCP server exposes.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function mcp_list_tools( string $server, string $token ): array {
+		if ( ! class_exists( '\Zaplane\Integrations\Mcpclient' ) ) {
+			return [];
+		}
+		$res = \Zaplane\Integrations\Mcpclient::execute_node(
+			[ 'data' => [ 'event' => 'list_tools', 'config' => [ 'server_url' => $server, 'auth_token' => $token ] ] ],
+			[]
+		);
+		$tools = $res['data']['tools'] ?? [];
+		return is_array( $tools ) ? $tools : [];
+	}
+
+	/**
+	 * Call one tool on the connected MCP server and return its text result.
+	 *
+	 * @param array<string,mixed> $args
+	 */
+	private static function mcp_call_tool( string $server, string $token, string $tool, array $args ): string {
+		if ( ! class_exists( '\Zaplane\Integrations\Mcpclient' ) ) {
+			return 'MCP client unavailable.';
+		}
+		$res = \Zaplane\Integrations\Mcpclient::execute_node(
+			[
+				'data' => [
+					'event'  => 'call_tool',
+					'config' => [
+						'server_url' => $server,
+						'auth_token' => $token,
+						'tool_name'  => $tool,
+						'arguments'  => wp_json_encode( $args ),
+					],
+				],
+			],
+			[]
+		);
+		$data = $res['data'] ?? [];
+		if ( empty( $data['success'] ) && ! empty( $data['error'] ) ) {
+			return 'MCP error: ' . $data['error'];
+		}
+		return (string) ( $data['result'] ?? '' );
+	}
+
+	private static function run_anthropic( string $api_key, string $model, string $system, string $task, array $ctx, int $max_steps, array $history = [] ): array {
 		$tools = array_map( static fn( $t ) => [
 			'name'         => $t['name'],
 			'description'  => $t['description'],
 			'input_schema' => $t['schema'],
 		], self::tool_specs( $ctx ) );
 
-		$messages   = [
-			[
-				'role' => 'user',
-				'content' => $task
-			]
-		];
+		$messages   = self::normalize_roles(
+			array_merge(
+				$history,
+				[
+					[
+						'role'    => 'user',
+						'content' => $task,
+					],
+				]
+			)
+		);
 		$tool_calls = [];
 
 		for ( $step = 0; $step <= $max_steps; $step++ ) {
@@ -408,7 +705,7 @@ class Aiagent extends IntegrationBase {
 		return $out;
 	}
 
-	private static function run_openai( string $api_key, string $model, string $system, string $task, array $ctx, int $max_steps, bool $json = false ): array {
+	private static function run_openai( string $api_key, string $model, string $system, string $task, array $ctx, int $max_steps, bool $json = false, array $history = [] ): array {
 		$tools = array_map( static fn( $t ) => [
 			'type'     => 'function',
 			'function' => [
@@ -424,6 +721,9 @@ class Aiagent extends IntegrationBase {
 				'role' => 'system',
 				'content' => $system
 			];
+		}
+		foreach ( $history as $turn ) {
+			$messages[] = $turn;
 		}
 		$messages[] = [
 			'role' => 'user',

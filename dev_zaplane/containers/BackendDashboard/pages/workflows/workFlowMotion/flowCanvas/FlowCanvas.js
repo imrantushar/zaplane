@@ -112,7 +112,7 @@ export default function FlowCanvas({
     custom: props => <CustomNode {...props} data={{
       ...props.data,
       onOpenDrawer: () => openDrawerForNode(props),
-      openDrawerFromAdd: () => openDrawerFromAdd(props),
+      openDrawerFromAdd: (port) => openDrawerFromAdd(props, port),
       deleteNode: () => deleteNode(props.id),
       resetTrigger: () => resetTrigger(props.id)
     }} canvasLayout={canvasLayout} nodes={nodes} />

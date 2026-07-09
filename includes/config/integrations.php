@@ -53,6 +53,10 @@ $registry = [
 		'file'  => 'iterator.php',
 		'class' => \Zaplane\Integrations\Iterator::class,
 	],
+	'repeater'            => [
+		'file'  => 'repeater.php',
+		'class' => \Zaplane\Integrations\Repeater::class,
+	],
 	'variable'            => [
 		'file'  => 'variable.php',
 		'class' => \Zaplane\Integrations\Variable::class,

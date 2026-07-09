@@ -350,6 +350,30 @@ class Automation {
 		$node['_run_id'] = $run->id;
 		$node['_node_run_id'] = $nodeRun->id;
 
+		// AI Agent sub-nodes: nodes wired into the agent's tool/memory/model
+		// handles are configuration providers, not flow steps. Collect them here
+		// so the agent can use them; they never execute on their own (nothing in
+		// the main flow connects into them).
+		if ( 'ai-agent' === $app ) {
+			$subs = $this->collect_sub_nodes( $graph, $nodeRun->node_key );
+
+			// Resolve {{...}} in each sub-node's config against the run context, the
+			// same way the agent's own config is resolved — otherwise e.g. a Memory
+			// node's dynamic conversation_key would stay a literal and never match.
+			foreach ( [ 'ai_model', 'ai_memory' ] as $handle ) {
+				if ( ! empty( $subs[ $handle ]['data']['config'] ) && is_array( $subs[ $handle ]['data']['config'] ) ) {
+					$subs[ $handle ]['data']['config'] = $this->resolveConfigValues( $subs[ $handle ]['data']['config'], $resolveData );
+				}
+			}
+			foreach ( $subs['ai_tool'] as $k => $tool_node ) {
+				if ( ! empty( $tool_node['data']['config'] ) && is_array( $tool_node['data']['config'] ) ) {
+					$subs['ai_tool'][ $k ]['data']['config'] = $this->resolveConfigValues( $tool_node['data']['config'], $resolveData );
+				}
+			}
+
+			$node['_sub_nodes'] = $subs;
+		}
+
 		try {
 			if ( 'trigger' === $node['type'] ) {
 				$output = $input;
@@ -386,10 +410,16 @@ class Automation {
 
 				$remaining = $output['remaining'] ?? [];
 				if ( ! empty( $remaining ) ) {
-					$iteratorInput = array_merge( $input, [
-						'_is_iterating' => true,
-						'_remaining'    => $remaining
-					] );
+					// `iterator_state` lets a looping tool carry counters (index/total)
+					// forward across passes without threading them by hand.
+					$iteratorInput = array_merge(
+						$input,
+						[
+							'_is_iterating' => true,
+							'_remaining'    => $remaining,
+						],
+						is_array( $output['iterator_state'] ?? null ) ? $output['iterator_state'] : []
+					);
 
 					$this->spawn_node_run(
 						$run->id,
@@ -530,6 +560,43 @@ class Automation {
 		}
 
 		return $context;
+	}
+
+	/**
+	 * Gather the sub-nodes wired into a node's AI-agent handles (ai_tool,
+	 * ai_memory, ai_model). Returns tool providers as a list and memory/model as
+	 * single nodes. These are inspected by the agent — never executed as steps.
+	 *
+	 * @return array{ai_tool:array<int,array<string,mixed>>,ai_memory:?array<string,mixed>,ai_model:?array<string,mixed>}
+	 */
+	private function collect_sub_nodes( array $graph, int $node_key ): array {
+		$subs = [ 'ai_tool' => [], 'ai_memory' => null, 'ai_model' => null ];
+
+		$nodeMap = [];
+		foreach ( $graph['nodes'] ?? [] as $n ) {
+			$nodeMap[ (int) $n['id'] ] = $n;
+		}
+
+		foreach ( $graph['edges'] ?? [] as $edge ) {
+			if ( (int) ( $edge['target'] ?? 0 ) !== $node_key ) {
+				continue;
+			}
+			$handle = $edge['targetHandle'] ?? '';
+			if ( ! array_key_exists( $handle, $subs ) ) {
+				continue;
+			}
+			$src = $nodeMap[ (int) ( $edge['source'] ?? 0 ) ] ?? null;
+			if ( ! $src ) {
+				continue;
+			}
+			if ( 'ai_tool' === $handle ) {
+				$subs['ai_tool'][] = $src;
+			} else {
+				$subs[ $handle ] = $src;
+			}
+		}
+
+		return $subs;
 	}
 
 	private function inject_credentials( array $node ): array {

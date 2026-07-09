@@ -51,7 +51,11 @@ export const getSelectedActionFields = (mode, selectedItem, actionType, isTrigge
 export const getVisibleFields = (fields, values) => {
   return fields.filter((f) => {
     if (!f.depends_on) return true;
-    return Object.entries(f.depends_on).every(([k, v]) => values[k] === v);
+    // A dependency value may be a single value or a list of accepted values,
+    // e.g. depends_on: { operation: ['truncate', 'substring', 'pad'] }.
+    return Object.entries(f.depends_on).every(([k, v]) =>
+      Array.isArray(v) ? v.includes(values[k]) : values[k] === v
+    );
   });
 };
 

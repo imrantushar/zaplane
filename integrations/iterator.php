@@ -44,35 +44,69 @@ class Iterator extends IntegrationBase {
 				'type'        => 'expression',
 				'required'    => true,
 				'placeholder' => 'Type @ to pick a list from an earlier step',
-				'help'        => 'Pick an array/list from a previous step (e.g. parsed CSV rows or an API list). The workflow runs once per item — read the current entry downstream with {{ item }}.',
+				'help'        => 'Pick an array/list from a previous step (e.g. parsed CSV rows or an API list). The workflow runs once per item — read the current entry downstream with {{ item }} (also available: {{ index }}, {{ is_first }}, {{ is_last }}, {{ total }}).',
+			],
+			[
+				'key'         => 'offset',
+				'label'       => 'Skip first N (offset)',
+				'type'        => 'number',
+				'required'    => false,
+				'default'     => 0,
+			],
+			[
+				'key'         => 'limit',
+				'label'       => 'Max items (limit)',
+				'type'        => 'number',
+				'required'    => false,
+				'placeholder' => 'blank = no limit',
 			],
 		];
 	}
 
 	public static function execute_node( array $node, array $input ): array {
+		$config = $node['data']['config'] ?? [];
 
-		// Support the iterator re-feeding itself
-		if ( isset( $input['_is_iterating'] ) && $input['_is_iterating'] ) {
+		// Support the iterator re-feeding itself.
+		if ( ! empty( $input['_is_iterating'] ) ) {
 			$items = $input['_remaining'] ?? [];
+			$index = (int) ( $input['_iter_index'] ?? 0 );
+			$total = (int) ( $input['_iter_total'] ?? ( count( $items ) + $index ) );
 		} else {
-			$items = self::resolve_items( $node['data']['config']['source'] ?? [], $input );
+			$items = self::resolve_items( $config['source'] ?? [], $input );
+
+			$offset = (int) ( $config['offset'] ?? 0 );
+			$limit  = ( isset( $config['limit'] ) && '' !== $config['limit'] ) ? (int) $config['limit'] : null;
+			if ( $offset > 0 || null !== $limit ) {
+				$items = array_values( array_slice( $items, max( 0, $offset ), $limit ) );
+			}
+
+			$index = 0;
+			$total = count( $items );
 		}
 
 		if ( empty( $items ) ) {
 			return [
 				'port' => 'done',
-				'data' => []
+				'data' => [ 'total' => $total ]
 			];
 		}
 
 		$current = array_shift( $items );
 
 		return [
-			'port' => 'loop',
-			'status' => 'iterate',
-			'remaining' => $items,
+			'port'           => 'loop',
+			'status'         => 'iterate',
+			'remaining'      => $items,
+			'iterator_state' => [
+				'_iter_index' => $index + 1,
+				'_iter_total' => $total,
+			],
 			'data' => [
-				'item' => $current,
+				'item'     => $current,
+				'index'    => $index,
+				'is_first' => 0 === $index,
+				'is_last'  => empty( $items ),
+				'total'    => $total,
 			],
 		];
 	}

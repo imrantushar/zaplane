@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-09 09:49:17",
+    "generated_at": "2026-07-09 11:42:09",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -2968,6 +2968,20 @@
                                     "label": "Yes"
                                 }
                             ]
+                        },
+                        {
+                            "key": "mcp_server_url",
+                            "label": "MCP Server URL (enables MCP tools)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "https://your-mcp-server/mcp",
+                            "help": "Connect an MCP server and every tool it exposes becomes callable by the agent."
+                        },
+                        {
+                            "key": "mcp_auth_token",
+                            "label": "MCP Bearer token (optional)",
+                            "type": "expression",
+                            "required": false
                         },
                         {
                             "key": "max_steps",
@@ -27437,6 +27451,54 @@
                                         {
                                             "label": "Is Not Empty",
                                             "value": "is_not_empty"
+                                        },
+                                        {
+                                            "label": "Equals (ignore case)",
+                                            "value": "equals_ci"
+                                        },
+                                        {
+                                            "label": "Contains (ignore case)",
+                                            "value": "contains_ci"
+                                        },
+                                        {
+                                            "label": "Not Starts With",
+                                            "value": "not_starts_with"
+                                        },
+                                        {
+                                            "label": "Not Ends With",
+                                            "value": "not_ends_with"
+                                        },
+                                        {
+                                            "label": "Matches Regex",
+                                            "value": "matches_regex"
+                                        },
+                                        {
+                                            "label": "In List",
+                                            "value": "in_list"
+                                        },
+                                        {
+                                            "label": "Not In List",
+                                            "value": "not_in_list"
+                                        },
+                                        {
+                                            "label": "Is True",
+                                            "value": "is_true"
+                                        },
+                                        {
+                                            "label": "Is False",
+                                            "value": "is_false"
+                                        },
+                                        {
+                                            "label": "Between",
+                                            "value": "between"
+                                        },
+                                        {
+                                            "label": "Date Before",
+                                            "value": "before"
+                                        },
+                                        {
+                                            "label": "Date After",
+                                            "value": "after"
                                         }
                                     ],
                                     "required": true
@@ -27605,6 +27667,14 @@
                             "label": "Output format (PHP date)",
                             "type": "text",
                             "default": "Y-m-d H:i:s"
+                        },
+                        {
+                            "key": "timezone",
+                            "label": "Timezone (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "e.g. America/New_York",
+                            "help": "Convert the result to this timezone. Defaults to the site timezone."
                         }
                     ],
                     "outputs": [
@@ -27621,6 +27691,22 @@
                             "type": "expression",
                             "required": true,
                             "help": "Any parseable date, e.g. 2026-07-05 or {{ order_date }}."
+                        },
+                        {
+                            "key": "input_format",
+                            "label": "Input format (optional)",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "e.g. d/m/Y H:i",
+                            "help": "Set this when the input is not a standard date, so it can be parsed correctly."
+                        },
+                        {
+                            "key": "timezone",
+                            "label": "Timezone (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "e.g. America/New_York",
+                            "help": "Convert the result to this timezone. Defaults to the site timezone."
                         },
                         {
                             "key": "format",
@@ -27768,6 +27854,130 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "parse": {
+                    "label": "Parse (extract parts)",
+                    "key": "parse",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "Date input",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "input_format",
+                            "label": "Input format (optional)",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "e.g. d/m/Y H:i",
+                            "help": "Set this when the input is not a standard date, so it can be parsed correctly."
+                        },
+                        {
+                            "key": "timezone",
+                            "label": "Timezone (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "e.g. America/New_York",
+                            "help": "Convert the result to this timezone. Defaults to the site timezone."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "humanize": {
+                    "label": "Humanize (relative)",
+                    "key": "humanize",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "Date input",
+                            "type": "expression",
+                            "required": true,
+                            "help": "Returns \"2 hours ago\" / \"in 3 days\" relative to now."
+                        },
+                        {
+                            "key": "input_format",
+                            "label": "Input format (optional)",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "e.g. d/m/Y H:i",
+                            "help": "Set this when the input is not a standard date, so it can be parsed correctly."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "boundary": {
+                    "label": "Start / End of\u2026",
+                    "key": "boundary",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "Date input",
+                            "type": "expression",
+                            "default": "now"
+                        },
+                        {
+                            "key": "boundary",
+                            "label": "Boundary",
+                            "type": "select",
+                            "default": "start",
+                            "options": [
+                                {
+                                    "value": "start",
+                                    "label": "Start of"
+                                },
+                                {
+                                    "value": "end",
+                                    "label": "End of"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "unit",
+                            "label": "Period",
+                            "type": "select",
+                            "default": "day",
+                            "options": [
+                                {
+                                    "value": "day",
+                                    "label": "Day"
+                                },
+                                {
+                                    "value": "week",
+                                    "label": "Week"
+                                },
+                                {
+                                    "value": "month",
+                                    "label": "Month"
+                                },
+                                {
+                                    "value": "year",
+                                    "label": "Year"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "timezone",
+                            "label": "Timezone (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "e.g. America/New_York",
+                            "help": "Convert the result to this timezone. Defaults to the site timezone."
+                        },
+                        {
+                            "key": "format",
+                            "label": "Output format (PHP date)",
+                            "type": "text",
+                            "default": "Y-m-d H:i:s"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             }
         },
@@ -27787,27 +27997,72 @@
                     "key": "wait",
                     "schema": [
                         {
-                            "key": "unit",
-                            "label": "Delay Unit",
+                            "key": "delay_type",
+                            "label": "Delay Type",
                             "type": "select",
+                            "default": "for",
+                            "options": [
+                                {
+                                    "value": "for",
+                                    "label": "Wait for a duration"
+                                },
+                                {
+                                    "value": "until",
+                                    "label": "Wait until a specific date/time"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "amount",
+                            "label": "Amount",
+                            "type": "number",
+                            "required": false,
+                            "depends_on": {
+                                "delay_type": "for"
+                            }
+                        },
+                        {
+                            "key": "unit",
+                            "label": "Unit",
+                            "type": "select",
+                            "default": "minutes",
+                            "depends_on": {
+                                "delay_type": "for"
+                            },
                             "options": [
                                 {
                                     "value": "seconds",
                                     "label": "Seconds"
                                 },
                                 {
+                                    "value": "minutes",
+                                    "label": "Minutes"
+                                },
+                                {
+                                    "value": "hours",
+                                    "label": "Hours"
+                                },
+                                {
                                     "value": "days",
                                     "label": "Days"
+                                },
+                                {
+                                    "value": "weeks",
+                                    "label": "Weeks"
                                 }
-                            ],
-                            "default": "seconds",
-                            "required": true
+                            ]
                         },
                         {
-                            "key": "amount",
-                            "label": "Amount",
-                            "type": "number",
-                            "required": true
+                            "key": "until",
+                            "label": "Wait until",
+                            "type": "expression",
+                            "subtype": "datetime",
+                            "required": false,
+                            "depends_on": {
+                                "delay_type": "until"
+                            },
+                            "placeholder": "2026-07-15 09:00 or {{ trigger.date }}",
+                            "help": "A date/time in the site timezone, a Unix timestamp, or a relative string like \"next monday 9am\". Supports variables."
                         }
                     ],
                     "outputs": [
@@ -27896,6 +28151,54 @@
                                         {
                                             "label": "Is Not Empty",
                                             "value": "is_not_empty"
+                                        },
+                                        {
+                                            "label": "Equals (ignore case)",
+                                            "value": "equals_ci"
+                                        },
+                                        {
+                                            "label": "Contains (ignore case)",
+                                            "value": "contains_ci"
+                                        },
+                                        {
+                                            "label": "Not Starts With",
+                                            "value": "not_starts_with"
+                                        },
+                                        {
+                                            "label": "Not Ends With",
+                                            "value": "not_ends_with"
+                                        },
+                                        {
+                                            "label": "Matches Regex",
+                                            "value": "matches_regex"
+                                        },
+                                        {
+                                            "label": "In List",
+                                            "value": "in_list"
+                                        },
+                                        {
+                                            "label": "Not In List",
+                                            "value": "not_in_list"
+                                        },
+                                        {
+                                            "label": "Is True",
+                                            "value": "is_true"
+                                        },
+                                        {
+                                            "label": "Is False",
+                                            "value": "is_false"
+                                        },
+                                        {
+                                            "label": "Between",
+                                            "value": "between"
+                                        },
+                                        {
+                                            "label": "Date Before",
+                                            "value": "before"
+                                        },
+                                        {
+                                            "label": "Date After",
+                                            "value": "after"
                                         }
                                     ],
                                     "required": true
@@ -27949,11 +28252,11 @@
                             "options": [
                                 {
                                     "value": "uppercase",
-                                    "label": "Uppercase"
+                                    "label": "UPPERCASE"
                                 },
                                 {
                                     "value": "lowercase",
-                                    "label": "Lowercase"
+                                    "label": "lowercase"
                                 },
                                 {
                                     "value": "capitalize",
@@ -27964,24 +28267,116 @@
                                     "label": "Title Case"
                                 },
                                 {
+                                    "value": "start_case",
+                                    "label": "Start Case (each word)"
+                                },
+                                {
+                                    "value": "camel_case",
+                                    "label": "camelCase"
+                                },
+                                {
+                                    "value": "snake_case",
+                                    "label": "snake_case"
+                                },
+                                {
+                                    "value": "kebab_case",
+                                    "label": "kebab-case"
+                                },
+                                {
                                     "value": "trim",
                                     "label": "Trim whitespace"
+                                },
+                                {
+                                    "value": "ltrim",
+                                    "label": "Trim left"
+                                },
+                                {
+                                    "value": "rtrim",
+                                    "label": "Trim right"
                                 },
                                 {
                                     "value": "replace",
                                     "label": "Find & Replace"
                                 },
                                 {
+                                    "value": "regex_replace",
+                                    "label": "Regex Replace"
+                                },
+                                {
                                     "value": "truncate",
                                     "label": "Truncate"
+                                },
+                                {
+                                    "value": "substring",
+                                    "label": "Substring"
+                                },
+                                {
+                                    "value": "pad",
+                                    "label": "Pad"
+                                },
+                                {
+                                    "value": "repeat",
+                                    "label": "Repeat"
+                                },
+                                {
+                                    "value": "reverse",
+                                    "label": "Reverse"
                                 },
                                 {
                                     "value": "slug",
                                     "label": "Slugify"
                                 },
                                 {
+                                    "value": "strip_html",
+                                    "label": "Strip HTML tags"
+                                },
+                                {
+                                    "value": "escape_html",
+                                    "label": "Escape HTML"
+                                },
+                                {
+                                    "value": "unescape_html",
+                                    "label": "Unescape HTML"
+                                },
+                                {
+                                    "value": "url_encode",
+                                    "label": "URL encode"
+                                },
+                                {
+                                    "value": "url_decode",
+                                    "label": "URL decode"
+                                },
+                                {
+                                    "value": "base64_encode",
+                                    "label": "Base64 encode"
+                                },
+                                {
+                                    "value": "base64_decode",
+                                    "label": "Base64 decode"
+                                },
+                                {
+                                    "value": "hash",
+                                    "label": "Hash"
+                                },
+                                {
+                                    "value": "split",
+                                    "label": "Split to list"
+                                },
+                                {
+                                    "value": "extract",
+                                    "label": "Extract (regex)"
+                                },
+                                {
                                     "value": "length",
                                     "label": "Length"
+                                },
+                                {
+                                    "value": "word_count",
+                                    "label": "Word count"
+                                },
+                                {
+                                    "value": "default",
+                                    "label": "Default if empty"
                                 }
                             ]
                         },
@@ -27989,7 +28384,6 @@
                             "key": "find",
                             "label": "Find",
                             "type": "expression",
-                            "required": false,
                             "depends_on": {
                                 "operation": "replace"
                             }
@@ -27998,18 +28392,138 @@
                             "key": "replace",
                             "label": "Replace with",
                             "type": "expression",
-                            "required": false,
                             "depends_on": {
-                                "operation": "replace"
+                                "operation": [
+                                    "replace",
+                                    "regex_replace"
+                                ]
                             }
                         },
                         {
-                            "key": "length",
-                            "label": "Max length",
-                            "type": "number",
-                            "required": false,
+                            "key": "pattern",
+                            "label": "Regex pattern",
+                            "type": "expression",
                             "depends_on": {
-                                "operation": "truncate"
+                                "operation": [
+                                    "regex_replace",
+                                    "extract"
+                                ]
+                            },
+                            "help": "e.g. /\\d+/ \u2014 first match is returned for Extract."
+                        },
+                        {
+                            "key": "length",
+                            "label": "Length",
+                            "type": "number",
+                            "depends_on": {
+                                "operation": [
+                                    "truncate",
+                                    "substring",
+                                    "pad"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "start",
+                            "label": "Start index",
+                            "type": "number",
+                            "default": 0,
+                            "depends_on": {
+                                "operation": "substring"
+                            }
+                        },
+                        {
+                            "key": "pad_char",
+                            "label": "Pad character",
+                            "type": "text",
+                            "default": " ",
+                            "depends_on": {
+                                "operation": "pad"
+                            }
+                        },
+                        {
+                            "key": "pad_side",
+                            "label": "Pad side",
+                            "type": "select",
+                            "default": "left",
+                            "options": [
+                                {
+                                    "value": "left",
+                                    "label": "Left"
+                                },
+                                {
+                                    "value": "right",
+                                    "label": "Right"
+                                },
+                                {
+                                    "value": "both",
+                                    "label": "Both"
+                                }
+                            ],
+                            "depends_on": {
+                                "operation": "pad"
+                            }
+                        },
+                        {
+                            "key": "times",
+                            "label": "Times",
+                            "type": "number",
+                            "default": 2,
+                            "depends_on": {
+                                "operation": "repeat"
+                            }
+                        },
+                        {
+                            "key": "separator",
+                            "label": "Separator",
+                            "type": "text",
+                            "default": ",",
+                            "depends_on": {
+                                "operation": "split"
+                            }
+                        },
+                        {
+                            "key": "algo",
+                            "label": "Algorithm",
+                            "type": "select",
+                            "default": "md5",
+                            "options": [
+                                {
+                                    "value": "md5",
+                                    "label": "MD5"
+                                },
+                                {
+                                    "value": "sha1",
+                                    "label": "SHA-1"
+                                },
+                                {
+                                    "value": "sha256",
+                                    "label": "SHA-256"
+                                },
+                                {
+                                    "value": "hmac_sha256",
+                                    "label": "HMAC-SHA256"
+                                }
+                            ],
+                            "depends_on": {
+                                "operation": "hash"
+                            }
+                        },
+                        {
+                            "key": "hmac_key",
+                            "label": "HMAC secret key",
+                            "type": "expression",
+                            "depends_on": {
+                                "operation": "hash"
+                            },
+                            "help": "Used only for HMAC-SHA256."
+                        },
+                        {
+                            "key": "default_value",
+                            "label": "Default value",
+                            "type": "expression",
+                            "depends_on": {
+                                "operation": "default"
                             }
                         }
                     ],
@@ -28025,7 +28539,8 @@
                             "key": "input",
                             "label": "Input",
                             "type": "expression",
-                            "required": true
+                            "required": true,
+                            "help": "A number. For \"Math expression\" this is ignored \u2014 use the expression field."
                         },
                         {
                             "key": "operation",
@@ -28053,6 +28568,22 @@
                                 {
                                     "value": "abs",
                                     "label": "Absolute value"
+                                },
+                                {
+                                    "value": "math",
+                                    "label": "Math expression"
+                                },
+                                {
+                                    "value": "currency",
+                                    "label": "Currency"
+                                },
+                                {
+                                    "value": "clamp",
+                                    "label": "Clamp (min/max)"
+                                },
+                                {
+                                    "value": "percentage",
+                                    "label": "Percentage of total"
                                 }
                             ]
                         },
@@ -28060,8 +28591,192 @@
                             "key": "decimals",
                             "label": "Decimals",
                             "type": "number",
-                            "required": false,
-                            "default": 2
+                            "default": 2,
+                            "depends_on": {
+                                "operation": [
+                                    "round",
+                                    "format",
+                                    "currency"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "expression",
+                            "label": "Expression",
+                            "type": "expression",
+                            "depends_on": {
+                                "operation": "math"
+                            },
+                            "help": "e.g. {{5.price}} * 1.2 + 3 \u2014 supports + - * / % and parentheses."
+                        },
+                        {
+                            "key": "currency_symbol",
+                            "label": "Currency symbol",
+                            "type": "text",
+                            "default": "$",
+                            "depends_on": {
+                                "operation": "currency"
+                            }
+                        },
+                        {
+                            "key": "min_value",
+                            "label": "Min",
+                            "type": "number",
+                            "depends_on": {
+                                "operation": "clamp"
+                            }
+                        },
+                        {
+                            "key": "max_value",
+                            "label": "Max",
+                            "type": "number",
+                            "depends_on": {
+                                "operation": "clamp"
+                            }
+                        },
+                        {
+                            "key": "total",
+                            "label": "Total",
+                            "type": "expression",
+                            "depends_on": {
+                                "operation": "percentage"
+                            },
+                            "help": "result = input / total * 100"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "format_list": {
+                    "label": "Format List",
+                    "key": "format_list",
+                    "schema": [
+                        {
+                            "key": "input",
+                            "label": "List",
+                            "type": "expression",
+                            "required": true,
+                            "help": "An array, a JSON array, or a comma-separated string."
+                        },
+                        {
+                            "key": "operation",
+                            "label": "Operation",
+                            "type": "select",
+                            "required": true,
+                            "default": "join",
+                            "options": [
+                                {
+                                    "value": "join",
+                                    "label": "Join to text"
+                                },
+                                {
+                                    "value": "count",
+                                    "label": "Count"
+                                },
+                                {
+                                    "value": "unique",
+                                    "label": "Unique"
+                                },
+                                {
+                                    "value": "first",
+                                    "label": "First"
+                                },
+                                {
+                                    "value": "last",
+                                    "label": "Last"
+                                },
+                                {
+                                    "value": "slice",
+                                    "label": "Slice"
+                                },
+                                {
+                                    "value": "sort",
+                                    "label": "Sort"
+                                },
+                                {
+                                    "value": "reverse",
+                                    "label": "Reverse"
+                                },
+                                {
+                                    "value": "compact",
+                                    "label": "Remove empty"
+                                },
+                                {
+                                    "value": "pluck",
+                                    "label": "Pluck field"
+                                },
+                                {
+                                    "value": "sum",
+                                    "label": "Sum"
+                                },
+                                {
+                                    "value": "min",
+                                    "label": "Min"
+                                },
+                                {
+                                    "value": "max",
+                                    "label": "Max"
+                                },
+                                {
+                                    "value": "average",
+                                    "label": "Average"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "separator",
+                            "label": "Separator",
+                            "type": "text",
+                            "default": ", ",
+                            "depends_on": {
+                                "operation": "join"
+                            }
+                        },
+                        {
+                            "key": "offset",
+                            "label": "Offset",
+                            "type": "number",
+                            "default": 0,
+                            "depends_on": {
+                                "operation": "slice"
+                            }
+                        },
+                        {
+                            "key": "length",
+                            "label": "Length",
+                            "type": "number",
+                            "depends_on": {
+                                "operation": "slice"
+                            }
+                        },
+                        {
+                            "key": "direction",
+                            "label": "Direction",
+                            "type": "select",
+                            "default": "asc",
+                            "options": [
+                                {
+                                    "value": "asc",
+                                    "label": "Ascending"
+                                },
+                                {
+                                    "value": "desc",
+                                    "label": "Descending"
+                                }
+                            ],
+                            "depends_on": {
+                                "operation": "sort"
+                            }
+                        },
+                        {
+                            "key": "field",
+                            "label": "Field key",
+                            "type": "text",
+                            "depends_on": {
+                                "operation": "pluck"
+                            },
+                            "help": "Extract this key from each object in the list."
                         }
                     ],
                     "outputs": [
@@ -28118,6 +28833,7 @@
                             "key": "method",
                             "label": "Method",
                             "type": "select",
+                            "default": "GET",
                             "options": [
                                 {
                                     "label": "GET",
@@ -28132,10 +28848,90 @@
                                     "value": "PUT"
                                 },
                                 {
+                                    "label": "PATCH",
+                                    "value": "PATCH"
+                                },
+                                {
                                     "label": "DELETE",
                                     "value": "DELETE"
+                                },
+                                {
+                                    "label": "HEAD",
+                                    "value": "HEAD"
                                 }
                             ]
+                        },
+                        {
+                            "key": "query_params",
+                            "label": "Query Parameters (JSON)",
+                            "type": "json",
+                            "required": false,
+                            "help": "{\"key\":\"value\"} \u2014 appended to the URL as ?key=value."
+                        },
+                        {
+                            "key": "auth_type",
+                            "label": "Authentication",
+                            "type": "select",
+                            "default": "none",
+                            "options": [
+                                {
+                                    "label": "None",
+                                    "value": "none"
+                                },
+                                {
+                                    "label": "Bearer token",
+                                    "value": "bearer"
+                                },
+                                {
+                                    "label": "Basic auth",
+                                    "value": "basic"
+                                },
+                                {
+                                    "label": "API key header",
+                                    "value": "api_key"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "auth_token",
+                            "label": "Bearer token",
+                            "type": "expression",
+                            "depends_on": {
+                                "auth_type": "bearer"
+                            }
+                        },
+                        {
+                            "key": "auth_user",
+                            "label": "Username",
+                            "type": "expression",
+                            "depends_on": {
+                                "auth_type": "basic"
+                            }
+                        },
+                        {
+                            "key": "auth_pass",
+                            "label": "Password",
+                            "type": "expression",
+                            "depends_on": {
+                                "auth_type": "basic"
+                            }
+                        },
+                        {
+                            "key": "auth_header",
+                            "label": "Header name",
+                            "type": "text",
+                            "default": "X-API-Key",
+                            "depends_on": {
+                                "auth_type": "api_key"
+                            }
+                        },
+                        {
+                            "key": "auth_value",
+                            "label": "API key value",
+                            "type": "expression",
+                            "depends_on": {
+                                "auth_type": "api_key"
+                            }
                         },
                         {
                             "key": "headers",
@@ -28143,9 +28939,51 @@
                             "type": "json"
                         },
                         {
+                            "key": "body_type",
+                            "label": "Body type",
+                            "type": "select",
+                            "default": "json",
+                            "depends_on": {
+                                "method": [
+                                    "POST",
+                                    "PUT",
+                                    "PATCH",
+                                    "DELETE"
+                                ]
+                            },
+                            "options": [
+                                {
+                                    "label": "JSON",
+                                    "value": "json"
+                                },
+                                {
+                                    "label": "Form (url-encoded)",
+                                    "value": "form"
+                                },
+                                {
+                                    "label": "Raw",
+                                    "value": "raw"
+                                }
+                            ]
+                        },
+                        {
                             "key": "body",
                             "label": "Body",
-                            "type": "expression"
+                            "type": "expression",
+                            "depends_on": {
+                                "method": [
+                                    "POST",
+                                    "PUT",
+                                    "PATCH",
+                                    "DELETE"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "timeout",
+                            "label": "Timeout (seconds)",
+                            "type": "number",
+                            "default": 15
                         }
                     ],
                     "outputs": [
@@ -28339,7 +29177,21 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "Type @ to pick a list from an earlier step",
-                            "help": "Pick an array/list from a previous step (e.g. parsed CSV rows or an API list). The workflow runs once per item \u2014 read the current entry downstream with {{ item }}."
+                            "help": "Pick an array/list from a previous step (e.g. parsed CSV rows or an API list). The workflow runs once per item \u2014 read the current entry downstream with {{ item }} (also available: {{ index }}, {{ is_first }}, {{ is_last }}, {{ total }})."
+                        },
+                        {
+                            "key": "offset",
+                            "label": "Skip first N (offset)",
+                            "type": "number",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Max items (limit)",
+                            "type": "number",
+                            "required": false,
+                            "placeholder": "blank = no limit"
                         }
                     ],
                     "outputs": [
@@ -28712,6 +29564,82 @@
                 }
             }
         },
+        "repeater": {
+            "slug": "repeater",
+            "name": "Repeater",
+            "icon": "iterator",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "repeat": {
+                    "label": "Repeat / Loop",
+                    "key": "repeat",
+                    "schema": [
+                        {
+                            "key": "mode",
+                            "label": "Mode",
+                            "type": "select",
+                            "default": "count",
+                            "options": [
+                                {
+                                    "value": "count",
+                                    "label": "Repeat N times"
+                                },
+                                {
+                                    "value": "range",
+                                    "label": "Number range (from \u2192 to)"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "times",
+                            "label": "Times",
+                            "type": "number",
+                            "default": 3,
+                            "depends_on": {
+                                "mode": "count"
+                            },
+                            "help": "Runs the branch this many times. Read the counter downstream with {{ i }} (also {{ index }}, {{ is_first }}, {{ is_last }}, {{ total }})."
+                        },
+                        {
+                            "key": "from",
+                            "label": "From",
+                            "type": "number",
+                            "default": 1,
+                            "depends_on": {
+                                "mode": "range"
+                            }
+                        },
+                        {
+                            "key": "to",
+                            "label": "To",
+                            "type": "number",
+                            "default": 10,
+                            "depends_on": {
+                                "mode": "range"
+                            }
+                        },
+                        {
+                            "key": "step",
+                            "label": "Step",
+                            "type": "number",
+                            "default": 1,
+                            "depends_on": {
+                                "mode": "range"
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "loop",
+                        "done"
+                    ]
+                }
+            }
+        },
         "router": {
             "slug": "router",
             "name": "Router",
@@ -28732,31 +29660,308 @@
                             "label": "Value to route on",
                             "type": "expression",
                             "required": true,
-                            "placeholder": "{{1.type}}"
+                            "placeholder": "{{1.type}}",
+                            "help": "Each route below is checked in order; the run takes the first match, else the Fallback branch. Wire a node to each branch handle (Path 1\u20134 / Fallback)."
+                        },
+                        {
+                            "key": "op_1",
+                            "label": "Path 1 \u2014 operator",
+                            "type": "select",
+                            "default": "==",
+                            "options": [
+                                {
+                                    "label": "Equals",
+                                    "value": "=="
+                                },
+                                {
+                                    "label": "Not Equals",
+                                    "value": "!="
+                                },
+                                {
+                                    "label": "Equals (ignore case)",
+                                    "value": "equals_ci"
+                                },
+                                {
+                                    "label": "Contains",
+                                    "value": "contains"
+                                },
+                                {
+                                    "label": "Contains (ignore case)",
+                                    "value": "contains_ci"
+                                },
+                                {
+                                    "label": "Not Contains",
+                                    "value": "not_contains"
+                                },
+                                {
+                                    "label": "Starts With",
+                                    "value": "starts_with"
+                                },
+                                {
+                                    "label": "Ends With",
+                                    "value": "ends_with"
+                                },
+                                {
+                                    "label": "Greater Than",
+                                    "value": ">"
+                                },
+                                {
+                                    "label": "Less Than",
+                                    "value": "<"
+                                },
+                                {
+                                    "label": "Greater or Equal",
+                                    "value": ">="
+                                },
+                                {
+                                    "label": "Less or Equal",
+                                    "value": "<="
+                                },
+                                {
+                                    "label": "Matches Regex",
+                                    "value": "matches_regex"
+                                },
+                                {
+                                    "label": "In List",
+                                    "value": "in_list"
+                                },
+                                {
+                                    "label": "Between",
+                                    "value": "between"
+                                }
+                            ]
                         },
                         {
                             "key": "case_1",
-                            "label": "Path 1 equals",
+                            "label": "Path 1 \u2014 value",
                             "type": "expression",
-                            "required": false
+                            "required": false,
+                            "placeholder": "Leave blank to skip this route"
+                        },
+                        {
+                            "key": "op_2",
+                            "label": "Path 2 \u2014 operator",
+                            "type": "select",
+                            "default": "==",
+                            "options": [
+                                {
+                                    "label": "Equals",
+                                    "value": "=="
+                                },
+                                {
+                                    "label": "Not Equals",
+                                    "value": "!="
+                                },
+                                {
+                                    "label": "Equals (ignore case)",
+                                    "value": "equals_ci"
+                                },
+                                {
+                                    "label": "Contains",
+                                    "value": "contains"
+                                },
+                                {
+                                    "label": "Contains (ignore case)",
+                                    "value": "contains_ci"
+                                },
+                                {
+                                    "label": "Not Contains",
+                                    "value": "not_contains"
+                                },
+                                {
+                                    "label": "Starts With",
+                                    "value": "starts_with"
+                                },
+                                {
+                                    "label": "Ends With",
+                                    "value": "ends_with"
+                                },
+                                {
+                                    "label": "Greater Than",
+                                    "value": ">"
+                                },
+                                {
+                                    "label": "Less Than",
+                                    "value": "<"
+                                },
+                                {
+                                    "label": "Greater or Equal",
+                                    "value": ">="
+                                },
+                                {
+                                    "label": "Less or Equal",
+                                    "value": "<="
+                                },
+                                {
+                                    "label": "Matches Regex",
+                                    "value": "matches_regex"
+                                },
+                                {
+                                    "label": "In List",
+                                    "value": "in_list"
+                                },
+                                {
+                                    "label": "Between",
+                                    "value": "between"
+                                }
+                            ]
                         },
                         {
                             "key": "case_2",
-                            "label": "Path 2 equals",
+                            "label": "Path 2 \u2014 value",
                             "type": "expression",
-                            "required": false
+                            "required": false,
+                            "placeholder": "Leave blank to skip this route"
+                        },
+                        {
+                            "key": "op_3",
+                            "label": "Path 3 \u2014 operator",
+                            "type": "select",
+                            "default": "==",
+                            "options": [
+                                {
+                                    "label": "Equals",
+                                    "value": "=="
+                                },
+                                {
+                                    "label": "Not Equals",
+                                    "value": "!="
+                                },
+                                {
+                                    "label": "Equals (ignore case)",
+                                    "value": "equals_ci"
+                                },
+                                {
+                                    "label": "Contains",
+                                    "value": "contains"
+                                },
+                                {
+                                    "label": "Contains (ignore case)",
+                                    "value": "contains_ci"
+                                },
+                                {
+                                    "label": "Not Contains",
+                                    "value": "not_contains"
+                                },
+                                {
+                                    "label": "Starts With",
+                                    "value": "starts_with"
+                                },
+                                {
+                                    "label": "Ends With",
+                                    "value": "ends_with"
+                                },
+                                {
+                                    "label": "Greater Than",
+                                    "value": ">"
+                                },
+                                {
+                                    "label": "Less Than",
+                                    "value": "<"
+                                },
+                                {
+                                    "label": "Greater or Equal",
+                                    "value": ">="
+                                },
+                                {
+                                    "label": "Less or Equal",
+                                    "value": "<="
+                                },
+                                {
+                                    "label": "Matches Regex",
+                                    "value": "matches_regex"
+                                },
+                                {
+                                    "label": "In List",
+                                    "value": "in_list"
+                                },
+                                {
+                                    "label": "Between",
+                                    "value": "between"
+                                }
+                            ]
                         },
                         {
                             "key": "case_3",
-                            "label": "Path 3 equals",
+                            "label": "Path 3 \u2014 value",
                             "type": "expression",
-                            "required": false
+                            "required": false,
+                            "placeholder": "Leave blank to skip this route"
+                        },
+                        {
+                            "key": "op_4",
+                            "label": "Path 4 \u2014 operator",
+                            "type": "select",
+                            "default": "==",
+                            "options": [
+                                {
+                                    "label": "Equals",
+                                    "value": "=="
+                                },
+                                {
+                                    "label": "Not Equals",
+                                    "value": "!="
+                                },
+                                {
+                                    "label": "Equals (ignore case)",
+                                    "value": "equals_ci"
+                                },
+                                {
+                                    "label": "Contains",
+                                    "value": "contains"
+                                },
+                                {
+                                    "label": "Contains (ignore case)",
+                                    "value": "contains_ci"
+                                },
+                                {
+                                    "label": "Not Contains",
+                                    "value": "not_contains"
+                                },
+                                {
+                                    "label": "Starts With",
+                                    "value": "starts_with"
+                                },
+                                {
+                                    "label": "Ends With",
+                                    "value": "ends_with"
+                                },
+                                {
+                                    "label": "Greater Than",
+                                    "value": ">"
+                                },
+                                {
+                                    "label": "Less Than",
+                                    "value": "<"
+                                },
+                                {
+                                    "label": "Greater or Equal",
+                                    "value": ">="
+                                },
+                                {
+                                    "label": "Less or Equal",
+                                    "value": "<="
+                                },
+                                {
+                                    "label": "Matches Regex",
+                                    "value": "matches_regex"
+                                },
+                                {
+                                    "label": "In List",
+                                    "value": "in_list"
+                                },
+                                {
+                                    "label": "Between",
+                                    "value": "between"
+                                }
+                            ]
                         },
                         {
                             "key": "case_4",
-                            "label": "Path 4 equals",
+                            "label": "Path 4 \u2014 value",
                             "type": "expression",
-                            "required": false
+                            "required": false,
+                            "placeholder": "Leave blank to skip this route"
                         }
                     ],
                     "outputs": [
@@ -28910,6 +30115,34 @@
                             "key": "value",
                             "label": "Value",
                             "type": "expression"
+                        },
+                        {
+                            "key": "type",
+                            "label": "Cast as",
+                            "type": "select",
+                            "default": "auto",
+                            "options": [
+                                {
+                                    "value": "auto",
+                                    "label": "Auto (keep as-is)"
+                                },
+                                {
+                                    "value": "string",
+                                    "label": "Text"
+                                },
+                                {
+                                    "value": "number",
+                                    "label": "Number"
+                                },
+                                {
+                                    "value": "boolean",
+                                    "label": "Boolean"
+                                },
+                                {
+                                    "value": "json",
+                                    "label": "JSON (parse)"
+                                }
+                            ]
                         }
                     ],
                     "outputs": [
