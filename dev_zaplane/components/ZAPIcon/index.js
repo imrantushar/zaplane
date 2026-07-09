@@ -4,7 +4,8 @@ const ZAPIcon = ({
   name,
   isAction = false
 }) => {
-  const isSvg = icon?.endsWith(".svg");
+  const isSvg = typeof icon === "string" && icon.endsWith(".svg");
+  const isIconKey = typeof icon === "string" && !isSvg;
   const size = isAction ? '40px' : '32px';
   const imgSize = isAction ? '20px' : '18px';
 
@@ -24,8 +25,15 @@ const ZAPIcon = ({
           alt={name}
           style={{width: imgSize, height: imgSize, objectFit: 'contain'}}
         />
-      ) : icon ? (
+      ) : isIconKey ? (
         <span className={`zaplane-icon zaplane-icon--${icon} m-0`} style={{fontSize: imgSize}} />
+      ) : icon ? (
+        <span
+          className="flex items-center justify-center text-[var(--zaplane-font-secondary-color)]"
+          style={{fontSize: imgSize}}
+        >
+          {icon}
+        </span>
       ) : (
         <span
           className="uppercase font-semibold m-0"

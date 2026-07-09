@@ -1,5 +1,6 @@
 import DrawerItemButton from "./DrawerItemButton";
 import { IoIosArrowForward } from "react-icons/io";
+import { FiTool } from "react-icons/fi";
 import { ACTION_TOOLS, TRIGGER_TOOLS } from "@ZAPHooks/useActionDrawer/helper";
 
 const DrawerModeList = ({
@@ -18,7 +19,7 @@ const DrawerModeList = ({
         ? TRIGGER_TOOLS.length > 0 && (
             <DrawerItemButton item={{
               name: "Tools"
-            }} onClick={() => setMode("tools")} arrowIcon={<IoIosArrowForward />} showType={false} icon={'grid'} />
+            }} onClick={() => setMode("tools")} arrowIcon={<IoIosArrowForward />} showType={false} icon={<FiTool />} />
           )
         : ACTION_TOOLS.map(tool => <DrawerItemButton key={tool.id} item={{
             ...tool,
