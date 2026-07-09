@@ -77,6 +77,12 @@ export default function VariablePopover({
                     </span>
                   )}
 
+                  {source === "app" && !item.is_sample && (
+                    <span className="mr-2 rounded border border-green-200 bg-green-50 px-1.5 py-0.5 text-xs text-green-600">
+                      {__("Live Data", "zaplane")}
+                    </span>
+                  )}
+
                   <LuChevronDown
                     className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
                       open ? "rotate-180" : ""

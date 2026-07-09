@@ -42,7 +42,9 @@ class Router extends IntegrationBase {
 	}
 
 	public static function get_output_ports(): array {
-		return [ 'path_1', 'path_2', 'path_3', 'path_4', 'fallback' ];
+		// Routes are dynamic; the canvas derives the visible paths from config.
+		// This is a generous superset used only for validation / the manifest.
+		return [ 'path_1', 'path_2', 'path_3', 'path_4', 'path_5', 'path_6', 'path_7', 'path_8', 'fallback' ];
 	}
 
 	public static function get_actions(): array {
@@ -76,35 +78,37 @@ class Router extends IntegrationBase {
 			return [];
 		}
 
-		$fields = [
+		return [
 			[
 				'key'         => 'value',
 				'label'       => 'Value to route on',
 				'type'        => 'expression',
 				'required'    => true,
 				'placeholder' => '{{1.type}}',
-				'help'        => 'Each route below is checked in order; the run takes the first match, else the Fallback branch. Wire a node to each branch handle (Path 1–4 / Fallback).',
+			],
+			[
+				'key'    => 'routes',
+				'label'  => 'Routes',
+				'type'   => 'repeater',
+				'help'   => 'Add a route for each path. They are checked top to bottom — the run takes the first match, otherwise the Fallback path. Each route is a branch on the canvas; wire a node to it with the “+”.',
+				'fields' => [
+					[
+						'key'     => 'operator',
+						'label'   => 'Operator',
+						'type'    => 'select',
+						'default' => '==',
+						'options' => self::operator_options(),
+					],
+					[
+						'key'         => 'value',
+						'label'       => 'Compare against',
+						'type'        => 'expression',
+						'required'    => false,
+						'placeholder' => 'e.g. paid',
+					],
+				],
 			],
 		];
-
-		for ( $i = 1; $i <= 4; $i++ ) {
-			$fields[] = [
-				'key'     => 'op_' . $i,
-				'label'   => "Path {$i} — operator",
-				'type'    => 'select',
-				'default' => '==',
-				'options' => self::operator_options(),
-			];
-			$fields[] = [
-				'key'         => 'case_' . $i,
-				'label'       => "Path {$i} — value",
-				'type'        => 'expression',
-				'required'    => false,
-				'placeholder' => 'Leave blank to skip this route',
-			];
-		}
-
-		return $fields;
 	}
 
 	public static function execute_node( array $node, array $input ): array {
@@ -115,9 +119,11 @@ class Router extends IntegrationBase {
 		$value  = (string) ( $config['value'] ?? '' );
 
 		$port = 'fallback';
-		for ( $i = 1; $i <= 4; $i++ ) {
-			$case = (string) ( $config[ 'case_' . $i ] ?? '' );
-			$op   = $config[ 'op_' . $i ] ?? '==';
+		$i    = 0;
+		foreach ( self::normalize_routes( $config ) as $route ) {
+			$i++;
+			$case = (string) ( $route['value'] ?? '' );
+			$op   = $route['operator'] ?? '==';
 
 			// An empty case skips the route (unless the operator is an emptiness check).
 			if ( '' === $case && ! in_array( $op, [ 'is_empty', 'is_not_empty', 'is_true', 'is_false' ], true ) ) {
@@ -137,5 +143,24 @@ class Router extends IntegrationBase {
 				'routed_value' => $value,
 			] ),
 		];
+	}
+
+	/**
+	 * Return the configured routes as a list of [operator, value].
+	 *
+	 * @param array<string,mixed> $config
+	 * @return array<int,array{operator:string,value:string}>
+	 */
+	private static function normalize_routes( array $config ): array {
+		$routes = [];
+		foreach ( (array) ( $config['routes'] ?? [] ) as $r ) {
+			if ( is_array( $r ) ) {
+				$routes[] = [
+					'operator' => $r['operator'] ?? '==',
+					'value'    => (string) ( $r['value'] ?? '' ),
+				];
+			}
+		}
+		return $routes;
 	}
 }

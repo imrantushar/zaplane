@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-09 13:53:52",
+    "generated_at": "2026-07-09 14:52:52",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -2887,125 +2887,6 @@
                             "type": "number",
                             "required": false,
                             "help": "Ignored for Claude Opus / Fable models, which do not accept it."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "ai-agent": {
-            "slug": "ai-agent",
-            "name": "AI Agent",
-            "icon": "ai-agent.svg",
-            "category": "app",
-            "requires_connection": true,
-            "auth_type": "api_key",
-            "supports_webhook": false,
-            "webhook_url": "",
-            "triggers": [],
-            "actions": {
-                "run_agent": {
-                    "label": "Run AI Agent",
-                    "key": "run_agent",
-                    "schema": [
-                        {
-                            "key": "model",
-                            "label": "Model",
-                            "type": "select",
-                            "required": true,
-                            "default": "claude-opus-4-8",
-                            "options": [
-                                {
-                                    "value": "claude-opus-4-8",
-                                    "label": "Claude Opus 4.8"
-                                },
-                                {
-                                    "value": "claude-sonnet-4-6",
-                                    "label": "Claude Sonnet 4.6"
-                                },
-                                {
-                                    "value": "gpt-4o",
-                                    "label": "OpenAI GPT-4o"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "system_prompt",
-                            "label": "Agent Instructions",
-                            "type": "textarea",
-                            "required": false,
-                            "placeholder": "You are a support agent for Acme. Use the tools to find answers before replying."
-                        },
-                        {
-                            "key": "task",
-                            "label": "Task / Message",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "{{trigger.text}}"
-                        },
-                        {
-                            "key": "business_key",
-                            "label": "Knowledge Business Key (enables knowledge search tool)",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "business_a"
-                        },
-                        {
-                            "key": "enable_http",
-                            "label": "Allow HTTP Request tool",
-                            "type": "select",
-                            "required": false,
-                            "default": "no",
-                            "options": [
-                                {
-                                    "value": "no",
-                                    "label": "No"
-                                },
-                                {
-                                    "value": "yes",
-                                    "label": "Yes"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "mcp_server_url",
-                            "label": "MCP Server URL (enables MCP tools)",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "https://your-mcp-server/mcp",
-                            "help": "Connect an MCP server and every tool it exposes becomes callable by the agent."
-                        },
-                        {
-                            "key": "mcp_auth_token",
-                            "label": "MCP Bearer token (optional)",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "max_steps",
-                            "label": "Max Tool Steps",
-                            "type": "number",
-                            "required": false,
-                            "default": 5
-                        },
-                        {
-                            "key": "response_format",
-                            "label": "Response Format",
-                            "type": "select",
-                            "default": "text",
-                            "options": [
-                                {
-                                    "value": "text",
-                                    "label": "Text"
-                                },
-                                {
-                                    "value": "json",
-                                    "label": "JSON (structured)"
-                                }
-                            ],
-                            "help": "Text returns the reply as-is. JSON asks the model for a structured JSON object and parses it into a `json` output field."
                         }
                     ],
                     "outputs": [
@@ -27377,6 +27258,67 @@
         }
     },
     "tools": {
+        "ai-agent": {
+            "slug": "ai-agent",
+            "name": "AI Agent",
+            "icon": "ai-agent.svg",
+            "category": "tool",
+            "requires_connection": true,
+            "auth_type": "api_key",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": [],
+            "actions": {
+                "run_agent": {
+                    "label": "Run AI Agent",
+                    "key": "run_agent",
+                    "schema": [
+                        {
+                            "key": "system_prompt",
+                            "label": "Agent Instructions",
+                            "type": "textarea",
+                            "required": false,
+                            "placeholder": "You are a support agent for Acme. Use the connected tools to find answers before replying."
+                        },
+                        {
+                            "key": "task",
+                            "label": "Task / Message",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.text}}"
+                        },
+                        {
+                            "key": "max_steps",
+                            "label": "Max Tool Steps",
+                            "type": "number",
+                            "required": false,
+                            "default": 5,
+                            "help": "How many tool-use rounds the agent may take before it must answer."
+                        },
+                        {
+                            "key": "response_format",
+                            "label": "Response Format",
+                            "type": "select",
+                            "default": "text",
+                            "options": [
+                                {
+                                    "value": "text",
+                                    "label": "Text"
+                                },
+                                {
+                                    "value": "json",
+                                    "label": "JSON (structured)"
+                                }
+                            ],
+                            "help": "Text returns the reply as-is. JSON asks the model for a structured JSON object and parses it into a `json` output field."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "condition": {
             "slug": "condition",
             "name": "Condition",
@@ -28869,10 +28811,21 @@
                         },
                         {
                             "key": "query_params",
-                            "label": "Query Parameters (JSON)",
-                            "type": "json",
-                            "required": false,
-                            "help": "{\"key\":\"value\"} \u2014 appended to the URL as ?key=value."
+                            "label": "Query Parameters",
+                            "type": "map",
+                            "help": "Appended to the URL as ?key=value. Add a row per parameter.",
+                            "fields": [
+                                {
+                                    "key": "key",
+                                    "label": "Key",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "expression"
+                                }
+                            ]
                         },
                         {
                             "key": "auth_type",
@@ -28941,8 +28894,21 @@
                         },
                         {
                             "key": "headers",
-                            "label": "Headers (JSON)",
-                            "type": "json"
+                            "label": "Headers",
+                            "type": "map",
+                            "help": "Add a row per header.",
+                            "fields": [
+                                {
+                                    "key": "key",
+                                    "label": "Header",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "expression"
+                                }
+                            ]
                         },
                         {
                             "key": "body_type",
@@ -29666,308 +29632,90 @@
                             "label": "Value to route on",
                             "type": "expression",
                             "required": true,
-                            "placeholder": "{{1.type}}",
-                            "help": "Each route below is checked in order; the run takes the first match, else the Fallback branch. Wire a node to each branch handle (Path 1\u20134 / Fallback)."
+                            "placeholder": "{{1.type}}"
                         },
                         {
-                            "key": "op_1",
-                            "label": "Path 1 \u2014 operator",
-                            "type": "select",
-                            "default": "==",
-                            "options": [
+                            "key": "routes",
+                            "label": "Routes",
+                            "type": "repeater",
+                            "help": "Add a route for each path. They are checked top to bottom \u2014 the run takes the first match, otherwise the Fallback path. Each route is a branch on the canvas; wire a node to it with the \u201c+\u201d.",
+                            "fields": [
                                 {
-                                    "label": "Equals",
-                                    "value": "=="
+                                    "key": "operator",
+                                    "label": "Operator",
+                                    "type": "select",
+                                    "default": "==",
+                                    "options": [
+                                        {
+                                            "label": "Equals",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": "Not Equals",
+                                            "value": "!="
+                                        },
+                                        {
+                                            "label": "Equals (ignore case)",
+                                            "value": "equals_ci"
+                                        },
+                                        {
+                                            "label": "Contains",
+                                            "value": "contains"
+                                        },
+                                        {
+                                            "label": "Contains (ignore case)",
+                                            "value": "contains_ci"
+                                        },
+                                        {
+                                            "label": "Not Contains",
+                                            "value": "not_contains"
+                                        },
+                                        {
+                                            "label": "Starts With",
+                                            "value": "starts_with"
+                                        },
+                                        {
+                                            "label": "Ends With",
+                                            "value": "ends_with"
+                                        },
+                                        {
+                                            "label": "Greater Than",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "Less Than",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": "Greater or Equal",
+                                            "value": ">="
+                                        },
+                                        {
+                                            "label": "Less or Equal",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": "Matches Regex",
+                                            "value": "matches_regex"
+                                        },
+                                        {
+                                            "label": "In List",
+                                            "value": "in_list"
+                                        },
+                                        {
+                                            "label": "Between",
+                                            "value": "between"
+                                        }
+                                    ]
                                 },
                                 {
-                                    "label": "Not Equals",
-                                    "value": "!="
-                                },
-                                {
-                                    "label": "Equals (ignore case)",
-                                    "value": "equals_ci"
-                                },
-                                {
-                                    "label": "Contains",
-                                    "value": "contains"
-                                },
-                                {
-                                    "label": "Contains (ignore case)",
-                                    "value": "contains_ci"
-                                },
-                                {
-                                    "label": "Not Contains",
-                                    "value": "not_contains"
-                                },
-                                {
-                                    "label": "Starts With",
-                                    "value": "starts_with"
-                                },
-                                {
-                                    "label": "Ends With",
-                                    "value": "ends_with"
-                                },
-                                {
-                                    "label": "Greater Than",
-                                    "value": ">"
-                                },
-                                {
-                                    "label": "Less Than",
-                                    "value": "<"
-                                },
-                                {
-                                    "label": "Greater or Equal",
-                                    "value": ">="
-                                },
-                                {
-                                    "label": "Less or Equal",
-                                    "value": "<="
-                                },
-                                {
-                                    "label": "Matches Regex",
-                                    "value": "matches_regex"
-                                },
-                                {
-                                    "label": "In List",
-                                    "value": "in_list"
-                                },
-                                {
-                                    "label": "Between",
-                                    "value": "between"
+                                    "key": "value",
+                                    "label": "Compare against",
+                                    "type": "expression",
+                                    "required": false,
+                                    "placeholder": "e.g. paid"
                                 }
                             ]
-                        },
-                        {
-                            "key": "case_1",
-                            "label": "Path 1 \u2014 value",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "Leave blank to skip this route"
-                        },
-                        {
-                            "key": "op_2",
-                            "label": "Path 2 \u2014 operator",
-                            "type": "select",
-                            "default": "==",
-                            "options": [
-                                {
-                                    "label": "Equals",
-                                    "value": "=="
-                                },
-                                {
-                                    "label": "Not Equals",
-                                    "value": "!="
-                                },
-                                {
-                                    "label": "Equals (ignore case)",
-                                    "value": "equals_ci"
-                                },
-                                {
-                                    "label": "Contains",
-                                    "value": "contains"
-                                },
-                                {
-                                    "label": "Contains (ignore case)",
-                                    "value": "contains_ci"
-                                },
-                                {
-                                    "label": "Not Contains",
-                                    "value": "not_contains"
-                                },
-                                {
-                                    "label": "Starts With",
-                                    "value": "starts_with"
-                                },
-                                {
-                                    "label": "Ends With",
-                                    "value": "ends_with"
-                                },
-                                {
-                                    "label": "Greater Than",
-                                    "value": ">"
-                                },
-                                {
-                                    "label": "Less Than",
-                                    "value": "<"
-                                },
-                                {
-                                    "label": "Greater or Equal",
-                                    "value": ">="
-                                },
-                                {
-                                    "label": "Less or Equal",
-                                    "value": "<="
-                                },
-                                {
-                                    "label": "Matches Regex",
-                                    "value": "matches_regex"
-                                },
-                                {
-                                    "label": "In List",
-                                    "value": "in_list"
-                                },
-                                {
-                                    "label": "Between",
-                                    "value": "between"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "case_2",
-                            "label": "Path 2 \u2014 value",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "Leave blank to skip this route"
-                        },
-                        {
-                            "key": "op_3",
-                            "label": "Path 3 \u2014 operator",
-                            "type": "select",
-                            "default": "==",
-                            "options": [
-                                {
-                                    "label": "Equals",
-                                    "value": "=="
-                                },
-                                {
-                                    "label": "Not Equals",
-                                    "value": "!="
-                                },
-                                {
-                                    "label": "Equals (ignore case)",
-                                    "value": "equals_ci"
-                                },
-                                {
-                                    "label": "Contains",
-                                    "value": "contains"
-                                },
-                                {
-                                    "label": "Contains (ignore case)",
-                                    "value": "contains_ci"
-                                },
-                                {
-                                    "label": "Not Contains",
-                                    "value": "not_contains"
-                                },
-                                {
-                                    "label": "Starts With",
-                                    "value": "starts_with"
-                                },
-                                {
-                                    "label": "Ends With",
-                                    "value": "ends_with"
-                                },
-                                {
-                                    "label": "Greater Than",
-                                    "value": ">"
-                                },
-                                {
-                                    "label": "Less Than",
-                                    "value": "<"
-                                },
-                                {
-                                    "label": "Greater or Equal",
-                                    "value": ">="
-                                },
-                                {
-                                    "label": "Less or Equal",
-                                    "value": "<="
-                                },
-                                {
-                                    "label": "Matches Regex",
-                                    "value": "matches_regex"
-                                },
-                                {
-                                    "label": "In List",
-                                    "value": "in_list"
-                                },
-                                {
-                                    "label": "Between",
-                                    "value": "between"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "case_3",
-                            "label": "Path 3 \u2014 value",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "Leave blank to skip this route"
-                        },
-                        {
-                            "key": "op_4",
-                            "label": "Path 4 \u2014 operator",
-                            "type": "select",
-                            "default": "==",
-                            "options": [
-                                {
-                                    "label": "Equals",
-                                    "value": "=="
-                                },
-                                {
-                                    "label": "Not Equals",
-                                    "value": "!="
-                                },
-                                {
-                                    "label": "Equals (ignore case)",
-                                    "value": "equals_ci"
-                                },
-                                {
-                                    "label": "Contains",
-                                    "value": "contains"
-                                },
-                                {
-                                    "label": "Contains (ignore case)",
-                                    "value": "contains_ci"
-                                },
-                                {
-                                    "label": "Not Contains",
-                                    "value": "not_contains"
-                                },
-                                {
-                                    "label": "Starts With",
-                                    "value": "starts_with"
-                                },
-                                {
-                                    "label": "Ends With",
-                                    "value": "ends_with"
-                                },
-                                {
-                                    "label": "Greater Than",
-                                    "value": ">"
-                                },
-                                {
-                                    "label": "Less Than",
-                                    "value": "<"
-                                },
-                                {
-                                    "label": "Greater or Equal",
-                                    "value": ">="
-                                },
-                                {
-                                    "label": "Less or Equal",
-                                    "value": "<="
-                                },
-                                {
-                                    "label": "Matches Regex",
-                                    "value": "matches_regex"
-                                },
-                                {
-                                    "label": "In List",
-                                    "value": "in_list"
-                                },
-                                {
-                                    "label": "Between",
-                                    "value": "between"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "case_4",
-                            "label": "Path 4 \u2014 value",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "Leave blank to skip this route"
                         }
                     ],
                     "outputs": [
@@ -29975,6 +29723,10 @@
                         "path_2",
                         "path_3",
                         "path_4",
+                        "path_5",
+                        "path_6",
+                        "path_7",
+                        "path_8",
                         "fallback"
                     ]
                 }

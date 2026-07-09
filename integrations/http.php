@@ -51,11 +51,14 @@ class Http extends IntegrationBase {
 				]
 			],
 			[
-				'key'      => 'query_params',
-				'label'    => 'Query Parameters (JSON)',
-				'type'     => 'json',
-				'required' => false,
-				'help'     => '{"key":"value"} — appended to the URL as ?key=value.',
+				'key'    => 'query_params',
+				'label'  => 'Query Parameters',
+				'type'   => 'map',
+				'help'   => 'Appended to the URL as ?key=value. Add a row per parameter.',
+				'fields' => [
+					[ 'key' => 'key',   'label' => 'Key',   'type' => 'text' ],
+					[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression' ],
+				],
 			],
 			[
 				'key'     => 'auth_type',
@@ -75,9 +78,14 @@ class Http extends IntegrationBase {
 			[ 'key' => 'auth_header', 'label' => 'Header name', 'type' => 'text', 'default' => 'X-API-Key', 'depends_on' => [ 'auth_type' => 'api_key' ] ],
 			[ 'key' => 'auth_value', 'label' => 'API key value', 'type' => 'expression', 'depends_on' => [ 'auth_type' => 'api_key' ] ],
 			[
-				'key' => 'headers',
-				'label' => 'Headers (JSON)',
-				'type' => 'json'
+				'key'    => 'headers',
+				'label'  => 'Headers',
+				'type'   => 'map',
+				'help'   => 'Add a row per header.',
+				'fields' => [
+					[ 'key' => 'key',   'label' => 'Header', 'type' => 'text' ],
+					[ 'key' => 'value', 'label' => 'Value',  'type' => 'expression' ],
+				],
 			],
 			[
 				'key'        => 'body_type',
@@ -140,19 +148,11 @@ class Http extends IntegrationBase {
 			];
 		}
 
-		$headers = $c['headers'] ?? [];
-		if ( is_string( $headers ) ) {
-			$decoded = json_decode( $headers, true );
-			$headers = is_array( $decoded ) ? $decoded : [];
-		}
+		$headers = self::kv_to_assoc( $c['headers'] ?? [] );
 
 		// Append query parameters to the URL.
-		$query = $c['query_params'] ?? [];
-		if ( is_string( $query ) ) {
-			$decoded = json_decode( $query, true );
-			$query   = is_array( $decoded ) ? $decoded : [];
-		}
-		if ( is_array( $query ) && ! empty( $query ) ) {
+		$query = self::kv_to_assoc( $c['query_params'] ?? [] );
+		if ( ! empty( $query ) ) {
 			$url = add_query_arg( array_map( 'strval', $query ), $url );
 		}
 
@@ -211,6 +211,41 @@ class Http extends IntegrationBase {
 				'headers' => $headers_array,
 			]
 		];
+	}
+
+	/**
+	 * Normalise a key-value `map` field (array of {key,value} rows) — or a JSON
+	 * string / associative array — into a plain associative array.
+	 *
+	 * @param mixed $val
+	 * @return array<string,mixed>
+	 */
+	protected static function kv_to_assoc( $val ): array {
+		if ( is_string( $val ) ) {
+			$decoded = json_decode( $val, true );
+			$val     = is_array( $decoded ) ? $decoded : [];
+		}
+		if ( ! is_array( $val ) ) {
+			return [];
+		}
+
+		// Repeater/map rows: [ ['key' => …, 'value' => …], … ].
+		$first = reset( $val );
+		if ( is_array( $first ) && array_key_exists( 'key', $first ) ) {
+			$out = [];
+			foreach ( $val as $row ) {
+				if ( ! is_array( $row ) ) {
+					continue;
+				}
+				$k = trim( (string) ( $row['key'] ?? '' ) );
+				if ( '' !== $k ) {
+					$out[ $k ] = $row['value'] ?? '';
+				}
+			}
+			return $out;
+		}
+
+		return $val;
 	}
 
 	/**

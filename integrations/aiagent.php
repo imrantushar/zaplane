@@ -27,6 +27,10 @@ class Aiagent extends IntegrationBase {
 		return 'ai-agent.svg';
 	}
 
+	public static function get_category(): string {
+		return 'tool';
+	}
+
 	public static function get_triggers(): array {
 		return [];
 	}
@@ -77,34 +81,18 @@ class Aiagent extends IntegrationBase {
 			return [];
 		}
 
+		// The agent's Chat Model, Memory, and Tools are wired on the canvas via the
+		// node's sub-input handles — so those settings intentionally do NOT appear
+		// here. Configure only the agent's own "brain": instructions, task, step
+		// budget, and output format. (execute_node still honours any legacy inline
+		// model/knowledge/http/mcp config for backward compatibility.)
 		return [
-			[
-				'key'      => 'model',
-				'label'    => 'Model',
-				'type'     => 'select',
-				'required' => true,
-				'default'  => self::DEFAULT_MODEL,
-				'options'  => [
-					[
-						'value' => 'claude-opus-4-8',
-						'label' => 'Claude Opus 4.8'
-					],
-					[
-						'value' => 'claude-sonnet-4-6',
-						'label' => 'Claude Sonnet 4.6'
-					],
-					[
-						'value' => 'gpt-4o',
-						'label' => 'OpenAI GPT-4o'
-					],
-				],
-			],
 			[
 				'key'         => 'system_prompt',
 				'label'       => 'Agent Instructions',
 				'type'        => 'textarea',
 				'required'    => false,
-				'placeholder' => 'You are a support agent for Acme. Use the tools to find answers before replying.',
+				'placeholder' => 'You are a support agent for Acme. Use the connected tools to find answers before replying.',
 			],
 			[
 				'key'         => 'task',
@@ -114,49 +102,12 @@ class Aiagent extends IntegrationBase {
 				'placeholder' => '{{trigger.text}}',
 			],
 			[
-				'key'         => 'business_key',
-				'label'       => 'Knowledge Business Key (enables knowledge search tool)',
-				'type'        => 'expression',
-				'required'    => false,
-				'placeholder' => 'business_a',
-			],
-			[
-				'key'      => 'enable_http',
-				'label'    => 'Allow HTTP Request tool',
-				'type'     => 'select',
-				'required' => false,
-				'default'  => 'no',
-				'options'  => [
-					[
-						'value' => 'no',
-						'label' => 'No'
-					],
-					[
-						'value' => 'yes',
-						'label' => 'Yes'
-					],
-				],
-			],
-			[
-				'key'         => 'mcp_server_url',
-				'label'       => 'MCP Server URL (enables MCP tools)',
-				'type'        => 'expression',
-				'required'    => false,
-				'placeholder' => 'https://your-mcp-server/mcp',
-				'help'        => 'Connect an MCP server and every tool it exposes becomes callable by the agent.',
-			],
-			[
-				'key'      => 'mcp_auth_token',
-				'label'    => 'MCP Bearer token (optional)',
-				'type'     => 'expression',
-				'required' => false,
-			],
-			[
 				'key'      => 'max_steps',
 				'label'    => 'Max Tool Steps',
 				'type'     => 'number',
 				'required' => false,
 				'default'  => self::DEFAULT_MAX_STEPS,
+				'help'     => 'How many tool-use rounds the agent may take before it must answer.',
 			],
 			[
 				'key'     => 'response_format',
