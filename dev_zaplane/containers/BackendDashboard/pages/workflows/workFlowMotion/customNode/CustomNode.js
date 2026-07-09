@@ -51,6 +51,11 @@ export default function CustomNode({
   // The AI Agent accepts sub-nodes wired into its bottom: a chat model, a memory
   // store, and any number of tool (action) nodes.
   const isAgent = data?.app === "ai-agent";
+  // A node wired into an agent's tool/memory/model handle is a "sub-node": it
+  // hangs off the agent, not the main flow, and connects from its top.
+  const isSubNode = edges.some(
+    (e) => e.source === id && (e.targetHandle === "ai_tool" || e.targetHandle === "ai_memory" || e.targetHandle === "ai_model")
+  );
   const SUB_PORTS = [
     { id: "ai_model", label: "Chat Model" },
     { id: "ai_memory", label: "Memory" },
@@ -185,7 +190,9 @@ export default function CustomNode({
         </div>
 
         {/* SOURCE HANDLES — one connectable, labelled handle per output branch */}
-        {isMultiPort ? (
+        {isSubNode ? (
+          <Handle type="source" id="sub_out" position={Position.Top} style={{ ...handleStyle, background: "#a855f7" }} />
+        ) : isMultiPort ? (
           ports.map((port, i) => {
             const pos = `${((i + 1) / (ports.length + 1)) * 100}%`;
             const portHasEdge = edges.some((e) => e.source === id && e.sourceHandle === port);

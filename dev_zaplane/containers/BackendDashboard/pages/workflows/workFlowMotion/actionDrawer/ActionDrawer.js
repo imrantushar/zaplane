@@ -38,7 +38,8 @@ const ActionDrawer = ({
   const {
     source,
     node,
-    edge
+    edge,
+    port
   } = context;
   const dispatch = useDispatch();
   const {
@@ -61,7 +62,7 @@ const ActionDrawer = ({
     visibleFields,
     resetAll,
   } = useActionDrawer({
-    open, node, source, setFieldValue, isTrigger, values, resetForm, onClose,
+    open, node, source, port, setFieldValue, isTrigger, values, resetForm, onClose,
   });
 
 

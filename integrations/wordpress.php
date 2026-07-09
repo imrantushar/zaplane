@@ -1803,6 +1803,7 @@ class Wordpress extends IntegrationBase {
 						'integration' => 'wordpress',
 						'query'       => 'taxonomy_terms',
 						'select'      => [ 'name', 'label' ],
+						'depends_on'  => [ 'taxonomy' ],
 					],
 				],
 				[
@@ -1952,6 +1953,7 @@ class Wordpress extends IntegrationBase {
 						'integration' => 'wordpress',
 						'query'       => 'taxonomy_terms',
 						'select'      => [ 'name', 'label' ],
+						'depends_on'  => [ 'taxonomy' ],
 					],
 				],
 				[
@@ -3065,6 +3067,8 @@ class Wordpress extends IntegrationBase {
 			'users_with_any' => [ self::class, 'query_users_with_any' ],
 			'taxonomies' => [ self::class, 'query_taxonomies' ],
 			'categories' => [ self::class, 'query_categories' ],
+			'tags'       => [ self::class, 'query_tags' ],
+			'taxonomy_terms' => [ self::class, 'query_taxonomy_terms' ],
 			'roles'      => [ self::class, 'query_roles' ],
 			'caps'       => [ self::class, 'query_caps' ],
 			'active_plugins'    => [ self::class, 'query_active_plugins' ],

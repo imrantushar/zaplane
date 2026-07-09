@@ -94,8 +94,9 @@ export const createActionNode = ({
             { id: `e${newNodeId}-${edge.target}`, source: newNodeId, target: edge.target, type: "custom" },
         ];
     } else if (port?.type === "target") {
-        // Sub-node feeds INTO the anchor's input handle (e.g. agent tools).
-        newEdges.push({ id: `e${newNodeId}-${sourceNode.id}-${port.id}`, source: newNodeId, target: sourceNode.id, targetHandle: port.id, type: "custom" });
+        // Sub-node feeds INTO the anchor's input handle (e.g. agent tools). It
+        // connects from its own top handle ("sub_out") for a clean vertical path.
+        newEdges.push({ id: `e${newNodeId}-${sourceNode.id}-${port.id}`, source: newNodeId, target: sourceNode.id, sourceHandle: "sub_out", targetHandle: port.id, type: "custom" });
     } else if (port?.type === "source") {
         // Child of a specific output branch (e.g. iterator loop, router path).
         newEdges.push({ id: `e${sourceNode.id}-${newNodeId}-${port.id}`, source: sourceNode.id, target: newNodeId, sourceHandle: port.id, type: "custom" });

@@ -41,10 +41,26 @@ import {
 
 
 
+// A tool sub-node shouldn't be a trigger, the agent itself, memory/model (those
+// have their own handles), or a control-flow node — they aren't callable tools.
+const SUB_TOOL_BLOCKLIST = new Set([
+  "ai-agent", "memory", "ai", "sticky_note", "manual",
+  "condition", "filter", "router", "iterator", "repeater", "delay",
+  "human_approval", "schedule",
+]);
+
+const subInputAllows = (portId, itemId) => {
+  if (portId === "ai_memory") return itemId === "memory";
+  if (portId === "ai_model") return itemId === "ai";
+  if (portId === "ai_tool") return !SUB_TOOL_BLOCKLIST.has(itemId);
+  return true;
+};
+
 export const useActionDrawer = ({
-  open, node, source, setFieldValue, isTrigger, values, resetForm, onClose,
+  open, node, source, port, setFieldValue, isTrigger, values, resetForm, onClose,
 }) => {
   const [mode, setMode] = useState(null);
+  const isSubInput = port?.type === "target";
   const [selectedItem, setSelectedItem] = useState(null);
   const [search, setSearch] = useState("");
   const [step, setStep] = useState("select");
@@ -85,6 +101,14 @@ export const useActionDrawer = ({
       setFieldValue("actionType", "");
     }
   }, [open, source]);
+
+  // ── Preset the tab for a sub-input add so its one valid item is visible ──
+  useEffect(() => {
+    if (!open || source !== "add" || !isSubInput) return;
+    if (port.id === "ai_memory") setMode("tools");
+    else if (port.id === "ai_model") setMode("app");
+    // ai_tool spans both Apps and Tools — leave the tab choice to the user.
+  }, [open, source, isSubInput, port?.id]);
 
   // ── Auto-set actionType if the integration exposes only one item ──
   // For a trigger drawer that means a single trigger (e.g. Schedule's
@@ -155,13 +179,15 @@ export const useActionDrawer = ({
     }
 
     return base.filter((item) => {
+      if (isSubInput && !subInputAllows(port.id, item.id)) return false;
+
       const integration =
         integrations.apps?.[item.id] ||
         integrations.tools?.[item.id];
 
       return integration?.actions && Object.keys(integration.actions).length > 0;
     });
-  }, [mode, isTrigger]);
+  }, [mode, isTrigger, isSubInput, port?.id]);
 
   // ── Search results ──
   const searchList = useMemo(() => {
@@ -186,8 +212,10 @@ export const useActionDrawer = ({
             .map(t => ({ ...t, type: "tools" }))
         );
 
-    return combined.filter(item => item.name.toLowerCase().includes(q));
-  }, [search, isTrigger]);
+    return combined
+      .filter(item => !isSubInput || subInputAllows(port.id, item.id))
+      .filter(item => item.name.toLowerCase().includes(q));
+  }, [search, isTrigger, isSubInput, port?.id]);
 
   // ── resetAll: close drawer and clear all state ──
   const resetAll = () => {

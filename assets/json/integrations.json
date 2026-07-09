@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-09 11:42:09",
+    "generated_at": "2026-07-09 12:48:34",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -22871,6 +22871,9 @@
                                 "select": [
                                     "name",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "taxonomy"
                                 ]
                             }
                         },
@@ -25151,6 +25154,9 @@
                                 "select": [
                                     "name",
                                     "label"
+                                ],
+                                "depends_on": [
+                                    "taxonomy"
                                 ]
                             }
                         },
