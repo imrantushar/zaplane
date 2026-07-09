@@ -1,8 +1,15 @@
 import { useEffect, useState, useCallback } from "react";
 import { __ } from "@wordpress/i18n";
+import { FiEdit2, FiTrash2, FiX } from "react-icons/fi";
 import PageLayout from "@ZAPComponents/PageLayout";
 import Search from "@ZAPComponents/Search";
-import CustomTableMessage from "@ZAPComponents/Oops/CustomTableMessage";
+import ListTable from "@ZAPComponents/ListTable";
+import OptionMenu from "@ZAPComponents/OptionMenu";
+import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
+import ZAPDrawer from "@ZAPComponents/Drawer";
+import ZAPInput from "@ZAPComponents/ZAPInput";
+import ZAPSelect from "@ZAPComponents/ZAPSelect";
+import { primaryBtn, outlineBtn } from "../../../../../assets/scss/chakra/recipe";
 import { API, namespace } from "@ZAPUtils/helper";
 
 const emptyForm = { id: 0, business_key: "", title: "", content: "" };
@@ -157,210 +164,223 @@ const KnowledgePage = () => {
     }
   };
 
+  const businessOptions = businesses.map((b) => ({ label: b, value: b }));
+
+  const columns = [
+    {
+      name: <span>{__("Business", "zaplane")}</span>,
+      cell: (row) => <ZAPLabel label={row.business_key} type="simple" />,
+      textAlign: "start",
+    },
+    {
+      name: <span>{__("Title", "zaplane")}</span>,
+      cell: (row) => <ZAPLabel label={row.title || "—"} type="title" />,
+      textAlign: "start",
+    },
+    {
+      name: <span>{__("Content", "zaplane")}</span>,
+      cell: (row) => (
+        <ZAPLabel
+          label={(row.content || "").slice(0, 140) + ((row.content || "").length > 140 ? "…" : "")}
+          type="subtitle"
+        />
+      ),
+      textAlign: "start",
+    },
+    {
+      name: <span>{__("Action", "zaplane")}</span>,
+      cell: (row) => (
+        <OptionMenu
+          options={[
+            {
+              label: __("Edit", "zaplane"),
+              icon: <FiEdit2 />,
+              type: "button",
+              onClick: () => openEdit(row),
+            },
+            {
+              label: __("Delete", "zaplane"),
+              icon: <FiTrash2 />,
+              type: "button",
+              suffix: "trash",
+              hasBorder: false,
+              onClick: () => remove(row),
+            },
+          ]}
+        />
+      ),
+      textAlign: "center",
+    },
+  ];
+
   const actions = (
-    <div className="flex items-center gap-3">
-      <select
-        value={business}
-        onChange={(e) => setBusiness(e.target.value)}
-        className="h-9 px-3 rounded-[4px] border border-[var(--zaplane-border-color)] bg-white"
-      >
-        <option value="">{__("All businesses", "zaplane")}</option>
-        {businesses.map((b) => (
-          <option key={b} value={b}>
-            {b}
-          </option>
-        ))}
-      </select>
-      <Search placeholder={__("Search knowledge...", "zaplane")} onSearchHandler={setSearch} />
-      <button
-        onClick={syncStoreEngine}
-        disabled={syncing}
-        className="h-9 px-4 rounded-[4px] border border-[var(--zaplane-border-color)] bg-white font-medium hover:opacity-90 disabled:opacity-60"
-      >
+    <div className="flex items-center gap-2">
+      <button type="button" style={outlineBtn} onClick={syncStoreEngine} disabled={syncing}>
         {syncing ? __("Syncing...", "zaplane") : __("Sync StoreEngine", "zaplane")}
       </button>
-      <button
-        onClick={openFaq}
-        className="h-9 px-4 rounded-[4px] border border-[var(--zaplane-primary)] text-[var(--zaplane-primary)] font-medium hover:opacity-90"
-      >
+      <button type="button" style={outlineBtn} onClick={openFaq}>
         {__("FAQ Builder", "zaplane")}
       </button>
-      <button
-        onClick={openAdd}
-        className="h-9 px-4 rounded-[4px] bg-[var(--zaplane-primary)] text-white font-medium hover:opacity-90"
-      >
+      <button type="button" style={primaryBtn} onClick={openAdd}>
         {__("Add Entry", "zaplane")}
       </button>
     </div>
   );
 
   return (
-    <PageLayout title={__("Business Knowledge", "zaplane")} isLoading={loading} actions={actions}>
-      {faq && (
-        <div className="mb-5 p-4 border rounded-md bg-[var(--zaplane-gray,#f7f7f8)]">
-          <div className="font-bold mb-1">{__("FAQ Builder", "zaplane")}</div>
-          <div className="text-sm text-[var(--zaplane-text-secondary,#6b7280)] mb-3">
-            {__("Add questions and answers — each pair is saved as its own searchable entry.", "zaplane")}
+    <PageLayout
+      title={__("Business Knowledge", "zaplane")}
+      heading={__("Business Knowledge", "zaplane")}
+      actions={actions}
+    >
+      <ListTable
+        columns={columns}
+        data={items}
+        isRowSelectable={false}
+        showSubHeader
+        subHeaderComponent={
+          <div className="flex items-center gap-3 w-full">
+            <div className="min-w-[220px]">
+              <ZAPSelect
+                options={businessOptions}
+                value={business}
+                onChange={(opt) => setBusiness(opt?.value || "")}
+                placeholder={__("All businesses", "zaplane")}
+                isClearable
+              />
+            </div>
+            <Search placeholder={__("Search knowledge...", "zaplane")} onSearchHandler={setSearch} />
           </div>
-          <div className="mb-3 max-w-[320px]">
-            <label className="block text-sm mb-1">{__("Business Key", "zaplane")}</label>
-            <input
-              type="text"
-              value={faq.business_key}
-              placeholder="business_a"
-              onChange={(e) => setFaq({ ...faq, business_key: e.target.value })}
-              className="w-full h-9 px-3 rounded-[4px] border border-[var(--zaplane-border-color)]"
-            />
-          </div>
-          <div className="flex flex-col gap-3">
-            {faq.rows.map((row, i) => (
-              <div key={i} className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-2 items-start">
-                <input
-                  type="text"
-                  value={row.q}
-                  placeholder={__("Question", "zaplane")}
-                  onChange={(e) => setFaqRow(i, "q", e.target.value)}
-                  className="h-9 px-3 rounded-[4px] border border-[var(--zaplane-border-color)]"
-                />
-                <textarea
-                  value={row.a}
-                  rows={2}
-                  placeholder={__("Answer", "zaplane")}
-                  onChange={(e) => setFaqRow(i, "a", e.target.value)}
-                  className="p-2 rounded-[4px] border border-[var(--zaplane-border-color)]"
-                />
-                <button
-                  onClick={() => removeFaqRow(i)}
-                  title={__("Remove", "zaplane")}
-                  className="h-9 px-3 rounded-[4px] border border-[var(--zaplane-border-color)] bg-white text-red-600"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-3 mt-3">
-            <button
-              onClick={addFaqRow}
-              className="h-9 px-4 rounded-[4px] border border-[var(--zaplane-border-color)] bg-white"
-            >
-              {__("+ Add another", "zaplane")}
-            </button>
-            <button
-              onClick={saveFaqs}
-              disabled={saving}
-              className="h-9 px-4 rounded-[4px] bg-[var(--zaplane-primary)] text-white font-medium hover:opacity-90 disabled:opacity-60"
-            >
-              {saving ? __("Saving...", "zaplane") : __("Save FAQs", "zaplane")}
-            </button>
-            <button
-              onClick={closeFaq}
-              className="h-9 px-4 rounded-[4px] border border-[var(--zaplane-border-color)] bg-white"
-            >
+        }
+        showColumnFilter={false}
+        showPagination={false}
+        noDataText={
+          search || business
+            ? __("Nothing matches your filter.", "zaplane")
+            : __("Add products, prices, and FAQs so the AI can answer from your business data.", "zaplane")
+        }
+        totalItems={items.length}
+        dataFetchingStatus={loading}
+        suffix="knowledge-table"
+      />
+
+      <ZAPDrawer
+        open={!!form}
+        onClose={closeForm}
+        title={form?.id ? __("Edit Entry", "zaplane") : __("Add Entry", "zaplane")}
+        size="md"
+        placement="end"
+        closeOnOverlayClick
+        footer={
+          <div className="flex items-center justify-end gap-3">
+            <button type="button" style={outlineBtn} onClick={closeForm}>
               {__("Cancel", "zaplane")}
             </button>
-          </div>
-        </div>
-      )}
-
-      {form && (
-        <div className="mb-5 p-4 border rounded-md bg-[var(--zaplane-gray,#f7f7f8)]">
-          <div className="font-bold mb-3">
-            {form.id ? __("Edit Entry", "zaplane") : __("Add Entry", "zaplane")}
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-            <div>
-              <label className="block text-sm mb-1">{__("Business Key", "zaplane")}</label>
-              <input
-                type="text"
-                value={form.business_key}
-                placeholder="business_a"
-                onChange={(e) => setForm({ ...form, business_key: e.target.value })}
-                className="w-full h-9 px-3 rounded-[4px] border border-[var(--zaplane-border-color)]"
-              />
-            </div>
-            <div>
-              <label className="block text-sm mb-1">{__("Title", "zaplane")}</label>
-              <input
-                type="text"
-                value={form.title}
-                placeholder={__("e.g. Blue Widget / Returns policy", "zaplane")}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full h-9 px-3 rounded-[4px] border border-[var(--zaplane-border-color)]"
-              />
-            </div>
-          </div>
-          <label className="block text-sm mb-1">{__("Content", "zaplane")}</label>
-          <textarea
-            value={form.content}
-            rows={5}
-            placeholder={__("Product name + price + details, or an FAQ/policy answer.", "zaplane")}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
-            className="w-full p-3 rounded-[4px] border border-[var(--zaplane-border-color)] mb-3"
-          />
-          <div className="flex gap-3">
-            <button
-              onClick={save}
-              disabled={saving}
-              className="h-9 px-4 rounded-[4px] bg-[var(--zaplane-primary)] text-white font-medium hover:opacity-90 disabled:opacity-60"
-            >
+            <button type="button" style={primaryBtn} onClick={save} disabled={saving}>
               {saving ? __("Saving...", "zaplane") : __("Save", "zaplane")}
             </button>
-            <button
-              onClick={closeForm}
-              className="h-9 px-4 rounded-[4px] border border-[var(--zaplane-border-color)] bg-white"
-            >
+          </div>
+        }
+      >
+        {form && (
+          <div className="zaplane-knowledge-page flex flex-col gap-4 pt-2">
+            <ZAPInput
+              label={__("Business Key", "zaplane")}
+              placeholder="business_a"
+              value={form.business_key}
+              onChange={(e) => setForm({ ...form, business_key: e.target.value })}
+              isRequired
+            />
+            <ZAPInput
+              label={__("Title", "zaplane")}
+              placeholder={__("e.g. Blue Widget / Returns policy", "zaplane")}
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
+            <ZAPInput
+              type="textarea"
+              label={__("Content", "zaplane")}
+              placeholder={__("Product name + price + details, or an FAQ/policy answer.", "zaplane")}
+              value={form.content}
+              onChange={(e) => setForm({ ...form, content: e.target.value })}
+              isRequired
+              inputStyle={{ minHeight: "140px" }}
+            />
+          </div>
+        )}
+      </ZAPDrawer>
+
+      <ZAPDrawer
+        open={!!faq}
+        onClose={closeFaq}
+        title={__("FAQ Builder", "zaplane")}
+        size="md"
+        placement="end"
+        closeOnOverlayClick
+        footer={
+          <div className="flex items-center justify-end gap-3">
+            <button type="button" style={outlineBtn} onClick={closeFaq}>
               {__("Cancel", "zaplane")}
             </button>
+            <button type="button" style={primaryBtn} onClick={saveFaqs} disabled={saving}>
+              {saving ? __("Saving...", "zaplane") : __("Save FAQs", "zaplane")}
+            </button>
           </div>
-        </div>
-      )}
-
-      {items?.length ? (
-        <div className="overflow-x-auto border rounded-md">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[var(--zaplane-gray,#f7f7f8)]">
-                <th className="p-3 text-sm font-bold">{__("Business", "zaplane")}</th>
-                <th className="p-3 text-sm font-bold">{__("Title", "zaplane")}</th>
-                <th className="p-3 text-sm font-bold">{__("Content", "zaplane")}</th>
-                <th className="p-3 text-sm font-bold w-[120px]">{__("Actions", "zaplane")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it) => (
-                <tr key={it.id} className="border-t">
-                  <td className="p-3 align-top text-sm">{it.business_key}</td>
-                  <td className="p-3 align-top text-sm font-medium">{it.title || "—"}</td>
-                  <td className="p-3 align-top text-sm text-[var(--zaplane-text-secondary,#6b7280)]">
-                    {(it.content || "").slice(0, 140)}
-                    {(it.content || "").length > 140 ? "…" : ""}
-                  </td>
-                  <td className="p-3 align-top">
-                    <div className="flex gap-2">
-                      <button onClick={() => openEdit(it)} className="text-[var(--zaplane-primary)] text-sm">
-                        {__("Edit", "zaplane")}
-                      </button>
-                      <button onClick={() => remove(it)} className="text-red-600 text-sm">
-                        {__("Delete", "zaplane")}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+        }
+      >
+        {faq && (
+          <div className="zaplane-knowledge-page flex flex-col gap-4 pt-2">
+            <p className="text-sm" style={{ color: "var(--zaplane-font-secondary-color)" }}>
+              {__("Add questions and answers — each pair is saved as its own searchable entry.", "zaplane")}
+            </p>
+            <ZAPInput
+              label={__("Business Key", "zaplane")}
+              placeholder="business_a"
+              value={faq.business_key}
+              onChange={(e) => setFaq({ ...faq, business_key: e.target.value })}
+              isRequired
+            />
+            <div className="flex flex-col gap-4">
+              {faq.rows.map((row, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-2 p-3 rounded-[6px]"
+                  style={{ border: "1px solid var(--zaplane-border-color)" }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="zaplane-label">
+                      {__("FAQ", "zaplane")} {i + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeFaqRow(i)}
+                      title={__("Remove", "zaplane")}
+                      className="text-red-600"
+                      style={{ background: "transparent", border: "none", cursor: "pointer" }}
+                    >
+                      <FiX />
+                    </button>
+                  </div>
+                  <ZAPInput
+                    placeholder={__("Question", "zaplane")}
+                    value={row.q}
+                    onChange={(e) => setFaqRow(i, "q", e.target.value)}
+                  />
+                  <ZAPInput
+                    type="textarea"
+                    placeholder={__("Answer", "zaplane")}
+                    value={row.a}
+                    onChange={(e) => setFaqRow(i, "a", e.target.value)}
+                  />
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <CustomTableMessage
-          title={__("No knowledge entries", "zaplane")}
-          subText={
-            search || business
-              ? __("Nothing matches your filter.", "zaplane")
-              : __("Add products, prices, and FAQs so the AI can answer from your business data.", "zaplane")
-          }
-        />
-      )}
+            </div>
+            <button type="button" style={outlineBtn} onClick={addFaqRow}>
+              {__("+ Add another", "zaplane")}
+            </button>
+          </div>
+        )}
+      </ZAPDrawer>
     </PageLayout>
   );
 };

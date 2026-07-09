@@ -1,17 +1,20 @@
-// Custom Apps builder — self-contained form styling.
+// Self-contained form field styling, shared by the Custom Apps builder and
+// the Business Knowledge drawers (add/edit entry + FAQ builder).
 //
 // The dashboard renders inside `.zaplane-scope`, where Tailwind's preflight
-// resets borders on every element (`border-width: 0`). The builder uses raw
-// <input>/<select>/<textarea> with the `.zaplane-input` / `.zaplane-textarea`
-// classes, so without explicit rules the selects and textareas fall back to
-// inconsistent WP-admin defaults. These rules give every field the same border,
-// height, padding, focus state and (for selects) a chevron across all tabs.
+// resets borders on every element (`border-width: 0`) — including inside
+// ZAPDrawer, which re-applies `.zaplane-scope` to its portaled content. Both
+// surfaces use raw <input>/<select>/<textarea> with the `.zaplane-input` /
+// `.zaplane-textarea` classes, so without explicit rules the fields render
+// with no border, padding or height. These rules give every field the same
+// border, height, padding, focus state and (for selects) a chevron.
 //
 // `!important` is used on structural properties because WordPress admin styles
 // target form controls via id selectors (`#wpbody-content input`, etc.) that
 // would otherwise win over these class-based rules.
 
-.zaplane-custom-apps {
+.zaplane-custom-apps,
+.zaplane-knowledge-page {
 
 	.zaplane-input,
 	.zaplane-textarea {
