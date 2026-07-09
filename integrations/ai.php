@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Models\Connection;
 
 class Ai extends IntegrationBase {
 
@@ -77,10 +78,10 @@ class Ai extends IntegrationBase {
 	}
 
 	public static function test_connection( array $credentials ): array {
-		$provider = $credentials['provider'] ?? 'WordPress';
+		$provider = strtolower( (string) ( $credentials['provider'] ?? 'wordpress' ) );
 		$api_key  = $credentials['api_key'] ?? '';
 
-		if ( 'WordPress' === $provider ) {
+		if ( 'wordpress' === $provider ) {
 			if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
 				return [
 					'success' => false,
@@ -163,6 +164,72 @@ class Ai extends IntegrationBase {
 		];
 	}
 
+	public static function get_dynamic_queries(): array {
+		return [
+			'ai_models' => [ self::class, 'query_models' ],
+		];
+	}
+
+	/**
+	 * Return the model options for the selected connection's provider.
+	 *
+	 * The `model` field declares `depends_on => connection_id`, so the drawer
+	 * only calls this once a connection is chosen — that's what keeps a mixed
+	 * Anthropic/OpenAI list from confusing the user before then.
+	 *
+	 * @param array<string,mixed> $params
+	 * @return array<int,array<string,string>>
+	 */
+	public static function query_models( array $params ): array {
+		$provider = self::provider_from_connection( $params['connection_id'] ?? null );
+		return self::models_for_provider( $provider );
+	}
+
+	/**
+	 * Resolve the provider (anthropic|openai|wordpress|'') stored on a connection.
+	 *
+	 * @param mixed $connection_id
+	 */
+	private static function provider_from_connection( $connection_id ): string {
+		$connection_id = (int) $connection_id;
+		if ( ! $connection_id ) {
+			return '';
+		}
+
+		$connection = Connection::find( $connection_id );
+		if ( ! $connection ) {
+			return '';
+		}
+
+		$provider = $connection->getCredentials()['provider'] ?? 'wordpress';
+		return strtolower( (string) $provider );
+	}
+
+	/**
+	 * @return array<int,array<string,string>>
+	 */
+	private static function models_for_provider( string $provider ): array {
+		switch ( $provider ) {
+			case 'openai':
+				return [
+					[ 'value' => 'gpt-4o',      'label' => 'OpenAI GPT-4o' ],
+					[ 'value' => 'gpt-4o-mini', 'label' => 'OpenAI GPT-4o mini' ],
+				];
+			case 'anthropic':
+				return [
+					[ 'value' => 'claude-opus-4-8',   'label' => 'Claude Opus 4.8 (most capable)' ],
+					[ 'value' => 'claude-sonnet-4-6', 'label' => 'Claude Sonnet 4.6 (balanced)' ],
+					[ 'value' => 'claude-haiku-4-5',  'label' => 'Claude Haiku 4.5 (fastest)' ],
+				];
+			case 'wordpress':
+				return [
+					[ 'value' => 'wordpress-default', 'label' => 'Site default (managed by WordPress AI)' ],
+				];
+			default:
+				return [];
+		}
+	}
+
 	public static function get_action_config_schema( string $action ): array {
 		if ( 'generate_response' !== $action ) {
 			return [];
@@ -174,30 +241,13 @@ class Ai extends IntegrationBase {
 				'label'    => 'Model',
 				'type'     => 'select',
 				'required' => true,
-				'default'  => self::DEFAULT_MODEL,
-				'options'  => [
-					[
-						'value' => 'claude-opus-4-8',
-						'label' => 'Claude Opus 4.8 (most capable)',
-					],
-					[
-						'value' => 'claude-sonnet-4-6',
-						'label' => 'Claude Sonnet 4.6 (balanced)',
-					],
-					[
-						'value' => 'claude-haiku-4-5',
-						'label' => 'Claude Haiku 4.5 (fastest)',
-					],
-					[
-						'value' => 'gpt-4o',
-						'label' => 'OpenAI GPT-4o',
-					],
-					[
-						'value' => 'gpt-4o-mini',
-						'label' => 'OpenAI GPT-4o mini',
-					],
+				'dynamic'  => [
+					'integration' => 'ai',
+					'query'       => 'ai_models',
+					'select'      => [ 'value', 'label' ],
+					'depends_on'  => [ 'connection_id' ],
 				],
-				'help'     => 'Pick a model that matches the connected provider.',
+				'help'     => 'Select an AI connection first — the list then shows only models for that provider.',
 			],
 			[
 				'key'         => 'system_prompt',
@@ -242,11 +292,11 @@ class Ai extends IntegrationBase {
 		$config      = $node['data']['config'] ?? [];
 		$credentials = $node['_connection_credentials'] ?? [];
 
-		$provider = $credentials['provider'] ?? 'WordPress';
+		$provider = strtolower( (string) ( $credentials['provider'] ?? 'wordpress' ) );
 		$api_key  = $credentials['api_key'] ?? '';
 
 		// WordPress Core AI uses the site's configured connection — no key here.
-		if ( 'WordPress' !== $provider && '' === $api_key ) {
+		if ( 'wordpress' !== $provider && '' === $api_key ) {
 			return self::error( 'No AI connection credentials available.', $input );
 		}
 
@@ -262,7 +312,7 @@ class Ai extends IntegrationBase {
 
 		$messages = self::build_messages( $config['history'] ?? '', $user_msg );
 
-		if ( 'WordPress' === $provider ) {
+		if ( 'wordpress' === $provider ) {
 			$result = self::call_wordpress( $system, $messages, $max_tokens, $temperature );
 		} elseif ( 'openai' === $provider ) {
 			$result = self::call_openai( $api_key, $model, $system, $messages, $max_tokens, $temperature );

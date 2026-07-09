@@ -53,6 +53,26 @@ class Csv extends IntegrationBase {
 					'type' => 'checkbox',
 					'default' => true
 				],
+				[
+					'key'     => 'destination',
+					'label'   => 'Output as',
+					'type'    => 'select',
+					'default' => 'text',
+					'options' => [
+						[ 'value' => 'text', 'label' => 'CSV text (use the value in later steps)' ],
+						[ 'value' => 'file', 'label' => 'Save as a file in the Media Library (returns a file URL)' ],
+					],
+					'help'    => 'Choose “Save as a file” to store the CSV in the Media Library and get a file URL / path you can attach to an email or link to.',
+				],
+				[
+					'key'         => 'filename',
+					'label'       => 'File name',
+					'type'        => 'expression',
+					'default'     => 'export.csv',
+					'placeholder' => 'export.csv',
+					'depends_on'  => [ 'destination' => 'file' ],
+					'help'        => 'Name of the generated file. A “.csv” extension is added automatically if missing.',
+				],
 			];
 		}//end if
 
@@ -80,7 +100,13 @@ class Csv extends IntegrationBase {
 
 	public static function get_action_sample_output( string $action ): array {
 		if ( 'build' === $action ) {
-			return [ 'csv' => "name,age\nAlice,30" ];
+			return [
+				'csv'           => "name,age\nAlice,30",
+				'file_url'      => 'https://example.com/wp-content/uploads/2026/07/export.csv',
+				'file_path'     => '/var/www/html/wp-content/uploads/2026/07/export.csv',
+				'filename'      => 'export.csv',
+				'attachment_id' => 123,
+			];
 		}
 		return [
 			'rows'  => [ [ 'column1' => 'value1', 'column2' => 'value2' ] ],
@@ -154,18 +180,74 @@ class Csv extends IntegrationBase {
 
 		$first = reset( $items );
 		if ( $header && is_array( $first ) ) {
-			fputcsv( $fh, array_keys( $first ), $delimiter );
+			fputcsv( $fh, array_keys( $first ), $delimiter, '"', '\\' );
 		}
 		foreach ( $items as $item ) {
 			$row = is_array( $item ) ? array_values( $item ) : [ $item ];
-			fputcsv( $fh, $row, $delimiter );
+			fputcsv( $fh, $row, $delimiter, '"', '\\' );
 		}
 
 		rewind( $fh );
 		$csv = stream_get_contents( $fh );
 		fclose( $fh ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose -- In-memory stream, not filesystem.
 
-		return [ 'csv' => $csv ];
+		if ( 'file' !== ( $config['destination'] ?? 'text' ) ) {
+			return [ 'csv' => $csv ];
+		}
+
+		return array_merge( [ 'csv' => $csv ], self::save_file( $csv, $config ) );
+	}
+
+	/**
+	 * Write the CSV to the uploads directory, register it in the Media Library,
+	 * and return the location so later steps can attach or link to it.
+	 *
+	 * @param array<string,mixed> $config
+	 * @return array<string,mixed>
+	 */
+	protected static function save_file( string $csv, array $config ): array {
+		$filename = self::filename( $config['filename'] ?? 'export.csv' );
+
+		$upload = wp_upload_bits( $filename, null, $csv );
+		if ( ! empty( $upload['error'] ) ) {
+			return [ 'file_error' => (string) $upload['error'] ];
+		}
+
+		$attachment_id = 0;
+		if ( function_exists( 'wp_insert_attachment' ) ) {
+			$attachment_id = (int) wp_insert_attachment(
+				[
+					'post_mime_type' => 'text/csv',
+					'post_title'     => preg_replace( '/\.csv$/i', '', $filename ),
+					'post_content'   => '',
+					'post_status'    => 'inherit',
+				],
+				$upload['file']
+			);
+		}
+
+		return [
+			'file_url'      => $upload['url'],
+			'file_path'     => $upload['file'],
+			'filename'      => $filename,
+			'attachment_id' => $attachment_id,
+		];
+	}
+
+	/**
+	 * Sanitise the requested file name and guarantee a .csv extension.
+	 *
+	 * @param mixed $name
+	 */
+	protected static function filename( $name ): string {
+		$name = sanitize_file_name( (string) $name );
+		if ( '' === $name ) {
+			$name = 'export.csv';
+		}
+		if ( ! preg_match( '/\.csv$/i', $name ) ) {
+			$name .= '.csv';
+		}
+		return $name;
 	}
 
 	protected static function read_rows( string $text, string $delimiter ): array {
@@ -180,7 +262,7 @@ class Csv extends IntegrationBase {
 
 		$rows = [];
 		// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Standard fgetcsv iteration pattern.
-		while ( ( $row = fgetcsv( $fh, 0, $delimiter ) ) !== false ) {
+		while ( ( $row = fgetcsv( $fh, 0, $delimiter, '"', '\\' ) ) !== false ) {
 			if ( [ null ] === $row || ( 1 === count( $row ) && '' === (string) $row[0] ) ) {
 				continue;
 			}

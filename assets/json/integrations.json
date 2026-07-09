@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-07 11:44:46",
+    "generated_at": "2026-07-09 08:52:25",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -2839,30 +2839,18 @@
                             "label": "Model",
                             "type": "select",
                             "required": true,
-                            "default": "claude-opus-4-8",
-                            "options": [
-                                {
-                                    "value": "claude-opus-4-8",
-                                    "label": "Claude Opus 4.8 (most capable)"
-                                },
-                                {
-                                    "value": "claude-sonnet-4-6",
-                                    "label": "Claude Sonnet 4.6 (balanced)"
-                                },
-                                {
-                                    "value": "claude-haiku-4-5",
-                                    "label": "Claude Haiku 4.5 (fastest)"
-                                },
-                                {
-                                    "value": "gpt-4o",
-                                    "label": "OpenAI GPT-4o"
-                                },
-                                {
-                                    "value": "gpt-4o-mini",
-                                    "label": "OpenAI GPT-4o mini"
-                                }
-                            ],
-                            "help": "Pick a model that matches the connected provider."
+                            "dynamic": {
+                                "integration": "ai",
+                                "query": "ai_models",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "connection_id"
+                                ]
+                            },
+                            "help": "Select an AI connection first \u2014 the list then shows only models for that provider."
                         },
                         {
                             "key": "system_prompt",
@@ -27515,6 +27503,34 @@
                             "label": "Include header row",
                             "type": "checkbox",
                             "default": true
+                        },
+                        {
+                            "key": "destination",
+                            "label": "Output as",
+                            "type": "select",
+                            "default": "text",
+                            "options": [
+                                {
+                                    "value": "text",
+                                    "label": "CSV text (use the value in later steps)"
+                                },
+                                {
+                                    "value": "file",
+                                    "label": "Save as a file in the Media Library (returns a file URL)"
+                                }
+                            ],
+                            "help": "Choose \u201cSave as a file\u201d to store the CSV in the Media Library and get a file URL / path you can attach to an email or link to."
+                        },
+                        {
+                            "key": "filename",
+                            "label": "File name",
+                            "type": "expression",
+                            "default": "export.csv",
+                            "placeholder": "export.csv",
+                            "depends_on": {
+                                "destination": "file"
+                            },
+                            "help": "Name of the generated file. A \u201c.csv\u201d extension is added automatically if missing."
                         }
                     ],
                     "outputs": [
@@ -28273,9 +28289,11 @@
                     "schema": [
                         {
                             "key": "source",
-                            "label": "Source / Array Data",
-                            "type": "text",
-                            "required": true
+                            "label": "List to loop over",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "Type @ to pick a list from an earlier step",
+                            "help": "Pick an array/list from a previous step (e.g. parsed CSV rows or an API list). The workflow runs once per item \u2014 read the current entry downstream with {{ item }}."
                         }
                     ],
                     "outputs": [
