@@ -59,10 +59,17 @@ const VariableEditor = ({
     }
     const text = editor.textContent.trim();
     setIsEmpty(text === "");
+    // The user is typing free text — get the picker out of the way.
+    if (isPopoverOpen) setPopoverOpen(false);
   };
 
   // open popover when @ typed
   const handleKeyDown = e => {
+    if (e.key === "Escape" && isPopoverOpen) {
+      e.preventDefault();
+      setPopoverOpen(false);
+      return;
+    }
     if (!multiline && e.key === "Enter") {
       e.preventDefault();
       return;
@@ -98,11 +105,23 @@ const VariableEditor = ({
     setActiveRange(saveSelection());
     setPopoverOpen(true);
   };
+
+  // Sync on blur, but keep the picker open when focus is moving into it (the
+  // user is clicking a variable) — otherwise the picker would close before the
+  // click registers.
+  const handleBlur = e => {
+    syncValue(editorRef, field.key, setFieldValue);
+    const toPicker =
+      e.relatedTarget &&
+      typeof e.relatedTarget.closest === "function" &&
+      e.relatedTarget.closest(".zaplane-variables-popover");
+    if (!toPicker) setPopoverOpen(false);
+  };
   return <>
       <div className="zaplane-label" style={{display:'flex', flexDirection:'column', gap:'8px', ...containerStyle}}>
         <span>{__(label, "zaplane")}{isRequired && <span style={{ color: 'red', marginLeft: '2px' }}>*</span>}</span>
 
-        <div ref={editorRef} onInput={handleInput} className={`zaplane-variable-editor ${multiline ? "zaplane-variable-editor-multiline" : "zaplane-variable-editor-singleline"} ${isEmpty ? "zaplane-empty" : ""}`} contentEditable suppressContentEditableWarning onKeyDown={handleKeyDown} onPaste={multiline ? undefined : handlePaste} onClick={handleEditorClick} onKeyUp={handleCursorSave} onBlur={() => syncValue(editorRef, field.key, setFieldValue)} data-placeholder={placeholder} />
+        <div ref={editorRef} onInput={handleInput} className={`zaplane-variable-editor ${multiline ? "zaplane-variable-editor-multiline" : "zaplane-variable-editor-singleline"} ${isEmpty ? "zaplane-empty" : ""}`} contentEditable suppressContentEditableWarning onKeyDown={handleKeyDown} onPaste={multiline ? undefined : handlePaste} onClick={handleEditorClick} onKeyUp={handleCursorSave} onBlur={handleBlur} data-placeholder={placeholder} />
       </div>
 
       <VariablePopover isOpen={isPopoverOpen} prefix="zaplane-variables-popover" onClose={() => setPopoverOpen(false)} data={variables} contextData={variableContext} onSelectVariable={variable => {

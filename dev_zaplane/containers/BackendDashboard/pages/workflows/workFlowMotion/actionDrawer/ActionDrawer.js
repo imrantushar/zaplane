@@ -37,7 +37,8 @@ const ActionDrawer = ({
 }) => {
   const {
     source,
-    node
+    node,
+    edge
   } = context;
   const dispatch = useDispatch();
   const {
@@ -147,24 +148,59 @@ const {
     }
   };
 
-  // Load the "@" dynamic variables for this node's upstream fields. The backend
-  // only needs the target node + graph, so don't gate on the version hash (it may
-  // not be ready yet, and gating on it without a dep meant the call never fired).
+  // Load the "@" dynamic variables available to this node/action. The picker's
+  // fields come from upstream nodes in the graph. The backend excludes the
+  // *target* node from its own variables, so:
+  //  - Opening an existing node  → target = that node (its ancestors show).
+  //  - Adding a NEW action       → the new node doesn't exist yet, so we splice
+  //    in a temporary target wired right after the node/edge it's being added
+  //    from. That makes the node it's added after (e.g. the trigger) count as
+  //    upstream — otherwise a fresh action after the trigger showed nothing.
+  // We wait for the graph to load (nodes.length) so we never fetch an empty
+  // graph, which would return empty data and clobber a good result.
   useEffect(() => {
-    if (!node?.id) return;
-    const payload = {
+    if (!open || !nodes?.length) return;
+
+    const baseNodes = mapNodesForBackend(nodes);
+    const baseEdges = mapEdgesForBackend(edges);
+    const TEMP_TARGET = 999999;
+
+    let targetKey = null;
+    let graphNodes = baseNodes;
+    let graphEdges = baseEdges;
+
+    if (source === "node" && node?.id) {
+      targetKey = node.id;
+    } else if (source === "add" && node?.id) {
+      targetKey = TEMP_TARGET;
+      graphNodes = [...baseNodes, { id: TEMP_TARGET, type: "action", data: {} }];
+      graphEdges = [...baseEdges, { source: node.id, target: TEMP_TARGET }];
+    } else if (source === "edge" && edge?.source != null) {
+      targetKey = TEMP_TARGET;
+      graphNodes = [...baseNodes, { id: TEMP_TARGET, type: "action", data: {} }];
+      graphEdges = [...baseEdges, { source: edge.source, target: TEMP_TARGET }];
+    }
+
+    if (targetKey == null) return;
+
+    dispatch(conditionVariables({
       workflow_id: workFlow?.workflow?.id,
       workflow_hash: workFlow?.version?.hash,
       workflow_version_id: workFlow?.version?.id,
-      target_node_key: node?.id,
-      graph: {
-        nodes: mapNodesForBackend(nodes),
-        edges: mapEdgesForBackend(edges),
-      },
-    };
-
-    dispatch(conditionVariables(payload));
-  }, [node?.id, workFlow?.version?.hash]);
+      target_node_key: targetKey,
+      graph: { nodes: graphNodes, edges: graphEdges },
+    }));
+  }, [
+    open,
+    source,
+    node?.id,
+    edge?.id,
+    workFlow?.workflow?.id,
+    workFlow?.version?.id,
+    workFlow?.version?.hash,
+    nodes?.length,
+    edges?.length,
+  ]);
   return <ZAPDrawer open={open} isFullscreen={isFullscreen} onClose={resetAll}
     arrowClose={['tools', 'app'].includes(mode)}
     maxWidth={['filter', 'if'].includes(values?.actionType) ? 'max-w-[700px]' : 'max-w-[500px]'}

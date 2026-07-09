@@ -148,6 +148,7 @@ export default function VariablePopover({
       onClose={onClose}
       title={null}
       prefix={prefix}
+      focusOnMount={false}
     >
       <ZAPTab value={activeTab} tabs={tabs} onChange={setActiveTab} />
     </WPPopover>
