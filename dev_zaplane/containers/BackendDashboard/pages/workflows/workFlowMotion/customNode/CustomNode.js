@@ -204,7 +204,13 @@ export default function CustomNode({
           <Handle type="source" id="sub_out" position={Position.Top} style={{ ...handleStyle, background: "#a855f7" }} />
         ) : isMultiPort ? (
           ports.map((port, i) => {
-            const pos = `${((i + 1) / (ports.length + 1)) * 100}%`;
+            // Fixed spacing centred on the node so ports never overlap, however
+            // many there are (they extend past the node body when needed).
+            const spacing = 30;
+            const offset = (i - (ports.length - 1) / 2) * spacing;
+            const along = isLR
+              ? { top: `calc(50% + ${offset}px)` }
+              : { left: `calc(50% + ${offset}px)` };
             const portHasEdge = edges.some((e) => e.source === id && e.sourceHandle === port);
             return (
               <div key={port}>
@@ -212,25 +218,26 @@ export default function CustomNode({
                   type="source"
                   id={port}
                   position={isLR ? Position.Right : Position.Bottom}
-                  style={{
-                    ...handleStyle,
-                    top: isLR ? pos : undefined,
-                    left: !isLR ? pos : undefined,
-                  }}
+                  style={{ ...handleStyle, ...along }}
                 />
                 <span
                   className="zaplane-port-label"
                   style={{
                     position: "absolute",
                     fontSize: 10,
-                    color: "#6B7280",
+                    color: "#4B5563",
                     whiteSpace: "nowrap",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 6,
+                    background: "#fff",
+                    border: "1px solid #E5E7EB",
+                    borderRadius: 6,
+                    padding: "1px 6px",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                     ...(isLR
-                      ? { top: pos, left: "100%", marginLeft: 10, transform: "translateY(-50%)" }
-                      : { left: pos, top: "100%", marginTop: 10, transform: "translateX(-50%)" }),
+                      ? { ...along, left: "100%", marginLeft: 14, transform: "translateY(-50%)" }
+                      : { ...along, top: "100%", marginTop: 14, transform: "translateX(-50%)" }),
                   }}
                 >
                   {formatLabel(port)}

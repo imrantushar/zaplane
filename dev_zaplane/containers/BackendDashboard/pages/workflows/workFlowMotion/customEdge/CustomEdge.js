@@ -31,11 +31,25 @@ const CustomEdge = ({
   if (sourceHandleId === "true") label = "Yes";
   if (sourceHandleId === "false") label = "No";
   const isFalse = label === "No";
+  const markerId = `zaplane-arrow-${id}`;
   return <g className="zaplane-custom-edge">
+      <defs>
+        <marker id={markerId} markerWidth="12" markerHeight="12" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+          <path d="M1,1 L8,4 L1,7" fill="none" stroke="var(--zaplane-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </marker>
+      </defs>
+
+      {/* Base (soft) path with an arrowhead showing direction */}
       <path id={id} style={{
       ...style,
       pointerEvents: "none"
-    }} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
+    }} className="react-flow__edge-path zaplane-edge-base" d={edgePath} markerEnd={markerEnd || `url(#${markerId})`} />
+
+      {/* Wide invisible hit-area so hover is easy to trigger */}
+      <path d={edgePath} className="zaplane-edge-hit" />
+
+      {/* Animated flow overlay — moving dashes show the data direction */}
+      <path d={edgePath} className="zaplane-edge-flow" style={{ pointerEvents: "none" }} />
 
       {/* YES / NO LABEL */}
       {label && <foreignObject width={30} height={20} x={centerX - 20} y={centerY - 20} style={{

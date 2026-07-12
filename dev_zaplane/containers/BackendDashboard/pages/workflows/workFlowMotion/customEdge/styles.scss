@@ -8,6 +8,46 @@
   opacity: 1;
   pointer-events: auto;
 }
-.react-flow__edge-path{
+
+// Soft base line — brightens on hover.
+.zaplane-custom-edge .zaplane-edge-base {
+  stroke: color-mix(in srgb, var(--zaplane-primary) 35%, transparent);
+  stroke-width: 2;
+  transition: stroke 0.2s ease, stroke-width 0.2s ease;
+}
+.zaplane-custom-edge:hover .zaplane-edge-base {
   stroke: var(--zaplane-primary);
+  stroke-width: 2.5;
+}
+
+// Wide invisible line so the edge is easy to hover.
+.zaplane-custom-edge .zaplane-edge-hit {
+  stroke: transparent;
+  stroke-width: 18;
+  fill: none;
+}
+
+// Animated flow overlay — moving dashes indicate direction of data flow.
+.zaplane-custom-edge .zaplane-edge-flow {
+  fill: none;
+  stroke: var(--zaplane-primary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 4 9;
+  animation: zaplane-edge-dash 0.7s linear infinite;
+  opacity: 0.9;
+}
+.zaplane-custom-edge:hover .zaplane-edge-flow {
+  stroke-width: 2.5;
+}
+
+@keyframes zaplane-edge-dash {
+  to {
+    stroke-dashoffset: -13;
+  }
+}
+
+// Fallback for the default class React Flow may still apply.
+.react-flow__edge-path {
+  stroke: color-mix(in srgb, var(--zaplane-primary) 35%, transparent);
 }
