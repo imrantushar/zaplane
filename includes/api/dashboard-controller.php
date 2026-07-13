@@ -60,9 +60,11 @@ class DashboardController extends WP_REST_Controller {
 	private function get_monthly_executions(): array {
 		$year = (int) gmdate( 'Y' );
 
+		// Half-open range instead of YEAR(started_at) so the started_at index can
+		// be used — wrapping the column in a function forces a full table scan.
 		$rows = DB::table( 'runs' )
 			->selectRaw( 'MONTH(started_at) as month_num, COUNT(*) as runs' )
-			->whereRaw( 'YEAR(started_at) = %d', [ $year ] )
+			->whereRaw( 'started_at >= %s AND started_at < %s', [ $year . '-01-01 00:00:00', ( $year + 1 ) . '-01-01 00:00:00' ] )
 			->groupBy( 'month_num' )
 			->orderBy( 'month_num', 'asc' )
 			->get();

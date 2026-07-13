@@ -19,11 +19,6 @@ use Zaplane\Framework\Classes\OAuthHandler;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Core\ModuleManager;
-use Zaplane\Database\Seeders\BirthdayRecipeSeeder;
-use Zaplane\Database\Seeders\InactiveCustomerRecipeSeeder;
-use Zaplane\Database\Seeders\OrderCompleteFeedbackRecipeSeeder;
-use Zaplane\Database\Seeders\PostPurchaseUpsellRecipeSeeder;
-use Zaplane\Database\Seeders\ProductRecommendationRecipeSeeder;
 use Zaplane\Integrations\Gemcrm;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -128,11 +123,13 @@ final class Zaplane {
 
 		( new \Zaplane\Scheduler\Scheduler() )->boot();
 
-		( new BirthdayRecipeSeeder() )->run();
-		( new InactiveCustomerRecipeSeeder() )->run();
-		( new OrderCompleteFeedbackRecipeSeeder() )->run();
-		( new PostPurchaseUpsellRecipeSeeder() )->run();
-		( new ProductRecommendationRecipeSeeder() )->run();
+		// Run migrations + recipe seeding once per version, not on every request.
+		// Activation covers fresh installs; this covers plugin updates (where the
+		// activation hook doesn't fire). Previously the seeders ran unconditionally
+		// on every page load, REST call and cron tick — five SELECTs of pure waste.
+		if ( version_compare( (string) get_option( 'zaplane_db_version', '0.0.0' ), ZAPLANE_VERSION, '<' ) ) {
+			\Zaplane\Installer::init()->run();
+		}
 
 		do_action( 'zaplane_init' );
 	}

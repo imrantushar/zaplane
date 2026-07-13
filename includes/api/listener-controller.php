@@ -137,6 +137,9 @@ class ListenerController extends WP_REST_Controller {
 			'triggered_at' => null,
 		];
 		Option::set( $optionName, $initialState, 'no' );
+		// Autoloaded flag so Automation::dispatch_active_listeners can skip its
+		// wp_options LIKE scan on every request when nobody is listening.
+		update_option( 'zaplane_listeners_active', 1 );
 
 		$this->register_listener_hook( $workflowId, $hook, $targetNode, $version );
 

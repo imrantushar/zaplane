@@ -50,6 +50,7 @@ class Automation {
 	}
 
 	public function reload_triggers() {
+		Query::flush_trigger_map();
 		foreach ( $this->registered_hooks as $event => $cb ) {
 			if ( is_array( $cb ) ) {
 				remove_action( $event, $cb, 10 );
@@ -71,7 +72,16 @@ class Automation {
 	}
 
 	public function dispatch_active_listeners(): void {
-		$listeners = Option::where( 'option_name', 'LIKE', 'zaplane_listener_state_%' )->get();
+		// Listeners only exist transiently while a user is in "Test Trigger" mode.
+		// The autoloaded flag lets the common case (nobody listening) skip the
+		// wp_options LIKE scan entirely on every request. It's set when a listener
+		// starts (ListenerController) and self-heals to 0 below once none remain.
+		if ( ! get_option( 'zaplane_listeners_active' ) ) {
+			return;
+		}
+
+		$listeners     = Option::where( 'option_name', 'LIKE', 'zaplane_listener_state_%' )->get();
+		$any_listening = false;
 
 		foreach ( $listeners as $listener ) {
 			$state = $listener->getValue();
@@ -79,6 +89,8 @@ class Automation {
 			if ( ! $state || ! is_array( $state ) || ( $state['status'] ?? '' ) !== 'listening' ) {
 				continue;
 			}
+
+			$any_listening = true;
 
 			$hook = $state['hook'] ?? '';
 			if ( ! $hook ) {
@@ -89,6 +101,10 @@ class Automation {
 				add_action( $hook, [ $this, 'listener_hook_handler' ], 1, 99 );
 				$this->registered_hooks[ 'listener_' . $hook ] = true;
 			}
+		}
+
+		if ( ! $any_listening ) {
+			update_option( 'zaplane_listeners_active', 0 );
 		}
 	}
 
