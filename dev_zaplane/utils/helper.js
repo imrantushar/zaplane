@@ -16,7 +16,7 @@ export const {
 	user_id,
 	is_plain_permalink,
 	integrations
-} = window?.ZaplaneGlobal;
+} = window?.ZaplaneGlobal ?? {};
 
 export const reactDebounce = (callback, wait) => {
 	let timeout;
