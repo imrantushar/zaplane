@@ -241,7 +241,10 @@ class Funnelkit extends IntegrationBase {
 				[
 					'new_funnel_id'    => 22,
 					'source_funnel_id' => 21,
-					'new_funnel'       => array_merge( $funnel, [ 'funnel_id' => 22, 'funnel_title' => 'Black Friday Funnel (Copy)' ] ),
+					'new_funnel'       => array_merge( $funnel, [
+						'funnel_id' => 22,
+						'funnel_title' => 'Black Friday Funnel (Copy)'
+					] ),
 					'source_funnel'    => $funnel,
 				]
 			),
@@ -281,7 +284,10 @@ class Funnelkit extends IntegrationBase {
 					'funnel_id'    => 21,
 					'step'         => $step,
 					'funnel'       => $funnel,
-					'step_context' => [ 'contact_id' => 9, 'device' => 'desktop' ],
+					'step_context' => [
+						'contact_id' => 9,
+						'device' => 'desktop'
+					],
 				]
 			),
 
@@ -292,7 +298,10 @@ class Funnelkit extends IntegrationBase {
 					'funnel_id'    => 21,
 					'step'         => $step,
 					'funnel'       => $funnel,
-					'step_context' => [ 'contact_id' => 9, 'order_id' => 501 ],
+					'step_context' => [
+						'contact_id' => 9,
+						'order_id' => 501
+					],
 				]
 			),
 
@@ -496,29 +505,57 @@ class Funnelkit extends IntegrationBase {
 			case 'do_action':
 				return [
 					$hook_field,
-					[ 'key' => 'arg_1', 'label' => 'Argument 1', 'type' => 'expression' ],
-					[ 'key' => 'arg_2', 'label' => 'Argument 2', 'type' => 'expression' ],
+					[
+						'key' => 'arg_1',
+						'label' => 'Argument 1',
+						'type' => 'expression'
+					],
+					[
+						'key' => 'arg_2',
+						'label' => 'Argument 2',
+						'type' => 'expression'
+					],
 				];
 
 			case 'add_filter':
 				return [
 					$hook_field,
-					[ 'key' => 'return_value', 'label' => 'Return Value', 'type' => 'expression' ],
-					[ 'key' => 'accepted_args', 'label' => 'Accepted Args', 'type' => 'number' ],
+					[
+						'key' => 'return_value',
+						'label' => 'Return Value',
+						'type' => 'expression'
+					],
+					[
+						'key' => 'accepted_args',
+						'label' => 'Accepted Args',
+						'type' => 'number'
+					],
 				];
 
 			case 'apply_filters':
 				return [
 					$hook_field,
-					[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression' ],
-					[ 'key' => 'arg_1', 'label' => 'Argument 1', 'type' => 'expression' ],
-					[ 'key' => 'arg_2', 'label' => 'Argument 2', 'type' => 'expression' ],
+					[
+						'key' => 'value',
+						'label' => 'Value',
+						'type' => 'expression'
+					],
+					[
+						'key' => 'arg_1',
+						'label' => 'Argument 1',
+						'type' => 'expression'
+					],
+					[
+						'key' => 'arg_2',
+						'label' => 'Argument 2',
+						'type' => 'expression'
+					],
 				];
 
 			case 'remove_action':
 			case 'has_action':
 				return [ $hook_field ];
-		}
+		}//end switch
 
 		return [];
 	}
@@ -555,7 +592,7 @@ class Funnelkit extends IntegrationBase {
 				return self::action_has_action( $config, $input );
 			case 'current_filter':
 				return self::action_current_filter( $input );
-		}
+		}//end switch
 
 		return [
 			'port' => 'main',

@@ -104,27 +104,63 @@ class GlobalContext {
 				'label'     => 'Workflow',
 				'prefix'    => 'workflow',
 				'variables' => [
-					[ 'key' => 'workflow_id',     'type' => 'integer', 'sample' => $workflow ? $workflow->id : 0 ],
-					[ 'key' => 'workflow_name',   'type' => 'string',  'sample' => $workflow ? ( $workflow->title ?? $workflow->name ?? '' ) : '' ],
-					[ 'key' => 'workflow_status', 'type' => 'string',  'sample' => $workflow ? ( $workflow->status ?? 'active' ) : 'active' ],
+					[
+						'key' => 'workflow_id',
+						'type' => 'integer',
+						'sample' => $workflow ? $workflow->id : 0
+					],
+					[
+						'key' => 'workflow_name',
+						'type' => 'string',
+						'sample' => $workflow ? ( $workflow->title ?? $workflow->name ?? '' ) : ''
+					],
+					[
+						'key' => 'workflow_status',
+						'type' => 'string',
+						'sample' => $workflow ? ( $workflow->status ?? 'active' ) : 'active'
+					],
 				],
 			];
-		}
+		}//end if
 
 		if ( isset( self::$registry['wp'] ) ) {
 			$context['wp'] = [
 				'label'     => 'WordPress',
 				'prefix'    => 'wp',
 				'variables' => [
-					[ 'key' => 'wp_version',       'type' => 'string',  'sample' => get_bloginfo( 'version' ) ],
-					[ 'key' => 'user_id',          'type' => 'integer', 'sample' => (int) $wpUser->ID ],
-					[ 'key' => 'username',         'type' => 'string',  'sample' => $wpUser->user_login ],
-					[ 'key' => 'user_email',       'type' => 'string',  'sample' => $wpUser->user_email ],
-					[ 'key' => 'timestamp',        'type' => 'string',  'sample' => current_time( 'mysql' ) ],
-					[ 'key' => 'total_post_count', 'type' => 'integer', 'sample' => (int) wp_count_posts()->publish ],
+					[
+						'key' => 'wp_version',
+						'type' => 'string',
+						'sample' => get_bloginfo( 'version' )
+					],
+					[
+						'key' => 'user_id',
+						'type' => 'integer',
+						'sample' => (int) $wpUser->ID
+					],
+					[
+						'key' => 'username',
+						'type' => 'string',
+						'sample' => $wpUser->user_login
+					],
+					[
+						'key' => 'user_email',
+						'type' => 'string',
+						'sample' => $wpUser->user_email
+					],
+					[
+						'key' => 'timestamp',
+						'type' => 'string',
+						'sample' => current_time( 'mysql' )
+					],
+					[
+						'key' => 'total_post_count',
+						'type' => 'integer',
+						'sample' => (int) wp_count_posts()->publish
+					],
 				],
 			];
-		}
+		}//end if
 
 		return $context;
 	}

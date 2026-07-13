@@ -161,7 +161,7 @@ class ManifestValidator {
 				}
 			}
 			$errors = array_merge( $errors, self::validate_fields( $trigger['fields'] ?? [], $label ) );
-		}
+		}//end foreach
 
 		return $errors;
 	}
@@ -201,7 +201,7 @@ class ManifestValidator {
 			}
 
 			$errors = array_merge( $errors, self::validate_fields( $action['fields'] ?? [], $label ) );
-		}
+		}//end foreach
 
 		foreach ( $triggers as $i => $trigger ) {
 			$label = 'Trigger #' . ( (int) $i + 1 );

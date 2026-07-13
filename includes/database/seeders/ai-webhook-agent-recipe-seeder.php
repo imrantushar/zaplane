@@ -34,7 +34,10 @@ class AiWebhookAgentRecipeSeeder {
 				[
 					'id'       => '1',
 					'type'     => 'trigger',
-					'position' => [ 'x' => 80, 'y' => 200 ],
+					'position' => [
+						'x' => 80,
+						'y' => 200
+					],
 					'data'     => [
 						'app'   => 'webhook',
 						'event' => 'catch_hook',
@@ -48,7 +51,10 @@ class AiWebhookAgentRecipeSeeder {
 				[
 					'id'       => '2',
 					'type'     => 'action',
-					'position' => [ 'x' => 420, 'y' => 200 ],
+					'position' => [
+						'x' => 420,
+						'y' => 200
+					],
 					'data'     => [
 						'app'           => 'ai-agent',
 						'event'         => 'run_agent',
@@ -74,7 +80,10 @@ class AiWebhookAgentRecipeSeeder {
 				[
 					'id'       => '3',
 					'type'     => 'action',
-					'position' => [ 'x' => 760, 'y' => 200 ],
+					'position' => [
+						'x' => 760,
+						'y' => 200
+					],
 					'data'     => [
 						'app'    => 'webhook',
 						'event'  => 'send_hook',
@@ -87,7 +96,10 @@ class AiWebhookAgentRecipeSeeder {
 							'payload_type'   => 'json',
 							// Structured body — the AI reply is safely JSON-encoded.
 							'payload_fields' => [
-								[ 'key' => 'answer', 'value' => '{{2.reply}}' ],
+								[
+									'key' => 'answer',
+									'value' => '{{2.reply}}'
+								],
 							],
 							'sign_type'      => 'none',
 							'timeout'        => 15,
@@ -96,8 +108,16 @@ class AiWebhookAgentRecipeSeeder {
 				],
 			],
 			'edges' => [
-				[ 'id' => 'e1-2', 'source' => '1', 'target' => '2' ],
-				[ 'id' => 'e2-3', 'source' => '2', 'target' => '3' ],
+				[
+					'id' => 'e1-2',
+					'source' => '1',
+					'target' => '2'
+				],
+				[
+					'id' => 'e2-3',
+					'source' => '2',
+					'target' => '3'
+				],
 			],
 		];
 

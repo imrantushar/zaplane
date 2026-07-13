@@ -205,7 +205,7 @@ class FluentCart extends IntegrationBase {
 					'required' => true,
 				],
 			];
-		}
+		}//end if
 
 		if ( in_array( $trigger, self::SUBSCRIPTION_EVENTS, true ) ) {
 			return [
@@ -243,7 +243,7 @@ class FluentCart extends IntegrationBase {
 					'required' => true,
 				],
 			];
-		}
+		}//end if
 
 		if ( in_array( $trigger, self::PRODUCT_EVENTS, true ) ) {
 			return [
@@ -285,7 +285,7 @@ class FluentCart extends IntegrationBase {
 			'get_order_single' => [
 				'label' => 'Get Order (Single)',
 			],
-				'get_orders_all' => [
+			'get_orders_all' => [
 				'label' => 'Get Orders (All)',
 			],
 			'get_customer_single' => [
@@ -645,7 +645,7 @@ class FluentCart extends IntegrationBase {
 	public static function get_trigger_sample_output( string $trigger ): array {
 		$customer_sample = [
 			'id'         => 5,
-			'customer_id'=> 5,
+			'customer_id' => 5,
 			'email'      => 'john@example.com',
 			'first_name' => 'John',
 			'last_name'  => 'Doe',
@@ -722,19 +722,48 @@ class FluentCart extends IntegrationBase {
 
 		$samples = [
 			'order_created'            => $order_base,
-			'order_paid'              => array_merge( $order_base, [ 'transaction' => [ 'id' => 501, 'total' => '49.00', 'status' => 'paid' ] ] ),
-			'order_paid_done'         => array_merge( $order_base, [ 'transaction' => [ 'id' => 501, 'total' => '49.00', 'status' => 'paid' ] ] ),
+			'order_paid'              => array_merge( $order_base, [
+				'transaction' => [
+					'id' => 501,
+					'total' => '49.00',
+					'status' => 'paid'
+				]
+			] ),
+			'order_paid_done'         => array_merge( $order_base, [
+				'transaction' => [
+					'id' => 501,
+					'total' => '49.00',
+					'status' => 'paid'
+				]
+			] ),
 			'order_payment_failed'    => array_merge( $order_base, [ 'reason' => 'card_declined' ] ),
 			'order_updated'           => $order_base,
 			'order_canceled'          => array_merge( $order_base, [ 'reason' => 'customer_request' ] ),
 			'order_deleted'           => $order_base,
 			'renewal_order_deleted'   => array_merge( $order_base, [ 'type' => 'renewal' ] ),
-			'order_refunded'          => array_merge( $order_base, [ 'refunded_amount' => 49.0, 'refunded_items' => [ [ 'product_id' => 12, 'total' => '49.00' ] ] ] ),
+			'order_refunded'          => array_merge( $order_base, [
+				'refunded_amount' => 49.0,
+				'refunded_items' => [
+					[
+						'product_id' => 12,
+						'total' => '49.00'
+					]
+				]
+			] ),
 			'order_fully_refunded'    => array_merge( $order_base, [ 'refunded_amount' => 49.0 ] ),
-			'order_partially_refunded'=> array_merge( $order_base, [ 'refunded_amount' => 20.0 ] ),
-			'order_status_changed'    => array_merge( $order_base, [ 'old_status' => 'processing', 'new_status' => 'paid' ] ),
-			'payment_status_changed'  => array_merge( $order_base, [ 'old_status' => 'pending', 'new_status' => 'paid' ] ),
-			'shipping_status_changed' => array_merge( $order_base, [ 'old_status' => 'unshipped', 'new_status' => 'shipped' ] ),
+			'order_partially_refunded' => array_merge( $order_base, [ 'refunded_amount' => 20.0 ] ),
+			'order_status_changed'    => array_merge( $order_base, [
+				'old_status' => 'processing',
+				'new_status' => 'paid'
+			] ),
+			'payment_status_changed'  => array_merge( $order_base, [
+				'old_status' => 'pending',
+				'new_status' => 'paid'
+			] ),
+			'shipping_status_changed' => array_merge( $order_base, [
+				'old_status' => 'unshipped',
+				'new_status' => 'shipped'
+			] ),
 
 			'subscription_activated'        => array_merge( $subscription_base, [ 'reason' => 'payment_received' ] ),
 			'subscription_canceled'         => array_merge( $subscription_base, [ 'reason' => 'customer_request' ] ),
@@ -764,7 +793,10 @@ class FluentCart extends IntegrationBase {
 				'original_product_id' => 12,
 				'new_product_id'      => 13,
 				'options'             => [],
-				'product'             => array_merge( $product_sample, [ 'id' => 13, 'ID' => 13 ] ),
+				'product'             => array_merge( $product_sample, [
+					'id' => 13,
+					'ID' => 13
+				] ),
 			],
 			'product_stock_changed' => [
 				'event'       => $trigger,

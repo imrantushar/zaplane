@@ -236,7 +236,10 @@ class IncomingWebhookController extends WP_REST_Controller {
 
 		$run_id = zaplane_run_workflow( $id, $payload );
 
-		return rest_ensure_response( [ 'received' => true, 'run_id' => $run_id ] );
+		return rest_ensure_response( [
+			'received' => true,
+			'run_id' => $run_id
+		] );
 	}
 
 	public function get_webhook_url( \WP_REST_Request $request ) {

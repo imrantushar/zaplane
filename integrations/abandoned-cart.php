@@ -113,12 +113,30 @@ class AbandonedCart extends IntegrationBase {
 
 	public static function get_action_config_schema( string $action ): array {
 		$status_options = [
-			[ 'label' => 'Draft', 'value' => 'draft' ],
-			[ 'label' => 'Processing', 'value' => 'processing' ],
-			[ 'label' => 'Recovered', 'value' => 'recovered' ],
-			[ 'label' => 'Lost', 'value' => 'lost' ],
-			[ 'label' => 'Opt Out', 'value' => 'opt_out' ],
-			[ 'label' => 'Skipped', 'value' => 'skipped' ],
+			[
+				'label' => 'Draft',
+				'value' => 'draft'
+			],
+			[
+				'label' => 'Processing',
+				'value' => 'processing'
+			],
+			[
+				'label' => 'Recovered',
+				'value' => 'recovered'
+			],
+			[
+				'label' => 'Lost',
+				'value' => 'lost'
+			],
+			[
+				'label' => 'Opt Out',
+				'value' => 'opt_out'
+			],
+			[
+				'label' => 'Skipped',
+				'value' => 'skipped'
+			],
 		];
 
 		switch ( $action ) {
@@ -186,7 +204,7 @@ class AbandonedCart extends IntegrationBase {
 				];
 			default:
 				return [];
-		}
+		}//end switch
 	}
 
 	public static function execute_node( array $node, array $input ): array {
@@ -205,7 +223,10 @@ class AbandonedCart extends IntegrationBase {
 			case 'get_report':
 				return self::action_get_report( $config, $input );
 			default:
-				return [ 'port' => 'main', 'data' => $input ];
+				return [
+					'port' => 'main',
+					'data' => $input
+				];
 		}
 	}
 
@@ -254,7 +275,10 @@ class AbandonedCart extends IntegrationBase {
 			$items[] = self::cart_payload( $cart );
 		}
 
-		return self::respond( [ 'carts' => $items, 'count' => count( $items ) ] );
+		return self::respond( [
+			'carts' => $items,
+			'count' => count( $items )
+		] );
 	}
 
 	private static function action_update_cart_status( array $config, array $input ): array {
@@ -270,14 +294,21 @@ class AbandonedCart extends IntegrationBase {
 			return self::respond_error( 'Invalid status value' );
 		}
 
-		$update = [ 'status' => $status, 'updated_at' => current_time( 'mysql' ) ];
+		$update = [
+			'status' => $status,
+			'updated_at' => current_time( 'mysql' )
+		];
 		if ( 'recovered' === $status ) {
 			$update['recovered_at'] = current_time( 'mysql' );
 		}
 
 		AbandonedCartModel::where( 'id', $cart_id )->update( $update );
 
-		return self::respond( [ 'cart_id' => $cart_id, 'status' => $status, 'updated' => true ] );
+		return self::respond( [
+			'cart_id' => $cart_id,
+			'status' => $status,
+			'updated' => true
+		] );
 	}
 
 	private static function action_get_report( array $config, array $input ): array {
@@ -320,7 +351,10 @@ class AbandonedCart extends IntegrationBase {
 			'summary'       => $summary,
 			'recovery_rate' => $recovery_rate,
 			'total_carts'   => $total_all,
-			'date_range'    => [ 'from' => $from, 'to' => $to ],
+			'date_range'    => [
+				'from' => $from,
+				'to' => $to
+			],
 		] );
 	}
 
@@ -382,7 +416,10 @@ class AbandonedCart extends IntegrationBase {
 	}
 
 	private static function respond( array $data, string $port = 'main' ): array {
-		return [ 'port' => $port, 'data' => $data ];
+		return [
+			'port' => $port,
+			'data' => $data
+		];
 	}
 
 	private static function respond_error( string $message ): array {

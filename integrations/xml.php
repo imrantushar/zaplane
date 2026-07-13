@@ -64,7 +64,11 @@ class Xml extends IntegrationBase {
 		if ( 'build' === $action ) {
 			return [ 'xml' => '<root><item>value</item></root>' ];
 		}
-		return [ 'data' => [ 'item' => 'value' ], 'success' => true, 'error' => null ];
+		return [
+			'data' => [ 'item' => 'value' ],
+			'success' => true,
+			'error' => null
+		];
 	}
 
 	public static function execute_node( array $node, array $input ): array {

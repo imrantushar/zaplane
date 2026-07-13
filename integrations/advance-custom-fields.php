@@ -154,7 +154,7 @@ class AdvanceCustomFields extends IntegrationBase {
 					'value'      => $meta_value,
 					'updated_at' => current_time( 'mysql' ),
 				];
-		}
+		}//end switch
 
 		return false;
 	}
@@ -397,8 +397,11 @@ class AdvanceCustomFields extends IntegrationBase {
 					'field_name' => $field_name,
 					'sub_fields' => $sub_fields,
 				] );
-		}
+		}//end switch
 
-		return [ 'port' => 'main', 'data' => $input ];
+		return [
+			'port' => 'main',
+			'data' => $input
+		];
 	}
 }

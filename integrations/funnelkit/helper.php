@@ -214,7 +214,7 @@ trait Helper {
 						'funnel'    => $funnel_id > 0 ? self::resolve_funnel_payload( $funnel_id ) : null,
 					]
 				);
-		}
+		}//end switch
 
 		return false;
 	}
@@ -839,7 +839,7 @@ trait Helper {
 			}
 
 			return $base;
-		}
+		}//end if
 
 		return null;
 	}
@@ -891,8 +891,8 @@ trait Helper {
 						];
 					}
 				}
-			}
-		}
+			}//end if
+		}//end if
 
 		return $options;
 	}
@@ -972,10 +972,10 @@ trait Helper {
 							'name'  => (string) $step_id,
 							'label' => $label,
 						];
-					}
-				}
-			}
-		}
+					}//end foreach
+				}//end foreach
+			}//end if
+		}//end if
 
 		return $options;
 	}

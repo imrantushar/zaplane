@@ -195,7 +195,10 @@ class KnowledgeController extends WP_REST_Controller {
 			++$created;
 		}
 
-		return rest_ensure_response( [ 'success' => true, 'created' => $created ] );
+		return rest_ensure_response( [
+			'success' => true,
+			'created' => $created
+		] );
 	}
 
 	public function create_item( $request ) {
@@ -215,7 +218,10 @@ class KnowledgeController extends WP_REST_Controller {
 			'updated_at'   => current_time( 'mysql' ),
 		] );
 
-		return rest_ensure_response( [ 'id' => $record->id ?? 0, 'success' => true ] );
+		return rest_ensure_response( [
+			'id' => $record->id ?? 0,
+			'success' => true
+		] );
 	}
 
 	public function update_item( $request ) {
@@ -236,7 +242,10 @@ class KnowledgeController extends WP_REST_Controller {
 		$entry->updated_at = current_time( 'mysql' );
 		$entry->save();
 
-		return rest_ensure_response( [ 'id' => $entry->id, 'success' => true ] );
+		return rest_ensure_response( [
+			'id' => $entry->id,
+			'success' => true
+		] );
 	}
 
 	public function delete_item( $request ) {

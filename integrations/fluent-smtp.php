@@ -124,9 +124,9 @@ class FluentSmtp extends IntegrationBase {
 				'label'       => 'Attachments',
 				'type'        => 'textarea',
 				'placeholder' => "/absolute/path/to/file.pdf\n/absolute/path/to/file-2.pdf",
-					'help'        => 'Optional. One file path per line or comma-separated.',
-				],
-			] : [];
+				'help'        => 'Optional. One file path per line or comma-separated.',
+			],
+		] : [];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {

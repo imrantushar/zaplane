@@ -59,8 +59,14 @@ class Csv extends IntegrationBase {
 					'type'    => 'select',
 					'default' => 'text',
 					'options' => [
-						[ 'value' => 'text', 'label' => 'CSV text (use the value in later steps)' ],
-						[ 'value' => 'file', 'label' => 'Save as a file in the Media Library (returns a file URL)' ],
+						[
+							'value' => 'text',
+							'label' => 'CSV text (use the value in later steps)'
+						],
+						[
+							'value' => 'file',
+							'label' => 'Save as a file in the Media Library (returns a file URL)'
+						],
 					],
 					'help'    => 'Choose “Save as a file” to store the CSV in the Media Library and get a file URL / path you can attach to an email or link to.',
 				],
@@ -83,8 +89,14 @@ class Csv extends IntegrationBase {
 				'type'    => 'select',
 				'default' => 'text',
 				'options' => [
-					[ 'value' => 'text', 'label' => 'Paste / map CSV text' ],
-					[ 'value' => 'file', 'label' => 'Upload or select a file' ],
+					[
+						'value' => 'text',
+						'label' => 'Paste / map CSV text'
+					],
+					[
+						'value' => 'file',
+						'label' => 'Upload or select a file'
+					],
 				],
 			],
 			[
@@ -128,7 +140,12 @@ class Csv extends IntegrationBase {
 			];
 		}
 		return [
-			'rows'  => [ [ 'column1' => 'value1', 'column2' => 'value2' ] ],
+			'rows'  => [
+				[
+					'column1' => 'value1',
+					'column2' => 'value2'
+				]
+			],
 			'count' => 2,
 		];
 	}

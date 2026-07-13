@@ -12,7 +12,9 @@ class Assets {
 	public function register(): void {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_app_assets' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_icons' ] );
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_icons' ] );
+		// Zaplane only renders in wp-admin (the builder); its icon font is not used
+		// on the front-end, so it isn't enqueued there — that avoided loading the
+		// stylesheet (and a filemtime stat) on every public page view.
 	}
 
 	public function enqueue_icons(): void {
@@ -50,10 +52,37 @@ class Assets {
 				'route_path'            => wp_parse_url( admin_url(), PHP_URL_PATH ),
 				'plugin_root_url'       => ZAPLANE_PLUGIN_ROOT_URI,
 				'menu'                  => wp_json_encode( Helper::get_admin_menu_list() ),
-				'integrations'          => $this->get_frontend_integrations(),
 			]);
+			// The integrations catalogue is ~1.2 MB. Inject it as a raw JSON string
+			// rather than through wp_localize_script, which would PHP-decode the
+			// file only to re-encode the whole array. Runs after the localized
+			// object above is declared, before app.js.
+			wp_add_inline_script(
+				'zaplane-app-scripts',
+				'window.ZaplaneGlobal=window.ZaplaneGlobal||{};window.ZaplaneGlobal.integrations=' . $this->get_frontend_integrations_json() . ';',
+				'before'
+			);
 			wp_set_script_translations( 'zaplane-app-scripts', 'zaplane', ZAPLANE_ROOT_DIR_PATH . 'languages/' );
 		}//end if
+	}
+
+	/**
+	 * The integrations catalogue as a JSON string for inline injection.
+	 *
+	 * When no Custom Apps exist (the common case) the pre-built static file is
+	 * streamed through verbatim — no decode/re-encode. Only when custom apps are
+	 * present do we pay the decode + live merge + re-encode.
+	 */
+	private function get_frontend_integrations_json(): string {
+		$file = ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json';
+
+		if ( empty( \Zaplane\CustomApps\ManifestStore::all() ) ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$raw = is_readable( $file ) ? (string) file_get_contents( $file ) : '';
+			return '' !== trim( $raw ) ? $raw : '{"apps":{},"tools":{}}';
+		}
+
+		return (string) wp_json_encode( $this->get_frontend_integrations() );
 	}
 
 	/**
@@ -66,7 +95,10 @@ class Assets {
 	 * @return array<string,mixed>
 	 */
 	private function get_frontend_integrations(): array {
-		$integrations = [ 'apps' => [], 'tools' => [] ];
+		$integrations = [
+			'apps' => [],
+			'tools' => []
+		];
 
 		$file = ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json';
 		if ( is_readable( $file ) ) {

@@ -44,8 +44,14 @@ class Delay extends IntegrationBase {
 				'type'    => 'select',
 				'default' => 'for',
 				'options' => [
-					[ 'value' => 'for',   'label' => 'Wait for a duration' ],
-					[ 'value' => 'until', 'label' => 'Wait until a specific date/time' ],
+					[
+						'value' => 'for',
+						'label' => 'Wait for a duration'
+					],
+					[
+						'value' => 'until',
+						'label' => 'Wait until a specific date/time'
+					],
 				],
 			],
 			[
@@ -62,11 +68,26 @@ class Delay extends IntegrationBase {
 				'default'    => 'minutes',
 				'depends_on' => [ 'delay_type' => 'for' ],
 				'options'    => [
-					[ 'value' => 'seconds', 'label' => 'Seconds' ],
-					[ 'value' => 'minutes', 'label' => 'Minutes' ],
-					[ 'value' => 'hours',   'label' => 'Hours' ],
-					[ 'value' => 'days',    'label' => 'Days' ],
-					[ 'value' => 'weeks',   'label' => 'Weeks' ],
+					[
+						'value' => 'seconds',
+						'label' => 'Seconds'
+					],
+					[
+						'value' => 'minutes',
+						'label' => 'Minutes'
+					],
+					[
+						'value' => 'hours',
+						'label' => 'Hours'
+					],
+					[
+						'value' => 'days',
+						'label' => 'Days'
+					],
+					[
+						'value' => 'weeks',
+						'label' => 'Weeks'
+					],
 				],
 			],
 			[

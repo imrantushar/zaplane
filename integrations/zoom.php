@@ -113,8 +113,14 @@ class Zoom extends IntegrationBase {
 						'label'    => 'Waiting Room',
 						'required' => false,
 						'options'  => [
-							[ 'value' => 'false', 'label' => 'Disabled' ],
-							[ 'value' => 'true',  'label' => 'Enabled' ],
+							[
+								'value' => 'false',
+								'label' => 'Disabled'
+							],
+							[
+								'value' => 'true',
+								'label' => 'Enabled'
+							],
 						],
 					],
 					[
@@ -123,8 +129,14 @@ class Zoom extends IntegrationBase {
 						'label'    => 'Start with Host Video On',
 						'required' => false,
 						'options'  => [
-							[ 'value' => 'true',  'label' => 'Yes' ],
-							[ 'value' => 'false', 'label' => 'No' ],
+							[
+								'value' => 'true',
+								'label' => 'Yes'
+							],
+							[
+								'value' => 'false',
+								'label' => 'No'
+							],
 						],
 					],
 					[
@@ -198,8 +210,14 @@ class Zoom extends IntegrationBase {
 						'label'    => 'Notify Registrants',
 						'required' => false,
 						'options'  => [
-							[ 'value' => 'false', 'label' => 'No' ],
-							[ 'value' => 'true',  'label' => 'Yes — send cancellation email' ],
+							[
+								'value' => 'false',
+								'label' => 'No'
+							],
+							[
+								'value' => 'true',
+								'label' => 'Yes — send cancellation email'
+							],
 						],
 					],
 				];
@@ -249,7 +267,7 @@ class Zoom extends IntegrationBase {
 						'required'    => false,
 					],
 				];
-		}
+		}//end switch
 
 		return [];
 	}
@@ -260,12 +278,12 @@ class Zoom extends IntegrationBase {
 
 		$base = [
 			'zoom_meeting_id' => (string) ( $object['id'] ?? '' ),
-			'zoom_topic'      => $object['topic']      ?? '',
-			'zoom_host_id'    => $object['host_id']    ?? '',
+			'zoom_topic'      => $object['topic'] ?? '',
+			'zoom_host_id'    => $object['host_id'] ?? '',
 			'zoom_start_time' => $object['start_time'] ?? '',
-			'zoom_end_time'   => $object['end_time']   ?? '',
-			'zoom_duration'   => $object['duration']   ?? '',
-			'zoom_uuid'       => $object['uuid']       ?? '',
+			'zoom_end_time'   => $object['end_time'] ?? '',
+			'zoom_duration'   => $object['duration'] ?? '',
+			'zoom_uuid'       => $object['uuid'] ?? '',
 		];
 
 		$event = $node['data']['event'] ?? '';
@@ -273,9 +291,9 @@ class Zoom extends IntegrationBase {
 		if ( 'participant_joined' === $event ) {
 			$participant = $object['participant'] ?? [];
 
-			$base['zoom_participant_id']    = $participant['user_id']   ?? '';
+			$base['zoom_participant_id']    = $participant['user_id'] ?? '';
 			$base['zoom_participant_name']  = $participant['user_name'] ?? '';
-			$base['zoom_participant_email'] = $participant['email']     ?? '';
+			$base['zoom_participant_email'] = $participant['email'] ?? '';
 			$base['zoom_join_time']         = $participant['join_time'] ?? '';
 		}
 
@@ -402,7 +420,7 @@ class Zoom extends IntegrationBase {
 	}
 
 	public static function exchange_oauth_code( string $code, string $redirect_uri, array $credentials = [] ): array {
-		$client_id     = $credentials['client_id']     ?? '';
+		$client_id     = $credentials['client_id'] ?? '';
 		$client_secret = $credentials['client_secret'] ?? '';
 
 		if ( empty( $client_id ) || empty( $client_secret ) ) {
@@ -432,17 +450,17 @@ class Zoom extends IntegrationBase {
 		}
 
 		return [
-			'access_token'  => $body['access_token']  ?? '',
-			'refresh_token' => $body['refresh_token']  ?? '',
-			'expires_in'    => $body['expires_in']     ?? 3600,
-			'token_type'    => $body['token_type']     ?? 'bearer',
-			'scope'         => $body['scope']          ?? '',
+			'access_token'  => $body['access_token'] ?? '',
+			'refresh_token' => $body['refresh_token'] ?? '',
+			'expires_in'    => $body['expires_in'] ?? 3600,
+			'token_type'    => $body['token_type'] ?? 'bearer',
+			'scope'         => $body['scope'] ?? '',
 		];
 	}
 
 	public static function refresh_oauth_token( array $credentials ): array {
 		$refresh_token = $credentials['refresh_token'] ?? '';
-		$client_id     = $credentials['client_id']     ?? '';
+		$client_id     = $credentials['client_id'] ?? '';
 		$client_secret = $credentials['client_secret'] ?? '';
 
 		if ( empty( $refresh_token ) ) {
@@ -484,7 +502,11 @@ class Zoom extends IntegrationBase {
 		$token = $credentials['access_token'] ?? '';
 
 		if ( empty( $token ) ) {
-			return [ 'success' => false, 'message' => 'access_token is missing.', 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => 'access_token is missing.',
+				'details' => []
+			];
 		}
 
 		$response = wp_remote_get( self::API_BASE_URL . '/users/me', [
@@ -493,13 +515,21 @@ class Zoom extends IntegrationBase {
 		] );
 
 		if ( is_wp_error( $response ) ) {
-			return [ 'success' => false, 'message' => 'Connection test failed: ' . $response->get_error_message(), 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => 'Connection test failed: ' . $response->get_error_message(),
+				'details' => []
+			];
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( isset( $body['code'] ) && (int) $body['code'] !== 0 ) {
-			return [ 'success' => false, 'message' => $body['message'] ?? 'Unknown Zoom API error', 'details' => [] ];
+			return [
+				'success' => false,
+				'message' => $body['message'] ?? 'Unknown Zoom API error',
+				'details' => []
+			];
 		}
 
 		$email = $body['email'] ?? '';
@@ -508,11 +538,11 @@ class Zoom extends IntegrationBase {
 			'success' => true,
 			'message' => 'Connected as ' . $email,
 			'details' => [
-				'id'         => $body['id']         ?? '',
+				'id'         => $body['id'] ?? '',
 				'email'      => $email,
 				'first_name' => $body['first_name'] ?? '',
-				'last_name'  => $body['last_name']  ?? '',
-				'type'       => $body['type']        ?? '',
+				'last_name'  => $body['last_name'] ?? '',
+				'type'       => $body['type'] ?? '',
 			],
 		];
 	}
@@ -564,7 +594,7 @@ class Zoom extends IntegrationBase {
 
 	private static function action_create_meeting( array $node, array $input, string $token ): array {
 		$config     = $node['data']['config'] ?? [];
-		$topic      = trim( $config['topic']      ?? '' );
+		$topic      = trim( $config['topic'] ?? '' );
 		$start_time = trim( $config['start_time'] ?? '' );
 
 		if ( empty( $topic ) ) {
@@ -590,7 +620,7 @@ class Zoom extends IntegrationBase {
 			'duration'   => (int) ( $config['duration'] ?? 60 ),
 			'timezone'   => ! empty( $config['timezone'] ) ? $config['timezone'] : 'UTC',
 			'settings'   => [
-				'host_video'        => ( $config['host_video']   ?? 'true' )  === 'true',
+				'host_video'        => ( $config['host_video'] ?? 'true' ) === 'true',
 				'participant_video' => true,
 				'waiting_room'      => ( $config['waiting_room'] ?? 'false' ) === 'true',
 				'join_before_host'  => false,
@@ -612,13 +642,13 @@ class Zoom extends IntegrationBase {
 			'port' => 'main',
 			'data' => array_merge( $input, [
 				'zoom_meeting_id' => (string) ( $data['id'] ?? '' ),
-				'zoom_topic'      => $data['topic']      ?? '',
-				'zoom_join_url'   => $data['join_url']   ?? '',
-				'zoom_start_url'  => $data['start_url']  ?? '',
-				'zoom_password'   => $data['password']   ?? '',
+				'zoom_topic'      => $data['topic'] ?? '',
+				'zoom_join_url'   => $data['join_url'] ?? '',
+				'zoom_start_url'  => $data['start_url'] ?? '',
+				'zoom_password'   => $data['password'] ?? '',
 				'zoom_start_time' => $data['start_time'] ?? '',
-				'zoom_duration'   => $data['duration']   ?? '',
-				'zoom_timezone'   => $data['timezone']   ?? '',
+				'zoom_duration'   => $data['duration'] ?? '',
+				'zoom_timezone'   => $data['timezone'] ?? '',
 			] ),
 		];
 	}
@@ -705,7 +735,7 @@ class Zoom extends IntegrationBase {
 	private static function action_add_registrant( array $node, array $input, string $token ): array {
 		$config     = $node['data']['config'] ?? [];
 		$meeting_id = trim( $config['meeting_id'] ?? '' );
-		$email      = trim( $config['email']      ?? '' );
+		$email      = trim( $config['email'] ?? '' );
 		$first_name = trim( $config['first_name'] ?? '' );
 
 		if ( empty( $meeting_id ) ) {
@@ -747,10 +777,10 @@ class Zoom extends IntegrationBase {
 			'port' => 'main',
 			'data' => array_merge( $input, [
 				'zoom_registrant_id' => $data['registrant_id'] ?? '',
-				'zoom_join_url'      => $data['join_url']      ?? '',
+				'zoom_join_url'      => $data['join_url'] ?? '',
 				'zoom_meeting_id'    => (string) ( $data['id'] ?? $meeting_id ),
-				'zoom_topic'         => $data['topic']         ?? '',
-				'zoom_start_time'    => $data['start_time']    ?? '',
+				'zoom_topic'         => $data['topic'] ?? '',
+				'zoom_start_time'    => $data['start_time'] ?? '',
 			] ),
 		];
 	}
@@ -761,24 +791,78 @@ class Zoom extends IntegrationBase {
 
 	private static function get_timezone_options(): array {
 		return [
-			[ 'value' => 'UTC',                'label' => 'UTC' ],
-			[ 'value' => 'Asia/Dhaka',         'label' => 'Asia/Dhaka (BD, UTC+6)' ],
-			[ 'value' => 'Asia/Kolkata',        'label' => 'Asia/Kolkata (IST, UTC+5:30)' ],
-			[ 'value' => 'Asia/Karachi',        'label' => 'Asia/Karachi (PKT, UTC+5)' ],
-			[ 'value' => 'Asia/Dubai',          'label' => 'Asia/Dubai (GST, UTC+4)' ],
-			[ 'value' => 'Asia/Riyadh',         'label' => 'Asia/Riyadh (AST, UTC+3)' ],
-			[ 'value' => 'Europe/Istanbul',     'label' => 'Europe/Istanbul (TRT, UTC+3)' ],
-			[ 'value' => 'Europe/Moscow',       'label' => 'Europe/Moscow (MSK, UTC+3)' ],
-			[ 'value' => 'Europe/Berlin',       'label' => 'Europe/Berlin (CET, UTC+1)' ],
-			[ 'value' => 'Europe/London',       'label' => 'Europe/London (GMT, UTC+0)' ],
-			[ 'value' => 'America/New_York',    'label' => 'America/New_York (EST, UTC-5)' ],
-			[ 'value' => 'America/Chicago',     'label' => 'America/Chicago (CST, UTC-6)' ],
-			[ 'value' => 'America/Denver',      'label' => 'America/Denver (MST, UTC-7)' ],
-			[ 'value' => 'America/Los_Angeles', 'label' => 'America/Los_Angeles (PST, UTC-8)' ],
-			[ 'value' => 'America/Sao_Paulo',   'label' => 'America/Sao_Paulo (BRT, UTC-3)' ],
-			[ 'value' => 'Asia/Singapore',      'label' => 'Asia/Singapore (SGT, UTC+8)' ],
-			[ 'value' => 'Asia/Tokyo',          'label' => 'Asia/Tokyo (JST, UTC+9)' ],
-			[ 'value' => 'Australia/Sydney',    'label' => 'Australia/Sydney (AEDT, UTC+11)' ],
+			[
+				'value' => 'UTC',
+				'label' => 'UTC'
+			],
+			[
+				'value' => 'Asia/Dhaka',
+				'label' => 'Asia/Dhaka (BD, UTC+6)'
+			],
+			[
+				'value' => 'Asia/Kolkata',
+				'label' => 'Asia/Kolkata (IST, UTC+5:30)'
+			],
+			[
+				'value' => 'Asia/Karachi',
+				'label' => 'Asia/Karachi (PKT, UTC+5)'
+			],
+			[
+				'value' => 'Asia/Dubai',
+				'label' => 'Asia/Dubai (GST, UTC+4)'
+			],
+			[
+				'value' => 'Asia/Riyadh',
+				'label' => 'Asia/Riyadh (AST, UTC+3)'
+			],
+			[
+				'value' => 'Europe/Istanbul',
+				'label' => 'Europe/Istanbul (TRT, UTC+3)'
+			],
+			[
+				'value' => 'Europe/Moscow',
+				'label' => 'Europe/Moscow (MSK, UTC+3)'
+			],
+			[
+				'value' => 'Europe/Berlin',
+				'label' => 'Europe/Berlin (CET, UTC+1)'
+			],
+			[
+				'value' => 'Europe/London',
+				'label' => 'Europe/London (GMT, UTC+0)'
+			],
+			[
+				'value' => 'America/New_York',
+				'label' => 'America/New_York (EST, UTC-5)'
+			],
+			[
+				'value' => 'America/Chicago',
+				'label' => 'America/Chicago (CST, UTC-6)'
+			],
+			[
+				'value' => 'America/Denver',
+				'label' => 'America/Denver (MST, UTC-7)'
+			],
+			[
+				'value' => 'America/Los_Angeles',
+				'label' => 'America/Los_Angeles (PST, UTC-8)'
+			],
+			[
+				'value' => 'America/Sao_Paulo',
+				'label' => 'America/Sao_Paulo (BRT, UTC-3)'
+			],
+			[
+				'value' => 'Asia/Singapore',
+				'label' => 'Asia/Singapore (SGT, UTC+8)'
+			],
+			[
+				'value' => 'Asia/Tokyo',
+				'label' => 'Asia/Tokyo (JST, UTC+9)'
+			],
+			[
+				'value' => 'Australia/Sydney',
+				'label' => 'Australia/Sydney (AEDT, UTC+11)'
+			],
 		];
 	}
 

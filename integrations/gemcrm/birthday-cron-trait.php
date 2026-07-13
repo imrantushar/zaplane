@@ -135,7 +135,7 @@ trait BirthdayCronTrait {
 				'_zaplane_birthday_triggered',
 				wp_json_encode( [ 'year' => $current_year ] )
 			);
-		}
+		}//end foreach
 	}
 
 	/**

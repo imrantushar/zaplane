@@ -73,11 +73,20 @@ class Woocommerce extends IntegrationBase {
 			case 'create_order':
 				return [ 'status' => 'processing' ];
 			case 'create_customer':
-				return [ 'email' => "customer_{$rand}@example.test", 'first_name' => 'Recipe' ];
+				return [
+					'email' => "customer_{$rand}@example.test",
+					'first_name' => 'Recipe'
+				];
 			case 'create_product':
-				return [ 'name' => "Recipe Product {$rand}", 'regular_price' => '10' ];
+				return [
+					'name' => "Recipe Product {$rand}",
+					'regular_price' => '10'
+				];
 			case 'create_coupon':
-				return [ 'code' => "recipe_{$rand}", 'amount' => '10' ];
+				return [
+					'code' => "recipe_{$rand}",
+					'amount' => '10'
+				];
 		}
 		return null;
 	}
@@ -108,7 +117,7 @@ class Woocommerce extends IntegrationBase {
 			$order->save();
 			// new_order + woocommerce_order_status_*: ( $order_id, $order ).
 			return [ $order->get_id(), $order ];
-		}
+		}//end if
 
 		if ( 'create_product' === $event || 'update_product' === $event ) {
 			if ( ! class_exists( '\WC_Product_Simple' ) ) {
@@ -1310,12 +1319,30 @@ class Woocommerce extends IntegrationBase {
 					'label'   => 'Status Filter',
 					'type'    => 'select',
 					'options' => [
-						[ 'label' => 'All', 'value' => '' ],
-						[ 'label' => 'Draft', 'value' => 'draft' ],
-						[ 'label' => 'Processing (Abandoned)', 'value' => 'processing' ],
-						[ 'label' => 'Recovered', 'value' => 'recovered' ],
-						[ 'label' => 'Lost', 'value' => 'lost' ],
-						[ 'label' => 'Opt Out', 'value' => 'opt_out' ],
+						[
+							'label' => 'All',
+							'value' => ''
+						],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
+						[
+							'label' => 'Processing (Abandoned)',
+							'value' => 'processing'
+						],
+						[
+							'label' => 'Recovered',
+							'value' => 'recovered'
+						],
+						[
+							'label' => 'Lost',
+							'value' => 'lost'
+						],
+						[
+							'label' => 'Opt Out',
+							'value' => 'opt_out'
+						],
 					],
 				],
 				[
@@ -1338,12 +1365,30 @@ class Woocommerce extends IntegrationBase {
 					'type'     => 'select',
 					'required' => true,
 					'options'  => [
-						[ 'label' => 'Draft', 'value' => 'draft' ],
-						[ 'label' => 'Processing', 'value' => 'processing' ],
-						[ 'label' => 'Recovered', 'value' => 'recovered' ],
-						[ 'label' => 'Lost', 'value' => 'lost' ],
-						[ 'label' => 'Opt Out', 'value' => 'opt_out' ],
-						[ 'label' => 'Skipped', 'value' => 'skipped' ],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
+						[
+							'label' => 'Processing',
+							'value' => 'processing'
+						],
+						[
+							'label' => 'Recovered',
+							'value' => 'recovered'
+						],
+						[
+							'label' => 'Lost',
+							'value' => 'lost'
+						],
+						[
+							'label' => 'Opt Out',
+							'value' => 'opt_out'
+						],
+						[
+							'label' => 'Skipped',
+							'value' => 'skipped'
+						],
 					],
 				],
 			],
@@ -1389,7 +1434,7 @@ class Woocommerce extends IntegrationBase {
 			'port' => 'main',
 			'data' => $input
 		];
-	} 
+	}
 
 	public static function get_trigger_sample_output( string $trigger ): array {
 		if ( in_array( $trigger, [ 'cart_abandoned', 'cart_recovered', 'cart_lost' ], true ) ) {
@@ -1466,7 +1511,10 @@ class Woocommerce extends IntegrationBase {
 		$explicit = [
 			'new_order'                 => $order,
 			'restore_order'             => array_merge( $order, [ 'previous_status' => 'trash' ] ),
-			'order_status_changed'      => array_merge( $order, [ 'old_status' => 'processing', 'new_status' => 'completed' ] ),
+			'order_status_changed'      => array_merge( $order, [
+				'old_status' => 'processing',
+				'new_status' => 'completed'
+			] ),
 			'new_coupon'                => $coupon,
 			'create_customer'           => array_merge( $customer, [ 'password_generated' => true ] ),
 			'update_customer'           => $customer,
@@ -1476,7 +1524,10 @@ class Woocommerce extends IntegrationBase {
 			'delete_product'            => $product,
 			'restore_product'           => $product,
 			'product_status_updated'    => array_merge( $product, [ 'stock_status' => 'instock' ] ),
-			'product_status_changed'    => array_merge( $product, [ 'old_status' => 'draft', 'new_status' => 'publish' ] ),
+			'product_status_changed'    => array_merge( $product, [
+				'old_status' => 'draft',
+				'new_status' => 'publish'
+			] ),
 			'product_added_to_cart'     => $cart_item,
 			'product_removed_from_cart' => $cart_item,
 		];

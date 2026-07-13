@@ -77,8 +77,8 @@ class RequestBuilder {
 	 * - others:  driven entirely by the manifest's auth.inject definition
 	 *            ({ in: 'header'|'query', name, template }).
 	 *
-	 * @param array<string,mixed> $auth
-	 * @param array<string,mixed> $context
+	 * @param array<string,mixed>  $auth
+	 * @param array<string,mixed>  $context
 	 * @param array<string,string> $headers Passed by reference.
 	 * @param array<string,string> $query   Passed by reference.
 	 */

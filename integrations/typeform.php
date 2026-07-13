@@ -637,8 +637,8 @@ class Typeform extends IntegrationBase {
 				default:
 					$data[ $key ] = $answer[ $type ] ?? null;
 					break;
-			}
-		}
+			}//end switch
+		}//end foreach
 
 		return $data;
 	}

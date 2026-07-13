@@ -26,7 +26,10 @@ class ProductRecommendationRecipeSeeder {
 				[
 					'id'       => '1',
 					'type'     => 'trigger',
-					'position' => [ 'x' => 250, 'y' => 50 ],
+					'position' => [
+						'x' => 250,
+						'y' => 50
+					],
 					'data'     => [
 						'app'    => 'woocommerce',
 						'event'  => 'order_status_completed',
@@ -40,7 +43,10 @@ class ProductRecommendationRecipeSeeder {
 				[
 					'id'       => '2',
 					'type'     => 'action',
-					'position' => [ 'x' => 250, 'y' => 200 ],
+					'position' => [
+						'x' => 250,
+						'y' => 200
+					],
 					'data'     => [
 						'app'    => 'woocommerce',
 						'event'  => 'get_products_by_category',
@@ -58,7 +64,10 @@ class ProductRecommendationRecipeSeeder {
 				[
 					'id'       => '3',
 					'type'     => 'action',
-					'position' => [ 'x' => 250, 'y' => 350 ],
+					'position' => [
+						'x' => 250,
+						'y' => 350
+					],
 					'data'     => [
 						'app'    => 'gemcrm',
 						'event'  => 'send_email',
@@ -75,8 +84,16 @@ class ProductRecommendationRecipeSeeder {
 				],
 			],
 			'edges' => [
-				[ 'id' => 'e1-2', 'source' => '1', 'target' => '2' ],
-				[ 'id' => 'e2-3', 'source' => '2', 'target' => '3' ],
+				[
+					'id' => 'e1-2',
+					'source' => '1',
+					'target' => '2'
+				],
+				[
+					'id' => 'e2-3',
+					'source' => '2',
+					'target' => '3'
+				],
 			],
 		];
 

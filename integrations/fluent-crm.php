@@ -695,9 +695,9 @@ class FluentCrm extends IntegrationBase {
 					'label' => 'Postal Code',
 					'type' => 'number'
 				],
-				...self::select_list(false),
-				...self::select_tag(false),
-				...self::select_company(false),
+				...self::select_list( false ),
+				...self::select_tag( false ),
+				...self::select_company( false ),
 				...self::contact_status(),
 			],
 			'get_contact_id' => self::contact_id(),

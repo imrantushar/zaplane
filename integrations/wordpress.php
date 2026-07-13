@@ -35,7 +35,7 @@ class Wordpress extends IntegrationBase {
 	use Helper;
 
 	public static function get_slug(): string {
-		return 'wordpress';
+		return 'WordPress';
 	}
 
 	public static function get_name(): string {
@@ -43,7 +43,7 @@ class Wordpress extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'wordpress.svg';
+		return 'WordPress.svg';
 	}
 
 	/** Trigger events the recipe tester can self-seed with real WordPress data. */
@@ -104,7 +104,11 @@ class Wordpress extends IntegrationBase {
 				return [ $user_id ];                               // user_register( $id )
 
 			case 'comment_post':
-				$post_id    = wp_insert_post( [ 'post_title' => 'Recipe Post', 'post_status' => 'publish', 'post_type' => 'post' ] );
+				$post_id    = wp_insert_post( [
+					'post_title' => 'Recipe Post',
+					'post_status' => 'publish',
+					'post_type' => 'post'
+				] );
 				$comment_id = wp_insert_comment(
 					[
 						'comment_post_ID'      => $post_id,
@@ -123,7 +127,7 @@ class Wordpress extends IntegrationBase {
 					return null;
 				}
 				return [ $term['term_id'], $term['term_taxonomy_id'], 'category' ]; // create_term( $term_id, $tt_id, $taxonomy )
-		}
+		}//end switch
 
 		return null;
 	}
@@ -539,13 +543,19 @@ class Wordpress extends IntegrationBase {
 				'time'          => '2024-01-01 10:00:00',
 			],
 			'media_upload_tabs'   => [
-				'tabs'         => [ 'type' => 'From Computer', 'library' => 'Media Library' ],
+				'tabs'         => [
+					'type' => 'From Computer',
+					'library' => 'Media Library'
+				],
 				'tabs_keys'    => [ 'type', 'library' ],
 				'count'        => 2,
 				'triggered_at' => '2024-01-01 10:00:00',
 			],
 			'image_sizes'         => [
-				'sizes'      => [ 'thumbnail' => 'Thumbnail', 'medium' => 'Medium' ],
+				'sizes'      => [
+					'thumbnail' => 'Thumbnail',
+					'medium' => 'Medium'
+				],
 				'sizes_keys' => [ 'thumbnail', 'medium' ],
 				'count'      => 2,
 				'time'       => '2024-01-01 10:00:00',
@@ -716,8 +726,14 @@ class Wordpress extends IntegrationBase {
 					'type'  => 'select',
 					'required' => true,
 					'options' => [
-						['label' => 'Publish', 'value' => 'publish'],
-						['label' => 'Draft', 'value' => 'draft'],
+						[
+							'label' => 'Publish',
+							'value' => 'publish'
+						],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
 					]
 				]
 			];
@@ -744,7 +760,7 @@ class Wordpress extends IntegrationBase {
 						'integration' => 'wordpress',
 						'query'       => 'posts',
 						'select'      => [ 'name', 'label' ],
-						'depends_on'  => ['post_type'],
+						'depends_on'  => [ 'post_type' ],
 					],
 					'required' => true,
 				],
@@ -754,8 +770,14 @@ class Wordpress extends IntegrationBase {
 					'type'  => 'select',
 					'required' => true,
 					'options' => [
-						['label' => 'Publish', 'value' => 'publish'],
-						['label' => 'Draft', 'value' => 'draft'],
+						[
+							'label' => 'Publish',
+							'value' => 'publish'
+						],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
 					]
 				]
 			];
@@ -1981,11 +2003,26 @@ class Wordpress extends IntegrationBase {
 					'required'    => true,
 					'placeholder' => 'any post status',
 					'options'     => [
-						[ 'label' => 'Draft',   'value' => 'draft' ],
-						[ 'label' => 'Publish', 'value' => 'publish' ],
-						[ 'label' => 'Pending', 'value' => 'pending' ],
-						[ 'label' => 'Private', 'value' => 'private' ],
-						[ 'label' => 'Future',  'value' => 'future' ],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
+						[
+							'label' => 'Publish',
+							'value' => 'publish'
+						],
+						[
+							'label' => 'Pending',
+							'value' => 'pending'
+						],
+						[
+							'label' => 'Private',
+							'value' => 'private'
+						],
+						[
+							'label' => 'Future',
+							'value' => 'future'
+						],
 					],
 				],
 				[
@@ -2098,8 +2135,18 @@ class Wordpress extends IntegrationBase {
 					'label'  => 'Post Custom Field Map',
 					'type'   => 'map',
 					'fields' => [
-						[ 'key' => 'key',   'label' => 'Key',   'type' => 'expression', 'required' => true ],
-						[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression', 'required' => true ],
+						[
+							'key' => 'key',
+							'label' => 'Key',
+							'type' => 'expression',
+							'required' => true
+						],
+						[
+							'key' => 'value',
+							'label' => 'Value',
+							'type' => 'expression',
+							'required' => true
+						],
 					],
 				],
 			],
@@ -2131,11 +2178,26 @@ class Wordpress extends IntegrationBase {
 					'required'    => true,
 					'placeholder' => 'any post status',
 					'options'     => [
-						[ 'label' => 'Draft',   'value' => 'draft' ],
-						[ 'label' => 'Publish', 'value' => 'publish' ],
-						[ 'label' => 'Pending', 'value' => 'pending' ],
-						[ 'label' => 'Private', 'value' => 'private' ],
-						[ 'label' => 'Future',  'value' => 'future' ],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
+						[
+							'label' => 'Publish',
+							'value' => 'publish'
+						],
+						[
+							'label' => 'Pending',
+							'value' => 'pending'
+						],
+						[
+							'label' => 'Private',
+							'value' => 'private'
+						],
+						[
+							'label' => 'Future',
+							'value' => 'future'
+						],
 					],
 				],
 				[
@@ -2248,8 +2310,18 @@ class Wordpress extends IntegrationBase {
 					'label'  => 'Post Custom Field Map',
 					'type'   => 'map',
 					'fields' => [
-						[ 'key' => 'key',   'label' => 'Key',   'type' => 'expression', 'required' => true ],
-						[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression', 'required' => true ],
+						[
+							'key' => 'key',
+							'label' => 'Key',
+							'type' => 'expression',
+							'required' => true
+						],
+						[
+							'key' => 'value',
+							'label' => 'Value',
+							'type' => 'expression',
+							'required' => true
+						],
 					],
 				],
 			],

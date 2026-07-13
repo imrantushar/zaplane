@@ -41,7 +41,10 @@ trait QueryTrait {
 
 			$name     = trim( "{$first} {$last}" );
 			$label    = $name !== '' ? "{$name} ({$email})" : $email;
-			$result[] = [ 'value' => $id, 'label' => $label ];
+			$result[] = [
+				'value' => $id,
+				'label' => $label
+			];
 		}
 
 		return $result;
@@ -101,7 +104,10 @@ trait QueryTrait {
 			$name = $item['title'] ?? '';
 
 			if ( $id ) {
-				$result[] = [ 'value' => $id, 'label' => $name ];
+				$result[] = [
+					'value' => $id,
+					'label' => $name
+				];
 			}
 		}
 
@@ -133,7 +139,10 @@ trait QueryTrait {
 			$name = $item['title'] ?? '';
 
 			if ( $id ) {
-				$result[] = [ 'value' => $id, 'label' => $name ];
+				$result[] = [
+					'value' => $id,
+					'label' => $name
+				];
 			}
 		}
 
@@ -165,7 +174,10 @@ trait QueryTrait {
 			$name = $item['title'] ?? $item['name'] ?? '';
 
 			if ( $id ) {
-				$result[] = [ 'value' => $id, 'label' => $name ];
+				$result[] = [
+					'value' => $id,
+					'label' => $name
+				];
 			}
 		}
 
@@ -197,7 +209,10 @@ trait QueryTrait {
 			$name = $item['title'] ?? $item['name'] ?? '';
 
 			if ( $id ) {
-				$result[] = [ 'value' => $id, 'label' => $name ];
+				$result[] = [
+					'value' => $id,
+					'label' => $name
+				];
 			}
 		}
 

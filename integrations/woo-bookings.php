@@ -139,32 +139,52 @@ class WooBookings extends IntegrationBase {
 		$samples = [
 			'booking_created' => array_merge(
 				$booking,
-				[ 'event' => 'booking_created', 'order_id' => 3417 ],
+				[
+					'event' => 'booking_created',
+					'order_id' => 3417
+				],
 				$context
 			),
 			'booking_confirmed' => array_merge(
 				$booking,
-				[ 'event' => 'booking_confirmed', 'order_id' => 3417 ],
+				[
+					'event' => 'booking_confirmed',
+					'order_id' => 3417
+				],
 				$context
 			),
 			'booking_paid' => array_merge(
 				$booking,
-				[ 'event' => 'booking_paid', 'order_id' => 3417 ],
+				[
+					'event' => 'booking_paid',
+					'order_id' => 3417
+				],
 				$context
 			),
 			'booking_cancelled' => array_merge(
 				$booking,
-				[ 'event' => 'booking_cancelled', 'status' => 'cancelled', 'order_id' => 3417 ],
+				[
+					'event' => 'booking_cancelled',
+					'status' => 'cancelled',
+					'order_id' => 3417
+				],
 				$context
 			),
 			'booking_unpaid' => array_merge(
 				$booking,
-				[ 'event' => 'booking_unpaid', 'status' => 'unpaid', 'order_id' => 3417 ],
+				[
+					'event' => 'booking_unpaid',
+					'status' => 'unpaid',
+					'order_id' => 3417
+				],
 				$context
 			),
 			'booking_status_changed' => array_merge(
 				$booking,
-				[ 'new_status' => 'confirmed', 'old_status' => 'pending-confirmation' ],
+				[
+					'new_status' => 'confirmed',
+					'old_status' => 'pending-confirmation'
+				],
 				$context
 			),
 		];

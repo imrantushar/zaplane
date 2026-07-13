@@ -137,7 +137,7 @@ class ImportExportController extends WP_REST_Controller {
 			}
 
 			$exportedVersions[] = $versionData;
-		}
+		}//end foreach
 
 		$connectionIds = array_values( array_unique( $connectionIds ) );
 		$connections   = [];
@@ -197,7 +197,7 @@ class ImportExportController extends WP_REST_Controller {
 				'last_error'      => $run->last_error,
 				'node_runs'       => $nodeRuns,
 			];
-		}
+		}//end foreach
 
 		return $exportedRuns;
 	}
@@ -310,7 +310,10 @@ class ImportExportController extends WP_REST_Controller {
 		$importedVersions = [];
 
 		foreach ( $data['versions'] as $versionData ) {
-			$graph = $versionData['graph_json'] ?? [ 'nodes' => [], 'edges' => [] ];
+			$graph = $versionData['graph_json'] ?? [
+				'nodes' => [],
+				'edges' => []
+			];
 
 			$graph = $this->strip_connection_ids( $graph );
 
@@ -333,7 +336,7 @@ class ImportExportController extends WP_REST_Controller {
 				'new_id'        => $version->id,
 				'is_active'     => (bool) $version->is_active,
 			];
-		}
+		}//end foreach
 
 		$hasActive = WorkflowVersion::where( 'workflow_id', $workflow->id )->where( 'is_active', 1 )->first();
 		if ( ! $hasActive ) {
@@ -419,7 +422,7 @@ class ImportExportController extends WP_REST_Controller {
 			if ( $originalParent ) {
 				$newNodes[ $nodeRun->id ] = (int) $originalParent;
 			}
-		}
+		}//end foreach
 
 		foreach ( $newNodes as $newId => $originalParentId ) {
 			if ( isset( $idMap[ $originalParentId ] ) ) {

@@ -64,7 +64,10 @@ class Query {
 		}
 
 		$map = self::build_trigger_map();
-		set_transient( self::CACHE_KEY, [ 'sig' => $signature, 'map' => $map ], HOUR_IN_SECONDS );
+		set_transient( self::CACHE_KEY, [
+			'sig' => $signature,
+			'map' => $map
+		], HOUR_IN_SECONDS );
 		self::$trigger_map = $map;
 		return $map;
 	}
@@ -152,7 +155,7 @@ class Query {
 					'graph_node'          => $node,
 				];
 			}
-		}
+		}//end foreach
 
 		return $map;
 	}

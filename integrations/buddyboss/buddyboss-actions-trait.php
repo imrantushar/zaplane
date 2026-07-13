@@ -9,14 +9,18 @@ trait BuddybossActionsTrait {
 
 	protected static function action_create_activity_post( array $config, array $input ): array {
 		$required = [ 'author_email', 'content' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		return self::handle_activity_post( $input );
 	}
 
 	protected static function action_create_group_post( array $config, array $input ): array {
 		$required = [ 'author_email', 'content', 'group_id' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$group_id = absint( $input['group_id'] );
 
@@ -25,7 +29,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_create_user_activity_post( array $config, array $input ): array {
 		$required = [ 'author_email', 'content', 'user_id' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$user_activity_id = absint( $input['user_id'] );
 
@@ -34,7 +40,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_add_user_to_group( array $config, array $input ): array {
 		$required = [ 'user_email', 'group_id' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$user_id = email_exists( $input['user_email'] );
 		if ( ! $user_id ) {
@@ -62,7 +70,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_update_member_profile_type( array $config, array $input ): array {
 		$required = [ 'user_email', 'profile_type' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$user_id = email_exists( $input['user_email'] );
 		if ( ! $user_id ) {
@@ -82,7 +92,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_create_group( array $config, array $input ): array {
 		$required = [ 'group_name', 'group_status', 'creator_email' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		if (
 			! function_exists( 'groups_create_group' )
@@ -116,7 +128,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_remove_friend_connection( array $config, array $input ): array {
 		$required = [ 'user_email', 'friend_email' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$user_id   = email_exists( $input['user_email'] );
 		$friend_id = email_exists( $input['friend_email'] );
@@ -138,7 +152,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_follow_user( array $config, array $input ): array {
 		$required = [ 'follower_email', 'leader_email' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$follower = get_user_by( 'email', $input['follower_email'] );
 		$leader   = get_user_by( 'email', $input['leader_email'] );
@@ -156,7 +172,10 @@ trait BuddybossActionsTrait {
 			return self::action_error( 'BuddyBoss Follow functions not found.' );
 		}
 
-		$result = $follow_fn( [ 'follower_id' => $follower->ID, 'leader_id' => $leader->ID ] );
+		$result = $follow_fn( [
+			'follower_id' => $follower->ID,
+			'leader_id' => $leader->ID
+		] );
 
 		if ( ! $result ) {
 			return self::action_error( 'User is already following.' );
@@ -170,7 +189,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_get_forum_subscribers( array $config, array $input ): array {
 		$required = [ 'forum_id' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		if ( ! function_exists( 'bbp_get_forum_subscribers' ) ) {
 			return self::action_error( 'BuddyBoss Forum functions do not exist.' );
@@ -184,7 +205,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_create_forum_topic_reply( array $config, array $input ): array {
 		$required = [ 'forum_id', 'topic_id', 'reply_title', 'reply_content', 'author_email' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		if ( ! function_exists( 'bbp_insert_reply' ) ) {
 			return self::action_error( 'BuddyBoss Forum functions not found.' );
@@ -237,7 +260,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_create_forum_topic( array $config, array $input ): array {
 		$required = [ 'forum_id', 'topic_title', 'topic_content', 'creator_email' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		if ( ! function_exists( 'bbp_insert_topic' ) ) {
 			return self::action_error( 'BuddyBoss Forum functions not found.' );
@@ -281,7 +306,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_remove_user_from_group( array $config, array $input ): array {
 		$required = [ 'user_email', 'group_id' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$user_id = email_exists( $input['user_email'] );
 		if ( ! $user_id ) {
@@ -305,7 +332,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_send_friend_request( array $config, array $input ): array {
 		$required = [ 'sender_email', 'receiver_email' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$sender   = get_user_by( 'email', $input['sender_email'] );
 		$receiver = get_user_by( 'email', $input['receiver_email'] );
@@ -332,7 +361,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_send_group_message( array $config, array $input ): array {
 		$required = [ 'group_id', 'sender_email', 'message_subject', 'message_content' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$group_id  = absint( $input['group_id'] );
 		$sender_id = email_exists( $input['sender_email'] );
@@ -389,7 +420,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_send_private_message( array $config, array $input ): array {
 		$required = [ 'sender_email', 'receiver_email', 'message_subject', 'message_content' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$sender_id = email_exists( $input['sender_email'] );
 		if ( ! $sender_id ) {
@@ -437,7 +470,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_send_group_notification( array $config, array $input ): array {
 		$required = [ 'group_id', 'sender_email', 'notification_content' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$group_id  = absint( $input['group_id'] );
 		$sender_id = email_exists( $input['sender_email'] );
@@ -534,7 +569,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_update_user_status( array $config, array $input ): array {
 		$required = [ 'user_email', 'status' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		if ( ! function_exists( 'bp_is_active' ) ) {
 			return self::action_error( 'BuddyBoss functions not found.' );
@@ -584,7 +621,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_stop_following_user( array $config, array $input ): array {
 		$required = [ 'follower_email', 'leader_email' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$follower = get_user_by( 'email', $input['follower_email'] );
 		$leader   = get_user_by( 'email', $input['leader_email'] );
@@ -598,7 +637,10 @@ trait BuddybossActionsTrait {
 			return self::action_error( 'BuddyBoss Follow functions not available.' );
 		}
 
-		$result = $stop_fn( [ 'follower_id' => $follower->ID, 'leader_id' => $leader->ID ] );
+		$result = $stop_fn( [
+			'follower_id' => $follower->ID,
+			'leader_id' => $leader->ID
+		] );
 
 		return $result
 			? self::action_success( [ 'message' => 'Stopped following successfully.' ] )
@@ -607,7 +649,9 @@ trait BuddybossActionsTrait {
 
 	protected static function action_subscribe_to_forum( array $config, array $input ): array {
 		$required = [ 'user_email', 'forum_id' ];
-		if ( $error = self::require_fields( $input, $required ) ) return $error;
+		if ( $error = self::require_fields( $input, $required ) ) {
+			return $error;
+		}
 
 		$user_id = email_exists( $input['user_email'] );
 		if ( ! $user_id ) {

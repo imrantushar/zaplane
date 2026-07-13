@@ -175,7 +175,7 @@ class Surecart extends IntegrationBase {
 			'customer'               => $customer['id'],
 			'price'                  => $price['id'],
 			'quantity'               => 1,
-			'current_period_start_at'=> 1767268800,
+			'current_period_start_at' => 1767268800,
 			'current_period_end_at'  => 1769947200,
 			'canceled_at'            => null,
 			'live_mode'              => true,
@@ -257,8 +257,14 @@ class Surecart extends IntegrationBase {
 			],
 
 			// [ 'post' => normalize_post(...), 'product' => model_to_array(...) ]
-			'product_sync_created' => [ 'post' => $post, 'product' => $product ],
-			'product_sync_updated' => [ 'post' => $post, 'product' => $product ],
+			'product_sync_created' => [
+				'post' => $post,
+				'product' => $product
+			],
+			'product_sync_updated' => [
+				'post' => $post,
+				'product' => $product
+			],
 
 			// [ 'params' => ... ]
 			'integrations_created' => [
@@ -321,16 +327,27 @@ class Surecart extends IntegrationBase {
 			return [ 'subscription' => $subscription ];
 		}
 		if ( 0 === strpos( $trigger, 'product_' ) ) {
-			return [ 'post' => $post, 'product' => $product ];
+			return [
+				'post' => $post,
+				'product' => $product
+			];
 		}
 		if ( 0 === strpos( $trigger, 'customer_' ) ) {
 			return [ 'customer' => $customer ];
 		}
 		if ( 0 === strpos( $trigger, 'integrations_' ) ) {
-			return [ 'params' => [ 'provider' => 'surecart', 'model_type' => 'product' ] ];
+			return [
+				'params' => [
+					'provider' => 'surecart',
+					'model_type' => 'product'
+				]
+			];
 		}
 		if ( 0 === strpos( $trigger, 'post_' ) ) {
-			return [ 'post' => $post, 'data' => [ 'source' => 'surecart' ] ];
+			return [
+				'post' => $post,
+				'data' => [ 'source' => 'surecart' ]
+			];
 		}
 
 		// Final non-empty catch-all so NO trigger ever returns [].

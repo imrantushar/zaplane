@@ -50,8 +50,14 @@ class Repeater extends IntegrationBase {
 				'type'    => 'select',
 				'default' => 'count',
 				'options' => [
-					[ 'value' => 'count', 'label' => 'Repeat N times' ],
-					[ 'value' => 'range', 'label' => 'Number range (from → to)' ],
+					[
+						'value' => 'count',
+						'label' => 'Repeat N times'
+					],
+					[
+						'value' => 'range',
+						'label' => 'Number range (from → to)'
+					],
 				],
 			],
 			[
@@ -62,9 +68,27 @@ class Repeater extends IntegrationBase {
 				'depends_on' => [ 'mode' => 'count' ],
 				'help'       => 'Runs the branch this many times. Read the counter downstream with {{ i }} (also {{ index }}, {{ is_first }}, {{ is_last }}, {{ total }}).',
 			],
-			[ 'key' => 'from', 'label' => 'From', 'type' => 'number', 'default' => 1, 'depends_on' => [ 'mode' => 'range' ] ],
-			[ 'key' => 'to',   'label' => 'To',   'type' => 'number', 'default' => 10, 'depends_on' => [ 'mode' => 'range' ] ],
-			[ 'key' => 'step', 'label' => 'Step', 'type' => 'number', 'default' => 1, 'depends_on' => [ 'mode' => 'range' ] ],
+			[
+				'key' => 'from',
+				'label' => 'From',
+				'type' => 'number',
+				'default' => 1,
+				'depends_on' => [ 'mode' => 'range' ]
+			],
+			[
+				'key' => 'to',
+				'label' => 'To',
+				'type' => 'number',
+				'default' => 10,
+				'depends_on' => [ 'mode' => 'range' ]
+			],
+			[
+				'key' => 'step',
+				'label' => 'Step',
+				'type' => 'number',
+				'default' => 1,
+				'depends_on' => [ 'mode' => 'range' ]
+			],
 		];
 	}
 

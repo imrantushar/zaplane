@@ -3,7 +3,7 @@ namespace Zaplane\Integrations\Trello;
 
 trait QueryTrait {
 
-    public static function query_board( array $query ): array {
+	public static function query_board( array $query ): array {
 		$options = [];
 		$creds   = self::extract_credentials( $query );
 		$api_key = $creds['api_key'] ?? '';
@@ -38,7 +38,7 @@ trait QueryTrait {
 		return $options;
 	}
 
-    public static function query_list( array $query ): array {
+	public static function query_list( array $query ): array {
 		$options  = [];
 		$creds    = self::extract_credentials( $query );
 		$api_key  = $creds['api_key'] ?? '';
@@ -74,7 +74,7 @@ trait QueryTrait {
 		return $options;
 	}
 
-    public static function query_label( array $query ): array {
+	public static function query_label( array $query ): array {
 		$options  = [];
 		$creds    = self::extract_credentials( $query );
 		$api_key  = $creds['api_key'] ?? '';
@@ -109,7 +109,7 @@ trait QueryTrait {
 		return $options;
 	}
 
-    public static function query_card( array $query ): array {
+	public static function query_card( array $query ): array {
 		$options  = [];
 		$creds    = self::extract_credentials( $query );
 		$api_key  = $creds['api_key'] ?? '';
@@ -145,7 +145,7 @@ trait QueryTrait {
 		return $options;
 	}
 
-    public static function query_checklist( array $query ): array {
+	public static function query_checklist( array $query ): array {
 		$options = [];
 		$creds   = self::extract_credentials( $query );
 		$api_key = $creds['api_key'] ?? '';
@@ -180,7 +180,7 @@ trait QueryTrait {
 		return $options;
 	}
 
-    public static function query_checklist_item( array $query ): array {
+	public static function query_checklist_item( array $query ): array {
 		$options      = [];
 		$creds        = self::extract_credentials( $query );
 		$api_key      = $creds['api_key'] ?? '';
@@ -216,7 +216,7 @@ trait QueryTrait {
 		return $options;
 	}
 
-    public static function query_attachment( array $query ): array {
+	public static function query_attachment( array $query ): array {
 		$options = [];
 		$creds   = self::extract_credentials( $query );
 		$api_key = $creds['api_key'] ?? '';
@@ -252,7 +252,7 @@ trait QueryTrait {
 		return $options;
 	}
 
-    public static function query_member( array $query ): array {
+	public static function query_member( array $query ): array {
 		$options  = [];
 		$creds    = self::extract_credentials( $query );
 		$api_key  = $creds['api_key'] ?? '';
@@ -290,7 +290,7 @@ trait QueryTrait {
 		return $options;
 	}
 
-    public static function query_org( array $query ): array {
+	public static function query_org( array $query ): array {
 		$options = [];
 		$creds   = self::extract_credentials( $query );
 		$api_key = $creds['api_key'] ?? '';

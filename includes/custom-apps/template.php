@@ -26,8 +26,8 @@ class Template {
 	/**
 	 * Recursively interpolate a value (string, array, or scalar) against a context.
 	 *
-	 * @param mixed                $value   The template value.
-	 * @param array<string,mixed>  $context Resolution context (see build_context()).
+	 * @param mixed               $value   The template value.
+	 * @param array<string,mixed> $context Resolution context (see build_context()).
 	 * @return mixed
 	 */
 	public static function interpolate( $value, array $context ) {

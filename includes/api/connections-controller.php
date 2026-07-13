@@ -173,7 +173,7 @@ class ConnectionsController extends WP_REST_Controller {
 	public function get_items( $request ) {
 		$user_id  = get_current_user_id();
 		$app      = $request->get_param( 'app' );
-		$page     = max( 1, (int) ( $request->get_param( 'page' )     ?? 1 ) );
+		$page     = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
 		$per_page = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 
 		$manager = $this->get_connection_manager();
@@ -273,7 +273,10 @@ class ConnectionsController extends WP_REST_Controller {
 			return new WP_Error( 'delete_failed', 'Failed to delete connection', [ 'status' => 500 ] );
 		}
 
-		return rest_ensure_response( [ 'deleted' => true, 'id' => $connection_id ] );
+		return rest_ensure_response( [
+			'deleted' => true,
+			'id' => $connection_id
+		] );
 	}
 
 	public function test_connection( $request ) {

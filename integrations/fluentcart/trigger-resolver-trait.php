@@ -72,7 +72,7 @@ trait TriggerResolverTrait {
 			'subscription'   => self::normalize_payload_value( $payload['subscription'] ?? [] ),
 			'connected_order_ids' => self::normalize_payload_value( $payload['connected_order_ids'] ?? [] ),
 			'refunded_items' => self::normalize_payload_value( $payload['refunded_items'] ?? [] ),
-			'refunded_amount'=> isset( $payload['refunded_amount'] ) ? (float) $payload['refunded_amount'] : 0.0,
+			'refunded_amount' => isset( $payload['refunded_amount'] ) ? (float) $payload['refunded_amount'] : 0.0,
 		];
 	}
 
@@ -162,7 +162,7 @@ trait TriggerResolverTrait {
 				'product_id' => $post_id,
 				'product'    => self::load_product_payload( $post_id ),
 			];
-		}
+		}//end if
 
 		if ( 'product_updated' === $event ) {
 			$change_data = self::normalize_payload_value( $payload['data'] ?? [] );

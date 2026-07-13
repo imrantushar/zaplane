@@ -15,7 +15,7 @@ trait DynamicQueriesTrait {
 			'order_statuses'       => [ self::class, 'order_statuses_query' ],
 			'payment_statuses'     => [ self::class, 'payment_statuses_query' ],
 			'customer_statuses'    => [ self::class, 'customer_statuses_query' ],
-			'subscription_statuses'=> [ self::class, 'subscription_statuses_query' ],
+			'subscription_statuses' => [ self::class, 'subscription_statuses_query' ],
 			'post_statuses'        => [ self::class, 'post_statuses_query' ],
 			'fulfillment_types'    => [ self::class, 'fulfillment_types_query' ],
 			'stock_statuses'       => [ self::class, 'stock_statuses_query' ],

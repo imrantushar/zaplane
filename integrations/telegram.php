@@ -75,10 +75,22 @@ class Telegram extends IntegrationBase {
 					'label'    => 'Parse Mode',
 					'required' => false,
 					'options'  => [
-						[ 'value' => '', 'label' => 'None' ],
-						[ 'value' => 'HTML', 'label' => 'HTML' ],
-						[ 'value' => 'Markdown', 'label' => 'Markdown' ],
-						[ 'value' => 'MarkdownV2', 'label' => 'MarkdownV2' ],
+						[
+							'value' => '',
+							'label' => 'None'
+						],
+						[
+							'value' => 'HTML',
+							'label' => 'HTML'
+						],
+						[
+							'value' => 'Markdown',
+							'label' => 'Markdown'
+						],
+						[
+							'value' => 'MarkdownV2',
+							'label' => 'MarkdownV2'
+						],
 					],
 					'help'     => 'Formatting mode for the message text.',
 				],
@@ -88,12 +100,18 @@ class Telegram extends IntegrationBase {
 					'label'    => 'Silent Message',
 					'required' => false,
 					'options'  => [
-						[ 'value' => 'false', 'label' => 'No (with notification)' ],
-						[ 'value' => 'true', 'label' => 'Yes (silent)' ],
+						[
+							'value' => 'false',
+							'label' => 'No (with notification)'
+						],
+						[
+							'value' => 'true',
+							'label' => 'Yes (silent)'
+						],
 					],
 				],
 			];
-		}
+		}//end if
 
 		if ( 'send_photo' === $action ) {
 			return [
@@ -216,12 +234,18 @@ class Telegram extends IntegrationBase {
 					'label'    => 'Silent Pin',
 					'required' => false,
 					'options'  => [
-						[ 'value' => 'false', 'label' => 'No (with notification)' ],
-						[ 'value' => 'true', 'label' => 'Yes (silent)' ],
+						[
+							'value' => 'false',
+							'label' => 'No (with notification)'
+						],
+						[
+							'value' => 'true',
+							'label' => 'Yes (silent)'
+						],
 					],
 				],
 			];
-		}
+		}//end if
 
 		if ( 'send_poll' === $action ) {
 			return [
@@ -248,12 +272,18 @@ class Telegram extends IntegrationBase {
 					'label'    => 'Anonymous Poll',
 					'required' => false,
 					'options'  => [
-						[ 'value' => 'true', 'label' => 'Yes (anonymous)' ],
-						[ 'value' => 'false', 'label' => 'No (show voters)' ],
+						[
+							'value' => 'true',
+							'label' => 'Yes (anonymous)'
+						],
+						[
+							'value' => 'false',
+							'label' => 'No (show voters)'
+						],
 					],
 				],
 			];
-		}
+		}//end if
 
 		return [];
 	}
@@ -270,7 +300,7 @@ class Telegram extends IntegrationBase {
 			'telegram_chat_id'        => $chat['id'] ?? '',
 			'telegram_chat_type'      => $chat['type'] ?? '',
 			'telegram_from_id'        => $from['id'] ?? '',
-			'telegram_from_first_name'=> $from['first_name'] ?? '',
+			'telegram_from_first_name' => $from['first_name'] ?? '',
 			'telegram_from_last_name' => $from['last_name'] ?? '',
 			'telegram_from_username'  => $from['username'] ?? '',
 			'telegram_date'           => $update['date'] ?? '',

@@ -93,8 +93,14 @@ class Masterstudy extends IntegrationBase {
 			'user_enroll_course' => $wrap( $course ),
 			'course_complete'    => $wrap( $course ),
 			'lesson_complete'    => $wrap( $lesson ),
-			'quiz_passed'        => $wrap( array_merge( $quiz, [ 'score' => 85, 'status' => 'passed' ] ) ),
-			'quiz_failed'        => $wrap( array_merge( $quiz, [ 'score' => 40, 'status' => 'failed' ] ) ),
+			'quiz_passed'        => $wrap( array_merge( $quiz, [
+				'score' => 85,
+				'status' => 'passed'
+			] ) ),
+			'quiz_failed'        => $wrap( array_merge( $quiz, [
+				'score' => 40,
+				'status' => 'failed'
+			] ) ),
 		];
 
 		if ( isset( $samples[ $event ] ) ) {
@@ -108,7 +114,10 @@ class Masterstudy extends IntegrationBase {
 			return $wrap( $lesson );
 		}
 		if ( 0 === strpos( $event, 'quiz' ) ) {
-			return $wrap( array_merge( $quiz, [ 'score' => 85, 'status' => 'passed' ] ) );
+			return $wrap( array_merge( $quiz, [
+				'score' => 85,
+				'status' => 'passed'
+			] ) );
 		}
 
 		return $wrap( $course );

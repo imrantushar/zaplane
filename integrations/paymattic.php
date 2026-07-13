@@ -170,16 +170,34 @@ class Paymattic extends IntegrationBase {
 				'label'    => 'Payment Status',
 				'type'     => 'select',
 				'options'  => [
-					[ 'label' => 'Any Status', 'value' => 'any' ],
-					[ 'label' => 'Paid', 'value' => 'paid' ],
-					[ 'label' => 'Pending', 'value' => 'pending' ],
-					[ 'label' => 'Failed', 'value' => 'failed' ],
-					[ 'label' => 'Refunded', 'value' => 'refunded' ],
-					[ 'label' => 'Partially Refunded', 'value' => 'partially_refunded' ],
+					[
+						'label' => 'Any Status',
+						'value' => 'any'
+					],
+					[
+						'label' => 'Paid',
+						'value' => 'paid'
+					],
+					[
+						'label' => 'Pending',
+						'value' => 'pending'
+					],
+					[
+						'label' => 'Failed',
+						'value' => 'failed'
+					],
+					[
+						'label' => 'Refunded',
+						'value' => 'refunded'
+					],
+					[
+						'label' => 'Partially Refunded',
+						'value' => 'partially_refunded'
+					],
 				],
 				'required' => true,
 			];
-		}
+		}//end if
 
 		return $fields;
 	}
@@ -282,11 +300,26 @@ class Paymattic extends IntegrationBase {
 					'label'    => 'Payment Status',
 					'type'     => 'select',
 					'options'  => [
-						[ 'label' => 'Any Status', 'value' => 'any' ],
-						[ 'label' => 'Paid', 'value' => 'paid' ],
-						[ 'label' => 'Pending', 'value' => 'pending' ],
-						[ 'label' => 'Failed', 'value' => 'failed' ],
-						[ 'label' => 'Refunded', 'value' => 'refunded' ],
+						[
+							'label' => 'Any Status',
+							'value' => 'any'
+						],
+						[
+							'label' => 'Paid',
+							'value' => 'paid'
+						],
+						[
+							'label' => 'Pending',
+							'value' => 'pending'
+						],
+						[
+							'label' => 'Failed',
+							'value' => 'failed'
+						],
+						[
+							'label' => 'Refunded',
+							'value' => 'refunded'
+						],
 					],
 					'required' => true,
 				],
@@ -325,11 +358,26 @@ class Paymattic extends IntegrationBase {
 					'label'    => 'Payment Status',
 					'type'     => 'select',
 					'options'  => [
-						[ 'label' => 'Paid', 'value' => 'paid' ],
-						[ 'label' => 'Pending', 'value' => 'pending' ],
-						[ 'label' => 'Failed', 'value' => 'failed' ],
-						[ 'label' => 'Refunded', 'value' => 'refunded' ],
-						[ 'label' => 'Partially Refunded', 'value' => 'partially_refunded' ],
+						[
+							'label' => 'Paid',
+							'value' => 'paid'
+						],
+						[
+							'label' => 'Pending',
+							'value' => 'pending'
+						],
+						[
+							'label' => 'Failed',
+							'value' => 'failed'
+						],
+						[
+							'label' => 'Refunded',
+							'value' => 'refunded'
+						],
+						[
+							'label' => 'Partially Refunded',
+							'value' => 'partially_refunded'
+						],
 					],
 					'required' => true,
 				],
@@ -554,7 +602,7 @@ class Paymattic extends IntegrationBase {
 			'event'         => 'payment_status_changed',
 			'submission_id' => $submission_id,
 			'form_id'       => $form_id,
-			'payment_status'=> $status,
+			'payment_status' => $status,
 			'submission'    => $submission,
 		];
 	}
@@ -743,7 +791,7 @@ class Paymattic extends IntegrationBase {
 				$input,
 				[
 					'submission_id' => $submission_id,
-					'payment_status'=> $payment_status,
+					'payment_status' => $payment_status,
 					'updated'       => true,
 					'submission'    => self::get_submission_by_id( $submission_id ),
 				]
@@ -788,7 +836,7 @@ class Paymattic extends IntegrationBase {
 			$items[] = [
 				'id'         => self::to_int( $form->ID ?? 0 ),
 				'post_title' => (string) ( $form->post_title ?? '' ),
-				'post_status'=> (string) ( $form->post_status ?? '' ),
+				'post_status' => (string) ( $form->post_status ?? '' ),
 				'post_type'  => (string) ( $form->post_type ?? '' ),
 				'post_date'  => (string) ( $form->post_date ?? '' ),
 			];
@@ -810,7 +858,7 @@ class Paymattic extends IntegrationBase {
 		return [
 			'id'         => self::to_int( $post->ID ?? 0 ),
 			'post_title' => (string) ( $post->post_title ?? '' ),
-			'post_status'=> (string) ( $post->post_status ?? '' ),
+			'post_status' => (string) ( $post->post_status ?? '' ),
 			'post_type'  => (string) ( $post->post_type ?? '' ),
 			'post_date'  => (string) ( $post->post_date ?? '' ),
 		];

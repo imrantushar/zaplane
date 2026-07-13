@@ -55,21 +55,66 @@ class Router extends IntegrationBase {
 
 	private static function operator_options(): array {
 		return [
-			[ 'label' => 'Equals', 'value' => '==' ],
-			[ 'label' => 'Not Equals', 'value' => '!=' ],
-			[ 'label' => 'Equals (ignore case)', 'value' => 'equals_ci' ],
-			[ 'label' => 'Contains', 'value' => 'contains' ],
-			[ 'label' => 'Contains (ignore case)', 'value' => 'contains_ci' ],
-			[ 'label' => 'Not Contains', 'value' => 'not_contains' ],
-			[ 'label' => 'Starts With', 'value' => 'starts_with' ],
-			[ 'label' => 'Ends With', 'value' => 'ends_with' ],
-			[ 'label' => 'Greater Than', 'value' => '>' ],
-			[ 'label' => 'Less Than', 'value' => '<' ],
-			[ 'label' => 'Greater or Equal', 'value' => '>=' ],
-			[ 'label' => 'Less or Equal', 'value' => '<=' ],
-			[ 'label' => 'Matches Regex', 'value' => 'matches_regex' ],
-			[ 'label' => 'In List', 'value' => 'in_list' ],
-			[ 'label' => 'Between', 'value' => 'between' ],
+			[
+				'label' => 'Equals',
+				'value' => '=='
+			],
+			[
+				'label' => 'Not Equals',
+				'value' => '!='
+			],
+			[
+				'label' => 'Equals (ignore case)',
+				'value' => 'equals_ci'
+			],
+			[
+				'label' => 'Contains',
+				'value' => 'contains'
+			],
+			[
+				'label' => 'Contains (ignore case)',
+				'value' => 'contains_ci'
+			],
+			[
+				'label' => 'Not Contains',
+				'value' => 'not_contains'
+			],
+			[
+				'label' => 'Starts With',
+				'value' => 'starts_with'
+			],
+			[
+				'label' => 'Ends With',
+				'value' => 'ends_with'
+			],
+			[
+				'label' => 'Greater Than',
+				'value' => '>'
+			],
+			[
+				'label' => 'Less Than',
+				'value' => '<'
+			],
+			[
+				'label' => 'Greater or Equal',
+				'value' => '>='
+			],
+			[
+				'label' => 'Less or Equal',
+				'value' => '<='
+			],
+			[
+				'label' => 'Matches Regex',
+				'value' => 'matches_regex'
+			],
+			[
+				'label' => 'In List',
+				'value' => 'in_list'
+			],
+			[
+				'label' => 'Between',
+				'value' => 'between'
+			],
 		];
 	}
 

@@ -35,7 +35,8 @@ class Webhook extends IntegrationBase {
 		return 'webhook.svg';
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	 ---------------------------------------------------------------------
 	 * Incoming — Catch Webhook trigger
 	 * ------------------------------------------------------------------- */
 
@@ -86,7 +87,8 @@ class Webhook extends IntegrationBase {
 		];
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	 ---------------------------------------------------------------------
 	 * Outgoing — Send Webhook action
 	 * ------------------------------------------------------------------- */
 
@@ -117,11 +119,26 @@ class Webhook extends IntegrationBase {
 				'type'    => 'select',
 				'default' => 'POST',
 				'options' => [
-					[ 'label' => 'POST', 'value' => 'POST' ],
-					[ 'label' => 'PUT', 'value' => 'PUT' ],
-					[ 'label' => 'PATCH', 'value' => 'PATCH' ],
-					[ 'label' => 'GET', 'value' => 'GET' ],
-					[ 'label' => 'DELETE', 'value' => 'DELETE' ],
+					[
+						'label' => 'POST',
+						'value' => 'POST'
+					],
+					[
+						'label' => 'PUT',
+						'value' => 'PUT'
+					],
+					[
+						'label' => 'PATCH',
+						'value' => 'PATCH'
+					],
+					[
+						'label' => 'GET',
+						'value' => 'GET'
+					],
+					[
+						'label' => 'DELETE',
+						'value' => 'DELETE'
+					],
 				],
 			],
 			[
@@ -131,9 +148,18 @@ class Webhook extends IntegrationBase {
 				'default'    => 'json',
 				'depends_on' => $with_body,
 				'options'    => [
-					[ 'label' => 'JSON', 'value' => 'json' ],
-					[ 'label' => 'Form (url-encoded)', 'value' => 'form' ],
-					[ 'label' => 'Raw', 'value' => 'raw' ],
+					[
+						'label' => 'JSON',
+						'value' => 'json'
+					],
+					[
+						'label' => 'Form (url-encoded)',
+						'value' => 'form'
+					],
+					[
+						'label' => 'Raw',
+						'value' => 'raw'
+					],
 				],
 			],
 			[
@@ -143,8 +169,16 @@ class Webhook extends IntegrationBase {
 				'depends_on' => $with_body,
 				'help'       => 'Recommended. Build the body field by field — each value is safely encoded, so multi-line or quoted values (e.g. an AI reply) never break the JSON. Use "@" in a value to insert data from earlier steps.',
 				'fields'     => [
-					[ 'key' => 'key',   'label' => 'Field', 'type' => 'text' ],
-					[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression' ],
+					[
+						'key' => 'key',
+						'label' => 'Field',
+						'type' => 'text'
+					],
+					[
+						'key' => 'value',
+						'label' => 'Value',
+						'type' => 'expression'
+					],
 				],
 			],
 			[
@@ -160,8 +194,16 @@ class Webhook extends IntegrationBase {
 				'type'   => 'map',
 				'help'   => 'Optional. Add a row per header (e.g. Authorization).',
 				'fields' => [
-					[ 'key' => 'key',   'label' => 'Header', 'type' => 'text' ],
-					[ 'key' => 'value', 'label' => 'Value',  'type' => 'expression' ],
+					[
+						'key' => 'key',
+						'label' => 'Header',
+						'type' => 'text'
+					],
+					[
+						'key' => 'value',
+						'label' => 'Value',
+						'type' => 'expression'
+					],
 				],
 			],
 			[
@@ -171,8 +213,14 @@ class Webhook extends IntegrationBase {
 				'default' => 'none',
 				'help'    => 'Optionally sign the raw body so the receiver can verify the request came from you.',
 				'options' => [
-					[ 'label' => 'None', 'value' => 'none' ],
-					[ 'label' => 'HMAC SHA-256', 'value' => 'hmac_sha256' ],
+					[
+						'label' => 'None',
+						'value' => 'none'
+					],
+					[
+						'label' => 'HMAC SHA-256',
+						'value' => 'hmac_sha256'
+					],
 				],
 			],
 			[

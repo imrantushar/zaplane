@@ -515,7 +515,7 @@ class Automation {
 				$nodeRun->id,
 				$targetNode ? $this->extract_node_meta( $targetNode ) : null
 			);
-		}
+		}//end foreach
 	}
 
 	private function finalize_run( int $run_id ) {
@@ -586,7 +586,11 @@ class Automation {
 	 * @return array{ai_tool:array<int,array<string,mixed>>,ai_memory:?array<string,mixed>,ai_model:?array<string,mixed>}
 	 */
 	private function collect_sub_nodes( array $graph, int $node_key ): array {
-		$subs = [ 'ai_tool' => [], 'ai_memory' => null, 'ai_model' => null ];
+		$subs = [
+			'ai_tool' => [],
+			'ai_memory' => null,
+			'ai_model' => null
+		];
 
 		$nodeMap = [];
 		foreach ( $graph['nodes'] ?? [] as $n ) {

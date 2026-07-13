@@ -118,8 +118,8 @@ class Iterator extends IntegrationBase {
 	 * We also accept a JSON-encoded array string, and — for backward
 	 * compatibility — a literal input key naming an array in the run context.
 	 *
-	 * @param mixed                $source
-	 * @param array<string,mixed>  $input
+	 * @param mixed               $source
+	 * @param array<string,mixed> $input
 	 * @return array<int|string,mixed>
 	 */
 	protected static function resolve_items( $source, array $input ): array {

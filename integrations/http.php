@@ -42,12 +42,30 @@ class Http extends IntegrationBase {
 				'type' => 'select',
 				'default' => 'GET',
 				'options' => [
-					[ 'label' => 'GET', 'value' => 'GET' ],
-					[ 'label' => 'POST', 'value' => 'POST' ],
-					[ 'label' => 'PUT', 'value' => 'PUT' ],
-					[ 'label' => 'PATCH', 'value' => 'PATCH' ],
-					[ 'label' => 'DELETE', 'value' => 'DELETE' ],
-					[ 'label' => 'HEAD', 'value' => 'HEAD' ],
+					[
+						'label' => 'GET',
+						'value' => 'GET'
+					],
+					[
+						'label' => 'POST',
+						'value' => 'POST'
+					],
+					[
+						'label' => 'PUT',
+						'value' => 'PUT'
+					],
+					[
+						'label' => 'PATCH',
+						'value' => 'PATCH'
+					],
+					[
+						'label' => 'DELETE',
+						'value' => 'DELETE'
+					],
+					[
+						'label' => 'HEAD',
+						'value' => 'HEAD'
+					],
 				]
 			],
 			[
@@ -56,8 +74,16 @@ class Http extends IntegrationBase {
 				'type'   => 'map',
 				'help'   => 'Appended to the URL as ?key=value. Add a row per parameter.',
 				'fields' => [
-					[ 'key' => 'key',   'label' => 'Key',   'type' => 'text' ],
-					[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression' ],
+					[
+						'key' => 'key',
+						'label' => 'Key',
+						'type' => 'text'
+					],
+					[
+						'key' => 'value',
+						'label' => 'Value',
+						'type' => 'expression'
+					],
 				],
 			],
 			[
@@ -66,25 +92,71 @@ class Http extends IntegrationBase {
 				'type'    => 'select',
 				'default' => 'none',
 				'options' => [
-					[ 'label' => 'None', 'value' => 'none' ],
-					[ 'label' => 'Bearer token', 'value' => 'bearer' ],
-					[ 'label' => 'Basic auth', 'value' => 'basic' ],
-					[ 'label' => 'API key header', 'value' => 'api_key' ],
+					[
+						'label' => 'None',
+						'value' => 'none'
+					],
+					[
+						'label' => 'Bearer token',
+						'value' => 'bearer'
+					],
+					[
+						'label' => 'Basic auth',
+						'value' => 'basic'
+					],
+					[
+						'label' => 'API key header',
+						'value' => 'api_key'
+					],
 				],
 			],
-			[ 'key' => 'auth_token', 'label' => 'Bearer token', 'type' => 'expression', 'depends_on' => [ 'auth_type' => 'bearer' ] ],
-			[ 'key' => 'auth_user', 'label' => 'Username', 'type' => 'expression', 'depends_on' => [ 'auth_type' => 'basic' ] ],
-			[ 'key' => 'auth_pass', 'label' => 'Password', 'type' => 'expression', 'depends_on' => [ 'auth_type' => 'basic' ] ],
-			[ 'key' => 'auth_header', 'label' => 'Header name', 'type' => 'text', 'default' => 'X-API-Key', 'depends_on' => [ 'auth_type' => 'api_key' ] ],
-			[ 'key' => 'auth_value', 'label' => 'API key value', 'type' => 'expression', 'depends_on' => [ 'auth_type' => 'api_key' ] ],
+			[
+				'key' => 'auth_token',
+				'label' => 'Bearer token',
+				'type' => 'expression',
+				'depends_on' => [ 'auth_type' => 'bearer' ]
+			],
+			[
+				'key' => 'auth_user',
+				'label' => 'Username',
+				'type' => 'expression',
+				'depends_on' => [ 'auth_type' => 'basic' ]
+			],
+			[
+				'key' => 'auth_pass',
+				'label' => 'Password',
+				'type' => 'expression',
+				'depends_on' => [ 'auth_type' => 'basic' ]
+			],
+			[
+				'key' => 'auth_header',
+				'label' => 'Header name',
+				'type' => 'text',
+				'default' => 'X-API-Key',
+				'depends_on' => [ 'auth_type' => 'api_key' ]
+			],
+			[
+				'key' => 'auth_value',
+				'label' => 'API key value',
+				'type' => 'expression',
+				'depends_on' => [ 'auth_type' => 'api_key' ]
+			],
 			[
 				'key'    => 'headers',
 				'label'  => 'Headers',
 				'type'   => 'map',
 				'help'   => 'Add a row per header.',
 				'fields' => [
-					[ 'key' => 'key',   'label' => 'Header', 'type' => 'text' ],
-					[ 'key' => 'value', 'label' => 'Value',  'type' => 'expression' ],
+					[
+						'key' => 'key',
+						'label' => 'Header',
+						'type' => 'text'
+					],
+					[
+						'key' => 'value',
+						'label' => 'Value',
+						'type' => 'expression'
+					],
 				],
 			],
 			[
@@ -94,9 +166,18 @@ class Http extends IntegrationBase {
 				'default'    => 'json',
 				'depends_on' => [ 'method' => [ 'POST', 'PUT', 'PATCH', 'DELETE' ] ],
 				'options'    => [
-					[ 'label' => 'JSON', 'value' => 'json' ],
-					[ 'label' => 'Form (url-encoded)', 'value' => 'form' ],
-					[ 'label' => 'Raw', 'value' => 'raw' ],
+					[
+						'label' => 'JSON',
+						'value' => 'json'
+					],
+					[
+						'label' => 'Form (url-encoded)',
+						'value' => 'form'
+					],
+					[
+						'label' => 'Raw',
+						'value' => 'raw'
+					],
 				],
 			],
 			[

@@ -86,27 +86,72 @@ class DateTime_Tool extends IntegrationBase {
 				];
 			case 'parse':
 				return [
-					[ 'key' => 'input', 'label' => 'Date input', 'type' => 'expression', 'required' => true ],
+					[
+						'key' => 'input',
+						'label' => 'Date input',
+						'type' => 'expression',
+						'required' => true
+					],
 					$input_format,
 					$timezone,
 				];
 			case 'humanize':
 				return [
-					[ 'key' => 'input', 'label' => 'Date input', 'type' => 'expression', 'required' => true, 'help' => 'Returns "2 hours ago" / "in 3 days" relative to now.' ],
+					[
+						'key' => 'input',
+						'label' => 'Date input',
+						'type' => 'expression',
+						'required' => true,
+						'help' => 'Returns "2 hours ago" / "in 3 days" relative to now.'
+					],
 					$input_format,
 				];
 			case 'boundary':
 				return [
-					[ 'key' => 'input', 'label' => 'Date input', 'type' => 'expression', 'default' => 'now' ],
 					[
-						'key' => 'boundary', 'label' => 'Boundary', 'type' => 'select', 'default' => 'start',
-						'options' => [ [ 'value' => 'start', 'label' => 'Start of' ], [ 'value' => 'end', 'label' => 'End of' ] ],
+						'key' => 'input',
+						'label' => 'Date input',
+						'type' => 'expression',
+						'default' => 'now'
 					],
 					[
-						'key' => 'unit', 'label' => 'Period', 'type' => 'select', 'default' => 'day',
+						'key' => 'boundary',
+						'label' => 'Boundary',
+						'type' => 'select',
+						'default' => 'start',
 						'options' => [
-							[ 'value' => 'day', 'label' => 'Day' ], [ 'value' => 'week', 'label' => 'Week' ],
-							[ 'value' => 'month', 'label' => 'Month' ], [ 'value' => 'year', 'label' => 'Year' ],
+							[
+								'value' => 'start',
+								'label' => 'Start of'
+							],
+							[
+								'value' => 'end',
+								'label' => 'End of'
+							]
+						],
+					],
+					[
+						'key' => 'unit',
+						'label' => 'Period',
+						'type' => 'select',
+						'default' => 'day',
+						'options' => [
+							[
+								'value' => 'day',
+								'label' => 'Day'
+							],
+							[
+								'value' => 'week',
+								'label' => 'Week'
+							],
+							[
+								'value' => 'month',
+								'label' => 'Month'
+							],
+							[
+								'value' => 'year',
+								'label' => 'Year'
+							],
 						],
 					],
 					$timezone,
@@ -179,7 +224,11 @@ class DateTime_Tool extends IntegrationBase {
 
 	public static function get_action_sample_output( string $action ): array {
 		if ( 'diff' === $action ) {
-			return [ 'difference' => 5, 'unit' => 'days', 'seconds' => 432000 ];
+			return [
+				'difference' => 5,
+				'unit' => 'days',
+				'seconds' => 432000
+			];
 		}
 		return [
 			'formatted' => '2026-07-05 12:00:00',
@@ -215,7 +264,7 @@ class DateTime_Tool extends IntegrationBase {
 			default:
 				$data = self::do_now( $config );
 				break;
-		}
+		}//end switch
 
 		return [
 			'port' => 'main',

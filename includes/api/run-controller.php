@@ -184,7 +184,10 @@ class RunController extends WP_REST_Controller {
 			return new WP_Error( 'delete_failed', $e->getMessage(), [ 'status' => 500 ] );
 		}
 
-		return rest_ensure_response( [ 'deleted' => true, 'id' => $id ] );
+		return rest_ensure_response( [
+			'deleted' => true,
+			'id' => $id
+		] );
 	}
 
 	public function get_run( $req ) {
@@ -458,7 +461,7 @@ class RunController extends WP_REST_Controller {
 				// captured context into pass-through nodes like Set Variable, so their
 				// output looked identical (a static blob) on every test run.
 				$output = $integration::execute_node( $targetNode, $input );
-			}
+			}//end if
 
 			$run->markAsCompleted();
 			$nodeRun->setOutput( $output );

@@ -103,7 +103,7 @@ abstract class CustomAppBase extends IntegrationBase {
 				'label' => '' !== $label ? $label : $key,
 				'hook'  => $hook,
 			];
-		}
+		}//end foreach
 		return $indexed;
 	}
 

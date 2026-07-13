@@ -244,23 +244,43 @@ class Wpfunnels extends IntegrationBase {
 			case 'do_action':
 				return [
 					$hook_field,
-					[ 'key' => 'arg_1', 'label' => 'Argument 1', 'type' => 'text' ],
-					[ 'key' => 'arg_2', 'label' => 'Argument 2', 'type' => 'text' ],
+					[
+						'key' => 'arg_1',
+						'label' => 'Argument 1',
+						'type' => 'text'
+					],
+					[
+						'key' => 'arg_2',
+						'label' => 'Argument 2',
+						'type' => 'text'
+					],
 				];
 
 			case 'apply_filters':
 				return [
 					$hook_field,
-					[ 'key' => 'value', 'label' => 'Value', 'type' => 'text' ],
-					[ 'key' => 'arg_1', 'label' => 'Argument 1', 'type' => 'text' ],
-					[ 'key' => 'arg_2', 'label' => 'Argument 2', 'type' => 'text' ],
+					[
+						'key' => 'value',
+						'label' => 'Value',
+						'type' => 'text'
+					],
+					[
+						'key' => 'arg_1',
+						'label' => 'Argument 1',
+						'type' => 'text'
+					],
+					[
+						'key' => 'arg_2',
+						'label' => 'Argument 2',
+						'type' => 'text'
+					],
 				];
 
 			case 'remove_action':
 			case 'has_action':
 			case 'current_filter':
 				return [ $hook_field ];
-		}
+		}//end switch
 
 		return [];
 	}
@@ -406,11 +426,18 @@ class Wpfunnels extends IntegrationBase {
 			],
 			'child_order_created' => [
 				'parent_order'   => $order,
-				'child_order'    => array_merge( $order, [ 'id' => 124, 'status' => 'processing', 'total' => 19.99 ] ),
+				'child_order'    => array_merge( $order, [
+					'id' => 124,
+					'status' => 'processing',
+					'total' => 19.99
+				] ),
 				'transaction_id' => 'txn_abc123',
 			],
 			'subscription_created' => [
-				'subscription'  => [ 'id' => 900, 'status' => 'active' ],
+				'subscription'  => [
+					'id' => 900,
+					'status' => 'active'
+				],
 				'offer_product' => $offer_product,
 				'order_id'      => 123,
 				'order'         => $order,

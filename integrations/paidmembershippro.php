@@ -322,7 +322,10 @@ class Paidmembershippro extends IntegrationBase {
 					[
 						'old_level_data' => [ $level_object ],
 						'new_level_data' => [
-							array_merge( $level_object, [ 'id' => 3, 'name' => 'Platinum' ] ),
+							array_merge( $level_object, [
+								'id' => 3,
+								'name' => 'Platinum'
+							] ),
 						],
 					]
 				),
@@ -719,16 +722,16 @@ class Paidmembershippro extends IntegrationBase {
 	}
 
 	private static function get_level_data( int $level_id ): array {
-        global $wpdb;
+		global $wpdb;
 
-        $level = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT * FROM {$wpdb->pmpro_membership_levels} WHERE id = %d LIMIT 1",
-                $level_id
-            ),
-            ARRAY_A
-        );
+		$level = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->pmpro_membership_levels} WHERE id = %d LIMIT 1",
+				$level_id
+			),
+			ARRAY_A
+		);
 
-        return $level ?: [ 'level_id' => $level_id ];
-    }
+		return $level ?: [ 'level_id' => $level_id ];
+	}
 }

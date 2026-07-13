@@ -81,8 +81,14 @@ class Gmail extends IntegrationBase {
 				'label'    => 'Content Type',
 				'required' => false,
 				'options'  => [
-					[ 'value' => 'text/plain', 'label' => 'Plain Text' ],
-					[ 'value' => 'text/html',  'label' => 'HTML' ],
+					[
+						'value' => 'text/plain',
+						'label' => 'Plain Text'
+					],
+					[
+						'value' => 'text/html',
+						'label' => 'HTML'
+					],
 				],
 			],
 		];
@@ -113,7 +119,7 @@ class Gmail extends IntegrationBase {
 					],
 				]
 			);
-		}
+		}//end if
 
 		if ( 'create_draft' === $action ) {
 			return $compose_fields;

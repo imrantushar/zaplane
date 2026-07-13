@@ -35,7 +35,12 @@ trait QueryTrait {
 			'posts_per_page' => -1,
 		] );
 
-		$result = [ [ 'name' => 'any', 'label' => 'Any' ] ];
+		$result = [
+			[
+				'name' => 'any',
+				'label' => 'Any'
+			]
+		];
 
 		foreach ( $posts as $post ) {
 			$label = ( $post->post_type === 'attachment' )
@@ -166,7 +171,10 @@ trait QueryTrait {
 	}
 
 	public static function query_tags( $q ) {
-		$args = [ 'taxonomy' => 'post_tag', 'hide_empty' => false ];
+		$args = [
+			'taxonomy' => 'post_tag',
+			'hide_empty' => false
+		];
 		if ( ! empty( $q['search'] ) ) {
 			$args['search'] = $q['search'];
 		}
@@ -195,7 +203,10 @@ trait QueryTrait {
 			return [];
 		}
 
-		$args = [ 'taxonomy' => $taxonomy, 'hide_empty' => false ];
+		$args = [
+			'taxonomy' => $taxonomy,
+			'hide_empty' => false
+		];
 		if ( ! empty( $q['search'] ) ) {
 			$args['search'] = $q['search'];
 		}

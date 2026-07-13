@@ -81,10 +81,10 @@ class Ai extends IntegrationBase {
 	}
 
 	public static function test_connection( array $credentials ): array {
-		$provider = strtolower( (string) ( $credentials['provider'] ?? 'wordpress' ) );
+		$provider = strtolower( (string) ( $credentials['provider'] ?? 'WordPress' ) );
 		$api_key  = $credentials['api_key'] ?? '';
 
-		if ( 'wordpress' === $provider ) {
+		if ( 'WordPress' === $provider ) {
 			if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
 				return [
 					'success' => false,
@@ -189,7 +189,7 @@ class Ai extends IntegrationBase {
 	}
 
 	/**
-	 * Resolve the provider (anthropic|openai|wordpress|'') stored on a connection.
+	 * Resolve the provider (anthropic|openai|WordPress|'') stored on a connection.
 	 *
 	 * @param mixed $connection_id
 	 */
@@ -204,7 +204,7 @@ class Ai extends IntegrationBase {
 			return '';
 		}
 
-		$provider = $connection->getCredentials()['provider'] ?? 'wordpress';
+		$provider = $connection->getCredentials()['provider'] ?? 'WordPress';
 		return strtolower( (string) $provider );
 	}
 
@@ -215,22 +215,40 @@ class Ai extends IntegrationBase {
 		switch ( $provider ) {
 			case 'openai':
 				return [
-					[ 'value' => 'gpt-4o',      'label' => 'OpenAI GPT-4o' ],
-					[ 'value' => 'gpt-4o-mini', 'label' => 'OpenAI GPT-4o mini' ],
+					[
+						'value' => 'gpt-4o',
+						'label' => 'OpenAI GPT-4o'
+					],
+					[
+						'value' => 'gpt-4o-mini',
+						'label' => 'OpenAI GPT-4o mini'
+					],
 				];
 			case 'anthropic':
 				return [
-					[ 'value' => 'claude-opus-4-8',   'label' => 'Claude Opus 4.8 (most capable)' ],
-					[ 'value' => 'claude-sonnet-4-6', 'label' => 'Claude Sonnet 4.6 (balanced)' ],
-					[ 'value' => 'claude-haiku-4-5',  'label' => 'Claude Haiku 4.5 (fastest)' ],
+					[
+						'value' => 'claude-opus-4-8',
+						'label' => 'Claude Opus 4.8 (most capable)'
+					],
+					[
+						'value' => 'claude-sonnet-4-6',
+						'label' => 'Claude Sonnet 4.6 (balanced)'
+					],
+					[
+						'value' => 'claude-haiku-4-5',
+						'label' => 'Claude Haiku 4.5 (fastest)'
+					],
 				];
-			case 'wordpress':
+			case 'WordPress':
 				return [
-					[ 'value' => 'wordpress-default', 'label' => 'Site default (managed by WordPress AI)' ],
+					[
+						'value' => 'wordpress-default',
+						'label' => 'Site default (managed by WordPress AI)'
+					],
 				];
 			default:
 				return [];
-		}
+		}//end switch
 	}
 
 	public static function get_action_config_schema( string $action ): array {
@@ -295,11 +313,11 @@ class Ai extends IntegrationBase {
 		$config      = $node['data']['config'] ?? [];
 		$credentials = $node['_connection_credentials'] ?? [];
 
-		$provider = strtolower( (string) ( $credentials['provider'] ?? 'wordpress' ) );
+		$provider = strtolower( (string) ( $credentials['provider'] ?? 'WordPress' ) );
 		$api_key  = $credentials['api_key'] ?? '';
 
 		// WordPress Core AI uses the site's configured connection — no key here.
-		if ( 'wordpress' !== $provider && '' === $api_key ) {
+		if ( 'WordPress' !== $provider && '' === $api_key ) {
 			return self::error( 'No AI connection credentials available.', $input );
 		}
 
@@ -315,7 +333,7 @@ class Ai extends IntegrationBase {
 
 		$messages = self::build_messages( $config['history'] ?? '', $user_msg );
 
-		if ( 'wordpress' === $provider ) {
+		if ( 'WordPress' === $provider ) {
 			$result = self::call_wordpress( $system, $messages, $max_tokens, $temperature );
 		} elseif ( 'openai' === $provider ) {
 			$result = self::call_openai( $api_key, $model, $system, $messages, $max_tokens, $temperature );

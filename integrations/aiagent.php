@@ -115,8 +115,14 @@ class Aiagent extends IntegrationBase {
 				'type'    => 'select',
 				'default' => 'text',
 				'options' => [
-					[ 'value' => 'text', 'label' => 'Text' ],
-					[ 'value' => 'json', 'label' => 'JSON (structured)' ],
+					[
+						'value' => 'text',
+						'label' => 'Text'
+					],
+					[
+						'value' => 'json',
+						'label' => 'JSON (structured)'
+					],
 				],
 				'help'    => 'Text returns the reply as-is. JSON asks the model for a structured JSON object and parses it into a `json` output field.',
 			],
@@ -171,11 +177,14 @@ class Aiagent extends IntegrationBase {
 					'description' => (string) ( $tool['description'] ?? ( 'MCP tool: ' . $name ) ),
 					'schema'      => ( isset( $tool['inputSchema'] ) && is_array( $tool['inputSchema'] ) )
 						? $tool['inputSchema']
-						: [ 'type' => 'object', 'properties' => (object) [] ],
+						: [
+							'type' => 'object',
+							'properties' => (object) []
+						],
 				];
 				$ctx['mcp_name_map'][ $agent_name ] = $name;
-			}
-		}
+			}//end foreach
+		}//end if
 
 		// Sub-nodes wired into the agent on the canvas (Tools / Memory / Chat
 		// Model). Any connected action node becomes a callable tool; a memory node
@@ -432,7 +441,10 @@ class Aiagent extends IntegrationBase {
 			}
 		}
 
-		$out = [ 'type' => 'object', 'properties' => empty( $props ) ? (object) [] : $props ];
+		$out = [
+			'type' => 'object',
+			'properties' => empty( $props ) ? (object) [] : $props
+		];
 		if ( ! empty( $required ) ) {
 			$out['required'] = $required;
 		}
@@ -450,7 +462,12 @@ class Aiagent extends IntegrationBase {
 		$config = array_merge( $tool['saved_config'], is_array( $args ) ? $args : [] );
 		try {
 			$out = $tool['class']::execute_node(
-				[ 'data' => [ 'event' => $tool['event'], 'config' => $config ] ],
+				[
+					'data' => [
+						'event' => $tool['event'],
+						'config' => $config
+					]
+				],
 				[]
 			);
 		} catch ( \Throwable $e ) {
@@ -494,7 +511,12 @@ class Aiagent extends IntegrationBase {
 		}
 		$config = is_array( $memory_node['data']['config'] ?? null ) ? $memory_node['data']['config'] : [];
 		$out     = \Zaplane\Integrations\Memory::execute_node(
-			[ 'data' => [ 'event' => 'get_history', 'config' => $config ] ],
+			[
+				'data' => [
+					'event' => 'get_history',
+					'config' => $config
+				]
+			],
 			[]
 		);
 		$history = $out['data']['history'] ?? [];
@@ -528,7 +550,15 @@ class Aiagent extends IntegrationBase {
 			return [];
 		}
 		$res = \Zaplane\Integrations\Mcpclient::execute_node(
-			[ 'data' => [ 'event' => 'list_tools', 'config' => [ 'server_url' => $server, 'auth_token' => $token ] ] ],
+			[
+				'data' => [
+					'event' => 'list_tools',
+					'config' => [
+						'server_url' => $server,
+						'auth_token' => $token
+					]
+				]
+			],
 			[]
 		);
 		$tools = $res['data']['tools'] ?? [];

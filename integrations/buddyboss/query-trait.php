@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 trait QueryTrait {
 
-    public static function query_forums( $query = [] ): array {
+	public static function query_forums( $query = [] ): array {
 		if ( ! function_exists( 'bbp_get_forum_post_type' ) ) {
 			return [];
 		}
@@ -24,7 +24,7 @@ trait QueryTrait {
 		], $forums );
 	}
 
-    public static function query_group( $query = [] ): array {
+	public static function query_group( $query = [] ): array {
 		if ( ! function_exists( 'groups_get_groups' ) ) {
 			return [];
 		}
@@ -44,7 +44,7 @@ trait QueryTrait {
 		return $data;
 	}
 
-    public static function query_group_types( $query = [] ): array {
+	public static function query_group_types( $query = [] ): array {
 		if ( ! function_exists( 'bp_groups_get_group_types' ) ) {
 			return [];
 		}
@@ -62,7 +62,7 @@ trait QueryTrait {
 		return $data;
 	}
 
-    public static function query_member_types( $query = [] ): array {
+	public static function query_member_types( $query = [] ): array {
 		if ( ! function_exists( 'bp_get_member_types' ) ) {
 			return [];
 		}

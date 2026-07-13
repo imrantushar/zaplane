@@ -62,7 +62,7 @@ class Loader {
 				// path — it just needs a non-empty value to skip the file lookup.
 				'path'  => ZAPLANE_INTEGRATION_DIR_PATH . 'custom-app-base.php',
 			];
-		}
+		}//end foreach
 
 		return $registry;
 	}

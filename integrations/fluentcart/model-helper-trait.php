@@ -232,6 +232,6 @@ trait ModelHelperTrait {
 			} catch ( \Throwable $e ) {
 				unset( $e );
 			}
-		}
+		}//end if
 	}
 }

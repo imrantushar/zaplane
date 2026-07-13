@@ -177,7 +177,10 @@ class RecipeController extends WP_REST_Controller {
 
 		$recipe->delete();
 
-		return rest_ensure_response( [ 'deleted' => true, 'id' => (int) $request['id'] ] );
+		return rest_ensure_response( [
+			'deleted' => true,
+			'id' => (int) $request['id']
+		] );
 	}
 
 	public function workflow_to_recipe( $request ) {

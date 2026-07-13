@@ -155,7 +155,7 @@ class RecipeFolderController extends WP_REST_Controller {
 			}
 
 			$folder->parent_id = $newParentId;
-		}
+		}//end if
 
 		$folder->save();
 
@@ -182,7 +182,10 @@ class RecipeFolderController extends WP_REST_Controller {
 
 		$folder->delete();
 
-		return rest_ensure_response( [ 'deleted' => true, 'id' => (int) $request['id'] ] );
+		return rest_ensure_response( [
+			'deleted' => true,
+			'id' => (int) $request['id']
+		] );
 	}
 
 	// -------------------------------------------------------------------------

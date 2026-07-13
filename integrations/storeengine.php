@@ -850,7 +850,10 @@ class Storeengine extends IntegrationBase {
 		// Category fallback so every trigger exposes fields in the "@" picker even
 		// before a capture, matching the shape resolve_trigger actually emits.
 		if ( 0 === strpos( $trigger, 'order_status_' ) ) {
-			return array_merge( $order_sample, [ 'old_status' => 'processing', 'new_status' => 'completed' ] );
+			return array_merge( $order_sample, [
+				'old_status' => 'processing',
+				'new_status' => 'completed'
+			] );
 		}
 		if ( 0 === strpos( $trigger, 'order' ) || 0 === strpos( $trigger, 'checkout' )
 			|| in_array( $trigger, [ 'product_purchased', 'add_to_cart', 'payment_refunded' ], true ) ) {

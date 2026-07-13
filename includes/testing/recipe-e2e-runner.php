@@ -157,7 +157,7 @@ class RecipeE2eRunner {
 			$result->skip( $e->getMessage() );
 		} catch ( \Throwable $e ) {
 			$result->abort( 'E2E error: ' . $e->getMessage() );
-		}
+		}//end try
 
 		return self::finish( $result, $workflow, $run, $opts );
 	}
@@ -176,7 +176,10 @@ class RecipeE2eRunner {
 			[
 				'id'       => '1',
 				'type'     => 'trigger',
-				'position' => [ 'x' => 400, 'y' => 140 ],
+				'position' => [
+					'x' => 400,
+					'y' => 140
+				],
 				'data'     => self::node_data( $integration, 'trigger', $event, $config, $hook ),
 			],
 		];
@@ -189,7 +192,10 @@ class RecipeE2eRunner {
 			$nodes[]   = [
 				'id'       => $id,
 				'type'     => 'action',
-				'position' => [ 'x' => 400, 'y' => 140 + ( (int) $id - 1 ) * 180 ],
+				'position' => [
+					'x' => 400,
+					'y' => 140 + ( (int) $id - 1 ) * 180
+				],
 				'data'     => self::node_data( $app, 'action', $action['event'] ?? '', (array) ( $action['config'] ?? [] ) ),
 			];
 			$edges[]   = [

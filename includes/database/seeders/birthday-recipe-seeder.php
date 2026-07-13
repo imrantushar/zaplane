@@ -26,7 +26,10 @@ class BirthdayRecipeSeeder {
 				[
 					'id'       => '1',
 					'type'     => 'trigger',
-					'position' => [ 'x' => 250, 'y' => 50 ],
+					'position' => [
+						'x' => 250,
+						'y' => 50
+					],
 					'data'     => [
 						'app'    => 'gemcrm',
 						'event'  => 'contact_birthday',
@@ -42,7 +45,10 @@ class BirthdayRecipeSeeder {
 				[
 					'id'       => '2',
 					'type'     => 'action',
-					'position' => [ 'x' => 250, 'y' => 200 ],
+					'position' => [
+						'x' => 250,
+						'y' => 200
+					],
 					'data'     => [
 						'app'    => 'woocommerce',
 						'event'  => 'create_coupon',
@@ -62,7 +68,10 @@ class BirthdayRecipeSeeder {
 				[
 					'id'       => '3',
 					'type'     => 'action',
-					'position' => [ 'x' => 250, 'y' => 350 ],
+					'position' => [
+						'x' => 250,
+						'y' => 350
+					],
 					'data'     => [
 						'app'    => 'gemcrm',
 						'event'  => 'send_email',
@@ -80,7 +89,10 @@ class BirthdayRecipeSeeder {
 				[
 					'id'       => '4',
 					'type'     => 'action',
-					'position' => [ 'x' => 250, 'y' => 500 ],
+					'position' => [
+						'x' => 250,
+						'y' => 500
+					],
 					'data'     => [
 						'app'    => 'delay',
 						'event'  => 'wait',
@@ -96,7 +108,10 @@ class BirthdayRecipeSeeder {
 				[
 					'id'       => '5',
 					'type'     => 'action',
-					'position' => [ 'x' => 250, 'y' => 650 ],
+					'position' => [
+						'x' => 250,
+						'y' => 650
+					],
 					'data'     => [
 						'app'    => 'gemcrm',
 						'event'  => 'send_email',
@@ -113,10 +128,26 @@ class BirthdayRecipeSeeder {
 				],
 			],
 			'edges' => [
-				[ 'id' => 'e1-2', 'source' => '1', 'target' => '2' ],
-				[ 'id' => 'e2-3', 'source' => '2', 'target' => '3' ],
-				[ 'id' => 'e3-4', 'source' => '3', 'target' => '4' ],
-				[ 'id' => 'e4-5', 'source' => '4', 'target' => '5' ],
+				[
+					'id' => 'e1-2',
+					'source' => '1',
+					'target' => '2'
+				],
+				[
+					'id' => 'e2-3',
+					'source' => '2',
+					'target' => '3'
+				],
+				[
+					'id' => 'e3-4',
+					'source' => '3',
+					'target' => '4'
+				],
+				[
+					'id' => 'e4-5',
+					'source' => '4',
+					'target' => '5'
+				],
 			],
 		];
 

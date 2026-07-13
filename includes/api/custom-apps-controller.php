@@ -133,7 +133,10 @@ class CustomAppsController extends WP_REST_Controller {
 		if ( ! ManifestStore::delete( $slug ) ) {
 			return new WP_Error( 'not_found', 'Custom app not found.', [ 'status' => 404 ] );
 		}
-		return rest_ensure_response( [ 'deleted' => true, 'slug' => $slug ] );
+		return rest_ensure_response( [
+			'deleted' => true,
+			'slug' => $slug
+		] );
 	}
 
 	public function import_item( WP_REST_Request $request ) {
@@ -166,7 +169,10 @@ class CustomAppsController extends WP_REST_Controller {
 		$response = HttpClient::request( $built['method'], $built['url'], $built['headers'], $built['body'] );
 
 		return rest_ensure_response( [
-			'request'  => [ 'method' => $built['method'], 'url' => $built['url'] ],
+			'request'  => [
+				'method' => $built['method'],
+				'url' => $built['url']
+			],
 			'status'   => $response['status'],
 			'body'     => $response['body'],
 			'headers'  => $response['headers'],

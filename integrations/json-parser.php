@@ -67,7 +67,11 @@ class JsonParser extends IntegrationBase {
 		if ( 'stringify' === $action ) {
 			return [ 'json' => '{"key":"value"}' ];
 		}
-		return [ 'data' => [ 'key' => 'value' ], 'success' => true, 'error' => null ];
+		return [
+			'data' => [ 'key' => 'value' ],
+			'success' => true,
+			'error' => null
+		];
 	}
 
 	public static function execute_node( array $node, array $input ): array {

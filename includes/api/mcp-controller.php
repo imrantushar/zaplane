@@ -178,13 +178,23 @@ class McpController extends WP_REST_Controller {
 			$data = $this->{$map[ $name ]}( $args );
 		} catch ( \Throwable $e ) {
 			return self::result( $id, [
-				'content' => [ [ 'type' => 'text', 'text' => 'Error: ' . $e->getMessage() ] ],
+				'content' => [
+					[
+						'type' => 'text',
+						'text' => 'Error: ' . $e->getMessage()
+					]
+				],
 				'isError' => true,
 			] );
 		}
 
 		return self::result( $id, [
-			'content' => [ [ 'type' => 'text', 'text' => wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) ] ],
+			'content' => [
+				[
+					'type' => 'text',
+					'text' => wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )
+				]
+			],
 		] );
 	}
 
@@ -193,7 +203,10 @@ class McpController extends WP_REST_Controller {
 	private function tool_list_integrations( array $args ): array {
 		$file = ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json';
 		if ( ! file_exists( $file ) ) {
-			return [ 'apps' => [], 'tools' => [] ];
+			return [
+				'apps' => [],
+				'tools' => []
+			];
 		}
 		$m    = json_decode( file_get_contents( $file ), true ); // phpcs:ignore
 		$apps = [];
@@ -207,9 +220,16 @@ class McpController extends WP_REST_Controller {
 		}
 		$tools = [];
 		foreach ( (array) ( $m['tools'] ?? [] ) as $slug => $a ) {
-			$tools[] = [ 'slug' => $slug, 'name' => $a['name'] ?? $slug, 'actions' => array_keys( $a['actions'] ?? [] ) ];
+			$tools[] = [
+				'slug' => $slug,
+				'name' => $a['name'] ?? $slug,
+				'actions' => array_keys( $a['actions'] ?? [] )
+			];
 		}
-		return [ 'apps' => $apps, 'tools' => $tools ];
+		return [
+			'apps' => $apps,
+			'tools' => $tools
+		];
 	}
 
 	private function tool_list_workflows( array $args ): array {
@@ -233,7 +253,11 @@ class McpController extends WP_REST_Controller {
 		if ( ! $run_id ) {
 			throw new \Exception( 'Failed to start workflow (not found or no active version).' );
 		}
-		return [ 'started' => true, 'run_id' => $run_id, 'workflow_id' => $id ];
+		return [
+			'started' => true,
+			'run_id' => $run_id,
+			'workflow_id' => $id
+		];
 	}
 
 	private function tool_list_recipes( array $args ): array {
@@ -278,11 +302,16 @@ class McpController extends WP_REST_Controller {
 		if ( ! class_exists( '\Zaplane\Integrations\Knowledge' ) ) {
 			throw new \Exception( 'Knowledge integration unavailable.' );
 		}
-		$node = [ 'data' => [ 'event' => 'retrieve', 'config' => [
-			'business_key' => (string) ( $args['business_key'] ?? '' ),
-			'query'        => (string) ( $args['query'] ?? '' ),
-			'limit'        => (int) ( $args['limit'] ?? 5 ),
-		] ] ];
+		$node = [
+			'data' => [
+				'event' => 'retrieve',
+				'config' => [
+					'business_key' => (string) ( $args['business_key'] ?? '' ),
+					'query'        => (string) ( $args['query'] ?? '' ),
+					'limit'        => (int) ( $args['limit'] ?? 5 ),
+				]
+			]
+		];
 		$res  = \Zaplane\Integrations\Knowledge::execute_node( $node, [] );
 		$data = $res['data'] ?? [];
 		return [
@@ -315,8 +344,14 @@ class McpController extends WP_REST_Controller {
 				'name'        => 'run_workflow',
 				'description' => 'Run a Zaplane workflow now by id, with optional trigger data.',
 				'inputSchema' => $obj( [
-					'workflow_id' => [ 'type' => 'integer', 'description' => 'Workflow id to run.' ],
-					'data'        => [ 'type' => 'object', 'description' => 'Optional trigger data passed to the workflow.' ],
+					'workflow_id' => [
+						'type' => 'integer',
+						'description' => 'Workflow id to run.'
+					],
+					'data'        => [
+						'type' => 'object',
+						'description' => 'Optional trigger data passed to the workflow.'
+					],
 				], [ 'workflow_id' ] ),
 			],
 			[
@@ -328,24 +363,42 @@ class McpController extends WP_REST_Controller {
 				'name'        => 'create_workflow_from_recipe',
 				'description' => 'Create a new workflow from a recipe id. Connections must be re-linked afterward.',
 				'inputSchema' => $obj( [
-					'recipe_id' => [ 'type' => 'integer', 'description' => 'Recipe id to instantiate.' ],
-					'title'     => [ 'type' => 'string', 'description' => 'Optional title for the new workflow.' ],
+					'recipe_id' => [
+						'type' => 'integer',
+						'description' => 'Recipe id to instantiate.'
+					],
+					'title'     => [
+						'type' => 'string',
+						'description' => 'Optional title for the new workflow.'
+					],
 				], [ 'recipe_id' ] ),
 			],
 			[
 				'name'        => 'list_runs',
 				'description' => 'List recent workflow runs and their status.',
 				'inputSchema' => $obj( [
-					'limit' => [ 'type' => 'integer', 'description' => 'Max runs to return (default 20).' ],
+					'limit' => [
+						'type' => 'integer',
+						'description' => 'Max runs to return (default 20).'
+					],
 				] ),
 			],
 			[
 				'name'        => 'search_knowledge',
 				'description' => 'Search a business knowledge base (products, prices, FAQ) for relevant entries.',
 				'inputSchema' => $obj( [
-					'business_key' => [ 'type' => 'string', 'description' => 'Business key, e.g. business_a.' ],
-					'query'        => [ 'type' => 'string', 'description' => 'What to search for.' ],
-					'limit'        => [ 'type' => 'integer', 'description' => 'Max results (default 5).' ],
+					'business_key' => [
+						'type' => 'string',
+						'description' => 'Business key, e.g. business_a.'
+					],
+					'query'        => [
+						'type' => 'string',
+						'description' => 'What to search for.'
+					],
+					'limit'        => [
+						'type' => 'integer',
+						'description' => 'Max results (default 5).'
+					],
 				], [ 'business_key', 'query' ] ),
 			],
 		];
@@ -354,10 +407,21 @@ class McpController extends WP_REST_Controller {
 	/* --------------------------- JSON-RPC helpers ------------------------- */
 
 	private static function result( $id, $result ): array {
-		return [ 'jsonrpc' => '2.0', 'id' => $id, 'result' => $result ];
+		return [
+			'jsonrpc' => '2.0',
+			'id' => $id,
+			'result' => $result
+		];
 	}
 
 	private static function error( $id, int $code, string $message ): array {
-		return [ 'jsonrpc' => '2.0', 'id' => $id, 'error' => [ 'code' => $code, 'message' => $message ] ];
+		return [
+			'jsonrpc' => '2.0',
+			'id' => $id,
+			'error' => [
+				'code' => $code,
+				'message' => $message
+			]
+		];
 	}
 }

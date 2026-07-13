@@ -99,18 +99,54 @@ class Condition extends IntegrationBase {
 								'label' => 'Is Not Empty',
 								'value' => 'is_not_empty'
 							],
-							[ 'label' => 'Equals (ignore case)', 'value' => 'equals_ci' ],
-							[ 'label' => 'Contains (ignore case)', 'value' => 'contains_ci' ],
-							[ 'label' => 'Not Starts With', 'value' => 'not_starts_with' ],
-							[ 'label' => 'Not Ends With', 'value' => 'not_ends_with' ],
-							[ 'label' => 'Matches Regex', 'value' => 'matches_regex' ],
-							[ 'label' => 'In List', 'value' => 'in_list' ],
-							[ 'label' => 'Not In List', 'value' => 'not_in_list' ],
-							[ 'label' => 'Is True', 'value' => 'is_true' ],
-							[ 'label' => 'Is False', 'value' => 'is_false' ],
-							[ 'label' => 'Between', 'value' => 'between' ],
-							[ 'label' => 'Date Before', 'value' => 'before' ],
-							[ 'label' => 'Date After', 'value' => 'after' ],
+							[
+								'label' => 'Equals (ignore case)',
+								'value' => 'equals_ci'
+							],
+							[
+								'label' => 'Contains (ignore case)',
+								'value' => 'contains_ci'
+							],
+							[
+								'label' => 'Not Starts With',
+								'value' => 'not_starts_with'
+							],
+							[
+								'label' => 'Not Ends With',
+								'value' => 'not_ends_with'
+							],
+							[
+								'label' => 'Matches Regex',
+								'value' => 'matches_regex'
+							],
+							[
+								'label' => 'In List',
+								'value' => 'in_list'
+							],
+							[
+								'label' => 'Not In List',
+								'value' => 'not_in_list'
+							],
+							[
+								'label' => 'Is True',
+								'value' => 'is_true'
+							],
+							[
+								'label' => 'Is False',
+								'value' => 'is_false'
+							],
+							[
+								'label' => 'Between',
+								'value' => 'between'
+							],
+							[
+								'label' => 'Date Before',
+								'value' => 'before'
+							],
+							[
+								'label' => 'Date After',
+								'value' => 'after'
+							],
 						],
 						'required' => true,
 					],

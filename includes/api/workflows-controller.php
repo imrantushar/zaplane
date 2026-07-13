@@ -166,7 +166,10 @@ class WorkflowsController extends WP_REST_Controller {
 			);
 		}
 
-		return rest_ensure_response( [ 'triggered' => true, 'run_id' => (int) $run_id ] );
+		return rest_ensure_response( [
+			'triggered' => true,
+			'run_id' => (int) $run_id
+		] );
 	}
 
 	public function get_workflow_items( $request ) {
@@ -263,11 +266,11 @@ class WorkflowsController extends WP_REST_Controller {
 
 		$icons = $graph['integration_icons'] ?? null;
 		// if ( is_array( $icons ) ) {
-		// 	$workflow->integration_icons = array_slice( array_values( array_unique( $icons ) ), 0, 3 );
+		// $workflow->integration_icons = array_slice( array_values( array_unique( $icons ) ), 0, 3 );
 		// }
 		if ( is_array( $icons ) ) {
-        $workflow->integration_icons = array_values(array_unique($icons));
-         }
+			$workflow->integration_icons = array_values( array_unique( $icons ) );
+		}
 
 		$workflow->save();
 
@@ -646,7 +649,7 @@ class WorkflowsController extends WP_REST_Controller {
 
 				if ( 'trigger' === $nodeType ) {
 					// 1) Reuse the most recent real capture of this trigger from ANY
-					//    workflow, so a new workflow inherits its fields.
+					// workflow, so a new workflow inherits its fields.
 					$sample = \Zaplane\Framework\Core\Automation::get_trigger_sample( $integration, $event );
 
 					// 2) Fall back to the integration's declared trigger sample.

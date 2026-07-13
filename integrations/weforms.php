@@ -75,7 +75,6 @@ class Weforms extends IntegrationBase {
 		switch ( $node['event'] ) {
 
 			case 'weforms_entry_submission':
-
 				$entry_id = $args[0] ?? 0;
 				$form_id  = $args[1] ?? 0;
 
@@ -139,8 +138,8 @@ class Weforms extends IntegrationBase {
 								'last_name'   => $name_values[2] ?? '',
 							];
 						}
-					}
-				}
+					}//end if
+				}//end foreach
 
 				$final_data = array_merge(
 					$submitted_data,
@@ -161,7 +160,7 @@ class Weforms extends IntegrationBase {
 				}
 
 				return $final_data;
-		}
+		}//end switch
 
 		return false;
 	}

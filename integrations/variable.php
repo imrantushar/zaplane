@@ -48,11 +48,26 @@ class Variable extends IntegrationBase {
 				'type'    => 'select',
 				'default' => 'auto',
 				'options' => [
-					[ 'value' => 'auto',    'label' => 'Auto (keep as-is)' ],
-					[ 'value' => 'string',  'label' => 'Text' ],
-					[ 'value' => 'number',  'label' => 'Number' ],
-					[ 'value' => 'boolean', 'label' => 'Boolean' ],
-					[ 'value' => 'json',    'label' => 'JSON (parse)' ],
+					[
+						'value' => 'auto',
+						'label' => 'Auto (keep as-is)'
+					],
+					[
+						'value' => 'string',
+						'label' => 'Text'
+					],
+					[
+						'value' => 'number',
+						'label' => 'Number'
+					],
+					[
+						'value' => 'boolean',
+						'label' => 'Boolean'
+					],
+					[
+						'value' => 'json',
+						'label' => 'JSON (parse)'
+					],
 				],
 			],
 		];
