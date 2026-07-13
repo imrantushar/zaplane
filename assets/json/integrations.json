@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-13 12:24:56",
+    "generated_at": "2026-07-13 12:59:20",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -17601,7 +17601,153 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": {
+                "send_hook": {
+                    "label": "Send Webhook",
+                    "key": "send_hook",
+                    "schema": [
+                        {
+                            "key": "url",
+                            "label": "Webhook URL",
+                            "type": "expression",
+                            "required": true,
+                            "help": "The endpoint that should receive this webhook."
+                        },
+                        {
+                            "key": "method",
+                            "label": "Method",
+                            "type": "select",
+                            "default": "POST",
+                            "options": [
+                                {
+                                    "label": "POST",
+                                    "value": "POST"
+                                },
+                                {
+                                    "label": "PUT",
+                                    "value": "PUT"
+                                },
+                                {
+                                    "label": "PATCH",
+                                    "value": "PATCH"
+                                },
+                                {
+                                    "label": "GET",
+                                    "value": "GET"
+                                },
+                                {
+                                    "label": "DELETE",
+                                    "value": "DELETE"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "payload_type",
+                            "label": "Payload format",
+                            "type": "select",
+                            "default": "json",
+                            "depends_on": {
+                                "method": [
+                                    "POST",
+                                    "PUT",
+                                    "PATCH",
+                                    "DELETE"
+                                ]
+                            },
+                            "options": [
+                                {
+                                    "label": "JSON",
+                                    "value": "json"
+                                },
+                                {
+                                    "label": "Form (url-encoded)",
+                                    "value": "form"
+                                },
+                                {
+                                    "label": "Raw",
+                                    "value": "raw"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "payload",
+                            "label": "Payload",
+                            "type": "expression",
+                            "depends_on": {
+                                "method": [
+                                    "POST",
+                                    "PUT",
+                                    "PATCH",
+                                    "DELETE"
+                                ]
+                            },
+                            "help": "The body to send. For JSON, write an object; use \"@\" to insert values from earlier steps."
+                        },
+                        {
+                            "key": "headers",
+                            "label": "Headers",
+                            "type": "map",
+                            "help": "Optional. Add a row per header (e.g. Authorization).",
+                            "fields": [
+                                {
+                                    "key": "key",
+                                    "label": "Header",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "expression"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "sign_type",
+                            "label": "Signature",
+                            "type": "select",
+                            "default": "none",
+                            "help": "Optionally sign the raw body so the receiver can verify the request came from you.",
+                            "options": [
+                                {
+                                    "label": "None",
+                                    "value": "none"
+                                },
+                                {
+                                    "label": "HMAC SHA-256",
+                                    "value": "hmac_sha256"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "sign_secret",
+                            "label": "Signing secret",
+                            "type": "expression",
+                            "depends_on": {
+                                "sign_type": "hmac_sha256"
+                            }
+                        },
+                        {
+                            "key": "sign_header",
+                            "label": "Signature header",
+                            "type": "text",
+                            "default": "X-Zaplane-Signature",
+                            "depends_on": {
+                                "sign_type": "hmac_sha256"
+                            },
+                            "help": "The header the signature is sent in. Value format: sha256=<hex digest>."
+                        },
+                        {
+                            "key": "timeout",
+                            "label": "Timeout (seconds)",
+                            "type": "number",
+                            "default": 15
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         },
         "weforms": {
             "slug": "weforms",
