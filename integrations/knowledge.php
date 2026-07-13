@@ -53,7 +53,7 @@ class Knowledge extends IntegrationBase {
 			'type'        => 'expression',
 			'required'    => true,
 			'placeholder' => 'business_a',
-			'help'        => 'Identifies which business this knowledge belongs to.',
+			'help'        => 'A label that groups all knowledge for one business (e.g. "business_a" or "acme_store"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge.',
 		];
 
 		switch ( $action ) {

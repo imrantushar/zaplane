@@ -238,7 +238,7 @@ const {
         </>
       )}
 
-      {!mode && !search && !selectedItem && <DrawerModeList setMode={setMode} setSelectedItem={setSelectedItem} isTrigger={isTrigger} source={source} TOOLS={TOOLS} />}
+      {!mode && !search && !selectedItem && <DrawerModeList setMode={setMode} setSelectedItem={setSelectedItem} isTrigger={isTrigger} source={source} TOOLS={TOOLS} port={port} />}
 
       {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={(item) => setSelectedItem(mode === "tools" ? { ...item, mode: "tools" } : item)} setMode={setMode} />}
 

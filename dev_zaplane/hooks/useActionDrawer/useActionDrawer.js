@@ -30,7 +30,7 @@
  * }
  */
 import { useState, useMemo, useEffect } from "react";
-import { APPS, TOOLS } from "./helper";
+import { APPS, TOOLS, subInputAllows } from "./helper";
 import { integrations } from "@ZAPUtils/helper";
 import {
   getIntegration,
@@ -40,21 +40,6 @@ import {
 } from "@ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/helper";
 
 
-
-// A tool sub-node shouldn't be a trigger, the agent itself, memory/model (those
-// have their own handles), or a control-flow node — they aren't callable tools.
-const SUB_TOOL_BLOCKLIST = new Set([
-  "ai-agent", "memory", "ai", "sticky_note", "manual",
-  "condition", "filter", "router", "iterator", "repeater", "delay",
-  "human_approval", "schedule",
-]);
-
-const subInputAllows = (portId, itemId) => {
-  if (portId === "ai_memory") return itemId === "memory";
-  if (portId === "ai_model") return itemId === "ai";
-  if (portId === "ai_tool") return !SUB_TOOL_BLOCKLIST.has(itemId);
-  return true;
-};
 
 export const useActionDrawer = ({
   open, node, source, port, setFieldValue, isTrigger, values, resetForm, onClose,

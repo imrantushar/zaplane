@@ -451,7 +451,13 @@ class RunController extends WP_REST_Controller {
 
 				$targetNode = $this->resolveNodeConfig( $targetNode, $effectiveInput );
 
-				$output = $integration::execute_node( $targetNode, $effectiveInput );
+				// Resolve {{...}} against the full accumulated test context above, but
+				// hand execute_node only the node's own input — the same bag it gets
+				// at runtime (Automation passes the parent's output, not every node's
+				// output). Passing $effectiveInput here leaks the entire workflow's
+				// captured context into pass-through nodes like Set Variable, so their
+				// output looked identical (a static blob) on every test run.
+				$output = $integration::execute_node( $targetNode, $input );
 			}
 
 			$run->markAsCompleted();

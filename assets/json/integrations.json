@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-09 14:52:52",
+    "generated_at": "2026-07-13 12:24:56",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -27234,20 +27234,29 @@
                 }
             }
         },
-        "custom_app": {
-            "slug": "custom_app",
-            "name": "Custom App",
-            "icon": "",
+        "gemcrm-email-inbox": {
+            "slug": "gemcrm-email-inbox",
+            "name": "GemCRM Email Inbox",
+            "icon": "crm.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
             "webhook_url": "",
             "triggers": {
-                "zap_form_submit": {
-                    "label": "Form Submit",
-                    "hook": "test_hook",
-                    "key": "zap_form_submit",
+                "email_received": {
+                    "label": "Email Received",
+                    "hook": "gemcrm/email_inbox/received",
+                    "key": "email_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_received_unmatched": {
+                    "label": "Email Received (Unmatched)",
+                    "hook": "gemcrm/email_inbox/received_unmatched",
+                    "key": "email_received_unmatched",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -29243,7 +29252,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "Identifies which business this knowledge belongs to."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "query",
@@ -29275,7 +29284,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "Identifies which business this knowledge belongs to."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "title",
@@ -29313,7 +29322,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "Identifies which business this knowledge belongs to."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "limit",
@@ -29355,7 +29364,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "Identifies which business this knowledge belongs to."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         }
                     ],
                     "outputs": [

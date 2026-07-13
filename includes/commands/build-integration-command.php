@@ -5,6 +5,7 @@ namespace Zaplane\Commands;
 use Zaplane\Framework\Console\Command;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Core\IntegrationManifest;
+use Zaplane\CustomApps\ManifestStore;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,7 +29,18 @@ class BuildIntegrationCommand extends Command {
 		$appCount = 0;
 		$toolCount = 0;
 
+		// User-defined Custom Apps register at runtime and are merged into the
+		// frontend manifest live (see Admin\Assets::get_frontend_integrations()).
+		// They must never be frozen into the static catalogue: once baked in they
+		// linger in the picker even after the app is deleted from the store.
+		$custom_slugs = array_map( 'strval', array_keys( ManifestStore::all() ) );
+
 		foreach ( IntegrationLoader::all() as $slug => $instance ) {
+			if ( in_array( (string) $slug, $custom_slugs, true ) ) {
+				$this->line( "  ↷ {$slug} (custom app) - merged live, skipping static build" );
+				continue;
+			}
+
 			$integration = IntegrationManifest::build_entry( get_class( $instance ), (string) $slug );
 			if ( null === $integration ) {
 				$this->warning( "⚠️  Could not build manifest entry for {$slug} - skipping" );

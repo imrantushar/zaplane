@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Handle, Position, useReactFlow } from "@xyflow/react";
+import { useState, useEffect } from "react";
+import { Handle, Position, useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy, FaPlus } from "react-icons/fa";
 import FloatingEdge from "../floatingEdge/FloatingEdge";
@@ -83,6 +83,16 @@ export default function CustomNode({
     background: "#6366f1", // purple-dot color
     border: "none",
   };
+
+  // React Flow caches each handle's measured position. When our handle set
+  // changes shape — a node turning into a sub-node (its source handle moves to
+  // the top `sub_out`), the agent's model/memory/tool ports appearing, ports
+  // changing, or the layout flipping — that cache goes stale and edges attach at
+  // the old spot. Re-measure whenever any of those inputs change.
+  const updateNodeInternals = useUpdateNodeInternals();
+  useEffect(() => {
+    updateNodeInternals(id);
+  }, [id, isAgent, isSubNode, isLR, ports.length, updateNodeInternals]);
 
   return (
     <div className="zaplane-custom-node-wrapper" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ position: 'relative' }}>

@@ -95,8 +95,12 @@ abstract class CustomAppBase extends IntegrationBase {
 				continue;
 			}
 
+			$label = (string) ( $trigger['label'] ?? '' );
+
 			$indexed[ $key ] = [
-				'label' => (string) ( $trigger['label'] ?? $key ),
+				// Fall back to the key when no label was authored — an empty label
+				// renders as a blank, unselectable option in the node's type dropdown.
+				'label' => '' !== $label ? $label : $key,
 				'hook'  => $hook,
 			];
 		}
@@ -114,7 +118,35 @@ abstract class CustomAppBase extends IntegrationBase {
 
 	public static function get_trigger_sample_output( string $trigger ): array {
 		$def = self::find_event( self::manifest()['triggers'] ?? [], $trigger );
-		return is_array( $def['sample_output'] ?? null ) ? $def['sample_output'] : [];
+
+		// An explicitly authored sample wins.
+		if ( ! empty( $def['sample_output'] ) && is_array( $def['sample_output'] ) ) {
+			return $def['sample_output'];
+		}
+
+		// Otherwise synthesise a sample from the trigger's declared output fields
+		// (HTTP/webhook apps) or hook arg names (local apps). Without this the "@"
+		// data picker has no keys to offer for a custom-app trigger until a real
+		// test run captures a payload — the authoring UI stores `fields`/`args`,
+		// never a `sample_output` key. Mirrors get_action_sample_output().
+		$sample = [];
+
+		foreach ( (array) ( $def['fields'] ?? [] ) as $field ) {
+			if ( is_array( $field ) && ! empty( $field['key'] ) ) {
+				$sample[ (string) $field['key'] ] = '';
+			}
+		}
+
+		foreach ( (array) ( $def['args'] ?? [] ) as $arg ) {
+			$name = is_string( $arg )
+				? $arg
+				: ( is_array( $arg ) ? (string) ( $arg['key'] ?? $arg['name'] ?? '' ) : '' );
+			if ( '' !== $name ) {
+				$sample[ $name ] = '';
+			}
+		}
+
+		return $sample;
 	}
 
 	public static function resolve_trigger( array $node, array $hook_args ) {
@@ -615,8 +647,10 @@ abstract class CustomAppBase extends IntegrationBase {
 				continue;
 			}
 			$key             = (string) $event['key'];
+			$label           = (string) ( $event['label'] ?? '' );
 			$indexed[ $key ] = [
-				'label' => (string) ( $event['label'] ?? $key ),
+				// Blank labels would surface as empty dropdown options; use the key.
+				'label' => '' !== $label ? $label : $key,
 			];
 		}
 		return $indexed;

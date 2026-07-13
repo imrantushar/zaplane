@@ -123,6 +123,9 @@ class ManifestValidator {
 			if ( empty( $action['key'] ) ) {
 				$errors[] = $label . ' is missing a key.';
 			}
+			if ( '' === trim( (string) ( $action['label'] ?? '' ) ) ) {
+				$errors[] = $label . ' needs a label (shown in the Action Type dropdown).';
+			}
 			$errors = array_merge( $errors, self::validate_request( $action['request'] ?? null, $base_url, $label ) );
 			$errors = array_merge( $errors, self::validate_fields( $action['fields'] ?? [], $label ) );
 		}
@@ -136,6 +139,9 @@ class ManifestValidator {
 			}
 			if ( empty( $trigger['key'] ) ) {
 				$errors[] = $label . ' is missing a key.';
+			}
+			if ( '' === trim( (string) ( $trigger['label'] ?? '' ) ) ) {
+				$errors[] = $label . ' needs a label (shown in the Trigger Type dropdown).';
 			}
 			$mode = isset( $trigger['mode'] ) ? (string) $trigger['mode'] : '';
 			if ( ! in_array( $mode, self::TRIGGER_MODES, true ) ) {
@@ -180,6 +186,9 @@ class ManifestValidator {
 				$errors[] = $label . ' is missing a key.';
 				continue;
 			}
+			if ( '' === trim( (string) ( $action['label'] ?? '' ) ) ) {
+				$errors[] = $label . ' needs a label (shown in the Action Type dropdown).';
+			}
 
 			$handler = isset( $action['handler'] ) && is_array( $action['handler'] ) ? $action['handler'] : [];
 			$type    = (string) ( $handler['type'] ?? '' );
@@ -199,6 +208,9 @@ class ManifestValidator {
 			if ( ! is_array( $trigger ) || empty( $trigger['key'] ) ) {
 				$errors[] = $label . ' is missing a key.';
 				continue;
+			}
+			if ( '' === trim( (string) ( $trigger['label'] ?? '' ) ) ) {
+				$errors[] = $label . ' needs a label (shown in the Trigger Type dropdown).';
 			}
 			if ( empty( $trigger['hook'] ) ) {
 				$errors[] = $label . ' needs a WordPress hook name to listen on.';

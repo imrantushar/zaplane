@@ -33,7 +33,9 @@ export const getActionOptions = (mode, selectedItem, isTrigger) => {
     ? Object.values(integration.triggers || {})
     : Object.values(integration.actions || {});
 
-  return list.map(i => ({ label: i.label, value: i.key, hook: i.hook }));
+  // Fall back to the key when a trigger/action was saved without a label, so it
+  // never renders as a blank, unselectable option.
+  return list.map(i => ({ label: i.label || i.key, value: i.key, hook: i.hook }));
 };
 
 
