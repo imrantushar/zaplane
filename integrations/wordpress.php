@@ -35,7 +35,7 @@ class Wordpress extends IntegrationBase {
 	use Helper;
 
 	public static function get_slug(): string {
-		return 'WordPress';
+		return 'wordpress';
 	}
 
 	public static function get_name(): string {
@@ -43,7 +43,7 @@ class Wordpress extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'WordPress.svg';
+		return 'wordpress.svg';
 	}
 
 	/** Trigger events the recipe tester can self-seed with real WordPress data. */

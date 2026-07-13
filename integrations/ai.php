@@ -81,10 +81,10 @@ class Ai extends IntegrationBase {
 	}
 
 	public static function test_connection( array $credentials ): array {
-		$provider = strtolower( (string) ( $credentials['provider'] ?? 'WordPress' ) );
+		$provider = strtolower( (string) ( $credentials['provider'] ?? 'wordpress' ) );
 		$api_key  = $credentials['api_key'] ?? '';
 
-		if ( 'WordPress' === $provider ) {
+		if ( 'wordpress' === $provider ) {
 			if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
 				return [
 					'success' => false,
@@ -189,7 +189,7 @@ class Ai extends IntegrationBase {
 	}
 
 	/**
-	 * Resolve the provider (anthropic|openai|WordPress|'') stored on a connection.
+	 * Resolve the provider (anthropic|openai|wordpress|'') stored on a connection.
 	 *
 	 * @param mixed $connection_id
 	 */
@@ -204,7 +204,7 @@ class Ai extends IntegrationBase {
 			return '';
 		}
 
-		$provider = $connection->getCredentials()['provider'] ?? 'WordPress';
+		$provider = $connection->getCredentials()['provider'] ?? 'wordpress';
 		return strtolower( (string) $provider );
 	}
 
@@ -239,7 +239,7 @@ class Ai extends IntegrationBase {
 						'label' => 'Claude Haiku 4.5 (fastest)'
 					],
 				];
-			case 'WordPress':
+			case 'wordpress':
 				return [
 					[
 						'value' => 'wordpress-default',
@@ -313,11 +313,11 @@ class Ai extends IntegrationBase {
 		$config      = $node['data']['config'] ?? [];
 		$credentials = $node['_connection_credentials'] ?? [];
 
-		$provider = strtolower( (string) ( $credentials['provider'] ?? 'WordPress' ) );
+		$provider = strtolower( (string) ( $credentials['provider'] ?? 'wordpress' ) );
 		$api_key  = $credentials['api_key'] ?? '';
 
 		// WordPress Core AI uses the site's configured connection — no key here.
-		if ( 'WordPress' !== $provider && '' === $api_key ) {
+		if ( 'wordpress' !== $provider && '' === $api_key ) {
 			return self::error( 'No AI connection credentials available.', $input );
 		}
 
@@ -333,7 +333,7 @@ class Ai extends IntegrationBase {
 
 		$messages = self::build_messages( $config['history'] ?? '', $user_msg );
 
-		if ( 'WordPress' === $provider ) {
+		if ( 'wordpress' === $provider ) {
 			$result = self::call_wordpress( $system, $messages, $max_tokens, $temperature );
 		} elseif ( 'openai' === $provider ) {
 			$result = self::call_openai( $api_key, $model, $system, $messages, $max_tokens, $temperature );
