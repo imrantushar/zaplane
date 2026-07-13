@@ -137,11 +137,22 @@ class Webhook extends IntegrationBase {
 				],
 			],
 			[
+				'key'        => 'payload_fields',
+				'label'      => 'Body fields',
+				'type'       => 'map',
+				'depends_on' => $with_body,
+				'help'       => 'Recommended. Build the body field by field — each value is safely encoded, so multi-line or quoted values (e.g. an AI reply) never break the JSON. Use "@" in a value to insert data from earlier steps.',
+				'fields'     => [
+					[ 'key' => 'key',   'label' => 'Field', 'type' => 'text' ],
+					[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression' ],
+				],
+			],
+			[
 				'key'        => 'payload',
-				'label'      => 'Payload',
+				'label'      => 'Raw body',
 				'type'       => 'expression',
 				'depends_on' => $with_body,
-				'help'       => 'The body to send. For JSON, write an object; use "@" to insert values from earlier steps.',
+				'help'       => 'Optional. A raw body string, used only when no Body fields are set above. For JSON, write the object yourself (remember to escape values).',
 			],
 			[
 				'key'    => 'headers',
@@ -218,7 +229,12 @@ class Webhook extends IntegrationBase {
 		$body      = null;
 
 		if ( $has_body ) {
-			$body = self::encode_body( $c['payload'] ?? '', (string) ( $c['payload_type'] ?? 'json' ), $headers );
+			// Prefer the structured field builder: an assoc array is JSON/form encoded
+			// with proper escaping, so multi-line or quoted values (an AI reply, HTML,
+			// etc.) can't produce a malformed body. Fall back to a raw string body.
+			$fields = self::kv_to_assoc( $c['payload_fields'] ?? [] );
+			$source = ! empty( $fields ) ? $fields : ( $c['payload'] ?? '' );
+			$body   = self::encode_body( $source, (string) ( $c['payload_type'] ?? 'json' ), $headers );
 		}
 
 		// Sign the exact bytes we're about to send so the receiver can recompute

@@ -1,6 +1,6 @@
 {
     "version": "1.0.2",
-    "generated_at": "2026-07-13 12:59:20",
+    "generated_at": "2026-07-13 14:12:49",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -17670,8 +17670,34 @@
                             ]
                         },
                         {
+                            "key": "payload_fields",
+                            "label": "Body fields",
+                            "type": "map",
+                            "depends_on": {
+                                "method": [
+                                    "POST",
+                                    "PUT",
+                                    "PATCH",
+                                    "DELETE"
+                                ]
+                            },
+                            "help": "Recommended. Build the body field by field \u2014 each value is safely encoded, so multi-line or quoted values (e.g. an AI reply) never break the JSON. Use \"@\" in a value to insert data from earlier steps.",
+                            "fields": [
+                                {
+                                    "key": "key",
+                                    "label": "Field",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "expression"
+                                }
+                            ]
+                        },
+                        {
                             "key": "payload",
-                            "label": "Payload",
+                            "label": "Raw body",
                             "type": "expression",
                             "depends_on": {
                                 "method": [
@@ -17681,7 +17707,7 @@
                                     "DELETE"
                                 ]
                             },
-                            "help": "The body to send. For JSON, write an object; use \"@\" to insert values from earlier steps."
+                            "help": "Optional. A raw body string, used only when no Body fields are set above. For JSON, write the object yourself (remember to escape values)."
                         },
                         {
                             "key": "headers",
