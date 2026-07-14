@@ -10,6 +10,8 @@ use Zaplane\Database\Seeders\OrderCompleteFeedbackRecipeSeeder;
 use Zaplane\Database\Seeders\PostPurchaseUpsellRecipeSeeder;
 use Zaplane\Database\Seeders\ProductRecommendationRecipeSeeder;
 use Zaplane\Database\Seeders\AiWebhookAgentRecipeSeeder;
+use Zaplane\Database\Seeders\AiKnowledgeReplyRecipeSeeder;
+use Zaplane\Database\Seeders\AiSupportAgentRecipeSeeder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -41,6 +43,8 @@ class Installer {
 		( new PostPurchaseUpsellRecipeSeeder() )->run();
 		( new ProductRecommendationRecipeSeeder() )->run();
 		( new AiWebhookAgentRecipeSeeder() )->run();
+		( new AiKnowledgeReplyRecipeSeeder() )->run();
+		( new AiSupportAgentRecipeSeeder() )->run();
 
 		$current_db_version = get_option( $this->db_version_option, '0.0.0' );
 		if ( version_compare( $current_db_version, $this->plugin_version, '<' ) ) {
