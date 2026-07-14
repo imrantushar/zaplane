@@ -120,6 +120,7 @@ const ActionFieldRenderer = ({
             setFieldValue={setFieldValue}
             placeholder={field.placeholder || __('name@example.com — or type "@" for dynamic data', "zaplane")}
             isRequired={!!field.required}
+            multiline={false}
           />
           <ErrorMsg />
         </div>
