@@ -2,13 +2,13 @@ import { plugin_root_url, integrations } from "@ZAPUtils/helper";
 
 // Custom apps store a full icon URL (or data URI); built-ins store a bare filename.
 // Absolute sources must be used verbatim rather than resolved/prefixed.
-const isAbsoluteIcon = (icon) =>
+export const isAbsoluteIcon = (icon) =>
   typeof icon === "string" && (/^https?:\/\//.test(icon) || icon.startsWith("data:") || icon.startsWith("//"));
 
 // Some callers (e.g. recipe seeders) store a bare integration slug (e.g. "woocommerce")
 // instead of the actual icon filename (e.g. "woo.svg"). Resolve those against the
 // integrations manifest so stale/legacy values still render correctly.
-const resolveIconFilename = (icon) => {
+export const resolveIconFilename = (icon) => {
   if (!icon) return icon;
   if (isAbsoluteIcon(icon) || icon.endsWith(".svg")) return icon;
   return integrations?.apps?.[icon]?.icon || integrations?.tools?.[icon]?.icon || icon;
