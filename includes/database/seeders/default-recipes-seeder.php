@@ -145,7 +145,7 @@ class DefaultRecipesSeeder {
 			'title'             => $title,
 			'description'       => 'Automatically follow up with customers who abandoned their WooCommerce cart. Sends an initial email, waits 3 days, then sends a follow-up email.',
 			'blueprint'         => wp_json_encode( $blueprint ),
-			'integration_icons' => wp_json_encode( [ 'abandoned-cart', 'gemcrm' ] ),
+			'integration_icons' => wp_json_encode( [ 'abandoned-cart.svg', 'gemcrm' ] ),
 			'created_by'        => 0,
 		] );
 	}

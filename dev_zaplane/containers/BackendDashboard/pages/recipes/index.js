@@ -30,7 +30,7 @@ const RecipesPage = () => {
       skeleton={RecipesSkeleton}
       actions={<Search placeholder={__("Search recipes...", "zaplane")} onSearchHandler={setSearchTerm} />}
     >
-        {filteredRecipes?.length ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-start">
+        {filteredRecipes?.length ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} />)}
           </div> : <div>
               <CustomTableMessage title={__('No recipes found', 'zaplane')} subText={searchTerm ? __('No recipes match your search.', 'zaplane') : __('Recipes you save will appear here.', 'zaplane')} />
