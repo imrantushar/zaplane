@@ -24,6 +24,21 @@ import ActionFieldRenderer from "../ActionDrawer/ActionFieldRenderer/ActionField
 import TestRun from "../ActionDrawer/TestRun/TestRun";
 import DrawerSearchList from "@ZAPComponents/SearchableDrawerList/DrawerSearchList/DrawerSearchList";
 
+// Pragmatic email check for UI validation (not RFC-exhaustive): non-empty local
+// part, "@", and a dotted domain, with no spaces.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Validate a literal recipient value: a single email, or a comma/semicolon
+// separated list where every non-empty part is a valid email.
+const isValidEmailList = (value) => {
+  const parts = String(value)
+    .split(/[,;]/)
+    .map((p) => p.trim())
+    .filter((p) => p !== "");
+  if (parts.length === 0) return false;
+  return parts.every((p) => EMAIL_RE.test(p));
+};
+
 const ActionDrawer = ({
   open,
   context,
@@ -100,16 +115,28 @@ const {
         });
         return;
       }
-      if (!field.required) return;
       const val = values?.[field.key];
       const isEmpty =
         val === undefined ||
         val === null ||
         val === "" ||
         (Array.isArray(val) && val.length === 0);
-      if (isEmpty) {
+
+      if (field.required && isEmpty) {
         setFieldError(field.key, __("This field is required", "zaplane"));
         hasError = true;
+        return;
+      }
+
+      // Format checks apply to present values only. Skip anything that uses
+      // dynamic data ({{...}} tokens) — those resolve at run time, so we can't
+      // (and shouldn't) validate their literal shape here.
+      if (!isEmpty && typeof val === "string") {
+        const usesDynamicData = /\{\{[\s\S]*?\}\}/.test(val);
+        if (!usesDynamicData && field.type === "email" && !isValidEmailList(val)) {
+          setFieldError(field.key, __("Enter a valid email address", "zaplane"));
+          hasError = true;
+        }
       }
     });
     return hasError;

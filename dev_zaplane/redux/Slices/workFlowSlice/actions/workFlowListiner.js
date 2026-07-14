@@ -29,6 +29,21 @@ export const workflowNodeListiner = createAsyncThunk(
 		}
 	}
 );
+// One fast poll of the listener state. The component calls this ~once a second
+// while listening; the backend returns quickly instead of holding the request.
+export const workflowNodeListinerPoll = createAsyncThunk(
+	'zaplane/workflowNodeListinerPoll',
+	async (id, thunkAPI) => {
+		try {
+			const res = await API.get(
+				namespace + `node-listener/${id}/poll`
+			);
+			return res.data;
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
 export const workflowNodeListinerStop = createAsyncThunk(
 	'zaplane/workflowNodeListinerStop',
 	async (id, thunkAPI) => {

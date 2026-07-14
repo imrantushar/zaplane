@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { __ } from "@wordpress/i18n";
 import { workFLowSingeNodeExction } from "@ZAPRedux/Slices/workFlowSlice/actions/workflowExctions";
-import { workflowNodeListiner, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
-import { startApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
+import { workflowNodeListiner, workflowNodeListinerPoll, workflowNodeListinerStop } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowListiner";
+import { startApiCountdown, decrementApiCountdown } from "@ZAPRedux/Slices/workFlowSlice/workFlowSlice";
 import TestDetails from "../TestDetails/TestDetails";
 import ZAPAlert from "@ZAPComponents/ZAPAlert";
 import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
@@ -20,15 +20,55 @@ const TestRun = ({
   const isTrigger = node?.data?.action === "trigger";
   const workflowId = workFlow?.workflow?.id;
 
-  // Trigger nodes can't be "run" — instead we listen for the real WordPress
-  // event to fire and capture its payload as the trigger's sample output. This
-  // reuses the same node-listener backend the topbar "Test Flow Once" uses.
-  const handleListen = () => {
+  // Track live "listening" state in a ref so timers/cleanup read the current
+  // value, not a stale closure.
+  const listeningRef = useRef(false);
+  useEffect(() => {
+    listeningRef.current = apiRequestRunning;
+  }, [apiRequestRunning]);
+
+  const pollRef = useRef(null);
+  const stopPolling = () => {
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  };
+
+  // Once listening ends (triggered / timeout / stopped), stop the poll timer.
+  useEffect(() => {
+    if (!apiRequestRunning) stopPolling();
+  }, [apiRequestRunning]);
+
+  // On unmount (tester closed): stop the timer and tell the server to stop
+  // listening, so nothing lingers.
+  useEffect(() => {
+    return () => {
+      stopPolling();
+      if (listeningRef.current && workflowId) {
+        dispatch(workflowNodeListinerStop(workflowId));
+      }
+    };
+  }, [dispatch, workflowId]);
+
+  // Trigger nodes can't be "run" — instead we register a listener and short-poll
+  // (one fast request per second) until the real WordPress event fires and its
+  // payload is captured as the trigger's sample output.
+  const handleListen = async () => {
     if (apiRequestRunning || !workflowId) return;
     dispatch(startApiCountdown(120));
-    dispatch(workflowNodeListiner(workflowId));
+    const res = await dispatch(workflowNodeListiner(workflowId));
+    // If registering the listener failed, the rejected reducer already cleared
+    // the running flag — don't start polling.
+    if (res?.meta?.requestStatus !== "fulfilled") return;
+    stopPolling();
+    pollRef.current = setInterval(() => {
+      dispatch(decrementApiCountdown());
+      dispatch(workflowNodeListinerPoll(workflowId));
+    }, 1000);
   };
   const handleStopListen = () => {
+    stopPolling();
     if (!workflowId) return;
     dispatch(workflowNodeListinerStop(workflowId));
   };

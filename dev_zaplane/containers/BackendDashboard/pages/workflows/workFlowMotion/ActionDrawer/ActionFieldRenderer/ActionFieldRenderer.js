@@ -103,8 +103,29 @@ const ActionFieldRenderer = ({
       );
     }
 
-    case "number":
+    // Email supports dynamic data (e.g. {{trigger.email}}) like text fields; a
+    // literal value is validated as an email address on continue (see
+    // ActionDrawer's validateRequiredFields).
     case "email":
+      return (
+        <div>
+          <VariableEditor
+            label={field.label}
+            required={!!field.required}
+            value={value || ""}
+            setValue={(val) => { setFieldValue(field.key, val); clearError(); }}
+            variables={workflowVariables?.data || []}
+            variableContext={workflowVariables?.context || {}}
+            field={field}
+            setFieldValue={setFieldValue}
+            placeholder={field.placeholder || __('name@example.com — or type "@" for dynamic data', "zaplane")}
+            isRequired={!!field.required}
+          />
+          <ErrorMsg />
+        </div>
+      );
+
+    case "number":
     case "url":
 
       return <div>
