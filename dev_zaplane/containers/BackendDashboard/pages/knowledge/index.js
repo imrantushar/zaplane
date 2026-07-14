@@ -27,6 +27,17 @@ const KnowledgePage = () => {
   const [sync, setSync] = useState(null); // null = closed; sync-content config
   const [postTypes, setPostTypes] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [embed, setEmbed] = useState(null); // null = closed; semantic-search settings
+  const [embedStatus, setEmbedStatus] = useState({ enabled: false, has_key: false });
+
+  const loadEmbedStatus = useCallback(async () => {
+    try {
+      const res = await API.get(namespace + "knowledge/embeddings");
+      setEmbedStatus(res?.data || { enabled: false, has_key: false });
+    } catch (e) {
+      setEmbedStatus({ enabled: false, has_key: false });
+    }
+  }, []);
 
   const loadPostTypes = useCallback(async () => {
     try {
@@ -65,7 +76,8 @@ const KnowledgePage = () => {
   useEffect(() => {
     loadBusinesses();
     loadPostTypes();
-  }, [loadBusinesses, loadPostTypes]);
+    loadEmbedStatus();
+  }, [loadBusinesses, loadPostTypes, loadEmbedStatus]);
 
   useEffect(() => {
     loadItems();
@@ -199,6 +211,68 @@ const KnowledgePage = () => {
     }
   };
 
+  const openEmbed = async () => {
+    let cfg = { enabled: false, provider: "openai", model: "", has_key: false };
+    try {
+      const res = await API.get(namespace + "knowledge/embeddings");
+      cfg = { ...cfg, ...(res?.data || {}) };
+    } catch (e) {
+      // fall back to defaults
+    }
+    setEmbed({
+      enabled: !!cfg.enabled,
+      provider: cfg.provider || "openai",
+      model: cfg.model || "",
+      has_key: !!cfg.has_key,
+      api_key: "",
+    });
+  };
+  const closeEmbed = () => setEmbed(null);
+
+  const saveEmbed = async () => {
+    setSaving(true);
+    try {
+      await API.post(namespace + "knowledge/embeddings", {
+        enabled: embed.enabled,
+        provider: embed.provider,
+        model: embed.model,
+        api_key: embed.api_key, // blank keeps the stored key
+      });
+      window.alert(__("Semantic search settings saved.", "zaplane"));
+      closeEmbed();
+      await loadEmbedStatus();
+    } catch (e) {
+      window.alert(e?.response?.data?.message || __("Failed to save settings.", "zaplane"));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const runBackfill = async () => {
+    const target = business || window.prompt(__("Backfill embeddings for which business key?", "zaplane"), "");
+    if (!target || !target.trim()) return;
+    setSyncing(true);
+    try {
+      let total = 0;
+      let guard = 0;
+      // Loop until every entry is embedded (each call processes a batch).
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const res = await API.post(namespace + "knowledge/embed-backfill", {
+          business_key: target.trim(),
+          limit: 100,
+        });
+        total += res?.data?.embedded ?? 0;
+        if ((res?.data?.remaining ?? 0) <= 0 || ++guard > 50) break;
+      }
+      window.alert(__("Embedded", "zaplane") + " " + total + " " + __("entries.", "zaplane"));
+    } catch (e) {
+      window.alert(e?.response?.data?.message || __("Backfill failed.", "zaplane"));
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const remove = async (it) => {
     if (!window.confirm(__("Delete this entry?", "zaplane"))) return;
     try {
@@ -270,8 +344,12 @@ const KnowledgePage = () => {
 
   const actions = (
     <div className="flex items-center gap-2">
+      <button type="button" style={outlineBtn} onClick={openEmbed}>
+        {__("Semantic Search", "zaplane")}
+        {embedStatus.enabled ? " ✓" : ""}
+      </button>
       <button type="button" style={outlineBtn} onClick={openSync} disabled={syncing}>
-        {syncing ? __("Syncing...", "zaplane") : __("Sync Content", "zaplane")}
+        {syncing ? __("Working...", "zaplane") : __("Sync Content", "zaplane")}
       </button>
       <button type="button" style={outlineBtn} onClick={openFaq}>
         {__("FAQ Builder", "zaplane")}
@@ -539,6 +617,82 @@ const KnowledgePage = () => {
               />
               <span className="zaplane-label">{__("Remove entries whose source item was deleted", "zaplane")}</span>
             </label>
+          </div>
+        )}
+      </ZAPDrawer>
+
+      <ZAPDrawer
+        open={!!embed}
+        onClose={closeEmbed}
+        title={__("Semantic Search", "zaplane")}
+        size="md"
+        placement="end"
+        closeOnOverlayClick
+        footer={
+          <div className="flex items-center justify-end gap-3">
+            <button type="button" style={outlineBtn} onClick={closeEmbed}>
+              {__("Cancel", "zaplane")}
+            </button>
+            <button type="button" style={primaryBtn} onClick={saveEmbed} disabled={saving}>
+              {saving ? __("Saving...", "zaplane") : __("Save", "zaplane")}
+            </button>
+          </div>
+        }
+      >
+        {embed && (
+          <div className="zaplane-knowledge-page flex flex-col gap-4 pt-2">
+            <p className="text-sm" style={{ color: "var(--zaplane-font-secondary-color)" }}>
+              {__("Match knowledge by meaning, not just keywords — so \"can I get my money back?\" finds your \"Refund policy\". When off, retrieval uses keyword scoring (always works).", "zaplane")}
+            </p>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={embed.enabled}
+                onChange={(e) => setEmbed({ ...embed, enabled: e.target.checked })}
+              />
+              <span className="zaplane-label">{__("Enable semantic (vector) search", "zaplane")}</span>
+            </label>
+            <div>
+              <label className="zaplane-label">{__("Embeddings Provider", "zaplane")}</label>
+              <ZAPSelect
+                options={[
+                  { label: "OpenAI", value: "openai" },
+                  { label: "Google Gemini", value: "gemini" },
+                ]}
+                value={embed.provider}
+                onChange={(opt) => setEmbed({ ...embed, provider: opt?.value || "openai" })}
+              />
+            </div>
+            <ZAPInput
+              type="password"
+              label={__("API Key", "zaplane")}
+              placeholder={embed.has_key ? __("•••••••• (stored — leave blank to keep)", "zaplane") : "sk-..."}
+              value={embed.api_key}
+              onChange={(e) => setEmbed({ ...embed, api_key: e.target.value })}
+            />
+            <ZAPInput
+              label={__("Model (optional)", "zaplane")}
+              placeholder={embed.provider === "gemini" ? "text-embedding-004" : "text-embedding-3-small"}
+              value={embed.model}
+              onChange={(e) => setEmbed({ ...embed, model: e.target.value })}
+            />
+            <div
+              className="flex flex-col gap-2 p-3 rounded-[6px]"
+              style={{ border: "1px solid var(--zaplane-border-color)" }}
+            >
+              <span className="zaplane-label">{__("Backfill embeddings", "zaplane")}</span>
+              <p className="text-sm" style={{ color: "var(--zaplane-font-secondary-color)" }}>
+                {__("Synced/imported entries are embedded in the background. Run this to embed any that are still missing a vector (for the selected business).", "zaplane")}
+              </p>
+              <button
+                type="button"
+                style={outlineBtn}
+                onClick={runBackfill}
+                disabled={syncing || !embed.enabled || (!embed.has_key && !embed.api_key)}
+              >
+                {syncing ? __("Working...", "zaplane") : __("Backfill now", "zaplane")}
+              </button>
+            </div>
           </div>
         )}
       </ZAPDrawer>

@@ -1,6 +1,6 @@
 {
     "version": "1.1.0",
-    "generated_at": "2026-07-14 04:06:44",
+    "generated_at": "2026-07-14 06:35:54",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -3009,6 +3009,14 @@
                             "help": "Select an AI connection first \u2014 the list then shows only models for that provider."
                         },
                         {
+                            "key": "image_url",
+                            "label": "Image URL (vision, optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "https://example.com/photo.jpg",
+                            "help": "Attach an image for the model to analyze. Supported on OpenAI, Anthropic, and Gemini vision models."
+                        },
+                        {
                             "key": "system_prompt",
                             "label": "System Prompt (persona / business context)",
                             "type": "textarea",
@@ -3043,6 +3051,99 @@
                             "type": "number",
                             "required": false,
                             "help": "Ignored for Claude Opus / Fable models, which do not accept it."
+                        },
+                        {
+                            "key": "response_format",
+                            "label": "Response Format",
+                            "type": "select",
+                            "default": "text",
+                            "options": [
+                                {
+                                    "value": "text",
+                                    "label": "Text"
+                                },
+                                {
+                                    "value": "json",
+                                    "label": "JSON (structured)"
+                                }
+                            ],
+                            "help": "JSON asks the model for a single JSON object and parses it into a `json` output field for use in later steps."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "generate_image": {
+                    "label": "Generate Image",
+                    "key": "generate_image",
+                    "schema": [
+                        {
+                            "key": "prompt",
+                            "label": "Prompt",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "A watercolor logo of a mountain at sunrise"
+                        },
+                        {
+                            "key": "model",
+                            "label": "Model",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "gpt-image-1",
+                            "help": "OpenAI image model (e.g. gpt-image-1 or dall-e-3). Requires an OpenAI connection."
+                        },
+                        {
+                            "key": "size",
+                            "label": "Size",
+                            "type": "select",
+                            "default": "1024x1024",
+                            "options": [
+                                {
+                                    "value": "1024x1024",
+                                    "label": "Square 1024\u00d71024"
+                                },
+                                {
+                                    "value": "1024x1792",
+                                    "label": "Portrait 1024\u00d71792"
+                                },
+                                {
+                                    "value": "1792x1024",
+                                    "label": "Landscape 1792\u00d71024"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "transcribe": {
+                    "label": "Transcribe Audio",
+                    "key": "transcribe",
+                    "schema": [
+                        {
+                            "key": "audio_url",
+                            "label": "Audio URL",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "https://example.com/voice-note.mp3",
+                            "help": "A reachable URL to the audio file (mp3, wav, m4a, webm\u2026). Requires an OpenAI connection."
+                        },
+                        {
+                            "key": "model",
+                            "label": "Model",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "whisper-1"
+                        },
+                        {
+                            "key": "language",
+                            "label": "Language (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "en",
+                            "help": "ISO-639-1 code to improve accuracy; leave blank to auto-detect."
                         }
                     ],
                     "outputs": [
@@ -27648,6 +27749,23 @@
                                 }
                             ],
                             "help": "Text returns the reply as-is. JSON asks the model for a structured JSON object and parses it into a `json` output field."
+                        },
+                        {
+                            "key": "persist_memory",
+                            "label": "Save turn to Memory",
+                            "type": "select",
+                            "default": "yes",
+                            "options": [
+                                {
+                                    "value": "yes",
+                                    "label": "Yes \u2014 append the question and answer"
+                                },
+                                {
+                                    "value": "no",
+                                    "label": "No"
+                                }
+                            ],
+                            "help": "When a Memory node is wired to this agent, automatically save the user message and the reply so the next turn has context (no manual append steps needed)."
                         }
                     ],
                     "outputs": [
@@ -29784,6 +29902,31 @@
                                 }
                             ],
                             "help": "When on (and syncing all products), removes synced entries whose product no longer exists. Manual entries are never touched."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "embed_backfill": {
+                    "label": "Backfill Semantic Embeddings",
+                    "key": "embed_backfill",
+                    "schema": [
+                        {
+                            "key": "business_key",
+                            "label": "Business Key",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "business_a",
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Max Entries Per Run",
+                            "type": "number",
+                            "required": false,
+                            "default": 100,
+                            "help": "Embeds entries that have no vector yet (newest sync leaves them empty). Run again until remaining is 0."
                         }
                     ],
                     "outputs": [

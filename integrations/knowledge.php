@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Models\Knowledge as KnowledgeModel;
+use Zaplane\Services\KnowledgeEmbeddings;
 
 class Knowledge extends IntegrationBase {
 
@@ -43,6 +44,7 @@ class Knowledge extends IntegrationBase {
 			'add_entry'        => [ 'label' => 'Add / Update Knowledge Entry' ],
 			'sync_content'     => [ 'label' => 'Sync WordPress Content' ],
 			'sync_storeengine' => [ 'label' => 'Sync StoreEngine Products' ],
+			'embed_backfill'   => [ 'label' => 'Backfill Semantic Embeddings' ],
 			'clear'            => [ 'label' => 'Clear Business Knowledge' ],
 		];
 	}
@@ -230,6 +232,19 @@ class Knowledge extends IntegrationBase {
 					],
 				];
 
+			case 'embed_backfill':
+				return [
+					$business_field,
+					[
+						'key'      => 'limit',
+						'label'    => 'Max Entries Per Run',
+						'type'     => 'number',
+						'required' => false,
+						'default'  => 100,
+						'help'     => 'Embeds entries that have no vector yet (newest sync leaves them empty). Run again until remaining is 0.',
+					],
+				];
+
 			case 'clear':
 				return [ $business_field ];
 		}//end switch
@@ -263,6 +278,8 @@ class Knowledge extends IntegrationBase {
 				return self::action_sync_content( $key, $config, $input );
 			case 'sync_storeengine':
 				return self::action_sync_storeengine( $key, $config, $input );
+			case 'embed_backfill':
+				return self::action_embed_backfill( $key, $config, $input );
 			case 'clear':
 				return self::action_clear( $key, $input );
 		}
@@ -280,38 +297,109 @@ class Knowledge extends IntegrationBase {
 		}
 
 		$table = KnowledgeModel::getTable();
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT id, title, content FROM {$table} WHERE business_key = %s ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
-				$key,
-				self::MAX_SCAN
-			),
-			ARRAY_A
-		);
-
-		$rows = is_array( $rows ) ? $rows : [];
-
 		$words = self::tokenize( $query );
 
-		if ( empty( $words ) ) {
-			// No usable query terms — fall back to the most recent entries.
+		// Try semantic scoring; fall back to keyword-only if embeddings are off or
+		// the query can't be embedded. Hybrid = weighted blend of the two.
+		$query_vec   = KnowledgeEmbeddings::enabled() ? KnowledgeEmbeddings::embed( $query ) : null;
+		$use_vec     = ! empty( $query_vec );
+		$current_tag = $use_vec ? KnowledgeEmbeddings::tag() : '';
+		$query_dims  = $use_vec ? count( $query_vec ) : 0;
+
+		// Cap on how many rows we pull into PHP for scoring. Filterable for large
+		// deployments; see the note on scale below.
+		$scan = (int) apply_filters( 'zaplane_knowledge_max_scan', self::MAX_SCAN );
+		if ( $scan <= 0 ) {
+			$scan = self::MAX_SCAN;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$table} WHERE business_key = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				$key
+			)
+		);
+
+		$rows = null;
+
+		// Keyword-only mode: an indexed FULLTEXT lookup returns just the matching
+		// candidates instead of scanning every row. Semantic mode still needs the
+		// full (bounded) set, since vector matches don't share keywords. Falls back
+		// to the scan when FULLTEXT is unavailable or finds nothing.
+		if ( ! $use_vec && ! empty( $words ) ) {
+			$rows = self::fulltext_candidates( $table, $key, $words, $scan );
+		}
+
+		if ( null === $rows ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT id, title, content, embedding FROM {$table} WHERE business_key = %s ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+					$key,
+					$scan
+				),
+				ARRAY_A
+			);
+		}
+
+		$rows      = is_array( $rows ) ? $rows : [];
+		$truncated = $total > count( $rows ) && $total > $scan;
+
+		if ( ! $use_vec && empty( $words ) ) {
+			// Nothing to rank by — return the most recent entries.
 			$top = array_slice( $rows, 0, $limit );
 		} else {
+			$weights   = apply_filters(
+				'zaplane_knowledge_hybrid_weights',
+				[
+					'vector'  => 0.6,
+					'keyword' => 0.4,
+				]
+			);
+			$w_vec = (float) ( $weights['vector'] ?? 0.6 );
+			$w_kw  = (float) ( $weights['keyword'] ?? 0.4 );
+
+			// Normalize keyword scores to [0,1] so they blend with cosine.
+			$kw_scores = [];
+			$max_kw    = 0;
+			foreach ( $rows as $i => $row ) {
+				$s             = empty( $words ) ? 0 : self::score_row( $row, $words );
+				$kw_scores[ $i ] = $s;
+				$max_kw        = max( $max_kw, $s );
+			}
+
 			$scored = [];
-			foreach ( $rows as $row ) {
-				$score = self::score_row( $row, $words );
-				if ( $score > 0 ) {
+			foreach ( $rows as $i => $row ) {
+				$kw_norm = $max_kw > 0 ? ( $kw_scores[ $i ] / $max_kw ) : 0.0;
+
+				if ( $use_vec ) {
+					// usable_vector() returns null for vectors from a different
+					// embedding model (or dimension) — those score keyword-only
+					// instead of contributing a meaningless cosine.
+					$row_vec = KnowledgeEmbeddings::usable_vector( $row['embedding'] ?? null, $current_tag, $query_dims );
+					$cos     = KnowledgeEmbeddings::cosine( $query_vec, $row_vec );
+					$final   = ( $w_vec * $cos ) + ( $w_kw * $kw_norm );
+				} else {
+					$final = $kw_norm;
+				}
+
+				if ( $final > 0 ) {
 					$scored[] = [
-						'score' => $score,
+						'score' => $final,
 						'row'   => $row,
 					];
 				}
 			}
+
 			usort( $scored, static fn( $a, $b ) => $b['score'] <=> $a['score'] );
 			$top = array_map( static fn( $s ) => $s['row'], array_slice( $scored, 0, $limit ) );
-		}
+
+			// Keyword query that matched nothing → recent entries, as before.
+			if ( empty( $top ) && ! $use_vec ) {
+				$top = array_slice( $rows, 0, $limit );
+			}
+		}//end if
 
 		$blocks  = [];
 		$matches = [];
@@ -331,10 +419,14 @@ class Knowledge extends IntegrationBase {
 			array_merge(
 				$input,
 				[
-					'success' => true,
-					'context' => $context,
-					'matches' => $matches,
-					'count'   => count( $matches ),
+					'success'   => true,
+					'context'   => $context,
+					'matches'   => $matches,
+					'count'     => count( $matches ),
+					// True when the business has more entries than the scan cap, so
+					// some were not considered. Raise `zaplane_knowledge_max_scan`
+					// (or move to a vector store) for very large knowledge bases.
+					'truncated' => $truncated,
 				]
 			)
 		);
@@ -361,7 +453,8 @@ class Knowledge extends IntegrationBase {
 			sanitize_text_field( (string) ( $config['title'] ?? '' ) ),
 			$content,
 			'' !== $source ? $source : 'manual',
-			sanitize_text_field( (string) ( $config['ref_id'] ?? '' ) )
+			sanitize_text_field( (string) ( $config['ref_id'] ?? '' ) ),
+			true
 		);
 
 		return self::respond(
@@ -639,7 +732,15 @@ class Knowledge extends IntegrationBase {
 		return implode( ', ', $parts );
 	}
 
-	private static function upsert( string $key, string $title, string $content, string $source, string $ref_id ): int {
+	private static function upsert( string $key, string $title, string $content, string $source, string $ref_id, bool $embed_now = false ): int {
+		// Embed inline only for one-off manual entries. Bulk syncs skip this
+		// (N API calls would stall the request) and leave embeddings null for the
+		// backfill action to fill in the background.
+		$embedding = null;
+		if ( $embed_now && KnowledgeEmbeddings::enabled() ) {
+			$embedding = KnowledgeEmbeddings::encode( KnowledgeEmbeddings::embed( trim( $title . "\n" . $content ) ) );
+		}
+
 		$existing = null;
 		if ( '' !== $ref_id ) {
 			// fresh() bypasses the ORM's per-request query cache: without it a
@@ -652,9 +753,16 @@ class Knowledge extends IntegrationBase {
 		}
 
 		if ( $existing ) {
+			$changed              = ( (string) $existing->title !== $title ) || ( (string) $existing->content !== $content );
 			$existing->title      = $title;
 			$existing->content    = $content;
 			$existing->source     = $source;
+			if ( $embed_now ) {
+				$existing->embedding = $embedding;
+			} elseif ( $changed ) {
+				// Content changed → drop the now-stale vector so backfill re-embeds.
+				$existing->embedding = null;
+			}
 			$existing->updated_at = current_time( 'mysql' );
 			$existing->save();
 			return (int) $existing->id;
@@ -665,6 +773,7 @@ class Knowledge extends IntegrationBase {
 				'business_key' => $key,
 				'title'        => $title,
 				'content'      => $content,
+				'embedding'    => $embedding,
 				'source'       => '' !== $source ? $source : 'manual',
 				'ref_id'       => '' !== $ref_id ? $ref_id : null,
 				'updated_at'   => current_time( 'mysql' ),
@@ -695,6 +804,136 @@ class Knowledge extends IntegrationBase {
 				]
 			)
 		);
+	}
+
+	/**
+	 * Embed entries that don't have a vector yet (bulk syncs leave them empty).
+	 * Processes up to `limit` per run and reports how many remain so the caller
+	 * can loop until done.
+	 */
+	public static function action_embed_backfill( string $key, array $config, array $input ): array {
+		global $wpdb;
+		$table = KnowledgeModel::getTable();
+
+		if ( ! KnowledgeEmbeddings::enabled() ) {
+			return self::respond(
+				array_merge(
+					$input,
+					[
+						'success' => false,
+						'error'   => 'Semantic embeddings are not configured.',
+					]
+				)
+			);
+		}
+
+		$limit = (int) ( $config['limit'] ?? 100 );
+		if ( $limit <= 0 ) {
+			$limit = 100;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, title, content FROM {$table} WHERE business_key = %s AND ( embedding IS NULL OR embedding = '' ) ORDER BY id ASC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				$key,
+				$limit
+			),
+			ARRAY_A
+		);
+		$rows = is_array( $rows ) ? $rows : [];
+
+		$embedded = 0;
+		$failed   = 0;
+
+		// Embed in batches (one API call per chunk) instead of one call per row.
+		foreach ( array_chunk( $rows, 96 ) as $chunk ) {
+			$texts = array_map(
+				static fn( $r ) => trim( (string) $r['title'] . "\n" . (string) $r['content'] ),
+				$chunk
+			);
+			$vectors = KnowledgeEmbeddings::embed_batch( $texts );
+
+			foreach ( $chunk as $i => $row ) {
+				$vec = $vectors[ $i ] ?? null;
+				if ( null === $vec ) {
+					++$failed;
+					continue;
+				}
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->update( $table, [ 'embedding' => KnowledgeEmbeddings::encode( $vec ) ], [ 'id' => (int) $row['id'] ] );
+				++$embedded;
+			}
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$remaining = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$table} WHERE business_key = %s AND ( embedding IS NULL OR embedding = '' )", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				$key
+			)
+		);
+
+		return self::respond(
+			array_merge(
+				$input,
+				[
+					'success'   => true,
+					'embedded'  => $embedded,
+					'failed'    => $failed,
+					'remaining' => $remaining,
+				]
+			)
+		);
+	}
+
+	/**
+	 * Fetch keyword candidates via the FULLTEXT index (BOOLEAN MODE, prefix
+	 * match). Returns matching rows, or null to signal "fall back to the row
+	 * scan" — when there's no index (error) or no match, so callers keep their
+	 * existing recency fallback behavior.
+	 *
+	 * @param array<int,string> $words
+	 * @return array<int,array<string,mixed>>|null
+	 */
+	private static function fulltext_candidates( string $table, string $key, array $words, int $limit ): ?array {
+		global $wpdb;
+
+		// InnoDB's default min token length is 3; shorter words are never indexed.
+		$terms = [];
+		foreach ( $words as $w ) {
+			$w = preg_replace( '/[^a-z0-9]/', '', strtolower( $w ) );
+			if ( strlen( $w ) >= 3 ) {
+				$terms[] = $w . '*';
+			}
+		}
+		if ( empty( $terms ) ) {
+			return null; // nothing indexable → let the scan + PHP scorer handle it
+		}
+
+		$boolean = implode( ' ', $terms );
+
+		$suppress = $wpdb->suppress_errors( true );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, title, content, embedding FROM {$table} WHERE business_key = %s AND MATCH(title, content) AGAINST (%s IN BOOLEAN MODE) LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				$key,
+				$boolean,
+				$limit
+			),
+			ARRAY_A
+		);
+		$err = $wpdb->last_error;
+		$wpdb->suppress_errors( $suppress );
+
+		// No FULLTEXT index (error) or no matches → fall back to the scan so the
+		// keyword scorer and its recency fallback still run.
+		if ( '' !== (string) $err || empty( $rows ) ) {
+			return null;
+		}
+
+		return $rows;
 	}
 
 	private static function tokenize( string $text ): array {

@@ -7,6 +7,7 @@ use WP_REST_Server;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Models\Knowledge;
+use Zaplane\Services\KnowledgeEmbeddings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -59,6 +60,27 @@ class KnowledgeController extends WP_REST_Controller {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'sync_content' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		] );
+
+		register_rest_route( $this->namespace, '/knowledge/embeddings', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_embeddings_config' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'save_embeddings_config' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		] );
+
+		register_rest_route( $this->namespace, '/knowledge/embed-backfill', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'embed_backfill' ],
 				'permission_callback' => [ $this, 'permissions_check' ],
 			],
 		] );
@@ -204,6 +226,65 @@ class KnowledgeController extends WP_REST_Controller {
 		return rest_ensure_response( [
 			'post_types' => $out,
 			'statuses'   => $statuses,
+		] );
+	}
+
+	/** Read the semantic-search config (never returns the raw key). */
+	public function get_embeddings_config() {
+		$cfg = KnowledgeEmbeddings::config();
+		return rest_ensure_response( [
+			'enabled'  => ! empty( $cfg['enabled'] ),
+			'provider' => (string) $cfg['provider'],
+			'model'    => (string) $cfg['model'],
+			'has_key'  => '' !== (string) $cfg['api_key'],
+		] );
+	}
+
+	/** Save semantic-search config. The key is encrypted at rest; a blank api_key keeps the stored one. */
+	public function save_embeddings_config( $request ) {
+		KnowledgeEmbeddings::save( [
+			'enabled'  => (bool) $request->get_param( 'enabled' ),
+			'provider' => (string) ( $request->get_param( 'provider' ) ?: 'openai' ),
+			'model'    => (string) $request->get_param( 'model' ),
+			'api_key'  => (string) $request->get_param( 'api_key' ),
+		] );
+
+		// Reflect the effective (decrypted) state back, without exposing the key.
+		$cfg = KnowledgeEmbeddings::config();
+		return rest_ensure_response( [
+			'success'  => true,
+			'enabled'  => ! empty( $cfg['enabled'] ),
+			'provider' => (string) $cfg['provider'],
+			'model'    => (string) $cfg['model'],
+			'has_key'  => '' !== (string) $cfg['api_key'],
+		] );
+	}
+
+	/** Embed entries missing a vector (admin button; loop until remaining = 0). */
+	public function embed_backfill( $request ) {
+		$business = sanitize_text_field( (string) $request->get_param( 'business_key' ) );
+		if ( '' === $business ) {
+			return new WP_Error( 'invalid', 'business_key is required.', [ 'status' => 400 ] );
+		}
+		if ( ! class_exists( '\Zaplane\Integrations\Knowledge' ) ) {
+			return new WP_Error( 'unavailable', 'Knowledge integration unavailable.', [ 'status' => 500 ] );
+		}
+
+		$result = \Zaplane\Integrations\Knowledge::action_embed_backfill(
+			$business,
+			[ 'limit' => (int) $request->get_param( 'limit' ) ],
+			[]
+		);
+		$data = $result['data'] ?? [];
+		if ( empty( $data['success'] ) ) {
+			return new WP_Error( 'backfill_failed', $data['error'] ?? 'Backfill failed.', [ 'status' => 422 ] );
+		}
+
+		return rest_ensure_response( [
+			'success'   => true,
+			'embedded'  => (int) ( $data['embedded'] ?? 0 ),
+			'failed'    => (int) ( $data['failed'] ?? 0 ),
+			'remaining' => (int) ( $data['remaining'] ?? 0 ),
 		] );
 	}
 

@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\AiHttp;
 
 class Aiagent extends IntegrationBase {
 
@@ -59,13 +60,25 @@ class Aiagent extends IntegrationBase {
 						'value' => 'openai',
 						'label' => 'OpenAI'
 					],
+					[
+						'value' => 'openai_compatible',
+						'label' => 'OpenAI-compatible (Azure, OpenRouter, Ollama, local…)'
+					],
 				],
-				'help'     => 'The AI Agent needs tool-calling, so it uses an Anthropic or OpenAI key (not WordPress Core AI).',
+				'help'     => 'The AI Agent needs tool-calling. Use Anthropic, OpenAI, or any OpenAI-compatible endpoint that supports tools (not WordPress Core AI).',
 			],
 			'api_key'  => [
 				'type'     => 'password',
 				'label'    => 'API Key',
 				'required' => true,
+			],
+			'base_url' => [
+				'type'        => 'text',
+				'label'       => 'Base URL',
+				'required'    => false,
+				'placeholder' => 'https://openrouter.ai/api/v1',
+				'depends_on'  => [ 'provider' => [ 'openai_compatible' ] ],
+				'help'        => 'For OpenAI-compatible endpoints — the base URL; /chat/completions is appended automatically. The model must support tool/function calling.',
 			],
 		];
 	}
@@ -125,6 +138,23 @@ class Aiagent extends IntegrationBase {
 					],
 				],
 				'help'    => 'Text returns the reply as-is. JSON asks the model for a structured JSON object and parses it into a `json` output field.',
+			],
+			[
+				'key'     => 'persist_memory',
+				'label'   => 'Save turn to Memory',
+				'type'    => 'select',
+				'default' => 'yes',
+				'options' => [
+					[
+						'value' => 'yes',
+						'label' => 'Yes — append the question and answer'
+					],
+					[
+						'value' => 'no',
+						'label' => 'No'
+					],
+				],
+				'help'    => 'When a Memory node is wired to this agent, automatically save the user message and the reply so the next turn has context (no manual append steps needed).',
 			],
 		];
 	}
@@ -208,6 +238,13 @@ class Aiagent extends IntegrationBase {
 
 		if ( 'openai' === $provider ) {
 			$result = self::run_openai( $api_key, $model, $system, $task, $ctx, $max_steps, 'json' === $format, $history );
+		} elseif ( 'openai_compatible' === $provider ) {
+			$base     = trim( (string) ( $credentials['base_url'] ?? '' ) );
+			if ( '' === $base ) {
+				return self::err( 'A Base URL is required for an OpenAI-compatible connection.', $input );
+			}
+			$endpoint = rtrim( $base, '/' ) . '/chat/completions';
+			$result   = self::run_openai( $api_key, $model, $system, $task, $ctx, $max_steps, 'json' === $format, $history, $endpoint );
 		} else {
 			$result = self::run_anthropic( $api_key, $model, $system, $task, $ctx, $max_steps, $history );
 		}
@@ -216,11 +253,19 @@ class Aiagent extends IntegrationBase {
 			return self::err( $result['error'], $input );
 		}
 
+		// Auto-persist the turn to a wired Memory node so the next run has context,
+		// removing the need for manual append steps. Off when persist_memory=no.
+		if ( ! empty( $sub['ai_memory'] ) && 'no' !== ( $config['persist_memory'] ?? 'yes' ) ) {
+			self::persist_turn( $sub['ai_memory'], $task, (string) $result['reply'] );
+		}
+
 		$data = array_merge( $input, [
 			'success'    => true,
 			'reply'      => $result['reply'],
 			'steps'      => $result['steps'],
 			'tool_calls' => $result['tool_calls'],
+			'usage'      => $result['usage'] ?? self::empty_usage(),
+			'cost_usd'   => AiHttp::estimate_cost( $model, $result['usage'] ?? self::empty_usage() ),
 			'format'     => $format,
 		] );
 
@@ -537,7 +582,72 @@ class Aiagent extends IntegrationBase {
 				];
 			}
 		}
-		return $messages;
+
+		return self::trim_history( $messages );
+	}
+
+	/**
+	 * Bound the loaded history to a character budget so long-running conversations
+	 * don't blow the context window (or the bill). Keeps the most recent turns.
+	 *
+	 * @param array<int,array{role:string,content:string}> $messages
+	 * @return array<int,array{role:string,content:string}>
+	 */
+	private static function trim_history( array $messages ): array {
+		/**
+		 * Filter the history budget (characters). ~4 chars/token, so 12000 chars
+		 * is roughly 3k tokens of history.
+		 */
+		$budget = (int) apply_filters( 'zaplane_agent_history_char_budget', 12000 );
+		if ( $budget <= 0 ) {
+			return $messages;
+		}
+
+		$kept  = [];
+		$total = 0;
+		// Walk newest→oldest, keeping turns until the budget is spent.
+		for ( $i = count( $messages ) - 1; $i >= 0; $i-- ) {
+			$len = strlen( $messages[ $i ]['content'] );
+			if ( $total + $len > $budget && ! empty( $kept ) ) {
+				break;
+			}
+			$total += $len;
+			array_unshift( $kept, $messages[ $i ] );
+		}
+		return $kept;
+	}
+
+	/**
+	 * Append the user message and the assistant reply to a wired Memory node.
+	 *
+	 * @param array<string,mixed> $memory_node
+	 */
+	private static function persist_turn( array $memory_node, string $user, string $assistant ): void {
+		if ( ! class_exists( '\Zaplane\Integrations\Memory' ) ) {
+			return;
+		}
+		$config = is_array( $memory_node['data']['config'] ?? null ) ? $memory_node['data']['config'] : [];
+
+		foreach ( [ [ 'user', $user ], [ 'assistant', $assistant ] ] as $turn ) {
+			if ( '' === trim( (string) $turn[1] ) ) {
+				continue;
+			}
+			\Zaplane\Integrations\Memory::execute_node(
+				[
+					'data' => [
+						'event'  => 'append',
+						'config' => array_merge(
+							$config,
+							[
+								'role'    => $turn[0],
+								'content' => $turn[1],
+							]
+						),
+					],
+				],
+				[]
+			);
+		}
 	}
 
 	/**
@@ -602,6 +712,13 @@ class Aiagent extends IntegrationBase {
 			'input_schema' => $t['schema'],
 		], self::tool_specs( $ctx ) );
 
+		// Cache the tool definitions (stable across every step of the loop) by
+		// marking the end of the tools block — Anthropic caches the whole prefix.
+		if ( ! empty( $tools ) ) {
+			$last                        = count( $tools ) - 1;
+			$tools[ $last ]['cache_control'] = [ 'type' => 'ephemeral' ];
+		}
+
 		$messages   = self::normalize_roles(
 			array_merge(
 				$history,
@@ -614,6 +731,7 @@ class Aiagent extends IntegrationBase {
 			)
 		);
 		$tool_calls = [];
+		$usage      = self::empty_usage();
 
 		for ( $step = 0; $step <= $max_steps; $step++ ) {
 			$body = [
@@ -622,7 +740,7 @@ class Aiagent extends IntegrationBase {
 				'messages'   => $messages,
 			];
 			if ( '' !== trim( $system ) ) {
-				$body['system'] = $system;
+				$body['system'] = AiHttp::anthropic_cached_text( $system );
 			}
 			if ( ! empty( $tools ) ) {
 				$body['tools'] = $tools;
@@ -638,6 +756,8 @@ class Aiagent extends IntegrationBase {
 				return [ 'error' => 'Anthropic: ' . $resp['error'] ];
 			}
 
+			$usage = self::add_usage( $usage, AiHttp::usage( 'anthropic', $resp ) );
+
 			$content = $resp['content'] ?? [];
 			$messages[] = [
 				'role' => 'assistant',
@@ -648,7 +768,8 @@ class Aiagent extends IntegrationBase {
 				return [
 					'reply' => self::text_from_blocks( $content ),
 					'steps' => $step,
-					'tool_calls' => $tool_calls
+					'tool_calls' => $tool_calls,
+					'usage' => $usage,
 				];
 			}
 
@@ -686,7 +807,7 @@ class Aiagent extends IntegrationBase {
 		return $out;
 	}
 
-	private static function run_openai( string $api_key, string $model, string $system, string $task, array $ctx, int $max_steps, bool $json = false, array $history = [] ): array {
+	private static function run_openai( string $api_key, string $model, string $system, string $task, array $ctx, int $max_steps, bool $json = false, array $history = [], string $endpoint = self::OPENAI_URL ): array {
 		$tools = array_map( static fn( $t ) => [
 			'type'     => 'function',
 			'function' => [
@@ -711,6 +832,7 @@ class Aiagent extends IntegrationBase {
 			'content' => $task
 		];
 		$tool_calls = [];
+		$usage      = self::empty_usage();
 
 		for ( $step = 0; $step <= $max_steps; $step++ ) {
 			$body = [
@@ -728,7 +850,7 @@ class Aiagent extends IntegrationBase {
 				$body['response_format'] = [ 'type' => 'json_object' ];
 			}
 
-			$resp = self::http_json( self::OPENAI_URL, [
+			$resp = self::http_json( $endpoint, [
 				'Authorization' => 'Bearer ' . $api_key,
 				'Content-Type'  => 'application/json',
 			], $body );
@@ -736,6 +858,8 @@ class Aiagent extends IntegrationBase {
 			if ( isset( $resp['error'] ) ) {
 				return [ 'error' => 'OpenAI: ' . $resp['error'] ];
 			}
+
+			$usage = self::add_usage( $usage, AiHttp::usage( 'openai', $resp ) );
 
 			$message = $resp['choices'][0]['message'] ?? [];
 			$messages[] = $message;
@@ -745,7 +869,8 @@ class Aiagent extends IntegrationBase {
 				return [
 					'reply' => (string) ( $message['content'] ?? '' ),
 					'steps' => $step,
-					'tool_calls' => $tool_calls
+					'tool_calls' => $tool_calls,
+					'usage' => $usage,
 				];
 			}
 
@@ -769,23 +894,41 @@ class Aiagent extends IntegrationBase {
 	}
 
 	private static function http_json( string $url, array $headers, array $body ): array {
-		$resp = wp_remote_post( $url, [
-			'headers' => $headers,
-			'body'    => wp_json_encode( $body ),
-			'timeout' => 120,
-		] );
+		// Retries 429/5xx with backoff so a transient rate limit mid-agent-loop
+		// doesn't kill the whole run.
+		$res = AiHttp::request( $url, $headers, $body );
 
-		if ( is_wp_error( $resp ) ) {
-			return [ 'error' => $resp->get_error_message() ];
+		if ( null !== $res['error'] ) {
+			return [ 'error' => $res['error'] ];
 		}
 
-		$data = json_decode( wp_remote_retrieve_body( $resp ), true );
-		if ( isset( $data['error'] ) ) {
-			$msg = is_array( $data['error'] ) ? ( $data['error']['message'] ?? 'API error' ) : (string) $data['error'];
-			return [ 'error' => $msg ];
-		}
+		return is_array( $res['data'] ) && ! empty( $res['data'] ) ? $res['data'] : [ 'error' => 'Invalid response.' ];
+	}
 
-		return is_array( $data ) ? $data : [ 'error' => 'Invalid response.' ];
+	/**
+	 * @return array{input_tokens:int,output_tokens:int,total_tokens:int}
+	 */
+	private static function empty_usage(): array {
+		return [
+			'input_tokens'  => 0,
+			'output_tokens' => 0,
+			'total_tokens'  => 0,
+		];
+	}
+
+	/**
+	 * Sum token usage across agent steps.
+	 *
+	 * @param array{input_tokens:int,output_tokens:int,total_tokens:int} $acc
+	 * @param array{input_tokens:int,output_tokens:int,total_tokens:int} $add
+	 * @return array{input_tokens:int,output_tokens:int,total_tokens:int}
+	 */
+	private static function add_usage( array $acc, array $add ): array {
+		return [
+			'input_tokens'  => $acc['input_tokens'] + $add['input_tokens'],
+			'output_tokens' => $acc['output_tokens'] + $add['output_tokens'],
+			'total_tokens'  => $acc['total_tokens'] + $add['total_tokens'],
+		];
 	}
 
 	private static function err( string $message, array $input ): array {
