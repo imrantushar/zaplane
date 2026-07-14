@@ -171,18 +171,20 @@ class ListenerController extends WP_REST_Controller {
 				// Workflow changed since listening started — still surface the
 				// captured payload so the user sees the trigger data.
 				return [
-					'status' => 'success',
-					'code'   => 'TRIGGERED',
-					'data'   => [ 'trigger_data' => $triggerData ],
+					'status'  => 'success',
+					'code'    => 'TRIGGERED',
+					'message' => 'Trigger fired — data captured.',
+					'data'    => [ 'trigger_data' => $triggerData ],
 				];
 			}
 			[ $version, $targetNode ] = $resolved;
 			$result = $this->execute_triggered_workflow( $version, $targetNode, $triggerData );
 
 			return [
-				'status' => 'success',
-				'code'   => 'TRIGGERED',
-				'data'   => [
+				'status'  => 'success',
+				'code'    => 'TRIGGERED',
+				'message' => 'Trigger fired — data captured.',
+				'data'    => [
 					'node' => [
 						'id'    => (int) $targetNode['id'],
 						'app'   => $targetNode['data']['app'] ?? null,

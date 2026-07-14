@@ -19,10 +19,12 @@ export const workflowNodeListiner = createAsyncThunk(
 	'zaplane/workflowNodeListiner',
 	async (id, thunkAPI) => {
 		try {
+			// "start" only registers the listener — no success toast here (it fired
+			// an empty one on every start). Success is shown when the trigger is
+			// actually captured, in the poll thunk below.
 			const res = await API.get(
 				namespace + `node-listener/${id}`
 			);
-			handleSliceSuccess(thunkAPI,res?.data?.message);
 			return res.data;
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
@@ -38,6 +40,11 @@ export const workflowNodeListinerPoll = createAsyncThunk(
 			const res = await API.get(
 				namespace + `node-listener/${id}/poll`
 			);
+			// Only toast on an actual capture — not while still listening / on
+			// stop / on timeout.
+			if (res?.data?.code === 'TRIGGERED') {
+				handleSliceSuccess(thunkAPI, res?.data?.message);
+			}
 			return res.data;
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
