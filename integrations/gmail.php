@@ -41,7 +41,7 @@ class Gmail extends IntegrationBase {
 		$compose_fields = [
 			[
 				'key'         => 'to',
-				'type'        => 'text',
+				'type'        => 'email',
 				'label'       => 'To',
 				'placeholder' => 'recipient@example.com',
 				'required'    => true,
@@ -49,7 +49,7 @@ class Gmail extends IntegrationBase {
 			],
 			[
 				'key'         => 'cc',
-				'type'        => 'text',
+				'type'        => 'email',
 				'label'       => 'CC',
 				'placeholder' => 'cc@example.com',
 				'required'    => false,

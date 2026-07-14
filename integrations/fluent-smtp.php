@@ -67,7 +67,7 @@ class FluentSmtp extends IntegrationBase {
 			[
 				'key'         => 'to',
 				'label'       => 'To',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'user@example.com, team@example.com',
 				'required'    => true,
 				'help'        => 'Use comma-separated email addresses or dynamic values.',
@@ -104,19 +104,19 @@ class FluentSmtp extends IntegrationBase {
 			[
 				'key'         => 'cc',
 				'label'       => 'CC',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'manager@example.com, support@example.com',
 			],
 			[
 				'key'         => 'bcc',
 				'label'       => 'BCC',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'audit@example.com',
 			],
 			[
 				'key'         => 'reply_to',
 				'label'       => 'Reply-To',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'reply@example.com',
 			],
 			[
@@ -552,7 +552,7 @@ class FluentSmtp extends IntegrationBase {
 		return [
 			'key'         => 'recipient_email',
 			'label'       => 'Recipient Email',
-			'type'        => 'text',
+			'type'        => 'email',
 			'placeholder' => 'user@example.com',
 			'help'        => 'Optional. Trigger only when this email address is one of the recipients.',
 		];

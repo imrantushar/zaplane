@@ -43,7 +43,7 @@ class HumanApproval extends IntegrationBase {
 			[
 				'key'      => 'approver_emails',
 				'label'    => 'Approver email(s)',
-				'type'     => 'expression',
+				'type'     => 'email',
 				'required' => true,
 				'help'     => 'Comma-separated. Supports variables, e.g. {{ manager_email }}.',
 			],

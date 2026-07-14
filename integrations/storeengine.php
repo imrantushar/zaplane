@@ -1064,8 +1064,8 @@ class Storeengine extends IntegrationBase {
 					[
 						'key' => 'email',
 						'label' => 'Email',
-						'type' => 'expression',
-						'subtype' => 'email',
+						'type'     => 'email',
+						'subtype'  => 'expression',
 						'required' => true
 					],
 					[

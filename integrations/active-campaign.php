@@ -72,7 +72,7 @@ class ActiveCampaign extends IntegrationBase {
 			[
 				'key'         => 'email',
 				'label'       => 'Contact Email',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'name@example.com',
 				'required' => true,
 				'help'        => 'Optional. Only continue when the submitted contact email matches this value.',
@@ -97,7 +97,7 @@ class ActiveCampaign extends IntegrationBase {
 			[
 				'key'         => 'email',
 				'label'       => 'Email Address',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'name@example.com or {{email}}',
 				'required'    => true,
 			],

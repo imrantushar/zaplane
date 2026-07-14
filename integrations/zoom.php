@@ -233,7 +233,7 @@ class Zoom extends IntegrationBase {
 					],
 					[
 						'key'         => 'email',
-						'type'        => 'text',
+						'type'        => 'email',
 						'label'       => 'Email',
 						'placeholder' => 'attendee@example.com',
 						'required'    => true,

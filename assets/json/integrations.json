@@ -1,6 +1,6 @@
 {
     "version": "1.1.0",
-    "generated_at": "2026-07-14 06:35:54",
+    "generated_at": "2026-07-14 12:22:23",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -148,7 +148,7 @@
                         {
                             "key": "user_id",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
                             "required": false
                         },
@@ -186,7 +186,7 @@
                         {
                             "key": "user_id",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
                             "required": false
                         },
@@ -224,7 +224,7 @@
                         {
                             "key": "user_id",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
                             "required": false
                         },
@@ -271,7 +271,7 @@
                         {
                             "key": "user_id",
                             "label": "User Email",
-                            "type": "text",
+                            "type": "email",
                             "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
                             "required": false
                         },
@@ -462,8 +462,8 @@
                         {
                             "key": "email",
                             "label": "Email",
-                            "type": "expression",
-                            "subtype": "email",
+                            "type": "email",
+                            "subtype": "expression",
                             "required": true
                         },
                         {
@@ -644,8 +644,8 @@
                         {
                             "key": "email",
                             "label": "Email",
-                            "type": "expression",
-                            "subtype": "email",
+                            "type": "email",
+                            "subtype": "expression",
                             "required": true
                         },
                         {
@@ -1057,8 +1057,8 @@
                         {
                             "key": "custom_email",
                             "label": "Email Address",
-                            "type": "expression",
-                            "subtype": "email",
+                            "type": "email",
+                            "subtype": "expression",
                             "required": false,
                             "depends_on": {
                                 "recipient_type": "custom"
@@ -1157,8 +1157,8 @@
                         {
                             "key": "from_email",
                             "label": "From Email",
-                            "type": "expression",
-                            "subtype": "email",
+                            "type": "email",
+                            "subtype": "expression",
                             "required": false,
                             "placeholder": "Leave empty to use system default"
                         },
@@ -1172,8 +1172,8 @@
                         {
                             "key": "reply_to_email",
                             "label": "Reply-To Email",
-                            "type": "expression",
-                            "subtype": "email",
+                            "type": "email",
+                            "subtype": "expression",
                             "required": false
                         },
                         {
@@ -1496,6 +1496,8 @@
                     "label": "User Added To Access Group",
                     "hook": "storeengine/membership/user_added_to_group",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "user_added_to_group",
                     "schema": [],
                     "outputs": [
@@ -1506,6 +1508,8 @@
                     "label": "User Removed From Access Group",
                     "hook": "storeengine/membership/user_removed_from_group",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "user_removed_from_group",
                     "schema": [],
                     "outputs": [
@@ -1516,6 +1520,8 @@
                     "label": "Access Group Created",
                     "hook": "save_post_storeengine_groups",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_created",
                     "schema": [],
                     "outputs": [
@@ -1526,6 +1532,8 @@
                     "label": "Access Group Updated",
                     "hook": "save_post_storeengine_groups",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_updated",
                     "schema": [],
                     "outputs": [
@@ -1536,6 +1544,8 @@
                     "label": "Access Group Deleted",
                     "hook": "delete_post_storeengine_groups",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_deleted",
                     "schema": [],
                     "outputs": [
@@ -1546,6 +1556,8 @@
                     "label": "Subscription Created",
                     "hook": "storeengine/after_create_subscription",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_created",
                     "schema": [],
                     "outputs": [
@@ -1556,6 +1568,8 @@
                     "label": "Subscription Status Changed (any)",
                     "hook": "storeengine/subscription/status_changed",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_status_changed",
                     "schema": [],
                     "outputs": [
@@ -1566,6 +1580,8 @@
                     "label": "Subscription Activated",
                     "hook": "storeengine/subscription/status_active",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_activated",
                     "schema": [],
                     "outputs": [
@@ -1576,6 +1592,8 @@
                     "label": "Subscription Paused (On Hold)",
                     "hook": "storeengine/subscription/status_on_hold",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_on_hold",
                     "schema": [],
                     "outputs": [
@@ -1586,6 +1604,8 @@
                     "label": "Subscription Cancelled",
                     "hook": "storeengine/subscription/status_cancelled",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_cancelled",
                     "schema": [],
                     "outputs": [
@@ -1596,6 +1616,8 @@
                     "label": "Subscription Expired",
                     "hook": "storeengine/subscription/status_expired",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_expired",
                     "schema": [],
                     "outputs": [
@@ -1606,6 +1628,8 @@
                     "label": "Subscription Renewal Payment Complete",
                     "hook": "storeengine/subscription/renewal_payment_complete",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewed",
                     "schema": [],
                     "outputs": [
@@ -1616,6 +1640,8 @@
                     "label": "Subscription Payment Complete",
                     "hook": "storeengine/subscription/payment_complete",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_payment_complete",
                     "schema": [],
                     "outputs": [
@@ -1626,6 +1652,8 @@
                     "label": "Subscription Renewal Failed",
                     "hook": "storeengine/subscription/failed_to_create_renewal_order",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_failed",
                     "schema": [],
                     "outputs": [
@@ -1636,6 +1664,8 @@
                     "label": "Subscription Trial Ended",
                     "hook": "storeengine/subscription/trial_ended",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_trial_ended",
                     "schema": [],
                     "outputs": [
@@ -1646,6 +1676,8 @@
                     "label": "Subscription Renewal Order Created",
                     "hook": "storeengine/api/after_create_renewal_order",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_order_created",
                     "schema": [],
                     "outputs": [
@@ -1728,6 +1760,8 @@
                     "label": "Affiliate Registered",
                     "hook": "storeengine/addons/affiliate/after_registration",
                     "requires_addon": "affiliate",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_registered",
                     "schema": [],
                     "outputs": [
@@ -1738,6 +1772,8 @@
                     "label": "Affiliate Status Updated",
                     "hook": "storeengine/addons/affiliate/update_status",
                     "requires_addon": "affiliate",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1748,6 +1784,8 @@
                     "label": "Affiliate Commission Status Updated",
                     "hook": "storeengine/addons/affiliate/update_commission_status",
                     "requires_addon": "affiliate",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_commission_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1758,6 +1796,8 @@
                     "label": "Affiliate Payout Status Updated",
                     "hook": "storeengine/addons/affiliate/update_payout_status",
                     "requires_addon": "affiliate",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_payout_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1912,8 +1952,8 @@
                         {
                             "key": "email",
                             "label": "Email",
-                            "type": "expression",
-                            "subtype": "email",
+                            "type": "email",
+                            "subtype": "expression",
                             "required": true
                         },
                         {
@@ -2140,6 +2180,8 @@
                 "update_subscription_status": {
                     "label": "Update Subscription Status",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "update_subscription_status",
                     "schema": [
                         {
@@ -2184,6 +2226,8 @@
                 "grant_membership": {
                     "label": "Grant Membership (Add User To Group)",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "grant_membership",
                     "schema": [
                         {
@@ -2220,6 +2264,8 @@
                 "revoke_membership": {
                     "label": "Revoke Membership (Remove User From Group)",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "revoke_membership",
                     "schema": [
                         {
@@ -2250,6 +2296,8 @@
                 "create_access_group": {
                     "label": "Create Access Group",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "create_access_group",
                     "schema": [
                         {
@@ -2318,6 +2366,8 @@
                 "update_access_group": {
                     "label": "Update Access Group",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "update_access_group",
                     "schema": [
                         {
@@ -2380,6 +2430,8 @@
                 "delete_access_group": {
                     "label": "Delete Access Group",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "delete_access_group",
                     "schema": [
                         {
@@ -2453,7 +2505,7 @@
                         {
                             "key": "email",
                             "label": "Contact Email",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com",
                             "required": true,
                             "help": "Optional. Only continue when the submitted contact email matches this value."
@@ -2493,7 +2545,7 @@
                         {
                             "key": "email",
                             "label": "Contact Email",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com",
                             "required": true,
                             "help": "Optional. Only continue when the submitted contact email matches this value."
@@ -2533,7 +2585,7 @@
                         {
                             "key": "email",
                             "label": "Contact Email",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com",
                             "required": true,
                             "help": "Optional. Only continue when the submitted contact email matches this value."
@@ -2559,7 +2611,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
                         },
@@ -2593,7 +2645,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
                         },
@@ -2639,7 +2691,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
                         },
@@ -2669,7 +2721,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
                         },
@@ -2699,7 +2751,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
                         },
@@ -6012,7 +6064,7 @@
                         {
                             "key": "email",
                             "label": "Customer Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -6456,7 +6508,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/fillout",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -8932,7 +8984,7 @@
                         {
                             "key": "recipient_email",
                             "label": "Recipient Email",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "user@example.com",
                             "help": "Optional. Trigger only when this email address is one of the recipients."
                         }
@@ -8949,7 +9001,7 @@
                         {
                             "key": "recipient_email",
                             "label": "Recipient Email",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "user@example.com",
                             "help": "Optional. Trigger only when this email address is one of the recipients."
                         }
@@ -8966,7 +9018,7 @@
                         {
                             "key": "recipient_email",
                             "label": "Recipient Email",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "user@example.com",
                             "help": "Optional. Trigger only when this email address is one of the recipients."
                         },
@@ -8991,7 +9043,7 @@
                         {
                             "key": "to",
                             "label": "To",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "user@example.com, team@example.com",
                             "required": true,
                             "help": "Use comma-separated email addresses or dynamic values."
@@ -9028,19 +9080,19 @@
                         {
                             "key": "cc",
                             "label": "CC",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "manager@example.com, support@example.com"
                         },
                         {
                             "key": "bcc",
                             "label": "BCC",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "audit@example.com"
                         },
                         {
                             "key": "reply_to",
                             "label": "Reply-To",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "reply@example.com"
                         },
                         {
@@ -9899,7 +9951,7 @@
                     "schema": [
                         {
                             "key": "to",
-                            "type": "text",
+                            "type": "email",
                             "label": "To",
                             "placeholder": "recipient@example.com",
                             "required": true,
@@ -9907,7 +9959,7 @@
                         },
                         {
                             "key": "cc",
-                            "type": "text",
+                            "type": "email",
                             "label": "CC",
                             "placeholder": "cc@example.com",
                             "required": false
@@ -9960,7 +10012,7 @@
                     "schema": [
                         {
                             "key": "to",
-                            "type": "text",
+                            "type": "email",
                             "label": "To",
                             "placeholder": "recipient@example.com",
                             "required": true,
@@ -9968,7 +10020,7 @@
                         },
                         {
                             "key": "cc",
-                            "type": "text",
+                            "type": "email",
                             "label": "CC",
                             "placeholder": "cc@example.com",
                             "required": false
@@ -10037,7 +10089,7 @@
                     "schema": [
                         {
                             "key": "to",
-                            "type": "text",
+                            "type": "email",
                             "label": "To",
                             "placeholder": "recipient@example.com",
                             "required": true,
@@ -10045,7 +10097,7 @@
                         },
                         {
                             "key": "cc",
-                            "type": "text",
+                            "type": "email",
                             "label": "CC",
                             "placeholder": "cc@example.com",
                             "required": false
@@ -10215,7 +10267,7 @@
                         },
                         {
                             "key": "attendees",
-                            "type": "text",
+                            "type": "email",
                             "label": "Attendees",
                             "placeholder": "alice@example.com,bob@example.com",
                             "required": false,
@@ -10586,7 +10638,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/jotform",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -11305,7 +11357,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/mailchimp",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/mailchimp",
             "triggers": {
                 "subscribed": {
                     "label": "Subscriber Added",
@@ -11433,7 +11485,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
                         },
@@ -11538,7 +11590,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
                         }
@@ -11569,7 +11621,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
                         },
@@ -11608,7 +11660,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
                         },
@@ -11647,7 +11699,7 @@
                         {
                             "key": "email",
                             "label": "Email Address",
-                            "type": "text",
+                            "type": "email",
                             "placeholder": "name@example.com or {{email}}",
                             "required": true
                         }
@@ -12150,7 +12202,7 @@
                         {
                             "key": "email",
                             "label": "Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -13019,7 +13071,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/messenger",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/messenger",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -13823,7 +13875,7 @@
             "requires_connection": true,
             "auth_type": "both",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/slack",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/slack",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -16670,7 +16722,7 @@
                         },
                         {
                             "key": "email",
-                            "type": "text",
+                            "type": "email",
                             "label": "Email Address",
                             "required": true
                         },
@@ -17645,7 +17697,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/typeform",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -18077,7 +18129,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/whatsapp",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/whatsapp",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -19278,7 +19330,7 @@
                         {
                             "key": "billing_email",
                             "label": "Billing Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -19441,7 +19493,7 @@
                         {
                             "key": "email",
                             "label": "Customer Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         }
                     ],
@@ -19498,7 +19550,7 @@
                         {
                             "key": "email",
                             "label": "Customer Email",
-                            "type": "text"
+                            "type": "email"
                         }
                     ],
                     "outputs": [
@@ -19512,7 +19564,7 @@
                         {
                             "key": "email",
                             "label": "Email",
-                            "type": "text",
+                            "type": "email",
                             "required": true
                         },
                         {
@@ -27244,7 +27296,7 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/zoom",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/zoom",
             "triggers": {
                 "meeting_started": {
                     "label": "Meeting Started",
@@ -27623,7 +27675,7 @@
                         },
                         {
                             "key": "email",
-                            "type": "text",
+                            "type": "email",
                             "label": "Email",
                             "placeholder": "attendee@example.com",
                             "required": true
@@ -27662,37 +27714,6 @@
                     ]
                 }
             }
-        },
-        "gemcrm-email-inbox": {
-            "slug": "gemcrm-email-inbox",
-            "name": "GemCRM Email Inbox",
-            "icon": "crm.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_url": "",
-            "triggers": {
-                "email_received": {
-                    "label": "Email Received",
-                    "hook": "gemcrm/email_inbox/received",
-                    "key": "email_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "email_received_unmatched": {
-                    "label": "Email Received (Unmatched)",
-                    "hook": "gemcrm/email_inbox/received_unmatched",
-                    "key": "email_received_unmatched",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": []
         }
     },
     "tools": {
@@ -29437,7 +29458,7 @@
                         {
                             "key": "approver_emails",
                             "label": "Approver email(s)",
-                            "type": "expression",
+                            "type": "email",
                             "required": true,
                             "help": "Comma-separated. Supports variables, e.g. {{ manager_email }}."
                         },

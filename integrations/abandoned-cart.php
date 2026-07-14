@@ -154,7 +154,7 @@ class AbandonedCart extends IntegrationBase {
 					[
 						'key'      => 'email',
 						'label'    => 'Email Address',
-						'type'     => 'text',
+						'type'     => 'email',
 						'required' => true,
 					],
 				];

@@ -324,7 +324,7 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Customer Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				[

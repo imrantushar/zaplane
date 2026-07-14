@@ -81,7 +81,7 @@ class Mailchimp extends IntegrationBase {
 			[
 				'key'         => 'email',
 				'label'       => 'Email Address',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'name@example.com or {{email}}',
 				'required'    => true,
 			],

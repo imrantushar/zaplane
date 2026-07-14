@@ -443,8 +443,8 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'        => 'custom_email',
 				'label'      => 'Email Address',
-				'type'       => 'expression',
-				'subtype'    => 'email',
+				'type'     => 'email',
+				'subtype'  => 'expression',
 				'required'   => false,
 				'depends_on' => [ 'recipient_type' => 'custom' ],
 				'placeholder' => 'someone@example.com or use @ to pick a variable',
@@ -505,8 +505,8 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'      => 'from_email',
 				'label'    => 'From Email',
-				'type'     => 'expression',
-				'subtype'  => 'email',
+				'type'     => 'email',
+				'subtype'  => 'expression',
 				'required' => false,
 				'placeholder' => 'Leave empty to use system default',
 			],
@@ -520,8 +520,8 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'      => 'reply_to_email',
 				'label'    => 'Reply-To Email',
-				'type'     => 'expression',
-				'subtype'  => 'email',
+				'type'     => 'email',
+				'subtype'  => 'expression',
 				'required' => false,
 			],
 			[
@@ -605,8 +605,8 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'     => 'email',
 				'label'   => 'Email',
-				'type'    => 'expression',
-				'subtype' => 'email',
+				'type'    => 'email',
+				'subtype' => 'expression',
 				'required' => true,
 			],
 			[

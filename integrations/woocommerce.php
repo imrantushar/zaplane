@@ -614,7 +614,7 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key' => 'billing_email',
 					'label' => 'Billing Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				...self::field_limit_page(),
@@ -637,7 +637,7 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Customer Email',
-					'type' => 'text'
+					'type' => 'email'
 				],
 			],
 			'add_order_note' => [
@@ -663,7 +663,7 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Customer Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 			],
@@ -671,7 +671,7 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				[
@@ -1309,7 +1309,7 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key'      => 'email',
 					'label'    => 'Email Address',
-					'type'     => 'text',
+					'type'     => 'email',
 					'required' => true,
 				],
 			],

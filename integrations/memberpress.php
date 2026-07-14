@@ -404,7 +404,7 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				[

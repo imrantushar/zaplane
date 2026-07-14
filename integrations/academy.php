@@ -711,7 +711,7 @@ class Academy extends IntegrationBase {
 		$user_field = [
 			'key'      => 'user_id',
 			'label'    => 'User Email',
-			'type'     => 'text',
+			'type'     => 'email',
 			'help'     => 'Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged‑in user.',
 			'required' => false,
 		];

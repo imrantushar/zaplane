@@ -95,7 +95,7 @@ class GoogleMeet extends IntegrationBase {
 				],
 				[
 					'key'         => 'attendees',
-					'type'        => 'text',
+					'type'        => 'email',
 					'label'       => 'Attendees',
 					'placeholder' => 'alice@example.com,bob@example.com',
 					'required'    => false,
