@@ -273,10 +273,15 @@ export default function CustomNode({
           />
         )}
 
-        {/* AI AGENT SUB-INPUT HANDLES — wire a chat model / memory / tools here */}
+        {/* AI AGENT SUB-INPUT HANDLES — wire a chat model / memory / tools here.
+            Each empty port renders as a column hanging off its handle dot:
+            dashed stem → "+" button → label, so the affordance reads as attached
+            to the node instead of floating. Once wired, only the label remains
+            (the incoming sub-node edge replaces the stem and button). */}
         {isAgent &&
           SUB_PORTS.map((sp, i) => {
             const pos = `${((i + 1) / (SUB_PORTS.length + 1)) * 100}%`;
+            const connected = edges.some((e) => e.target === id && e.targetHandle === sp.id);
             return (
               <div key={sp.id}>
                 <Handle
@@ -285,32 +290,60 @@ export default function CustomNode({
                   position={Position.Bottom}
                   style={{ ...handleStyle, background: "#a855f7", left: pos }}
                 />
-                <span
+                <div
                   style={{
                     position: "absolute",
                     top: "100%",
                     left: pos,
                     transform: "translateX(-50%)",
-                    marginTop: 10,
-                    fontSize: 9,
-                    color: "#a855f7",
-                    whiteSpace: "nowrap",
-                    display: "inline-flex",
+                    display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    gap: 4,
+                    pointerEvents: "none",
                   }}
                 >
-                  {sp.label}
-                  <button
-                    type="button"
-                    title={__("Add", "zaplane")}
-                    onClick={(e) => { e.stopPropagation(); data.openDrawerFromAdd?.({ id: sp.id, type: "target" }); }}
-                    style={{ ...addPortBtnStyle, borderColor: "#a855f7", color: "#a855f7" }}
+                  {!connected && (
+                    <>
+                      <span style={{ width: 0, height: 14, borderLeft: "1.5px dashed #C4B5FD" }} />
+                      <button
+                        type="button"
+                        title={sprintf(__("Add %s", "zaplane"), sp.label)}
+                        onClick={(e) => { e.stopPropagation(); data.openDrawerFromAdd?.({ id: sp.id, type: "target" }); }}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 22,
+                          height: 22,
+                          borderRadius: "50%",
+                          border: "1px dashed #a855f7",
+                          background: "#fff",
+                          color: "#a855f7",
+                          cursor: "pointer",
+                          padding: 0,
+                          pointerEvents: "auto",
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                        }}
+                      >
+                        <FaPlus size={9} />
+                      </button>
+                    </>
+                  )}
+                  <span
+                    style={{
+                      marginTop: connected ? 8 : 5,
+                      fontSize: 10,
+                      fontWeight: 500,
+                      color: "#7C3AED",
+                      whiteSpace: "nowrap",
+                      background: "rgba(255,255,255,0.9)",
+                      borderRadius: 4,
+                      padding: "0 4px",
+                    }}
                   >
-                    <FaPlus size={8} />
-                  </button>
-                </span>
+                    {sp.label}
+                  </span>
+                </div>
               </div>
             );
           })}

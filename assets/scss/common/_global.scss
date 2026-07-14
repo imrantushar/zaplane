@@ -90,8 +90,9 @@
             color: var(--zaplane-font-color);
             cursor: pointer;
             white-space: nowrap;
+            background: transparent;
             &:hover, &:active {
-                background: var(--zaplane-primary) !important;
+                background: var(--zaplane-secondary-color) !important;
                 -webkit-tap-highlight-color: none !important;
             }
             width: calc(100% - 16px);
@@ -99,14 +100,19 @@
             border-radius: 4px;
         }
 
+        // Keyboard/mouse-hovered row: a neutral highlight, not the brand color —
+        // a solid primary fill here reads like a button, not a passive hover state.
         &__option--is-focused {
-            background: var(--zaplane-primary) !important;
-            color: #fff !important;
+            background: var(--zaplane-secondary-color) !important;
+            color: var(--zaplane-font-color) !important;
         }
 
+        // The actually-selected value: a soft tint instead of a solid fill, so it
+        // doesn't visually compete with real primary buttons (e.g. "Create New").
         &__option--is-selected {
-            background: var(--zaplane-primary) !important;
-            color: #fff !important;
+            background: var(--zaplane-second-primary) !important;
+            color: var(--zaplane-primary) !important;
+            font-weight: 600;
         }
         
         &__multi-value {
