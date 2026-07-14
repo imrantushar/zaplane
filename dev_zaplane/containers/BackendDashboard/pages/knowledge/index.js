@@ -24,6 +24,20 @@ const KnowledgePage = () => {
   const [syncing, setSyncing] = useState(false);
   const [form, setForm] = useState(null); // null = closed; object = add/edit
   const [faq, setFaq] = useState(null); // null = closed; { business_key, rows:[{q,a}] }
+  const [sync, setSync] = useState(null); // null = closed; sync-content config
+  const [postTypes, setPostTypes] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+
+  const loadPostTypes = useCallback(async () => {
+    try {
+      const res = await API.get(namespace + "knowledge/post-types");
+      setPostTypes(res?.data?.post_types || []);
+      setStatuses(res?.data?.statuses || []);
+    } catch (e) {
+      setPostTypes([]);
+      setStatuses([]);
+    }
+  }, []);
 
   const loadBusinesses = useCallback(async () => {
     try {
@@ -50,7 +64,8 @@ const KnowledgePage = () => {
 
   useEffect(() => {
     loadBusinesses();
-  }, [loadBusinesses]);
+    loadPostTypes();
+  }, [loadBusinesses, loadPostTypes]);
 
   useEffect(() => {
     loadItems();
@@ -132,19 +147,49 @@ const KnowledgePage = () => {
     }
   };
 
-  const syncStoreEngine = async () => {
-    const target = business || window.prompt(__("Enter the business key to sync StoreEngine products into:", "zaplane"), "");
-    if (!target || !target.trim()) return;
+  const openSync = () =>
+    setSync({
+      business_key: business || "",
+      post_type: "",
+      post_status: "publish",
+      include_content: true,
+      include_excerpt: true,
+      meta_keys: "",
+      taxonomies: [],
+      prune: true,
+    });
+  const closeSync = () => setSync(null);
+
+  const runSync = async () => {
+    if (!sync.business_key.trim()) {
+      window.alert(__("Business key is required.", "zaplane"));
+      return;
+    }
+    if (!sync.post_type) {
+      window.alert(__("Choose a post type to sync.", "zaplane"));
+      return;
+    }
     setSyncing(true);
     try {
-      const res = await API.post(namespace + "knowledge/sync-storeengine", { business_key: target.trim() });
+      const res = await API.post(namespace + "knowledge/sync-content", {
+        business_key: sync.business_key.trim(),
+        post_type: sync.post_type,
+        post_status: sync.post_status || "publish",
+        include_content: sync.include_content ? "yes" : "no",
+        include_excerpt: sync.include_excerpt ? "yes" : "no",
+        meta_keys: sync.meta_keys,
+        taxonomies: (sync.taxonomies || []).join(","),
+        prune: sync.prune ? "yes" : "no",
+      });
       const synced = res?.data?.synced ?? 0;
       const pruned = res?.data?.pruned ?? 0;
       window.alert(
-        __("Synced", "zaplane") + " " + synced + " " + __("products", "zaplane") +
+        __("Synced", "zaplane") + " " + synced + " " + __("items", "zaplane") +
         (pruned ? " · " + __("removed", "zaplane") + " " + pruned + " " + __("deleted", "zaplane") : "")
       );
-      if (!business) setBusiness(target.trim());
+      const target = sync.business_key.trim();
+      if (!business) setBusiness(target);
+      closeSync();
       await loadBusinesses();
       await loadItems();
     } catch (e) {
@@ -165,6 +210,16 @@ const KnowledgePage = () => {
   };
 
   const businessOptions = businesses.map((b) => ({ label: b, value: b }));
+  const postTypeOptions = postTypes.map((p) => ({
+    label: p.label + " (" + p.count + ")",
+    value: p.slug,
+  }));
+  const statusOptions = statuses.map((s) => ({ label: s.label, value: s.value }));
+  const selectedPostType = sync ? postTypes.find((p) => p.slug === sync.post_type) : null;
+  const taxonomyOptions = (selectedPostType?.taxonomies || []).map((t) => ({
+    label: t.label,
+    value: t.slug,
+  }));
 
   const columns = [
     {
@@ -215,8 +270,8 @@ const KnowledgePage = () => {
 
   const actions = (
     <div className="flex items-center gap-2">
-      <button type="button" style={outlineBtn} onClick={syncStoreEngine} disabled={syncing}>
-        {syncing ? __("Syncing...", "zaplane") : __("Sync StoreEngine", "zaplane")}
+      <button type="button" style={outlineBtn} onClick={openSync} disabled={syncing}>
+        {syncing ? __("Syncing...", "zaplane") : __("Sync Content", "zaplane")}
       </button>
       <button type="button" style={outlineBtn} onClick={openFaq}>
         {__("FAQ Builder", "zaplane")}
@@ -378,6 +433,112 @@ const KnowledgePage = () => {
             <button type="button" style={outlineBtn} onClick={addFaqRow}>
               {__("+ Add another", "zaplane")}
             </button>
+          </div>
+        )}
+      </ZAPDrawer>
+
+      <ZAPDrawer
+        open={!!sync}
+        onClose={closeSync}
+        title={__("Sync Content", "zaplane")}
+        size="md"
+        placement="end"
+        closeOnOverlayClick
+        footer={
+          <div className="flex items-center justify-end gap-3">
+            <button type="button" style={outlineBtn} onClick={closeSync}>
+              {__("Cancel", "zaplane")}
+            </button>
+            <button type="button" style={primaryBtn} onClick={runSync} disabled={syncing}>
+              {syncing ? __("Syncing...", "zaplane") : __("Sync", "zaplane")}
+            </button>
+          </div>
+        }
+      >
+        {sync && (
+          <div className="zaplane-knowledge-page flex flex-col gap-4 pt-2">
+            <p className="text-sm" style={{ color: "var(--zaplane-font-secondary-color)" }}>
+              {__("Pull any post type — posts, pages, products, docs — into this business's knowledge. Each item becomes one searchable entry. Re-syncing updates existing entries.", "zaplane")}
+            </p>
+            <ZAPInput
+              label={__("Business Key", "zaplane")}
+              placeholder="business_a"
+              value={sync.business_key}
+              onChange={(e) => setSync({ ...sync, business_key: e.target.value })}
+              isRequired
+            />
+            <div>
+              <label className="zaplane-label">{__("Post Type", "zaplane")}</label>
+              <ZAPSelect
+                options={postTypeOptions}
+                value={sync.post_type}
+                onChange={(opt) =>
+                  setSync({ ...sync, post_type: opt?.value || "", taxonomies: [] })
+                }
+                placeholder={__("Choose a post type", "zaplane")}
+              />
+            </div>
+            <div>
+              <label className="zaplane-label">{__("Status", "zaplane")}</label>
+              <ZAPSelect
+                options={statusOptions}
+                value={sync.post_status}
+                onChange={(opt) => setSync({ ...sync, post_status: opt?.value || "publish" })}
+                placeholder={__("Choose a status", "zaplane")}
+              />
+            </div>
+            <div className="flex items-center gap-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={sync.include_content}
+                  onChange={(e) => setSync({ ...sync, include_content: e.target.checked })}
+                />
+                <span className="zaplane-label">{__("Include body content", "zaplane")}</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={sync.include_excerpt}
+                  onChange={(e) => setSync({ ...sync, include_excerpt: e.target.checked })}
+                />
+                <span className="zaplane-label">{__("Include excerpt", "zaplane")}</span>
+              </label>
+            </div>
+            <ZAPInput
+              label={__("Custom fields (optional)", "zaplane")}
+              placeholder="price, sku"
+              value={sync.meta_keys}
+              onChange={(e) => setSync({ ...sync, meta_keys: e.target.value })}
+            />
+            <div>
+              <label className="zaplane-label">{__("Taxonomies (optional)", "zaplane")}</label>
+              {sync.post_type && taxonomyOptions.length === 0 ? (
+                <p className="text-sm pt-1" style={{ color: "var(--zaplane-font-secondary-color)" }}>
+                  {__("This post type has no taxonomies.", "zaplane")}
+                </p>
+              ) : (
+                <ZAPSelect
+                  isMulti
+                  options={taxonomyOptions}
+                  value={sync.taxonomies}
+                  onChange={(vals) => setSync({ ...sync, taxonomies: vals || [] })}
+                  placeholder={
+                    sync.post_type
+                      ? __("Select taxonomies to include", "zaplane")
+                      : __("Choose a post type first", "zaplane")
+                  }
+                />
+              )}
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={sync.prune}
+                onChange={(e) => setSync({ ...sync, prune: e.target.checked })}
+              />
+              <span className="zaplane-label">{__("Remove entries whose source item was deleted", "zaplane")}</span>
+            </label>
           </div>
         )}
       </ZAPDrawer>

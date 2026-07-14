@@ -1,6 +1,6 @@
 {
     "version": "1.1.0",
-    "generated_at": "2026-07-13 16:15:48",
+    "generated_at": "2026-07-14 04:06:44",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -29634,6 +29634,114 @@
                             "type": "expression",
                             "required": false,
                             "help": "If set, re-adding with the same ref updates the entry instead of duplicating."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "sync_content": {
+                    "label": "Sync WordPress Content",
+                    "key": "sync_content",
+                    "schema": [
+                        {
+                            "key": "business_key",
+                            "label": "Business Key",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "business_a",
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "post",
+                            "help": "The slug of the content to sync \u2014 e.g. post, page, product, docs. Each item becomes one knowledge entry (title + body)."
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Status",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "publish",
+                            "help": "Which post status to include. Defaults to publish."
+                        },
+                        {
+                            "key": "include_excerpt",
+                            "label": "Include excerpt",
+                            "type": "select",
+                            "required": false,
+                            "default": "yes",
+                            "options": [
+                                {
+                                    "value": "yes",
+                                    "label": "Yes"
+                                },
+                                {
+                                    "value": "no",
+                                    "label": "No"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "include_content",
+                            "label": "Include body content",
+                            "type": "select",
+                            "required": false,
+                            "default": "yes",
+                            "options": [
+                                {
+                                    "value": "yes",
+                                    "label": "Yes"
+                                },
+                                {
+                                    "value": "no",
+                                    "label": "No"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "meta_keys",
+                            "label": "Custom fields (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "price, sku",
+                            "help": "Comma-separated meta keys to append to each entry (scalar values only)."
+                        },
+                        {
+                            "key": "taxonomies",
+                            "label": "Taxonomies (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "category, product_cat",
+                            "help": "Comma-separated taxonomies whose term names get appended to each entry."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Max Items (0 = all)",
+                            "type": "number",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "prune",
+                            "label": "Remove deleted items",
+                            "type": "select",
+                            "required": false,
+                            "default": "yes",
+                            "options": [
+                                {
+                                    "value": "yes",
+                                    "label": "Yes \u2014 mirror the source (full sync only)"
+                                },
+                                {
+                                    "value": "no",
+                                    "label": "No \u2014 only add/update"
+                                }
+                            ],
+                            "help": "When on (and syncing all items), removes synced entries whose source item no longer exists. Manual entries are never touched."
                         }
                     ],
                     "outputs": [

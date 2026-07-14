@@ -168,6 +168,8 @@ class McpController extends WP_REST_Controller {
 			'create_workflow_from_recipe' => 'tool_create_workflow_from_recipe',
 			'list_runs'                   => 'tool_list_runs',
 			'search_knowledge'            => 'tool_search_knowledge',
+			'list_businesses'             => 'tool_list_businesses',
+			'sync_content'                => 'tool_sync_content',
 		];
 
 		if ( ! isset( $map[ $name ] ) ) {
@@ -320,6 +322,43 @@ class McpController extends WP_REST_Controller {
 		];
 	}
 
+	private function tool_list_businesses( array $args ): array {
+		global $wpdb;
+		$t = \Zaplane\Models\Knowledge::getTable();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results( "SELECT business_key, COUNT(*) AS entries FROM {$t} GROUP BY business_key ORDER BY business_key ASC", ARRAY_A );
+		return [ 'businesses' => is_array( $rows ) ? $rows : [] ];
+	}
+
+	private function tool_sync_content( array $args ): array {
+		if ( ! class_exists( '\Zaplane\Integrations\Knowledge' ) ) {
+			throw new \Exception( 'Knowledge integration unavailable.' );
+		}
+		$business = (string) ( $args['business_key'] ?? '' );
+		if ( '' === trim( $business ) ) {
+			throw new \Exception( 'business_key is required.' );
+		}
+		$config = [
+			'post_type'   => (string) ( $args['post_type'] ?? '' ),
+			'post_status' => (string) ( $args['post_status'] ?? 'publish' ),
+			'meta_keys'   => (string) ( $args['meta_keys'] ?? '' ),
+			'taxonomies'  => (string) ( $args['taxonomies'] ?? '' ),
+			'limit'       => (int) ( $args['limit'] ?? 0 ),
+			'prune'       => isset( $args['prune'] ) && false === $args['prune'] ? 'no' : 'yes',
+		];
+		$res  = \Zaplane\Integrations\Knowledge::action_sync_content( $business, $config, [] );
+		$data = $res['data'] ?? [];
+		if ( empty( $data['success'] ) ) {
+			throw new \Exception( (string) ( $data['error'] ?? 'Sync failed.' ) );
+		}
+		return [
+			'success'   => true,
+			'synced'    => (int) ( $data['synced'] ?? 0 ),
+			'pruned'    => (int) ( $data['pruned'] ?? 0 ),
+			'post_type' => $data['post_type'] ?? $config['post_type'],
+		];
+	}
+
 	/* --------------------------- Tool schemas ----------------------------- */
 
 	private static function tool_defs(): array {
@@ -400,6 +439,45 @@ class McpController extends WP_REST_Controller {
 						'description' => 'Max results (default 5).'
 					],
 				], [ 'business_key', 'query' ] ),
+			],
+			[
+				'name'        => 'list_businesses',
+				'description' => 'List the business keys that have knowledge entries, with entry counts.',
+				'inputSchema' => $obj(),
+			],
+			[
+				'name'        => 'sync_content',
+				'description' => 'Sync a WordPress post type (posts, pages, products, or any CPT) into a business knowledge base. Each item becomes one entry.',
+				'inputSchema' => $obj( [
+					'business_key' => [
+						'type' => 'string',
+						'description' => 'Business key to sync into, e.g. business_a.'
+					],
+					'post_type'    => [
+						'type' => 'string',
+						'description' => 'Post type slug to sync, e.g. post, page, product.'
+					],
+					'post_status'  => [
+						'type' => 'string',
+						'description' => 'Status to include (default publish).'
+					],
+					'meta_keys'    => [
+						'type' => 'string',
+						'description' => 'Optional comma-separated custom field keys to append.'
+					],
+					'taxonomies'   => [
+						'type' => 'string',
+						'description' => 'Optional comma-separated taxonomies whose terms to append.'
+					],
+					'limit'        => [
+						'type' => 'integer',
+						'description' => 'Max items to sync (0 = all).'
+					],
+					'prune'        => [
+						'type' => 'boolean',
+						'description' => 'Remove synced entries whose source item no longer exists (full sync only). Default true.'
+					],
+				], [ 'business_key', 'post_type' ] ),
 			],
 		];
 	}

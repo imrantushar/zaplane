@@ -47,6 +47,22 @@ class KnowledgeController extends WP_REST_Controller {
 			],
 		] );
 
+		register_rest_route( $this->namespace, '/knowledge/post-types', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_post_types' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		] );
+
+		register_rest_route( $this->namespace, '/knowledge/sync-content', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'sync_content' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		] );
+
 		register_rest_route( $this->namespace, '/knowledge/sync-storeengine', [
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -134,6 +150,97 @@ class KnowledgeController extends WP_REST_Controller {
 		$keys = $wpdb->get_col( "SELECT business_key, COUNT(*) AS c FROM {$table} GROUP BY business_key ORDER BY business_key ASC" );
 
 		return rest_ensure_response( [ 'businesses' => array_values( array_filter( (array) $keys ) ) ] );
+	}
+
+	/**
+	 * Sync options for the admin drawer: the public post types (with their entry
+	 * counts and the taxonomies registered to each), plus the selectable post
+	 * statuses. Bundled into one response so the drawer needs a single fetch.
+	 */
+	public function get_post_types() {
+		$types = get_post_types( [ 'public' => true ], 'objects' );
+		$out   = [];
+		foreach ( $types as $slug => $obj ) {
+			if ( 'attachment' === $slug ) {
+				continue;
+			}
+			$counts = wp_count_posts( $slug );
+
+			$taxonomies = [];
+			foreach ( get_object_taxonomies( $slug, 'objects' ) as $tax_slug => $tax_obj ) {
+				// Include taxonomies with meaningful terms. `public` catches
+				// plugin-managed ones (e.g. StoreEngine product categories, which
+				// set show_ui=false because they render their own admin UI);
+				// show_ui catches standard editor taxonomies.
+				if ( empty( $tax_obj->public ) && empty( $tax_obj->show_ui ) ) {
+					continue;
+				}
+				$taxonomies[] = [
+					'slug'  => $tax_slug,
+					'label' => $tax_obj->labels->name ?? $tax_slug,
+				];
+			}
+
+			$out[] = [
+				'slug'       => $slug,
+				'label'      => $obj->labels->name ?? $slug,
+				'count'      => (int) ( $counts->publish ?? 0 ),
+				'taxonomies' => $taxonomies,
+			];
+		}
+
+		$statuses = [];
+		foreach ( get_post_stati( [], 'objects' ) as $status_value => $status_obj ) {
+			// Skip internal statuses (auto-draft, inherit, trash).
+			if ( ! empty( $status_obj->internal ) ) {
+				continue;
+			}
+			$statuses[] = [
+				'value' => $status_value,
+				'label' => $status_obj->label ?? $status_value,
+			];
+		}
+
+		return rest_ensure_response( [
+			'post_types' => $out,
+			'statuses'   => $statuses,
+		] );
+	}
+
+	/** Sync any post type into a business's knowledge (admin drawer). */
+	public function sync_content( $request ) {
+		$business = sanitize_text_field( (string) $request->get_param( 'business_key' ) );
+		if ( '' === $business ) {
+			return new WP_Error( 'invalid', 'business_key is required.', [ 'status' => 400 ] );
+		}
+
+		if ( ! class_exists( '\Zaplane\Integrations\Knowledge' ) ) {
+			return new WP_Error( 'unavailable', 'Knowledge integration unavailable.', [ 'status' => 500 ] );
+		}
+
+		$config = [
+			'post_type'       => (string) $request->get_param( 'post_type' ),
+			'post_status'     => (string) ( $request->get_param( 'post_status' ) ?: 'publish' ),
+			'include_excerpt' => 'no' === $request->get_param( 'include_excerpt' ) ? 'no' : 'yes',
+			'include_content' => 'no' === $request->get_param( 'include_content' ) ? 'no' : 'yes',
+			'meta_keys'       => (string) $request->get_param( 'meta_keys' ),
+			'taxonomies'      => (string) $request->get_param( 'taxonomies' ),
+			'limit'           => (int) $request->get_param( 'limit' ),
+			'prune'           => 'no' === $request->get_param( 'prune' ) ? 'no' : 'yes',
+		];
+
+		$result = \Zaplane\Integrations\Knowledge::action_sync_content( $business, $config, [] );
+
+		$data = $result['data'] ?? [];
+		if ( empty( $data['success'] ) ) {
+			return new WP_Error( 'sync_failed', $data['error'] ?? 'Sync failed.', [ 'status' => 422 ] );
+		}
+
+		return rest_ensure_response( [
+			'success' => true,
+			'synced'  => (int) ( $data['synced'] ?? 0 ),
+			'pruned'  => (int) ( $data['pruned'] ?? 0 ),
+		] );
 	}
 
 	/** Sync StoreEngine products into a business's knowledge (admin button). */
