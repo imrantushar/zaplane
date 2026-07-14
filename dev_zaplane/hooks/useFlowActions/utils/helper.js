@@ -51,12 +51,17 @@ export const createActionNode = ({
     // A "target" sub-handle (AI Agent tools/memory/model) places the new node
     // BELOW the anchor; everything else places it to the side/below as usual.
     const isSubInput = port?.type === "target";
-    // Spread stacked sub-nodes so a 2nd/3rd tool doesn't land on the first.
+    // Sub-nodes fan out into one column per port (model | memory | tools), so
+    // nodes wired to different ports never stack on each other; extra nodes on
+    // the same port (e.g. a 2nd tool) continue rightward along that column.
+    const SUB_COLUMN_GAP = 250;
+    const SUB_PORT_ORDER = ["ai_model", "ai_memory", "ai_tool"];
+    const subPortIndex = isSubInput ? Math.max(0, SUB_PORT_ORDER.indexOf(port.id)) : 0;
     const subCount = isSubInput
         ? edges.filter((e) => e.target === sourceNode.id && e.targetHandle === port.id).length
         : 0;
     const newX = isSubInput
-        ? sourceNode.position.x + subCount * 220
+        ? sourceNode.position.x + (subPortIndex - 1 + subCount) * SUB_COLUMN_GAP
         : (layoutLR ? sourceNode.position.x + LRGap : sourceNode.position.x);
     const newY = isSubInput
         ? sourceNode.position.y + 180

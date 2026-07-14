@@ -382,7 +382,7 @@ const KnowledgePage = () => {
                 isClearable
               />
             </div>
-            <Search placeholder={__("Search knowledge...", "zaplane")} onSearchHandler={setSearch} />
+            <Search placeholder={__("Search knowledge...", "zaplane")} onSearchHandler={setSearch} debounce={500} />
           </div>
         }
         showColumnFilter={false}
