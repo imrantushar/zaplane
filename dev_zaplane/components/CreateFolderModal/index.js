@@ -34,10 +34,6 @@ const CreateFolderModal = ({
         <ZAPDivider mt="24px" />
 
         <div className="flex mt-5 gap-3">
-          <button variant="outline" onClick={onClose} className="mr-3 px-4 py-2 border border-zaplane-border rounded text-sm">
-            {__("Cancel", "zaplane")}
-          </button>
-
           <button style={primaryBtn} onClick={handleCreate} disabled={!folderName.trim()}>
             {__("Create", "zaplane")}
           </button>

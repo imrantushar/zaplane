@@ -1,5 +1,5 @@
-export const HistoryIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="none">
+export const HistoryIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="none" {...props}>
         <path d="M4.86328 4.25391H9.72442" stroke="black" strokeWidth="0.911458" strokeLinecap="round" strokeLinejoin="round" />
         <path d="M4.86328 6.68457H7.29386" stroke="black" strokeWidth="0.911458" strokeLinecap="round" strokeLinejoin="round" />
         <path d="M6.56258 13.3695H3.64497C2.97305 13.3695 2.42864 12.8243 2.42969 12.1523L2.44486 2.4292C2.4459 1.75876 2.9897 1.21582 3.66013 1.21582H10.9348C11.6059 1.21582 12.15 1.75992 12.15 2.4311V7.65727" stroke="black" strokeWidth="0.911458" strokeLinecap="round" strokeLinejoin="round" />

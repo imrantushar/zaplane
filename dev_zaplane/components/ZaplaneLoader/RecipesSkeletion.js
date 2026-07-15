@@ -1,7 +1,7 @@
 import React from "react";
 
 const SkeletonBox = ({ className = "", style = {} }) => (
-  <div className={`bg-gray-200 rounded animate-pulse ${className}`} style={style} />
+  <div className={`bg-[var(--zaplane-secondary-color)] rounded animate-pulse ${className}`} style={style} />
 );
 
 const RecipesSkeleton = () => {

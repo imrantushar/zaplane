@@ -1,14 +1,15 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { menu, makeRequest } from '@ZAPUtils/helper';
+import { menu, API, namespace } from '@ZAPUtils/helper';
 import { showNotification } from '../notificationSlice/notificationSlice';
 
+// Refetch the feature-filtered admin menu so the SPA sidebar reflects a module
+// being toggled on/off without a full page reload.
 export const fetchAdminMenuItems = createAsyncThunk(
 	'Zaplane/fetchAdminMenuItems',
-	( thunkAPI ) => {
+	async ( _, thunkAPI ) => {
 		try {
-			return makeRequest( 'get_admin_menu_items' ).then( ( res ) => {
-				return JSON.parse( res?.data?.data );
-			} );
+			const res = await API.get( namespace + 'menu' );
+			return res.data;
 		} catch ( error ) {
 			thunkAPI.dispatch(
 				showNotification( {
@@ -17,6 +18,7 @@ export const fetchAdminMenuItems = createAsyncThunk(
 					type: 'error',
 				} )
 			);
+			return thunkAPI.rejectWithValue( error?.message );
 		}
 	}
 );
@@ -26,6 +28,11 @@ const menuSlice = createSlice( {
 	initialState: {
 		data: menu ? JSON.parse( menu ) : [],
 		loading: false,
+	},
+	reducers: {
+		setMenu: ( state, action ) => {
+			state.data = action.payload;
+		},
 	},
 	extraReducers: ( builder ) => {
 		builder
@@ -42,4 +49,5 @@ const menuSlice = createSlice( {
 	},
 } );
 
+export const { setMenu } = menuSlice.actions;
 export default menuSlice.reducer;

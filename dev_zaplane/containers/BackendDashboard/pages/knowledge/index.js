@@ -488,7 +488,7 @@ const KnowledgePage = () => {
                       type="button"
                       onClick={() => removeFaqRow(i)}
                       title={__("Remove", "zaplane")}
-                      className="text-red-600"
+                      className="text-[var(--zaplane-danger)]"
                       style={{ background: "transparent", border: "none", cursor: "pointer" }}
                     >
                       <FiX />

@@ -11,7 +11,7 @@ export default function WPModal( {
 	isOpen = false,
 	onRequestClose,
 	isFullScreen = false,
-	shouldCloseOnClickOutside = false,
+	shouldCloseOnClickOutside = true,
 	size = 'medium',
 } ) {
 	return (

@@ -1,7 +1,9 @@
 .zaplane-table {
-    background: #fff;
+    background: var(--zaplane-background);
     padding: 24px;
     border-radius: 4px;
+    border: 1px solid var(--zaplane-border-color);
+    box-shadow: none;
     &__sub-header {
         display: flex;
         justify-content: space-between;

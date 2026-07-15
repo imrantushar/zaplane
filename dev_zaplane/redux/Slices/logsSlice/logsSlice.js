@@ -37,11 +37,15 @@ export const getSingleRunDetails = createAsyncThunk(
 );
 export const getRunsList = createAsyncThunk(
 	'zaplane/getRunsList',
-	async ({ page = 1, per_page = 20 } = {}, thunkAPI) => {
+	async ({ page = 1, per_page = 20, status } = {}, thunkAPI) => {
 		try {
+			const params = { page, per_page };
+			if (status && status !== 'all') {
+				params.status = status;
+			}
 			const res = await API.get(
 				namespace + `runs`,{
-					params: { page, per_page },
+					params,
 				}
 			);
 			const { runs = [], ...pagination } = res.data;

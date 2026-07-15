@@ -12,7 +12,7 @@
     line-height: 20px;
     font-weight: 500;
     text-decoration: none;
-    background: #fff;
+    background: var(--zaplane-background);
     color: #444;
     cursor: pointer;
     text-align: center;
@@ -125,10 +125,10 @@
         }
     }
     &--preset-white {
-        background: #fff;
+        background: var(--zaplane-background);
         color: #000000;
         &:hover, &:focus {
-            background: #fff;
+            background: var(--zaplane-background);
             color: #000000;
         }
     }

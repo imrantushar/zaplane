@@ -109,6 +109,9 @@ final class Zaplane {
 	}
 
 	public function init_plugin(): void {
+		// Feature-toggle gating (hides disabled feature pages from menu + SPA).
+		\Zaplane\Settings::boot();
+
 		// Register user-defined Custom Apps into the integration registry before
 		// anything reads it (automation boot below, and later REST controllers).
 		\Zaplane\CustomApps\Loader::boot();

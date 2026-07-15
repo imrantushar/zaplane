@@ -102,7 +102,7 @@ const TestRun = ({
     return <>
         {!apiRequestRunning ? <button style={primaryBtn} onClick={handleListen} className="mb-4">
             {__("Test Trigger", "zaplane")}
-          </button> : <button onClick={handleStopListen} className="mb-4 flex items-center gap-2 h-9 px-4 bg-red-50 text-red-600 font-medium rounded-[4px] hover:bg-red-100 transition-all">
+          </button> : <button onClick={handleStopListen} className="mb-4 flex items-center gap-2 h-9 px-4 bg-red-50 text-[var(--zaplane-danger)] font-medium rounded-[4px] hover:bg-red-100 transition-all">
             {__("Stop Listening", "zaplane")}
           </button>}
 

@@ -15,15 +15,15 @@ const ZAPTable = ({
   noDataText = __('Please, create data to see the available list here.', 'zaplane')
 }) => {
   const colSpan = columns.length + (actionsRenderer ? 1 : 0);
-  return <div className="flex flex-col bg-white border border-[var(--zaplane-border-color)] rounded-lg overflow-hidden shadow-sm">
+  return <div className="flex flex-col bg-[var(--zaplane-background)] border border-[var(--zaplane-border-color)] rounded-lg overflow-hidden">
       <table className="min-w-full" style={{marginBottom: data.length > 0 ? "25px" : "0"}}>
         {caption && <caption>{caption}</caption>}
         <thead style={{background:'var(--zaplane-secondary-color)'}}>
           <tr>
-            {columns.map((col, i) => <th key={i} style={{textAlign: col.textAlign || "left", width: col.width}} className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 whitespace-nowrap">
+            {columns.map((col, i) => <th key={i} style={{textAlign: col.textAlign || "left", width: col.width}} className="px-4 py-3 text-xs font-medium text-[var(--zaplane-font-secondary-color)] uppercase tracking-wider border-b border-[var(--zaplane-border-color)] whitespace-nowrap">
                 {__(col.label, 'zaplane')}
               </th>)}
-            {actionsRenderer && <th style={{textAlign:'center'}} className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+            {actionsRenderer && <th style={{textAlign:'center'}} className="px-4 py-3 text-xs font-medium text-[var(--zaplane-font-secondary-color)] uppercase tracking-wider border-b border-[var(--zaplane-border-color)]">
                 {__('Actions', 'zaplane')}
               </th>}
           </tr>
@@ -37,7 +37,7 @@ const ZAPTable = ({
                 </div>
               </td>
             </tr>}
-          {!isLoading && Array.isArray(data) && data.map(row => <tr key={row[rowKey]} className="border-b border-gray-100 hover:bg-gray-50">
+          {!isLoading && Array.isArray(data) && data.map(row => <tr key={row[rowKey]} className="border-b border-[var(--zaplane-border-color)] hover:bg-[var(--zaplane-secondary-color)]">
                 {columns.map((col, i) => <td key={i} style={{textAlign: col.textAlign || "left"}} className="px-4 py-3 text-sm">
                     {col.render ? col.render(row) : row[col.key] || "--"}
                   </td>)}

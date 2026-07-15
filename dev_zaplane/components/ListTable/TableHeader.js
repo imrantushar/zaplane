@@ -17,10 +17,10 @@ const TableHeader = ({
 		<thead style={{ background: 'var(--zaplane-secondary-color)' }}>
 			<tr>
 				{isCheckboxColumnVisible && (
-					<th style={{ width: '40px' }} className="px-4 py-3 zaplane-label border-gray-200">
+					<th style={{ width: '40px' }} className="px-4 py-3 zaplane-label border-[var(--zaplane-border-color)]">
 						<input 
 							type="checkbox" 
-							className="h-4 w-4 rounded border-gray-300"
+							className="h-4 w-4 rounded border-[var(--zaplane-border-color)]"
 							checked={isCheckboxChecked}
 							onChange={(e) => selectAllRow(e.target.checked)}
 						/>	
@@ -35,7 +35,7 @@ const TableHeader = ({
 							textAlign: column?.textAlign || 'center',
 							whiteSpace: 'nowrap',
 						}}
-						className="px-4 py-3  border-b zaplane-label"
+						className="px-4 py-3 zaplane-label"
 					>
 						{column?.name}
 					</th>

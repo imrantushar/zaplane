@@ -95,10 +95,7 @@ const SaveAsRecipeModal = ({
         {/* Folder Tree */}
 
         {/* Actions */}
-        <div className="flex justify-end gap-3">
-          <button style={{border:'1px solid var(--zaplane-border-color)', background:'transparent', cursor:'pointer', padding:'6px 12px', borderRadius:'4px'}} onClick={onClose}>
-            {__("Cancel", "zaplane")}
-          </button>
+        <div className="flex gap-3">
           <button style={primaryBtn} onClick={handleSave} disabled={!title.trim() || creating}>
             {__("Create Recipe", "zaplane")}
           </button>

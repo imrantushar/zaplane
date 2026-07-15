@@ -13,8 +13,8 @@ const ZAPMenu = ({
   menuPlacement = "bottom"
 }) => {
   const menuClassName = menuPlacement === "top"
-    ? "absolute right-0 bottom-full mb-2 z-[99999] w-56 origin-bottom-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
-    : "absolute right-0 mt-2 z-[99999] w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0";
+    ? "absolute right-0 bottom-full mb-2 z-[99999] w-56 origin-bottom-right rounded-md bg-[var(--zaplane-background)] shadow-lg ring-1 ring-black/5 focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
+    : "absolute right-0 mt-2 z-[99999] w-56 origin-top-right rounded-md bg-[var(--zaplane-background)] shadow-lg ring-1 ring-black/5 focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0";
 
   return (
     <Menu as="div" className="relative inline-block text-left">
@@ -28,7 +28,7 @@ const ZAPMenu = ({
             <BsThreeDotsVertical />
           </button>
         ) : (
-          <button className="px-4 py-2 border rounded-md hover:bg-gray-50">
+          <button className="px-4 py-2 border rounded-md hover:bg-[var(--zaplane-secondary-color)]">
             {__(triggerLabel, "zaplane")}
           </button>
         ))}
@@ -41,7 +41,7 @@ const ZAPMenu = ({
         <div className="py-1">
           {items.map((item, index) => {
             if (item.type === "divider") {
-              return <div key={index} className="my-1 border-t border-gray-200" />;
+              return <div key={index} className="my-1 border-t border-[var(--zaplane-border-color)]" />;
             }
             const Icon = item.icon;
             return (
@@ -53,10 +53,10 @@ const ZAPMenu = ({
                       item.onClick(e);
                     }}
                     className={`${
-                      focus ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+                      focus ? 'bg-[var(--zaplane-secondary-color)] text-[var(--zaplane-font-color)]' : 'text-[var(--zaplane-font-color)]'
                     } group flex w-full items-center px-4 py-2 text-sm whitespace-nowrap`}
                   >
-                    {Icon && <Icon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" aria-hidden="true" />}
+                    {Icon && <Icon className="mr-3 h-5 w-5 text-[var(--zaplane-text-muted)] group-hover:text-[var(--zaplane-font-secondary-color)]" aria-hidden="true" />}
                     {sprintf(__("%s", "zaplane"), item.label)}
                   </button>
                 )}

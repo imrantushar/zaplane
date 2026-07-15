@@ -32,13 +32,13 @@ const CopyInput = ({ label, value, help }) => {
         <button
           type="button"
           onClick={handleCopy}
-          className="px-3 bg-white !border-y-0 !border-r-0 !border-l border-solid border-slate-200 cursor-pointer flex items-center justify-center hover:bg-slate-50 transition-colors"
+          className="px-3 bg-[var(--zaplane-background)] !border-y-0 !border-r-0 !border-l border-solid border-[var(--zaplane-border-color)] cursor-pointer flex items-center justify-center hover:bg-[var(--zaplane-secondary-color)] transition-colors"
           title={__("Copy to clipboard", "zaplane")}
         >
-          <Copy size={16} className="text-slate-500" />
+          <Copy size={16} className="text-[var(--zaplane-font-secondary-color)]" />
         </button>
       </div>
-      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+      {help && <p className="text-[var(--zaplane-font-secondary-color)] text-xs mt-1">{help}</p>}
     </div>
   );
 };

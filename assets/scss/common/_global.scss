@@ -1,5 +1,5 @@
 :root {
-    --zaplane-font: "Roboto", sans-serif;
+    --zaplane-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
     --zaplane-primary: #006BFF;
     --zaplane-second-primary: #DAEAFF;
     --zaplane-secondary: #f5f5f5;
@@ -12,7 +12,12 @@
     --zaplane-text-muted: #738496;
     --zaplane-danger: #e44a3f;
     --zaplane-warning: #FDB022;
+    --zaplane-success: #16A34A;
     --zaplane-placeholder: #A2ADB9;
+    // Aliases for a few legacy references in component styles. Resolved lazily,
+    // so they follow the active (light/dark) values of the vars they point at.
+    --zaplane-primary-color: var(--zaplane-primary);
+    --zaplane-gray-color: var(--zaplane-font-secondary-color);
     --zaplane-shadow: 0 0 1px 0 rgba(212, 212, 216, 0.30) inset, 0 8px 16px 0 rgba(24, 24, 27, 0.10);
     --zaplane-shadow-2: 0 0 1px 0 rgba(20, 26, 36, 0.20), 0 1px 2px 0 rgba(20, 26, 36, 0.10);
     --zaplane-gray: #F6F7F8;
@@ -64,8 +69,8 @@
     font-size: 14px;
     .zaplane-select {
         &__control {
-            border: 1px solid #CBD1D7;
-            background: #FFF;
+            border: 1px solid var(--zaplane-border-color);
+            background: var(--zaplane-background);
             border-radius: 4px;
             box-shadow: none;
             .zaplane-select__input-container {
@@ -77,11 +82,11 @@
             }
         }
           &__control:hover{
-        border:1px solid #CBD1D7;
+        border:1px solid var(--zaplane-border-color);
        }
 
         &__menu {
-            background: #fff;
+            background: var(--zaplane-background);
             min-width: 100%;
             box-shadow: 0 0 1px 0 rgba(20, 26, 36, 0.30), 0 8px 16px 0 rgba(20, 26, 36, 0.10);
         }
@@ -129,6 +134,25 @@
 
         &__single-value {
             color: var(--zaplane-font-secondary-color);
+        }
+
+        // Typed text + placeholder + indicators must theme too (react-select
+        // renders these with hardcoded near-black inline colors otherwise).
+        &__input-container {
+            color: var(--zaplane-font-color) !important;
+        }
+
+        &__input input {
+            background: transparent !important;
+            color: var(--zaplane-font-color) !important;
+        }
+
+        &__placeholder {
+            color: var(--zaplane-placeholder);
+        }
+
+        &__indicator {
+            color: var(--zaplane-text-muted);
         }
     }
 
@@ -278,6 +302,47 @@ input.zaplane-checkbox:hover {
 .zaplane-textarea {
     font-weight: 400;
     color: var(--zaplane-font-secondary-color);
+}
+
+// ── Themed form controls (dark-mode-aware) ────────────────────────────────
+// Any input/select/textarea inside a Zaplane surface — the main app AND portaled
+// modals/drawers (which re-apply `.zaplane-scope`) — must use themed colors so
+// they don't fall back to WordPress admin core's hardcoded white. `!important`
+// beats WP core's id-scoped form rules.
+.zaplane-scope {
+    .zaplane-input,
+    .zaplane-textarea,
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    input[type="number"],
+    input[type="search"],
+    input[type="password"],
+    input[type="tel"],
+    textarea,
+    select {
+        background-color: var(--zaplane-background) !important;
+        color: var(--zaplane-font-color);
+        border-color: var(--zaplane-border-color);
+
+        &::placeholder {
+            color: var(--zaplane-placeholder);
+        }
+    }
+
+    // Styled checkbox/radio: themed fill for the unchecked state (the :checked
+    // rules above set the primary fill and win on specificity).
+    input.zaplane-checkbox,
+    .zaplane-radio-input {
+        background-color: var(--zaplane-background);
+    }
+
+    // Native (unstyled) checkboxes/radios — e.g. the table select-all box.
+    input[type="checkbox"]:not(.zaplane-checkbox),
+    input[type="radio"]:not(.zaplane-radio-input) {
+        background: var(--zaplane-background) !important;
+        border-color: var(--zaplane-border-color) !important;
+    }
 }
 
 @media (max-width: 768px) {

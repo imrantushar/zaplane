@@ -50,7 +50,7 @@
             min-width: 175px;
             z-index: 99999;
             border-radius: 4px;
-            background: #fff;
+            background: var(--zaplane-background);
             margin: 0;
             padding: 5px;
             border-width: 1px;
@@ -61,7 +61,7 @@
             &__item{
                 display: flex;
                 color: var(--zaplane-font-color);
-                background: #fff;
+                background: var(--zaplane-background);
                 font-size: 12px;
                 font-weight: 500;
                 border: none;
