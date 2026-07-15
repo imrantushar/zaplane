@@ -97,9 +97,9 @@ trait InactiveCustomerCronTrait {
 					$automation->run_workflow( $workflow_id, $payload );
 
 					self::mark_inactive_triggered( $user_id, $email, $workflow_id );
-				}
-			}
-		}
+				}//end foreach
+			}//end foreach
+		}//end foreach
 	}
 
 	/**
@@ -141,7 +141,10 @@ trait InactiveCustomerCronTrait {
 			return;
 		}
 
-		$existing   = \GemCrm\Database\Models\Contact::index( [ 'email' => $email, 'per_page' => 1 ], null );
+		$existing   = \GemCrm\Database\Models\Contact::index( [
+			'email' => $email,
+			'per_page' => 1
+		], null );
 		$contact_id = (int) ( $existing['records'][0]['id'] ?? 0 );
 		if ( ! $contact_id ) {
 			return;
@@ -165,7 +168,7 @@ trait InactiveCustomerCronTrait {
 			'paginate'     => false,
 			'type'         => 'shop_order',
 		] );
-		
+
 		if ( empty( $orders ) ) {
 			return [];
 		}
@@ -208,7 +211,7 @@ trait InactiveCustomerCronTrait {
 					? $order->get_date_created()->date( 'Y-m-d' )
 					: '',
 			];
-		}
+		}//end foreach
 
 		return $result;
 	}
@@ -247,7 +250,10 @@ trait InactiveCustomerCronTrait {
 			return 0;
 		}
 
-		$existing = \GemCrm\Database\Models\Contact::index( [ 'email' => $email, 'per_page' => 1 ], null );
+		$existing = \GemCrm\Database\Models\Contact::index( [
+			'email' => $email,
+			'per_page' => 1
+		], null );
 		$contact  = $existing['records'][0] ?? null;
 
 		if ( $contact ) {

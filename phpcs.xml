@@ -78,6 +78,12 @@
     </rule>
 
 	<rule ref="WordPress-Extra">
+		<!-- Capital_P_Dangit auto-"corrects" the string "wordpress" to "WordPress"
+		     even inside code literals (slugs, provider values, icon filenames),
+		     which silently breaks logic. Never let phpcbf rewrite these. -->
+		<exclude name="WordPress.WP.CapitalPDangit.MisspelledInText" />
+		<exclude name="WordPress.WP.CapitalPDangit.MisspelledInComment" />
+		<exclude name="WordPress.WP.CapitalPDangit" />
 		<exclude name="Generic.Commenting.DocComment.MissingShort" />
 		<exclude name="Generic.Formatting.MultipleStatementAlignment" />
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax.Found" />

@@ -197,7 +197,7 @@ class RecipeRunner {
 			return $result->skip( $e->getMessage() );
 		} catch ( \Throwable $e ) {
 			$result->abort( 'Run error: ' . $e->getMessage() );
-		}
+		}//end try
 
 		return $result->finalize();
 	}

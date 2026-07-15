@@ -41,7 +41,7 @@ class Gmail extends IntegrationBase {
 		$compose_fields = [
 			[
 				'key'         => 'to',
-				'type'        => 'text',
+				'type'        => 'email',
 				'label'       => 'To',
 				'placeholder' => 'recipient@example.com',
 				'required'    => true,
@@ -49,7 +49,7 @@ class Gmail extends IntegrationBase {
 			],
 			[
 				'key'         => 'cc',
-				'type'        => 'text',
+				'type'        => 'email',
 				'label'       => 'CC',
 				'placeholder' => 'cc@example.com',
 				'required'    => false,
@@ -81,8 +81,14 @@ class Gmail extends IntegrationBase {
 				'label'    => 'Content Type',
 				'required' => false,
 				'options'  => [
-					[ 'value' => 'text/plain', 'label' => 'Plain Text' ],
-					[ 'value' => 'text/html',  'label' => 'HTML' ],
+					[
+						'value' => 'text/plain',
+						'label' => 'Plain Text'
+					],
+					[
+						'value' => 'text/html',
+						'label' => 'HTML'
+					],
 				],
 			],
 		];
@@ -113,7 +119,7 @@ class Gmail extends IntegrationBase {
 					],
 				]
 			);
-		}
+		}//end if
 
 		if ( 'create_draft' === $action ) {
 			return $compose_fields;

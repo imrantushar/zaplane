@@ -3,7 +3,7 @@
  * Plugin Name:     Zaplane
  * Plugin URI:      https://zaplane.app/
  * Description:     WordPress Automation Plugin
- * Version:         1.0.2
+ * Version:         1.1.0
  * Author:          kodezen
  * Author URI:      https://kodezen.com
  * License:         GPL-3.0+
@@ -19,11 +19,6 @@ use Zaplane\Framework\Classes\OAuthHandler;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Core\ModuleManager;
-use Zaplane\Database\Seeders\BirthdayRecipeSeeder;
-use Zaplane\Database\Seeders\InactiveCustomerRecipeSeeder;
-use Zaplane\Database\Seeders\OrderCompleteFeedbackRecipeSeeder;
-use Zaplane\Database\Seeders\PostPurchaseUpsellRecipeSeeder;
-use Zaplane\Database\Seeders\ProductRecommendationRecipeSeeder;
 use Zaplane\Integrations\Gemcrm;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -61,7 +56,7 @@ final class Zaplane {
 	}
 
 	public function define_constants(): void {
-		define( 'ZAPLANE_VERSION', '1.0.2' );
+		define( 'ZAPLANE_VERSION', '1.1.0' );
 		define( 'ZAPLANE_ALLOW_LOGS', true );
 		define( 'ZAPLANE_PLUGIN_SLUG', 'zaplane' );
 		define( 'ZAPLANE_PLUGIN_FILE', __FILE__ );
@@ -114,6 +109,11 @@ final class Zaplane {
 	}
 
 	public function init_plugin(): void {
+		// Register user-defined Custom Apps into the integration registry before
+		// anything reads it (automation boot below, and later REST controllers).
+		\Zaplane\CustomApps\Loader::boot();
+		\Zaplane\CustomApps\Poller::boot();
+
 		// Initialize modules first
 		$modules = $this->container->get( 'modules' );
 		$modules->boot();
@@ -121,11 +121,15 @@ final class Zaplane {
 		$automation = $this->container->get( 'automation' );
 		$automation->boot();
 
-		( new BirthdayRecipeSeeder() )->run();
-		( new InactiveCustomerRecipeSeeder() )->run();
-		( new OrderCompleteFeedbackRecipeSeeder() )->run();
-		( new PostPurchaseUpsellRecipeSeeder() )->run();
-		( new ProductRecommendationRecipeSeeder() )->run();
+		( new \Zaplane\Scheduler\Scheduler() )->boot();
+
+		// Run migrations + recipe seeding once per version, not on every request.
+		// Activation covers fresh installs; this covers plugin updates (where the
+		// activation hook doesn't fire). Previously the seeders ran unconditionally
+		// on every page load, REST call and cron tick — five SELECTs of pure waste.
+		if ( version_compare( (string) get_option( 'zaplane_db_version', '0.0.0' ), ZAPLANE_VERSION, '<' ) ) {
+			\Zaplane\Installer::init()->run();
+		}
 
 		do_action( 'zaplane_init' );
 	}
@@ -133,6 +137,7 @@ final class Zaplane {
 	public function deactivate_plugin(): void {
 		Gemcrm::unschedule_birthday_cron();
 		\Zaplane\Integrations\Woocommerce::unschedule_inactive_customer_cron();
+		\Zaplane\CustomApps\Poller::unschedule();
 	}
 }
 

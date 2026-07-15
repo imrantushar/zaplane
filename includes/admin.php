@@ -48,7 +48,7 @@ class Admin implements ModuleInterface {
 			$this->assets = new Assets();
 			$this->assets->register();
 		}
-		if( ! $this->updater ) {
+		if ( ! $this->updater ) {
 			$this->updater = new Updater();
 			$this->updater->register();
 		}

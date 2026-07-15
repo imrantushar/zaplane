@@ -18,5 +18,7 @@ return [
 		'node_runs' => $wpdb->prefix . 'zaplane_node_runs',
 
 		'connections' => $wpdb->prefix . 'zaplane_connections',
+		'conversations' => $wpdb->prefix . 'zaplane_conversations',
+		'knowledge' => $wpdb->prefix . 'zaplane_knowledge',
 	],
 ];

@@ -104,7 +104,11 @@ class Wordpress extends IntegrationBase {
 				return [ $user_id ];                               // user_register( $id )
 
 			case 'comment_post':
-				$post_id    = wp_insert_post( [ 'post_title' => 'Recipe Post', 'post_status' => 'publish', 'post_type' => 'post' ] );
+				$post_id    = wp_insert_post( [
+					'post_title' => 'Recipe Post',
+					'post_status' => 'publish',
+					'post_type' => 'post'
+				] );
 				$comment_id = wp_insert_comment(
 					[
 						'comment_post_ID'      => $post_id,
@@ -123,7 +127,7 @@ class Wordpress extends IntegrationBase {
 					return null;
 				}
 				return [ $term['term_id'], $term['term_taxonomy_id'], 'category' ]; // create_term( $term_id, $tt_id, $taxonomy )
-		}
+		}//end switch
 
 		return null;
 	}
@@ -409,6 +413,299 @@ class Wordpress extends IntegrationBase {
 		];
 	}
 
+	/**
+	 * Realistic sample payloads for the "@" variable picker.
+	 *
+	 * Every trigger returned by get_triggers() must yield a non-empty array so
+	 * fields can be mapped before a live capture. Field keys mirror the shapes
+	 * resolve_trigger() actually emits (Post/User/Comment/term toArray columns
+	 * plus the extra keys merged per event). Explicit samples come first, then
+	 * category fallbacks by event group keep any unlisted trigger non-empty.
+	 */
+	public static function get_trigger_sample_output( string $event ): array {
+		// Shared base payloads reused across the category samples/fallbacks.
+		$post_sample = [
+			'ID'             => 101,
+			'post_author'    => 1,
+			'post_date'      => '2024-01-01 10:00:00',
+			'post_date_gmt'  => '2024-01-01 10:00:00',
+			'post_content'   => 'Post body content.',
+			'post_title'     => 'Sample Post',
+			'post_excerpt'   => 'Sample excerpt.',
+			'post_status'    => 'publish',
+			'comment_status' => 'open',
+			'ping_status'    => 'open',
+			'post_name'      => 'sample-post',
+			'post_modified'  => '2024-01-01 10:00:00',
+			'post_parent'    => 0,
+			'guid'           => 'https://example.com/?p=101',
+			'menu_order'     => 0,
+			'post_type'      => 'post',
+			'post_mime_type' => '',
+			'comment_count'  => 0,
+		];
+
+		$media_sample = array_merge( $post_sample, [
+			'ID'             => 202,
+			'post_title'     => 'Sample Image',
+			'post_name'      => 'sample-image',
+			'post_status'    => 'inherit',
+			'post_type'      => 'attachment',
+			'post_mime_type' => 'image/png',
+			'guid'           => 'https://example.com/wp-content/uploads/sample-image.png',
+			'url'            => 'https://example.com/wp-content/uploads/sample-image.png',
+			'user_id'        => 1,
+			'time'           => '2024-01-01 10:00:00',
+		] );
+
+		$user_sample = [
+			'ID'              => 5,
+			'user_login'      => 'johndoe',
+			'user_nicename'   => 'johndoe',
+			'user_email'      => 'john@example.com',
+			'user_url'        => 'https://example.com',
+			'user_registered' => '2024-01-01 10:00:00',
+			'user_status'     => 0,
+			'display_name'    => 'John Doe',
+		];
+
+		$comment_sample = [
+			'comment_ID'           => 55,
+			'comment_post_ID'      => 101,
+			'comment_author'       => 'Jane Reader',
+			'comment_author_email' => 'jane@example.com',
+			'comment_author_url'   => 'https://example.com',
+			'comment_author_IP'    => '127.0.0.1',
+			'comment_date'         => '2024-01-01 10:00:00',
+			'comment_date_gmt'     => '2024-01-01 10:00:00',
+			'comment_content'      => 'Great post!',
+			'comment_karma'        => 0,
+			'comment_approved'     => '1',
+			'comment_agent'        => 'Mozilla/5.0',
+			'comment_type'         => 'comment',
+			'comment_parent'       => 0,
+			'user_id'              => 5,
+		];
+
+		$term_sample = [
+			'term_id'          => 3,
+			'term_taxonomy_id' => 3,
+			'taxonomy'         => 'category',
+			'name'             => 'News',
+			'slug'             => 'news',
+			'description'      => 'News category.',
+			'parent'           => 0,
+			'count'            => 12,
+		];
+
+		$option_sample = [
+			'option_name' => 'blogname',
+			'value'       => 'My Site',
+		];
+
+		$blog_sample = [
+			'blog_id'    => 2,
+			'blog_url'   => 'https://example.com/site2',
+			'blog_name'  => 'Second Site',
+		];
+
+		// Explicit samples: events whose payload has extra/merged keys.
+		$samples = [
+			// Posts.
+			'transition_post_status' => array_merge( $post_sample, [
+				'old_status' => 'draft',
+				'new_status' => 'publish',
+			] ),
+			'wp_insert_post'         => array_merge( $post_sample, [
+				'post_type'   => 'revision',
+				'revision_id' => 102,
+				'parent'      => $post_sample,
+			] ),
+			'wp_after_insert_post'   => array_merge( $post_sample, [ 'is_update' => true ] ),
+
+			// Media / attachments.
+			'save_attachment'     => array_merge( $media_sample, [ 'fields' => [] ] ),
+			'attachment_metadata' => array_merge( $media_sample, [
+				'metadata' => [
+					'width'  => 1200,
+					'height' => 800,
+					'file'   => '2024/01/sample-image.png',
+				],
+			] ),
+			'attachment_count'    => [
+				'post_type' => 'attachment',
+				'counts'    => [ 'image/png' => 5 ],
+				'time'      => '2024-01-01 10:00:00',
+			],
+			'delete_attachment'   => [
+				'attachment_id' => 202,
+				'user_id'       => 1,
+				'time'          => '2024-01-01 10:00:00',
+			],
+			'media_upload_tabs'   => [
+				'tabs'         => [
+					'type' => 'From Computer',
+					'library' => 'Media Library'
+				],
+				'tabs_keys'    => [ 'type', 'library' ],
+				'count'        => 2,
+				'triggered_at' => '2024-01-01 10:00:00',
+			],
+			'image_sizes'         => [
+				'sizes'      => [
+					'thumbnail' => 'Thumbnail',
+					'medium' => 'Medium'
+				],
+				'sizes_keys' => [ 'thumbnail', 'medium' ],
+				'count'      => 2,
+				'time'       => '2024-01-01 10:00:00',
+			],
+
+			// Users.
+			'wp_login'                    => array_merge( $user_sample, [ 'roles' => [ 'subscriber' ] ] ),
+			'validate_reset'              => array_merge( $user_sample, [ 'roles' => [ 'subscriber' ] ] ),
+			'wp_login_failed'             => [
+				'username' => 'johndoe',
+				'failed'   => true,
+			],
+			'wp_authenticate'             => [
+				'username' => 'johndoe',
+				'password' => '',
+			],
+			'create_application_password' => array_merge( $user_sample, [
+				'new_password' => 'abcd 1234 efgh 5678',
+				'time'         => '2024-01-01 10:00:00',
+			] ),
+			'update_application_password' => array_merge( $user_sample, [
+				'item_name' => 'My App',
+				'item_id'   => '0b7f1e8a-1234-5678-9abc-def012345678',
+				'time'      => '2024-01-01 10:00:00',
+			] ),
+			'delete_application_password' => array_merge( $user_sample, [
+				'uuid' => '0b7f1e8a-1234-5678-9abc-def012345678',
+			] ),
+
+			// Comments.
+			'transition_comment_status' => array_merge( $comment_sample, [
+				'old_status' => 'hold',
+				'new_status' => 'approve',
+			] ),
+			'pre_comment_approved'      => [
+				'approved'   => 1,
+				'comment_id' => 55,
+			],
+
+			// Plugins / themes.
+			'activated_plugin'  => [ 'plugin' => 'akismet/akismet.php' ],
+			'deactivate_plugin' => [ 'plugin' => 'akismet/akismet.php' ],
+			'switch_theme'      => [ 'theme' => 'Twenty Twenty-Four' ],
+
+			// Options.
+			'add_option'    => $option_sample,
+			'update_option' => $option_sample,
+			'delete_option' => $option_sample,
+
+			// System / multisite.
+			'upgrader_process_complete' => [
+				'action' => 'update',
+				'type'   => 'plugin',
+			],
+			'generate_rewrite_rules'    => [ 'event' => 'generate_rewrite_rules' ],
+			'switch_blog'               => $blog_sample,
+			'customize_register'        => [
+				'message' => 'Customize Registration',
+				'time'    => '2024-01-01 10:00:00',
+			],
+			'rest_api_init'             => [ 'time' => '2024-01-01 10:00:00' ],
+			'update_blog_public'        => [
+				'blog_id'   => 2,
+				'is_public' => 1,
+			],
+			'update_blog_status'        => [
+				'blog_id'    => 2,
+				'new_status' => 1,
+				'old_status' => 0,
+			],
+			'wpmu_new_blog'             => [
+				'blog_id' => 2,
+				'user_id' => 1,
+				'domain'  => 'example.com',
+				'path'    => '/site2/',
+				'site_id' => 1,
+				'meta'    => [],
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		// Category fallbacks by event group so every trigger stays non-empty and
+		// exposes the field shape resolve_trigger() emits before a live capture.
+		$post_events = [
+			'publish_post',
+			'post_updated',
+			'wp_trash_post',
+			'untrashed_post',
+			'delete_post',
+			'deleted_post',
+			'save_post',
+			'post_revision',
+		];
+		if ( in_array( $event, $post_events, true ) || 0 === strpos( $event, 'post_' ) ) {
+			return $post_sample;
+		}
+
+		if ( false !== strpos( $event, 'attachment' ) || 0 === strpos( $event, 'media' )
+			|| 0 === strpos( $event, 'image' ) ) {
+			return $media_sample;
+		}
+
+		$user_events = [
+			'user_register',
+			'set_user_role',
+			'add_user_role',
+			'profile_update',
+			'wp_update_user',
+			'remove_user_from_blog',
+			'delete_user',
+			'wpmu_delete_user',
+			'wpmu_new_user',
+			'wpmu_activate_user',
+			'wp_logout',
+		];
+		if ( in_array( $event, $user_events, true ) || 0 === strpos( $event, 'user_' )
+			|| false !== strpos( $event, 'application_password' ) ) {
+			return $user_sample;
+		}
+
+		if ( 0 === strpos( $event, 'comment' ) || false !== strpos( $event, '_comment' ) ) {
+			return $comment_sample;
+		}
+
+		if ( false !== strpos( $event, 'term' ) ) {
+			return $term_sample;
+		}
+
+		if ( false !== strpos( $event, 'option' ) ) {
+			return $option_sample;
+		}
+
+		if ( false !== strpos( $event, 'plugin' ) ) {
+			return [ 'plugin' => 'akismet/akismet.php' ];
+		}
+
+		if ( false !== strpos( $event, 'theme' ) ) {
+			return [ 'theme' => 'Twenty Twenty-Four' ];
+		}
+
+		if ( false !== strpos( $event, 'blog' ) ) {
+			return $blog_sample;
+		}
+
+		return [ 'time' => '2024-01-01 10:00:00' ];
+	}
+
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( 'publish_post' === $trigger ) {
 			return [
@@ -429,8 +726,14 @@ class Wordpress extends IntegrationBase {
 					'type'  => 'select',
 					'required' => true,
 					'options' => [
-						['label' => 'Publish', 'value' => 'publish'],
-						['label' => 'Draft', 'value' => 'draft'],
+						[
+							'label' => 'Publish',
+							'value' => 'publish'
+						],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
 					]
 				]
 			];
@@ -457,7 +760,7 @@ class Wordpress extends IntegrationBase {
 						'integration' => 'wordpress',
 						'query'       => 'posts',
 						'select'      => [ 'name', 'label' ],
-						'depends_on'  => ['post_type'],
+						'depends_on'  => [ 'post_type' ],
 					],
 					'required' => true,
 				],
@@ -467,8 +770,14 @@ class Wordpress extends IntegrationBase {
 					'type'  => 'select',
 					'required' => true,
 					'options' => [
-						['label' => 'Publish', 'value' => 'publish'],
-						['label' => 'Draft', 'value' => 'draft'],
+						[
+							'label' => 'Publish',
+							'value' => 'publish'
+						],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
 					]
 				]
 			];
@@ -1694,11 +2003,26 @@ class Wordpress extends IntegrationBase {
 					'required'    => true,
 					'placeholder' => 'any post status',
 					'options'     => [
-						[ 'label' => 'Draft',   'value' => 'draft' ],
-						[ 'label' => 'Publish', 'value' => 'publish' ],
-						[ 'label' => 'Pending', 'value' => 'pending' ],
-						[ 'label' => 'Private', 'value' => 'private' ],
-						[ 'label' => 'Future',  'value' => 'future' ],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
+						[
+							'label' => 'Publish',
+							'value' => 'publish'
+						],
+						[
+							'label' => 'Pending',
+							'value' => 'pending'
+						],
+						[
+							'label' => 'Private',
+							'value' => 'private'
+						],
+						[
+							'label' => 'Future',
+							'value' => 'future'
+						],
 					],
 				],
 				[
@@ -1803,6 +2127,7 @@ class Wordpress extends IntegrationBase {
 						'integration' => 'wordpress',
 						'query'       => 'taxonomy_terms',
 						'select'      => [ 'name', 'label' ],
+						'depends_on'  => [ 'taxonomy' ],
 					],
 				],
 				[
@@ -1810,8 +2135,18 @@ class Wordpress extends IntegrationBase {
 					'label'  => 'Post Custom Field Map',
 					'type'   => 'map',
 					'fields' => [
-						[ 'key' => 'key',   'label' => 'Key',   'type' => 'expression', 'required' => true ],
-						[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression', 'required' => true ],
+						[
+							'key' => 'key',
+							'label' => 'Key',
+							'type' => 'expression',
+							'required' => true
+						],
+						[
+							'key' => 'value',
+							'label' => 'Value',
+							'type' => 'expression',
+							'required' => true
+						],
 					],
 				],
 			],
@@ -1843,11 +2178,26 @@ class Wordpress extends IntegrationBase {
 					'required'    => true,
 					'placeholder' => 'any post status',
 					'options'     => [
-						[ 'label' => 'Draft',   'value' => 'draft' ],
-						[ 'label' => 'Publish', 'value' => 'publish' ],
-						[ 'label' => 'Pending', 'value' => 'pending' ],
-						[ 'label' => 'Private', 'value' => 'private' ],
-						[ 'label' => 'Future',  'value' => 'future' ],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
+						[
+							'label' => 'Publish',
+							'value' => 'publish'
+						],
+						[
+							'label' => 'Pending',
+							'value' => 'pending'
+						],
+						[
+							'label' => 'Private',
+							'value' => 'private'
+						],
+						[
+							'label' => 'Future',
+							'value' => 'future'
+						],
 					],
 				],
 				[
@@ -1952,6 +2302,7 @@ class Wordpress extends IntegrationBase {
 						'integration' => 'wordpress',
 						'query'       => 'taxonomy_terms',
 						'select'      => [ 'name', 'label' ],
+						'depends_on'  => [ 'taxonomy' ],
 					],
 				],
 				[
@@ -1959,8 +2310,18 @@ class Wordpress extends IntegrationBase {
 					'label'  => 'Post Custom Field Map',
 					'type'   => 'map',
 					'fields' => [
-						[ 'key' => 'key',   'label' => 'Key',   'type' => 'expression', 'required' => true ],
-						[ 'key' => 'value', 'label' => 'Value', 'type' => 'expression', 'required' => true ],
+						[
+							'key' => 'key',
+							'label' => 'Key',
+							'type' => 'expression',
+							'required' => true
+						],
+						[
+							'key' => 'value',
+							'label' => 'Value',
+							'type' => 'expression',
+							'required' => true
+						],
 					],
 				],
 			],
@@ -3065,6 +3426,8 @@ class Wordpress extends IntegrationBase {
 			'users_with_any' => [ self::class, 'query_users_with_any' ],
 			'taxonomies' => [ self::class, 'query_taxonomies' ],
 			'categories' => [ self::class, 'query_categories' ],
+			'tags'       => [ self::class, 'query_tags' ],
+			'taxonomy_terms' => [ self::class, 'query_taxonomy_terms' ],
 			'roles'      => [ self::class, 'query_roles' ],
 			'caps'       => [ self::class, 'query_caps' ],
 			'active_plugins'    => [ self::class, 'query_active_plugins' ],

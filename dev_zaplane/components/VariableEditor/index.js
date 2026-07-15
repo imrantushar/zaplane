@@ -59,16 +59,28 @@ const VariableEditor = ({
     }
     const text = editor.textContent.trim();
     setIsEmpty(text === "");
+    // The user is typing free text — get the picker out of the way.
+    if (isPopoverOpen) setPopoverOpen(false);
   };
 
   // open popover when @ typed
   const handleKeyDown = e => {
+    if (e.key === "Escape" && isPopoverOpen) {
+      e.preventDefault();
+      setPopoverOpen(false);
+      return;
+    }
     if (!multiline && e.key === "Enter") {
       e.preventDefault();
       return;
     }
     if (e.key === "@") {
+      // Let the "@" type normally so plain-text values (e.g. an email address)
+      // are possible, then open the picker at the caret just after it. Picking a
+      // variable strips that leading "@" (see insertVariableAtRange); typing
+      // anything else closes the picker (handleInput) and leaves the literal "@".
       setTimeout(() => {
+        if (!editorRef.current) return;
         setActiveRange(saveSelection());
         setPopoverOpen(true);
       }, 0);
@@ -87,11 +99,32 @@ const VariableEditor = ({
     const range = saveSelection();
     setActiveRange(range);
   };
+
+  // Clicking into any field opens the variable picker directly — no need to type
+  // "@" (which still works too). Clicks on an existing variable's remove (×)
+  // button are ignored so deleting a chip doesn't pop the picker.
+  const handleEditorClick = e => {
+    if (e.target.classList.contains("zaplane-variable-remove")) return;
+    setActiveRange(saveSelection());
+    setPopoverOpen(true);
+  };
+
+  // Sync on blur, but keep the picker open when focus is moving into it (the
+  // user is clicking a variable) — otherwise the picker would close before the
+  // click registers.
+  const handleBlur = e => {
+    syncValue(editorRef, field.key, setFieldValue);
+    const toPicker =
+      e.relatedTarget &&
+      typeof e.relatedTarget.closest === "function" &&
+      e.relatedTarget.closest(".zaplane-variables-popover");
+    if (!toPicker) setPopoverOpen(false);
+  };
   return <>
       <div className="zaplane-label" style={{display:'flex', flexDirection:'column', gap:'8px', ...containerStyle}}>
         <span>{__(label, "zaplane")}{isRequired && <span style={{ color: 'red', marginLeft: '2px' }}>*</span>}</span>
 
-        <div ref={editorRef} onInput={handleInput} className={`zaplane-variable-editor ${multiline ? "zaplane-variable-editor-multiline" : "zaplane-variable-editor-singleline"} ${isEmpty ? "zaplane-empty" : ""}`} contentEditable suppressContentEditableWarning onKeyDown={handleKeyDown} onPaste={multiline ? undefined : handlePaste} onClick={handleCursorSave} onKeyUp={handleCursorSave} onBlur={() => syncValue(editorRef, field.key, setFieldValue)} data-placeholder={placeholder} />
+        <div ref={editorRef} onInput={handleInput} className={`zaplane-variable-editor ${multiline ? "zaplane-variable-editor-multiline" : "zaplane-variable-editor-singleline"} ${isEmpty ? "zaplane-empty" : ""}`} contentEditable suppressContentEditableWarning onKeyDown={handleKeyDown} onPaste={multiline ? undefined : handlePaste} onClick={handleEditorClick} onKeyUp={handleCursorSave} onBlur={handleBlur} data-placeholder={placeholder} />
       </div>
 
       <VariablePopover isOpen={isPopoverOpen} prefix="zaplane-variables-popover" onClose={() => setPopoverOpen(false)} data={variables} contextData={variableContext} onSelectVariable={variable => {

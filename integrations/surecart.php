@@ -120,6 +120,246 @@ class Surecart extends IntegrationBase {
 
 
 
+	/**
+	 * Sample output for the "@" variable picker.
+	 *
+	 * Keys mirror exactly what resolve_trigger() returns for each event so users
+	 * can pick trigger fields before a real test run exists. Values are realistic
+	 * SureCart-shaped dummies. Every trigger resolves to a non-empty array.
+	 */
+	public static function get_trigger_sample_output( string $trigger ): array {
+		$customer = [
+			'id'         => 'cust_a1b2c3d4e5',
+			'object'     => 'customer',
+			'name'       => 'John Doe',
+			'first_name' => 'John',
+			'last_name'  => 'Doe',
+			'email'      => 'john@example.com',
+			'phone'      => '+15551234567',
+			'live_mode'  => true,
+			'created_at' => 1767268800,
+			'updated_at' => 1767268800,
+		];
+
+		$price = [
+			'id'                       => 'price_p1r2i3c4e5',
+			'object'                   => 'price',
+			'name'                     => 'Monthly',
+			'amount'                   => 4900,
+			'currency'                 => 'usd',
+			'recurring_interval'       => 'month',
+			'recurring_interval_count' => 1,
+			'ad_hoc'                   => false,
+			'live_mode'                => true,
+			'product'                  => 'prod_p1r2o3d4u5',
+		];
+
+		$product = [
+			'id'          => 'prod_p1r2o3d4u5',
+			'object'      => 'product',
+			'name'        => 'Pro Plan',
+			'description' => 'Full access to all pro features.',
+			'status'      => 'published',
+			'slug'        => 'pro-plan',
+			'currency'    => 'usd',
+			'live_mode'   => true,
+			'prices'      => [ $price ],
+			'created_at'  => 1767268800,
+			'updated_at'  => 1767268800,
+		];
+
+		$subscription = [
+			'id'                     => 'sub_s1u2b3s4c5',
+			'object'                 => 'subscription',
+			'status'                 => 'active',
+			'customer'               => $customer['id'],
+			'price'                  => $price['id'],
+			'quantity'               => 1,
+			'current_period_start_at' => 1767268800,
+			'current_period_end_at'  => 1769947200,
+			'canceled_at'            => null,
+			'live_mode'              => true,
+			'created_at'             => 1767268800,
+			'updated_at'             => 1767268800,
+		];
+
+		$checkout = [
+			'id'           => 'checkout_c1h2e3c4k5',
+			'object'       => 'checkout',
+			'status'       => 'paid',
+			'email'        => 'john@example.com',
+			'name'         => 'John Doe',
+			'currency'     => 'usd',
+			'total_amount' => 4900,
+			'subtotal_amount' => 4900,
+			'tax_amount'   => 0,
+			'discount_amount' => 0,
+			'customer'     => $customer,
+			'live_mode'    => true,
+			'line_items'   => [
+				'object' => 'list',
+				'data'   => [
+					[
+						'id'       => 'li_l1i2n3e4i5',
+						'object'   => 'line_item',
+						'quantity' => 1,
+						'price'    => $price,
+					],
+				],
+			],
+			'created_at'   => 1767268800,
+			'updated_at'   => 1767268800,
+		];
+
+		// Shape emitted by payload_from_model( $model, 'purchase' ).
+		$purchase = [
+			'id'           => 'purchase_p1u2r3c4h5',
+			'object'       => 'purchase',
+			'revoked'      => false,
+			'quantity'     => 1,
+			'customer'     => $customer,
+			'product'      => $product,
+			'price'        => $price,
+			'subscription' => $subscription,
+			'checkout'     => $checkout,
+			'live_mode'    => true,
+			'created_at'   => 1767268800,
+			'updated_at'   => 1767268800,
+		];
+
+		// Shape emitted by normalize_post().
+		$post = [
+			'ID'            => 42,
+			'post_title'    => 'Pro Plan',
+			'post_name'     => 'pro-plan',
+			'post_status'   => 'publish',
+			'post_type'     => 'sc_product',
+			'post_date'     => '2026-01-01 12:00:00',
+			'post_modified' => '2026-01-01 12:00:00',
+			'post_author'   => 1,
+			'guid'          => 'https://example.com/?post_type=sc_product&p=42',
+		];
+
+		$samples = [
+			// payload_from_model( $args[0], 'purchase' ) => [ 'purchase' => ... ]
+			'purchase_created' => [ 'purchase' => $purchase ],
+			'purchase_invoked' => [ 'purchase' => $purchase ],
+			'purchase_revoked' => [ 'purchase' => array_merge( $purchase, [ 'revoked' => true ] ) ],
+
+			// payload_checkout_confirmed() => [ 'checkout' => ..., 'request' => ... ]
+			'checkout_confirmed' => [
+				'checkout' => $checkout,
+				'request'  => [
+					'method' => 'POST',
+					'route'  => '/surecart/v1/checkouts/checkout_c1h2e3c4k5/confirm',
+					'params' => [ 'id' => 'checkout_c1h2e3c4k5' ],
+				],
+			],
+
+			// [ 'post' => normalize_post(...), 'product' => model_to_array(...) ]
+			'product_sync_created' => [
+				'post' => $post,
+				'product' => $product
+			],
+			'product_sync_updated' => [
+				'post' => $post,
+				'product' => $product
+			],
+
+			// [ 'params' => ... ]
+			'integrations_created' => [
+				'params' => [
+					'provider'   => 'surecart',
+					'model_id'   => 'prod_p1r2o3d4u5',
+					'model_type' => 'product',
+					'integration_type' => 'download',
+				],
+			],
+			'integrations_deleted' => [
+				'params' => [
+					'provider'   => 'surecart',
+					'model_id'   => 'prod_p1r2o3d4u5',
+					'model_type' => 'product',
+					'integration_type' => 'download',
+				],
+			],
+
+			// resolve_trigger returns [] for these; provide a non-empty sample.
+			'help_widget_loaded' => [
+				'user_id'    => 1,
+				'user_email' => 'john@example.com',
+				'screen'     => 'sc-dashboard',
+				'loaded_at'  => 1767268800,
+			],
+			'admin_coupons_edit' => [
+				'coupon_id' => 'coupon_c1o2u3p4o5',
+				'screen'    => 'surecart-coupons',
+				'user_id'   => 1,
+			],
+
+			// [ 'post' => normalize_post(...), 'data' => ... ]
+			'post_created' => [
+				'post' => $post,
+				'data' => [
+					'source'  => 'surecart',
+					'model'   => 'product',
+					'post_id' => 42,
+				],
+			],
+		];
+
+		if ( isset( $samples[ $trigger ] ) ) {
+			return $samples[ $trigger ];
+		}
+
+		// Category fallbacks by event-name prefix so any future trigger still
+		// exposes fields in the "@" picker without an explicit sample above.
+		if ( 0 === strpos( $trigger, 'purchase_' ) ) {
+			return [ 'purchase' => $purchase ];
+		}
+		if ( 0 === strpos( $trigger, 'checkout_' ) ) {
+			return [ 'checkout' => $checkout ];
+		}
+		if ( 0 === strpos( $trigger, 'order_' ) ) {
+			return [ 'checkout' => $checkout ];
+		}
+		if ( 0 === strpos( $trigger, 'subscription_' ) ) {
+			return [ 'subscription' => $subscription ];
+		}
+		if ( 0 === strpos( $trigger, 'product_' ) ) {
+			return [
+				'post' => $post,
+				'product' => $product
+			];
+		}
+		if ( 0 === strpos( $trigger, 'customer_' ) ) {
+			return [ 'customer' => $customer ];
+		}
+		if ( 0 === strpos( $trigger, 'integrations_' ) ) {
+			return [
+				'params' => [
+					'provider' => 'surecart',
+					'model_type' => 'product'
+				]
+			];
+		}
+		if ( 0 === strpos( $trigger, 'post_' ) ) {
+			return [
+				'post' => $post,
+				'data' => [ 'source' => 'surecart' ]
+			];
+		}
+
+		// Final non-empty catch-all so NO trigger ever returns [].
+		return [
+			'purchase' => $purchase,
+			'customer' => $customer,
+			'product'  => $product,
+		];
+	}
+
+
+
 	public static function get_actions(): array {
 		return [
 			'create_order' => [ 'label' => 'Create Order' ],

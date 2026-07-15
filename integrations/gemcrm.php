@@ -107,7 +107,7 @@ class Gemcrm extends IntegrationBase {
 						],
 					],
 				];
-		}
+		}//end switch
 
 		return [];
 	}
@@ -137,10 +137,22 @@ class Gemcrm extends IntegrationBase {
 
 		$samples = [
 			'contact_created'       => $contact_base,
-			'contact_tag_attached'  => [ 'contact_id' => 1, 'tag_ids' => [ 1 ] ],
-			'contact_tag_removed'   => [ 'contact_id' => 1, 'tag_ids' => [ 1 ] ],
-			'contact_list_attached' => [ 'contact_id' => 1, 'list_ids' => [ 1 ] ],
-			'contact_list_removed'  => [ 'contact_id' => 1, 'list_ids' => [ 1 ] ],
+			'contact_tag_attached'  => [
+				'contact_id' => 1,
+				'tag_ids' => [ 1 ]
+			],
+			'contact_tag_removed'   => [
+				'contact_id' => 1,
+				'tag_ids' => [ 1 ]
+			],
+			'contact_list_attached' => [
+				'contact_id' => 1,
+				'list_ids' => [ 1 ]
+			],
+			'contact_list_removed'  => [
+				'contact_id' => 1,
+				'list_ids' => [ 1 ]
+			],
 			'contact_birthday'      => array_merge( $contact_base, [
 				'dob'               => '1990-03-15',
 				'_zaplane_birthday' => true,
@@ -350,7 +362,7 @@ class Gemcrm extends IntegrationBase {
 						],
 					],
 				];
-		}
+		}//end switch
 
 		return [];
 	}
@@ -390,9 +402,18 @@ class Gemcrm extends IntegrationBase {
 				'required' => true,
 				'default'  => 'contact',
 				'options'  => [
-					[ 'value' => 'contact', 'label' => 'Specific Contact' ],
-					[ 'value' => 'list',    'label' => 'Contact List'     ],
-					[ 'value' => 'custom',  'label' => 'Custom Email'     ],
+					[
+						'value' => 'contact',
+						'label' => 'Specific Contact'
+					],
+					[
+						'value' => 'list',
+						'label' => 'Contact List'
+					],
+					[
+						'value' => 'custom',
+						'label' => 'Custom Email'
+					],
 				],
 			],
 			[
@@ -422,8 +443,8 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'        => 'custom_email',
 				'label'      => 'Email Address',
-				'type'       => 'expression',
-				'subtype'    => 'email',
+				'type'     => 'email',
+				'subtype'  => 'expression',
 				'required'   => false,
 				'depends_on' => [ 'recipient_type' => 'custom' ],
 				'placeholder' => 'someone@example.com or use @ to pick a variable',
@@ -442,8 +463,14 @@ class Gemcrm extends IntegrationBase {
 				'required' => true,
 				'default'  => 'custom',
 				'options'  => [
-					[ 'value' => 'custom',   'label' => 'Custom Email'      ],
-					[ 'value' => 'template', 'label' => 'Existing Template' ],
+					[
+						'value' => 'custom',
+						'label' => 'Custom Email'
+					],
+					[
+						'value' => 'template',
+						'label' => 'Existing Template'
+					],
 				],
 			],
 			[
@@ -478,8 +505,8 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'      => 'from_email',
 				'label'    => 'From Email',
-				'type'     => 'expression',
-				'subtype'  => 'email',
+				'type'     => 'email',
+				'subtype'  => 'expression',
 				'required' => false,
 				'placeholder' => 'Leave empty to use system default',
 			],
@@ -493,8 +520,8 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'      => 'reply_to_email',
 				'label'    => 'Reply-To Email',
-				'type'     => 'expression',
-				'subtype'  => 'email',
+				'type'     => 'email',
+				'subtype'  => 'expression',
 				'required' => false,
 			],
 			[
@@ -514,13 +541,34 @@ class Gemcrm extends IntegrationBase {
 	 */
 	private static function email_merge_tags(): array {
 		return [
-			[ 'value' => '{{contact.first_name}}', 'label' => 'First Name' ],
-			[ 'value' => '{{contact.last_name}}',  'label' => 'Last Name' ],
-			[ 'value' => '{{contact.email}}',      'label' => 'Email' ],
-			[ 'value' => '{{contact.phone}}',      'label' => 'Phone' ],
-			[ 'value' => '{{contact.id}}',         'label' => 'Contact ID' ],
-			[ 'value' => '{{unsubscribe_link}}',        'label' => 'Unsubscribe Link' ],
-			[ 'value' => '{{update_preferences_link}}', 'label' => 'Update Preferences Link' ],
+			[
+				'value' => '{{contact.first_name}}',
+				'label' => 'First Name'
+			],
+			[
+				'value' => '{{contact.last_name}}',
+				'label' => 'Last Name'
+			],
+			[
+				'value' => '{{contact.email}}',
+				'label' => 'Email'
+			],
+			[
+				'value' => '{{contact.phone}}',
+				'label' => 'Phone'
+			],
+			[
+				'value' => '{{contact.id}}',
+				'label' => 'Contact ID'
+			],
+			[
+				'value' => '{{unsubscribe_link}}',
+				'label' => 'Unsubscribe Link'
+			],
+			[
+				'value' => '{{update_preferences_link}}',
+				'label' => 'Update Preferences Link'
+			],
 		];
 	}
 
@@ -557,8 +605,8 @@ class Gemcrm extends IntegrationBase {
 			[
 				'key'     => 'email',
 				'label'   => 'Email',
-				'type'    => 'expression',
-				'subtype' => 'email',
+				'type'    => 'email',
+				'subtype' => 'expression',
 				'required' => true,
 			],
 			[
@@ -580,8 +628,14 @@ class Gemcrm extends IntegrationBase {
 				'type'     => 'select',
 				'required' => false,
 				'options'  => [
-					[ 'value' => 'lead',     'label' => 'Lead' ],
-					[ 'value' => 'customer', 'label' => 'Customer' ],
+					[
+						'value' => 'lead',
+						'label' => 'Lead'
+					],
+					[
+						'value' => 'customer',
+						'label' => 'Customer'
+					],
 				],
 			],
 			[
@@ -659,14 +713,38 @@ class Gemcrm extends IntegrationBase {
 
 	private static function get_contact_statuses(): array {
 		return [
-			[ 'value' => 'draft',         'label' => 'Draft' ],
-			[ 'value' => 'pending',       'label' => 'Pending' ],
-			[ 'value' => 'subscribed',    'label' => 'Subscribed' ],
-			[ 'value' => 'unsubscribed',  'label' => 'Unsubscribed' ],
-			[ 'value' => 'spamed',        'label' => 'Spamed' ],
-			[ 'value' => 'bounced',       'label' => 'Bounced' ],
-			[ 'value' => 'complained',    'label' => 'Complained' ],
-			[ 'value' => 'transactional', 'label' => 'Transactional' ],
+			[
+				'value' => 'draft',
+				'label' => 'Draft'
+			],
+			[
+				'value' => 'pending',
+				'label' => 'Pending'
+			],
+			[
+				'value' => 'subscribed',
+				'label' => 'Subscribed'
+			],
+			[
+				'value' => 'unsubscribed',
+				'label' => 'Unsubscribed'
+			],
+			[
+				'value' => 'spamed',
+				'label' => 'Spamed'
+			],
+			[
+				'value' => 'bounced',
+				'label' => 'Bounced'
+			],
+			[
+				'value' => 'complained',
+				'label' => 'Complained'
+			],
+			[
+				'value' => 'transactional',
+				'label' => 'Transactional'
+			],
 		];
 	}
 
@@ -934,15 +1012,23 @@ class Gemcrm extends IntegrationBase {
 				$pre_header = $template->pre_header ?: null;
 			}
 
-			return [ 'subject' => $subject, 'body' => $body, 'pre_header' => $pre_header ];
-		}
+			return [
+				'subject' => $subject,
+				'body' => $body,
+				'pre_header' => $pre_header
+			];
+		}//end if
 
 		// Inline: an HTML string from the simple editor (a legacy editor tree
 		// array is rendered to HTML for backward compatibility).
 		$raw  = $config['body'] ?? '';
 		$body = is_array( $raw ) ? self::render_email_tree( $raw ) : (string) $raw;
 
-		return [ 'subject' => $subject, 'body' => $body, 'pre_header' => $pre_header ];
+		return [
+			'subject' => $subject,
+			'body' => $body,
+			'pre_header' => $pre_header
+		];
 	}
 
 	/**
@@ -1067,7 +1153,7 @@ class Gemcrm extends IntegrationBase {
 					'sent_to'        => $to,
 					'sent_count'     => 1,
 				] ) );
-		}
+		}//end switch
 	}
 
 	/**
@@ -1149,7 +1235,10 @@ class Gemcrm extends IntegrationBase {
 			$page++;
 		} while ( count( $records ) === $per_page );
 
-		return [ 'sent' => $sent, 'failed' => $failed ];
+		return [
+			'sent' => $sent,
+			'failed' => $failed
+		];
 	}
 
 	protected static function action_reapply_sequence( array $config, array $input ): array {

@@ -8,7 +8,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 class Eventscalendar extends IntegrationBase {
 
-    public static function get_slug(): string { return 'eventscalendar'; }
+	public static function get_slug(): string {
+		return 'eventscalendar'; }
 
 	public static function get_name(): string {
 		return 'The Events Calendar';
@@ -18,82 +19,166 @@ class Eventscalendar extends IntegrationBase {
 		return 'events-calendar.svg';
 	}
 
-    public static function get_triggers(): array {
-        return [
-            'attendEvent'          => [
-                'label' => 'User attended an event',
-                'hook'  => 'event_tickets_checkin'
-            ],
-             'attendeeRegistered'  => [
-                'label' => 'Attendee registered for an event',
-                'hook' => 'event_tickets_rsvp_attendee_created'
-            ],
-             'newAttendee'         => [
-                'label' => 'New attendee registered',
-                'hook' => 'event_tickets_rsvp_tickets_generated_for_product'
-            ],
-            'attendeeRegisteredWc' => [
-                'label' => 'Attendee registered via WooCommerce',
-                'hook' => 'tribe_tickets_attendee_repository_create_attendee_for_ticket_after_create'
-            ],
-        ];
-    }
+	public static function get_triggers(): array {
+		return [
+			'attendEvent'          => [
+				'label' => 'User attended an event',
+				'hook'  => 'event_tickets_checkin'
+			],
+			'attendeeRegistered'  => [
+				'label' => 'Attendee registered for an event',
+				'hook' => 'event_tickets_rsvp_attendee_created'
+			],
+			'newAttendee'         => [
+				'label' => 'New attendee registered',
+				'hook' => 'event_tickets_rsvp_tickets_generated_for_product'
+			],
+			'attendeeRegisteredWc' => [
+				'label' => 'Attendee registered via WooCommerce',
+				'hook' => 'tribe_tickets_attendee_repository_create_attendee_for_ticket_after_create'
+			],
+		];
+	}
 
-    public static function resolve_trigger(array $node, array $args) {
-        switch ($node['event']) {
+	public static function get_trigger_sample_output( string $event ): array {
+		$event_data = [
+			'event_id'    => 410,
+			'event_title' => 'Annual Tech Conference 2026',
+			'event_url'   => 'https://example.com/events/annual-tech-conference-2026/',
+		];
 
-            case 'attendEvent':
-                $attendee_id = $args[0] ?? 0;
-                if ( ! $attendee_id ) {
-                    return false;
-                }
-                $attendee = get_post( $attendee_id );
-                if ( ! $attendee ) {
-                    return false;
-                }
-                $user_id  = get_post_meta( $attendee_id, '_tribe_tickets_meta_user_id', true )
-                         ?: get_post_meta( $attendee_id, '_tribe_rsvp_user_id', true );
-                $event_id = ! empty( $args[1] ) ? $args[1]
-                         : ( get_post_meta( $attendee_id, '_tribe_rsvp_event', true )
-                         ?: get_post_meta( $attendee_id, '_tribe_tickets_checkin_event_id', true ) );
-                $user     = $user_id ? get_user_by( 'id', $user_id ) : null;
-                $event    = $event_id ? get_post( $event_id ) : null;
-                return [
-                    'attendee_id'   => (int) $attendee_id,
-                    'attendee_name' => $attendee->post_title,
-                    'event_id'      => $event_id ? (int) $event_id : '',
-                    'event_title'   => $event ? $event->post_title : '',
-                    'event_url'     => $event ? get_permalink( $event->ID ) : '',
-                    'user_id'       => $user ? (int) $user->ID : '',
-                    'user_email'    => $user ? $user->user_email : '',
-                    'display_name'  => $user ? $user->display_name : '',
-                    'checked_in_at' => current_time( 'mysql' ),
-                ];
+		$attendee = [
+			'attendee_id'   => 720,
+			'attendee_name' => 'Sarah Johnson',
+			'user_id'       => 15,
+			'user_email'    => 'sarah.johnson@example.com',
+			'display_name'  => 'Sarah Johnson',
+		];
 
-            case 'attendeeRegistered':
-                return [
-                    'attendee_id' => $args[0] ?? '',
-                    'post_id'     => $args[1] ?? '',
-                    'order_id'    => $args[2] ?? '',
-                    'product_id'  => $args[3] ?? '',
-                ];
+		$venue = [
+			'venue_id'   => 88,
+			'venue_name' => 'Downtown Convention Center',
+			'address'    => '123 Main Street, Springfield',
+		];
 
-            case 'newAttendee':
-                return [
-                    'product_id' => $args[0] ?? '',
-                    'order_id'   => $args[1] ?? '',
-                    'attendees'  => $args[2] ?? [],
-                ];
+		$samples = [
+			'attendEvent'          => [
+				'attendee_id'   => $attendee['attendee_id'],
+				'attendee_name' => $attendee['attendee_name'],
+				'event_id'      => $event_data['event_id'],
+				'event_title'   => $event_data['event_title'],
+				'event_url'     => $event_data['event_url'],
+				'user_id'       => $attendee['user_id'],
+				'user_email'    => $attendee['user_email'],
+				'display_name'  => $attendee['display_name'],
+				'checked_in_at' => '2026-07-09 09:15:00',
+			],
+			'attendeeRegistered'   => [
+				'attendee_id' => $attendee['attendee_id'],
+				'post_id'     => $event_data['event_id'],
+				'order_id'    => 9001,
+				'product_id'  => 512,
+			],
+			'newAttendee'          => [
+				'product_id' => 512,
+				'order_id'   => 9001,
+				'attendees'  => [
+					[
+						'attendee_id' => $attendee['attendee_id'],
+						'full_name'   => $attendee['attendee_name'],
+						'email'       => $attendee['user_email'],
+					],
+				],
+			],
+			'attendeeRegisteredWc' => [
+				'attendee_id'   => $attendee['attendee_id'],
+				'ticket'        => [
+					'ticket_id' => 512,
+					'name'      => 'General Admission',
+					'price'     => 49.00,
+				],
+				'order'         => [
+					'order_id' => 9001,
+					'total'    => 49.00,
+					'status'   => 'completed',
+				],
+				'attendee_data' => [
+					'full_name' => $attendee['attendee_name'],
+					'email'     => $attendee['user_email'],
+					'venue'     => $venue,
+				],
+			],
+		];
 
-            case 'attendeeRegisteredWc':
-                return [
-                    'attendee_id'   => $args[0] ?? '',
-                    'ticket'        => $args[1] ?? '',
-                    'order'         => $args[2] ?? '',
-                    'attendee_data' => $args[3] ?? [],
-                ];
-        }
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
 
-        return false;
-    }
+		if ( 0 === strpos( $event, 'new' ) ) {
+			return $samples['newAttendee'];
+		}
+		if ( 0 === strpos( $event, 'attend' ) ) {
+			return $samples['attendEvent'];
+		}
+
+		return $samples['attendEvent'];
+	}
+
+	public static function resolve_trigger( array $node, array $args ) {
+		switch ( $node['event'] ) {
+
+			case 'attendEvent':
+				$attendee_id = $args[0] ?? 0;
+				if ( ! $attendee_id ) {
+					return false;
+				}
+				$attendee = get_post( $attendee_id );
+				if ( ! $attendee ) {
+					return false;
+				}
+				$user_id  = get_post_meta( $attendee_id, '_tribe_tickets_meta_user_id', true )
+						 ?: get_post_meta( $attendee_id, '_tribe_rsvp_user_id', true );
+				$event_id = ! empty( $args[1] ) ? $args[1]
+						 : ( get_post_meta( $attendee_id, '_tribe_rsvp_event', true )
+						 ?: get_post_meta( $attendee_id, '_tribe_tickets_checkin_event_id', true ) );
+				$user     = $user_id ? get_user_by( 'id', $user_id ) : null;
+				$event    = $event_id ? get_post( $event_id ) : null;
+				return [
+					'attendee_id'   => (int) $attendee_id,
+					'attendee_name' => $attendee->post_title,
+					'event_id'      => $event_id ? (int) $event_id : '',
+					'event_title'   => $event ? $event->post_title : '',
+					'event_url'     => $event ? get_permalink( $event->ID ) : '',
+					'user_id'       => $user ? (int) $user->ID : '',
+					'user_email'    => $user ? $user->user_email : '',
+					'display_name'  => $user ? $user->display_name : '',
+					'checked_in_at' => current_time( 'mysql' ),
+				];
+
+			case 'attendeeRegistered':
+				return [
+					'attendee_id' => $args[0] ?? '',
+					'post_id'     => $args[1] ?? '',
+					'order_id'    => $args[2] ?? '',
+					'product_id'  => $args[3] ?? '',
+				];
+
+			case 'newAttendee':
+				return [
+					'product_id' => $args[0] ?? '',
+					'order_id'   => $args[1] ?? '',
+					'attendees'  => $args[2] ?? [],
+				];
+
+			case 'attendeeRegisteredWc':
+				return [
+					'attendee_id'   => $args[0] ?? '',
+					'ticket'        => $args[1] ?? '',
+					'order'         => $args[2] ?? '',
+					'attendee_data' => $args[3] ?? [],
+				];
+		}//end switch
+
+		return false;
+	}
 }

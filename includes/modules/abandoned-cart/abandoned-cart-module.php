@@ -105,12 +105,18 @@ class AbandonedCartModule implements ModuleInterface {
 			$runs = $runs_query->count();
 
 			return [
-				[ 'label' => __( 'Active workflows', 'zaplane' ), 'value' => $active ],
-				[ 'label' => __( 'Automation runs', 'zaplane' ), 'value' => $runs ],
+				[
+					'label' => __( 'Active workflows', 'zaplane' ),
+					'value' => $active
+				],
+				[
+					'label' => __( 'Automation runs', 'zaplane' ),
+					'value' => $runs
+				],
 			];
 		} catch ( \Throwable $e ) {
 			return [];
-		}
+		}//end try
 	}
 
 	/**
@@ -160,7 +166,7 @@ class AbandonedCartModule implements ModuleInterface {
 			unset( $cart );
 		} catch ( \Throwable $e ) {
 			// best-effort — leave carts unannotated on any failure
-		}
+		}//end try
 
 		return $carts;
 	}

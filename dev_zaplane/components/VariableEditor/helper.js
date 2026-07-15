@@ -87,33 +87,50 @@ export const restoreSelection = (range) => {
     sel.removeAllRanges();
     sel.addRange(range);
 };
-// Convert editor DOM content into backend variable format like {{variable}}
+// Convert editor DOM content into backend variable format like {{variable}}.
+// Walks the tree so a variable chip serialises to its token even if it ends up
+// nested, and free text around it is preserved (not dropped).
 export const syncValue = (editorRef, fieldKey, setFieldValue) => {
     if (!editorRef.current) return;
-    const nodes = Array.from(editorRef.current.childNodes);
-    const backendValue = nodes
-        .map((node) => (node.dataset?.variable ? `{{${node.dataset.variable}}}` : node.textContent))
-        .join("");
+
+    const serialize = (node) => {
+        if (node.nodeType === Node.TEXT_NODE) return node.textContent;
+        if (node.nodeType !== Node.ELEMENT_NODE) return "";
+        if (node.dataset && node.dataset.variable) return `{{${node.dataset.variable}}}`;
+        if (node.tagName === "BR") return "\n";
+        return Array.from(node.childNodes).map(serialize).join("");
+    };
+
+    const backendValue = Array.from(editorRef.current.childNodes).map(serialize).join("");
     setFieldValue(fieldKey, backendValue);
 };
-// Convert backend text containing {{variables}} into styled HTML variable tags
+// Escape a string for safe insertion as HTML text.
+const escapeHtml = (str) =>
+    String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+
+// Convert backend text containing {{variables}} into styled HTML variable tags.
+// Tokens are matched ANYWHERE (not only as whitespace-delimited words), so a
+// variable placed right next to text (e.g. "hi{{workflow.name}}") still renders
+// as a chip on reload. Chips are contenteditable=false so typing next to one
+// never merges into it.
 export const renderVariableHTML = (val, vars = [], context = {}) => {
     if (!val) return "";
 
-    return val
-        .split(/(\s+)/)
-        .map((word) => {
-            const match = word.match(/^{{(.+)}}$/);
+    return String(val)
+        .split(/(\{\{.*?\}\})/g)
+        .map((part) => {
+            const match = part.match(/^\{\{(.+)\}\}$/);
             if (match) {
                 const key = match[1];
                 const displayLabel = getVariableDisplayLabel(key, vars, context);
 
-                return `<span class="zaplane-variable-item" data-variable="${key}">
-                    <span class="zaplane-variable-label">${displayLabel}</span>
-                    <span class="zaplane-variable-remove">&times;</span>
-                </span>`;
+                return `<span class="zaplane-variable-item" contenteditable="false" data-variable="${escapeHtml(key)}"><span class="zaplane-variable-label">${escapeHtml(displayLabel)}</span><span class="zaplane-variable-remove">&times;</span></span>`;
             }
-            return word;
+            return escapeHtml(part);
         })
         .join("");
 };
@@ -133,6 +150,8 @@ export const insertVariableAtRange = ({
     const span = document.createElement("span");
     span.className = "zaplane-variable-item";
     span.setAttribute("data-variable", variableKey);
+    // Atomic: typing next to the chip never merges into it.
+    span.setAttribute("contenteditable", "false");
 
     const labelSpan = document.createElement("span");
     labelSpan.textContent = displayLabel;
@@ -150,9 +169,10 @@ export const insertVariableAtRange = ({
     if (range.startContainer.nodeType === Node.TEXT_NODE) {
         const textContent = range.startContainer.textContent;
         const startOffset = range.startOffset;
-        let atIndex = textContent.lastIndexOf("@", startOffset - 1);
-        if (atIndex !== -1) {
-            range.setStart(range.startContainer, atIndex);
+        // Only strip a legacy trigger "@" sitting immediately before the caret —
+        // never reach back and delete an unrelated earlier literal "@".
+        if (startOffset > 0 && textContent[startOffset - 1] === "@") {
+            range.setStart(range.startContainer, startOffset - 1);
         }
     }
 

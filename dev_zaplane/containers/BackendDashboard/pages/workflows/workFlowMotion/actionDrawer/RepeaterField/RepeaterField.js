@@ -37,23 +37,27 @@ export default function RepeaterField({
             )}
 
             {rows.map((row, rIndex) => (
-              <div key={rIndex} className="flex items-start gap-4">
+              <div key={rIndex} className="flex items-start gap-3">
                 {rowFields.map((rf) => (
-                  <ActionFieldRenderer
-                    key={rf.key}
-                    field={{ ...rf, key: `${field.key}.${rIndex}.${rf.key}` }}
-                    value={row?.[rf.key]}
-                    setFieldValue={(_key, val) => helpers.replace(rIndex, { ...row, [rf.key]: val })}
-                    getKey={getKey}
-                    dynamicOptions={dynamicOptions || {}}
-                    loadingFields={loadingFields || {}}
-                    fetchDynamicOptions={fetchDynamicOptions}
-                  />
+                  // Each column shares the row width equally; min-w-0 lets the
+                  // input shrink instead of overflowing the drawer (flex items
+                  // default to min-width:auto, which was pushing Value off-screen).
+                  <div key={rf.key} className="flex-1 min-w-0">
+                    <ActionFieldRenderer
+                      field={{ ...rf, key: `${field.key}.${rIndex}.${rf.key}` }}
+                      value={row?.[rf.key]}
+                      setFieldValue={(_key, val) => helpers.replace(rIndex, { ...row, [rf.key]: val })}
+                      getKey={getKey}
+                      dynamicOptions={dynamicOptions || {}}
+                      loadingFields={loadingFields || {}}
+                      fetchDynamicOptions={fetchDynamicOptions}
+                    />
+                  </div>
                 ))}
 
                 <button
                   type="button"
-                  className="mt-[27px] disabled:opacity-40"
+                  className="mt-[27px] shrink-0 disabled:opacity-40"
                   disabled={rows.length === 1}
                   onClick={() => helpers.remove(rIndex)}
                 >

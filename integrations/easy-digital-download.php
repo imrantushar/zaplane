@@ -173,6 +173,138 @@ class EasyDigitalDownload extends IntegrationBase {
 		return false;
 	}
 
+	/**
+	 * Sample output for each trigger so the "@" field picker has fields to
+	 * offer before a real capture exists. Keys mirror exactly what
+	 * resolve_trigger() emits for the same event.
+	 */
+	public static function get_trigger_sample_output( string $event ): array {
+		// Recurring shapes shared across several triggers.
+		$payment_base = [
+			'payment_id'  => 101,
+			'customer_id' => 5,
+		];
+
+		$customer_data = [
+			'user_id'        => 9,
+			'name'           => 'John Doe',
+			'email'          => 'john@example.com',
+			'date_created'   => '2026-07-09 12:00:00',
+			'purchase_count' => 3,
+			'purchase_value' => '147.00',
+			'status'         => 'active',
+		];
+
+		$customer_base = [
+			'customer_id' => 5,
+		];
+
+		$discount_data = [
+			'name'        => 'Summer Sale',
+			'code'        => 'SUMMER25',
+			'type'        => 'percent',
+			'amount'      => '25.00',
+			'status'      => 'active',
+			'start_date'  => '2026-07-01 00:00:00',
+			'end_date'    => '2026-07-31 23:59:59',
+			'use_count'   => 4,
+			'max_uses'    => 100,
+		];
+
+		$discount_base = [
+			'discount_id' => 12,
+		];
+
+		$download_post = [
+			'ID'          => 21,
+			'post_title'  => 'Pro Plan',
+			'post_status' => 'publish',
+			'post_type'   => 'download',
+			'post_author' => 1,
+			'post_date'   => '2026-07-09 12:00:00',
+		];
+
+		$download_base = [
+			'download_id' => 21,
+		];
+
+		$samples = [
+			'purchase_product'       => $payment_base,
+			'payment_status_changed' => array_merge( $payment_base, [
+				'new_status' => 'complete',
+				'old_status' => 'pending',
+			] ),
+			'customer_created'       => array_merge( $customer_base, [
+				'data' => $customer_data,
+			] ),
+			'customer_updated'       => array_merge( $customer_base, [
+				'updated' => true,
+				'data'    => $customer_data,
+			] ),
+			'customer_deleted'       => $customer_base,
+			'discount_created'       => array_merge( $discount_base, [
+				'data' => $discount_data,
+			] ),
+			'discount_updated'       => array_merge( $discount_base, [
+				'data' => $discount_data,
+			] ),
+			'discount_deleted'       => $discount_base,
+			'download_created'       => array_merge( $download_base, [
+				'data' => $download_post,
+			] ),
+			'download_updated'       => array_merge( $download_base, [
+				'post' => $download_post,
+			] ),
+			'download_deleted'       => array_merge( $download_base, [
+				'post' => $download_post,
+			] ),
+			'download_purchased'     => [
+				'download_id'   => 21,
+				'order_id'      => 101,
+				'download_type' => 'default',
+				'cart_details'  => [
+					[
+						'name'        => 'Pro Plan',
+						'id'          => 21,
+						'item_number' => [
+							'id'      => 21,
+							'options' => [ 'price_id' => 1 ],
+						],
+						'item_price'  => '49.00',
+						'quantity'    => 1,
+						'price'       => '49.00',
+					],
+				],
+				'cart_index'    => 0,
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		// Prefix fallbacks so any future trigger still exposes a sensible shape
+		// in the "@" picker even before a capture.
+		if ( 0 === strpos( $event, 'payment_' ) || 0 === strpos( $event, 'purchase_' ) ) {
+			return array_merge( $payment_base, [
+				'new_status' => 'complete',
+				'old_status' => 'pending',
+			] );
+		}
+		if ( 0 === strpos( $event, 'customer_' ) ) {
+			return array_merge( $customer_base, [ 'data' => $customer_data ] );
+		}
+		if ( 0 === strpos( $event, 'discount_' ) ) {
+			return array_merge( $discount_base, [ 'data' => $discount_data ] );
+		}
+		if ( 0 === strpos( $event, 'download_' ) ) {
+			return array_merge( $download_base, [ 'post' => $download_post ] );
+		}
+
+		// Final non-empty catch-all: no trigger ever returns [].
+		return $payment_base;
+	}
+
 
 	public static function get_actions(): array {
 		return [
@@ -192,7 +324,7 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Customer Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				[

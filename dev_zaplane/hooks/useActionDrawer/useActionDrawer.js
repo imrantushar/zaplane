@@ -30,7 +30,7 @@
  * }
  */
 import { useState, useMemo, useEffect } from "react";
-import { APPS, TOOLS } from "./helper";
+import { APPS, TOOLS, subInputAllows } from "./helper";
 import { integrations } from "@ZAPUtils/helper";
 import {
   getIntegration,
@@ -42,9 +42,10 @@ import {
 
 
 export const useActionDrawer = ({
-  open, node, source, setFieldValue, isTrigger, values, resetForm, onClose,
+  open, node, source, port, setFieldValue, isTrigger, values, resetForm, onClose,
 }) => {
   const [mode, setMode] = useState(null);
+  const isSubInput = port?.type === "target";
   const [selectedItem, setSelectedItem] = useState(null);
   const [search, setSearch] = useState("");
   const [step, setStep] = useState("select");
@@ -86,13 +87,27 @@ export const useActionDrawer = ({
     }
   }, [open, source]);
 
-  // ── Auto-set actionType if tool has only one action ──
+  // ── Preset the tab for a sub-input add so its one valid item is visible ──
   useEffect(() => {
-    if (mode !== "tools" || !selectedItem) return;
-    const tool = integrations.tools?.[selectedItem.id];
-    const actions = Object.values(tool?.actions || {});
-    if (actions.length === 1) setFieldValue("actionType", actions[0].key);
-  }, [mode, selectedItem, setFieldValue]);
+    if (!open || source !== "add" || !isSubInput) return;
+    if (port.id === "ai_memory") setMode("tools");
+    else if (port.id === "ai_model") setMode("app");
+    // ai_tool spans both Apps and Tools — leave the tab choice to the user.
+  }, [open, source, isSubInput, port?.id]);
+
+  // ── Auto-set actionType if the integration exposes only one item ──
+  // For a trigger drawer that means a single trigger (e.g. Schedule's
+  // "On a Schedule" or Webhook's "Catch Webhook"), otherwise a single action.
+  // Applies to both apps and tools so a lone required option is never left
+  // blank for the user to hunt for.
+  useEffect(() => {
+    if (!selectedItem) return;
+    const integration = mode === "tools"
+      ? integrations.tools?.[selectedItem.id]
+      : integrations.apps?.[selectedItem.id];
+    const items = Object.values((isTrigger ? integration?.triggers : integration?.actions) || {});
+    if (items.length === 1) setFieldValue("actionType", items[0].key);
+  }, [mode, selectedItem, isTrigger, setFieldValue]);
 
   // ── Derived: integration object ──
   const selectedIntegration = useMemo(
@@ -136,27 +151,56 @@ export const useActionDrawer = ({
   const list = useMemo(() => {
     const base = mode === "app" ? APPS : mode === "tools" ? TOOLS : [];
 
-    if (isTrigger) return base;
+    if (isTrigger) {
+      // Look in the registry matching the current mode so tool triggers (e.g.
+      // Schedule) surface under Tools, and app triggers under Apps.
+      const registry = mode === "tools" ? integrations.tools : integrations.apps;
+      return base.filter((item) => {
+        const triggers = registry?.[item.id]?.triggers;
+        if (!triggers) return false;
+        if (Array.isArray(triggers)) return triggers.length > 0;
+        return Object.keys(triggers).length > 0;
+      });
+    }
 
     return base.filter((item) => {
+      if (isSubInput && !subInputAllows(port.id, item.id)) return false;
+
       const integration =
         integrations.apps?.[item.id] ||
         integrations.tools?.[item.id];
 
       return integration?.actions && Object.keys(integration.actions).length > 0;
     });
-  }, [mode, isTrigger]);
+  }, [mode, isTrigger, isSubInput, port?.id]);
 
   // ── Search results ──
   const searchList = useMemo(() => {
     if (!search) return [];
     const q = search.toLowerCase();
+    const hasEntries = (registry, id, kind) => {
+      const items = registry?.[id]?.[kind];
+      if (!items) return false;
+      if (Array.isArray(items)) return items.length > 0;
+      return Object.keys(items).length > 0;
+    };
+    // Only surface integrations that actually have a matching option, so the
+    // user can never land on an empty Trigger/Action Type select (e.g. Webhook
+    // has no actions, most tools have no triggers).
     const combined = isTrigger
-      ? APPS
-      : APPS.concat(TOOLS.map(t => ({ ...t, type: "tools" })));
+      ? APPS.filter((item) => hasEntries(integrations.apps, item.id, "triggers")).concat(
+          TOOLS.filter((item) => hasEntries(integrations.tools, item.id, "triggers"))
+            .map(t => ({ ...t, type: "tools" }))
+        )
+      : APPS.filter((item) => hasEntries(integrations.apps, item.id, "actions")).concat(
+          TOOLS.filter((item) => hasEntries(integrations.tools, item.id, "actions"))
+            .map(t => ({ ...t, type: "tools" }))
+        );
 
-    return combined.filter(item => item.name.toLowerCase().includes(q));
-  }, [search, isTrigger]);
+    return combined
+      .filter(item => !isSubInput || subInputAllows(port.id, item.id))
+      .filter(item => item.name.toLowerCase().includes(q));
+  }, [search, isTrigger, isSubInput, port?.id]);
 
   // ── resetAll: close drawer and clear all state ──
   const resetAll = () => {

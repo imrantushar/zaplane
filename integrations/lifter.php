@@ -2,335 +2,413 @@
 
 namespace Zaplane\Integrations;
 
-if (! defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-class Lifter extends IntegrationBase
-{
+class Lifter extends IntegrationBase {
 
-    public static function get_slug(): string
-    {
-        return 'lifter';
-    }
 
-    public static function get_name(): string
-    {
-        return 'Lifter LMS';
-    }
+	public static function get_slug(): string {
+		return 'lifter';
+	}
 
-    public static function get_icon(): string
-    {
-        return 'lifter.svg';
-    }
+	public static function get_name(): string {
+		return 'Lifter LMS';
+	}
 
-    public static function get_triggers(): array
-    {
-        return [
-            'user_enroll_course' => [
-                'label'         => 'User enrolled in a course',
-                'hook'          => 'llms_user_enrolled_in_course',
-            ],
-            'lifter_quiz_course_attempt' => [
-                'label'         => 'User attempted (submitted) a quiz',
-                'hook'          => 'lifterlms_quiz_completed',
-            ],
-            'lesson_complete' => [
-                'label'         => 'User completed a lesson',
-                'hook'          => 'lifterlms_lesson_completed',
-            ],
-            'course_complete' => [
-                'label'         => 'User completed a course',
-                'hook'          => 'lifterlms_course_completed',
-            ],
-        ];
-    }
+	public static function get_icon(): string {
+		return 'lifter.svg';
+	}
 
-    public static function get_trigger_config_schema(string $trigger): array
-    {
-        if (in_array($trigger, ['user_enroll_course', 'course_complete'], true)) {
-            return [
-                [
-                    'key'      => 'course_id',
-                    'label'    => 'Course',
-                    'type'     => 'select',
-                    'dynamic' => [
-                            'integration' => 'lifter',
-                            'query'       => 'course',
-                            'select'      => ['value', 'label'],
-                        ],
-                    'required' => true,
-                ],
-            ];
-        }
+	public static function get_triggers(): array {
+		return [
+			'user_enroll_course' => [
+				'label'         => 'User enrolled in a course',
+				'hook'          => 'llms_user_enrolled_in_course',
+			],
+			'lifter_quiz_course_attempt' => [
+				'label'         => 'User attempted (submitted) a quiz',
+				'hook'          => 'lifterlms_quiz_completed',
+			],
+			'lesson_complete' => [
+				'label'         => 'User completed a lesson',
+				'hook'          => 'lifterlms_lesson_completed',
+			],
+			'course_complete' => [
+				'label'         => 'User completed a course',
+				'hook'          => 'lifterlms_course_completed',
+			],
+		];
+	}
 
-        if ($trigger === 'lifter_quiz_course_attempt') {
-            return [
-                [
-                    'key'      => 'quiz_id',
-                    'label'    => 'Quiz',
-                    'type'     => 'select',
-                    'dynamic' => [
-                            'integration' => 'lifter',
-                            'query'       => 'quiz',
-                            'select'      => ['value', 'label'],
-                        ],
-                    'required' => true,
-                ],
-            ];
-        }
+	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( in_array( $trigger, [ 'user_enroll_course', 'course_complete' ], true ) ) {
+			return [
+				[
+					'key'      => 'course_id',
+					'label'    => 'Course',
+					'type'     => 'select',
+					'dynamic' => [
+						'integration' => 'lifter',
+						'query'       => 'course',
+						'select'      => [ 'value', 'label' ],
+					],
+					'required' => true,
+				],
+			];
+		}
 
-        if ($trigger === 'lesson_complete') {
-            return [
-                [
-                    'key'      => 'lesson_id',
-                    'label'    => 'Lesson',
-                    'type'     => 'select',
-                    'dynamic' => [
-                            'integration' => 'lifter',
-                            'query'       => 'lesson',
-                            'select'      => ['value', 'label'],
-                        ],
-                    'required' => true,
-                ],
-            ];
-        }
+		if ( $trigger === 'lifter_quiz_course_attempt' ) {
+			return [
+				[
+					'key'      => 'quiz_id',
+					'label'    => 'Quiz',
+					'type'     => 'select',
+					'dynamic' => [
+						'integration' => 'lifter',
+						'query'       => 'quiz',
+						'select'      => [ 'value', 'label' ],
+					],
+					'required' => true,
+				],
+			];
+		}
 
-        return [];
-    }
+		if ( $trigger === 'lesson_complete' ) {
+			return [
+				[
+					'key'      => 'lesson_id',
+					'label'    => 'Lesson',
+					'type'     => 'select',
+					'dynamic' => [
+						'integration' => 'lifter',
+						'query'       => 'lesson',
+						'select'      => [ 'value', 'label' ],
+					],
+					'required' => true,
+				],
+			];
+		}
 
-    public static function resolve_trigger(array $node, array $args)
-    {
-        switch ($node['event']) {
-            case 'user_enroll_course':
+		return [];
+	}
 
-                $user_id    = $args[0] ?? null;
-                $course_id  = $args[1] ?? null;
+	public static function resolve_trigger( array $node, array $args ) {
+		switch ( $node['event'] ) {
+			case 'user_enroll_course':
+				$user_id    = $args[0] ?? null;
+				$course_id  = $args[1] ?? null;
 
-                if (! $user_id || ! $course_id) {
-                    return false;
-                }
+				if ( ! $user_id || ! $course_id ) {
+					return false;
+				}
 
-                // Filter by selected course
-                $selected_course = $node['data']['config']['course_id'] ?? 'any';
-                if ($selected_course !== 'any' && (int) $selected_course !== (int) $course_id) {
-                    return false;
-                }
+				// Filter by selected course
+				$selected_course = $node['data']['config']['course_id'] ?? 'any';
+				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+					return false;
+				}
 
-                $user   = get_userdata($user_id);
-                $course = get_post($course_id);
+				$user   = get_userdata( $user_id );
+				$course = get_post( $course_id );
 
-                if (! $user || ! $course) {
-                    return false;
-                }
+				if ( ! $user || ! $course ) {
+					return false;
+				}
 
-                return [
-                    'success'      => true,
-                    'user_id'      => (int) $user_id,
-                    'course_id'    => (int) $course_id,
-                    'course_title' => $course->post_title,
-                    'course_url'   => get_permalink($course->ID),
+				return [
+					'success'      => true,
+					'user_id'      => (int) $user_id,
+					'course_id'    => (int) $course_id,
+					'course_title' => $course->post_title,
+					'course_url'   => get_permalink( $course->ID ),
 
-                    // user data
-                    'user_email'   => $user->user_email,
-                    'first_name'   => $user->first_name,
-                    'last_name'    => $user->last_name,
-                    'display_name' => $user->display_name,
-                ];
-            case 'course_complete':
-                $user_id   = $args[0] ?? null;
-                $course_id = $args[1] ?? null;
+					// user data
+					'user_email'   => $user->user_email,
+					'first_name'   => $user->first_name,
+					'last_name'    => $user->last_name,
+					'display_name' => $user->display_name,
+				];
+			case 'course_complete':
+				$user_id   = $args[0] ?? null;
+				$course_id = $args[1] ?? null;
 
-                if (! $user_id || ! $course_id) {
-                    return false;
-                }
+				if ( ! $user_id || ! $course_id ) {
+					return false;
+				}
 
-                $selected_course = $node['data']['config']['course_id'] ?? 'any';
-                if ($selected_course !== 'any' && (int) $selected_course !== (int) $course_id) {
-                    return false;
-                }
+				$selected_course = $node['data']['config']['course_id'] ?? 'any';
+				if ( $selected_course !== 'any' && (int) $selected_course !== (int) $course_id ) {
+					return false;
+				}
 
-                $course = get_post($course_id);
-                $user   = get_userdata($user_id);
+				$course = get_post( $course_id );
+				$user   = get_userdata( $user_id );
 
-                if (! $course || ! $user) {
-                    return false;
-                }
+				if ( ! $course || ! $user ) {
+					return false;
+				}
 
-                return [
-                    'success'      => true,
-                    'course_id'    => $course->ID,
-                    'course_title' => $course->post_title,
-                    'course_url'   => get_permalink($course->ID),
-                    'user_id'      => (int) $user_id,
-                    'user_email'   => $user->user_email,
-                    'first_name'   => $user->first_name,
-                    'last_name'    => $user->last_name,
-                    'display_name' => $user->display_name,
-                ];
+				return [
+					'success'      => true,
+					'course_id'    => $course->ID,
+					'course_title' => $course->post_title,
+					'course_url'   => get_permalink( $course->ID ),
+					'user_id'      => (int) $user_id,
+					'user_email'   => $user->user_email,
+					'first_name'   => $user->first_name,
+					'last_name'    => $user->last_name,
+					'display_name' => $user->display_name,
+				];
 
-            case 'lesson_complete':
-                $user_id   = $args[0] ?? null;
-                $lesson_id = $args[1] ?? null;
+			case 'lesson_complete':
+				$user_id   = $args[0] ?? null;
+				$lesson_id = $args[1] ?? null;
 
-                if (! $user_id || ! $lesson_id) {
-                    return false;
-                }
+				if ( ! $user_id || ! $lesson_id ) {
+					return false;
+				}
 
-                $selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
-                if ($selected_lesson !== 'any' && (int) $selected_lesson !== (int) $lesson_id) {
-                    return false;
-                }
+				$selected_lesson = $node['data']['config']['lesson_id'] ?? 'any';
+				if ( $selected_lesson !== 'any' && (int) $selected_lesson !== (int) $lesson_id ) {
+					return false;
+				}
 
-                $user = get_userdata($user_id);
-                if (! $user) {
-                    return false;
-                }
+				$user = get_userdata( $user_id );
+				if ( ! $user ) {
+					return false;
+				}
 
-                $lesson       = get_post($lesson_id);
-                $lesson_title = $lesson ? $lesson->post_title : '';
+				$lesson       = get_post( $lesson_id );
+				$lesson_title = $lesson ? $lesson->post_title : '';
 
-                return [
-                    'success'      => true,
-                    'lesson_id'    => (int) $lesson_id,
-                    'lesson_title' => $lesson_title,
-                    'user_id'      => (int) $user_id,
-                    'user_email'   => $user->user_email,
-                    'first_name'   => $user->first_name,
-                    'last_name'    => $user->last_name,
-                    'display_name' => $user->display_name,
-                ];
+				return [
+					'success'      => true,
+					'lesson_id'    => (int) $lesson_id,
+					'lesson_title' => $lesson_title,
+					'user_id'      => (int) $user_id,
+					'user_email'   => $user->user_email,
+					'first_name'   => $user->first_name,
+					'last_name'    => $user->last_name,
+					'display_name' => $user->display_name,
+				];
 
-            case 'lifter_quiz_course_attempt':
-                $user_id = $args[0] ?? null;
-                $quiz_id = $args[1] ?? null;
-                $attempt = $args[2] ?? null;
+			case 'lifter_quiz_course_attempt':
+				$user_id = $args[0] ?? null;
+				$quiz_id = $args[1] ?? null;
+				$attempt = $args[2] ?? null;
 
-                if (! $user_id || ! $quiz_id || ! is_object($attempt)) {
-                    return false;
-                }
+				if ( ! $user_id || ! $quiz_id || ! is_object( $attempt ) ) {
+					return false;
+				}
 
-                $attempt_status = is_callable([$attempt, 'get_status'])
-                    ? $attempt->get_status()
-                    : ($attempt->attempt_status ?? null);
+				$attempt_status = is_callable( [ $attempt, 'get_status' ] )
+					? $attempt->get_status()
+					: ( $attempt->attempt_status ?? null );
 
-                if ($attempt_status === 'pending') {
-                    return false;
-                }
+				if ( $attempt_status === 'pending' ) {
+					return false;
+				}
 
-                $selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
-                if ($selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id) {
-                    return false;
-                }
+				$selected_quiz = $node['data']['config']['quiz_id'] ?? 'any';
+				if ( $selected_quiz !== 'any' && (int) $selected_quiz !== (int) $quiz_id ) {
+					return false;
+				}
 
-                $user       = get_userdata($user_id);
-                $quiz       = get_post($quiz_id);
-                $quiz_title = $quiz ? $quiz->post_title : '';
+				$user       = get_userdata( $user_id );
+				$quiz       = get_post( $quiz_id );
+				$quiz_title = $quiz ? $quiz->post_title : '';
 
-                if (is_callable([$attempt, 'get_earned_percentage'])) {
-                    $percentage = $attempt->get_earned_percentage();
-                } else {
-                    $total      = $attempt->total_marks ?? 0;
-                    $earned     = $attempt->earned_marks ?? 0;
-                    $percentage = ($total > 0) ? round(($earned / $total) * 100, 2) : 0;
-                }
+				if ( is_callable( [ $attempt, 'get_earned_percentage' ] ) ) {
+					$percentage = $attempt->get_earned_percentage();
+				} else {
+					$total      = $attempt->total_marks ?? 0;
+					$earned     = $attempt->earned_marks ?? 0;
+					$percentage = ( $total > 0 ) ? round( ( $earned / $total ) * 100, 2 ) : 0;
+				}
 
-                return [
-                    'success'      => true,
-                    'quiz_id'      => (int) $quiz_id,
-                    'quiz_title'   => $quiz_title,
-                    'user_id'      => (int) $user_id,
-                    'user_email'   => $user ? $user->user_email : '',
-                    'first_name'   => $user ? $user->first_name : '',
-                    'last_name'    => $user ? $user->last_name : '',
-                    'display_name' => $user ? $user->display_name : '',
-                    'score'        => $attempt->earned_marks ?? 0,
-                    'total'        => $attempt->total_marks ?? 0,
-                    'percentage'   => $percentage,
-                ];
-        }
+				return [
+					'success'      => true,
+					'quiz_id'      => (int) $quiz_id,
+					'quiz_title'   => $quiz_title,
+					'user_id'      => (int) $user_id,
+					'user_email'   => $user ? $user->user_email : '',
+					'first_name'   => $user ? $user->first_name : '',
+					'last_name'    => $user ? $user->last_name : '',
+					'display_name' => $user ? $user->display_name : '',
+					'score'        => $attempt->earned_marks ?? 0,
+					'total'        => $attempt->total_marks ?? 0,
+					'percentage'   => $percentage,
+				];
+		}//end switch
 
-        return false;
-    }
+		return false;
+	}
 
-    public static function get_dynamic_queries(): array
-    {
-        return [
-            'course' => [self::class, 'query_courses'],
-            'quiz' => [self::class, 'query_quiz'],
-            'lesson' => [self::class, 'query_lesson'],
-        ];
-    }
+	public static function get_trigger_sample_output( string $event ): array {
+		$user = [
+			'user_id'      => 1,
+			'user_email'   => 'john@example.com',
+			'first_name'   => 'John',
+			'last_name'    => 'Doe',
+			'display_name' => 'John Doe',
+		];
 
-    public static function query_courses()
-    {
-        $options = [['label' => 'Any course', 'value' => 'any']];
+		$course = [
+			'course_id'    => 10,
+			'course_title' => 'Introduction to WordPress',
+			'course_url'   => 'https://example.com/course/introduction-to-wordpress',
+		];
 
-        global $wpdb;
-        $courses = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT ID, post_title FROM {$wpdb->posts}
+		$lesson = [
+			'lesson_id'    => 20,
+			'lesson_title' => 'Getting Started',
+		];
+
+		$quiz = [
+			'quiz_id'    => 30,
+			'quiz_title' => 'Module 1 Quiz',
+		];
+
+		$samples = [
+			'user_enroll_course' => array_merge(
+				[ 'success' => true ],
+				$course,
+				$user
+			),
+			'course_complete' => array_merge(
+				[ 'success' => true ],
+				$course,
+				$user
+			),
+			'lesson_complete' => array_merge(
+				[ 'success' => true ],
+				$lesson,
+				$user
+			),
+			'lifter_quiz_course_attempt' => array_merge(
+				[ 'success' => true ],
+				$quiz,
+				$user,
+				[
+					'score'      => 8,
+					'total'      => 10,
+					'percentage' => 80.0,
+				]
+			),
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		// Prefix / keyword fallbacks so no trigger returns [].
+		if ( strpos( $event, 'quiz' ) !== false ) {
+			return $samples['lifter_quiz_course_attempt'];
+		}
+		if ( strpos( $event, 'lesson' ) !== false ) {
+			return $samples['lesson_complete'];
+		}
+		if ( strpos( $event, 'course' ) !== false || strpos( $event, 'enroll' ) !== false ) {
+			return $samples['user_enroll_course'];
+		}
+
+		// Catch-all: always non-empty.
+		return array_merge( [ 'success' => true ], $course, $user );
+	}
+
+	public static function get_dynamic_queries(): array {
+		return [
+			'course' => [ self::class, 'query_courses' ],
+			'quiz' => [ self::class, 'query_quiz' ],
+			'lesson' => [ self::class, 'query_lesson' ],
+		];
+	}
+
+	public static function query_courses() {
+		$options = [
+			[
+				'label' => 'Any course',
+				'value' => 'any'
+			]
+		];
+
+		global $wpdb;
+		$courses = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT ID, post_title FROM {$wpdb->posts}
                     WHERE {$wpdb->posts}.post_status = 'publish'
                     AND {$wpdb->posts}.post_type = 'course'
                     ORDER BY post_title"
-            )
-        );
+			)
+		);
 
-        if (! empty($courses)) {
-            foreach ($courses as $course) {
-                $options[] = [
-                    'label' => $course->post_title,
-                    'value' => $course->ID
-                ];
-            }
-        }
-        return $options;
-    }
+		if ( ! empty( $courses ) ) {
+			foreach ( $courses as $course ) {
+				$options[] = [
+					'label' => $course->post_title,
+					'value' => $course->ID
+				];
+			}
+		}
+		return $options;
+	}
 
-    public static function query_quiz()
-    {
-        $options = [['label' => 'Any Quiz', 'value' => 'any']];
+	public static function query_quiz() {
+		$options = [
+			[
+				'label' => 'Any Quiz',
+				'value' => 'any'
+			]
+		];
 
-        global $wpdb;
-        $quizzes = $wpdb->get_results(
-            "SELECT ID, post_title
+		global $wpdb;
+		$quizzes = $wpdb->get_results(
+			"SELECT ID, post_title
                 FROM {$wpdb->posts}
                 WHERE post_status = 'publish'
                 AND post_type = 'llms_quiz'
                 ORDER BY post_title ASC"
-        );
+		);
 
-        if (! empty($quizzes)) {
-            foreach ($quizzes as $quiz) {
-                $options[] = [
-                    'label' => $quiz->post_title,
-                    'value' => $quiz->ID,
-                ];
-            }
-        }
-        return $options;
-    }
-    public static function query_lesson()
-    {
-        $options = [['label' => 'Any lesson', 'value' => 'any']];
+		if ( ! empty( $quizzes ) ) {
+			foreach ( $quizzes as $quiz ) {
+				$options[] = [
+					'label' => $quiz->post_title,
+					'value' => $quiz->ID,
+				];
+			}
+		}
+		return $options;
+	}
+	public static function query_lesson() {
+		$options = [
+			[
+				'label' => 'Any lesson',
+				'value' => 'any'
+			]
+		];
 
-        global $wpdb;
-        $lessons = $wpdb->get_results(
-            "SELECT ID, post_title
+		global $wpdb;
+		$lessons = $wpdb->get_results(
+			"SELECT ID, post_title
                 FROM {$wpdb->posts}
                 WHERE post_status = 'publish'
                 AND post_type = 'lesson'
                 ORDER BY post_title ASC"
-        );
+		);
 
-        if (! empty($lessons)) {
-            foreach ($lessons as $lesson) {
-                $options[] = [
-                    'label' => $lesson->post_title,
-                    'value' => $lesson->ID,
-                ];
-            }
-        }
-        return $options;
-    }
+		if ( ! empty( $lessons ) ) {
+			foreach ( $lessons as $lesson ) {
+				$options[] = [
+					'label' => $lesson->post_title,
+					'value' => $lesson->ID,
+				];
+			}
+		}
+		return $options;
+	}
 }

@@ -1,11 +1,46 @@
-import { useState } from "react";
-import { Handle, Position, useReactFlow } from "@xyflow/react";
+import { useState, useEffect } from "react";
+import { Handle, Position, useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegCopy, FaPlus } from "react-icons/fa";
 import FloatingEdge from "../floatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
-import { formatLabel } from "@ZAPUtils/helper";
+import { formatLabel, integrations } from "@ZAPUtils/helper";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
+
+const addPortBtnStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 16,
+  height: 16,
+  borderRadius: "50%",
+  border: "1px solid #9CA3AF",
+  background: "#fff",
+  color: "#6B7280",
+  cursor: "pointer",
+  padding: 0,
+  pointerEvents: "auto",
+  flexShrink: 0,
+};
+
+// Ports (output branches) declared by the node's action in the manifest, e.g.
+// router → path_1..fallback, condition → true/false, iterator → loop/done.
+const getNodePorts = (data) => {
+  const integ = integrations?.apps?.[data?.app] || integrations?.tools?.[data?.app];
+  const outputs = integ?.actions?.[data?.event]?.outputs || [];
+  // "main" is the implicit single output — not a branch.
+  const branches = outputs.filter((p) => p && p !== "main");
+
+  // Router: one path per configured route (+ fallback), derived from the
+  // dynamic `routes` repeater. A fresh router still shows one path to build on.
+  if (data?.app === "router") {
+    const routes = Array.isArray(data?.config?.routes) ? data.config.routes : [];
+    const active = Array.from({ length: Math.max(1, routes.length) }, (_, i) => `path_${i + 1}`);
+    return [...active, "fallback"];
+  }
+
+  return branches;
+};
 export default function CustomNode({
   id,
   data,
@@ -21,7 +56,21 @@ export default function CustomNode({
   const isLR = canvasLayout === "LR";
   const isSelectApp = data.app === "Select an app";
   const formattedAction = data?.action?.charAt(0).toUpperCase() + data?.action?.slice(1);
-  const isCondition = data?.app === "condition";
+  const ports = getNodePorts(data);
+  const isMultiPort = ports.length > 1;
+  // The AI Agent accepts sub-nodes wired into its bottom: a chat model, a memory
+  // store, and any number of tool (action) nodes.
+  const isAgent = data?.app === "ai-agent";
+  // A node wired into an agent's tool/memory/model handle is a "sub-node": it
+  // hangs off the agent, not the main flow, and connects from its top.
+  const isSubNode = edges.some(
+    (e) => e.source === id && (e.targetHandle === "ai_tool" || e.targetHandle === "ai_memory" || e.targetHandle === "ai_model")
+  );
+  const SUB_PORTS = [
+    { id: "ai_model", label: "Chat Model" },
+    { id: "ai_memory", label: "Memory" },
+    { id: "ai_tool", label: "Tools" },
+  ];
   const node = nodes.find(n => n.id === id);
   const hasPort = node?.port === undefined;
   const isTrigger = data?.action === "trigger";
@@ -34,6 +83,16 @@ export default function CustomNode({
     background: "#6366f1", // purple-dot color
     border: "none",
   };
+
+  // React Flow caches each handle's measured position. When our handle set
+  // changes shape — a node turning into a sub-node (its source handle moves to
+  // the top `sub_out`), the agent's model/memory/tool ports appearing, ports
+  // changing, or the layout flipping — that cache goes stale and edges attach at
+  // the old spot. Re-measure whenever any of those inputs change.
+  const updateNodeInternals = useUpdateNodeInternals();
+  useEffect(() => {
+    updateNodeInternals(id);
+  }, [id, isAgent, isSubNode, isLR, ports.length, updateNodeInternals]);
 
   return (
     <div className="zaplane-custom-node-wrapper" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ position: 'relative' }}>
@@ -150,41 +209,149 @@ export default function CustomNode({
           </div>
         </div>
 
-        {/* SOURCE HANDLES */}
-        {isCondition ? (
-          <>
-            <Handle 
-              type="source" 
-              id="true" 
-              position={isLR ? Position.Right : Position.Bottom} 
-              style={{
-                ...handleStyle,
-                top: isLR ? "40%" : undefined,
-                left: !isLR ? "40%" : undefined,
-              }} 
-            />
-            <Handle 
-              type="source" 
-              id="false" 
-              position={isLR ? Position.Right : Position.Bottom} 
-              style={{
-                ...handleStyle,
-                top: isLR ? "60%" : undefined,
-                left: !isLR ? "60%" : undefined,
-              }} 
-            />
-          </>
+        {/* SOURCE HANDLES — one connectable, labelled handle per output branch */}
+        {isSubNode ? (
+          <Handle type="source" id="sub_out" position={Position.Top} style={{ ...handleStyle, background: "#a855f7" }} />
+        ) : isMultiPort ? (
+          ports.map((port, i) => {
+            // Fixed spacing centred on the node so ports never overlap, however
+            // many there are (they extend past the node body when needed).
+            const spacing = 30;
+            const offset = (i - (ports.length - 1) / 2) * spacing;
+            const along = isLR
+              ? { top: `calc(50% + ${offset}px)` }
+              : { left: `calc(50% + ${offset}px)` };
+            const portHasEdge = edges.some((e) => e.source === id && e.sourceHandle === port);
+            return (
+              <div key={port}>
+                <Handle
+                  type="source"
+                  id={port}
+                  position={isLR ? Position.Right : Position.Bottom}
+                  style={{ ...handleStyle, ...along }}
+                />
+                <span
+                  className="zaplane-port-label"
+                  style={{
+                    position: "absolute",
+                    fontSize: 10,
+                    color: "#4B5563",
+                    whiteSpace: "nowrap",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    background: "#fff",
+                    border: "1px solid #E5E7EB",
+                    borderRadius: 6,
+                    padding: "1px 6px",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    ...(isLR
+                      ? { ...along, left: "100%", marginLeft: 14, transform: "translateY(-50%)" }
+                      : { ...along, top: "100%", marginTop: 14, transform: "translateX(-50%)" }),
+                  }}
+                >
+                  {formatLabel(port)}
+                  {!portHasEdge && (
+                    <button
+                      type="button"
+                      title={__("Add step", "zaplane")}
+                      onClick={(e) => { e.stopPropagation(); data.openDrawerFromAdd?.({ id: port, type: "source" }); }}
+                      style={addPortBtnStyle}
+                    >
+                      <FaPlus size={8} />
+                    </button>
+                  )}
+                </span>
+              </div>
+            );
+          })
         ) : (
-          <Handle 
-            type="source" 
-            position={isLR ? Position.Right : Position.Bottom} 
-            style={handleStyle} 
+          <Handle
+            type="source"
+            position={isLR ? Position.Right : Position.Bottom}
+            style={handleStyle}
           />
         )}
+
+        {/* AI AGENT SUB-INPUT HANDLES — wire a chat model / memory / tools here.
+            Each empty port renders as a column hanging off its handle dot:
+            dashed stem → "+" button → label, so the affordance reads as attached
+            to the node instead of floating. Once wired, only the label remains
+            (the incoming sub-node edge replaces the stem and button). */}
+        {isAgent &&
+          SUB_PORTS.map((sp, i) => {
+            const pos = `${((i + 1) / (SUB_PORTS.length + 1)) * 100}%`;
+            const connected = edges.some((e) => e.target === id && e.targetHandle === sp.id);
+            return (
+              <div key={sp.id}>
+                <Handle
+                  type="target"
+                  id={sp.id}
+                  position={Position.Bottom}
+                  style={{ ...handleStyle, background: "#a855f7", left: pos }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: pos,
+                    transform: "translateX(-50%)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    pointerEvents: "none",
+                  }}
+                >
+                  {!connected && (
+                    <>
+                      <span style={{ width: 0, height: 14, borderLeft: "1.5px dashed #C4B5FD" }} />
+                      <button
+                        type="button"
+                        title={sprintf(__("Add %s", "zaplane"), sp.label)}
+                        onClick={(e) => { e.stopPropagation(); data.openDrawerFromAdd?.({ id: sp.id, type: "target" }); }}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 22,
+                          height: 22,
+                          borderRadius: "50%",
+                          border: "1px dashed #a855f7",
+                          background: "#fff",
+                          color: "#a855f7",
+                          cursor: "pointer",
+                          padding: 0,
+                          pointerEvents: "auto",
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                        }}
+                      >
+                        <FaPlus size={9} />
+                      </button>
+                    </>
+                  )}
+                  <span
+                    style={{
+                      marginTop: connected ? 8 : 5,
+                      fontSize: 10,
+                      fontWeight: 500,
+                      color: "#7C3AED",
+                      whiteSpace: "nowrap",
+                      background: "rgba(255,255,255,0.9)",
+                      borderRadius: 4,
+                      padding: "0 4px",
+                    }}
+                  >
+                    {sp.label}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
       </div>
 
-      {/* ADD NODE BUTTON */}
-      {!hasOutgoingEdge && !isCondition && (
+      {/* ADD NODE BUTTON — single-output nodes get the inline "+"; multi-port
+          nodes are wired by dragging from each branch handle. */}
+      {!hasOutgoingEdge && !isMultiPort && (
         <FloatingEdge openDrawerFromAdd={data.openDrawerFromAdd} canvasLayout={canvasLayout} />
       )}
     </div>

@@ -1,5 +1,5 @@
 import {  createAsyncThunk} from '@reduxjs/toolkit';
-import { API, namespace } from '@ZAPUtils/helper';
+import { API, namespace, handleSliceError } from '@ZAPUtils/helper';
 
 
 export const conditionVariables = createAsyncThunk(

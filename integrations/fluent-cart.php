@@ -205,7 +205,7 @@ class FluentCart extends IntegrationBase {
 					'required' => true,
 				],
 			];
-		}
+		}//end if
 
 		if ( in_array( $trigger, self::SUBSCRIPTION_EVENTS, true ) ) {
 			return [
@@ -243,7 +243,7 @@ class FluentCart extends IntegrationBase {
 					'required' => true,
 				],
 			];
-		}
+		}//end if
 
 		if ( in_array( $trigger, self::PRODUCT_EVENTS, true ) ) {
 			return [
@@ -285,7 +285,7 @@ class FluentCart extends IntegrationBase {
 			'get_order_single' => [
 				'label' => 'Get Order (Single)',
 			],
-				'get_orders_all' => [
+			'get_orders_all' => [
 				'label' => 'Get Orders (All)',
 			],
 			'get_customer_single' => [
@@ -632,6 +632,220 @@ class FluentCart extends IntegrationBase {
 		}//end switch
 
 		return self::main_response( $input );
+	}
+
+	/**
+	 * Sample trigger output for the "@" variable picker.
+	 *
+	 * Keys mirror what resolve_trigger() emits for each event. Every trigger
+	 * returns a non-empty array: explicit samples where the shape is specific,
+	 * plus category fallbacks keyed by the event-name prefix so no trigger is
+	 * ever empty in the picker before a real capture.
+	 */
+	public static function get_trigger_sample_output( string $trigger ): array {
+		$customer_sample = [
+			'id'         => 5,
+			'customer_id' => 5,
+			'email'      => 'john@example.com',
+			'first_name' => 'John',
+			'last_name'  => 'Doe',
+		];
+
+		$order_sample = [
+			'id'             => 101,
+			'order_id'       => 101,
+			'status'         => 'paid',
+			'total'          => '49.00',
+			'currency'       => 'USD',
+			'customer_id'    => 5,
+			'customer_email' => 'john@example.com',
+			'items'          => [
+				[
+					'product_id' => 12,
+					'name'       => 'Pro Plan',
+					'quantity'   => 1,
+					'total'      => '49.00',
+				],
+			],
+		];
+
+		$subscription_sample = [
+			'id'          => 9,
+			'status'      => 'active',
+			'total'       => '49.00',
+			'currency'    => 'USD',
+			'customer_id' => 5,
+			'order_id'    => 101,
+		];
+
+		$product_sample = [
+			'id'    => 12,
+			'ID'    => 12,
+			'name'  => 'Pro Plan',
+			'price' => '49.00',
+		];
+
+		// Base shape emitted by resolve_order_event_trigger().
+		$order_base = [
+			'event'               => $trigger,
+			'event_time'          => '2026-01-01 12:00:00',
+			'args'                => [],
+			'order_id'            => 101,
+			'customer_id'         => 5,
+			'order'               => $order_sample,
+			'customer'            => $customer_sample,
+			'transaction'         => [],
+			'old_status'          => '',
+			'new_status'          => '',
+			'reason'              => '',
+			'type'                => '',
+			'subscription'        => [],
+			'connected_order_ids' => [],
+			'refunded_items'      => [],
+			'refunded_amount'     => 0.0,
+		];
+
+		// Base shape emitted by resolve_subscription_event_trigger().
+		$subscription_base = [
+			'event'           => $trigger,
+			'event_time'      => '2026-01-01 12:00:00',
+			'args'            => [],
+			'subscription_id' => 9,
+			'customer_id'     => 5,
+			'order_id'        => 101,
+			'subscription'    => $subscription_sample,
+			'order'           => $order_sample,
+			'customer'        => $customer_sample,
+			'reason'          => '',
+			'meta'            => [],
+		];
+
+		$samples = [
+			'order_created'            => $order_base,
+			'order_paid'              => array_merge( $order_base, [
+				'transaction' => [
+					'id' => 501,
+					'total' => '49.00',
+					'status' => 'paid'
+				]
+			] ),
+			'order_paid_done'         => array_merge( $order_base, [
+				'transaction' => [
+					'id' => 501,
+					'total' => '49.00',
+					'status' => 'paid'
+				]
+			] ),
+			'order_payment_failed'    => array_merge( $order_base, [ 'reason' => 'card_declined' ] ),
+			'order_updated'           => $order_base,
+			'order_canceled'          => array_merge( $order_base, [ 'reason' => 'customer_request' ] ),
+			'order_deleted'           => $order_base,
+			'renewal_order_deleted'   => array_merge( $order_base, [ 'type' => 'renewal' ] ),
+			'order_refunded'          => array_merge( $order_base, [
+				'refunded_amount' => 49.0,
+				'refunded_items' => [
+					[
+						'product_id' => 12,
+						'total' => '49.00'
+					]
+				]
+			] ),
+			'order_fully_refunded'    => array_merge( $order_base, [ 'refunded_amount' => 49.0 ] ),
+			'order_partially_refunded' => array_merge( $order_base, [ 'refunded_amount' => 20.0 ] ),
+			'order_status_changed'    => array_merge( $order_base, [
+				'old_status' => 'processing',
+				'new_status' => 'paid'
+			] ),
+			'payment_status_changed'  => array_merge( $order_base, [
+				'old_status' => 'pending',
+				'new_status' => 'paid'
+			] ),
+			'shipping_status_changed' => array_merge( $order_base, [
+				'old_status' => 'unshipped',
+				'new_status' => 'shipped'
+			] ),
+
+			'subscription_activated'        => array_merge( $subscription_base, [ 'reason' => 'payment_received' ] ),
+			'subscription_canceled'         => array_merge( $subscription_base, [ 'reason' => 'customer_request' ] ),
+			'subscription_renewed'          => array_merge( $subscription_base, [ 'reason' => 'renewal_payment' ] ),
+			'subscription_eot'              => array_merge( $subscription_base, [ 'reason' => 'end_of_term' ] ),
+			'subscription_expired_validity' => array_merge( $subscription_base, [ 'reason' => 'validity_expired' ] ),
+
+			'product_created' => [
+				'event'      => $trigger,
+				'event_time' => '2026-01-01 12:00:00',
+				'args'       => [],
+				'product_id' => 12,
+				'product'    => $product_sample,
+			],
+			'product_updated' => [
+				'event'      => $trigger,
+				'event_time' => '2026-01-01 12:00:00',
+				'args'       => [],
+				'product_id' => 12,
+				'data'       => [ 'price' => '49.00' ],
+				'product'    => $product_sample,
+			],
+			'product_duplicated' => [
+				'event'               => $trigger,
+				'event_time'          => '2026-01-01 12:00:00',
+				'args'                => [],
+				'original_product_id' => 12,
+				'new_product_id'      => 13,
+				'options'             => [],
+				'product'             => array_merge( $product_sample, [
+					'id' => 13,
+					'ID' => 13
+				] ),
+			],
+			'product_stock_changed' => [
+				'event'       => $trigger,
+				'event_time'  => '2026-01-01 12:00:00',
+				'args'        => [],
+				'product_ids' => [ 12 ],
+				'other_info'  => [],
+			],
+		];
+
+		if ( isset( $samples[ $trigger ] ) ) {
+			return $samples[ $trigger ];
+		}
+
+		// Category fallbacks by event-name prefix so every trigger exposes fields
+		// in the "@" picker even without an explicit sample above.
+		if ( 0 === strpos( $trigger, 'order_' ) || 0 === strpos( $trigger, 'payment_' ) || 0 === strpos( $trigger, 'shipping_' ) ) {
+			return [
+				'order_id'       => 101,
+				'total'          => '49.00',
+				'currency'       => 'USD',
+				'status'         => 'paid',
+				'customer_email' => 'john@example.com',
+			];
+		}
+		if ( 0 === strpos( $trigger, 'subscription_' ) ) {
+			return [
+				'subscription_id' => 9,
+				'status'          => 'active',
+				'total'           => '49.00',
+			];
+		}
+		if ( 0 === strpos( $trigger, 'product_' ) ) {
+			return [
+				'product_id' => 12,
+				'name'       => 'Pro Plan',
+				'price'      => '49.00',
+			];
+		}
+		if ( 0 === strpos( $trigger, 'customer_' ) ) {
+			return [
+				'customer_id' => 5,
+				'email'       => 'john@example.com',
+				'first_name'  => 'John',
+				'last_name'   => 'Doe',
+			];
+		}
+
+		return $order_base;
 	}
 
 

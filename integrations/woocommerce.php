@@ -73,11 +73,20 @@ class Woocommerce extends IntegrationBase {
 			case 'create_order':
 				return [ 'status' => 'processing' ];
 			case 'create_customer':
-				return [ 'email' => "customer_{$rand}@example.test", 'first_name' => 'Recipe' ];
+				return [
+					'email' => "customer_{$rand}@example.test",
+					'first_name' => 'Recipe'
+				];
 			case 'create_product':
-				return [ 'name' => "Recipe Product {$rand}", 'regular_price' => '10' ];
+				return [
+					'name' => "Recipe Product {$rand}",
+					'regular_price' => '10'
+				];
 			case 'create_coupon':
-				return [ 'code' => "recipe_{$rand}", 'amount' => '10' ];
+				return [
+					'code' => "recipe_{$rand}",
+					'amount' => '10'
+				];
 		}
 		return null;
 	}
@@ -108,7 +117,7 @@ class Woocommerce extends IntegrationBase {
 			$order->save();
 			// new_order + woocommerce_order_status_*: ( $order_id, $order ).
 			return [ $order->get_id(), $order ];
-		}
+		}//end if
 
 		if ( 'create_product' === $event || 'update_product' === $event ) {
 			if ( ! class_exists( '\WC_Product_Simple' ) ) {
@@ -605,7 +614,7 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key' => 'billing_email',
 					'label' => 'Billing Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				...self::field_limit_page(),
@@ -628,7 +637,7 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Customer Email',
-					'type' => 'text'
+					'type' => 'email'
 				],
 			],
 			'add_order_note' => [
@@ -654,7 +663,7 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Customer Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 			],
@@ -662,7 +671,7 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				[
@@ -1300,7 +1309,7 @@ class Woocommerce extends IntegrationBase {
 				[
 					'key'      => 'email',
 					'label'    => 'Email Address',
-					'type'     => 'text',
+					'type'     => 'email',
 					'required' => true,
 				],
 			],
@@ -1310,12 +1319,30 @@ class Woocommerce extends IntegrationBase {
 					'label'   => 'Status Filter',
 					'type'    => 'select',
 					'options' => [
-						[ 'label' => 'All', 'value' => '' ],
-						[ 'label' => 'Draft', 'value' => 'draft' ],
-						[ 'label' => 'Processing (Abandoned)', 'value' => 'processing' ],
-						[ 'label' => 'Recovered', 'value' => 'recovered' ],
-						[ 'label' => 'Lost', 'value' => 'lost' ],
-						[ 'label' => 'Opt Out', 'value' => 'opt_out' ],
+						[
+							'label' => 'All',
+							'value' => ''
+						],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
+						[
+							'label' => 'Processing (Abandoned)',
+							'value' => 'processing'
+						],
+						[
+							'label' => 'Recovered',
+							'value' => 'recovered'
+						],
+						[
+							'label' => 'Lost',
+							'value' => 'lost'
+						],
+						[
+							'label' => 'Opt Out',
+							'value' => 'opt_out'
+						],
 					],
 				],
 				[
@@ -1338,12 +1365,30 @@ class Woocommerce extends IntegrationBase {
 					'type'     => 'select',
 					'required' => true,
 					'options'  => [
-						[ 'label' => 'Draft', 'value' => 'draft' ],
-						[ 'label' => 'Processing', 'value' => 'processing' ],
-						[ 'label' => 'Recovered', 'value' => 'recovered' ],
-						[ 'label' => 'Lost', 'value' => 'lost' ],
-						[ 'label' => 'Opt Out', 'value' => 'opt_out' ],
-						[ 'label' => 'Skipped', 'value' => 'skipped' ],
+						[
+							'label' => 'Draft',
+							'value' => 'draft'
+						],
+						[
+							'label' => 'Processing',
+							'value' => 'processing'
+						],
+						[
+							'label' => 'Recovered',
+							'value' => 'recovered'
+						],
+						[
+							'label' => 'Lost',
+							'value' => 'lost'
+						],
+						[
+							'label' => 'Opt Out',
+							'value' => 'opt_out'
+						],
+						[
+							'label' => 'Skipped',
+							'value' => 'skipped'
+						],
 					],
 				],
 			],
@@ -1389,7 +1434,7 @@ class Woocommerce extends IntegrationBase {
 			'port' => 'main',
 			'data' => $input
 		];
-	} 
+	}
 
 	public static function get_trigger_sample_output( string $trigger ): array {
 		if ( in_array( $trigger, [ 'cart_abandoned', 'cart_recovered', 'cart_lost' ], true ) ) {
@@ -1411,24 +1456,120 @@ class Woocommerce extends IntegrationBase {
 			];
 		}
 
+		// Shared base samples that mirror the build_*_payload() shapes in Woo\Helper.
+		$order = [
+			'order_id'          => 123,
+			'order_number'      => '123',
+			'order_key'         => 'wc_order_abc123',
+			'status'            => 'completed',
+			'total'             => 49.99,
+			'currency'          => 'USD',
+			'customer_id'       => 1,
+			'email'             => 'customer@example.com',
+			'first_name'        => 'Jane',
+			'last_name'         => 'Smith',
+			'feedback_page_url' => home_url( '/feedback/?order_id=123&key=wc_order_abc123' ),
+		];
+
+		$product = [
+			'product_id' => 55,
+			'name'       => 'Sample Product',
+			'status'     => 'publish',
+			'sku'        => 'SKU-055',
+			'price'      => '19.99',
+			'type'       => 'simple',
+		];
+
+		$coupon = [
+			'coupon_id'     => 77,
+			'code'          => 'save10',
+			'amount'        => '10',
+			'discount_type' => 'percent',
+		];
+
+		$customer = [
+			'customer_id' => 1,
+			'email'       => 'customer@example.com',
+			'username'    => 'janesmith',
+		];
+
+		$cart_item = [
+			'cart_item_key' => 'a1b2c3d4e5',
+			'product_id'    => 55,
+			'quantity'      => 2,
+			'variation_id'  => 0,
+		];
+
 		if ( in_array( $trigger, self::$order_status_events, true ) ) {
+			return array_merge( $order, [
+				'old_status' => 'processing',
+				'new_status' => 'completed',
+			] );
+		}
+
+		// Explicit samples that match each resolve_trigger() branch.
+		$explicit = [
+			'new_order'                 => $order,
+			'restore_order'             => array_merge( $order, [ 'previous_status' => 'trash' ] ),
+			'order_status_changed'      => array_merge( $order, [
+				'old_status' => 'processing',
+				'new_status' => 'completed'
+			] ),
+			'new_coupon'                => $coupon,
+			'create_customer'           => array_merge( $customer, [ 'password_generated' => true ] ),
+			'update_customer'           => $customer,
+			'delete_customer'           => [ 'customer_id' => 1 ],
+			'create_product'            => $product,
+			'update_product'            => $product,
+			'delete_product'            => $product,
+			'restore_product'           => $product,
+			'product_status_updated'    => array_merge( $product, [ 'stock_status' => 'instock' ] ),
+			'product_status_changed'    => array_merge( $product, [
+				'old_status' => 'draft',
+				'new_status' => 'publish'
+			] ),
+			'product_added_to_cart'     => $cart_item,
+			'product_removed_from_cart' => $cart_item,
+		];
+
+		if ( isset( $explicit[ $trigger ] ) ) {
+			return $explicit[ $trigger ];
+		}
+
+		// Category fallbacks by event-name prefix so any future trigger stays non-empty.
+		if ( 0 === strpos( $trigger, 'order_' ) || 'new_order' === $trigger || 'restore_order' === $trigger ) {
+			return $order;
+		}
+		if ( 0 === strpos( $trigger, 'product_' ) ) {
+			return $product;
+		}
+		if ( 0 === strpos( $trigger, 'customer_' ) || false !== strpos( $trigger, '_customer' ) ) {
+			return $customer;
+		}
+		if ( 0 === strpos( $trigger, 'coupon_' ) || false !== strpos( $trigger, 'coupon' ) ) {
+			return $coupon;
+		}
+		if ( 0 === strpos( $trigger, 'cart_' ) ) {
+			return $cart_item;
+		}
+		if ( 0 === strpos( $trigger, 'subscription_' ) ) {
 			return [
-				'order_id'          => 123,
-				'order_number'      => '123',
-				'order_key'         => 'wc_order_abc123',
-				'status'            => 'completed',
-				'total'             => 49.99,
-				'currency'          => 'USD',
-				'customer_id'       => 1,
-				'email'             => 'customer@example.com',
-				'first_name'        => 'Jane',
-				'last_name'         => 'Smith',
-				'feedback_page_url' => home_url( '/feedback/?order_id=123&key=wc_order_abc123' ),
-				'old_status'        => 'processing',
-				'new_status'        => 'completed',
+				'subscription_id' => 900,
+				'status'          => 'active',
+				'total'           => 49.99,
+			];
+		}
+		if ( 0 === strpos( $trigger, 'review_' ) ) {
+			return [
+				'review_id'    => 300,
+				'product_id'   => 55,
+				'reviewer'     => 'Jane Smith',
+				'rating'       => 5,
+				'review'       => 'Great product!',
+				'approved'     => true,
 			];
 		}
 
-		return [];
+		return $order;
 	}
 }

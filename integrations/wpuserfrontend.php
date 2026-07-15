@@ -55,6 +55,211 @@ class Wpuserfrontend extends IntegrationBase {
 		];
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+
+		$user_payload = [
+			'user_id'      => '42',
+			'first_name'   => 'Jane',
+			'last_name'    => 'Doe',
+			'user_login'   => 'janedoe',
+			'user_email'   => 'jane@example.com',
+			'nickname'     => 'janedoe',
+			'avatar_url'   => 'https://www.gravatar.com/avatar/0123456789abcdef?s=96&d=mm&r=g',
+			'display_name' => 'Jane Doe',
+			'user_roles'   => [ 'subscriber' ],
+		];
+
+		$post_object = [
+			'ID'                => 101,
+			'post_author'       => '42',
+			'post_date'         => '2026-07-09 10:15:00',
+			'post_date_gmt'     => '2026-07-09 10:15:00',
+			'post_content'      => 'This is the submitted post content.',
+			'post_title'        => 'My Submitted Post',
+			'post_excerpt'      => '',
+			'post_status'       => 'publish',
+			'comment_status'    => 'open',
+			'ping_status'       => 'open',
+			'post_password'     => '',
+			'post_name'         => 'my-submitted-post',
+			'post_modified'     => '2026-07-09 10:15:00',
+			'post_modified_gmt' => '2026-07-09 10:15:00',
+			'post_parent'       => 0,
+			'guid'              => 'https://example.com/?p=101',
+			'menu_order'        => 0,
+			'post_type'         => 'post',
+			'post_mime_type'    => '',
+			'comment_count'     => '0',
+			'filter'            => 'raw',
+		];
+
+		$coupon_post = array_merge(
+			$post_object,
+			[
+				'post_title' => 'SUMMER25',
+				'post_name'  => 'summer25',
+				'post_type'  => 'wpuf_coupon',
+				'guid'       => 'https://example.com/?post_type=wpuf_coupon&p=101',
+			]
+		);
+
+		$nested_user_data = [
+			'id'   => 42,
+			'user' => [
+				'data'  => [
+					'ID'              => 42,
+					'user_login'      => 'janedoe',
+					'user_email'      => 'jane@example.com',
+					'display_name'    => 'Jane Doe',
+					'user_url'        => 'https://example.com',
+					'user_registered' => '2026-01-01 08:00:00',
+				],
+				'roles' => [ 'subscriber' ],
+			],
+		];
+
+		$subscription_post = [
+			'post_type'         => 'wpuf_subscription',
+			'post_date'         => '2026-07-09 10:15:00',
+			'post_date_gmt'     => '2026-07-09 10:15:00',
+			'post_content'      => 'Premium subscription pack.',
+			'post_title'        => 'Premium Pack',
+			'post_status'       => 'publish',
+			'post_modified'     => '2026-07-09 10:15:00',
+			'post_modified_gmt' => '2026-07-09 10:15:00',
+			'post_name'         => 'premium-pack',
+		];
+
+		$subscription = [
+			'meta_value' => [
+				'recurring_pay'     => 'no',
+				'billing_amount'    => '29.00',
+				'expiration_number' => '1',
+				'expiration_period' => 'month',
+				'post_count'        => '10',
+			],
+		];
+
+		$samples = [
+			'post_form_submission' => [
+				'success'      => true,
+				'post_id'      => 101,
+				'form_id'      => 7,
+				'post_data'    => array_merge(
+					$post_object,
+					[
+						'custom_field' => 'Custom field value',
+						'phone_number' => '+1-555-0100',
+					]
+				),
+				'user_data'    => $nested_user_data,
+				'meta_data'    => [
+					'custom_field' => [ 'Custom field value' ],
+					'phone_number' => [ '+1-555-0100' ],
+				],
+				'formSettings' => [
+					'post_type'   => 'post',
+					'post_status' => 'publish',
+					'redirect_to' => 'page',
+				],
+			],
+			'registration_form_submission' => [
+				'success'       => true,
+				'user_id'       => 42,
+				'form_id'       => 3,
+				'user_data'     => $user_payload,
+				'form_settings' => [
+					'role'        => 'subscriber',
+					'redirect_to' => 'same',
+				],
+			],
+			'profile_edit_form_submission' => [
+				'success'       => true,
+				'user_id'       => 42,
+				'form_id'       => 5,
+				'user_data'     => $user_payload,
+				'meta_data'     => [
+					'company' => 'Acme Inc',
+					'website' => 'https://example.com',
+				],
+				'form_settings' => [
+					'role'        => 'subscriber',
+					'redirect_to' => 'same',
+				],
+			],
+			'metadata_update_profile_edit_form_submission' => [
+				'success'   => true,
+				'user_data' => $user_payload,
+				'post_data' => [
+					'first_name' => 'Jane',
+					'last_name'  => 'Doe',
+					'company'    => 'Acme Inc',
+					'website'    => 'https://example.com',
+				],
+			],
+			'subscription_pack_update' => [
+				'success'      => true,
+				'id'           => 88,
+				'subscription' => $subscription,
+				'post'         => $subscription_post,
+			],
+			'created_coupon' => [
+				'success'   => true,
+				'post_data' => $coupon_post,
+				'user_data' => $user_payload,
+			],
+			'updated_coupon' => [
+				'success'   => true,
+				'post_data' => array_merge(
+					$coupon_post,
+					[
+						'_coupon_amount' => '25',
+						'_coupon_type'   => 'percent',
+					]
+				),
+				'user_data' => $user_payload,
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'coupon' ) ) {
+			return [
+				'success'   => true,
+				'post_data' => $coupon_post,
+				'user_data' => $user_payload,
+			];
+		}
+
+		if ( false !== strpos( $event, 'subscription' ) ) {
+			return [
+				'success'      => true,
+				'id'           => 88,
+				'subscription' => $subscription,
+				'post'         => $subscription_post,
+			];
+		}
+
+		if ( false !== strpos( $event, 'profile' )
+			|| false !== strpos( $event, 'registration' )
+			|| false !== strpos( $event, 'user' )
+		) {
+			return [
+				'success'   => true,
+				'user_id'   => 42,
+				'user_data' => $user_payload,
+			];
+		}
+
+		return [
+			'success'   => true,
+			'user_data' => $user_payload,
+			'post_data' => $post_object,
+		];
+	}
+
 	private static function resolve_user_payload( int $user_id ) {
 		$user = get_userdata( $user_id );
 

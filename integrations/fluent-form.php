@@ -119,8 +119,7 @@ class FluentForm extends IntegrationBase {
 		return $options;
 	}
 
-	public static function get_output_ports(): array
-	{
+	public static function get_output_ports(): array {
 		return [
 			'main' => 'Main output',
 		];

@@ -45,7 +45,7 @@ export default function ConditionGroupField({
                   }
                   return <VariableEditor containerStyle={{
                     width: '30%'
-                  }} label={f.label} placeholder={__('Type "@" here to...', "zaplane")} value={rule[f.key]} variables={variables} variableContext={variableContext} isRequired field={{
+                  }} multiline={false} label={f.label} placeholder={__('Type "@" here to...', "zaplane")} value={rule[f.key]} variables={variables} variableContext={variableContext} isRequired field={{
                     key: `${field.key}.${gIndex}.${rIndex}.${f.key}`
                   }} setFieldValue={(key, val) => {
                     ruleHelpers.replace(rIndex, {

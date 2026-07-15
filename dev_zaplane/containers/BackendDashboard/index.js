@@ -10,10 +10,12 @@ import Connections from './pages/connections';
 import Dashboard from './pages/dashboard';
 import { __ } from '@wordpress/i18n';
 import RecipesPage from './pages/recipes';
+import KnowledgePage from './pages/knowledge';
 import Folders from './pages/Folders';
 import Folder from './pages/Folders/Folder';
 import EmailTemplatesPage from './pages/email-templates';
 import EmailTemplateEditor from './pages/email-templates/Editor';
+import CustomApps from './pages/custom-apps';
 
 
 
@@ -31,8 +33,12 @@ const renderSwitch = (page, id, action, path) => {
 			return <Logs />;
 		case 'zaplane-connections':
 			return <Connections />;
+		case 'zaplane-custom-apps':
+			return <CustomApps id={id} action={action} />;
 		case 'zaplane-recipes':
 			return <RecipesPage />;
+		case 'zaplane-knowledge':
+			return <KnowledgePage />;
 		case 'zaplane-email-templates':
 			if (action || id) {
 				return <EmailTemplateEditor id={id} />;

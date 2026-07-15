@@ -17,10 +17,16 @@ const ZAPSelect = ({
   containerStyle = {}
 }) => {
 
-  // Handle selected value properly
+  // Handle selected value properly. For a single select, dynamic options load
+  // lazily (e.g. the AI model list is fetched per connection), so the saved value
+  // may not be in `options` yet — fall back to showing the raw value instead of
+  // the placeholder, otherwise a already-chosen value reads as "nothing selected".
   const selectedValue = isMulti
     ? options.filter((o) => Array.isArray(value) && value.includes(o.value))
-    : options.find((o) => o.value === value) || null;
+    : options.find((o) => o.value === value) ||
+      (value !== undefined && value !== null && value !== ""
+        ? { value, label: String(value) }
+        : null);
 
   // Handle change properly
   const handleChange = (selected) => {

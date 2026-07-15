@@ -75,7 +75,7 @@ class BirthdayCronModule implements ModuleInterface {
 
 			// Only process once per order (first birthday coupon wins).
 			break;
-		}
+		}//end foreach
 	}
 
 	/**

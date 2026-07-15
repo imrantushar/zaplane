@@ -24,6 +24,21 @@ import ActionFieldRenderer from "../ActionDrawer/ActionFieldRenderer/ActionField
 import TestRun from "../ActionDrawer/TestRun/TestRun";
 import DrawerSearchList from "@ZAPComponents/SearchableDrawerList/DrawerSearchList/DrawerSearchList";
 
+// Pragmatic email check for UI validation (not RFC-exhaustive): non-empty local
+// part, "@", and a dotted domain, with no spaces.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Validate a literal recipient value: a single email, or a comma/semicolon
+// separated list where every non-empty part is a valid email.
+const isValidEmailList = (value) => {
+  const parts = String(value)
+    .split(/[,;]/)
+    .map((p) => p.trim())
+    .filter((p) => p !== "");
+  if (parts.length === 0) return false;
+  return parts.every((p) => EMAIL_RE.test(p));
+};
+
 const ActionDrawer = ({
   open,
   context,
@@ -37,7 +52,9 @@ const ActionDrawer = ({
 }) => {
   const {
     source,
-    node
+    node,
+    edge,
+    port
   } = context;
   const dispatch = useDispatch();
   const {
@@ -60,7 +77,7 @@ const ActionDrawer = ({
     visibleFields,
     resetAll,
   } = useActionDrawer({
-    open, node, source, setFieldValue, isTrigger, values, resetForm, onClose,
+    open, node, source, port, setFieldValue, isTrigger, values, resetForm, onClose,
   });
 
 
@@ -98,23 +115,46 @@ const {
         });
         return;
       }
-      if (!field.required) return;
       const val = values?.[field.key];
       const isEmpty =
         val === undefined ||
         val === null ||
         val === "" ||
         (Array.isArray(val) && val.length === 0);
-      if (isEmpty) {
+
+      if (field.required && isEmpty) {
         setFieldError(field.key, __("This field is required", "zaplane"));
         hasError = true;
+        return;
+      }
+
+      // Format checks apply to present values only. Skip anything that uses
+      // dynamic data ({{...}} tokens) — those resolve at run time, so we can't
+      // (and shouldn't) validate their literal shape here.
+      if (!isEmpty && typeof val === "string") {
+        const usesDynamicData = /\{\{[\s\S]*?\}\}/.test(val);
+        if (!usesDynamicData && field.type === "email" && !isValidEmailList(val)) {
+          setFieldError(field.key, __("Enter a valid email address", "zaplane"));
+          hasError = true;
+        }
       }
     });
     return hasError;
   };
 
+  // Apps that require a connection (e.g. AI) must have one picked before moving
+  // past the Select step. Returns true when a required connection is missing.
+  const validateConnection = () => {
+    if (selectedIntegration?.requires_connection === true && !values?.connection_id) {
+      setFieldError("connection_id", __("A connection is required", "zaplane"));
+      return true;
+    }
+    return false;
+  };
+
   const handleContinue = () => {
     if (step === "select") {
+      if (validateConnection()) return;
       return setStep("configure");
     }
     if (step === "configure") {
@@ -136,22 +176,59 @@ const {
     }
   };
 
-  // get global variable
+  // Load the "@" dynamic variables available to this node/action. The picker's
+  // fields come from upstream nodes in the graph. The backend excludes the
+  // *target* node from its own variables, so:
+  //  - Opening an existing node  → target = that node (its ancestors show).
+  //  - Adding a NEW action       → the new node doesn't exist yet, so we splice
+  //    in a temporary target wired right after the node/edge it's being added
+  //    from. That makes the node it's added after (e.g. the trigger) count as
+  //    upstream — otherwise a fresh action after the trigger showed nothing.
+  // We wait for the graph to load (nodes.length) so we never fetch an empty
+  // graph, which would return empty data and clobber a good result.
   useEffect(() => {
-    if (!node?.id || !workFlow?.version?.hash) return;
-    const payload = {
-      workflow_id: workFlow.workflow?.id,
-      workflow_hash: workFlow.version?.hash,
-      workflow_version_id: workFlow.version?.id,
-      target_node_key: node?.id,
-      graph: {
-        nodes: mapNodesForBackend(nodes),
-        edges: mapEdgesForBackend(edges),
-      },
-    };
+    if (!open || !nodes?.length) return;
 
-    dispatch(conditionVariables(payload));
-  }, [node?.id]);
+    const baseNodes = mapNodesForBackend(nodes);
+    const baseEdges = mapEdgesForBackend(edges);
+    const TEMP_TARGET = 999999;
+
+    let targetKey = null;
+    let graphNodes = baseNodes;
+    let graphEdges = baseEdges;
+
+    if (source === "node" && node?.id) {
+      targetKey = node.id;
+    } else if (source === "add" && node?.id) {
+      targetKey = TEMP_TARGET;
+      graphNodes = [...baseNodes, { id: TEMP_TARGET, type: "action", data: {} }];
+      graphEdges = [...baseEdges, { source: node.id, target: TEMP_TARGET }];
+    } else if (source === "edge" && edge?.source != null) {
+      targetKey = TEMP_TARGET;
+      graphNodes = [...baseNodes, { id: TEMP_TARGET, type: "action", data: {} }];
+      graphEdges = [...baseEdges, { source: edge.source, target: TEMP_TARGET }];
+    }
+
+    if (targetKey == null) return;
+
+    dispatch(conditionVariables({
+      workflow_id: workFlow?.workflow?.id,
+      workflow_hash: workFlow?.version?.hash,
+      workflow_version_id: workFlow?.version?.id,
+      target_node_key: targetKey,
+      graph: { nodes: graphNodes, edges: graphEdges },
+    }));
+  }, [
+    open,
+    source,
+    node?.id,
+    edge?.id,
+    workFlow?.workflow?.id,
+    workFlow?.version?.id,
+    workFlow?.version?.hash,
+    nodes?.length,
+    edges?.length,
+  ]);
   return <ZAPDrawer open={open} isFullscreen={isFullscreen} onClose={resetAll}
     arrowClose={['tools', 'app'].includes(mode)}
     maxWidth={['filter', 'if'].includes(values?.actionType) ? 'max-w-[700px]' : 'max-w-[500px]'}
@@ -161,8 +238,8 @@ const {
       setStep("select");
       setFieldValue("actionType", "");
     }}
-    // closeOnOverlayClick
-    title={!mode ? "Add Action" : selectedItem?.name || __('App', 'zaplane')} placement="end"
+    closeOnOverlayClick
+    title={!mode ? (isTrigger ? __('Add Trigger', 'zaplane') : __('Add Action', 'zaplane')) : selectedItem?.name || __('App', 'zaplane')} placement="end"
     // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
     footer={<div className="flex items-center justify-end gap-3">
       <button
@@ -188,11 +265,14 @@ const {
         </>
       )}
 
-      {!mode && !search && !selectedItem && <DrawerModeList setMode={setMode} setSelectedItem={setSelectedItem} isTrigger={isTrigger} source={source} TOOLS={TOOLS} />}
+      {!mode && !search && !selectedItem && <DrawerModeList setMode={setMode} setSelectedItem={setSelectedItem} isTrigger={isTrigger} source={source} TOOLS={TOOLS} port={port} />}
 
-      {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={setSelectedItem} setMode={setMode} />}
+      {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={(item) => setSelectedItem(mode === "tools" ? { ...item, mode: "tools" } : item)} setMode={setMode} />}
 
       {selectedItem && <ZAPTab value={step} onChange={values?.actionType ? (newStep) => {
+        if (step === "select" && newStep !== "select") {
+          if (validateConnection()) return;
+        }
         if (step === "configure" && newStep === "test") {
           if (validateRequiredFields()) return;
         }

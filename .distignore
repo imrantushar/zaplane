@@ -1,33 +1,62 @@
+# ─────────────────────────────────────────────────────────────
+# Files/dirs excluded from the distributable plugin zip.
+# NOTE: never exclude the whole `vendor/` dir — wp dist-archive drops
+# vendor/autoload.php when the vendor dir is ignored. Production deps are
+# already trimmed by `composer install --no-dev` in scripts/build-zip.sh.
+# ─────────────────────────────────────────────────────────────
+
 # VCS & IDE
 .git
 .github
 .gitignore
+.gitattributes
 .DS_Store
 .claude
 .codex
+.editorconfig
+.vscode
+.idea
 
-# Dev tooling
+# Dev tooling & configs
+.distignore
 .eslintrc.js
 .eslintignore
 .prettierrc.js
 .prettierignore
 .phpunit.result.cache
-.gitignore
 .fantasticonrc.js
+.npmrc
 webpack.config.js
+tailwind.config.js
+postcss.config.js
+jsconfig.json
 phpcs.xml
+phpunit.xml
 composer.json
 composer.lock
 package.json
 package-lock.json
-jsconfig.json
-phpunit.xml
-node_modules
-CLAUDE.md
 
-# Dev-only code
-tests
+# Build tooling & logs (not needed at runtime)
+build.sh
+build_output.log
+scripts
+
+# Docs (dev-facing; README.txt ships the user-facing changelog)
+CLAUDE.md
+CHANGELOG.md
+TESTING.md
+front-end-dev-doc
 docs
+
+# Dev-only code & tests
+tests
 dev_zaplane
+recipes-test
+node_modules
 includes/framework/console
 includes/commands
+
+# Asset sources (compiled output ships in assets/build & assets/library)
+assets/scss
+assets/icon-src

@@ -25,7 +25,12 @@ class Whatsapp extends IntegrationBase {
 	}
 
 	public static function get_triggers(): array {
-		return [];
+		return [
+			'message_received' => [
+				'label' => 'Message Received',
+				'hook'  => 'zaplane/whatsapp/message_received',
+			],
+		];
 	}
 
 	public static function get_actions(): array {
@@ -91,7 +96,7 @@ class Whatsapp extends IntegrationBase {
 					'help'        => 'Optional JSON array of template component parameters.',
 				],
 			];
-		}
+		}//end if
 
 		if ( 'send_image' === $action ) {
 			return [
@@ -141,7 +146,7 @@ class Whatsapp extends IntegrationBase {
 					'required'    => false,
 				],
 			];
-		}
+		}//end if
 
 		if ( 'send_video' === $action ) {
 			return [
@@ -210,13 +215,132 @@ class Whatsapp extends IntegrationBase {
 					'required'    => false,
 				],
 			];
-		}
+		}//end if
 
 		return [];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
+		$event = $node['event'] ?? '';
+
+		if ( 'message_received' === $event ) {
+			// The incoming-webhook controller fires the hook with the parsed
+			// payload as the single argument.
+			$payload = $args[0] ?? [];
+
+			if ( ! is_array( $payload ) || empty( $payload ) ) {
+				return false;
+			}
+
+			// Ignore messages echoed from our own business number, which would
+			// otherwise loop a reply workflow back onto itself.
+			if ( ! empty( $payload['is_echo'] ) ) {
+				return false;
+			}
+
+			return $payload;
+		}
+
+		return false;
+	}
+
+	public static function get_trigger_sample_output( string $trigger ): array {
+		if ( 'message_received' === $trigger ) {
+			return [
+				'message_id'      => 'wamid.HBgLMTU1NTEyMzQ1NjcVAgARGBI...',
+				'from'            => '15551234567',
+				'sender_name'     => 'John Doe',
+				'type'            => 'text',
+				'text'            => 'Hello, I need help with my order',
+				'timestamp'       => '1700000000',
+				'phone_number_id' => '1234567890',
+			];
+		}
+
 		return [];
+	}
+
+	public static function supports_webhook(): bool {
+		return true;
+	}
+
+	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
+		$secret = self::get_webhook_app_secret();
+
+		if ( '' === $secret ) {
+			return true;
+		}
+
+		$signature = $request->get_header( 'x_hub_signature_256' );
+
+		if ( ! $signature ) {
+			return false;
+		}
+
+		$expected = 'sha256=' . hash_hmac( 'sha256', $request->get_body(), $secret );
+
+		return hash_equals( $expected, $signature );
+	}
+
+	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
+		$data = json_decode( $request->get_body(), true );
+
+		if ( ! is_array( $data ) ) {
+			return null;
+		}
+
+		$value   = $data['entry'][0]['changes'][0]['value'] ?? [];
+		$message = $value['messages'][0] ?? null;
+
+		// No inbound message (status update, template event, etc.) → skip.
+		if ( ! is_array( $message ) ) {
+			return null;
+		}
+
+		// Idempotency: Meta retries webhooks until it gets a 200, so the same
+		// message id can arrive several times. Skip any id we've already seen
+		// within the dedup window to avoid firing the workflow (and replying)
+		// twice.
+		$message_id = $message['id'] ?? '';
+		if ( $message_id ) {
+			$seen_key = 'zaplane_wa_seen_' . md5( $message_id );
+			if ( get_transient( $seen_key ) ) {
+				return null;
+			}
+			set_transient( $seen_key, 1, 5 * MINUTE_IN_SECONDS );
+		}
+
+		$contact = $value['contacts'][0] ?? [];
+		$type    = $message['type'] ?? '';
+
+		$text = '';
+		if ( 'text' === $type ) {
+			$text = $message['text']['body'] ?? '';
+		} elseif ( 'button' === $type ) {
+			$text = $message['button']['text'] ?? '';
+		} elseif ( 'interactive' === $type ) {
+			$text = $message['interactive']['button_reply']['title']
+				?? ( $message['interactive']['list_reply']['title'] ?? '' );
+		}
+
+		return [
+			'event'   => 'message_received',
+			'payload' => [
+				'message_id'      => $message['id'] ?? '',
+				'from'            => $message['from'] ?? '',
+				'sender_name'     => $contact['profile']['name'] ?? '',
+				'type'            => $type,
+				'text'            => $text,
+				'timestamp'       => $message['timestamp'] ?? '',
+				'phone_number_id' => $value['metadata']['phone_number_id'] ?? '',
+			],
+		];
+	}
+
+	public static function get_webhook_app_secret(): string {
+		$secret = (string) get_option( 'zaplane_webhook_app_secret_whatsapp', '' );
+
+		return (string) apply_filters( 'zaplane_webhook_app_secret', $secret, 'whatsapp' );
 	}
 
 	public static function execute_node( array $node, array $input ): array {
@@ -362,8 +486,6 @@ class Whatsapp extends IntegrationBase {
 			],
 		];
 	}
-
-	// ── Private action helpers ────────────────────────────────────────────────
 
 	private static function action_send_text( array $node, array $input, string $token, string $phone_number_id, string $api_version ): array {
 		$to   = $node['data']['config']['to'] ?? '';
@@ -521,11 +643,11 @@ class Whatsapp extends IntegrationBase {
 			throw new \Exception( 'WhatsApp: recipient phone number (to) is required' );
 		}
 
-		if ( $latitude === '' || $latitude === null ) {
+		if ( '' === $latitude || null === $latitude ) {
 			throw new \Exception( 'WhatsApp: latitude is required' );
 		}
 
-		if ( $longitude === '' || $longitude === null ) {
+		if ( '' === $longitude || null === $longitude ) {
 			throw new \Exception( 'WhatsApp: longitude is required' );
 		}
 
@@ -566,11 +688,6 @@ class Whatsapp extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * Send a request to the WhatsApp Business Cloud API.
-	 *
-	 * @throws \Exception on WP_Error or API error response.
-	 */
 	private static function whatsapp_request( string $token, string $phone_number_id, string $api_version, array $body ): array {
 		$url = self::API_BASE_URL . '/' . $api_version . '/' . $phone_number_id . '/messages';
 

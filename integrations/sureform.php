@@ -2,141 +2,132 @@
 
 namespace Zaplane\Integrations;
 
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-class Sureform extends IntegrationBase
-{
+class Sureform extends IntegrationBase {
 
-    public static function get_slug(): string
-    {
-        return 'sureform';
-    }
 
-    public static function get_name(): string
-    {
-        return 'Sure Form';
-    }
+	public static function get_slug(): string {
+		return 'sureform';
+	}
 
-    public static function get_icon(): string
-    {
-        return 'sureform.svg';
-    }
+	public static function get_name(): string {
+		return 'Sure Form';
+	}
 
-    public static function get_triggers(): array
-    {
-        return [
-            'submit_form' => [
-                'label' => 'Form Submit',
-                'hook'  => 'srfm_form_submit',
-            ],
-        ];
-    }
+	public static function get_icon(): string {
+		return 'sureform.svg';
+	}
 
-    public static function get_trigger_config_schema(string $trigger): array
-    {
-        if ('submit_form' !== $trigger) {
-            return [];
-        }
+	public static function get_triggers(): array {
+		return [
+			'submit_form' => [
+				'label' => 'Form Submit',
+				'hook'  => 'srfm_form_submit',
+			],
+		];
+	}
 
-        return [
-            [
-                'key'      => 'form_id',
-                'label'    => 'Form',
-                'type'     => 'select',
-                'dynamic'  => [
-                    'integration' => 'sureform',
-                    'query'       => 'forms',
-                    'select'      => ['value', 'label'],
-                ],
-                'required' => true,
-            ],
-        ];
-    }
+	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( 'submit_form' !== $trigger ) {
+			return [];
+		}
 
-    public static function resolve_trigger(array $node, array $args): ?array
-    {
-        if (($node['event'] ?? '') !== 'submit_form') {
-            return null;
-        }
+		return [
+			[
+				'key'      => 'form_id',
+				'label'    => 'Form',
+				'type'     => 'select',
+				'dynamic'  => [
+					'integration' => 'sureform',
+					'query'       => 'forms',
+					'select'      => [ 'value', 'label' ],
+				],
+				'required' => true,
+			],
+		];
+	}
 
-        if (count($args) < 1 || !is_array($args[0])) {
-            return null;
-        }
+	public static function resolve_trigger( array $node, array $args ): ?array {
+		if ( ( $node['event'] ?? '' ) !== 'submit_form' ) {
+			return null;
+		}
 
-        $payload = $args[0];
-        $formId = (int)($payload['form_id'] ?? 0);
-        $formData = $payload['data'] ?? [];
+		if ( count( $args ) < 1 || ! is_array( $args[0] ) ) {
+			return null;
+		}
 
-        if ($formId === 0 || empty($formData)) {
-            return null;
-        }
+		$payload = $args[0];
+		$formId = (int) ( $payload['form_id'] ?? 0 );
+		$formData = $payload['data'] ?? [];
 
-        $config = $node['config'] ?? [];
-        $configuredFormId = $config['form_id'] ?? 'any';
+		if ( $formId === 0 || empty( $formData ) ) {
+			return null;
+		}
 
-        if ($configuredFormId !== 'any' && (int)$configuredFormId !== $formId) {
-            return null;
-        }
+		$config = $node['config'] ?? [];
+		$configuredFormId = $config['form_id'] ?? 'any';
 
-        return [
-            'form_id'   => $formId,
-            'form_name' => $payload['form_name'] ?? '',
-            'form_data' => $formData,
-            'message'   => $payload['message'] ?? '',
-            'to_emails' => $payload['to_emails'] ?? [],
-            'success'   => $payload['success'] ?? false,
-        ];
-    }
+		if ( $configuredFormId !== 'any' && (int) $configuredFormId !== $formId ) {
+			return null;
+		}
 
-    public static function get_dynamic_queries(): array
-    {
-        return [
-            'forms' => [self::class, 'query_forms'],
-        ];
-    }
+		return [
+			'form_id'   => $formId,
+			'form_name' => $payload['form_name'] ?? '',
+			'form_data' => $formData,
+			'message'   => $payload['message'] ?? '',
+			'to_emails' => $payload['to_emails'] ?? [],
+			'success'   => $payload['success'] ?? false,
+		];
+	}
 
-    public static function query_forms(): array
-    {
-        if (!is_plugin_active('sureforms/sureforms.php')) {
-            return [];
-        }
+	public static function get_dynamic_queries(): array {
+		return [
+			'forms' => [ self::class, 'query_forms' ],
+		];
+	}
 
-        $options = [
-            [
-                'label' => 'Any form',
-                'value' => 'any',
-            ],
-        ];
+	public static function query_forms(): array {
+		if ( ! is_plugin_active( 'sureforms/sureforms.php' ) ) {
+			return [];
+		}
 
-        $forms = get_posts(
-            [
-                'posts_per_page' => -1,
-                'orderby'        => 'name',
-                'order'          => 'asc',
-                'post_type'      => 'sureforms_form',
-                'post_status'    => 'publish',
-            ]
-        );
+		$options = [
+			[
+				'label' => 'Any form',
+				'value' => 'any',
+			],
+		];
 
-        foreach ($forms as $form) {
-            $label = !empty(trim($form->post_title)) ? $form->post_title : '(no title)';
-            $options[] = [
-                'label' => $label,
-                'value' => $form->ID,
-            ];
-        }
+		$forms = get_posts(
+			[
+				'posts_per_page' => -1,
+				'orderby'        => 'name',
+				'order'          => 'asc',
+				'post_type'      => 'sureforms_form',
+				'post_status'    => 'publish',
+			]
+		);
 
-        return $options;
-    }
+		foreach ( $forms as $form ) {
+			$label = ! empty( trim( $form->post_title ) ) ? $form->post_title : '(no title)';
+			$options[] = [
+				'label' => $label,
+				'value' => $form->ID,
+			];
+		}
 
-    public static function get_output_ports(): array
-    {
-        return [
-            'main' => 'Main output',
-        ];
-    }
+		return $options;
+	}
+
+	public static function get_output_ports(): array {
+		return [
+			'main' => 'Main output',
+		];
+	}
 }

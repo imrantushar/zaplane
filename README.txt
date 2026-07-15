@@ -4,7 +4,7 @@ Tags: automation, workflow, woocommerce, marketing automation, crm
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -101,6 +101,37 @@ Yes. You can chain multiple actions and insert delay, condition, filter, iterato
 
 == Changelog ==
 
+= 1.1.0 =
+**New integrations**
+* StoreEngine — order, subscription and product triggers plus actions.
+* AI (Chat Model) — generate replies with Anthropic, OpenAI, or WordPress Core AI.
+* AI Agent — autonomous tool-calling agent with Chat Model, Memory and Tools sub-nodes, plus MCP server support.
+* Conversation Memory — durable, keyed chat history for AI conversations.
+* Business Knowledge — a searchable knowledge base the AI Agent can query; sync from StoreEngine products.
+* Custom Apps — build your own integrations (REST or same-site WordPress hooks) without code changes.
+* Webhook — a dedicated app for both directions: Catch Webhook (incoming) and Send Webhook (outgoing) with optional HMAC-SHA256 signing.
+* Messenger and WhatsApp — AI auto-reply flows.
+* Academy — course enrolment triggers, actions and access-group membership.
+
+**New tools & flow control**
+* Manual Trigger, Schedule trigger, and Human-in-the-Loop approval.
+* Router (multi-branch), Repeater/Iterator, Condition and Filter.
+* Utility tools: CSV, XML, JSON Parser, Formatter, Date/Time, Image Helper, Set Variable, and Sticky Note.
+
+**New recipe**
+* "AI Reply to Incoming Webhook" — receive a question by webhook, answer it with the AI Agent using your Business Knowledge, then post the reply back out.
+
+**Improvements**
+* Dynamic-data "@" token picker across expression fields, with sample outputs so tokens are available before a test run.
+* Redesigned Business Knowledge, field, checkbox and connection-icon UI, with icon fallbacks.
+* Clearer node port / branch handles and AI Agent sub-node handles on the canvas.
+
+**Fixes**
+* AI and AI Agent no longer appear as trigger options where only actions apply.
+* Custom Apps: trigger firing, label handling, and the stale generic "Custom App" entry in the app picker.
+* Webhook: structured Body fields so multi-line/quoted values (e.g. an AI reply) can't produce malformed JSON.
+* Node port, multiple-output, route-indicator, CSV parser, and dynamic-data resolution fixes.
+
 = 1.0.2 =
 * Improvements and bug fixes.
 
@@ -108,6 +139,9 @@ Yes. You can chain multiple actions and insert delay, condition, filter, iterato
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Major feature release: StoreEngine, AI Agent (with MCP), AI Chat Model, Memory, Business Knowledge, Custom Apps, a bidirectional Webhook app, and many new tools and flow-control nodes.
 
 = 1.0.2 =
 Recommended update with stability improvements and bug fixes.

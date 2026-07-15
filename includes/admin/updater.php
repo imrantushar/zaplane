@@ -41,7 +41,7 @@ class Updater {
 				'first_install_time'  => get_option( 'gemcrm_first_install_time' ),
 				'optin_notice_delay'  => 3 * DAY_IN_SECONDS,
 			] );
-		}
+		}//end if
 
 		return self::$client;
 	}

@@ -50,6 +50,7 @@ class Automation {
 	}
 
 	public function reload_triggers() {
+		Query::flush_trigger_map();
 		foreach ( $this->registered_hooks as $event => $cb ) {
 			if ( is_array( $cb ) ) {
 				remove_action( $event, $cb, 10 );
@@ -71,7 +72,16 @@ class Automation {
 	}
 
 	public function dispatch_active_listeners(): void {
-		$listeners = Option::where( 'option_name', 'LIKE', 'zaplane_listener_state_%' )->get();
+		// Listeners only exist transiently while a user is in "Test Trigger" mode.
+		// The autoloaded flag lets the common case (nobody listening) skip the
+		// wp_options LIKE scan entirely on every request. It's set when a listener
+		// starts (ListenerController) and self-heals to 0 below once none remain.
+		if ( ! get_option( 'zaplane_listeners_active' ) ) {
+			return;
+		}
+
+		$listeners     = Option::where( 'option_name', 'LIKE', 'zaplane_listener_state_%' )->get();
+		$any_listening = false;
 
 		foreach ( $listeners as $listener ) {
 			$state = $listener->getValue();
@@ -79,6 +89,8 @@ class Automation {
 			if ( ! $state || ! is_array( $state ) || ( $state['status'] ?? '' ) !== 'listening' ) {
 				continue;
 			}
+
+			$any_listening = true;
 
 			$hook = $state['hook'] ?? '';
 			if ( ! $hook ) {
@@ -89,6 +101,10 @@ class Automation {
 				add_action( $hook, [ $this, 'listener_hook_handler' ], 1, 99 );
 				$this->registered_hooks[ 'listener_' . $hook ] = true;
 			}
+		}
+
+		if ( ! $any_listening ) {
+			update_option( 'zaplane_listeners_active', 0 );
 		}
 	}
 
@@ -176,7 +192,41 @@ class Automation {
 		// NodeRun gets the clean payload — __wp_user_id must not appear in node outputs.
 		$this->spawn_node_run( $run->id, $nodeKey, $payload, null, $this->extract_node_meta( $trigger['graph_node'] ) );
 
+		// Remember this payload as the shared sample for the trigger (app+event)
+		// so other workflows using the same trigger can map its fields without
+		// re-capturing.
+		$gnode = $trigger['graph_node']['data'] ?? [];
+		self::store_trigger_sample( $gnode['app'] ?? '', $gnode['event'] ?? '', $payload );
+
 		return $run->id;
+	}
+
+	/**
+	 * Persist the most recent payload for a trigger, keyed by app+event (NOT by
+	 * workflow), so any workflow that uses the same trigger can reuse it as
+	 * sample data for field mapping without capturing again.
+	 */
+	public static function store_trigger_sample( string $app, string $event, array $payload ): void {
+		$app   = sanitize_key( $app );
+		$event = sanitize_key( $event );
+		if ( '' === $app || '' === $event || empty( $payload ) ) {
+			return;
+		}
+		Option::set( 'zaplane_trigger_sample_' . $app . '__' . $event, $payload, 'no' );
+	}
+
+	/**
+	 * Read the shared sample payload previously captured for a trigger (app+event).
+	 * Returns [] when nothing has been captured for it yet.
+	 */
+	public static function get_trigger_sample( string $app, string $event ): array {
+		$app   = sanitize_key( $app );
+		$event = sanitize_key( $event );
+		if ( '' === $app || '' === $event ) {
+			return [];
+		}
+		$value = Option::get( 'zaplane_trigger_sample_' . $app . '__' . $event );
+		return is_array( $value ) ? $value : [];
 	}
 
 	public static function get_instance(): ?self {
@@ -316,6 +366,30 @@ class Automation {
 		$node['_run_id'] = $run->id;
 		$node['_node_run_id'] = $nodeRun->id;
 
+		// AI Agent sub-nodes: nodes wired into the agent's tool/memory/model
+		// handles are configuration providers, not flow steps. Collect them here
+		// so the agent can use them; they never execute on their own (nothing in
+		// the main flow connects into them).
+		if ( 'ai-agent' === $app ) {
+			$subs = $this->collect_sub_nodes( $graph, $nodeRun->node_key );
+
+			// Resolve {{...}} in each sub-node's config against the run context, the
+			// same way the agent's own config is resolved — otherwise e.g. a Memory
+			// node's dynamic conversation_key would stay a literal and never match.
+			foreach ( [ 'ai_model', 'ai_memory' ] as $handle ) {
+				if ( ! empty( $subs[ $handle ]['data']['config'] ) && is_array( $subs[ $handle ]['data']['config'] ) ) {
+					$subs[ $handle ]['data']['config'] = $this->resolveConfigValues( $subs[ $handle ]['data']['config'], $resolveData );
+				}
+			}
+			foreach ( $subs['ai_tool'] as $k => $tool_node ) {
+				if ( ! empty( $tool_node['data']['config'] ) && is_array( $tool_node['data']['config'] ) ) {
+					$subs['ai_tool'][ $k ]['data']['config'] = $this->resolveConfigValues( $tool_node['data']['config'], $resolveData );
+				}
+			}
+
+			$node['_sub_nodes'] = $subs;
+		}
+
 		try {
 			if ( 'trigger' === $node['type'] ) {
 				$output = $input;
@@ -352,10 +426,16 @@ class Automation {
 
 				$remaining = $output['remaining'] ?? [];
 				if ( ! empty( $remaining ) ) {
-					$iteratorInput = array_merge( $input, [
-						'_is_iterating' => true,
-						'_remaining'    => $remaining
-					] );
+					// `iterator_state` lets a looping tool carry counters (index/total)
+					// forward across passes without threading them by hand.
+					$iteratorInput = array_merge(
+						$input,
+						[
+							'_is_iterating' => true,
+							'_remaining'    => $remaining,
+						],
+						is_array( $output['iterator_state'] ?? null ) ? $output['iterator_state'] : []
+					);
 
 					$this->spawn_node_run(
 						$run->id,
@@ -435,7 +515,7 @@ class Automation {
 				$nodeRun->id,
 				$targetNode ? $this->extract_node_meta( $targetNode ) : null
 			);
-		}
+		}//end foreach
 	}
 
 	private function finalize_run( int $run_id ) {
@@ -496,6 +576,47 @@ class Automation {
 		}
 
 		return $context;
+	}
+
+	/**
+	 * Gather the sub-nodes wired into a node's AI-agent handles (ai_tool,
+	 * ai_memory, ai_model). Returns tool providers as a list and memory/model as
+	 * single nodes. These are inspected by the agent — never executed as steps.
+	 *
+	 * @return array{ai_tool:array<int,array<string,mixed>>,ai_memory:?array<string,mixed>,ai_model:?array<string,mixed>}
+	 */
+	private function collect_sub_nodes( array $graph, int $node_key ): array {
+		$subs = [
+			'ai_tool' => [],
+			'ai_memory' => null,
+			'ai_model' => null
+		];
+
+		$nodeMap = [];
+		foreach ( $graph['nodes'] ?? [] as $n ) {
+			$nodeMap[ (int) $n['id'] ] = $n;
+		}
+
+		foreach ( $graph['edges'] ?? [] as $edge ) {
+			if ( (int) ( $edge['target'] ?? 0 ) !== $node_key ) {
+				continue;
+			}
+			$handle = $edge['targetHandle'] ?? '';
+			if ( ! array_key_exists( $handle, $subs ) ) {
+				continue;
+			}
+			$src = $nodeMap[ (int) ( $edge['source'] ?? 0 ) ] ?? null;
+			if ( ! $src ) {
+				continue;
+			}
+			if ( 'ai_tool' === $handle ) {
+				$subs['ai_tool'][] = $src;
+			} else {
+				$subs[ $handle ] = $src;
+			}
+		}
+
+		return $subs;
 	}
 
 	private function inject_credentials( array $node ): array {

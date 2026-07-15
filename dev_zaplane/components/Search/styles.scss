@@ -1,11 +1,13 @@
 .zaplane-search-component {
 	position: relative;
+	background: var(--zaplane-background);
 	input.zaplane-search-component__input {
 		height: 38px;
 		padding-left: 40px;
 		padding-right: 20px;
 		width: 100%;
 		border: 1px solid var(--zaplane-border-color);
+		border-radius: 4px;
 		&:hover, &:focus {
 			border-color: var(--zaplane-primary);
 		}

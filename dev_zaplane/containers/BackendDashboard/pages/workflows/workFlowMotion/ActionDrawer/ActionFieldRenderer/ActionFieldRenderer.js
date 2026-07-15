@@ -27,6 +27,7 @@ const ActionFieldRenderer = ({
   dynamicOptions,
   loadingFields,
   fetchDynamicOptions,
+  workFlow,
 }) => {
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,6 +61,24 @@ const ActionFieldRenderer = ({
   switch (field.type) {
     case "copy": {
       let displayValue = field.value || value || "";
+
+      // Templates like `zaplane/v1/hook/{workflow_id}` are per-workflow, so the
+      // real id is only known here (and only after the workflow is saved).
+      if (typeof displayValue === "string" && displayValue.includes("{workflow_id}")) {
+        const workflowId = workFlow?.workflow?.id;
+        if (!workflowId) {
+          return (
+            <div className="flex flex-col gap-2">
+              {field.label && <span className="zaplane-label">{__(field.label, "zaplane")}</span>}
+              <p className="text-gray-500 text-xs">
+                {__("Save the workflow to generate its webhook URL.", "zaplane")}
+              </p>
+            </div>
+          );
+        }
+        displayValue = displayValue.replace("{workflow_id}", workflowId);
+      }
+
       if (typeof displayValue === "string" && displayValue) {
         if (displayValue.startsWith("http")) {
           // Legacy: an absolute URL was stored — force it to the live origin.
@@ -84,8 +103,30 @@ const ActionFieldRenderer = ({
       );
     }
 
-    case "number":
+    // Email supports dynamic data (e.g. {{trigger.email}}) like text fields; a
+    // literal value is validated as an email address on continue (see
+    // ActionDrawer's validateRequiredFields).
     case "email":
+      return (
+        <div>
+          <VariableEditor
+            label={field.label}
+            required={!!field.required}
+            value={value || ""}
+            setValue={(val) => { setFieldValue(field.key, val); clearError(); }}
+            variables={workflowVariables?.data || []}
+            variableContext={workflowVariables?.context || {}}
+            field={field}
+            setFieldValue={setFieldValue}
+            placeholder={field.placeholder || __('name@example.com — or type "@" for dynamic data', "zaplane")}
+            isRequired={!!field.required}
+            multiline={false}
+          />
+          <ErrorMsg />
+        </div>
+      );
+
+    case "number":
     case "url":
 
       return <div>
@@ -122,6 +163,84 @@ const ActionFieldRenderer = ({
           <ErrorMsg />
         </div>
       );
+
+    // File picker: opens the WP Media Library to upload/select a file, stores its
+    // URL, and shows the chosen file's name with Change / Remove controls.
+    case "file": {
+      const openMediaLibrary = () => {
+        const media = window.wp && window.wp.media;
+        if (!media) {
+          console.warn("WP media library is not available.");
+          return;
+        }
+        const frame = media({
+          title: __("Select a file", "zaplane"),
+          button: { text: __("Use this file", "zaplane") },
+          multiple: false,
+        });
+        frame.on("select", () => {
+          const attachment = frame.state().get("selection").first().toJSON();
+          setFieldValue(field.key, attachment.url || "");
+          clearError();
+        });
+        frame.open();
+      };
+
+      let fileName = "";
+      if (value) {
+        try {
+          fileName = decodeURIComponent(String(value).split("/").pop().split("?")[0]);
+        } catch (e) {
+          fileName = String(value).split("/").pop();
+        }
+      }
+
+      return (
+        <div className="flex flex-col gap-2">
+          <span className="zaplane-label">
+            {__(field.label, "zaplane")}
+            {field.required && <span className="text-red-500 ml-[2px]">*</span>}
+          </span>
+
+          {value ? (
+            <div className="flex items-center justify-between gap-3 rounded-md border border-[var(--zaplane-border-color)] px-3 py-2">
+              <span className="truncate text-sm" title={fileName}>{fileName}</span>
+              <div className="flex items-center gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={openMediaLibrary}
+                  className="text-[13px] text-[var(--zaplane-primary)] bg-transparent border-0 cursor-pointer p-0"
+                >
+                  {__("Change", "zaplane")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setFieldValue(field.key, ""); }}
+                  className="text-[13px] text-red-500 bg-transparent border-0 cursor-pointer p-0"
+                >
+                  {__("Remove", "zaplane")}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={openMediaLibrary}
+              className="flex items-center justify-center gap-1.5 rounded-md border border-dashed border-[var(--zaplane-border-color)] bg-transparent px-3 py-3 text-[13px] text-[var(--zaplane-text-muted)] cursor-pointer hover:border-[var(--zaplane-primary)]"
+            >
+              {__("Upload or select a file", "zaplane")}
+            </button>
+          )}
+
+          {field.help && (
+            <span className="text-[13px] text-[var(--zaplane-text-muted)] leading-relaxed mt-0.5">
+              {__(field.help, "zaplane")}
+            </span>
+          )}
+          <ErrorMsg />
+        </div>
+      );
+    }
 
     // Simple rich-text email body (HTML in / HTML out). The full drag-and-drop
     // builder lives on the dedicated Email Templates page, not inline here.

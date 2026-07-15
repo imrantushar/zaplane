@@ -277,6 +277,148 @@ class FluentCrm extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+
+		$contact = [
+			'id'              => 42,
+			'user_id'         => 15,
+			'hash'            => 'a1b2c3d4e5f6a7b8',
+			'contact_owner'   => 1,
+			'company_id'      => 7,
+			'prefix'          => 'Mr',
+			'first_name'      => 'Jane',
+			'last_name'       => 'Doe',
+			'full_name'       => 'Jane Doe',
+			'email'           => 'jane.doe@example.com',
+			'timezone'        => 'America/New_York',
+			'address_line_1'  => '123 Main St',
+			'address_line_2'  => 'Suite 400',
+			'postal_code'     => '10001',
+			'city'            => 'New York',
+			'state'           => 'NY',
+			'country'         => 'US',
+			'ip'              => '203.0.113.42',
+			'latitude'        => '40.7128',
+			'longitude'       => '-74.0060',
+			'total_points'    => 120,
+			'life_time_value' => 4999,
+			'phone'           => '+12025550143',
+			'status'          => 'subscribed',
+			'contact_type'    => 'lead',
+			'source'          => 'website',
+			'avatar'          => 'https://www.gravatar.com/avatar/a1b2c3d4',
+			'date_of_birth'   => '1990-05-14',
+			'created_at'      => '2026-01-10 09:30:00',
+			'last_activity'   => '2026-07-08 14:12:00',
+			'updated_at'      => '2026-07-09 08:00:00',
+			'photo'           => 'https://www.gravatar.com/avatar/a1b2c3d4',
+		];
+
+		$company = [
+			'id'               => 7,
+			'hash'             => 'c9d8e7f6a5b4',
+			'owner_id'         => 1,
+			'name'             => 'Acme Corporation',
+			'industry'         => 'Software',
+			'email'            => 'contact@acme.example.com',
+			'timezone'         => 'America/New_York',
+			'address_line_1'   => '500 Market St',
+			'address_line_2'   => 'Floor 12',
+			'postal_code'      => '94105',
+			'city'             => 'San Francisco',
+			'state'            => 'CA',
+			'country'          => 'US',
+			'employees_number' => '250',
+			'description'      => 'A sample company used for demo automations.',
+			'phone'            => '+14155550100',
+			'type'             => 'customer',
+			'logo'             => 'https://example.com/logo.png',
+			'website'          => 'https://acme.example.com',
+			'linkedin_url'     => 'https://linkedin.com/company/acme',
+			'facebook_url'     => 'https://facebook.com/acme',
+			'twitter_url'      => 'https://twitter.com/acme',
+			'date_of_start'    => '2015-03-01',
+			'meta'             => [ 'custom_values' => [] ],
+			'created_at'       => '2026-01-05 10:00:00',
+			'updated_at'       => '2026-07-09 08:00:00',
+		];
+
+		$samples = [
+			'added_tag' => [
+				'success' => true,
+				'contact' => $contact,
+				'tag_ids' => [ 3, 8 ],
+			],
+			'removed_tag' => [
+				'success' => true,
+				'contact' => $contact,
+				'tag_ids' => [ 3, 8 ],
+			],
+			'added_list' => [
+				'success'  => true,
+				'contact'  => $contact,
+				'list_ids' => [ 2, 5 ],
+			],
+			'removed_list' => [
+				'success'  => true,
+				'contact'  => $contact,
+				'list_ids' => [ 2, 5 ],
+			],
+			'created_contact' => [
+				'success' => true,
+				'contact' => $contact,
+			],
+			'company_created' => [
+				'success' => true,
+				'company' => $company,
+			],
+			'company_deleted' => [
+				'success' => true,
+				'company' => $company,
+			],
+			'company_updated' => [
+				'success'    => true,
+				'company'    => $company,
+				'old_status' => [ 'status' => 'pending' ],
+				'new_status' => [ 'status' => 'active' ],
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		// Prefix / keyword based category fallbacks.
+		if ( strpos( $event, 'company' ) !== false ) {
+			return [
+				'success' => true,
+				'company' => $company,
+			];
+		}
+
+		if ( strpos( $event, 'tag' ) !== false ) {
+			return [
+				'success' => true,
+				'contact' => $contact,
+				'tag_ids' => [ 3, 8 ],
+			];
+		}
+
+		if ( strpos( $event, 'list' ) !== false ) {
+			return [
+				'success'  => true,
+				'contact'  => $contact,
+				'list_ids' => [ 2, 5 ],
+			];
+		}
+
+		// Non-empty catch-all so no trigger returns [].
+		return [
+			'success' => true,
+			'contact' => $contact,
+		];
+	}
+
 	public static function get_actions(): array {
 		return [
 			'created_contact'             => [ 'label' => 'Create Contact' ],
@@ -553,9 +695,9 @@ class FluentCrm extends IntegrationBase {
 					'label' => 'Postal Code',
 					'type' => 'number'
 				],
-				...self::select_list(false),
-				...self::select_tag(false),
-				...self::select_company(false),
+				...self::select_list( false ),
+				...self::select_tag( false ),
+				...self::select_company( false ),
 				...self::contact_status(),
 			],
 			'get_contact_id' => self::contact_id(),

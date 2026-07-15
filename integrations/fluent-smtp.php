@@ -67,7 +67,7 @@ class FluentSmtp extends IntegrationBase {
 			[
 				'key'         => 'to',
 				'label'       => 'To',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'user@example.com, team@example.com',
 				'required'    => true,
 				'help'        => 'Use comma-separated email addresses or dynamic values.',
@@ -104,19 +104,19 @@ class FluentSmtp extends IntegrationBase {
 			[
 				'key'         => 'cc',
 				'label'       => 'CC',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'manager@example.com, support@example.com',
 			],
 			[
 				'key'         => 'bcc',
 				'label'       => 'BCC',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'audit@example.com',
 			],
 			[
 				'key'         => 'reply_to',
 				'label'       => 'Reply-To',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'reply@example.com',
 			],
 			[
@@ -124,9 +124,9 @@ class FluentSmtp extends IntegrationBase {
 				'label'       => 'Attachments',
 				'type'        => 'textarea',
 				'placeholder' => "/absolute/path/to/file.pdf\n/absolute/path/to/file-2.pdf",
-					'help'        => 'Optional. One file path per line or comma-separated.',
-				],
-			] : [];
+				'help'        => 'Optional. One file path per line or comma-separated.',
+			],
+		] : [];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
@@ -143,6 +143,75 @@ class FluentSmtp extends IntegrationBase {
 		}
 
 		return self::{$resolver}( $args, $config );
+	}
+
+	public static function get_trigger_sample_output( string $event ): array {
+		$recipient_emails = [ 'jane.doe@example.com' ];
+		$subject          = 'Your receipt from Acme';
+		$message          = '<p>Thanks for your order!</p>';
+		$headers          = [ 'Content-Type: text/html; charset=UTF-8', 'From: Acme <no-reply@acme.example.com>' ];
+		$attachments      = [ '/var/www/uploads/invoice-1042.pdf' ];
+
+		$payload = [
+			'recipient_emails' => $recipient_emails,
+			'subject'          => $subject,
+			'message'          => $message,
+			'headers'          => $headers,
+			'attachments'      => $attachments,
+			'mail'             => [
+				'to'          => $recipient_emails,
+				'subject'     => $subject,
+				'message'     => $message,
+				'headers'     => $headers,
+				'attachments' => $attachments,
+			],
+		];
+
+		$samples = [
+			'email_sent' => array_merge(
+				[
+					'success' => true,
+					'status'  => 'sent',
+				],
+				$payload
+			),
+			'email_failed' => array_merge(
+				[
+					'success'       => true,
+					'status'        => 'failed',
+					'error_code'    => 'wp_mail_failed',
+					'error_message' => 'The email could not be sent. SMTP connect() failed.',
+				],
+				$payload
+			),
+			'delivery_failed_no_fallback' => array_merge(
+				[
+					'success'  => true,
+					'status'   => 'failed',
+					'log_id'   => 4521,
+					'provider' => 'smtp',
+				],
+				array_merge(
+					$payload,
+					[
+						'response' => [
+							'code'    => 535,
+							'message' => 'Authentication failed',
+						],
+					]
+				)
+			),
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'fail' ) ) {
+			return $samples['email_failed'];
+		}
+
+		return $samples['email_sent'];
 	}
 
 	public static function execute_node( array $node, array $input ): array {
@@ -483,7 +552,7 @@ class FluentSmtp extends IntegrationBase {
 		return [
 			'key'         => 'recipient_email',
 			'label'       => 'Recipient Email',
-			'type'        => 'text',
+			'type'        => 'email',
 			'placeholder' => 'user@example.com',
 			'help'        => 'Optional. Trigger only when this email address is one of the recipients.',
 		];

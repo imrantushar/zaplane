@@ -116,6 +116,14 @@ class WorkflowsController extends WP_REST_Controller {
 			],
 		]);
 
+		register_rest_route($namespace, '/' . $rest_base . '/(?P<id>\d+)/trigger', [
+			[
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => [ $this, 'trigger_workflow' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		]);
+
 		register_rest_route($namespace, '/condition-variables', [
 			[
 				'methods' => WP_REST_Server::CREATABLE,
@@ -127,6 +135,41 @@ class WorkflowsController extends WP_REST_Controller {
 
 	public function permissions_check() {
 		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * Run a workflow on demand (the "Run"/Manual trigger). Starts a run from the
+	 * workflow's trigger node with any posted data, via the automation engine.
+	 */
+	public function trigger_workflow( $request ) {
+		$workflow_id = (int) $request['id'];
+
+		$workflow = Workflow::find( $workflow_id );
+		if ( ! $workflow ) {
+			return new WP_Error( 'not_found', 'Workflow not found.', [ 'status' => 404 ] );
+		}
+
+		$body = $request->get_json_params();
+		$data = isset( $body['data'] ) && is_array( $body['data'] ) ? $body['data'] : [];
+
+		$automation = $this->container ? $this->container->get( 'automation' ) : \Zaplane\Framework\Core\Automation::get_instance();
+		if ( ! $automation ) {
+			return new WP_Error( 'unavailable', 'Automation engine is not available.', [ 'status' => 500 ] );
+		}
+
+		$run_id = $automation->run_workflow( $workflow_id, $data );
+		if ( ! $run_id ) {
+			return new WP_Error(
+				'no_trigger',
+				'This workflow has no active version or trigger node to run.',
+				[ 'status' => 422 ]
+			);
+		}
+
+		return rest_ensure_response( [
+			'triggered' => true,
+			'run_id' => (int) $run_id
+		] );
 	}
 
 	public function get_workflow_items( $request ) {
@@ -223,11 +266,11 @@ class WorkflowsController extends WP_REST_Controller {
 
 		$icons = $graph['integration_icons'] ?? null;
 		// if ( is_array( $icons ) ) {
-		// 	$workflow->integration_icons = array_slice( array_values( array_unique( $icons ) ), 0, 3 );
+		// $workflow->integration_icons = array_slice( array_values( array_unique( $icons ) ), 0, 3 );
 		// }
 		if ( is_array( $icons ) ) {
-        $workflow->integration_icons = array_values(array_unique($icons));
-         }
+			$workflow->integration_icons = array_values( array_unique( $icons ) );
+		}
 
 		$workflow->save();
 
@@ -552,7 +595,11 @@ class WorkflowsController extends WP_REST_Controller {
 
 		$previousNodeIds = $this->findPreviousNodes( $targetNodeKey, $edges );
 
+		// Prefer captured output from a dedicated "Test" run, but fall back to the
+		// latest real run (e.g. an actual form submission or a manual "Run") so the
+		// "@" picker shows real fields the user has already produced.
 		$nodeOutputs = Run::latestTestNodeRunsByWorkflow( $workflowId, $previousNodeIds );
+		$realOutputs = Run::latestNodeRunsByWorkflow( $workflowId, $previousNodeIds );
 
 		$data = [];
 		foreach ( $previousNodeIds as $nodeId ) {
@@ -561,12 +608,18 @@ class WorkflowsController extends WP_REST_Controller {
 				continue;
 			}
 
-			$nodeType = $node['type'] ?? '';
-			if ( ! in_array( $nodeType, [ 'trigger', 'action', 'condition', 'filter' ], true ) ) {
+			// The target node's own output is not a variable source for itself.
+			if ( (int) $nodeId === $targetNodeKey ) {
 				continue;
 			}
 
-			$nodeRun = $nodeOutputs[ $nodeId ] ?? null;
+			// The "type" the builder sends is the app slug for tools (csv, delay…)
+			// and 'trigger'/'action' otherwise, so a fixed whitelist would drop every
+			// tool node. Resolve by integration slug instead; trigger-vs-action comes
+			// from the graph type / data.action.
+			$nodeType = $node['type'] ?? '';
+
+			$nodeRun = $nodeOutputs[ $nodeId ] ?? $realOutputs[ $nodeId ] ?? null;
 
 			if ( $nodeRun ) {
 				$output = $nodeRun->getOutput();
@@ -583,28 +636,42 @@ class WorkflowsController extends WP_REST_Controller {
 					'is_sample'  => false,
 				];
 			} else {
-				$variables = [];
-				$isSample  = false;
+				// No test run — fall back to the integration's declared sample so
+				// fields still show in the "@" picker. Nodes store their integration
+				// under data.app (data.integration is a legacy fallback).
+				$integration = $node['data']['app'] ?? $node['data']['integration'] ?? '';
+				$event       = $node['data']['event'] ?? '';
+				$instance    = ( '' !== $integration && 'Select an app' !== $integration )
+					? IntegrationLoader::get( $integration )
+					: null;
 
-				if ( $nodeType === 'trigger' ) {
-					$integration = $node['data']['integration'] ?? '';
-					$event       = $node['data']['event'] ?? '';
-					$instance    = IntegrationLoader::get( $integration );
-					if ( $instance ) {
+				$sample = [];
+
+				if ( 'trigger' === $nodeType ) {
+					// 1) Reuse the most recent real capture of this trigger from ANY
+					// workflow, so a new workflow inherits its fields.
+					$sample = \Zaplane\Framework\Core\Automation::get_trigger_sample( $integration, $event );
+
+					// 2) Fall back to the integration's declared trigger sample.
+					if ( empty( $sample ) && $instance ) {
 						$sample = get_class( $instance )::get_trigger_sample_output( $event );
-						if ( ! empty( $sample ) ) {
-							$variables = VariableExtractor::extract( $sample );
-							$isSample  = true;
-						}
 					}
+				} elseif ( $instance ) {
+					// Actions/tools expose their fields via the action sample.
+					$sample = get_class( $instance )::get_action_sample_output( $event );
+				}
+
+				// Skip nodes that expose nothing (placeholder / Sticky Note).
+				if ( empty( $sample ) ) {
+					continue;
 				}
 
 				$data[] = [
 					'node_id'    => $nodeId,
 					'node_name'  => $node['data']['name'] ?? '',
-					'node_event' => $node['data']['event'] ?? '',
-					'variables'  => $variables,
-					'is_sample'  => $isSample,
+					'node_event' => $event,
+					'variables'  => VariableExtractor::extract( $sample ),
+					'is_sample'  => true,
 				];
 			}//end if
 		}//end foreach

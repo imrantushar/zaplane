@@ -139,6 +139,79 @@ class Ultimatemember extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$user = [
+			'user_id'      => '1',
+			'first_name'   => 'John',
+			'last_name'    => 'Doe',
+			'user_login'   => 'johndoe',
+			'user_email'   => 'john@example.com',
+			'nickname'     => 'johndoe',
+			'avatar_url'   => 'https://example.com/wp-content/uploads/avatar.png',
+			'display_name' => 'John Doe',
+			'user_roles'   => [ 'subscriber' ],
+			'role'         => 'subscriber',
+		];
+
+		$samples = [
+			'user_login' => [
+				'success' => true,
+				'data'    => array_merge(
+					$user,
+					[ 'form_username' => 'johndoe' ]
+				),
+			],
+			'user_registration' => [
+				'success' => true,
+				'data'    => array_merge(
+					$user,
+					[
+						'form_data' => [
+							'first_name' => 'John',
+							'last_name'  => 'Doe',
+							'user_email' => 'john@example.com',
+						],
+					]
+				),
+			],
+			'inactive_user' => [
+				'success' => true,
+				'data'    => array_merge(
+					$user,
+					[ 'status' => 'inactive' ]
+				),
+			],
+			'change_user_role' => [
+				'success' => true,
+				'data'    => array_merge(
+					$user,
+					[ 'role' => 'editor' ]
+				),
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		// Prefix / keyword fallbacks so no trigger returns [].
+		if ( false !== strpos( $event, 'role' ) ) {
+			return $samples['change_user_role'];
+		}
+		if ( false !== strpos( $event, 'registration' ) ) {
+			return $samples['user_registration'];
+		}
+		if ( false !== strpos( $event, 'inactive' ) ) {
+			return $samples['inactive_user'];
+		}
+
+		// Catch-all: always non-empty.
+		return [
+			'success' => true,
+			'data'    => $user,
+		];
+	}
+
 	public static function get_actions(): array {
 		return [
 			'um_set_user_role' => [ 'label' => 'Change User Role' ],

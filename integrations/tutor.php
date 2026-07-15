@@ -234,6 +234,74 @@ class Tutor extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$course = [
+			'course_id' => 10,
+		];
+
+		$enrollment = [
+			'enroll_id' => 55,
+		];
+
+		$user = [
+			'user_id' => 1,
+		];
+
+		$lesson = [
+			'lesson_id' => 20,
+		];
+
+		$quiz = [
+			'quiz_id' => 30,
+		];
+
+		$samples = [
+			'user_enroll_course' => array_merge(
+				[ 'success' => true ],
+				$course,
+				$enrollment
+			),
+			'lesson_complete' => array_merge(
+				[ 'success' => true ],
+				$lesson,
+				$user
+			),
+			'tutor_quiz_course_attempt' => array_merge(
+				[ 'success' => true ],
+				$quiz,
+				$user
+			),
+			'quiz_target' => array_merge(
+				[ 'success' => true ],
+				$quiz,
+				$user,
+				[
+					'score'       => 8,
+					'total_marks' => 10,
+					'percentage'  => 80.0,
+				]
+			),
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		// Prefix / keyword fallbacks so no trigger returns [].
+		if ( false !== strpos( $event, 'quiz' ) ) {
+			return $samples['tutor_quiz_course_attempt'];
+		}
+		if ( false !== strpos( $event, 'lesson' ) ) {
+			return $samples['lesson_complete'];
+		}
+		if ( false !== strpos( $event, 'course' ) || false !== strpos( $event, 'enroll' ) ) {
+			return $samples['user_enroll_course'];
+		}
+
+		// Catch-all: always non-empty.
+		return array_merge( [ 'success' => true ], $course, $enrollment );
+	}
+
 	public static function get_actions(): array {
 		return [];
 	}
@@ -349,8 +417,7 @@ class Tutor extends IntegrationBase {
 			return $options;
 	}
 
-	public static function get_output_ports(): array
-	{
+	public static function get_output_ports(): array {
 		return [
 			'main' => 'Main output port',
 		];

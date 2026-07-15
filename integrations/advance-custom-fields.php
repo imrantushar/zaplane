@@ -154,9 +154,71 @@ class AdvanceCustomFields extends IntegrationBase {
 					'value'      => $meta_value,
 					'updated_at' => current_time( 'mysql' ),
 				];
-		}
+		}//end switch
 
 		return false;
+	}
+
+	public static function get_trigger_sample_output( string $event ): array {
+		$timestamp = '2024-01-01 12:00:00';
+
+		$acf_fields = [
+			'headline'     => 'Welcome to our site',
+			'subtitle'     => 'The best place to learn',
+			'cta_link'     => 'https://example.com/signup',
+			'is_featured'  => true,
+		];
+
+		$post = [
+			'post_id' => 42,
+		];
+
+		$user = [
+			'user_id' => 1,
+		];
+
+		$field = [
+			'field_name' => 'headline',
+			'value'      => 'Welcome to our site',
+		];
+
+		$samples = [
+			'acf_save_post' => array_merge(
+				$post,
+				[
+					'fields'   => $acf_fields,
+					'saved_at' => $timestamp,
+				]
+			),
+			'acf_post_field_updated' => array_merge(
+				$post,
+				$field,
+				[ 'updated_at' => $timestamp ]
+			),
+			'acf_user_field_updated' => array_merge(
+				$user,
+				$field,
+				[ 'updated_at' => $timestamp ]
+			),
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		// Prefix / keyword fallbacks so no trigger returns [].
+		if ( false !== strpos( $event, 'user' ) ) {
+			return $samples['acf_user_field_updated'];
+		}
+		if ( false !== strpos( $event, 'save' ) ) {
+			return $samples['acf_save_post'];
+		}
+		if ( false !== strpos( $event, 'field' ) || false !== strpos( $event, 'post' ) ) {
+			return $samples['acf_post_field_updated'];
+		}
+
+		// Catch-all: always non-empty.
+		return array_merge( $post, $field, [ 'updated_at' => $timestamp ] );
 	}
 
 	public static function get_actions(): array {
@@ -335,8 +397,11 @@ class AdvanceCustomFields extends IntegrationBase {
 					'field_name' => $field_name,
 					'sub_fields' => $sub_fields,
 				] );
-		}
+		}//end switch
 
-		return [ 'port' => 'main', 'data' => $input ];
+		return [
+			'port' => 'main',
+			'data' => $input
+		];
 	}
 }

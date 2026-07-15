@@ -5,7 +5,7 @@ import { getRunWorkFlow, getSingleRun } from './actions/workFlowRuns';
 import { getAllVersion, getPreviewOldVersion, versionActive } from './actions/workFlowVersion';
 import { nodeLogsRunDetails, getNodeLogDetails } from './actions/workFlowLogs';
 import { workFLowSingeNodeExction } from './actions/workflowExctions';
-import { workflowNodeListiner, workflowNodeListinerStop } from './actions/workFlowListiner';
+import { workflowNodeListiner, workflowNodeListinerPoll, workflowNodeListinerStop } from './actions/workFlowListiner';
 import { conditionVariables } from './actions/conditonVariales';
 import { fetchConnectionsByApp } from './actions/connectionsSlice';
 
@@ -151,12 +151,38 @@ const workflowsSlice = createSlice({
 
 
 			.addCase(workflowNodeListiner.fulfilled, (state) => {
+				// "start" only registers the listener and returns immediately; the
+				// component now short-polls (workflowNodeListinerPoll) until a
+				// terminal state, so we keep apiRequestRunning true here.
+				state.isLoading = false;
+			})
+			.addCase(workflowNodeListiner.rejected, (state) => {
 				state.isLoading = false;
 				state.apiRequestRunning = false;
 				state.apiCountdown = 0;
 			})
-			.addCase(workflowNodeListiner.rejected, (state) => {
-				state.isLoading = false;
+			.addCase(workflowNodeListinerPoll.fulfilled, (state, action) => {
+				const payload = action?.payload || {};
+				// 'listening' → keep waiting. Any terminal status stops the loop.
+				if (payload.status === 'listening') return;
+
+				state.apiRequestRunning = false;
+				state.apiCountdown = 0;
+
+				// On a captured trigger, surface its payload in the node's Test tab
+				// like an action test result. Trigger nodes have no upstream input,
+				// so input stays empty and the captured payload is the output.
+				const data = payload.data;
+				const node_id = data?.node?.id;
+				if (node_id != null && data?.trigger_data) {
+					state.singleNodeExecution[node_id] = {
+						input: {},
+						output: data.trigger_data,
+						node: data.node,
+					};
+				}
+			})
+			.addCase(workflowNodeListinerPoll.rejected, (state) => {
 				state.apiRequestRunning = false;
 				state.apiCountdown = 0;
 			})

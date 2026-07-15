@@ -57,7 +57,8 @@ export default function VariablePopover({
           <Disclosure
             key={item.node_id || item.key}
             as="div"
-            className={`border border-gray-200 
+            defaultOpen
+            className={`border border-gray-200
                 ${index === 0 ? "rounded-t-md" : ""} 
                 ${index === items.length - 1 ? "rounded-b-md" : ""} 
                 ${index !== 0 ? "border-t-0" : ""}
@@ -73,6 +74,12 @@ export default function VariablePopover({
                   {source === "app" && item.is_sample && (
                     <span className="mr-2 rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-xs text-amber-600">
                       {__("Sample Data", "zaplane")}
+                    </span>
+                  )}
+
+                  {source === "app" && !item.is_sample && (
+                    <span className="mr-2 rounded border border-green-200 bg-green-50 px-1.5 py-0.5 text-xs text-green-600">
+                      {__("Live Data", "zaplane")}
                     </span>
                   )}
 
@@ -147,6 +154,7 @@ export default function VariablePopover({
       onClose={onClose}
       title={null}
       prefix={prefix}
+      focusOnMount={false}
     >
       <ZAPTab value={activeTab} tabs={tabs} onChange={setActiveTab} />
     </WPPopover>

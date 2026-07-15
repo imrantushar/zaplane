@@ -17,9 +17,45 @@ $registry = [
 		'file'  => 'delay.php',
 		'class' => \Zaplane\Integrations\Delay::class,
 	],
+	'human_approval'      => [
+		'file'  => 'human-approval.php',
+		'class' => \Zaplane\Integrations\HumanApproval::class,
+	],
+	'manual'              => [
+		'file'  => 'manual.php',
+		'class' => \Zaplane\Integrations\Manual::class,
+	],
+	'csv'                 => [
+		'file'  => 'csv.php',
+		'class' => \Zaplane\Integrations\Csv::class,
+	],
+	'datetime'            => [
+		'file'  => 'datetime.php',
+		'class' => \Zaplane\Integrations\DateTime_Tool::class,
+	],
+	'image_helper'        => [
+		'file'  => 'image-helper.php',
+		'class' => \Zaplane\Integrations\ImageHelper::class,
+	],
+	'json_parser'         => [
+		'file'  => 'json-parser.php',
+		'class' => \Zaplane\Integrations\JsonParser::class,
+	],
+	'sticky_note'         => [
+		'file'  => 'sticky-note.php',
+		'class' => \Zaplane\Integrations\StickyNote::class,
+	],
+	'xml'                 => [
+		'file'  => 'xml.php',
+		'class' => \Zaplane\Integrations\Xml::class,
+	],
 	'iterator'            => [
 		'file'  => 'iterator.php',
 		'class' => \Zaplane\Integrations\Iterator::class,
+	],
+	'repeater'            => [
+		'file'  => 'repeater.php',
+		'class' => \Zaplane\Integrations\Repeater::class,
 	],
 	'variable'            => [
 		'file'  => 'variable.php',
@@ -68,6 +104,46 @@ $registry = [
 	'http'                => [
 		'file'  => 'http.php',
 		'class' => \Zaplane\Integrations\Http::class,
+	],
+	'ai'                  => [
+		'file'  => 'ai.php',
+		'class' => \Zaplane\Integrations\Ai::class,
+	],
+	'memory'              => [
+		'file'  => 'memory.php',
+		'class' => \Zaplane\Integrations\Memory::class,
+	],
+	'knowledge'           => [
+		'file'  => 'knowledge.php',
+		'class' => \Zaplane\Integrations\Knowledge::class,
+	],
+	'formatter'           => [
+		'file'  => 'formatter.php',
+		'class' => \Zaplane\Integrations\Formatter::class,
+	],
+	'mcp-client'          => [
+		'file'  => 'mcpclient.php',
+		'class' => \Zaplane\Integrations\Mcpclient::class,
+	],
+	'schedule'            => [
+		'file'  => 'schedule.php',
+		'class' => \Zaplane\Integrations\Schedule::class,
+	],
+	'router'              => [
+		'file'  => 'router.php',
+		'class' => \Zaplane\Integrations\Router::class,
+	],
+	'webhook'             => [
+		'file'  => 'webhook.php',
+		'class' => \Zaplane\Integrations\Webhook::class,
+	],
+	'ai-agent'            => [
+		'file'  => 'aiagent.php',
+		'class' => \Zaplane\Integrations\Aiagent::class,
+	],
+	'messenger'           => [
+		'file'  => 'messenger.php',
+		'class' => \Zaplane\Integrations\Messenger::class,
 	],
 	'learndash'           => [
 		'file'  => 'learndash.php',

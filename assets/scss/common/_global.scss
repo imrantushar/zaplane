@@ -90,8 +90,9 @@
             color: var(--zaplane-font-color);
             cursor: pointer;
             white-space: nowrap;
+            background: transparent;
             &:hover, &:active {
-                background: var(--zaplane-primary) !important;
+                background: var(--zaplane-secondary-color) !important;
                 -webkit-tap-highlight-color: none !important;
             }
             width: calc(100% - 16px);
@@ -99,14 +100,19 @@
             border-radius: 4px;
         }
 
+        // Keyboard/mouse-hovered row: a neutral highlight, not the brand color —
+        // a solid primary fill here reads like a button, not a passive hover state.
         &__option--is-focused {
-            background: var(--zaplane-primary) !important;
-            color: #fff !important;
+            background: var(--zaplane-secondary-color) !important;
+            color: var(--zaplane-font-color) !important;
         }
 
+        // The actually-selected value: a soft tint instead of a solid fill, so it
+        // doesn't visually compete with real primary buttons (e.g. "Create New").
         &__option--is-selected {
-            background: var(--zaplane-primary) !important;
-            color: #fff !important;
+            background: var(--zaplane-second-primary) !important;
+            color: var(--zaplane-primary) !important;
+            font-weight: 600;
         }
         
         &__multi-value {
@@ -199,7 +205,11 @@
 }
 
 // Custom checkbox (boolean / checkbox field types)
-.zaplane-checkbox {
+// Selectors use the "input.zaplane-checkbox" form (rather than just ".zaplane-checkbox")
+// to match/beat the specificity of WP admin core's own
+// `input[type=checkbox]:checked::before` dashicon-based rule (forms.css), which would
+// otherwise win the cascade and clobber this checkmark's size/position/content.
+input.zaplane-checkbox {
     appearance: none;
     width: 18px;
     height: 18px;
@@ -212,29 +222,33 @@
     flex-shrink: 0;
 }
 
-.zaplane-checkbox:checked {
+input.zaplane-checkbox:checked {
     border-color: var(--zaplane-primary);
     background-color: var(--zaplane-primary);
 }
 
-.zaplane-checkbox:checked::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -60%) rotate(45deg);
-    width: 4px;
-    height: 8px;
-    border-right: 2px solid white;
-    border-bottom: 2px solid white;
+input.zaplane-checkbox:checked::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 5px !important;
+    top: 2px !important;
+    width: 4px !important;
+    height: 9px !important;
+    border-right: 2px solid white !important;
+    border-bottom: 2px solid white !important;
+    transform: rotate(45deg) !important;
+    float: none !important;
+    display: block !important;
+    margin: 0 !important;
+    font: normal 0/0 serif !important;
 }
 
-.zaplane-checkbox:focus {
+input.zaplane-checkbox:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 }
 
-.zaplane-checkbox:hover {
+input.zaplane-checkbox:hover {
     border-color: var(--zaplane-primary);
 }
 

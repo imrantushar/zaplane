@@ -207,7 +207,10 @@ class FolderController extends WP_REST_Controller {
 		$workflow->folder_id = null;
 		$workflow->save();
 
-		return rest_ensure_response( [ 'removed' => true, 'workflow_id' => $workflow->id ] );
+		return rest_ensure_response( [
+			'removed' => true,
+			'workflow_id' => $workflow->id
+		] );
 	}
 
 	public function get_folder_workflows( $request ) {
@@ -272,6 +275,9 @@ class FolderController extends WP_REST_Controller {
 
 		$folder->delete();
 
-		return rest_ensure_response( [ 'deleted' => true, 'id' => (int) $request['id'] ] );
+		return rest_ensure_response( [
+			'deleted' => true,
+			'id' => (int) $request['id']
+		] );
 	}
 }

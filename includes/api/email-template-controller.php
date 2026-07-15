@@ -159,6 +159,9 @@ class EmailTemplateController extends WP_REST_Controller {
 
 		$template->delete();
 
-		return rest_ensure_response( [ 'deleted' => true, 'id' => (int) $request['id'] ] );
+		return rest_ensure_response( [
+			'deleted' => true,
+			'id' => (int) $request['id']
+		] );
 	}
 }

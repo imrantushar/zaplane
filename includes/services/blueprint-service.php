@@ -69,7 +69,7 @@ class BlueprintService {
 			}
 
 			$exportedVersions[] = $versionData;
-		}
+		}//end foreach
 
 		$connectionIds = array_values( array_unique( $connectionIds ) );
 		$connections   = [];
@@ -129,7 +129,7 @@ class BlueprintService {
 				'last_error'      => $run->last_error,
 				'node_runs'       => $nodeRuns,
 			];
-		}
+		}//end foreach
 
 		return $exportedRuns;
 	}
@@ -167,7 +167,10 @@ class BlueprintService {
 		$icons = [];
 
 		foreach ( $data['versions'] as $versionData ) {
-			$graph = $versionData['graph_json'] ?? [ 'nodes' => [], 'edges' => [] ];
+			$graph = $versionData['graph_json'] ?? [
+				'nodes' => [],
+				'edges' => []
+			];
 			$graph = $this->strip_connection_ids( $graph );
 			$hash  = hash( 'sha256', wp_json_encode( $graph ) );
 
@@ -191,7 +194,7 @@ class BlueprintService {
 			if ( ! empty( $versionData['runs'] ) && is_array( $versionData['runs'] ) ) {
 				$this->import_runs( $versionData['runs'], $workflow->id, $version->id );
 			}
-		}
+		}//end foreach
 
 		$workflow->integration_icons = array_values( array_unique( $icons ) );
 		$workflow->save();
@@ -270,7 +273,7 @@ class BlueprintService {
 			if ( $originalParent ) {
 				$newNodes[ $nodeRun->id ] = (int) $originalParent;
 			}
-		}
+		}//end foreach
 
 		foreach ( $newNodes as $newId => $originalParentId ) {
 			if ( isset( $idMap[ $originalParentId ] ) ) {

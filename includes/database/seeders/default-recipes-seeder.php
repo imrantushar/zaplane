@@ -32,7 +32,10 @@ class DefaultRecipesSeeder {
 				[
 					'id'       => '1',
 					'type'     => 'trigger',
-					'position' => [ 'x' => 250, 'y' => 50 ],
+					'position' => [
+						'x' => 250,
+						'y' => 50
+					],
 					'data'     => [
 						'app'   => 'woocommerce',
 						'event' => 'cart_abandoned',
@@ -45,7 +48,10 @@ class DefaultRecipesSeeder {
 				[
 					'id'       => '2',
 					'type'     => 'action',
-					'position' => [ 'x' => 250, 'y' => 200 ],
+					'position' => [
+						'x' => 250,
+						'y' => 200
+					],
 					'data'     => [
 						'app'   => 'gemcrm',
 						'event' => 'send_email',
@@ -63,7 +69,10 @@ class DefaultRecipesSeeder {
 				[
 					'id'       => '3',
 					'type'     => 'action',
-					'position' => [ 'x' => 250, 'y' => 350 ],
+					'position' => [
+						'x' => 250,
+						'y' => 350
+					],
 					'data'     => [
 						'app'   => 'delay',
 						'event' => 'wait',
@@ -79,7 +88,10 @@ class DefaultRecipesSeeder {
 				[
 					'id'       => '4',
 					'type'     => 'action',
-					'position' => [ 'x' => 250, 'y' => 500 ],
+					'position' => [
+						'x' => 250,
+						'y' => 500
+					],
 					'data'     => [
 						'app'   => 'gemcrm',
 						'event' => 'send_email',
@@ -133,7 +145,7 @@ class DefaultRecipesSeeder {
 			'title'             => $title,
 			'description'       => 'Automatically follow up with customers who abandoned their WooCommerce cart. Sends an initial email, waits 3 days, then sends a follow-up email.',
 			'blueprint'         => wp_json_encode( $blueprint ),
-			'integration_icons' => wp_json_encode( [ 'abandoned-cart', 'gemcrm' ] ),
+			'integration_icons' => wp_json_encode( [ 'abandoned-cart.svg', 'gemcrm' ] ),
 			'created_by'        => 0,
 		] );
 	}

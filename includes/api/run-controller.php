@@ -11,6 +11,7 @@ use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Models\WorkflowVersion;
+use Zaplane\Framework\Database\ORM\DB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -129,14 +130,47 @@ class RunController extends WP_REST_Controller {
 		$total = Run::query()->count();
 		$runs  = Run::query()->orderBy( 'id', 'desc' )->forPage( $page, $perPage )->get();
 
-		$data = $runs->map(function ( $run ) {
-			$node       = null;
-			$version    = $run->workflowVersion();
-			$node_count = NodeRun::where( 'run_id', $run->id )->count();
+		// Batch everything the row loop needs so it issues zero per-row queries.
+		// Previously each run did its own workflowVersion() find + node-run count()
+		// — ~2 queries and a graph_json decode per row (up to 100).
+		$run_ids     = [];
+		$version_ids = [];
+		foreach ( $runs as $run ) {
+			$run_ids[] = (int) $run->id;
+			if ( $run->workflow_version_id ) {
+				$version_ids[ (int) $run->workflow_version_id ] = true;
+			}
+		}
+		$version_ids = array_keys( $version_ids );
 
-			if ( $version ) {
+		// One query for the page's distinct versions; decode each graph once
+		// (many runs on a page share the same version).
+		$graph_by_version = [];
+		if ( $version_ids ) {
+			foreach ( WorkflowVersion::query()->whereIn( 'id', $version_ids )->get() as $version ) {
+				$graph_by_version[ (int) $version->id ] = $version->getGraph();
+			}
+		}
+
+		// One grouped query for all node-run counts on the page.
+		$count_by_run = [];
+		if ( $run_ids ) {
+			$rows = DB::table( 'node_runs' )
+				->selectRaw( 'run_id, COUNT(*) as c' )
+				->whereIn( 'run_id', $run_ids )
+				->groupBy( 'run_id' )
+				->get();
+			foreach ( $rows as $row ) {
+				$count_by_run[ (int) $row['run_id'] ] = (int) $row['c'];
+			}
+		}
+
+		$data = $runs->map(function ( $run ) use ( $graph_by_version, $count_by_run ) {
+			$node  = null;
+			$graph = $graph_by_version[ (int) $run->workflow_version_id ] ?? null;
+
+			if ( is_array( $graph ) ) {
 				$nodeKey = $run->start_node_key ?? $run->target_node_key;
-				$graph   = $version->getGraph();
 				foreach ( $graph['nodes'] ?? [] as $n ) {
 					if ( (int) $n['id'] === (int) $nodeKey ) {
 						$node = $n;
@@ -150,7 +184,7 @@ class RunController extends WP_REST_Controller {
 				'status'      => $run->status,
 				'started_at'  => $run->started_at,
 				'finished_at' => $run->finished_at,
-				'node_count'  => $node_count,
+				'node_count'  => $count_by_run[ (int) $run->id ] ?? 0,
 				'node'        => $node ? [
 					'app'   => $node['data']['app'] ?? null,
 					'event' => $node['data']['event'] ?? null,
@@ -184,7 +218,10 @@ class RunController extends WP_REST_Controller {
 			return new WP_Error( 'delete_failed', $e->getMessage(), [ 'status' => 500 ] );
 		}
 
-		return rest_ensure_response( [ 'deleted' => true, 'id' => $id ] );
+		return rest_ensure_response( [
+			'deleted' => true,
+			'id' => $id
+		] );
 	}
 
 	public function get_run( $req ) {
@@ -451,8 +488,14 @@ class RunController extends WP_REST_Controller {
 
 				$targetNode = $this->resolveNodeConfig( $targetNode, $effectiveInput );
 
-				$output = $integration::execute_node( $targetNode, $effectiveInput );
-			}
+				// Resolve {{...}} against the full accumulated test context above, but
+				// hand execute_node only the node's own input — the same bag it gets
+				// at runtime (Automation passes the parent's output, not every node's
+				// output). Passing $effectiveInput here leaks the entire workflow's
+				// captured context into pass-through nodes like Set Variable, so their
+				// output looked identical (a static blob) on every test run.
+				$output = $integration::execute_node( $targetNode, $input );
+			}//end if
 
 			$run->markAsCompleted();
 			$nodeRun->setOutput( $output );

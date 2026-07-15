@@ -96,18 +96,25 @@ class OAuthHandler {
 
 			$merged_credentials = array_merge( $credentials, $tokens );
 
+			// Fall back to the integration's own icon if the caller didn't provide one,
+			// so OAuth connections render with the correct app icon instead of the placeholder.
+		if ( empty( $icon ) && method_exists( $class, 'get_icon' ) ) {
+			$icon = $class::get_icon();
+		}
+
 			$create_result = $this->connections->create(
 				$user_id,
 				$app,
 				$name,
 				'oauth2',
-				$merged_credentials
+				$merged_credentials,
+				$icon
 			);
 			$connection_id = $create_result['id'];
 
-			if ( isset( $tokens['expires_in'] ) ) {
-				$this->connections->set_oauth_expiry( $connection_id, (int) $tokens['expires_in'] );
-			}
+		if ( isset( $tokens['expires_in'] ) ) {
+			$this->connections->set_oauth_expiry( $connection_id, (int) $tokens['expires_in'] );
+		}
 
 		delete_transient( self::STATE_TRANSIENT_PREFIX . $state );
 

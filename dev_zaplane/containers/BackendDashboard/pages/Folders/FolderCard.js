@@ -87,19 +87,19 @@ const FolderCard = ({
 
       <WPModal title={__("Rename Folder", "zaplane")} isOpen={isRenameOpen} onRequestClose={() => setIsRenameOpen(false)} size="large">
     
-        <div justify="flex-end" gap={3} className="flex">
-          <div className='flex flex-col gap-6'>
-            <ZAPInput
-              placeholder={__("Enter folder name", "zaplane")}
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-            />
+        <div className="flex flex-col gap-6">
+          <ZAPInput
+            placeholder={__("Enter folder name", "zaplane")}
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+          />
+          <div className="flex justify-end gap-3">
             <button style={outlineBtn} onClick={() => setIsRenameOpen(false)}>
-            {__("Cancel", "zaplane")}
-          </button>
-          <button style={primaryBtn} onClick={handleRename} disabled={!title.trim()}>
-            {__("Update", "zaplane")}
-          </button>
+              {__("Cancel", "zaplane")}
+            </button>
+            <button style={primaryBtn} onClick={handleRename} disabled={!title.trim()}>
+              {__("Update", "zaplane")}
+            </button>
           </div>
         </div>
       </WPModal>

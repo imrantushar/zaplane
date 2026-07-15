@@ -26,13 +26,16 @@ export const getActionOptions = (mode, selectedItem, isTrigger) => {
   const integration = getIntegration(mode, selectedItem);
   if (!integration) return [];
 
-  const list = mode === "tools"
-    ? Object.values(integration.actions || {})
-    : isTrigger
-      ? Object.values(integration.triggers || {})
-      : Object.values(integration.actions || {});
+  // Triggers come from `triggers`, actions from `actions` — regardless of
+  // whether the integration is an app or a tool (tools like Schedule can be
+  // triggers too).
+  const list = isTrigger
+    ? Object.values(integration.triggers || {})
+    : Object.values(integration.actions || {});
 
-  return list.map(i => ({ label: i.label, value: i.key, hook: i.hook }));
+  // Fall back to the key when a trigger/action was saved without a label, so it
+  // never renders as a blank, unselectable option.
+  return list.map(i => ({ label: i.label || i.key, value: i.key, hook: i.hook }));
 };
 
 
@@ -41,7 +44,6 @@ export const getActionOptions = (mode, selectedItem, isTrigger) => {
 export const getSelectedActionFields = (mode, selectedItem, actionType, isTrigger) => {
   const integration = getIntegration(mode, selectedItem);
   if (!integration || !actionType) return [];
-  if (mode === "tools") return integration.actions?.[actionType]?.schema || [];
   if (isTrigger) return integration.triggers?.[actionType]?.schema || [];
   return integration.actions?.[actionType]?.schema || [];
 };
@@ -51,7 +53,11 @@ export const getSelectedActionFields = (mode, selectedItem, actionType, isTrigge
 export const getVisibleFields = (fields, values) => {
   return fields.filter((f) => {
     if (!f.depends_on) return true;
-    return Object.entries(f.depends_on).every(([k, v]) => values[k] === v);
+    // A dependency value may be a single value or a list of accepted values,
+    // e.g. depends_on: { operation: ['truncate', 'substring', 'pad'] }.
+    return Object.entries(f.depends_on).every(([k, v]) =>
+      Array.isArray(v) ? v.includes(values[k]) : values[k] === v
+    );
   });
 };
 

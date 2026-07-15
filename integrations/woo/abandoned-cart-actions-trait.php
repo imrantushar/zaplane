@@ -12,12 +12,18 @@ if ( trait_exists( __NAMESPACE__ . '\AbandonedCartActionsTrait' ) ) {
 if ( ! class_exists( 'GemCrm\Addons\AbandonedCart\Database\Models\AbandonedCart' ) ) {
 	// Trait methods become no-ops when GemCRM addon is unavailable.
 	trait AbandonedCartActionsTrait {
-		private static function abandoned_cart_trigger_payload( array $args ): ?array { return null; }
-		private static function action_get_abandoned_cart( array $config, array $input ): array { return self::error( 'GemCRM Abandoned Cart addon not active' ); }
-		private static function action_get_abandoned_cart_by_email( array $config, array $input ): array { return self::error( 'GemCRM Abandoned Cart addon not active' ); }
-		private static function action_get_abandoned_carts( array $config, array $input ): array { return self::error( 'GemCRM Abandoned Cart addon not active' ); }
-		private static function action_update_abandoned_cart_status( array $config, array $input ): array { return self::error( 'GemCRM Abandoned Cart addon not active' ); }
-		private static function action_get_abandoned_cart_report( array $config, array $input ): array { return self::error( 'GemCRM Abandoned Cart addon not active' ); }
+		private static function abandoned_cart_trigger_payload( array $args ): ?array {
+			return null; }
+		private static function action_get_abandoned_cart( array $config, array $input ): array {
+			return self::error( 'GemCRM Abandoned Cart addon not active' ); }
+		private static function action_get_abandoned_cart_by_email( array $config, array $input ): array {
+			return self::error( 'GemCRM Abandoned Cart addon not active' ); }
+		private static function action_get_abandoned_carts( array $config, array $input ): array {
+			return self::error( 'GemCRM Abandoned Cart addon not active' ); }
+		private static function action_update_abandoned_cart_status( array $config, array $input ): array {
+			return self::error( 'GemCRM Abandoned Cart addon not active' ); }
+		private static function action_get_abandoned_cart_report( array $config, array $input ): array {
+			return self::error( 'GemCRM Abandoned Cart addon not active' ); }
 	}
 	return;
 }
@@ -119,7 +125,10 @@ trait AbandonedCartActionsTrait {
 			$items[] = self::abandoned_cart_payload( $cart );
 		}
 
-		return self::respond( [ 'carts' => $items, 'count' => count( $items ) ] );
+		return self::respond( [
+			'carts' => $items,
+			'count' => count( $items )
+		] );
 	}
 
 	private static function action_update_abandoned_cart_status( array $config, array $input ): array {
@@ -135,14 +144,21 @@ trait AbandonedCartActionsTrait {
 			return self::error( 'Invalid status value' );
 		}
 
-		$update = [ 'status' => $status, 'updated_at' => current_time( 'mysql' ) ];
+		$update = [
+			'status' => $status,
+			'updated_at' => current_time( 'mysql' )
+		];
 		if ( 'recovered' === $status ) {
 			$update['recovered_at'] = current_time( 'mysql' );
 		}
 
 		AbandonedCartModel::where( 'id', $cart_id )->update( $update );
 
-		return self::respond( [ 'cart_id' => $cart_id, 'status' => $status, 'updated' => true ] );
+		return self::respond( [
+			'cart_id' => $cart_id,
+			'status' => $status,
+			'updated' => true
+		] );
 	}
 
 	private static function action_get_abandoned_cart_report( array $config, array $input ): array {
@@ -184,7 +200,10 @@ trait AbandonedCartActionsTrait {
 			'summary'       => $summary,
 			'recovery_rate' => $recovery_rate,
 			'total_carts'   => $total_all,
-			'date_range'    => [ 'from' => $from, 'to' => $to ],
+			'date_range'    => [
+				'from' => $from,
+				'to' => $to
+			],
 		] );
 	}
 }

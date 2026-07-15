@@ -135,6 +135,55 @@ class Groundhogg extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$contact = [
+			'id'           => 42,
+			'first_name'   => 'Jane',
+			'last_name'    => 'Doe',
+			'email'        => 'jane.doe@example.com',
+			'optin_status' => 2,
+			'date_created' => '2026-07-09 08:00:00',
+			'owner'        => [
+				'id'    => 1,
+				'name'  => 'Site Admin',
+				'email' => 'admin@example.com',
+			],
+		];
+
+		$tag = [
+			'success'   => true,
+			'contact'   => $contact,
+			'object_id' => 8,
+			'tag'       => [
+				'id'   => 8,
+				'name' => 'Newsletter',
+				'slug' => 'newsletter',
+			],
+		];
+
+		$samples = [
+			'created_contact' => [
+				'success' => true,
+				'contact' => $contact,
+			],
+			'added_tag'   => $tag,
+			'removed_tag' => $tag,
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'tag' ) ) {
+			return $tag;
+		}
+
+		return [
+			'success' => true,
+			'contact' => $contact,
+		];
+	}
+
 	public static function get_dynamic_queries(): array {
 		return [
 			'groundhogg_query' => [ self::class, 'grounhogg_query_types' ],
