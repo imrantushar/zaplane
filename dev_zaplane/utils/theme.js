@@ -61,7 +61,8 @@ export const buildThemeCss = (theme) => {
 		Object.entries(palette || {})
 			.map(([k, v]) => `${k}:${v};`)
 			.join('');
-	return `html[data-theme="light"]{${block(theme?.light)}}html[data-theme="dark"]{${block(theme?.dark)}}`;
+	const light = block(theme?.light);
+	return `html[data-theme="light"]{${light}}html[data-theme="dark"]{${block(theme?.dark)}}.zaplane-force-light{${light}}`;
 };
 
 export const applyThemePalettes = (theme) => {

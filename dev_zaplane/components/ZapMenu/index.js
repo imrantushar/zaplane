@@ -13,8 +13,8 @@ const ZAPMenu = ({
   menuPlacement = "bottom"
 }) => {
   const menuClassName = menuPlacement === "top"
-    ? "absolute right-0 bottom-full mb-2 z-[99999] w-56 origin-bottom-right rounded-md bg-[var(--zaplane-background)] shadow-lg ring-1 ring-black/5 focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
-    : "absolute right-0 mt-2 z-[99999] w-56 origin-top-right rounded-md bg-[var(--zaplane-background)] shadow-lg ring-1 ring-black/5 focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0";
+    ? "absolute right-0 bottom-full mb-2 z-[99999] w-56 origin-bottom-right rounded-md bg-[var(--zaplane-background)] shadow-lg border border-[var(--zaplane-border-color)] focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
+    : "absolute right-0 mt-2 z-[99999] w-56 origin-top-right rounded-md bg-[var(--zaplane-background)] shadow-lg border border-[var(--zaplane-border-color)] focus:outline-none transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0";
 
   return (
     <Menu as="div" className="relative inline-block text-left">

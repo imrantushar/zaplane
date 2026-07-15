@@ -3,7 +3,6 @@ import { __ } from '@wordpress/i18n';
 import ZAPLabel from '@ZAPComponents/Labels/ZAPLabel';
 import { outlineBtn } from '../../../assets/scss/chakra/recipe';
 import { FiHelpCircle } from 'react-icons/fi';
-import WhatsNew from '@ZAPComponents/WhatsNew/WhatsNew';
 import { useThemeMode } from '@ZAPUtils/theme';
 import './styles.scss';
 
@@ -38,7 +37,6 @@ const TopBar = ({
 	title = '',
 	render = () => null,
 	rightContent = () => <div className="flex items-center gap-3">
-		<WhatsNew />
 		<ThemeToggle />
 		<button className='flex items-center gap-2' style={outlineBtn} onClick={() => {
 			window.open('https://zaplane.app/docs/', '_blank');

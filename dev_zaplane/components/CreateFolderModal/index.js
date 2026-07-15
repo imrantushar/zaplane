@@ -26,7 +26,7 @@ const CreateFolderModal = ({
     }
   };
   return <WPModal title={__("Create Folder", "zaplane")} isOpen={isOpen} onRequestClose={onClose} size="medium">
-      <div>
+      <div className="mt-6">
         <ZAPInput label={__("Folder Name", "zaplane")} placeholder={__("Enter folder name", "zaplane")} value={folderName} onChange={e => setFolderName(e.target.value)} />
 
         <ZAPDivider mt="24px" />

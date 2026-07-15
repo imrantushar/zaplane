@@ -42,13 +42,23 @@ export default function EmbEmailBuilder( {
 } ) {
     const initialTree = useMemo( () => toInitialTree( source ), [ source ] );
 
+    // The email builder is a third-party editor with no dark mode — it hardcodes
+    // its colors inline. Render it as a consistent light workspace (the email
+    // document is light anyway) so it stays cohesive and usable when the rest of
+    // the app is in dark mode. `.zaplane-force-light` pins the light palette here.
     return (
-        <EmailEditor
-            initialTree={ initialTree }
-            mergeTags={ CONTACT_MERGE_TAGS }
-            header
-            height={ height }
-            onChange={ ( { tree, html } ) => onChange?.( { tree, html } ) }
-        />
+        <div
+            className="zaplane-force-light"
+            data-theme="light"
+            style={ { background: 'var(--zaplane-background)', color: 'var(--zaplane-font-color)', borderRadius: '8px' } }
+        >
+            <EmailEditor
+                initialTree={ initialTree }
+                mergeTags={ CONTACT_MERGE_TAGS }
+                header
+                height={ height }
+                onChange={ ( { tree, html } ) => onChange?.( { tree, html } ) }
+            />
+        </div>
     );
 }

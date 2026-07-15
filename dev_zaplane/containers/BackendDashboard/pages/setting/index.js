@@ -52,11 +52,14 @@ const Toggle = ({ checked, onChange }) => (
     role="switch"
     aria-checked={checked}
     onClick={() => onChange(!checked)}
-    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-colors ${checked ? 'bg-[var(--zaplane-primary)] border-[var(--zaplane-primary)]' : 'bg-[var(--zaplane-secondary-color)] border-[var(--zaplane-border-color)]'}`}
+    // Track color set inline so it beats Tailwind preflight's transparent
+    // background-color on [type=button] (which outranks the bg-[...] utility).
+    style={{ backgroundColor: checked ? 'var(--zaplane-primary)' : 'var(--zaplane-border-color)' }}
+    className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors"
   >
     <span
       className={`inline-block h-[18px] w-[18px] transform rounded-full bg-white transition-transform ${checked ? 'translate-x-[23px]' : 'translate-x-[3px]'}`}
-      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.35)' }}
+      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
     />
   </button>
 );

@@ -91,8 +91,11 @@ class Assets {
 
 		// Emit at the <html> level so portaled UI (WP modals, drawers, react-select
 		// menus) — which render outside .zaplane-scope — still inherit the variables.
+		// `.zaplane-force-light` pins the light palette for subtrees that must stay
+		// light regardless of mode (e.g. the third-party email builder, which has no
+		// dark mode and hardcodes its colors inline).
 		return sprintf(
-			'html[data-theme="light"]{%s}html[data-theme="dark"]{%s}',
+			'html[data-theme="light"]{%1$s}html[data-theme="dark"]{%2$s}.zaplane-force-light{%1$s}',
 			$to_block( $light ),
 			$to_block( $dark )
 		);
