@@ -343,6 +343,17 @@ input.zaplane-checkbox:hover {
         background: var(--zaplane-background) !important;
         border-color: var(--zaplane-border-color) !important;
     }
+
+    // react-select's editable input shares a grid cell with the selected value.
+    // The generic themed-input rule above forces an opaque background on every
+    // [type=text] input — which would paint over and CLIP the value's first
+    // character. Keep the select's own input transparent (declared later, so it
+    // wins the equal-specificity tie against that rule).
+    .zaplane-select__input-container input,
+    input.zaplane-select__input {
+        background: transparent !important;
+        color: var(--zaplane-font-color) !important;
+    }
 }
 
 @media (max-width: 768px) {

@@ -26,6 +26,44 @@ const PALETTE_FIELDS = [
   ['--zaplane-gray', __('Gray', 'zaplane')],
 ];
 
+// Default palettes — mirror PHP Settings::default_light_palette()/default_dark_palette().
+const DEFAULT_PALETTES = {
+  light: {
+    '--zaplane-primary': '#006BFF',
+    '--zaplane-second-primary': '#DAEAFF',
+    '--zaplane-secondary': '#F5F5F5',
+    '--zaplane-secondary-color': '#F6F7F8',
+    '--zaplane-background': '#FFFFFF',
+    '--zaplane-body-background': '#F6F7F8',
+    '--zaplane-border-color': '#CBD1D7',
+    '--zaplane-font-color': '#141A24',
+    '--zaplane-font-secondary-color': '#737373',
+    '--zaplane-text-muted': '#738496',
+    '--zaplane-placeholder': '#A2ADB9',
+    '--zaplane-success': '#16A34A',
+    '--zaplane-warning': '#FDB022',
+    '--zaplane-danger': '#E44A3F',
+    '--zaplane-gray': '#F6F7F8',
+  },
+  dark: {
+    '--zaplane-primary': '#4C8DFF',
+    '--zaplane-second-primary': '#172A45',
+    '--zaplane-secondary': '#1F2630',
+    '--zaplane-secondary-color': '#1E242C',
+    '--zaplane-background': '#171C24',
+    '--zaplane-body-background': '#0F141A',
+    '--zaplane-border-color': '#2C333F',
+    '--zaplane-font-color': '#E6E9EF',
+    '--zaplane-font-secondary-color': '#9AA4B2',
+    '--zaplane-text-muted': '#6B7684',
+    '--zaplane-placeholder': '#6B7280',
+    '--zaplane-success': '#34D399',
+    '--zaplane-warning': '#FBBF24',
+    '--zaplane-danger': '#F87171',
+    '--zaplane-gray': '#1E242C',
+  },
+};
+
 const FEATURE_FIELDS = [
   {
     key: 'custom_apps',
@@ -93,7 +131,7 @@ const SectionTitle = ({ title, description }) => (
   </div>
 );
 
-const AppearanceTab = ({ form, activeMode, setActiveMode, setDefaultMode, paletteTab, setPaletteTab, setColor }) => {
+const AppearanceTab = ({ form, activeMode, setActiveMode, setDefaultMode, paletteTab, setPaletteTab, setColor, resetPalette }) => {
   const modes = [
     { value: 'light', label: __('Light', 'zaplane') },
     { value: 'dark', label: __('Dark', 'zaplane') },
@@ -101,51 +139,41 @@ const AppearanceTab = ({ form, activeMode, setActiveMode, setDefaultMode, palett
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <SectionTitle title={__('Theme', 'zaplane')} description={__('Choose the default mode. Anyone can switch it from the topbar.', 'zaplane')} />
-        <div className="flex flex-wrap items-center gap-6">
-          <div>
-            <div className="mb-2 text-[12px] font-medium text-[var(--zaplane-font-secondary-color)]">{__('Default mode', 'zaplane')}</div>
-            <div className="inline-flex rounded-[6px] border border-[var(--zaplane-border-color)] p-1">
-              {modes.map(m => (
-                <button
-                  key={m.value}
-                  onClick={() => setDefaultMode(m.value)}
-                  className={`px-4 py-1.5 rounded-[4px] text-[13px] font-medium transition-colors ${form.theme.default_mode === m.value ? 'bg-[var(--zaplane-primary)] text-white' : 'text-[var(--zaplane-font-secondary-color)]'}`}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="mb-2 text-[12px] font-medium text-[var(--zaplane-font-secondary-color)]">{__('Preview', 'zaplane')}</div>
-            <div className="inline-flex gap-2">
-              {modes.map(m => (
-                <button
-                  key={m.value}
-                  onClick={() => setActiveMode(m.value)}
-                  className={`px-3 py-1.5 rounded-full text-[12px] font-medium border ${activeMode === m.value ? 'border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]' : 'border-[var(--zaplane-border-color)] text-[var(--zaplane-font-secondary-color)]'}`}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-          </div>
+        <SectionTitle title={__('Default mode', 'zaplane')} description={__('The mode new visitors see first. Anyone can switch it from the topbar.', 'zaplane')} />
+        <div className="inline-flex rounded-[6px] border border-[var(--zaplane-border-color)] p-1">
+          {modes.map(m => (
+            <button
+              key={m.value}
+              onClick={() => { setDefaultMode(m.value); setActiveMode(m.value); }}
+              className={`px-4 py-1.5 rounded-[4px] text-[13px] font-medium transition-colors ${form.theme.default_mode === m.value ? 'bg-[var(--zaplane-primary)] text-white' : 'text-[var(--zaplane-font-secondary-color)]'}`}
+            >
+              {m.label}
+            </button>
+          ))}
         </div>
       </div>
 
       <div>
-        <SectionTitle title={__('Colors', 'zaplane')} description={__('Customize the palette for light and dark mode. Changes preview instantly.', 'zaplane')} />
-        <div className="mb-4 inline-flex rounded-[6px] border border-[var(--zaplane-border-color)] p-1">
-          {['light', 'dark'].map(variant => (
-            <button
-              key={variant}
-              onClick={() => setPaletteTab(variant)}
-              className={`px-4 py-1.5 rounded-[4px] text-[13px] font-medium transition-colors ${paletteTab === variant ? 'bg-[var(--zaplane-primary)] text-white' : 'text-[var(--zaplane-font-secondary-color)]'}`}
-            >
-              {variant === 'light' ? __('Light', 'zaplane') : __('Dark', 'zaplane')}
-            </button>
-          ))}
+        <SectionTitle title={__('Colors', 'zaplane')} description={__('Pick a mode to edit its palette — the app previews it live as you change colors.', 'zaplane')} />
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="inline-flex rounded-[6px] border border-[var(--zaplane-border-color)] p-1">
+            {['light', 'dark'].map(variant => (
+              <button
+                key={variant}
+                onClick={() => { setPaletteTab(variant); setActiveMode(variant); }}
+                className={`px-4 py-1.5 rounded-[4px] text-[13px] font-medium transition-colors ${paletteTab === variant ? 'bg-[var(--zaplane-primary)] text-white' : 'text-[var(--zaplane-font-secondary-color)]'}`}
+              >
+                {variant === 'light' ? __('Light', 'zaplane') : __('Dark', 'zaplane')}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => resetPalette(paletteTab)}
+            className="text-[13px] font-medium text-[var(--zaplane-font-secondary-color)] hover:text-[var(--zaplane-primary)] hover:underline"
+          >
+            {__('Reset to default', 'zaplane')}
+          </button>
         </div>
         <div className="grid grid-cols-1 gap-x-10 md:grid-cols-2">
           {PALETTE_FIELDS.map(([varName, label]) => (
@@ -185,7 +213,7 @@ const Setting = () => {
   const { mode: activeMode, set: setActiveMode } = useThemeMode();
   const [form, setForm] = useState(data ? clone(data) : null);
   const [activeTab, setActiveTab] = useState('appearance');
-  const [paletteTab, setPaletteTab] = useState('light');
+  const [paletteTab, setPaletteTab] = useState(activeMode);
   const savedRef = useRef(data);
 
   useEffect(() => {
@@ -212,6 +240,8 @@ const Setting = () => {
   const setDefaultMode = mode => setForm(f => ({ ...f, theme: { ...f.theme, default_mode: mode } }));
   const setColor = (variant, varName, value) =>
     setForm(f => ({ ...f, theme: { ...f.theme, [variant]: { ...f.theme[variant], [varName]: value } } }));
+  const resetPalette = variant =>
+    setForm(f => ({ ...f, theme: { ...f.theme, [variant]: { ...DEFAULT_PALETTES[variant] } } }));
 
   const handleSave = async () => {
     if (!form) return;
@@ -278,6 +308,7 @@ const Setting = () => {
                 paletteTab={paletteTab}
                 setPaletteTab={setPaletteTab}
                 setColor={setColor}
+                resetPalette={resetPalette}
               />
             ) : (
               <ModulesTab form={form} setFeature={setFeature} />
