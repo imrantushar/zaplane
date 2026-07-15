@@ -62,8 +62,6 @@ const CreateWorkflowModal = ({
     onClose();
   };
   return <WPModal title={__("Create Workflow", "zaplane")} isOpen={isOpen} onRequestClose={onClose} size="medium">
-    <ZAPDivider mb="24px" />
-
     <div flexDirection="column" gap="8px" className="flex flex-col gap-2">
       <ZAPInput label={__("Workflow Name", "zaplane")} placeholder={__("Enter workflow name", "zaplane")} value={workflowName} onChange={e => setWorkflowName(e.target.value)} />
       {!!allFolders.length && <div direction="column" gap={2} className="flex">
