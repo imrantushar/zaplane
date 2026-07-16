@@ -5,7 +5,7 @@ import { __ } from "@wordpress/i18n";
 import { getRunsList, clearRuns, deleteRun } from "@ZAPRedux/Slices/logsSlice/logsSlice";
 import Button from "@ZAPComponents/Button";
 import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
-import { FiTrash2, FiEdit2, FiChevronDown, FiFilter } from "react-icons/fi";
+import { FiTrash2, FiEdit2 } from "react-icons/fi";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
 import LogDetails from "@ZAPComponents/LogDetails";
 import ZAPDrawer from "@ZAPComponents/Drawer";
@@ -82,7 +82,6 @@ const Logs = () => {
     label: __("Running", "zaplane"),
     value: "running"
   }];
-  const currentStatusLabel = statusFilterOptions.find(o => o.value === statusFilter)?.label || __("All statuses", "zaplane");
   const handlePageChange = newPage => {
     handleRefresh(newPage, perPage);
   };
@@ -231,7 +230,8 @@ const Logs = () => {
           label={__("Clear logs", "zaplane")} 
           size="sm" 
           suffix=" p-[8px]" 
-          preset="border" 
+          preset="transparent"
+          border='gray'
           onClick={handleClearLogs} 
           isDisabled={loading || data.length === 0} />
       }>
@@ -241,22 +241,18 @@ const Logs = () => {
           data={data || []}
           showSubHeader={true}
           subHeaderComponent={
-            <ZAPMenu
-              menuPlacement="bottom"
-              trigger={
-                <button className="flex items-center justify-between gap-3 min-w-[180px] px-3 h-[38px] rounded-[4px] border border-[var(--zaplane-border-color)] bg-[var(--zaplane-background)] text-[13px] font-medium text-[var(--zaplane-font-color)]">
-                  <span className="flex items-center gap-2">
-                    <FiFilter size={14} className="text-[var(--zaplane-text-muted)]" />
-                    {currentStatusLabel}
-                  </span>
-                  <FiChevronDown size={16} className="text-[var(--zaplane-text-muted)]" />
-                </button>
-              }
-              items={statusFilterOptions.map(opt => ({
-                label: opt.label,
-                onClick: () => handleStatusFilter(opt.value)
-              }))}
-            />
+            <div className="zaplane-table-sub-header-tabs">
+              {statusFilterOptions.map(opt => (
+                <span
+                  key={opt.value}
+                  role="presentation"
+                  className={`tab ${opt.value === statusFilter ? 'is-active' : ''}`}
+                  onClick={() => handleStatusFilter(opt.value)}
+                >
+                  {opt.label}
+                </span>
+              ))}
+            </div>
           }
           showColumnFilter={false}
           showPagination={totalItems > itemPerPage}

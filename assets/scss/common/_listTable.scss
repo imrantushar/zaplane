@@ -49,6 +49,48 @@
     }
 }
 
+.zaplane-table-sub-header-tabs {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    .tab {
+        position: relative;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--zaplane-text-muted);
+        cursor: pointer;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -17px;
+            width: 0;
+            height: 1px;
+            background: var(--zaplane-primary);
+            transition: width 0.2s ease;
+        }
+
+        &:hover {
+            color: var(--zaplane-primary);
+
+            &::after {
+                width: 100%;
+            }
+        }
+
+        &.is-active {
+            color: var(--zaplane-primary);
+            cursor: default;
+
+            &::after {
+                width: 100%;
+            }
+        }
+    }
+}
+
 // suffix
 .zaplane-table {
     &--logs-table {
