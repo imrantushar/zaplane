@@ -3,6 +3,7 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ReactJson from "react-json-view";
 import { useSelector } from "react-redux";
+import { zaplaneJsonViewTheme } from "@ZAPUtils/jsonViewTheme";
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { LuChevronDown } from 'react-icons/lu';
 
@@ -57,14 +58,14 @@ const LogDetails = ({
                         <span className="zaplane-label font-bold mb-2 block">
                           {__('Input', 'zaplane')}
                         </span>
-                        <ReactJson src={input} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} />
+                        <ReactJson src={input} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} theme={zaplaneJsonViewTheme} />
                       </div>
 
                       <div className="p-3 border border-[var(--zaplane-border-color)] rounded-md bg-[var(--zaplane-secondary-color)]" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
                         <span className="font-bold mb-2 block text-[var(--zaplane-font-color)]">
                           {__('Output', 'zaplane')}
                         </span>
-                        <ReactJson src={output} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} />
+                        <ReactJson src={output} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} theme={zaplaneJsonViewTheme} />
                       </div>
                     </div>
                   </DisclosurePanel>
