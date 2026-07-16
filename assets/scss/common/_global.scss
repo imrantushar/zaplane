@@ -29,8 +29,13 @@
 // #wpbody-content{
 //     padding: 0
 // }
+// #wpfooter is absolutely positioned against #wpcontent (WP core sets
+// #wpcontent to position:relative), so it sits outside #wpbody-content's own
+// box and shows WP core's light background through unless #wpcontent itself
+// is themed too.
 #wpcontent{
-    padding: 0
+    padding: 0;
+    background: var(--zaplane-body-background);
 }
 .react-flow{
     position: fixed !important;

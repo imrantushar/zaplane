@@ -11,6 +11,13 @@
     min-height: calc(100vh - 32px);
 }
 
+// #wpbody-content is the WP-core wrapper around #zaplane-app (it also holds
+// #wpfooter below it). Without this, dark mode leaves a white margin/footer
+// strip showing through around the app on the Zaplane screen.
+#wpbody-content {
+    background: var(--zaplane-body-background);
+}
+
 // Smooth page transition when switching between admin menu routes.
 .zaplane-route {
     animation: zaplane-route-in 0.28s ease;

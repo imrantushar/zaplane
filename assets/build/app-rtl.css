@@ -3504,6 +3504,10 @@ h2.react-datepicker__current-month {
   min-height: calc(100vh - 32px);
 }
 
+#wpbody-content {
+  background: var(--zaplane-body-background);
+}
+
 .zaplane-route {
   animation: zaplane-route-in 0.28s ease;
 }
@@ -3703,6 +3707,7 @@ h2.react-datepicker__current-month {
 
 #wpcontent {
   padding: 0;
+  background: var(--zaplane-body-background);
 }
 
 .react-flow {

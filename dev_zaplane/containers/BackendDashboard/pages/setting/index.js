@@ -139,21 +139,6 @@ const AppearanceTab = ({ form, activeMode, setActiveMode, setDefaultMode, palett
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <SectionTitle title={__('Default mode', 'zaplane')} description={__('The mode new visitors see first. Anyone can switch it from the topbar.', 'zaplane')} />
-        <div className="inline-flex rounded-[6px] border border-[var(--zaplane-border-color)] p-1">
-          {modes.map(m => (
-            <button
-              key={m.value}
-              onClick={() => { setDefaultMode(m.value); setActiveMode(m.value); }}
-              className={`px-4 py-1.5 rounded-[4px] text-[13px] font-medium transition-colors ${form.theme.default_mode === m.value ? 'bg-[var(--zaplane-primary)] text-white' : 'text-[var(--zaplane-font-secondary-color)]'}`}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
         <SectionTitle title={__('Colors', 'zaplane')} description={__('Pick a mode to edit its palette — the app previews it live as you change colors.', 'zaplane')} />
         <div className="mb-4 flex items-center justify-between gap-3">
           <div className="inline-flex rounded-[6px] border border-[var(--zaplane-border-color)] p-1">
