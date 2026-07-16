@@ -312,8 +312,11 @@ input.zaplane-checkbox:hover {
 // ── Themed form controls (dark-mode-aware) ────────────────────────────────
 // Any input/select/textarea inside a Zaplane surface — the main app AND portaled
 // modals/drawers (which re-apply `.zaplane-scope`) — must use themed colors so
-// they don't fall back to WordPress admin core's hardcoded white. `!important`
-// beats WP core's id-scoped form rules.
+// they don't fall back to WordPress admin core's hardcoded white. No
+// `!important` needed: this selector (0,2,1) already outweighs WP core's
+// element+attribute form rules (0,1,1) — and `!important` here would leak into
+// embedded third-party editors (e.g. the email builder) whose own class-based
+// input styles could then never win.
 .zaplane-scope {
     .zaplane-input,
     .zaplane-textarea,
@@ -326,7 +329,7 @@ input.zaplane-checkbox:hover {
     input[type="tel"],
     textarea,
     select {
-        background-color: var(--zaplane-background) !important;
+        background-color: var(--zaplane-background);
         color: var(--zaplane-font-color);
         border-color: var(--zaplane-border-color);
 
