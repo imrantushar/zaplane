@@ -232,7 +232,8 @@ export default function FlowTopBar({
       isClearable={false}
       isSearchable={false}
       placeholder="Select status"
-      className="zaplane-selete"
+      className="zaplane-select"
+      classNamePrefix="zaplane-select"
       formatOptionLabel={(opt) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: opt.color, flexShrink: 0, display: 'inline-block' }} />
