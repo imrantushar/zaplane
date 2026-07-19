@@ -71,6 +71,7 @@ export default function RichTextField( {
                 value={ typeof value === 'string' ? value : '' }
                 mergeTags={ mergeTags }
                 onChange={ ( { html } ) => setFieldValue( field.key, html ) }
+                suffix="zaplane"
             />
         </div>
     );

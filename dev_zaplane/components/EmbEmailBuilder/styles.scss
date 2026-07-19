@@ -20,4 +20,59 @@
     --emb-text-secondary: var(--zaplane-font-secondary-color);
     --emb-text-muted: var(--zaplane-text-muted);
     --emb-canvas-backdrop: var(--zaplane-body-background);
+    // Accent used by the Preview button, active device tab, active icon
+    // buttons, the "+" quick-add button, and the search/lib-item hover
+    // states — previously hardcoded to the library's own blue everywhere,
+    // so it never picked up the app's palette. Now themeable.
+    --emb-primary: var(--zaplane-primary);
+    .emb-canvas--zaplane {
+        .emb-canvas-page {
+            background: var(--zaplane-background);
+            .emb-quick-add--zaplane {
+                .emb-split-btn {
+                    background: var(--zaplane-background);
+                    color: var(--zaplane-font-color);
+                    padding: 4px 10px;
+                    .emb-split-main {
+                        padding-right: 10px;
+                    }
+                    .emb-split-caret, .emb-split-main  {
+                        background: var(--zaplane-background);
+                        color: var(--zaplane-font-color);
+                    }
+                }
+            }
+            .emb-quick-add-menu--zaplane {
+                background: var(--zaplane-background);
+                color: var(--zaplane-font-color);
+                padding: 4px 10px;
+                .emb-menu-icon{
+                    background: var(--zaplane-background);
+                    color: var(--zaplane-font-color, #475569);
+                }
+                .emb-search {
+                    background: var(--zaplane-background);
+                    .emb-search-input {
+                        color: var(--zaplane-font-color, #475569);
+                    }
+                }
+                .emb-menu-item:hover {
+                    color: var(--zaplane-second-primary);
+                    background: var(--zaplane-text-muted, #f1f5f9);
+                    .emb-menu-icon {
+                        color: var(--zaplane-second-primary);
+                        background: var(--zaplane-text-muted, #f1f5f9);
+                    }
+                }
+            }
+        }
+    }
+    .emb-preview-btn--zaplane {
+        padding: 4px 10px;
+        border: 1px solid var(--zaplane-border-color);
+    }
+    // The Preview modal (.emb-preview-backdrop/-dialog/-header/-body/-frame
+    // etc.) renders as a plain child of .emb-embed-root, not inside
+    // .emb-canvas-page, so it needs no override here — it inherits the
+    // `--emb-*` vars mapped above through the normal DOM cascade.
 }
