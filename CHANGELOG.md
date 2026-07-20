@@ -3,6 +3,11 @@
 All notable changes to Zaplane are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added — Integrations
+- **ABlocks** — a **Form Submitted** trigger for aBlocks form-builder forms, with an optional per-form filter. Requires a companion `ablocks/form_builder/after_submission` action hook shipped in the aBlocks plugin.
+
 ## [1.1.0] - 2026-07-13
 
 A major feature release that turns Zaplane into a full automation platform: an AI

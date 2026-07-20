@@ -201,6 +201,10 @@ $registry = [
 		'file'  => 'essentialblocks.php',
 		'class' => \Zaplane\Integrations\Essentialblocks::class,
 	],
+	'ablocks'             => [
+		'file'  => 'ablocks.php',
+		'class' => \Zaplane\Integrations\Ablocks::class,
+	],
 	'coblocks'            => [
 		'file'  => 'coblocks.php',
 		'class' => \Zaplane\Integrations\Coblocks::class,
