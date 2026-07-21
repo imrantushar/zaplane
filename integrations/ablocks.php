@@ -15,7 +15,7 @@ class Ablocks extends IntegrationBase {
 	}
 
 	public static function get_name(): string {
-		return 'ABlocks';
+		return 'aBlocks';
 	}
 
 	public static function get_icon(): string {
