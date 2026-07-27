@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { EmailEditor, treeFromHtml } from '@kodezen/email-builder-editor';
+import { EmailEditor, treeFromHtml } from '@kodezen/editor';
 
 /**
  * Full drag-and-drop email builder (EMB) used on the dedicated Email Templates
