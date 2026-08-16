@@ -53,6 +53,14 @@ class Gemcrm extends IntegrationBase {
 				'label' => 'Contact Birthday',
 				'hook'  => 'zaplane_gemcrm_contact_birthday',
 			],
+			'sequence_enrolled' => [
+				'label' => 'Contact Enrolled In Sequence',
+				'hook'  => 'gemcrm/email_seq/subscriber/enrolled',
+			],
+			'sequence_completed' => [
+				'label' => 'Contact Completed Sequence',
+				'hook'  => 'gemcrm/email_seq/subscriber/completed',
+			],
 		];
 	}
 
@@ -107,6 +115,23 @@ class Gemcrm extends IntegrationBase {
 						],
 					],
 				];
+
+			case 'sequence_enrolled':
+			case 'sequence_completed':
+				return [
+					[
+						'key'         => 'sequence_id',
+						'label'       => 'Email Sequence',
+						'type'        => 'select',
+						'required'    => false,
+						'placeholder' => 'Leave empty to trigger for any sequence',
+						'dynamic'     => [
+							'integration' => 'gemcrm',
+							'query'       => 'gemcrm_sequence_query',
+							'select'      => [ 'value', 'label' ],
+						],
+					],
+				];
 		}//end switch
 
 		return [];
@@ -157,6 +182,14 @@ class Gemcrm extends IntegrationBase {
 				'dob'               => '1990-03-15',
 				'_zaplane_birthday' => true,
 			] ),
+			'sequence_enrolled'     => [
+				'contact_id'  => 1,
+				'sequence_id' => 1,
+			],
+			'sequence_completed'    => [
+				'contact_id'  => 1,
+				'sequence_id' => 1,
+			],
 		];
 
 		return $samples[ $trigger ] ?? [];
@@ -262,6 +295,31 @@ class Gemcrm extends IntegrationBase {
 					'tags'              => $data['tags'] ?? [],
 					'_zaplane_birthday' => true,
 				];
+
+			case 'sequence_enrolled':
+			case 'sequence_completed':
+				// Fired as do_action( hook, $sequence_id, $contact_id, ...) —
+				// sequence_id first, unlike the contact-centric hooks above.
+				$sequence_id = $args[0] ?? null;
+				$contact_id  = $args[1] ?? null;
+
+				if ( ! $sequence_id || ! $contact_id ) {
+					return false;
+				}
+
+				$config              = $node['data']['config'] ?? $node['config'] ?? [];
+				$filter_sequence_id  = ! empty( $config['sequence_id'] )
+					? (int) $config['sequence_id']
+					: null;
+
+				if ( $filter_sequence_id && $filter_sequence_id !== (int) $sequence_id ) {
+					return false;
+				}
+
+				return [
+					'contact_id'  => (int) $contact_id,
+					'sequence_id' => (int) $sequence_id,
+				];
 		}//end switch
 
 		return false;
@@ -279,6 +337,8 @@ class Gemcrm extends IntegrationBase {
 			'send_campaign'       => [ 'label' => 'Send Email Campaign' ],
 			'send_email'          => [ 'label' => 'Send Email' ],
 			'reapply_sequence'    => [ 'label' => 'Re Apply A Sequence' ],
+			'enroll_in_sequence'    => [ 'label' => 'Enroll Contact In Sequence' ],
+			'remove_from_sequence'  => [ 'label' => 'Remove Contact From Sequence' ],
 		];
 	}
 
@@ -350,6 +410,49 @@ class Gemcrm extends IntegrationBase {
 
 			case 'reapply_sequence':
 				return [
+					[
+						'key'      => 'sequence_id',
+						'label'    => 'Email Sequence',
+						'type'     => 'select',
+						'required' => true,
+						'dynamic'  => [
+							'integration' => 'gemcrm',
+							'query'       => 'gemcrm_sequence_query',
+							'select'      => [ 'value', 'label' ],
+						],
+					],
+				];
+
+			case 'enroll_in_sequence':
+				return [
+					self::contact_id_field( true ),
+					[
+						'key'      => 'sequence_id',
+						'label'    => 'Email Sequence',
+						'type'     => 'select',
+						'required' => true,
+						'dynamic'  => [
+							'integration' => 'gemcrm',
+							'query'       => 'gemcrm_sequence_query',
+							'select'      => [ 'value', 'label' ],
+						],
+					],
+					[
+						'key'      => 'restart_if_exist',
+						'label'    => 'If already enrolled',
+						'type'     => 'select',
+						'required' => false,
+						'default'  => 'no',
+						'options'  => [
+							[ 'value' => 'no', 'label' => 'Leave their current progress' ],
+							[ 'value' => 'yes', 'label' => 'Restart from the first email' ],
+						],
+					],
+				];
+
+			case 'remove_from_sequence':
+				return [
+					self::contact_id_field( true ),
 					[
 						'key'      => 'sequence_id',
 						'label'    => 'Email Sequence',
@@ -1259,6 +1362,56 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		return self::action_success( array_merge( $input, [
+			'sequence_id' => $sequence_id,
+		] ) );
+	}
+
+	protected static function action_enroll_in_sequence( array $config, array $input ): array {
+		if ( ! class_exists( \GemCrmPro\Database\Models\EmailSequence::class ) ) {
+			return self::action_error( 'GemCRM Pro is not installed', $input );
+		}
+
+		$contact_id  = (int) ( $config['contact_id'] ?? 0 );
+		$sequence_id = (int) ( $config['sequence_id'] ?? 0 );
+		$restart     = ( $config['restart_if_exist'] ?? 'no' ) === 'yes';
+
+		if ( ! $contact_id ) {
+			return self::action_error( 'Contact ID is required', $input );
+		}
+		if ( ! $sequence_id ) {
+			return self::action_error( 'Email sequence is required', $input );
+		}
+
+		$tracker_ids = \GemCrmPro\Database\Models\EmailSequence::subscribe( $sequence_id, [ $contact_id ], $restart );
+
+		return self::action_success( array_merge( $input, [
+			'contact_id'  => $contact_id,
+			'sequence_id' => $sequence_id,
+			// false when the contact was already enrolled and restart_if_exist
+			// was left "no" — not a failure, just a no-op enrollment.
+			'enrolled'    => ! empty( $tracker_ids ),
+		] ) );
+	}
+
+	protected static function action_remove_from_sequence( array $config, array $input ): array {
+		if ( ! class_exists( \GemCrmPro\Database\Models\EmailSequence::class ) ) {
+			return self::action_error( 'GemCRM Pro is not installed', $input );
+		}
+
+		$contact_id  = (int) ( $config['contact_id'] ?? 0 );
+		$sequence_id = (int) ( $config['sequence_id'] ?? 0 );
+
+		if ( ! $contact_id ) {
+			return self::action_error( 'Contact ID is required', $input );
+		}
+		if ( ! $sequence_id ) {
+			return self::action_error( 'Email sequence is required', $input );
+		}
+
+		\GemCrmPro\Database\Models\EmailSequence::unsubscribe( $sequence_id, [ $contact_id ], 'Removed by Zaplane automation' );
+
+		return self::action_success( array_merge( $input, [
+			'contact_id'  => $contact_id,
 			'sequence_id' => $sequence_id,
 		] ) );
 	}
