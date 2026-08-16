@@ -444,8 +444,14 @@ class Gemcrm extends IntegrationBase {
 						'required' => false,
 						'default'  => 'no',
 						'options'  => [
-							[ 'value' => 'no', 'label' => 'Leave their current progress' ],
-							[ 'value' => 'yes', 'label' => 'Restart from the first email' ],
+							[
+								'value' => 'no',
+								'label' => 'Leave their current progress'
+							],
+							[
+								'value' => 'yes',
+								'label' => 'Restart from the first email'
+							],
 						],
 					],
 				];
