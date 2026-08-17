@@ -339,6 +339,7 @@ class Gemcrm extends IntegrationBase {
 			'reapply_sequence'    => [ 'label' => 'Re Apply A Sequence' ],
 			'enroll_in_sequence'    => [ 'label' => 'Enroll Contact In Sequence' ],
 			'remove_from_sequence'  => [ 'label' => 'Remove Contact From Sequence' ],
+			'activate_sequence_email' => [ 'label' => 'Activate Sequence Email' ],
 		];
 	}
 
@@ -471,6 +472,22 @@ class Gemcrm extends IntegrationBase {
 						],
 					],
 				];
+
+			case 'activate_sequence_email':
+				return [
+					[
+						'key'      => 'step_id',
+						'label'    => 'Sequence Email',
+						'type'     => 'select',
+						'required' => true,
+						'help'     => 'The individual email inside a sequence — not the sequence itself.',
+						'dynamic'  => [
+							'integration' => 'gemcrm',
+							'query'       => 'gemcrm_sequence_campaign_query',
+							'select'      => [ 'value', 'label' ],
+						],
+					],
+				];
 		}//end switch
 
 		return [];
@@ -483,6 +500,7 @@ class Gemcrm extends IntegrationBase {
 			'gemcrm_list_query'     => [ self::class, 'query_lists' ],
 			'gemcrm_campaign_query' => [ self::class, 'query_campaigns' ],
 			'gemcrm_sequence_query' => [ self::class, 'query_sequences' ],
+			'gemcrm_sequence_campaign_query' => [ self::class, 'query_sequence_campaigns' ],
 			'gemcrm_email_template_query' => [ self::class, 'query_email_templates' ],
 		];
 	}
@@ -1419,6 +1437,35 @@ class Gemcrm extends IntegrationBase {
 		return self::action_success( array_merge( $input, [
 			'contact_id'  => $contact_id,
 			'sequence_id' => $sequence_id,
+		] ) );
+	}
+
+	/**
+	 * Sequence emails start as drafts and are activated (moved to pending,
+	 * which is what actually arms their Action Scheduler sending) here
+	 * rather than through any manual control in the GemCRM admin UI —
+	 * activation is meant to happen only as part of an automation workflow.
+	 */
+	protected static function action_activate_sequence_email( array $config, array $input ): array {
+		if ( ! class_exists( \GemCrmPro\Database\Models\EmailSequenceCampaign::class ) ) {
+			return self::action_error( 'GemCRM Pro is not installed', $input );
+		}
+
+		$step_id = (int) ( $config['step_id'] ?? 0 );
+
+		if ( ! $step_id ) {
+			return self::action_error( 'Sequence email is required', $input );
+		}
+
+		$step = \GemCrmPro\Database\Models\EmailSequenceCampaign::update( $step_id, [ 'status' => 'pending' ] );
+
+		if ( ! $step ) {
+			return self::action_error( 'Failed to activate sequence email', $input );
+		}
+
+		return self::action_success( array_merge( $input, [
+			'step_id' => $step_id,
+			'step'    => $step,
 		] ) );
 	}
 
