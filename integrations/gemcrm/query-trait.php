@@ -185,34 +185,6 @@ trait QueryTrait {
 	}
 
 	/**
-	 * Returns the latest 20 sequence emails (steps) across all sequences,
-	 * each labeled with its parent sequence's title — for the "Activate
-	 * Sequence Email" action's step picker. Search narrows by step title.
-	 */
-	public static function query_sequence_campaigns( $q = null ): array {
-		if ( ! class_exists( \GemCrmPro\Database\Models\EmailSequenceCampaign::class ) ) {
-			return [];
-		}
-
-		$search = (string) ( $q['search'] ?? '' );
-		$items  = \GemCrmPro\Database\Models\EmailSequenceCampaign::search_with_sequence_title( $search, 20 );
-		$result = [];
-
-		foreach ( $items as $item ) {
-			$step_title     = '' !== $item['title'] ? $item['title'] : sprintf( '#%d', $item['id'] );
-			$sequence_title = '' !== $item['sequence_title'] ? $item['sequence_title'] : 'Sequence';
-			$status_suffix  = 'pending' === $item['status'] ? ' (active)' : ' (draft)';
-
-			$result[] = [
-				'value' => $item['id'],
-				'label' => "{$sequence_title} → {$step_title}{$status_suffix}",
-			];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Returns the latest 10 campaigns by default; search narrows results.
 	 */
 	public static function query_campaigns( $q = null ): array {
