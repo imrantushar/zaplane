@@ -1,6 +1,6 @@
 {
     "version": "1.1.0",
-    "generated_at": "2026-07-14 12:22:23",
+    "generated_at": "2026-08-17 07:33:38",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -430,6 +430,56 @@
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "sequence_enrolled": {
+                    "label": "Contact Enrolled In Sequence",
+                    "hook": "gemcrm/email_seq/subscriber/enrolled",
+                    "key": "sequence_enrolled",
+                    "schema": [
+                        {
+                            "key": "sequence_id",
+                            "label": "Email Sequence",
+                            "type": "select",
+                            "required": false,
+                            "placeholder": "Leave empty to trigger for any sequence",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_sequence_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "sequence_completed": {
+                    "label": "Contact Completed Sequence",
+                    "hook": "gemcrm/email_seq/subscriber/completed",
+                    "key": "sequence_completed",
+                    "schema": [
+                        {
+                            "key": "sequence_id",
+                            "label": "Email Sequence",
+                            "type": "select",
+                            "required": false,
+                            "placeholder": "Leave empty to trigger for any sequence",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_sequence_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -1191,6 +1241,101 @@
                     "label": "Re Apply A Sequence",
                     "key": "reapply_sequence",
                     "schema": [
+                        {
+                            "key": "sequence_id",
+                            "label": "Email Sequence",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_sequence_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "enroll_in_sequence": {
+                    "label": "Enroll Contact In Sequence",
+                    "key": "enroll_in_sequence",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
+                            "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "sequence_id",
+                            "label": "Email Sequence",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_sequence_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "restart_if_exist",
+                            "label": "If already enrolled",
+                            "type": "select",
+                            "required": false,
+                            "default": "no",
+                            "options": [
+                                {
+                                    "value": "no",
+                                    "label": "Leave their current progress"
+                                },
+                                {
+                                    "value": "yes",
+                                    "label": "Restart from the first email"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_from_sequence": {
+                    "label": "Remove Contact From Sequence",
+                    "key": "remove_from_sequence",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
+                            "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
                         {
                             "key": "sequence_id",
                             "label": "Email Sequence",
@@ -6508,7 +6653,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
+            "webhook_url": "http://localhost:10004/wp-json/zaplane/v1/incoming/fillout",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10638,7 +10783,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
+            "webhook_url": "http://localhost:10004/wp-json/zaplane/v1/incoming/jotform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -11357,7 +11502,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/mailchimp",
+            "webhook_url": "http://localhost:10004/wp-json/zaplane/v1/incoming/mailchimp",
             "triggers": {
                 "subscribed": {
                     "label": "Subscriber Added",
@@ -13071,7 +13216,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/messenger",
+            "webhook_url": "http://localhost:10004/wp-json/zaplane/v1/incoming/messenger",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -13875,7 +14020,7 @@
             "requires_connection": true,
             "auth_type": "both",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/slack",
+            "webhook_url": "http://localhost:10004/wp-json/zaplane/v1/incoming/slack",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -17697,7 +17842,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
+            "webhook_url": "http://localhost:10004/wp-json/zaplane/v1/incoming/typeform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -18129,7 +18274,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/whatsapp",
+            "webhook_url": "http://localhost:10004/wp-json/zaplane/v1/incoming/whatsapp",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -27296,7 +27441,7 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/zoom",
+            "webhook_url": "http://localhost:10004/wp-json/zaplane/v1/incoming/zoom",
             "triggers": {
                 "meeting_started": {
                     "label": "Meeting Started",
@@ -27714,6 +27859,37 @@
                     ]
                 }
             }
+        },
+        "gemcrm-email-inbox": {
+            "slug": "gemcrm-email-inbox",
+            "name": "GemCRM Email Inbox",
+            "icon": "crm.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": {
+                "email_received": {
+                    "label": "Email Received",
+                    "hook": "gemcrm/email_inbox/received",
+                    "key": "email_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_received_unmatched": {
+                    "label": "Email Received (Unmatched)",
+                    "hook": "gemcrm/email_inbox/received_unmatched",
+                    "key": "email_received_unmatched",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
