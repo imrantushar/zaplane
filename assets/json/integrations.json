@@ -1,6 +1,6 @@
 {
     "version": "1.1.0",
-    "generated_at": "2026-07-14 12:22:23",
+    "generated_at": "2026-08-05 06:06:09",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -11888,7 +11888,7 @@
         },
         "memberpress": {
             "slug": "memberpress",
-            "name": "Memberpress",
+            "name": "MemberPress",
             "icon": "memberpress.svg",
             "category": "app",
             "requires_connection": false,
@@ -14101,7 +14101,7 @@
         },
         "spectra": {
             "slug": "spectra",
-            "name": "Spectra",
+            "name": "Spectra Legacy",
             "icon": "spectra.svg",
             "category": "app",
             "requires_connection": false,
@@ -18086,7 +18086,7 @@
         },
         "weforms": {
             "slug": "weforms",
-            "name": "We Forms",
+            "name": "weForms",
             "icon": "weforms.svg",
             "category": "app",
             "requires_connection": false,
