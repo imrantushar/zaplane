@@ -2,6 +2,7 @@
 namespace Zaplane\Admin;
 
 use Zaplane\Utils\Helper;
+use Zaplane\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -34,6 +35,9 @@ class Assets {
 			// open the uploader via window.wp.media.
 			wp_enqueue_media();
 			wp_enqueue_style( 'zaplane-app-style', ZAPLANE_ASSETS_URI . 'build/app.css', [ 'wp-components' ], filemtime( ZAPLANE_ASSETS_DIR_PATH . 'build/app.css' ), 'all' );
+			// Admin-configured theme palettes, emitted as scoped CSS variables so
+			// they override the SCSS :root defaults with no color flash on load.
+			wp_add_inline_style( 'zaplane-app-style', $this->get_theme_inline_css() );
 			wp_enqueue_script(
 				'zaplane-app-scripts',
 				ZAPLANE_ASSETS_URI . 'build/app.js',
@@ -52,6 +56,7 @@ class Assets {
 				'route_path'            => wp_parse_url( admin_url(), PHP_URL_PATH ),
 				'plugin_root_url'       => ZAPLANE_PLUGIN_ROOT_URI,
 				'menu'                  => wp_json_encode( Helper::get_admin_menu_list() ),
+				'settings'              => Settings::get(),
 			]);
 			// The integrations catalogue is ~1.2 MB. Inject it as a raw JSON string
 			// rather than through wp_localize_script, which would PHP-decode the
@@ -64,6 +69,36 @@ class Assets {
 			);
 			wp_set_script_translations( 'zaplane-app-scripts', 'zaplane', ZAPLANE_ROOT_DIR_PATH . 'languages/' );
 		}//end if
+	}
+
+	/**
+	 * Build the scoped theme stylesheet: light palette on `.zaplane-scope`, dark
+	 * palette on `.zaplane-scope[data-theme="dark"]`. app.js stamps the data-theme
+	 * attribute from the saved/preferred mode before React paints.
+	 */
+	private function get_theme_inline_css(): string {
+		$theme = Settings::theme();
+		$light = isset( $theme['light'] ) && is_array( $theme['light'] ) ? $theme['light'] : [];
+		$dark  = isset( $theme['dark'] ) && is_array( $theme['dark'] ) ? $theme['dark'] : [];
+
+		$to_block = static function ( array $palette ): string {
+			$decls = '';
+			foreach ( $palette as $var => $value ) {
+				$decls .= sprintf( '%s:%s;', $var, $value );
+			}
+			return $decls;
+		};
+
+		// Emit at the <html> level so portaled UI (WP modals, drawers, react-select
+		// menus) — which render outside .zaplane-scope — still inherit the variables.
+		// `.zaplane-force-light` pins the light palette for subtrees that must stay
+		// light regardless of mode (e.g. the third-party email builder, which has no
+		// dark mode and hardcodes its colors inline).
+		return sprintf(
+			'html[data-theme="light"]{%1$s}html[data-theme="dark"]{%2$s}.zaplane-force-light{%1$s}',
+			$to_block( $light ),
+			$to_block( $dark )
+		);
 	}
 
 	/**

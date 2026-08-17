@@ -32,8 +32,8 @@ const ZAPLabel = ({
   const variantStyles = {
     heading: { fontSize: "20px", fontWeight: "200", color: "var(--zaplane-font-color)" },
     title: { fontSize: "14px", fontWeight: "500", color: "var(--zaplane-font-color)" },
-    subtitle: { fontSize: "14px", fontWeight: "400", color: "#4B5563" },
-    miniTitle: { fontSize: "12px", fontWeight: "400", color: "#4B5563" },
+    subtitle: { fontSize: "14px", fontWeight: "400", color: "var(--zaplane-font-secondary-color)" },
+    miniTitle: { fontSize: "12px", fontWeight: "400", color: "var(--zaplane-font-secondary-color)" },
     basic: { fontSize: "14px", fontWeight: "500", color: "var(--zaplane-font-color)" },
     simple: { fontSize: "14px", fontWeight: "400", color: "var(--zaplane-font-color)", lineHeight: '20px' },
     simpleLight: { fontSize: "12px", fontWeight: "400", color: "var(--zaplane-gray-color)" },

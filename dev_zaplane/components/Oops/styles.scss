@@ -5,6 +5,11 @@
 		img {
 			width: 100%;
 		}
+		// The empty-state illustration is a light SVG loaded as <img>, so its
+		// internals can't be themed. invert + hue-rotate adapts it to dark mode.
+		html[data-theme="dark"] & img {
+			filter: invert(0.9) hue-rotate(180deg);
+		}
 	}
 	&__message {
 		padding: 0 0 40px 0;

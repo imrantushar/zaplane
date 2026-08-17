@@ -24,11 +24,11 @@ export default function ConditionGroupField({
       return <div className="flex flex-col gap-4">
                         {groups.map((group, gIndex) => <div key={gIndex}>
                                 {groups.length > 1 && gIndex !== 0 && <div className="flex items-center mb-3">
-                                        <div className="flex-[1] h-[1px] bg-gray-300" />
+                                        <div className="flex-[1] h-[1px] bg-[var(--zaplane-border-color)]" />
                                         <span className="mx-3 text-[sm]">
                                             {__("OR", "zaplane")}
                                         </span>
-                                        <div className="flex-[1] h-[1px] bg-gray-300" />
+                                        <div className="flex-[1] h-[1px] bg-[var(--zaplane-border-color)]" />
                                     </div>}
 
                                 <FieldArray name={`${field.key}.${gIndex}`}>

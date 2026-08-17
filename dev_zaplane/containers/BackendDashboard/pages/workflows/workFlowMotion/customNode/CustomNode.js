@@ -14,9 +14,9 @@ const addPortBtnStyle = {
   width: 16,
   height: 16,
   borderRadius: "50%",
-  border: "1px solid #9CA3AF",
-  background: "#fff",
-  color: "#6B7280",
+  border: "1px solid var(--zaplane-border-color)",
+  background: "var(--zaplane-background)",
+  color: "var(--zaplane-font-secondary-color)",
   cursor: "pointer",
   padding: 0,
   pointerEvents: "auto",
@@ -104,7 +104,7 @@ export default function CustomNode({
         left: 0, 
         fontSize: '13px', 
         fontWeight: '500', 
-        color: '#1f2937' 
+        color: 'var(--zaplane-font-color)' 
       }}>
         {formattedAction || "Action"}
       </div>
@@ -140,8 +140,8 @@ export default function CustomNode({
           padding: '12px 16px',
           minWidth: '220px',
           minHeight: '64px',
-          background: '#F9FAFB',
-          border: '1px solid #E5E7EB',
+          background: 'var(--zaplane-secondary-color)',
+          border: '1px solid var(--zaplane-border-color)',
           borderRadius: '8px',
           boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
           display: 'flex',
@@ -168,14 +168,14 @@ export default function CustomNode({
               <div style={{
                 width: '32px',
                 height: '32px',
-                background: '#FFFFFF',
+                background: 'var(--zaplane-background)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '8px',
-                border: '1px solid #E5E7EB'
+                border: '1px solid var(--zaplane-border-color)'
               }}>
-                <FaPlus size={14} color="#6B7280" />
+                <FaPlus size={14} color="var(--zaplane-font-secondary-color)" />
               </div>
             ) : (
               <ZAPIcon icon={data?.icon} name={data.app} />
@@ -185,7 +185,7 @@ export default function CustomNode({
             <span style={{ 
               fontSize: '14px', 
               fontWeight: '500', 
-              color: '#374151',
+              color: 'var(--zaplane-font-color)',
               display: 'block',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -197,7 +197,7 @@ export default function CustomNode({
             {!isSelectApp && (
               <span style={{ 
                 fontSize: '12px', 
-                color: '#6B7280',
+                color: 'var(--zaplane-font-secondary-color)',
                 display: 'block',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -235,13 +235,13 @@ export default function CustomNode({
                   style={{
                     position: "absolute",
                     fontSize: 10,
-                    color: "#4B5563",
+                    color: "var(--zaplane-font-secondary-color)",
                     whiteSpace: "nowrap",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 6,
-                    background: "#fff",
-                    border: "1px solid #E5E7EB",
+                    background: "var(--zaplane-background)",
+                    border: "1px solid var(--zaplane-border-color)",
                     borderRadius: 6,
                     padding: "1px 6px",
                     boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
@@ -317,7 +317,7 @@ export default function CustomNode({
                           height: 22,
                           borderRadius: "50%",
                           border: "1px dashed #a855f7",
-                          background: "#fff",
+                          background: "var(--zaplane-background)",
                           color: "#a855f7",
                           cursor: "pointer",
                           padding: 0,

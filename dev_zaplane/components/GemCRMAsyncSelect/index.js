@@ -77,7 +77,7 @@ const GemCRMAsyncSelect = ({
                         ...base,
                         minHeight: '38px',
                         fontSize: '13px',
-                        borderColor: '#e2e8f0',
+                        borderColor: 'var(--zaplane-border-color)',
                         boxShadow: 'none',
                         '&:hover': { borderColor: '#cbd5e1' },
                     }),
@@ -87,7 +87,7 @@ const GemCRMAsyncSelect = ({
                         backgroundColor: state.isSelected
                             ? 'var(--zaplane-primary, #6366f1)'
                             : state.isFocused
-                            ? '#f1f5f9'
+                            ? 'var(--zaplane-secondary-color)'
                             : 'white',
                         color: state.isSelected ? 'white' : '#1e293b',
                     }),

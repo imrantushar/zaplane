@@ -55,28 +55,28 @@ const ZAPDrawer = ({
                 leaveTo={placement === 'start' ? '-translate-x-full' : 'translate-x-full'}
               >
                 <DialogPanel className={`pointer-events-auto w-screen ${isFullscreen ? 'max-w-full' : maxWidth}`}>
-                  <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+                  <div className="flex h-full flex-col overflow-y-scroll bg-[var(--zaplane-background)] shadow-xl">
                     {title && (
                       <div className="px-4 py-6 sm:px-6 flex items-center justify-between ">
                         <div className="flex items-center">
                           {arrowClose && (
                             <button
                               type="button"
-                              className="mr-3 text-gray-400 hover:text-gray-500 focus:outline-none"
+                              className="mr-3 text-[var(--zaplane-text-muted)] hover:text-[var(--zaplane-font-secondary-color)] focus:outline-none"
                               onClick={arrowOnClick || onClose}
                             >
                               <span className="sr-only">Close panel</span>
                               <IoIosArrowBack className="h-6 w-6" aria-hidden="true" />
                             </button>
                           )}
-                          <DialogTitle className="text-base font-semibold leading-6 text-gray-900 m-0">
+                          <DialogTitle className="text-base font-semibold leading-6 text-[var(--zaplane-font-color)] m-0">
                             <ZAPLabel label={title} type={"bold"} />
                           </DialogTitle>
                         </div>
                         <div className="ml-3 flex h-7 items-center">
                           <button
                             type="button"
-                            className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none"
+                            className="relative rounded-md bg-[var(--zaplane-background)] text-[var(--zaplane-text-muted)] hover:text-[var(--zaplane-font-secondary-color)] focus:outline-none"
                             onClick={onClose}
                           >
                             <span className="absolute -inset-2.5" />
@@ -90,7 +90,7 @@ const ZAPDrawer = ({
                       {typeof children === "function" ? children({ onClose }) : children}
                     </div>
                     {footer && (
-                      <div className="border-t border-gray-200 px-4 py-4 sm:px-6">
+                      <div className="border-t border-[var(--zaplane-border-color)] px-4 py-4 sm:px-6">
                         {typeof footer === "function" ? footer({ onClose }) : footer}
                       </div>
                     )}

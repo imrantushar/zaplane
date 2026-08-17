@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
-import { RichTextEditor } from '@kodezen/email-builder-editor';
+import { RichTextEditor } from '@kodezen/editor';
 
 /**
  * Simple rich-text field for the GemCRM "Send Email" action body (HTML in /
@@ -71,6 +71,7 @@ export default function RichTextField( {
                 value={ typeof value === 'string' ? value : '' }
                 mergeTags={ mergeTags }
                 onChange={ ( { html } ) => setFieldValue( field.key, html ) }
+                suffix="zaplane"
             />
         </div>
     );

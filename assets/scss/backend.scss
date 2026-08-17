@@ -2,8 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+// Theme the whole app surface so dark mode fills the content area, not just cards.
+// Scoped to the app mount only — .zaplane-scope is also re-applied to portaled
+// modal/drawer content, which must NOT inherit the full-viewport background.
+#zaplane-app.zaplane-scope {
+    background: var(--zaplane-body-background);
+    color: var(--zaplane-font-color);
+    min-height: calc(100vh - 32px);
+}
+
+// #wpbody-content is the WP-core wrapper around #zaplane-app (it also holds
+// #wpfooter below it). Without this, dark mode leaves a white margin/footer
+// strip showing through around the app on the Zaplane screen.
+#wpbody-content {
+    background: var(--zaplane-body-background);
+}
+
+// Smooth page transition when switching between admin menu routes.
+.zaplane-route {
+    animation: zaplane-route-in 0.28s ease;
+}
+@keyframes zaplane-route-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .zaplane-route { animation: none; }
+}
+
 .zaplane-scope {
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-family: var(--zaplane-font);
     line-height: 1.5;
     -webkit-text-size-adjust: 100%;
     -moz-tab-size: 4;
@@ -73,7 +101,7 @@
     input::placeholder,
     textarea::placeholder {
         opacity: 1;
-        color: #9ca3af;
+        color: var(--zaplane-text-muted);
     }
 
     textarea {

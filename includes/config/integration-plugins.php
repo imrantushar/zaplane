@@ -75,6 +75,7 @@ return [
 	'elementor'           => [ 'elementor/elementor.php' ],
 	'beaverbuilder'       => [ 'beaver-builder-lite-version/fl-builder.php' ],
 	'essentialblocks'     => [ 'essential-blocks/essential-blocks.php' ],
+	'ablocks'             => [ 'ablocks/ablocks.php' ],
 	'kadenceblocks'       => [ 'kadence-blocks/kadence-blocks.php' ],
 	'spectra'             => [ 'ultimate-addons-for-gutenberg/ultimate-addons-for-gutenberg.php' ],
 	'coblocks'            => [ 'coblocks/class-coblocks.php' ],

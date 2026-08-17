@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { route_path } from '@ZAPUtils/helper';
 import WPModal from '@ZAPComponents/Modal/WPModal';
 import { deleteRecipe, recipeToWorkflow, updateRecipe } from '@ZAPRedux/Slices/recipeSlice/recipeSlice';
-import { outlineBtn, primaryBtn } from '../../../../../assets/scss/chakra/recipe';
+import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import { IoIosPlay } from 'react-icons/io';
 import ZAPTooltip from '@ZAPComponents/ZAPTooltip';
 import ZAPMenu from '@ZAPComponents/ZapMenu';
@@ -86,20 +86,21 @@ const RecipeCard = ({
         </h3>
 
         <div className="flex flex-col gap-1">
-          <p className={`text-[13px] text-[var(--zaplane-font-secondary-color)] leading-relaxed min-h-[38px] ${!showFullDesc ? 'line-clamp-2' : ''}`} title={recipe?.description}>
-            {recipe?.description || __('No description', 'zaplane')}
-          </p>
-
-          <div className="flex justify-end min-h-[18px]">
+          <p className="text-[13px] text-[var(--zaplane-font-secondary-color)] leading-relaxed min-h-[38px]" title={recipe?.description}>
+            {recipe?.description
+              ? (showFullDesc || recipe.description.length <= 100
+                  ? recipe.description
+                  : `${recipe.description.slice(0, 100).trimEnd()}… `)
+              : __('No description', 'zaplane')}
             {recipe?.description && recipe.description.length > 100 && (
               <button
                 onClick={() => setShowFullDesc(prev => !prev)}
-                className="text-[12px] text-[var(--zaplane-primary)] hover:underline font-semibold"
+                className="ml-1 inline text-[12px] text-[var(--zaplane-font-color)] hover:underline font-semibold whitespace-nowrap"
               >
                 {showFullDesc ? __('See less', 'zaplane') : __('See more', 'zaplane')}
               </button>
             )}
-          </div>
+          </p>
         </div>
       </div>
 
@@ -125,10 +126,6 @@ const RecipeCard = ({
 
 
         <div className="flex gap-3">
-          <button style={outlineBtn} onClick={() => setIsConvertOpen(false)}>
-            {__('Cancel', 'zaplane')}
-          </button>
-
           <button style={primaryBtn} onClick={handleConvert}>
             {__('Convert', 'zaplane')}
           </button>
@@ -145,10 +142,6 @@ const RecipeCard = ({
           value={title}
           onChange={e => setTitle(e.target.value)} />
         <div className="flex gap-3">
-          <button style={outlineBtn} onClick={() => setIsRenameOpen(false)}>
-            {__("Cancel", "zaplane")}
-          </button>
-
           <button style={primaryBtn} onClick={handleRename} disabled={!title.trim()}>
             {__("Update", "zaplane")}
           </button>

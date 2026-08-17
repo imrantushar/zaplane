@@ -16,7 +16,7 @@ import Button from "@ZAPComponents/Button";
 const getIcon = (type) => {
   switch (type) {
     case "error":
-      return <AlertCircle className="w-5 h-5 text-red-600" />;
+      return <AlertCircle className="w-5 h-5 text-[var(--zaplane-danger)]" />;
     case "info":
       return <Info className="w-5 h-5 text-blue-600" />;
     case "warning":
@@ -66,7 +66,7 @@ const Notification = () => {
   return <>
     {isShowNotification && createPortal(<div className={`zaplane-notification ${notification.type && `zaplane-notification--${notification.type}`}`} ref={notificationRef}>
       <div className="zaplane-notification__message">
-        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100">
+        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[var(--zaplane-secondary-color)]">
           {getIcon(notification.type)}
         </div>
         {notification.isHtml ? <div dangerouslySetInnerHTML={{

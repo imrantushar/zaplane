@@ -10,6 +10,7 @@ use Zaplane\Framework\Classes\GlobalContext;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
+use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 use Zaplane\Framework\Database\ORM\DB;
 
@@ -45,6 +46,11 @@ class RunController extends WP_REST_Controller {
 					'minimum' => 1,
 					'maximum' => 100,
 					'sanitize_callback' => 'absint',
+				],
+				'status' => [
+					'type' => 'string',
+					'required' => false,
+					'sanitize_callback' => 'sanitize_text_field',
 				],
 			],
 		]);
@@ -127,8 +133,21 @@ class RunController extends WP_REST_Controller {
 		$page    = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
 		$perPage = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 
-		$total = Run::query()->count();
-		$runs  = Run::query()->orderBy( 'id', 'desc' )->forPage( $page, $perPage )->get();
+		// Optional status filter (e.g. "completed", "failed", "running"). Only a
+		// known status is honoured so an arbitrary value can't slip into the query.
+		$status          = $request->get_param( 'status' );
+		$allowedStatuses = [ 'completed', 'failed', 'running', 'cancelled', 'pending', 'waiting' ];
+		$status          = in_array( $status, $allowedStatuses, true ) ? $status : null;
+
+		$countQuery = Run::query();
+		$listQuery  = Run::query()->orderBy( 'id', 'desc' );
+		if ( $status ) {
+			$countQuery->where( 'status', $status );
+			$listQuery->where( 'status', $status );
+		}
+
+		$total = $countQuery->count();
+		$runs  = $listQuery->forPage( $page, $perPage )->get();
 
 		// Batch everything the row loop needs so it issues zero per-row queries.
 		// Previously each run did its own workflowVersion() find + node-run count()
@@ -145,10 +164,21 @@ class RunController extends WP_REST_Controller {
 
 		// One query for the page's distinct versions; decode each graph once
 		// (many runs on a page share the same version).
-		$graph_by_version = [];
+		$graph_by_version    = [];
+		$workflow_by_version = []; // version_id => workflow_id, so each run can link back to its workflow.
 		if ( $version_ids ) {
 			foreach ( WorkflowVersion::query()->whereIn( 'id', $version_ids )->get() as $version ) {
-				$graph_by_version[ (int) $version->id ] = $version->getGraph();
+				$graph_by_version[ (int) $version->id ]    = $version->getGraph();
+				$workflow_by_version[ (int) $version->id ] = (int) $version->workflow_id;
+			}
+		}
+
+		// One query for the page's workflow titles (many runs share a workflow).
+		$title_by_workflow = [];
+		$workflow_ids      = array_values( array_unique( array_filter( $workflow_by_version ) ) );
+		if ( $workflow_ids ) {
+			foreach ( Workflow::query()->whereIn( 'id', $workflow_ids )->get() as $wf ) {
+				$title_by_workflow[ (int) $wf->id ] = $wf->title ?: $wf->name;
 			}
 		}
 
@@ -165,7 +195,7 @@ class RunController extends WP_REST_Controller {
 			}
 		}
 
-		$data = $runs->map(function ( $run ) use ( $graph_by_version, $count_by_run ) {
+		$data = $runs->map(function ( $run ) use ( $graph_by_version, $count_by_run, $workflow_by_version, $title_by_workflow ) {
 			$node  = null;
 			$graph = $graph_by_version[ (int) $run->workflow_version_id ] ?? null;
 
@@ -179,13 +209,17 @@ class RunController extends WP_REST_Controller {
 				}
 			}
 
+			$workflow_id = $workflow_by_version[ (int) $run->workflow_version_id ] ?? null;
+
 			return [
-				'id'          => $run->id,
-				'status'      => $run->status,
-				'started_at'  => $run->started_at,
-				'finished_at' => $run->finished_at,
-				'node_count'  => $count_by_run[ (int) $run->id ] ?? 0,
-				'node'        => $node ? [
+				'id'             => $run->id,
+				'status'         => $run->status,
+				'started_at'     => $run->started_at,
+				'finished_at'    => $run->finished_at,
+				'node_count'     => $count_by_run[ (int) $run->id ] ?? 0,
+				'workflow_id'    => $workflow_id,
+				'workflow_title' => $workflow_id ? ( $title_by_workflow[ $workflow_id ] ?? null ) : null,
+				'node'           => $node ? [
 					'app'   => $node['data']['app'] ?? null,
 					'event' => $node['data']['event'] ?? null,
 				] : null,

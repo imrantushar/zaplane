@@ -3,49 +3,17 @@ import { __ } from '@wordpress/i18n';
 
 import {
 	API,
-	current_user_can,
-	current_user_id,
-	is_admin,
 	handleSliceSuccess,
 	handleSliceError,
 	namespace,
-	makeRequest,
+	settings as injectedSettings,
 } from '@ZAPUtils/helper';
-import { showNotification } from '../notificationSlice/notificationSlice';
 
-export const testAPI = createAsyncThunk(
-	'zaplane/runDynamicApi',
-	async ({ method, path, body }, thunkAPI) => {
+export const getSettings = createAsyncThunk(
+	'zaplane/getSettings',
+	async (_, thunkAPI) => {
 		try {
-			const url = namespace + path;
-			let res;
-
-			switch (method) {
-				case 'GET':
-					res = await API.get(url);
-					break;
-
-				case 'POST':
-					res = await API.post(url, body);
-					break;
-
-				case 'PUT':
-					res = await API.put(url, body);
-					break;
-
-				case 'DELETE':
-					res = await API.delete(url);
-					break;
-
-				default:
-					throw new Error('Invalid HTTP Method');
-			}
-
-			handleSliceSuccess(
-				thunkAPI,
-				__('API request successful', 'workflow')
-			);
-
+			const res = await API.get(namespace + 'settings');
 			return res.data;
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
@@ -53,30 +21,52 @@ export const testAPI = createAsyncThunk(
 	}
 );
 
-
-
+export const saveSettings = createAsyncThunk(
+	'zaplane/saveSettings',
+	async (payload, thunkAPI) => {
+		try {
+			const res = await API.post(namespace + 'settings', payload);
+			handleSliceSuccess(thunkAPI, __('Settings saved', 'zaplane'));
+			return res.data;
+		} catch (e) {
+			return handleSliceError(thunkAPI, e);
+		}
+	}
+);
 
 const settingSlice = createSlice({
 	name: 'setting',
 	initialState: {
-		data: [],
-
+		// Seed from the server-injected snapshot so the UI renders instantly,
+		// then refresh via getSettings().
+		data: injectedSettings || null,
+		loading: false,
+		saving: false,
 	},
-	reducers: {
-
-	},
+	reducers: {},
 	extraReducers: (builder) => {
 		builder
-		.addCase(testAPI.fulfilled, (state, action) => {
-						state.data = action.payload;
-					})
-			
-
-
-
+			.addCase(getSettings.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(getSettings.fulfilled, (state, action) => {
+				state.loading = false;
+				state.data = action.payload;
+			})
+			.addCase(getSettings.rejected, (state) => {
+				state.loading = false;
+			})
+			.addCase(saveSettings.pending, (state) => {
+				state.saving = true;
+			})
+			.addCase(saveSettings.fulfilled, (state, action) => {
+				state.saving = false;
+				state.data = action.payload;
+			})
+			.addCase(saveSettings.rejected, (state) => {
+				state.saving = false;
+			});
 	},
 });
-
-
 
 export default settingSlice.reducer;

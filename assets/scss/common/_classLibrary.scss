@@ -1,5 +1,5 @@
 .zaplane-app {
-    background: #F6F7F8;
+    background: var(--zaplane-secondary-color);
     display: flex;
     flex-direction: column;
     left: 0;
@@ -73,8 +73,8 @@
 
     .zaplane-select {
         &__control {
-            border: 1px solid #CBD1D7;
-            background: #FFF;
+            border: 1px solid var(--zaplane-border-color);
+            background: var(--zaplane-background);
             border-radius: 4px;
             box-shadow: none;
 
@@ -88,11 +88,11 @@
         }
 
         &__control:hover {
-            border: 1px solid #CBD1D7;
+            border: 1px solid var(--zaplane-border-color);
         }
 
         &__menu {
-            background: #fff;
+            background: var(--zaplane-background);
             min-width: 100%;
             box-shadow: 0 0 1px 0 rgba(20, 26, 36, 0.30), 0 8px 16px 0 rgba(20, 26, 36, 0.10);
         }
@@ -142,7 +142,7 @@
         }
 
         &__single-value {
-            color: #141A24;
+            color: var(--zaplane-font-color);
         }
     }
 

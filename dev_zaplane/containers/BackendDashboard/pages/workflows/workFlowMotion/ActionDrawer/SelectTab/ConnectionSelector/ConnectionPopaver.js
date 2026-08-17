@@ -85,14 +85,14 @@ const ConnectionPopaver = props => {
   };
   const authTypes = authFields?.available_auth_types || {};
   return <WPPopover isOpen={isOpen} onClose={onClose} title={__("Create New Connection", 'zaplane')} prefix='connection-popaver'>
-            <div className="flex bg-gray-50/50 p-1.5 rounded-xl gap-2 mb-8">
+            <div className="flex bg-[var(--zaplane-secondary-color)]/50 p-1.5 rounded-xl gap-2 mb-8">
                 {Object.keys(authTypes).map(key => (
                     <button 
                         key={key} 
                         className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all duration-200 ${
                             selectedAuthType === key 
                             ? "bg-[var(--zaplane-second-primary)] text-[var(--zaplane-primary)] shadow-sm" 
-                            : "bg-white text-gray-500 border border-gray-100 hover:bg-gray-50"
+                            : "bg-[var(--zaplane-background)] text-[var(--zaplane-font-secondary-color)] border border-[var(--zaplane-border-color)] hover:bg-[var(--zaplane-secondary-color)]"
                         }`}
                         onClick={() => {
                             setSelectedAuthType(key);

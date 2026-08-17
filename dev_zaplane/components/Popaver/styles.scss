@@ -20,6 +20,8 @@
     width: 100%;
     max-height: fit-content !important;
     box-shadow: none;
+    background: var(--zaplane-background);
+    color: var(--zaplane-font-color);
   }
 
   .zaplane-popover-inner {

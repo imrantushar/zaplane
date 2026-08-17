@@ -13,13 +13,13 @@ const ConnectionDetails = ({
       ) : (
         <div className="flex flex-col gap-6">
           {/* Hero Section */}
-          <div className="p-6 rounded-[12px] bg-white border border-[#E5E7EB] shadow-sm">
+          <div className="p-6 rounded-[12px] bg-[var(--zaplane-background)] border border-[var(--zaplane-border-color)] shadow-sm">
             <div className="flex justify-between items-center">
               <div className="flex flex-col gap-1">
-                <h3 className="text-[18px] font-bold text-[#111827]">
+                <h3 className="text-[18px] font-bold text-[var(--zaplane-font-color)]">
                   {__(connection.name, "zaplane")}
                 </h3>
-                <span className="text-[14px] text-[#6B7280] font-medium uppercase tracking-wider">
+                <span className="text-[14px] text-[var(--zaplane-font-secondary-color)] font-medium uppercase tracking-wider">
                   {__(connection.app, "zaplane")}
                 </span>
               </div>
@@ -41,11 +41,11 @@ const ConnectionDetails = ({
               { label: __('LAST USED', 'zaplane'), value: connection.last_used_at || "--" },
               { label: __('LAST TESTED', 'zaplane'), value: connection.last_tested_at || "--" },
             ].map((item, idx) => (
-              <div key={idx} className="p-5 rounded-[12px] bg-[#F9FAFB] border border-[#F3F4F6] flex flex-col gap-2">
-                <span className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest">
+              <div key={idx} className="p-5 rounded-[12px] bg-[var(--zaplane-secondary-color)] border border-[var(--zaplane-border-color)] flex flex-col gap-2">
+                <span className="text-[11px] font-bold text-[var(--zaplane-text-muted)] uppercase tracking-widest">
                   {item.label}
                 </span>
-                <span className="text-[14px] font-semibold text-[#374151]">
+                <span className="text-[14px] font-semibold text-[var(--zaplane-font-color)]">
                   {__(item.value, 'zaplane')}
                 </span>
               </div>

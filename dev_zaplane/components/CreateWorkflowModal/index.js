@@ -62,9 +62,7 @@ const CreateWorkflowModal = ({
     onClose();
   };
   return <WPModal title={__("Create Workflow", "zaplane")} isOpen={isOpen} onRequestClose={onClose} size="medium">
-    <ZAPDivider mb="24px" />
-
-    <div flexDirection="column" gap="8px" className="flex flex-col gap-2">
+    <div flexDirection="column" gap="8px" className="flex flex-col gap-2 mt-6">
       <ZAPInput label={__("Workflow Name", "zaplane")} placeholder={__("Enter workflow name", "zaplane")} value={workflowName} onChange={e => setWorkflowName(e.target.value)} />
       {!!allFolders.length && <div direction="column" gap={2} className="flex">
         <div className="flex flex-col gap-2 w-full">
@@ -83,10 +81,6 @@ const CreateWorkflowModal = ({
       <ZAPDivider mt="24px" />
 
       <div className="flex mt-5 gap-3">
-        <button variant="outline" onClick={onClose} className="mr-3 px-4 py-2 border border-zaplane-border rounded text-sm">
-          {__("Cancel", "zaplane")}
-        </button>
-
         <button style={primaryBtn} onClick={handleCreate} disabled={!workflowName.trim()}>
           {__("Create", "zaplane")}
         </button>

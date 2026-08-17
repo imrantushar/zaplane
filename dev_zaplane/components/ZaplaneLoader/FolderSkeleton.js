@@ -1,7 +1,7 @@
 import React from "react";
 
 const SkeletonBox = ({ className = "", style = {} }) => (
-  <div className={`bg-gray-200 rounded animate-pulse ${className}`} style={style} />
+  <div className={`bg-[var(--zaplane-secondary-color)] rounded animate-pulse ${className}`} style={style} />
 );
 
 const FolderSkeleton = () => {
@@ -18,7 +18,7 @@ const FolderSkeleton = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="border border-gray-200 rounded-lg p-4">
+          <div key={i} className="border border-[var(--zaplane-border-color)] rounded-lg p-4">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3">
                 <SkeletonBox style={{width:'20px', height:'20px'}} />

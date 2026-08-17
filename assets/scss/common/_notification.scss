@@ -8,7 +8,7 @@
     border-radius: 4px;
     min-width: 400px;
     z-index: 99999;
-    background: #fff;
+    background: var(--zaplane-background);
     &--success {
         background: #00AD6B;
         color: #fff;

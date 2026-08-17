@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { EmailEditor, treeFromHtml } from '@kodezen/email-builder-editor';
+import { EmailEditor, treeFromHtml } from '@kodezen/editor';
+import './styles.scss';
 
 /**
  * Full drag-and-drop email builder (EMB) used on the dedicated Email Templates
@@ -42,13 +43,32 @@ export default function EmbEmailBuilder( {
 } ) {
     const initialTree = useMemo( () => toInitialTree( source ), [ source ] );
 
+    // The email builder is a third-party editor. Its shell chrome (header,
+    // undo/redo, left panel, navigator, block search/tiles, canvas empty-state
+    // + quick-add menu) is theme-aware: `suffix="zaplane"` adds a
+    // `.emb-embed-root--zaplane` class the library reads `--emb-*` custom
+    // properties from, mapped to the app's live palette (light AND dark) in
+    // styles.scss. IMPORTANT: don't wrap this in `.zaplane-force-light` —
+    // that pins `--zaplane-*` to their light values unconditionally, which
+    // would poison the mapping below for every descendant (including this
+    // one), silently forcing the shell light no matter the app's theme. The
+    // email-content canvas itself (the white "page" being composed) and its
+    // block settings/Inspector panel still hardcode light colors — the email
+    // being composed is a light document, so that surface intentionally stays
+    // light regardless of app theme (`.emb-canvas-page` pins that in the
+    // library, independent of this wrapper).
     return (
-        <EmailEditor
-            initialTree={ initialTree }
-            mergeTags={ CONTACT_MERGE_TAGS }
-            header
-            height={ height }
-            onChange={ ( { tree, html } ) => onChange?.( { tree, html } ) }
-        />
+        <div
+            style={ { background: 'var(--zaplane-background)', color: 'var(--zaplane-font-color)', borderRadius: '8px' } }
+        >
+            <EmailEditor
+                initialTree={ initialTree }
+                mergeTags={ CONTACT_MERGE_TAGS }
+                header
+                height={ height }
+                suffix="zaplane"
+                onChange={ ( { tree, html } ) => onChange?.( { tree, html } ) }
+            />
+        </div>
     );
 }
