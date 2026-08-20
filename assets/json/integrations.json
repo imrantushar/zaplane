@@ -1,6 +1,6 @@
 {
     "version": "1.1.0",
-    "generated_at": "2026-08-17 07:33:38",
+    "generated_at": "2026-08-20 11:57:54",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -134,6 +134,60 @@
                             "required": true
                         }
                     ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "student_registered": {
+                    "label": "Student registered",
+                    "hook": "academy/api/auth/after_student_registration",
+                    "key": "student_registered",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_manually_evaluated": {
+                    "label": "Quiz manually evaluated by instructor",
+                    "hook": "academy_quizzes/after_quiz_attempt_manual_review",
+                    "key": "quiz_manually_evaluated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assignment_evaluated": {
+                    "label": "Assignment evaluated",
+                    "hook": "academy_pro/frontend/evaluate_submitted_assignment",
+                    "key": "assignment_evaluated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "qa_answered": {
+                    "label": "Course question answered",
+                    "hook": "academy/frontend/insert_course_qa_answered",
+                    "key": "qa_answered",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_confirmed": {
+                    "label": "Tutor booking confirmed",
+                    "hook": "academy_pro/booking/after_booked",
+                    "key": "booking_confirmed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "instructor_status_updated": {
+                    "label": "Instructor request accepted or denied",
+                    "hook": "academy/admin/update_instructor_status",
+                    "key": "instructor_status_updated",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -27859,37 +27913,6 @@
                     ]
                 }
             }
-        },
-        "gemcrm-email-inbox": {
-            "slug": "gemcrm-email-inbox",
-            "name": "GemCRM Email Inbox",
-            "icon": "crm.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_url": "",
-            "triggers": {
-                "email_received": {
-                    "label": "Email Received",
-                    "hook": "gemcrm/email_inbox/received",
-                    "key": "email_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "email_received_unmatched": {
-                    "label": "Email Received (Unmatched)",
-                    "hook": "gemcrm/email_inbox/received_unmatched",
-                    "key": "email_received_unmatched",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": []
         }
     },
     "tools": {
