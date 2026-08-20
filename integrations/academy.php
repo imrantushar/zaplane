@@ -52,6 +52,30 @@ class Academy extends IntegrationBase {
 				'label' => 'User achieved target percentage on a quiz',
 				'hook'  => 'academy_quizzes/api/after_quiz_attempt_finished'
 			],
+			'student_registered' => [
+				'label' => 'Student registered',
+				'hook'  => 'academy/api/auth/after_student_registration'
+			],
+			'quiz_manually_evaluated' => [
+				'label' => 'Quiz manually evaluated by instructor',
+				'hook'  => 'academy_quizzes/after_quiz_attempt_manual_review'
+			],
+			'assignment_evaluated' => [
+				'label' => 'Assignment evaluated',
+				'hook'  => 'academy_pro/frontend/evaluate_submitted_assignment'
+			],
+			'qa_answered' => [
+				'label' => 'Course question answered',
+				'hook'  => 'academy/frontend/insert_course_qa_answered'
+			],
+			'booking_confirmed' => [
+				'label' => 'Tutor booking confirmed',
+				'hook'  => 'academy_pro/booking/after_booked'
+			],
+			'instructor_status_updated' => [
+				'label' => 'Instructor request accepted or denied',
+				'hook'  => 'academy/admin/update_instructor_status'
+			],
 		];
 	}
 
@@ -170,6 +194,52 @@ class Academy extends IntegrationBase {
 				'score'       => 8,
 				'total_marks' => 10,
 				'percentage'  => 80.00,
+			],
+			'student_registered'           => [
+				'success'    => true,
+				'user_id'    => 1,
+				'user_email' => 'student@example.com',
+				'first_name' => 'Jane',
+				'last_name'  => 'Smith',
+			],
+			'quiz_manually_evaluated'      => [
+				'success'    => true,
+				'user_id'    => 1,
+				'course_id'  => 1,
+				'user_email' => 'student@example.com',
+				'first_name' => 'Jane',
+			],
+			'assignment_evaluated'         => [
+				'success'       => true,
+				'user_id'       => 1,
+				'course_id'     => 1,
+				'user_email'    => 'student@example.com',
+				'first_name'    => 'Jane',
+				'achieved_mark' => 8,
+				'total_mark'    => 10,
+			],
+			'qa_answered'                  => [
+				'success'    => true,
+				'user_id'    => 1,
+				'course_id'  => 1,
+				'user_email' => 'student@example.com',
+				'first_name' => 'Jane',
+			],
+			'booking_confirmed'            => [
+				'success'    => true,
+				'booking_id' => 1,
+				'booked_id'  => 1,
+				'user_id'    => 1,
+				'user_email' => 'student@example.com',
+				'first_name' => 'Jane',
+				'tutor_name' => 'Sample Tutor Session',
+			],
+			'instructor_status_updated'    => [
+				'success'    => true,
+				'user_id'    => 1,
+				'status'     => 'approved',
+				'user_email' => 'instructor@example.com',
+				'first_name' => 'John',
 			],
 		];
 
@@ -328,6 +398,145 @@ class Academy extends IntegrationBase {
 					'score'       => $earned,
 					'total_marks' => $total,
 					'percentage'  => round( $percentage, 2 ),
+				];
+
+			case 'student_registered':
+				$user_id = $args[0] ?? null;
+
+				if ( ! $user_id ) {
+					return false;
+				}
+
+				$user = get_userdata( (int) $user_id );
+
+				if ( ! $user ) {
+					return false;
+				}
+
+				return [
+					'success'    => true,
+					'user_id'    => (int) $user_id,
+					'user_email' => $user->user_email,
+					'first_name' => $user->first_name,
+					'last_name'  => $user->last_name,
+				];
+
+			case 'quiz_manually_evaluated':
+				$quiz_data = $args[0] ?? null;
+
+				if ( ! $quiz_data || empty( $quiz_data['user_id'] ) ) {
+					return false;
+				}
+
+				$user = get_userdata( (int) $quiz_data['user_id'] );
+
+				if ( ! $user ) {
+					return false;
+				}
+
+				return [
+					'success'    => true,
+					'user_id'    => (int) $quiz_data['user_id'],
+					'course_id'  => (int) ( $quiz_data['course_id'] ?? 0 ),
+					'user_email' => $user->user_email,
+					'first_name' => $user->first_name,
+				];
+
+			case 'assignment_evaluated':
+				$assignment = $args[0] ?? null;
+
+				if ( ! $assignment || empty( $assignment->user_id ) ) {
+					return false;
+				}
+
+				$user = get_userdata( (int) $assignment->user_id );
+
+				if ( ! $user ) {
+					return false;
+				}
+
+				return [
+					'success'       => true,
+					'user_id'       => (int) $assignment->user_id,
+					'course_id'     => (int) ( $assignment->comment_post_ID ?? 0 ),
+					'user_email'    => $user->user_email,
+					'first_name'    => $user->first_name,
+					'achieved_mark' => $assignment->meta['academy_pro_assignment_evaluate_point'] ?? null,
+					'total_mark'    => $assignment->academy_assignment_settings['total_points'] ?? null,
+				];
+
+			case 'qa_answered':
+				$comment = $args[0] ?? null;
+
+				if ( ! $comment || empty( $comment['parent'] ) ) {
+					return false;
+				}
+
+				$question = get_comment( $comment['parent'] );
+
+				if ( ! $question || ! $question->user_id ) {
+					return false;
+				}
+
+				$user = get_userdata( (int) $question->user_id );
+
+				if ( ! $user ) {
+					return false;
+				}
+
+				return [
+					'success'    => true,
+					'user_id'    => (int) $question->user_id,
+					'course_id'  => (int) ( $comment['post'] ?? 0 ),
+					'user_email' => $user->user_email,
+					'first_name' => $user->first_name,
+				];
+
+			case 'booking_confirmed':
+				$booking_id = $args[0] ?? null;
+				$booked_id  = $args[1] ?? null;
+				$user_id    = $args[2] ?? null;
+
+				if ( ! $booking_id || ! $user_id ) {
+					return false;
+				}
+
+				$user = get_userdata( (int) $user_id );
+
+				if ( ! $user ) {
+					return false;
+				}
+
+				return [
+					'success'    => true,
+					'booking_id' => (int) $booking_id,
+					'booked_id'  => (int) $booked_id,
+					'user_id'    => (int) $user_id,
+					'user_email' => $user->user_email,
+					'first_name' => $user->first_name,
+					'tutor_name' => get_the_title( $booking_id ),
+				];
+
+			case 'instructor_status_updated':
+				$user_id = $args[0] ?? null;
+				$status  = $args[1] ?? null;
+
+				if ( ! $user_id || ! in_array( $status, [ 'approved', 'remove' ], true ) ) {
+					return false;
+				}
+
+				$user = get_userdata( (int) $user_id );
+
+				if ( ! $user ) {
+					return false;
+				}
+
+				return [
+					'success'    => true,
+					'user_id'    => (int) $user_id,
+					'status'     => $status,
+					'user_email' => $user->user_email,
+					'first_name' => $user->first_name,
 				];
 		}//end switch
 
