@@ -1006,7 +1006,39 @@ class Gemcrm extends IntegrationBase {
 				return [ 'error' => 'Selected email template was not found' ];
 			}
 
-			$body = self::render_email_tree( $template->getTree() );
+			// Resolve {{node.field}} tokens the template carries (e.g.
+			// {{1.course_title}}) BEFORE rendering — not pre-processed by the
+			// core (only literal config values get that pass, via
+			// Automation::resolveConfigValues(), before execute_node() runs),
+			// and doing it on the RENDERED html would be too late for anything
+			// going through esc_url() (href/src attributes): esc_url() strips
+			// the `{` `}` characters as invalid URL chars, silently mangling
+			// {{1.course_url}} into a garbage relative link. Evaluating against
+			// the tree first means the substituted value goes through esc_url()
+			// as a real, already-resolved URL.
+			//
+			// $input here is the raw NodeRun input, NOT the core's resolveData —
+			// the automation engine only builds the numeric node-id map
+			// ({'1' => [...], '2' => [...]}) for its own resolveConfigValues()
+			// pass on literal config values; execute_node() (and everything an
+			// integration's action does) only ever sees the flat payload the
+			// upstream node emitted (verified: a trigger node's output IS that
+			// flat payload, and filter/condition nodes explicitly strip numeric
+			// keys before re-emitting via $directInput in filter.php). Since
+			// every one of this integration's recipes puts the trigger at node
+			// "1", alias the flat payload under '1' too so {{1.field}} keeps
+			// working the same way it does in inline recipe bodies, without
+			// forcing every saved template to switch to bare {{field}} syntax.
+			$tree = $template->getTree();
+			if ( ! empty( $input ) ) {
+				$eval_context = $input;
+				if ( ! isset( $eval_context['1'] ) ) {
+					$eval_context['1'] = $input;
+				}
+				$tree = self::resolve_tree_expressions( $tree, $eval_context );
+			}
+
+			$body = self::render_email_tree( $tree );
 			if ( '' === $body ) {
 				return [ 'error' => 'Email template has no renderable content' ];
 			}
@@ -1020,13 +1052,9 @@ class Gemcrm extends IntegrationBase {
 				$pre_header = $template->pre_header ?: null;
 			}
 
-			// Resolve {{node.field}} tokens the template's own content carries
-			// (e.g. {{1.course_title}}) — not pre-processed by the core, since
-			// this content only exists once fetched from the DB above.
 			if ( ! empty( $input ) ) {
-				$subject    = (string) Expression::evaluate( $subject, $input );
-				$body       = (string) Expression::evaluate( $body, $input );
-				$pre_header = null !== $pre_header ? (string) Expression::evaluate( $pre_header, $input ) : null;
+				$subject    = (string) Expression::evaluate( $subject, $eval_context );
+				$pre_header = null !== $pre_header ? (string) Expression::evaluate( $pre_header, $eval_context ) : null;
 			}
 
 			return [
@@ -1068,6 +1096,24 @@ class Gemcrm extends IntegrationBase {
 		}
 
 		return (string) \GemCrm\Classes\EmailTreeRenderer::render_content( $tree );
+	}
+
+	/**
+	 * Recursively resolve {{...}} expressions in every string value of an EMB
+	 * editor tree (text, href, src, alt, ...) against $context, before the
+	 * tree is rendered to HTML. Reserved tokens ({{contact.*}}, unsubscribe/
+	 * update-preferences links — see Expression::is_reserved()) pass through
+	 * untouched for GemCRM's own per-recipient merge engine to resolve later.
+	 */
+	private static function resolve_tree_expressions( array $node, array $context ) {
+		foreach ( $node as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$node[ $key ] = self::resolve_tree_expressions( $value, $context );
+			} elseif ( is_string( $value ) ) {
+				$node[ $key ] = (string) Expression::evaluate( $value, $context );
+			}
+		}
+		return $node;
 	}
 
 	protected static function action_send_email( array $config, array $input ): array {
