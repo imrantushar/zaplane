@@ -156,14 +156,16 @@ class Academy extends IntegrationBase {
 	public static function get_trigger_sample_output( string $trigger ): array {
 		$samples = [
 			'user_enroll_course'           => [
-				'success'    => true,
-				'course_id'  => 1,
-				'enroll_id'  => 1,
-				'user_id'    => 1,
-				'user_email' => 'student@example.com',
-				'first_name' => 'Jane',
-				'last_name'  => 'Smith',
-				'username'   => 'janesmith',
+				'success'      => true,
+				'course_id'    => 1,
+				'course_title' => 'Sample Course',
+				'course_url'   => 'https://example.com/course/sample-course',
+				'enroll_id'    => 1,
+				'user_id'      => 1,
+				'user_email'   => 'student@example.com',
+				'first_name'   => 'Jane',
+				'last_name'    => 'Smith',
+				'username'     => 'janesmith',
 			],
 			'course_complete'              => [
 				'success'      => true,
@@ -203,36 +205,44 @@ class Academy extends IntegrationBase {
 				'last_name'  => 'Smith',
 			],
 			'quiz_manually_evaluated'      => [
-				'success'    => true,
-				'user_id'    => 1,
-				'course_id'  => 1,
-				'user_email' => 'student@example.com',
-				'first_name' => 'Jane',
+				'success'     => true,
+				'user_id'     => 1,
+				'course_id'   => 1,
+				'course_title'=> 'Sample Course',
+				'course_url'  => 'https://example.com/course/sample-course',
+				'user_email'  => 'student@example.com',
+				'first_name'  => 'Jane',
 			],
 			'assignment_evaluated'         => [
 				'success'       => true,
 				'user_id'       => 1,
 				'course_id'     => 1,
+				'course_title'  => 'Sample Course',
+				'course_url'    => 'https://example.com/course/sample-course',
 				'user_email'    => 'student@example.com',
 				'first_name'    => 'Jane',
 				'achieved_mark' => 8,
 				'total_mark'    => 10,
 			],
 			'qa_answered'                  => [
-				'success'    => true,
-				'user_id'    => 1,
-				'course_id'  => 1,
-				'user_email' => 'student@example.com',
-				'first_name' => 'Jane',
+				'success'     => true,
+				'user_id'     => 1,
+				'course_id'   => 1,
+				'course_title'=> 'Sample Course',
+				'course_url'  => 'https://example.com/course/sample-course',
+				'user_email'  => 'student@example.com',
+				'first_name'  => 'Jane',
 			],
 			'booking_confirmed'            => [
-				'success'    => true,
-				'booking_id' => 1,
-				'booked_id'  => 1,
-				'user_id'    => 1,
-				'user_email' => 'student@example.com',
-				'first_name' => 'Jane',
-				'tutor_name' => 'Sample Tutor Session',
+				'success'                   => true,
+				'booking_id'                => 1,
+				'booked_id'                 => 1,
+				'user_id'                   => 1,
+				'user_email'                => 'student@example.com',
+				'first_name'                => 'Jane',
+				'tutor_name'                => 'Sample Tutor Session',
+				'session_time'              => '2026-01-01 10:00:00',
+				'location_or_meeting_link'  => 'https://meet.example.com/room/123',
 			],
 			'instructor_status_updated'    => [
 				'success'    => true,
@@ -266,14 +276,16 @@ class Academy extends IntegrationBase {
 				$user = $user_id ? get_userdata( (int) $user_id ) : null;
 
 				return [
-					'success'    => true,
-					'course_id'  => (int) $course_id,
-					'enroll_id'  => (int) $enroll_id,
-					'user_id'    => $user ? (int) $user->ID : null,
-					'user_email' => $user ? $user->user_email : null,
-					'first_name' => $user ? $user->first_name : null,
-					'last_name'  => $user ? $user->last_name : null,
-					'username'   => $user ? $user->user_login : null,
+					'success'      => true,
+					'course_id'    => (int) $course_id,
+					'course_title' => get_the_title( $course_id ),
+					'course_url'   => get_permalink( $course_id ),
+					'enroll_id'    => (int) $enroll_id,
+					'user_id'      => $user ? (int) $user->ID : null,
+					'user_email'   => $user ? $user->user_email : null,
+					'first_name'   => $user ? $user->first_name : null,
+					'last_name'    => $user ? $user->last_name : null,
+					'username'     => $user ? $user->user_login : null,
 				];
 
 			case 'course_complete':
@@ -434,12 +446,16 @@ class Academy extends IntegrationBase {
 					return false;
 				}
 
+				$course_id = (int) ( $quiz_data['course_id'] ?? 0 );
+
 				return [
-					'success'    => true,
-					'user_id'    => (int) $quiz_data['user_id'],
-					'course_id'  => (int) ( $quiz_data['course_id'] ?? 0 ),
-					'user_email' => $user->user_email,
-					'first_name' => $user->first_name,
+					'success'     => true,
+					'user_id'     => (int) $quiz_data['user_id'],
+					'course_id'   => $course_id,
+					'course_title'=> $course_id ? get_the_title( $course_id ) : '',
+					'course_url'  => $course_id ? get_permalink( $course_id ) : '',
+					'user_email'  => $user->user_email,
+					'first_name'  => $user->first_name,
 				];
 
 			case 'assignment_evaluated':
@@ -455,10 +471,14 @@ class Academy extends IntegrationBase {
 					return false;
 				}
 
+				$course_id = (int) ( $assignment->comment_post_ID ?? 0 );
+
 				return [
 					'success'       => true,
 					'user_id'       => (int) $assignment->user_id,
-					'course_id'     => (int) ( $assignment->comment_post_ID ?? 0 ),
+					'course_id'     => $course_id,
+					'course_title'  => $course_id ? get_the_title( $course_id ) : '',
+					'course_url'    => $course_id ? get_permalink( $course_id ) : '',
 					'user_email'    => $user->user_email,
 					'first_name'    => $user->first_name,
 					'achieved_mark' => $assignment->meta['academy_pro_assignment_evaluate_point'] ?? null,
@@ -484,12 +504,16 @@ class Academy extends IntegrationBase {
 					return false;
 				}
 
+				$course_id = (int) ( $comment['post'] ?? 0 );
+
 				return [
-					'success'    => true,
-					'user_id'    => (int) $question->user_id,
-					'course_id'  => (int) ( $comment['post'] ?? 0 ),
-					'user_email' => $user->user_email,
-					'first_name' => $user->first_name,
+					'success'     => true,
+					'user_id'     => (int) $question->user_id,
+					'course_id'   => $course_id,
+					'course_title'=> $course_id ? get_the_title( $course_id ) : '',
+					'course_url'  => $course_id ? get_permalink( $course_id ) : '',
+					'user_email'  => $user->user_email,
+					'first_name'  => $user->first_name,
 				];
 
 			case 'booking_confirmed':
@@ -508,13 +532,15 @@ class Academy extends IntegrationBase {
 				}
 
 				return [
-					'success'    => true,
-					'booking_id' => (int) $booking_id,
-					'booked_id'  => (int) $booked_id,
-					'user_id'    => (int) $user_id,
-					'user_email' => $user->user_email,
-					'first_name' => $user->first_name,
-					'tutor_name' => get_the_title( $booking_id ),
+					'success'                  => true,
+					'booking_id'               => (int) $booking_id,
+					'booked_id'                => (int) $booked_id,
+					'user_id'                  => (int) $user_id,
+					'user_email'               => $user->user_email,
+					'first_name'               => $user->first_name,
+					'tutor_name'               => get_the_title( $booking_id ),
+					'session_time'             => get_post_meta( $booked_id, '_academy_booked_schedule_time', true ),
+					'location_or_meeting_link' => get_post_meta( $booking_id, '_academy_booking_private_booked_info', true ),
 				];
 
 			case 'instructor_status_updated':
