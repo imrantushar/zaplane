@@ -3,6 +3,7 @@
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\Expression;
 use Zaplane\Integrations\Gemcrm\QueryTrait;
 use Zaplane\Integrations\Gemcrm\BirthdayCronTrait;
 
@@ -977,9 +978,16 @@ class Gemcrm extends IntegrationBase {
 	 * Template source: load the chosen email_templates post, render its tree,
 	 * and use its subject/pre_header meta as defaults the action can override.
 	 *
+	 * `$input` is the node-run context ({{1.field}}, {{2.field}}, ...). Inline
+	 * config values are already expression-resolved generically by the core
+	 * dispatcher before execute_node() runs (see Automation::resolveConfigValues),
+	 * but a template's stored subject/body/pre_header is fetched fresh from the
+	 * DB here, bypassing that pass — so any {{node.field}} tokens inside a saved
+	 * template need to be resolved explicitly against $input before sending.
+	 *
 	 * @return array{subject:string,body:string,pre_header:?string}|array{error:string}
 	 */
-	private static function resolve_email_content( array $config ): array {
+	private static function resolve_email_content( array $config, array $input = [] ): array {
 		$subject    = trim( (string) ( $config['subject'] ?? '' ) );
 		$pre_header = $config['pre_header'] ?? null;
 		// Default to 'custom' so configs saved before this field existed (which
@@ -1010,6 +1018,15 @@ class Gemcrm extends IntegrationBase {
 			}
 			if ( null === $pre_header || '' === $pre_header ) {
 				$pre_header = $template->pre_header ?: null;
+			}
+
+			// Resolve {{node.field}} tokens the template's own content carries
+			// (e.g. {{1.course_title}}) — not pre-processed by the core, since
+			// this content only exists once fetched from the DB above.
+			if ( ! empty( $input ) ) {
+				$subject    = (string) Expression::evaluate( $subject, $input );
+				$body       = (string) Expression::evaluate( $body, $input );
+				$pre_header = null !== $pre_header ? (string) Expression::evaluate( $pre_header, $input ) : null;
 			}
 
 			return [
@@ -1066,7 +1083,7 @@ class Gemcrm extends IntegrationBase {
 
 		// Resolve the body + subject from either the inline designer (an editor
 		// JSON tree, rendered to HTML server-side) or a saved GemCRM template.
-		$content = self::resolve_email_content( $config );
+		$content = self::resolve_email_content( $config, $input );
 		if ( isset( $content['error'] ) ) {
 			return self::action_error( $content['error'], $input );
 		}
