@@ -8,29 +8,29 @@
     "packages": [
         {
             "name": "storeengine/wordpress-sdk",
-            "version": "v1.3.0",
+            "version": "v1.5.6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/imrantushar/storeengine-sdk-for-wordpress.git",
-                "reference": "4fbdfe0d9580d7d8eaa742581c65873b93cbbde2"
+                "url": "git@github.com:imrantushar/storeengine-sdk-for-wordpress.git",
+                "reference": "c2fd07992ea0fb79d9b64d4398c55e234a0922af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imrantushar/storeengine-sdk-for-wordpress/zipball/4fbdfe0d9580d7d8eaa742581c65873b93cbbde2",
-                "reference": "4fbdfe0d9580d7d8eaa742581c65873b93cbbde2",
+                "url": "https://api.github.com/repos/imrantushar/storeengine-sdk-for-wordpress/zipball/c2fd07992ea0fb79d9b64d4398c55e234a0922af",
+                "reference": "c2fd07992ea0fb79d9b64d4398c55e234a0922af",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1"
             },
             "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "dev-main",
-                "phpcompatibility/php-compatibility": "10.x-dev",
-                "phpcompatibility/phpcompatibility-wp": "dev-master",
-                "phpstan/extension-installer": "1.4.x-dev",
-                "squizlabs/php_codesniffer": "4.x-dev",
-                "szepeviktor/phpstan-wordpress": "2.x-dev",
-                "wp-coding-standards/wpcs": "dev-develop"
+                "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+                "phpcompatibility/php-compatibility": "^9.3",
+                "phpcompatibility/phpcompatibility-wp": "^2.1",
+                "phpstan/extension-installer": "^1.4",
+                "squizlabs/php_codesniffer": "^3.9",
+                "szepeviktor/phpstan-wordpress": "^2.0",
+                "wp-coding-standards/wpcs": "^3.0"
             },
             "type": "library",
             "extra": {
@@ -72,10 +72,16 @@
             "authors": [
                 {
                     "name": "Kodezen Limited",
-                    "email": "support@kodezen.com"
+                    "email": "support@kodezen.com",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Kudratullah",
+                    "email": "hi@kudratullah.dev",
+                    "role": "Lead Developer"
                 }
             ],
-            "description": "StoreEngine license activation & insights sdk for WordPress plugin & theme.",
+            "description": "Official StoreEngine SDK for WordPress licensing and telemetry insights.",
             "homepage": "https://storeengine.pro",
             "keywords": [
                 "insights",
@@ -89,10 +95,16 @@
                 "wordpress-theme"
             ],
             "support": {
-                "source": "https://github.com/imrantushar/storeengine-sdk-for-wordpress/tree/v1.3.0",
+                "source": "https://github.com/imrantushar/storeengine-sdk-for-wordpress",
                 "issues": "https://github.com/imrantushar/storeengine-sdk-for-wordpress/issues"
             },
-            "time": "2026-03-30T12:19:49+00:00"
+            "funding": [
+                {
+                    "type": "custom",
+                    "url": "https://storeengine.pro"
+                }
+            ],
+            "time": "2026-08-26T06:42:31+00:00"
         },
         {
             "name": "woocommerce/action-scheduler",
