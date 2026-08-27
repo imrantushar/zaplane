@@ -317,11 +317,13 @@ class ConnectionsController extends WP_REST_Controller {
 			$this->send_oauth_html( false, 'No authorization code received' );
 		}
 
-		$oauth  = $this->get_oauth_handler();
-		$result = $oauth->handle_callback( $state, $code );
+		$oauth = $this->get_oauth_handler();
 
-		if ( is_wp_error( $result ) ) {
-			$this->send_oauth_html( false, $result->get_error_message() );
+		try {
+			$result = $oauth->handle_callback( $state, $code );
+		} catch ( \Throwable $e ) {
+			$this->send_oauth_html( false, $e->getMessage() );
+			return;
 		}
 
 		$this->send_oauth_html( true, 'Connection created successfully', $result );
