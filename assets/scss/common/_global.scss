@@ -338,10 +338,12 @@ input.zaplane-checkbox:hover {
         }
     }
 
-    // Styled checkbox/radio: themed fill for the unchecked state (the :checked
-    // rules above set the primary fill and win on specificity).
-    input.zaplane-checkbox,
-    .zaplane-radio-input {
+    // Styled checkbox/radio: themed fill for the unchecked state only. This ties
+    // in specificity with the plain `input.zaplane-checkbox:checked` rule above
+    // and comes later in the cascade, so without `:not(:checked)` it would win
+    // the tie and permanently mask the checked-state primary fill.
+    input.zaplane-checkbox:not(:checked),
+    .zaplane-radio-input:not(:checked) {
         background-color: var(--zaplane-background);
     }
 
