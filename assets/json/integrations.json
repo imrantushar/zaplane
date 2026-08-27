@@ -1,6 +1,6 @@
 {
     "version": "1.1.0",
-    "generated_at": "2026-07-19 10:19:50",
+    "generated_at": "2026-07-20 09:36:02",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -296,6 +296,43 @@
                     ]
                 }
             }
+        },
+        "ablocks": {
+            "slug": "ablocks",
+            "name": "aBlocks",
+            "icon": "ablocks.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_url": "",
+            "triggers": {
+                "form_submitted": {
+                    "label": "Form Submitted",
+                    "hook": "ablocks/form_builder/after_submission",
+                    "key": "form_submitted",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Forms",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "ablocks",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         },
         "gemcrm": {
             "slug": "gemcrm",
@@ -2419,43 +2456,6 @@
                     ]
                 }
             }
-        },
-        "ablocks": {
-            "slug": "ablocks",
-            "name": "ABlocks",
-            "icon": "ablocks.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_url": "",
-            "triggers": {
-                "form_submitted": {
-                    "label": "Form Submitted",
-                    "hook": "ablocks/form_builder/after_submission",
-                    "key": "form_submitted",
-                    "schema": [
-                        {
-                            "key": "form_id",
-                            "label": "Forms",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "ablocks",
-                                "query": "form_query",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": []
         },
         "activecampaign": {
             "slug": "activecampaign",
@@ -6493,7 +6493,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/fillout",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10623,7 +10623,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/jotform",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -11342,7 +11342,7 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/mailchimp",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/mailchimp",
             "triggers": {
                 "subscribed": {
                     "label": "Subscriber Added",
@@ -13056,7 +13056,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/messenger",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/messenger",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -13860,7 +13860,7 @@
             "requires_connection": true,
             "auth_type": "both",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/slack",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/slack",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -17682,7 +17682,7 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/typeform",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -18114,7 +18114,7 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/whatsapp",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/whatsapp",
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -27281,7 +27281,7 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": true,
-            "webhook_url": "https://dev.test/wp-json/zaplane/v1/incoming/zoom",
+            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/zoom",
             "triggers": {
                 "meeting_started": {
                     "label": "Meeting Started",
@@ -27699,37 +27699,6 @@
                     ]
                 }
             }
-        },
-        "gemcrm-email-inbox": {
-            "slug": "gemcrm-email-inbox",
-            "name": "GemCRM Email Inbox",
-            "icon": "crm.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_url": "",
-            "triggers": {
-                "email_received": {
-                    "label": "Email Received",
-                    "hook": "gemcrm/email_inbox/received",
-                    "key": "email_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "email_received_unmatched": {
-                    "label": "Email Received (Unmatched)",
-                    "hook": "gemcrm/email_inbox/received_unmatched",
-                    "key": "email_received_unmatched",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": []
         }
     },
     "tools": {

@@ -470,9 +470,9 @@ html[data-theme=dark] .zaplane-oops__icon img {
   --xy-minimap-node-stroke-width-default: 2;
 
   --xy-background-color-default: #141414;
-  --xy-background-pattern-dots-color-default: #777;
-  --xy-background-pattern-lines-color-default: #777;
-  --xy-background-pattern-cross-color-default: #777;
+  --xy-background-pattern-dots-color-default: #555;
+  --xy-background-pattern-lines-color-default: #333;
+  --xy-background-pattern-cross-color-default: #333;
   --xy-node-color-default: #f8f8f8;
 }
 .react-flow__background {
@@ -489,6 +489,7 @@ html[data-theme=dark] .zaplane-oops__icon img {
 }
 .react-flow__pane {
   z-index: 1;
+  touch-action: none;
 }
 .react-flow__pane.draggable {
     cursor: grab;

@@ -381,6 +381,7 @@ $registry = [
 
 $priority = [
 	'academy',
+	'ablocks',
 	'gemcrm',
 	'storeengine',
 ];
