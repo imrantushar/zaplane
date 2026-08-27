@@ -338,16 +338,21 @@ input.zaplane-checkbox:hover {
         }
     }
 
-    // Styled checkbox/radio: themed fill for the unchecked state (the :checked
-    // rules above set the primary fill and win on specificity).
-    input.zaplane-checkbox,
-    .zaplane-radio-input {
+    // Styled checkbox/radio: themed fill for the unchecked state only. This ties
+    // in specificity with the plain `input.zaplane-checkbox:checked` rule above
+    // and comes later in the cascade, so without `:not(:checked)` it would win
+    // the tie and permanently mask the checked-state primary fill.
+    input.zaplane-checkbox:not(:checked),
+    .zaplane-radio-input:not(:checked) {
         background-color: var(--zaplane-background);
     }
 
     // Native (unstyled) checkboxes/radios — e.g. the table select-all box.
-    input[type="checkbox"]:not(.zaplane-checkbox),
-    input[type="radio"]:not(.zaplane-radio-input) {
+    // `:not(:checked)` here too: these are `!important`, so without it they'd
+    // unconditionally win over WP core's (non-`!important`) `:checked` fill/
+    // border rules and permanently mask the checked-state appearance.
+    input[type="checkbox"]:not(.zaplane-checkbox):not(:checked),
+    input[type="radio"]:not(.zaplane-radio-input):not(:checked) {
         background: var(--zaplane-background) !important;
         border-color: var(--zaplane-border-color) !important;
     }
