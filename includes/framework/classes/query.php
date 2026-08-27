@@ -142,18 +142,17 @@ class Query {
 					continue;
 				}
 
-				$hook = self::resolve_hook( $node );
-				if ( ! $hook ) {
-					continue;
-				}
-
-				$map[ $hook ][] = [
+				$entry = [
 					'workflow_version_id' => (int) $row['version_id'],
 					'workflow_id'         => (int) $row['workflow_id'],
 					'id'                  => $node['id'],
 					'app'                 => $node['data']['app'] ?? '',
 					'graph_node'          => $node,
 				];
+
+				foreach ( self::resolve_hooks( $node ) as $hook ) {
+					$map[ $hook ][] = $entry;
+				}
 			}
 		}//end foreach
 
@@ -161,29 +160,45 @@ class Query {
 	}
 
 	/**
-	 * Returns the WP hook for a trigger node. Uses the stored data.hook when
-	 * present; falls back to the integration's get_triggers() definition so
-	 * that workflows created before the hook was persisted still fire correctly.
+	 * Every WP hook a trigger node listens on. Uses the stored data.hook when
+	 * present; falls back to the integration's get_triggers() definition so that
+	 * workflows created before the hook was persisted still fire correctly.
+	 *
+	 * A trigger may declare an array of hooks when the same event reaches it by
+	 * more than one route (ACF's user-meta updates arrive as either
+	 * updated_user_meta or added_user_meta). Those used to be returned as an
+	 * array and then silently dropped by the is_string() guard in
+	 * dispatch_active_triggers(), so the trigger never registered at all.
+	 *
+	 * @return string[]
 	 */
-	private static function resolve_hook( array $node ): ?string {
+	private static function resolve_hooks( array $node ): array {
 		$hook = $node['data']['hook'] ?? null;
-		if ( $hook ) {
-			return $hook;
+
+		if ( ! $hook ) {
+			$app   = strtolower( $node['data']['app'] ?? '' );
+			$event = $node['data']['event'] ?? '';
+
+			if ( ! $app || ! $event ) {
+				return [];
+			}
+
+			$integration = IntegrationLoader::get( $app );
+			if ( ! $integration ) {
+				return [];
+			}
+
+			$triggers = $integration::get_triggers();
+			$hook     = $triggers[ $event ]['hook'] ?? null;
 		}
 
-		$app   = strtolower( $node['data']['app'] ?? '' );
-		$event = $node['data']['event'] ?? '';
-
-		if ( ! $app || ! $event ) {
-			return null;
+		$hooks = [];
+		foreach ( (array) $hook as $candidate ) {
+			if ( is_string( $candidate ) && '' !== $candidate ) {
+				$hooks[] = $candidate;
+			}
 		}
 
-		$integration = IntegrationLoader::get( $app );
-		if ( ! $integration ) {
-			return null;
-		}
-
-		$triggers = $integration::get_triggers();
-		return $triggers[ $event ]['hook'] ?? null;
+		return array_values( array_unique( $hooks ) );
 	}
 }

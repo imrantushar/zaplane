@@ -6,6 +6,7 @@ namespace Zaplane\Tests {
 		private static array $options          = [];
 		private static array $transients       = [];
 		private static array $posts            = [];
+		private static array $postMeta         = [];
 		private static array $users            = [];
 		private static array $comments         = [];
 		private static array $terms            = [];
@@ -22,6 +23,7 @@ namespace Zaplane\Tests {
 			self::$options          = [];
 			self::$transients       = [];
 			self::$posts            = [];
+			self::$postMeta         = [];
 			self::$users            = [];
 			self::$comments         = [];
 			self::$terms            = [];
@@ -71,6 +73,22 @@ namespace Zaplane\Tests {
 
 		public static function setPost( int $id, array $data ): void {
 			self::$posts[ $id ] = array_merge( self::getDefaultPost( $id ), $data );
+		}
+
+		public static function setPostMeta( int $id, string $key, $value ): void {
+			self::$postMeta[ $id ][ $key ] = $value;
+		}
+
+		public static function getPostMeta( int $id, string $key, bool $single ) {
+			if ( '' === $key ) {
+				return $single ? '' : self::$postMeta[ $id ] ?? [];
+			}
+			if ( ! isset( self::$postMeta[ $id ][ $key ] ) ) {
+				return $single ? '' : [];
+			}
+			$value = self::$postMeta[ $id ][ $key ];
+
+			return $single ? $value : [ $value ];
 		}
 
 		public static function getPost( int $id ): ?object {
@@ -725,8 +743,24 @@ namespace {
 				$this->json_params = $params;
 			}
 
+			/**
+			 * Mirror WP: when nothing was set explicitly, a JSON content-type
+			 * means the raw body is decoded on read. Returning only what
+			 * set_json_params() stored let tests pass a JSON body and silently
+			 * see an empty array.
+			 */
 			public function get_json_params(): array {
-				return $this->json_params;
+				if ( ! empty( $this->json_params ) ) {
+					return $this->json_params;
+				}
+
+				if ( '' === $this->body || false === strpos( (string) $this->get_header( 'content-type' ), 'json' ) ) {
+					return [];
+				}
+
+				$decoded = json_decode( $this->body, true );
+
+				return is_array( $decoded ) ? $decoded : [];
 			}
 		}
 	}
@@ -990,12 +1024,13 @@ namespace {
 
 	if ( ! function_exists( 'get_post_meta' ) ) {
 		function get_post_meta( $post_id, $key = '', $single = false ) {
-			return $single ? '' : [];
+			return WPMocks::getPostMeta( (int) $post_id, (string) $key, (bool) $single );
 		}
 	}
 
 	if ( ! function_exists( 'update_post_meta' ) ) {
 		function update_post_meta( $post_id, $meta_key, $meta_value, $prev_value = '' ) {
+			WPMocks::setPostMeta( (int) $post_id, (string) $meta_key, $meta_value );
 			return true;
 		}
 	}

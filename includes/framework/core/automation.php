@@ -164,6 +164,13 @@ class Automation {
 			}
 
 			$integration = $this->container->get( 'integrations' )->get( strtolower( $trigger['app'] ) );
+			// A workflow can outlive its integration (plugin removed, custom app
+			// deleted). Without this the whole hook fataled, taking down every
+			// other workflow listening on the same event.
+			if ( ! $integration ) {
+				continue;
+			}
+
 			$payload = $integration::resolve_trigger( $trigger['graph_node']['data'], $args );
 			if ( ! $payload ) {
 				continue;

@@ -66,7 +66,12 @@ class IntegrationManifest {
 			'requires_connection' => $class::requires_connection(),
 			'auth_type'           => $class::get_auth_type(),
 			'supports_webhook'    => $class::supports_webhook(),
-			'webhook_url'         => $class::supports_webhook() ? rest_url( $class::get_webhook_url() ) : '',
+			// Route only, never an absolute URL: this manifest is written to a file
+			// at build time, so baking rest_url() here would ship the build
+			// machine's host to every site. The dashboard joins it to
+			// ZaplaneGlobal.rest_url at render time.
+			'webhook_route'       => $class::supports_webhook() ? $class::get_webhook_route() : '',
+			'webhook_setup'       => $class::supports_webhook() ? array_values( $class::get_webhook_setup_fields() ) : [],
 			'triggers'            => [],
 			'actions'             => [],
 		];

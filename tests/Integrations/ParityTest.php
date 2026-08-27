@@ -150,6 +150,82 @@ class ParityTest extends TestCase {
 		}
 	}
 
+	/**
+	 * The inverse of the check below, and the one that was missing.
+	 *
+	 * The dashboard gates both the Connections page entry and the node's
+	 * connection picker on requires_connection === true. An integration that
+	 * declares credentials but returns false therefore has no way to ever
+	 * receive them, and every action throws at run time. Mailchimp and
+	 * ActiveCampaign both shipped like this.
+	 */
+	public function test_integrations_with_auth_fields_require_a_connection(): void {
+		foreach ( self::registry() as $slug => $meta ) {
+			$cls = $meta['class'];
+			if ( ! class_exists( $cls ) || $cls::requires_connection() ) {
+				continue;
+			}
+
+			$this->assertEmpty(
+				$cls::get_auth_fields(),
+				"Integration `{$slug}` declares auth fields but requires_connection() = false. "
+				. 'The dashboard hides the Connections entry and the node connection picker '
+				. 'for those, so the credentials can never be supplied and every action fails.'
+			);
+
+			$this->assertSame(
+				'none',
+				$cls::get_auth_type(),
+				"Integration `{$slug}` declares an auth type but requires_connection() = false."
+			);
+		}
+	}
+
+	/**
+	 * A trigger whose hook is only ever fired by the incoming-webhook endpoint
+	 * is dead unless that endpoint accepts the integration — it returns a 400
+	 * before parsing when supports_webhook() is false. Telegram shipped like
+	 * this: two triggers that could not fire at all.
+	 */
+	public function test_webhook_style_trigger_hooks_have_a_delivery_path(): void {
+		foreach ( self::registry() as $slug => $meta ) {
+			$cls = $meta['class'];
+			if ( ! class_exists( $cls ) || 'webhook' === $slug ) {
+				continue;
+			}
+
+			$webhook_hooks = [];
+			foreach ( $cls::get_triggers() as $key => $trigger ) {
+				// A trigger may declare several hooks for one event.
+				foreach ( (array) ( $trigger['hook'] ?? [] ) as $hook ) {
+					if ( is_string( $hook ) && false !== strpos( $hook, 'webhook' ) ) {
+						$webhook_hooks[] = $key;
+						break;
+					}
+				}
+			}
+
+			if ( empty( $webhook_hooks ) ) {
+				continue;
+			}
+
+			$this->assertTrue(
+				$cls::supports_webhook(),
+				"Integration `{$slug}` has webhook-delivered triggers (" . implode( ', ', $webhook_hooks ) . ') '
+				. 'but supports_webhook() = false, so /incoming/' . $slug . ' rejects every delivery with a 400 '
+				. 'and those hooks can never fire.'
+			);
+
+			$ref = new ReflectionMethod( $cls, 'parse_webhook_event' );
+			$this->assertNotSame(
+				IntegrationBase::class,
+				$ref->getDeclaringClass()->getName(),
+				"Integration `{$slug}` has webhook-delivered triggers but inherits the default "
+				. 'parse_webhook_event() which always returns null, so no delivery is ever dispatched.'
+			);
+		}
+	}
+
 	public function test_connection_integrations_override_test_connection(): void {
 		foreach ( self::registry() as $slug => $meta ) {
 			$cls = $meta['class'];
