@@ -1,6 +1,6 @@
 {
     "version": "1.1.0",
-    "generated_at": "2026-08-23 03:58:42",
+    "generated_at": "2026-08-27 11:43:53",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -10,7 +10,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -305,7 +306,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -342,7 +344,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "contact_created": {
                     "label": "Contact Created",
@@ -1257,7 +1260,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "product_purchased": {
                     "label": "Product Purchased",
@@ -1533,8 +1537,6 @@
                     "label": "User Added To Access Group",
                     "hook": "storeengine/membership/user_added_to_group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "user_added_to_group",
                     "schema": [],
                     "outputs": [
@@ -1545,8 +1547,6 @@
                     "label": "User Removed From Access Group",
                     "hook": "storeengine/membership/user_removed_from_group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "user_removed_from_group",
                     "schema": [],
                     "outputs": [
@@ -1557,8 +1557,6 @@
                     "label": "Access Group Created",
                     "hook": "save_post_storeengine_groups",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_created",
                     "schema": [],
                     "outputs": [
@@ -1569,8 +1567,6 @@
                     "label": "Access Group Updated",
                     "hook": "save_post_storeengine_groups",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_updated",
                     "schema": [],
                     "outputs": [
@@ -1581,8 +1577,6 @@
                     "label": "Access Group Deleted",
                     "hook": "delete_post_storeengine_groups",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_deleted",
                     "schema": [],
                     "outputs": [
@@ -1593,8 +1587,6 @@
                     "label": "Subscription Created",
                     "hook": "storeengine/after_create_subscription",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_created",
                     "schema": [],
                     "outputs": [
@@ -1605,8 +1597,6 @@
                     "label": "Subscription Status Changed (any)",
                     "hook": "storeengine/subscription/status_changed",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_status_changed",
                     "schema": [],
                     "outputs": [
@@ -1617,8 +1607,6 @@
                     "label": "Subscription Activated",
                     "hook": "storeengine/subscription/status_active",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_activated",
                     "schema": [],
                     "outputs": [
@@ -1629,8 +1617,6 @@
                     "label": "Subscription Paused (On Hold)",
                     "hook": "storeengine/subscription/status_on_hold",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_on_hold",
                     "schema": [],
                     "outputs": [
@@ -1641,8 +1627,6 @@
                     "label": "Subscription Cancelled",
                     "hook": "storeengine/subscription/status_cancelled",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_cancelled",
                     "schema": [],
                     "outputs": [
@@ -1653,8 +1637,6 @@
                     "label": "Subscription Expired",
                     "hook": "storeengine/subscription/status_expired",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_expired",
                     "schema": [],
                     "outputs": [
@@ -1665,8 +1647,6 @@
                     "label": "Subscription Renewal Payment Complete",
                     "hook": "storeengine/subscription/renewal_payment_complete",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewed",
                     "schema": [],
                     "outputs": [
@@ -1677,8 +1657,6 @@
                     "label": "Subscription Payment Complete",
                     "hook": "storeengine/subscription/payment_complete",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_payment_complete",
                     "schema": [],
                     "outputs": [
@@ -1689,8 +1667,6 @@
                     "label": "Subscription Renewal Failed",
                     "hook": "storeengine/subscription/failed_to_create_renewal_order",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_failed",
                     "schema": [],
                     "outputs": [
@@ -1701,8 +1677,6 @@
                     "label": "Subscription Trial Ended",
                     "hook": "storeengine/subscription/trial_ended",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_trial_ended",
                     "schema": [],
                     "outputs": [
@@ -1713,8 +1687,6 @@
                     "label": "Subscription Renewal Order Created",
                     "hook": "storeengine/api/after_create_renewal_order",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_order_created",
                     "schema": [],
                     "outputs": [
@@ -1797,8 +1769,6 @@
                     "label": "Affiliate Registered",
                     "hook": "storeengine/addons/affiliate/after_registration",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_registered",
                     "schema": [],
                     "outputs": [
@@ -1809,8 +1779,6 @@
                     "label": "Affiliate Status Updated",
                     "hook": "storeengine/addons/affiliate/update_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1821,8 +1789,6 @@
                     "label": "Affiliate Commission Status Updated",
                     "hook": "storeengine/addons/affiliate/update_commission_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_commission_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1833,8 +1799,6 @@
                     "label": "Affiliate Payout Status Updated",
                     "hook": "storeengine/addons/affiliate/update_payout_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_payout_status_updated",
                     "schema": [],
                     "outputs": [
@@ -2217,8 +2181,6 @@
                 "update_subscription_status": {
                     "label": "Update Subscription Status",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "update_subscription_status",
                     "schema": [
                         {
@@ -2263,8 +2225,6 @@
                 "grant_membership": {
                     "label": "Grant Membership (Add User To Group)",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "grant_membership",
                     "schema": [
                         {
@@ -2301,8 +2261,6 @@
                 "revoke_membership": {
                     "label": "Revoke Membership (Remove User From Group)",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "revoke_membership",
                     "schema": [
                         {
@@ -2333,8 +2291,6 @@
                 "create_access_group": {
                     "label": "Create Access Group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "create_access_group",
                     "schema": [
                         {
@@ -2403,8 +2359,6 @@
                 "update_access_group": {
                     "label": "Update Access Group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "update_access_group",
                     "schema": [
                         {
@@ -2467,8 +2421,6 @@
                 "delete_access_group": {
                     "label": "Delete Access Group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "delete_access_group",
                     "schema": [
                         {
@@ -2514,14 +2466,23 @@
             "name": "ActiveCampaign",
             "icon": "activecampaign.svg",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_url": "",
+            "requires_connection": true,
+            "auth_type": "api_key",
+            "supports_webhook": true,
+            "webhook_route": "zaplane/v1/incoming/activecampaign",
+            "webhook_setup": [
+                {
+                    "key": "shared_secret",
+                    "label": "Shared Secret",
+                    "type": "password",
+                    "generate": true,
+                    "help": "Optional. When set, append ?secret=<value> to the callback URL you register in ActiveCampaign; requests without it are rejected."
+                }
+            ],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
-                    "hook": "wp_loaded",
+                    "hook": "activecampaign_webhook_form_submitted",
                     "key": "form_submitted",
                     "schema": [
                         {
@@ -2561,7 +2522,7 @@
                 },
                 "contact_subscribed": {
                     "label": "Contact Subscribed",
-                    "hook": "wp_loaded",
+                    "hook": "activecampaign_webhook_contact_subscribed",
                     "key": "contact_subscribed",
                     "schema": [
                         {
@@ -2601,7 +2562,7 @@
                 },
                 "contact_unsubscribed": {
                     "label": "Contact Unsubscribed",
-                    "hook": "wp_loaded",
+                    "hook": "activecampaign_webhook_contact_unsubscribed",
                     "key": "contact_unsubscribed",
                     "schema": [
                         {
@@ -2821,7 +2782,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "acf_save_post": {
                     "label": "ACF Fields Saved",
@@ -3072,7 +3034,8 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "generate_response": {
@@ -3249,7 +3212,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit (Lite)",
@@ -3312,7 +3276,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -3349,7 +3314,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "contact_form_submission": {
                     "label": "Contact Form Submission",
@@ -3389,7 +3355,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -3426,7 +3393,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -3448,7 +3416,8 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "create_contact": {
@@ -3576,7 +3545,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "account_activated": {
                     "label": "Account Activated",
@@ -4420,7 +4390,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "coblocks_form_submit": {
                     "label": "Form Submission",
@@ -4442,7 +4413,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -4497,7 +4469,8 @@
             "requires_connection": true,
             "auth_type": "bot_token",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "create_channel": {
@@ -5249,7 +5222,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "contact_form_submit": {
                     "label": "Contact Form Submitted",
@@ -5271,7 +5245,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "new_seller_created": {
                     "label": "New Seller Created",
@@ -5750,6 +5725,7 @@
                 "refund_approved": {
                     "label": "Refund Approved",
                     "hook": "dokan_pro_refund_approved",
+                    "requires_addon": "Dokan Pro",
                     "key": "refund_approved",
                     "schema": [
                         {
@@ -5774,6 +5750,7 @@
                 "refund_cancelled": {
                     "label": "Refund Cancelled",
                     "hook": "dokan_pro_refund_cancelled",
+                    "requires_addon": "Dokan Pro",
                     "key": "refund_cancelled",
                     "schema": [
                         {
@@ -5982,7 +5959,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "purchase_product": {
                     "label": "Product Purchased",
@@ -6452,7 +6430,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "elementor_pro/forms/new_record": {
                     "label": "Form New Record",
@@ -6474,7 +6453,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "eb_form_submit_before_email": {
                     "label": "Form Submission",
@@ -6496,7 +6476,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "attendEvent": {
                     "label": "User attended an event",
@@ -6545,7 +6526,8 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
+            "webhook_route": "zaplane/v1/incoming/fillout",
+            "webhook_setup": [],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -6570,7 +6552,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "zaplane/v1/incoming/fillout",
+                            "value": "https://dev.test/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -6590,7 +6572,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "order_created": {
                     "label": "Order Created",
@@ -8004,7 +7987,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "added_tag": {
                     "label": "Tag Added To Contact",
@@ -8974,7 +8958,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "submission_inserted": {
                     "label": "Form Submitted",
@@ -9011,7 +8996,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "email_sent": {
                     "label": "Email Sent",
@@ -9154,7 +9140,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -9191,7 +9178,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "woofunnels_loaded": {
                     "label": "WooFunnels Loaded",
@@ -9827,7 +9815,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "user_earns_rank": {
                     "label": "User Earns Rank",
@@ -9979,7 +9968,8 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "send_email": {
@@ -10257,7 +10247,8 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "create_meeting": {
@@ -10531,7 +10522,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10568,7 +10560,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "created_contact": {
                     "label": "Created Contact",
@@ -10638,7 +10631,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "post_type_field_update": {
                     "label": "Updated JetEngine field on post type",
@@ -10675,7 +10669,8 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
+            "webhook_route": "zaplane/v1/incoming/jotform",
+            "webhook_setup": [],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10700,7 +10695,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "zaplane/v1/incoming/jotform",
+                            "value": "https://dev.test/wp-json/zaplane/v1/incoming/jotform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Jotform \u2192 Your Form \u2192 Settings \u2192 Integrations \u2192 Webhooks \u2192 Paste & Save."
                         }
@@ -11002,7 +10997,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "kadence_blocks_advanced_form_submission": {
                     "label": "Form Submission",
@@ -11024,7 +11020,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "user_enroll_course": {
                     "label": "User Is Enrolled In A Course",
@@ -11285,7 +11282,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -11391,10 +11389,19 @@
             "name": "Mailchimp",
             "icon": "mailchimp.svg",
             "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
+            "requires_connection": true,
+            "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/mailchimp",
+            "webhook_route": "zaplane/v1/incoming/mailchimp",
+            "webhook_setup": [
+                {
+                    "key": "shared_secret",
+                    "label": "Shared Secret",
+                    "type": "password",
+                    "generate": true,
+                    "help": "Optional. When set, append ?secret=<value> to the callback URL you paste into Mailchimp; requests without it are rejected."
+                }
+            ],
             "triggers": {
                 "subscribed": {
                     "label": "Subscriber Added",
@@ -11755,7 +11762,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "run_manually": {
                     "label": "Run Manually",
@@ -11784,7 +11792,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "user_enroll_course": {
                     "label": "User Is Enrolled In A Course",
@@ -11931,7 +11940,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "member_added": {
                     "label": "Member Added",
@@ -13108,7 +13118,24 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/messenger",
+            "webhook_route": "zaplane/v1/incoming/messenger",
+            "webhook_setup": [
+                {
+                    "key": "verify_token",
+                    "label": "Verify Token",
+                    "type": "password",
+                    "generate": true,
+                    "required": true,
+                    "help": "Invent a value, save it here, then paste the same string into Meta \u2192 Webhooks \u2192 Verify Token. Meta will not accept the callback URL until this matches."
+                },
+                {
+                    "key": "app_secret",
+                    "label": "App Secret",
+                    "type": "password",
+                    "required": true,
+                    "help": "Meta app \u2192 Settings \u2192 Basic \u2192 App Secret. Used to check the X-Hub-Signature-256 on every delivery."
+                }
+            ],
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -13155,7 +13182,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "form_submission": {
                     "label": "Form Submission",
@@ -13192,7 +13220,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "metform_after_store_form_data": {
                     "label": "Form Submitted",
@@ -13214,7 +13243,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "process_ninja_form": {
                     "label": "Form Submit",
@@ -13251,7 +13281,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "admin_assigns_membership": {
                     "label": "Admin Assigns a Membership Level to a User",
@@ -13484,7 +13515,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -13506,10 +13538,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
                 },
                 "payment_success": {
                     "label": "Payment Success",
@@ -13531,10 +13563,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
                 },
                 "payment_failed": {
                     "label": "Payment Failed",
@@ -13556,10 +13588,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
                 },
                 "payment_status_changed": {
                     "label": "Payment Status Changed",
@@ -13613,10 +13645,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
                 },
                 "payment_refunded": {
                     "label": "Payment Refunded",
@@ -13638,10 +13670,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
                 }
             },
             "actions": {
@@ -13664,10 +13696,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
                 },
                 "get_forms_all": {
                     "label": "Get Forms (All)",
@@ -13685,10 +13717,10 @@
                             "type": "text"
                         }
                     ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
                 },
                 "get_submission_single": {
                     "label": "Get Submission (Single)",
@@ -13709,10 +13741,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
                 },
                 "get_submissions_all": {
                     "label": "Get Submissions (All)",
@@ -13778,10 +13810,10 @@
                             "type": "text"
                         }
                     ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
                 },
                 "update_submission_payment_status": {
                     "label": "Update Submission Payment Status",
@@ -13830,10 +13862,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
+                    "outputs": {
+                        "main": "Main output",
+                        "error": "Error output"
+                    }
                 }
             }
         },
@@ -13845,7 +13877,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "user_registration": {
                     "label": "User Registration",
@@ -13912,13 +13945,30 @@
             "requires_connection": true,
             "auth_type": "both",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/slack",
+            "webhook_route": "zaplane/v1/incoming/slack",
+            "webhook_setup": [
+                {
+                    "key": "signing_secret",
+                    "label": "Signing Secret",
+                    "type": "password",
+                    "required": true,
+                    "help": "Slack app \u2192 Basic Information \u2192 App Credentials \u2192 Signing Secret. Without it this endpoint accepts unsigned requests from anyone."
+                }
+            ],
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
                     "hook": "slack_webhook_message",
                     "key": "message_received",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "channel",
+                            "label": "Channel ID",
+                            "type": "text",
+                            "placeholder": "C012AB3CD",
+                            "help": "Optional. Only continue when the event came from this channel."
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -13927,7 +13977,15 @@
                     "label": "App Mentioned",
                     "hook": "slack_webhook_app_mention",
                     "key": "app_mention",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "channel",
+                            "label": "Channel ID",
+                            "type": "text",
+                            "placeholder": "C012AB3CD",
+                            "help": "Optional. Only continue when the event came from this channel."
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -13936,7 +13994,15 @@
                     "label": "Reaction Added",
                     "hook": "slack_webhook_reaction_added",
                     "key": "reaction_added",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "channel",
+                            "label": "Channel ID",
+                            "type": "text",
+                            "placeholder": "C012AB3CD",
+                            "help": "Optional. Only continue when the event came from this channel."
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -13954,7 +14020,15 @@
                     "label": "File Shared",
                     "hook": "slack_webhook_file_shared",
                     "key": "file_shared",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "channel",
+                            "label": "Channel ID",
+                            "type": "text",
+                            "placeholder": "C012AB3CD",
+                            "help": "Optional. Only continue when the event came from this channel."
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
@@ -14138,13 +14212,14 @@
         },
         "spectra": {
             "slug": "spectra",
-            "name": "Spectra Legacy",
+            "name": "Spectra",
             "icon": "spectra.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "uagb_form_success": {
                     "label": "Form Submission",
@@ -14166,7 +14241,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "purchase_created": {
                     "label": "Purchase Created",
@@ -15334,7 +15410,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -15371,7 +15448,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "email_sent_successfully": {
                     "label": "Email Sent Successfully",
@@ -15402,7 +15480,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "access_group": {
                     "label": "User Added To Access Group",
@@ -15545,8 +15624,17 @@
             "category": "app",
             "requires_connection": true,
             "auth_type": "api_key",
-            "supports_webhook": false,
-            "webhook_url": "",
+            "supports_webhook": true,
+            "webhook_route": "zaplane/v1/incoming/telegram",
+            "webhook_setup": [
+                {
+                    "key": "secret_token",
+                    "label": "Secret Token",
+                    "type": "password",
+                    "generate": true,
+                    "help": "Pass the same value as secret_token when you call setWebhook. Telegram then sends it back on every request, which is how this endpoint tells real deliveries from forged ones."
+                }
+            ],
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -15892,7 +15980,8 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "create_card": {
@@ -17619,7 +17708,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -17734,7 +17824,8 @@
             "requires_connection": true,
             "auth_type": "token_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
+            "webhook_route": "zaplane/v1/incoming/typeform",
+            "webhook_setup": [],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -17759,7 +17850,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "zaplane/v1/incoming/typeform",
+                            "value": "https://dev.test/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -17833,7 +17924,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "user_login": {
                     "label": "User Login",
@@ -17920,7 +18012,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "catch_hook": {
                     "label": "Catch Webhook",
@@ -18123,13 +18216,14 @@
         },
         "weforms": {
             "slug": "weforms",
-            "name": "weForms",
+            "name": "We Forms",
             "icon": "weforms.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "weforms_entry_submission": {
                     "label": "Form Submission",
@@ -18166,7 +18260,24 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/whatsapp",
+            "webhook_route": "zaplane/v1/incoming/whatsapp",
+            "webhook_setup": [
+                {
+                    "key": "verify_token",
+                    "label": "Verify Token",
+                    "type": "password",
+                    "generate": true,
+                    "required": true,
+                    "help": "Invent a value, save it here, then paste the same string into Meta \u2192 WhatsApp \u2192 Configuration \u2192 Verify Token. Meta will not accept the callback URL until this matches."
+                },
+                {
+                    "key": "app_secret",
+                    "label": "App Secret",
+                    "type": "password",
+                    "required": true,
+                    "help": "Meta app \u2192 Settings \u2192 Basic \u2192 App Secret. Used to check the X-Hub-Signature-256 on every delivery."
+                }
+            ],
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -18428,7 +18539,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "booking_created": {
                     "label": "Booking Created",
@@ -18689,7 +18801,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "new_order": {
                     "label": "New Order Created",
@@ -21902,7 +22015,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "publish_post": {
                     "label": "Post Published",
@@ -26648,7 +26762,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -26685,7 +26800,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "import_complete": {
                     "label": "Import Complete",
@@ -27257,7 +27373,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "post_form_submission": {
                     "label": "Post Form Submission",
@@ -27333,7 +27450,8 @@
             "requires_connection": true,
             "auth_type": "oauth2",
             "supports_webhook": true,
-            "webhook_url": "http://kodezen.local/wp-json/zaplane/v1/incoming/zoom",
+            "webhook_route": "zaplane/v1/incoming/zoom",
+            "webhook_setup": [],
             "triggers": {
                 "meeting_started": {
                     "label": "Meeting Started",
@@ -27762,7 +27880,8 @@
             "requires_connection": true,
             "auth_type": "api_key",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "run_agent": {
@@ -27840,7 +27959,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "if": {
@@ -27992,7 +28112,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "parse": {
@@ -28116,7 +28237,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "now": {
@@ -28450,7 +28572,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "wait": {
@@ -28540,7 +28663,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "filter": {
@@ -28691,7 +28815,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "format_text": {
@@ -29277,7 +29402,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "request": {
@@ -29485,7 +29611,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "request_approval": {
@@ -29590,7 +29717,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "info": {
@@ -29649,7 +29777,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "iterator": {
@@ -29694,7 +29823,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "parse": {
@@ -29743,7 +29873,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "retrieve": {
@@ -30018,7 +30149,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "list_tools": {
@@ -30088,7 +30220,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "get_history": {
@@ -30190,7 +30323,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "repeat": {
@@ -30266,7 +30400,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "route": {
@@ -30386,7 +30521,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": {
                 "interval": {
                     "label": "On a Schedule",
@@ -30450,7 +30586,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "note": {
@@ -30502,7 +30639,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "set": {
@@ -30563,7 +30701,8 @@
             "requires_connection": false,
             "auth_type": "none",
             "supports_webhook": false,
-            "webhook_url": "",
+            "webhook_route": "",
+            "webhook_setup": [],
             "triggers": [],
             "actions": {
                 "parse": {

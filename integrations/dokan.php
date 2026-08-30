@@ -108,13 +108,17 @@ class Dokan extends IntegrationBase {
 				'label' => 'Refund Requested',
 				'hook' => 'dokan_refund_request_created'
 			],
+			// dokan_pro_* hooks only exist in Dokan Pro. Flagged so the trigger
+			// picker can say so instead of silently never firing on Dokan Lite.
 			'refund_approved'         => [
 				'label' => 'Refund Approved',
-				'hook' => 'dokan_pro_refund_approved'
+				'hook' => 'dokan_pro_refund_approved',
+				'requires_addon' => 'Dokan Pro',
 			],
 			'refund_cancelled'        => [
 				'label' => 'Refund Cancelled',
-				'hook' => 'dokan_pro_refund_cancelled'
+				'hook' => 'dokan_pro_refund_cancelled',
+				'requires_addon' => 'Dokan Pro',
 			],
 		];
 	}

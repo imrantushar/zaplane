@@ -181,13 +181,67 @@ abstract class IntegrationBase {
 	}
 
 	/**
+	 * Answer a handshake the provider performs over the same POST endpoint it
+	 * later delivers events to (Slack's `url_verification`, for example). Return
+	 * the raw body to echo back, or null when this request is a normal event.
+	 *
+	 * The GET-style handshake (Meta's hub.challenge) is handled separately by
+	 * verify_webhook_challenge().
+	 *
+	 * @return array{body:string,content_type:string}|null
+	 */
+	public static function handle_webhook_handshake( \WP_REST_Request $request ): ?array {
+		return null;
+	}
+
+	/**
+	 * Fields the site owner must fill in before this integration's incoming
+	 * webhook can be used — verify tokens, signing secrets, shared secrets.
+	 *
+	 * Rendered by the trigger drawer's Webhook Setup panel and persisted through
+	 * the /incoming/<slug>/config REST route. Each entry:
+	 *   key, label, type ('text'|'password'), help, generate (bool)
+	 *
+	 * `generate` marks a value the user invents rather than copies from the
+	 * provider, so the UI can offer to generate one.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	public static function get_webhook_setup_fields(): array {
+		return [];
+	}
+
+	/**
+	 * Read one saved webhook setting for this integration.
+	 *
+	 * Values live together under the `zaplane_webhook_config` option keyed by
+	 * slug. $legacy_option names the standalone option an earlier version wrote
+	 * to, so sites that set one by hand keep working.
+	 */
+	public static function get_webhook_setting( string $key, string $legacy_option = '' ): string {
+		$slug   = static::get_slug();
+		$config = get_option( 'zaplane_webhook_config', [] );
+		$value  = '';
+
+		if ( is_array( $config ) && isset( $config[ $slug ][ $key ] ) && is_scalar( $config[ $slug ][ $key ] ) ) {
+			$value = trim( (string) $config[ $slug ][ $key ] );
+		}
+
+		if ( '' === $value && '' !== $legacy_option ) {
+			$value = trim( (string) get_option( $legacy_option, '' ) );
+		}
+
+		return (string) apply_filters( 'zaplane_webhook_setting', $value, $key, $slug );
+	}
+
+	/**
 	 * The verify token this integration expects during the webhook handshake.
 	 * Stored per integration as an option and filterable; integrations may
 	 * override to pull it from a connection credential instead.
 	 */
 	public static function get_webhook_verify_token(): string {
 		$slug  = static::get_slug();
-		$token = (string) get_option( 'zaplane_webhook_verify_token_' . $slug, '' );
+		$token = static::get_webhook_setting( 'verify_token', 'zaplane_webhook_verify_token_' . $slug );
 
 		return (string) apply_filters( 'zaplane_webhook_verify_token', $token, $slug );
 	}
@@ -338,7 +392,15 @@ abstract class IntegrationBase {
 		return [ $body, $status ];
 	}
 
-	public static function get_webhook_url(): string {
+	/**
+	 * The REST route (namespace-relative) this integration receives webhooks on.
+	 * Kept relative so the built manifest never bakes in a build machine's host.
+	 */
+	public static function get_webhook_route(): string {
 		return 'zaplane/v1/incoming/' . static::get_slug();
+	}
+
+	public static function get_webhook_url(): string {
+		return rest_url( static::get_webhook_route() );
 	}
 }

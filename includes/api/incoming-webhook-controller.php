@@ -61,22 +61,48 @@ class IncomingWebhookController extends WP_REST_Controller {
 			]
 		);
 
+		$slug_arg = [
+			'slug' => [
+				'required'          => true,
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_key',
+			],
+		];
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<slug>[a-z0-9_-]+)/url',
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_webhook_url' ],
-				'permission_callback' => '__return_true',
-				'args'                => [
-					'slug' => [
-						'required'          => true,
-						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_key',
-					],
-				],
+				'permission_callback' => [ $this, 'admin_permissions_check' ],
+				'args'                => $slug_arg,
 			]
 		);
+
+		// Webhook Setup panel: the callback URL plus the secrets the provider
+		// handshake needs. Admin-only — these are credentials.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<slug>[a-z0-9_-]+)/config',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_webhook_config' ],
+					'permission_callback' => [ $this, 'admin_permissions_check' ],
+				],
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'update_webhook_config' ],
+					'permission_callback' => [ $this, 'admin_permissions_check' ],
+				],
+				'args' => $slug_arg,
+			]
+		);
+	}
+
+	public function admin_permissions_check(): bool {
+		return current_user_can( 'manage_options' );
 	}
 
 	public function handle_incoming( \WP_REST_Request $request ) {
@@ -105,6 +131,15 @@ class IncomingWebhookController extends WP_REST_Controller {
 				'Webhook signature verification failed.',
 				[ 'status' => 401 ]
 			);
+		}
+
+		// Some providers verify the callback URL over this same POST endpoint and
+		// require their challenge echoed back verbatim (Slack's url_verification).
+		// That has to happen before event parsing, and the body must not be wrapped
+		// in the usual JSON envelope.
+		$handshake = $integration::handle_webhook_handshake( $request );
+		if ( null !== $handshake ) {
+			$this->send_raw( (string) ( $handshake['body'] ?? '' ), (string) ( $handshake['content_type'] ?? 'text/plain' ) );
 		}
 
 		$parsed = $integration::parse_webhook_event( $request );
@@ -175,8 +210,22 @@ class IncomingWebhookController extends WP_REST_Controller {
 
 		// Meta requires the body to equal the challenge verbatim — echo raw,
 		// not JSON-encoded, then stop so WP doesn't wrap the response.
-		header( 'Content-Type: text/plain; charset=utf-8' );
-		echo $challenge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Verbatim echo required by Meta handshake.
+		$this->send_raw( $challenge, 'text/plain' );
+	}
+
+	/**
+	 * Echo a provider handshake response verbatim and stop.
+	 *
+	 * Providers compare the body byte-for-byte against the challenge they sent,
+	 * so it must not go through WP's REST JSON envelope.
+	 */
+	private function send_raw( string $body, string $content_type = 'text/plain' ): void {
+		if ( ! headers_sent() ) {
+			header( 'Content-Type: ' . $content_type . '; charset=utf-8' );
+			header( 'Cache-Control: no-store' );
+			status_header( 200 );
+		}
+		echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Verbatim echo required by the provider handshake.
 		exit;
 	}
 
@@ -243,11 +292,102 @@ class IncomingWebhookController extends WP_REST_Controller {
 	}
 
 	public function get_webhook_url( \WP_REST_Request $request ) {
-		$slug = $request->get_param( 'slug' );
+		$slug        = $request->get_param( 'slug' );
+		$integration = IntegrationLoader::get( $slug );
+
+		if ( ! $integration ) {
+			return new WP_Error( 'not_found', 'Integration not found: ' . $slug, [ 'status' => 404 ] );
+		}
 
 		return rest_ensure_response([
 			'integration' => $slug,
-			'url'         => 'zaplane/v1/incoming/' . $slug,
+			'url'         => $integration::get_webhook_url(),
 		]);
+	}
+
+	/**
+	 * The Webhook Setup panel's payload: where the provider should POST, and the
+	 * secrets this integration needs before it will accept anything.
+	 *
+	 * Secret values are never sent back — only whether each one is set — so the
+	 * panel can show "configured" without leaking the value to the browser.
+	 */
+	public function get_webhook_config( \WP_REST_Request $request ) {
+		$slug        = $request->get_param( 'slug' );
+		$integration = IntegrationLoader::get( $slug );
+
+		if ( ! $integration ) {
+			return new WP_Error( 'not_found', 'Integration not found: ' . $slug, [ 'status' => 404 ] );
+		}
+
+		$fields = $integration::get_webhook_setup_fields();
+		$status = [];
+
+		foreach ( $fields as $field ) {
+			$key = $field['key'] ?? '';
+			if ( '' === $key ) {
+				continue;
+			}
+			$status[ $key ] = '' !== $integration::get_webhook_setting( $key );
+		}
+
+		return rest_ensure_response([
+			'integration'      => $slug,
+			'supports_webhook' => $integration::supports_webhook(),
+			'url'              => $integration::supports_webhook() ? $integration::get_webhook_url() : '',
+			'fields'           => array_values( $fields ),
+			'configured'       => $status,
+		]);
+	}
+
+	/**
+	 * Save the Webhook Setup panel's values. Only keys the integration declares
+	 * are accepted; an empty submitted value clears that key.
+	 */
+	public function update_webhook_config( \WP_REST_Request $request ) {
+		$slug        = $request->get_param( 'slug' );
+		$integration = IntegrationLoader::get( $slug );
+
+		if ( ! $integration ) {
+			return new WP_Error( 'not_found', 'Integration not found: ' . $slug, [ 'status' => 404 ] );
+		}
+
+		$submitted = $request->get_json_params();
+		if ( ! is_array( $submitted ) ) {
+			$submitted = (array) $request->get_param( 'values' );
+		}
+
+		$allowed = [];
+		foreach ( $integration::get_webhook_setup_fields() as $field ) {
+			if ( ! empty( $field['key'] ) ) {
+				$allowed[] = (string) $field['key'];
+			}
+		}
+
+		$config = get_option( 'zaplane_webhook_config', [] );
+		$config = is_array( $config ) ? $config : [];
+		$bucket = isset( $config[ $slug ] ) && is_array( $config[ $slug ] ) ? $config[ $slug ] : [];
+
+		foreach ( $allowed as $key ) {
+			if ( ! array_key_exists( $key, $submitted ) ) {
+				continue;
+			}
+			$value = is_scalar( $submitted[ $key ] ) ? trim( (string) $submitted[ $key ] ) : '';
+			if ( '' === $value ) {
+				unset( $bucket[ $key ] );
+			} else {
+				$bucket[ $key ] = $value;
+			}
+		}
+
+		if ( empty( $bucket ) ) {
+			unset( $config[ $slug ] );
+		} else {
+			$config[ $slug ] = $bucket;
+		}
+
+		update_option( 'zaplane_webhook_config', $config, false );
+
+		return $this->get_webhook_config( $request );
 	}
 }

@@ -74,6 +74,13 @@ class API implements ModuleInterface {
 					return [];
 				}
 
+				// Not part of IntegrationBase — an integration only declares it when
+				// it has dynamic selects. Calling it blind fataled the whole route
+				// for every integration that doesn't.
+				if ( ! method_exists( $integration, 'get_dynamic_queries' ) ) {
+					return [];
+				}
+
 				$queries = $integration::get_dynamic_queries();
 
 				$query = $req['query'];
