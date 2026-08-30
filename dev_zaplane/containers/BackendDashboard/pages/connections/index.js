@@ -68,9 +68,9 @@ const Connections = () => {
                     <button
                         className="bg-[var(--zaplane-primary)] hover:opacity-90 text-white font-medium py-2 px-6 rounded-lg transition-all shadow-md active:scale-95 disabled:opacity-50"
                         onClick={saveConnection}
-                        disabled={!selectedAuthType}
+                        disabled={!selectedAuthType || loadingOAuth}
                     >
-                        {__("Save Connection", "zaplane")}
+                        {loadingOAuth ? __("Connecting...", "zaplane") : __("Save Connection", "zaplane")}
                     </button>
                 </div>
             ) : null}
