@@ -28,8 +28,8 @@ const TestDetails = ({
   }, [id, dispatch]);
   if (isLoading) return <ZAPLoading />;
   if (!outputData || Object.keys(outputData).length === 0 && isNode) return null;
-  return <div style={{overflow:'hidden'}} className="flex flex-col gap-4">
-            <div className="p-3 border border-[var(--zaplane-border-color)] rounded-md bg-[var(--zaplane-gray)]">
+  return <div className="flex flex-col gap-4">
+            <div className="p-3 border border-[var(--zaplane-border-color)] rounded-md bg-[var(--zaplane-gray)]" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
                 <span className="zaplane-label font-[bold] mb-2">
                     {__('Input', 'zaplane')}
                 </span>
@@ -37,7 +37,7 @@ const TestDetails = ({
                 <ReactJson src={inputData} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} theme={zaplaneJsonViewTheme} />
             </div>
 
-            <div className="p-3 border border-[var(--zaplane-border-color)] rounded-md bg-[var(--zaplane-gray)]">
+            <div className="p-3 border border-[var(--zaplane-border-color)] rounded-md bg-[var(--zaplane-gray)]" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
                 <span className="font-[bold] mb-2">
                     {__('Output', 'zaplane')}
                 </span>
