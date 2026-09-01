@@ -24,7 +24,7 @@ const TestDetails = ({
   const outputData = singleNodeExecution[id]?.output || selectedOutput;
   const isNode = source === "node";
   useEffect(() => {
-    dispatch(resetSingleNodeExecution());
+    dispatch(resetSingleNodeExecution(id));
   }, [id, dispatch]);
   if (isLoading) return <ZAPLoading />;
   if (!outputData || Object.keys(outputData).length === 0 && isNode) return null;
