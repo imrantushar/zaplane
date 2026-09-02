@@ -70,7 +70,6 @@ class JsonParser extends IntegrationBase {
 		return [
 			'data' => [ 'key' => 'value' ],
 			'success' => true,
-			'error' => null
 		];
 	}
 
@@ -96,13 +95,18 @@ class JsonParser extends IntegrationBase {
 		$decoded = json_decode( (string) ( $config['json'] ?? '' ), true );
 		$ok      = JSON_ERROR_NONE === json_last_error();
 
+		$data = [
+			'success' => $ok,
+			'data'    => $ok ? $decoded : null,
+		];
+
+		if ( ! $ok ) {
+			$data['error'] = json_last_error_msg();
+		}
+
 		return [
 			'port' => 'main',
-			'data' => [
-				'data'    => $ok ? $decoded : null,
-				'success' => $ok,
-				'error'   => $ok ? null : json_last_error_msg(),
-			],
+			'data' => $data,
 		];
 	}
 }

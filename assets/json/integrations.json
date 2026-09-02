@@ -1,6 +1,6 @@
 {
     "version": "1.1.0",
-    "generated_at": "2026-08-27 11:43:53",
+    "generated_at": "2026-09-02 05:39:18",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -1537,6 +1537,8 @@
                     "label": "User Added To Access Group",
                     "hook": "storeengine/membership/user_added_to_group",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "user_added_to_group",
                     "schema": [],
                     "outputs": [
@@ -1547,6 +1549,8 @@
                     "label": "User Removed From Access Group",
                     "hook": "storeengine/membership/user_removed_from_group",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "user_removed_from_group",
                     "schema": [],
                     "outputs": [
@@ -1557,6 +1561,8 @@
                     "label": "Access Group Created",
                     "hook": "save_post_storeengine_groups",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_created",
                     "schema": [],
                     "outputs": [
@@ -1567,6 +1573,8 @@
                     "label": "Access Group Updated",
                     "hook": "save_post_storeengine_groups",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_updated",
                     "schema": [],
                     "outputs": [
@@ -1577,6 +1585,8 @@
                     "label": "Access Group Deleted",
                     "hook": "delete_post_storeengine_groups",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_deleted",
                     "schema": [],
                     "outputs": [
@@ -1587,6 +1597,8 @@
                     "label": "Subscription Created",
                     "hook": "storeengine/after_create_subscription",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_created",
                     "schema": [],
                     "outputs": [
@@ -1597,6 +1609,8 @@
                     "label": "Subscription Status Changed (any)",
                     "hook": "storeengine/subscription/status_changed",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_status_changed",
                     "schema": [],
                     "outputs": [
@@ -1607,6 +1621,8 @@
                     "label": "Subscription Activated",
                     "hook": "storeengine/subscription/status_active",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_activated",
                     "schema": [],
                     "outputs": [
@@ -1617,6 +1633,8 @@
                     "label": "Subscription Paused (On Hold)",
                     "hook": "storeengine/subscription/status_on_hold",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_on_hold",
                     "schema": [],
                     "outputs": [
@@ -1627,6 +1645,8 @@
                     "label": "Subscription Cancelled",
                     "hook": "storeengine/subscription/status_cancelled",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_cancelled",
                     "schema": [],
                     "outputs": [
@@ -1637,6 +1657,8 @@
                     "label": "Subscription Expired",
                     "hook": "storeengine/subscription/status_expired",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_expired",
                     "schema": [],
                     "outputs": [
@@ -1647,6 +1669,8 @@
                     "label": "Subscription Renewal Payment Complete",
                     "hook": "storeengine/subscription/renewal_payment_complete",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewed",
                     "schema": [],
                     "outputs": [
@@ -1657,6 +1681,8 @@
                     "label": "Subscription Payment Complete",
                     "hook": "storeengine/subscription/payment_complete",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_payment_complete",
                     "schema": [],
                     "outputs": [
@@ -1667,6 +1693,8 @@
                     "label": "Subscription Renewal Failed",
                     "hook": "storeengine/subscription/failed_to_create_renewal_order",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_failed",
                     "schema": [],
                     "outputs": [
@@ -1677,6 +1705,8 @@
                     "label": "Subscription Trial Ended",
                     "hook": "storeengine/subscription/trial_ended",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_trial_ended",
                     "schema": [],
                     "outputs": [
@@ -1687,6 +1717,8 @@
                     "label": "Subscription Renewal Order Created",
                     "hook": "storeengine/api/after_create_renewal_order",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_order_created",
                     "schema": [],
                     "outputs": [
@@ -1769,6 +1801,8 @@
                     "label": "Affiliate Registered",
                     "hook": "storeengine/addons/affiliate/after_registration",
                     "requires_addon": "affiliate",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_registered",
                     "schema": [],
                     "outputs": [
@@ -1779,6 +1813,8 @@
                     "label": "Affiliate Status Updated",
                     "hook": "storeengine/addons/affiliate/update_status",
                     "requires_addon": "affiliate",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1789,6 +1825,8 @@
                     "label": "Affiliate Commission Status Updated",
                     "hook": "storeengine/addons/affiliate/update_commission_status",
                     "requires_addon": "affiliate",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_commission_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1799,6 +1837,8 @@
                     "label": "Affiliate Payout Status Updated",
                     "hook": "storeengine/addons/affiliate/update_payout_status",
                     "requires_addon": "affiliate",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_payout_status_updated",
                     "schema": [],
                     "outputs": [
@@ -2181,6 +2221,8 @@
                 "update_subscription_status": {
                     "label": "Update Subscription Status",
                     "requires_addon": "subscription",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "update_subscription_status",
                     "schema": [
                         {
@@ -2225,6 +2267,8 @@
                 "grant_membership": {
                     "label": "Grant Membership (Add User To Group)",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "grant_membership",
                     "schema": [
                         {
@@ -2261,6 +2305,8 @@
                 "revoke_membership": {
                     "label": "Revoke Membership (Remove User From Group)",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "revoke_membership",
                     "schema": [
                         {
@@ -2291,6 +2337,8 @@
                 "create_access_group": {
                     "label": "Create Access Group",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "create_access_group",
                     "schema": [
                         {
@@ -2359,6 +2407,8 @@
                 "update_access_group": {
                     "label": "Update Access Group",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "update_access_group",
                     "schema": [
                         {
@@ -2421,6 +2471,8 @@
                 "delete_access_group": {
                     "label": "Delete Access Group",
                     "requires_addon": "membership",
+                    "disabled": true,
+                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "delete_access_group",
                     "schema": [
                         {
@@ -5252,22 +5304,7 @@
                     "label": "New Seller Created",
                     "hook": "dokan_new_seller_created",
                     "key": "new_seller_created",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5276,22 +5313,7 @@
                     "label": "Store Profile Saved",
                     "hook": "dokan_store_profile_saved",
                     "key": "store_profile_saved",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5300,36 +5322,7 @@
                     "label": "New Product Added",
                     "hook": "dokan_new_product_added",
                     "key": "new_product_added",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        },
-                        {
-                            "key": "product_id",
-                            "label": "Product",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "products",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5338,36 +5331,7 @@
                     "label": "Product Updated",
                     "hook": "dokan_product_updated",
                     "key": "product_updated",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        },
-                        {
-                            "key": "product_id",
-                            "label": "Product",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "products",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5376,36 +5340,7 @@
                     "label": "Product Deleted",
                     "hook": "dokan_product_deleted",
                     "key": "product_deleted",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        },
-                        {
-                            "key": "product_id",
-                            "label": "Product",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "products",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5414,22 +5349,7 @@
                     "label": "Checkout Order Meta Updated",
                     "hook": "dokan_checkout_update_order_meta",
                     "key": "checkout_update_order_meta",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5486,22 +5406,7 @@
                     "label": "Withdraw Request Created",
                     "hook": "dokan_after_withdraw_request",
                     "key": "withdraw_request_created",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5510,46 +5415,7 @@
                     "label": "Withdraw Created",
                     "hook": "dokan_withdraw_created",
                     "key": "withdraw_created",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "withdraw_request_pending": {
-                    "label": "Withdraw Request Pending",
-                    "hook": "dokan_withdraw_request_pending",
-                    "key": "withdraw_request_pending",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5558,22 +5424,7 @@
                     "label": "Withdraw Request Approved",
                     "hook": "dokan_withdraw_request_approved",
                     "key": "withdraw_request_approved",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5582,22 +5433,7 @@
                     "label": "Withdraw Request Cancelled",
                     "hook": "dokan_withdraw_request_cancelled",
                     "key": "withdraw_request_cancelled",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5606,22 +5442,7 @@
                     "label": "Withdraw Status Updated",
                     "hook": "dokan_withdraw_status_updated",
                     "key": "withdraw_status_updated",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5630,22 +5451,7 @@
                     "label": "Vendor Added (before create)",
                     "hook": "dokan_before_create_vendor",
                     "key": "vendor_add",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5702,22 +5508,7 @@
                     "label": "Refund Requested",
                     "hook": "dokan_refund_request_created",
                     "key": "refund_request",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5727,22 +5518,7 @@
                     "hook": "dokan_pro_refund_approved",
                     "requires_addon": "Dokan Pro",
                     "key": "refund_approved",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -5752,22 +5528,7 @@
                     "hook": "dokan_pro_refund_cancelled",
                     "requires_addon": "Dokan Pro",
                     "key": "refund_cancelled",
-                    "schema": [
-                        {
-                            "key": "vendor_id",
-                            "label": "Vendor",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "dokan",
-                                "query": "vendors",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -6552,7 +6313,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://dev.test/wp-json/zaplane/v1/incoming/fillout",
+                            "value": "http://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -10695,7 +10456,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://dev.test/wp-json/zaplane/v1/incoming/jotform",
+                            "value": "http://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Jotform \u2192 Your Form \u2192 Settings \u2192 Integrations \u2192 Webhooks \u2192 Paste & Save."
                         }
@@ -13538,10 +13299,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": {
-                        "main": "Main output",
-                        "error": "Error output"
-                    }
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
                 },
                 "payment_success": {
                     "label": "Payment Success",
@@ -13563,10 +13324,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": {
-                        "main": "Main output",
-                        "error": "Error output"
-                    }
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
                 },
                 "payment_failed": {
                     "label": "Payment Failed",
@@ -13588,10 +13349,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": {
-                        "main": "Main output",
-                        "error": "Error output"
-                    }
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
                 },
                 "payment_status_changed": {
                     "label": "Payment Status Changed",
@@ -13645,10 +13406,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": {
-                        "main": "Main output",
-                        "error": "Error output"
-                    }
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
                 },
                 "payment_refunded": {
                     "label": "Payment Refunded",
@@ -13670,10 +13431,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": {
-                        "main": "Main output",
-                        "error": "Error output"
-                    }
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
                 }
             },
             "actions": {
@@ -13696,10 +13457,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": {
-                        "main": "Main output",
-                        "error": "Error output"
-                    }
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
                 },
                 "get_forms_all": {
                     "label": "Get Forms (All)",
@@ -13717,10 +13478,10 @@
                             "type": "text"
                         }
                     ],
-                    "outputs": {
-                        "main": "Main output",
-                        "error": "Error output"
-                    }
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
                 },
                 "get_submission_single": {
                     "label": "Get Submission (Single)",
@@ -13741,10 +13502,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": {
-                        "main": "Main output",
-                        "error": "Error output"
-                    }
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
                 },
                 "get_submissions_all": {
                     "label": "Get Submissions (All)",
@@ -13810,10 +13571,10 @@
                             "type": "text"
                         }
                     ],
-                    "outputs": {
-                        "main": "Main output",
-                        "error": "Error output"
-                    }
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
                 },
                 "update_submission_payment_status": {
                     "label": "Update Submission Payment Status",
@@ -13862,10 +13623,10 @@
                             "required": true
                         }
                     ],
-                    "outputs": {
-                        "main": "Main output",
-                        "error": "Error output"
-                    }
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
                 }
             }
         },
@@ -14212,7 +13973,7 @@
         },
         "spectra": {
             "slug": "spectra",
-            "name": "Spectra",
+            "name": "Spectra Legacy",
             "icon": "spectra.svg",
             "category": "app",
             "requires_connection": false,
@@ -17850,7 +17611,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "https://dev.test/wp-json/zaplane/v1/incoming/typeform",
+                            "value": "http://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
@@ -18216,7 +17977,7 @@
         },
         "weforms": {
             "slug": "weforms",
-            "name": "We Forms",
+            "name": "weForms",
             "icon": "weforms.svg",
             "category": "app",
             "requires_connection": false,

@@ -10,11 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Dokan extends IntegrationBase {
 
-
-	// -------------------------------------------------------------------------
-	// Registration
-	// -------------------------------------------------------------------------
-
 	public static function get_slug(): string {
 		return 'dokan';
 	}
@@ -26,10 +21,6 @@ class Dokan extends IntegrationBase {
 	public static function get_icon(): string {
 		return 'dokan.svg';
 	}
-
-	// -------------------------------------------------------------------------
-	// Triggers
-	// -------------------------------------------------------------------------
 
 	public static function get_triggers(): array {
 		return [
@@ -52,7 +43,7 @@ class Dokan extends IntegrationBase {
 			],
 			'product_deleted'         => [
 				'label' => 'Product Deleted',
-				'hook' => 'dokan_product_deleted'
+				'hook' => 'dokan_product_delete'
 			],
 			'checkout_update_order_meta' => [
 				'label' => 'Checkout Order Meta Updated',
@@ -74,10 +65,6 @@ class Dokan extends IntegrationBase {
 				'label' => 'Withdraw Created',
 				'hook' => 'dokan_withdraw_created'
 			],
-			'withdraw_request_pending' => [
-				'label' => 'Withdraw Request Pending',
-				'hook' => 'dokan_withdraw_request_pending'
-			],
 			'withdraw_request_approved' => [
 				'label' => 'Withdraw Request Approved',
 				'hook' => 'dokan_withdraw_request_approved'
@@ -90,8 +77,7 @@ class Dokan extends IntegrationBase {
 				'label' => 'Withdraw Status Updated',
 				'hook' => 'dokan_withdraw_status_updated'
 			],
-
-			// --- New triggers (from BitApps PiPro) ---
+			// --- New triggers
 			'vendor_add'              => [
 				'label' => 'Vendor Added (before create)',
 				'hook' => 'dokan_before_create_vendor'
@@ -138,42 +124,11 @@ class Dokan extends IntegrationBase {
 			],
 		];
 
-		$product_selector = [
-			[
-				'key'      => 'product_id',
-				'label'    => 'Product',
-				'type'     => 'select',
-				'dynamic'  => [
-					'integration' => 'dokan',
-					'query'       => 'products',
-					'select'      => [ 'name', 'label' ],
-				],
-				'required' => true,
-			],
-		];
-
-		if ( in_array( $trigger, [ 'new_product_added', 'product_updated', 'product_deleted' ], true ) ) {
-			return array_merge( $vendor_selector, $product_selector );
-		}
-
 		$vendor_triggers = [
-			'new_seller_created',
-			'store_profile_saved',
-			'checkout_update_order_meta',
 			'vendor_enabled',
 			'vendor_disabled',
-			'withdraw_request_created',
-			'withdraw_created',
-			'withdraw_request_pending',
-			'withdraw_request_approved',
-			'withdraw_request_cancelled',
-			'withdraw_status_updated',
-			'vendor_add',
 			'vendor_update',
 			'vendor_delete',
-			'refund_request',
-			'refund_approved',
-			'refund_cancelled',
 		];
 		if ( in_array( $trigger, $vendor_triggers, true ) ) {
 			return $vendor_selector;
@@ -181,10 +136,6 @@ class Dokan extends IntegrationBase {
 
 		return [];
 	}
-
-	// -------------------------------------------------------------------------
-	// Sample output (feeds the "@" variable picker before any test capture)
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Return a non-empty sample payload for every Dokan trigger.
@@ -375,13 +326,6 @@ class Dokan extends IntegrationBase {
 				'vendor_id'   => 3,
 				'withdraw'    => $withdraw_sample,
 			],
-			'withdraw_request_pending'    => [
-				'event'       => $trigger,
-				'event_time'  => $event_time,
-				'withdraw_id' => 21,
-				'vendor_id'   => 3,
-				'withdraw'    => $withdraw_sample,
-			],
 			'withdraw_request_approved'   => [
 				'event'       => $trigger,
 				'event_time'  => $event_time,
@@ -487,10 +431,6 @@ class Dokan extends IntegrationBase {
 		];
 	}
 
-	// -------------------------------------------------------------------------
-	// Resolve Trigger
-	// -------------------------------------------------------------------------
-
 	public static function resolve_trigger( array $node, array $args ) {
 		if ( ! self::is_dokan_available() ) {
 			return false;
@@ -504,10 +444,6 @@ class Dokan extends IntegrationBase {
 		}
 
 		switch ( $event ) {
-
-			// ------------------------------
-			// Existing triggers
-			// ------------------------------
 
 			case 'new_seller_created':
 				$vendor_id = self::parse_positive_int( $args[0] ?? 0 );
@@ -523,8 +459,8 @@ class Dokan extends IntegrationBase {
 				];
 
 			case 'store_profile_saved':
-				$store_info     = is_array( $args[0] ?? null ) ? $args[0] : [];
-				$vendor_id      = self::parse_positive_int( $args[1] ?? 0 );
+				$vendor_id      = self::parse_positive_int( $args[0] ?? 0 );
+				$store_info     = is_array( $args[1] ?? null ) ? $args[1] : [];
 				$previous_store = is_array( $args[2] ?? null ) ? $args[2] : [];
 				if ( $vendor_id <= 0 || ! self::matches_id_filter( $config, 'vendor_id', $vendor_id ) ) {
 					return false;
@@ -551,10 +487,8 @@ class Dokan extends IntegrationBase {
 					'vendor'     => self::build_vendor_payload_from_id( $vendor_id ),
 				];
 
-				// Products
 			case 'new_product_added':
 			case 'product_updated':
-			case 'product_deleted':
 				$product_id = self::parse_positive_int( $args[0] ?? 0 );
 				if ( $product_id <= 0 || ! self::matches_id_filter( $config, 'product_id', $product_id ) ) {
 					return false;
@@ -577,7 +511,24 @@ class Dokan extends IntegrationBase {
 					'product'    => $product,
 				];
 
-				// Order meta
+			case 'product_deleted':
+				$product_id = self::parse_positive_int( $args[0] ?? 0 );
+				if ( $product_id <= 0 || ! self::matches_id_filter( $config, 'product_id', $product_id ) ) {
+					return false;
+				}
+				$product   = self::build_product_payload( $product_id );
+				$vendor_id = (int) ( $product['vendor_id'] ?? 0 );
+				if ( $vendor_id > 0 && ! self::matches_id_filter( $config, 'vendor_id', $vendor_id ) ) {
+					return false;
+				}
+				return [
+					'event'      => $event,
+					'event_time' => current_time( 'mysql' ),
+					'product_id' => $product_id,
+					'vendor_id'  => $vendor_id,
+					'product'    => $product,
+				];
+
 			case 'checkout_update_order_meta':
 				$order_id  = self::parse_positive_int( $args[0] ?? 0 );
 				$vendor_id = self::parse_positive_int( $args[1] ?? 0 );
@@ -598,20 +549,16 @@ class Dokan extends IntegrationBase {
 					'order'      => self::build_order_payload( $order_id, $vendor_id ),
 				];
 
-				// Withdrawals
 			case 'withdraw_request_created':
 				$vendor_id   = self::parse_positive_int( $args[0] ?? 0 );
 				$amount      = isset( $args[1] ) ? (float) $args[1] : 0.0;
 				$method      = (string) ( $args[2] ?? '' );
 				$withdraw_id = self::parse_positive_int( $args[3] ?? 0 );
-				$withdraw    = self::resolve_withdraw_entity( $withdraw_id );
-				$withdraw_payload = $withdraw ? self::build_withdraw_payload( $withdraw ) : [];
-				if ( $vendor_id <= 0 ) {
-					$vendor_id = self::parse_positive_int( $withdraw_payload['vendor_id'] ?? 0 );
-				}
 				if ( $vendor_id <= 0 || ! self::matches_id_filter( $config, 'vendor_id', $vendor_id ) ) {
 					return false;
 				}
+				$withdraw         = $withdraw_id > 0 ? self::resolve_withdraw_entity( $withdraw_id ) : null;
+				$withdraw_payload = $withdraw ? self::build_withdraw_payload( $withdraw ) : [];
 				return [
 					'event'       => $event,
 					'event_time'  => current_time( 'mysql' ),
@@ -624,15 +571,15 @@ class Dokan extends IntegrationBase {
 				];
 
 			case 'withdraw_created':
-			case 'withdraw_request_pending':
 			case 'withdraw_request_approved':
 			case 'withdraw_request_cancelled':
-				$withdraw = self::resolve_withdraw_entity( $args[0] ?? null );
-				if ( ! $withdraw ) {
-					$withdraw = self::resolve_withdraw_entity( $args[2] ?? null );
-				}
-				if ( ! $withdraw ) {
-					$withdraw = self::resolve_withdraw_entity( $args[1] ?? null );
+				$withdraw = null;
+				foreach ( $args as $arg ) {
+					$candidate = self::resolve_withdraw_entity( $arg );
+					if ( $candidate ) {
+						$withdraw = $candidate;
+						break;
+					}
 				}
 				if ( ! $withdraw ) {
 					return false;
@@ -671,25 +618,7 @@ class Dokan extends IntegrationBase {
 					'withdraw'        => $withdraw_payload,
 				];
 
-				// ------------------------------------------------------------
-				// NEW: Vendor Add / Update / Delete
-				// ------------------------------------------------------------
-
 			case 'vendor_add':
-				$vendor_id = self::parse_positive_int( $args[0] ?? 0 );
-				$data      = is_array( $args[1] ?? null ) ? $args[1] : [];
-				if ( $vendor_id <= 0 || ! self::matches_id_filter( $config, 'vendor_id', $vendor_id ) ) {
-					return false;
-				}
-				$payload = self::build_vendor_payload_from_id( $vendor_id );
-				$extra   = self::extract_vendor_extra_fields( $data );
-				return array_merge([
-					'event'      => $event,
-					'event_time' => current_time( 'mysql' ),
-					'vendor_id'  => $vendor_id,
-					'vendor'     => $payload,
-				], $extra);
-
 			case 'vendor_update':
 				$vendor_id = self::parse_positive_int( $args[0] ?? 0 );
 				$data      = is_array( $args[1] ?? null ) ? $args[1] : [];
@@ -697,7 +626,12 @@ class Dokan extends IntegrationBase {
 					return false;
 				}
 				$payload = self::build_vendor_payload_from_id( $vendor_id );
-				$extra   = self::extract_vendor_extra_fields( $data );
+				if ( '' === $payload['display_name'] && '' === $payload['user_email'] ) {
+					$payload['display_name'] = (string) ( $data['display_name'] ?? $data['first_name'] ?? $payload['display_name'] );
+					$payload['user_email']   = (string) ( $data['user_email'] ?? $data['email'] ?? $payload['user_email'] );
+					$payload['store_name']   = '' !== ( $data['store_name'] ?? '' ) ? (string) $data['store_name'] : $payload['store_name'];
+				}
+				$extra = self::extract_vendor_extra_fields( $data );
 				return array_merge([
 					'event'      => $event,
 					'event_time' => current_time( 'mysql' ),
@@ -720,10 +654,6 @@ class Dokan extends IntegrationBase {
 					'vendor_id'  => $user_id,
 					'vendor'     => $payload,
 				];
-
-				// ------------------------------------------------------------
-				// NEW: Refund triggers
-				// ------------------------------------------------------------
 
 			case 'refund_request':
 			case 'refund_approved':
@@ -748,10 +678,6 @@ class Dokan extends IntegrationBase {
 
 		return false;
 	}
-
-	// -------------------------------------------------------------------------
-	// Actions
-	// -------------------------------------------------------------------------
 
 	public static function get_actions(): array {
 		return [
@@ -921,10 +847,6 @@ class Dokan extends IntegrationBase {
 		return self::main_response( $input );
 	}
 
-	// -------------------------------------------------------------------------
-	// Dynamic queries
-	// -------------------------------------------------------------------------
-
 	public static function get_dynamic_queries(): array {
 		return [
 			'vendors'   => [ self::class, 'vendors_query' ],
@@ -933,21 +855,9 @@ class Dokan extends IntegrationBase {
 		];
 	}
 
-	// -------------------------------------------------------------------------
-	// Availability check
-	// -------------------------------------------------------------------------
-
 	private static function is_dokan_available(): bool {
 		return function_exists( 'dokan' ) || function_exists( 'dokan_get_store_info' );
 	}
-
-	// =========================================================================
-	// Helper methods
-	// =========================================================================
-
-	// -------------------------------------------------------------------------
-	// Node resolution
-	// -------------------------------------------------------------------------
 
 	private static function resolve_node_event( array $node, string $type ): string {
 		$candidates = [
@@ -1003,10 +913,6 @@ class Dokan extends IntegrationBase {
 		);
 		return $config;
 	}
-
-	// -------------------------------------------------------------------------
-	// Action handlers
-	// -------------------------------------------------------------------------
 
 	private static function action_get_vendor_single( array $config, array $input ): array {
 		$vendor_id = self::parse_positive_int( $config['vendor_id'] ?? 0 );
@@ -1176,10 +1082,6 @@ class Dokan extends IntegrationBase {
 		);
 	}
 
-	// -------------------------------------------------------------------------
-	// Dynamic query handlers
-	// -------------------------------------------------------------------------
-
 	public static function vendors_query( $q ): array {
 		$q = is_array( $q ) ? $q : [];
 
@@ -1304,10 +1206,6 @@ class Dokan extends IntegrationBase {
 
 		return $options;
 	}
-
-	// -------------------------------------------------------------------------
-	// Payload builders
-	// -------------------------------------------------------------------------
 
 	private static function build_vendor_payload_from_id( int $vendor_id ): array {
 		if ( $vendor_id <= 0 ) {
@@ -1445,10 +1343,6 @@ class Dokan extends IntegrationBase {
 
 		return $payload;
 	}
-
-	// -------------------------------------------------------------------------
-	// Withdraw helpers
-	// -------------------------------------------------------------------------
 
 	private static function resolve_withdraw_entity( $value ) {
 		if ( is_object( $value ) && method_exists( $value, 'get_id' ) ) {
@@ -1604,10 +1498,6 @@ class Dokan extends IntegrationBase {
 		return is_array( $result ) ? $result : [];
 	}
 
-	// -------------------------------------------------------------------------
-	// Filter helpers
-	// -------------------------------------------------------------------------
-
 	private static function matches_id_filter( array $config, string $config_key, int $actual_id ): bool {
 		if ( ! array_key_exists( $config_key, $config ) ) {
 			return true;
@@ -1659,10 +1549,6 @@ class Dokan extends IntegrationBase {
 		return false;
 	}
 
-	// -------------------------------------------------------------------------
-	// Integer parsing
-	// -------------------------------------------------------------------------
-
 	private static function parse_positive_int( $value ): int {
 		if ( is_int( $value ) || is_float( $value ) ) {
 			$parsed = (int) $value;
@@ -1710,10 +1596,6 @@ class Dokan extends IntegrationBase {
 		return $parsed > 0 ? $parsed : 0;
 	}
 
-	// -------------------------------------------------------------------------
-	// Response helpers
-	// -------------------------------------------------------------------------
-
 	private static function main_response( array $data ): array {
 		return [
 			'port' => 'main',
@@ -1727,10 +1609,6 @@ class Dokan extends IntegrationBase {
 			'data' => array_merge( $input, [ 'error' => $message ] ),
 		];
 	}
-
-	// -------------------------------------------------------------------------
-	// NEW: Additional helpers for missing triggers
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Check if a user has the 'seller' role.
@@ -1887,10 +1765,17 @@ class Dokan extends IntegrationBase {
 		$order = null;
 		if ( function_exists( 'dokan' ) && $order_id ) {
 			$order = dokan()->order->get( $order_id );
+			if ( ! is_object( $order ) ) {
+				$order = null;
+			}
 		}
+
 		$vendor = null;
 		if ( function_exists( 'dokan' ) && $vendor_id ) {
-			$vendor = dokan()->vendor->get( $vendor_id )->to_array();
+			$vendor_obj = dokan()->vendor->get( $vendor_id );
+			if ( is_object( $vendor_obj ) && method_exists( $vendor_obj, 'to_array' ) ) {
+				$vendor = $vendor_obj->to_array();
+			}
 		}
 
 		$payload = [
