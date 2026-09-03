@@ -648,12 +648,26 @@ class Slack extends IntegrationBase {
 		];
 	}
 
+	/**
+	 * Slack grants exactly the scopes requested here — nothing more. Each
+	 * trigger/action below needs its own scope or Slack silently drops it
+	 * (an event is never delivered, or an API call fails with
+	 * "missing_scope"), so this list has to cover every trigger and action
+	 * this integration declares, not just the common ones.
+	 */
 	public static function get_oauth_scopes(): array {
 		return [
-			'chat:write',
-			'channels:read',
-			'users:read',
-			'im:write',
+			'chat:write',      // send_message, send_dm
+			'im:write',        // send_dm (conversations.open)
+			'channels:read',   // channel_created event, channel lookups
+			'channels:history', // message_received event
+			'app_mentions:read', // app_mention event
+			'reactions:read',  // reaction_added event
+			'reactions:write', // add_reaction action
+			'files:read',      // file_shared event
+			'users:read',      // get_user_info
+			'channels:manage', // create_channel, invite_to_channel, set_topic (public)
+			'groups:write',    // create_channel, invite_to_channel, set_topic (private)
 		];
 	}
 
