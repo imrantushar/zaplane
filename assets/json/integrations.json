@@ -1,6 +1,6 @@
 {
     "version": "1.1.0",
-    "generated_at": "2026-09-02 05:39:18",
+    "generated_at": "2026-09-06 06:11:12",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -5338,7 +5338,7 @@
                 },
                 "product_deleted": {
                     "label": "Product Deleted",
-                    "hook": "dokan_product_deleted",
+                    "hook": "dokan_product_delete",
                     "key": "product_deleted",
                     "schema": [],
                     "outputs": [
@@ -13996,7 +13996,7 @@
         },
         "surecart": {
             "slug": "surecart",
-            "name": "Surecart",
+            "name": "SureCart",
             "icon": "surecart.svg",
             "category": "app",
             "requires_connection": false,
@@ -14014,19 +14014,19 @@
                         "main"
                     ]
                 },
-                "purchase_invoked": {
-                    "label": "Purchase Invoked",
-                    "hook": "surecart/purchase_invoked",
-                    "key": "purchase_invoked",
+                "purchase_revoked": {
+                    "label": "Purchase Revoked",
+                    "hook": "surecart/purchase_revoked",
+                    "key": "purchase_revoked",
                     "schema": [],
                     "outputs": [
                         "main"
                     ]
                 },
-                "purchase_revoked": {
-                    "label": "Purchase Revoked",
-                    "hook": "surecart/purchase_revoked",
-                    "key": "purchase_revoked",
+                "purchase_invoked": {
+                    "label": "Purchase Invoked",
+                    "hook": "surecart/purchase_invoked",
+                    "key": "purchase_invoked",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -14111,9 +14111,108 @@
                     "key": "create_order",
                     "schema": [
                         {
-                            "key": "data",
-                            "label": "Order Data (JSON)",
-                            "type": "textarea"
+                            "key": "price_id",
+                            "label": "Price ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "prices",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "quantity",
+                            "label": "Quantity",
+                            "type": "number",
+                            "required": true,
+                            "default": 1,
+                            "placeholder": "quantity",
+                            "min": 1
+                        },
+                        {
+                            "key": "order_status",
+                            "label": "Order Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "label": "Pending",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Processing",
+                                    "value": "processing"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "billing_address",
+                            "label": "Map Billing Address",
+                            "type": "repeater",
+                            "required": false,
+                            "fields": [
+                                {
+                                    "key": "field",
+                                    "label": "Field",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "First Name",
+                                            "value": "first_name"
+                                        },
+                                        {
+                                            "label": "Last Name",
+                                            "value": "last_name"
+                                        },
+                                        {
+                                            "label": "Email",
+                                            "value": "email"
+                                        },
+                                        {
+                                            "label": "Company",
+                                            "value": "company"
+                                        },
+                                        {
+                                            "label": "Address",
+                                            "value": "address"
+                                        },
+                                        {
+                                            "label": "Address Line 2",
+                                            "value": "address_2"
+                                        },
+                                        {
+                                            "label": "City",
+                                            "value": "city"
+                                        },
+                                        {
+                                            "label": "State",
+                                            "value": "state"
+                                        },
+                                        {
+                                            "label": "Postal Code",
+                                            "value": "postal_code"
+                                        },
+                                        {
+                                            "label": "Country",
+                                            "value": "country"
+                                        },
+                                        {
+                                            "label": "Phone",
+                                            "value": "phone"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "text",
+                                    "placeholder": "Enter value or map a field"
+                                }
+                            ]
                         },
                         {
                             "key": "mode",
@@ -14134,6 +14233,11 @@
                         {
                             "key": "expand",
                             "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "data",
+                            "label": "Advanced Order Data (JSON)",
                             "type": "textarea"
                         }
                     ],
@@ -14160,9 +14264,69 @@
                             "required": true
                         },
                         {
-                            "key": "data",
-                            "label": "Order Data (JSON)",
-                            "type": "textarea"
+                            "key": "billing_address",
+                            "label": "Map Billing Address",
+                            "type": "repeater",
+                            "required": false,
+                            "fields": [
+                                {
+                                    "key": "field",
+                                    "label": "Field",
+                                    "type": "select",
+                                    "options": [
+                                        {
+                                            "label": "First Name",
+                                            "value": "first_name"
+                                        },
+                                        {
+                                            "label": "Last Name",
+                                            "value": "last_name"
+                                        },
+                                        {
+                                            "label": "Email",
+                                            "value": "email"
+                                        },
+                                        {
+                                            "label": "Company",
+                                            "value": "company"
+                                        },
+                                        {
+                                            "label": "Address",
+                                            "value": "address"
+                                        },
+                                        {
+                                            "label": "Address Line 2",
+                                            "value": "address_2"
+                                        },
+                                        {
+                                            "label": "City",
+                                            "value": "city"
+                                        },
+                                        {
+                                            "label": "State",
+                                            "value": "state"
+                                        },
+                                        {
+                                            "label": "Postal Code",
+                                            "value": "postal_code"
+                                        },
+                                        {
+                                            "label": "Country",
+                                            "value": "country"
+                                        },
+                                        {
+                                            "label": "Phone",
+                                            "value": "phone"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "text",
+                                    "placeholder": "Enter value or map a field"
+                                }
+                            ]
                         },
                         {
                             "key": "mode",
@@ -14183,6 +14347,11 @@
                         {
                             "key": "expand",
                             "label": "Expand (CSV/JSON)",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "data",
+                            "label": "Advanced Order Data (JSON)",
                             "type": "textarea"
                         }
                     ],
@@ -14205,32 +14374,6 @@
                             "label": "Page",
                             "type": "number",
                             "required": true
-                        },
-                        {
-                            "key": "query",
-                            "label": "Query (JSON)",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "mode",
-                            "label": "Mode",
-                            "type": "select",
-                            "required": true,
-                            "options": [
-                                {
-                                    "label": "Live",
-                                    "value": "live"
-                                },
-                                {
-                                    "label": "Test",
-                                    "value": "test"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "expand",
-                            "label": "Expand (CSV/JSON)",
-                            "type": "textarea"
                         }
                     ],
                     "outputs": [
@@ -14286,9 +14429,29 @@
                     "key": "create_customer",
                     "schema": [
                         {
-                            "key": "data",
-                            "label": "Customer Data (JSON)",
-                            "type": "textarea"
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "customer@example.com"
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "number",
+                            "required": false
                         },
                         {
                             "key": "mode",
@@ -14335,9 +14498,28 @@
                             "required": true
                         },
                         {
-                            "key": "data",
-                            "label": "Customer Data (JSON)",
-                            "type": "textarea"
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "number",
+                            "required": false
                         },
                         {
                             "key": "mode",
@@ -14380,11 +14562,6 @@
                             "label": "Page",
                             "type": "number",
                             "required": true
-                        },
-                        {
-                            "key": "query",
-                            "label": "Query (JSON)",
-                            "type": "textarea"
                         },
                         {
                             "key": "mode",
@@ -14464,16 +14641,18 @@
                             "key": "name",
                             "label": "Product Name",
                             "type": "text",
-                            "required": true
+                            "required": true,
+                            "placeholder": "Enter product name"
                         },
                         {
                             "key": "description",
                             "label": "Description",
-                            "type": "textarea"
+                            "type": "textarea",
+                            "required": false
                         },
                         {
                             "key": "product_status",
-                            "label": "Status",
+                            "label": "Product Status",
                             "type": "select",
                             "required": true,
                             "options": [
@@ -14493,21 +14672,30 @@
                         },
                         {
                             "key": "price_amount",
-                            "label": "Price Amount (minor unit)",
+                            "label": "Price Amount",
                             "type": "number",
-                            "required": true
+                            "required": true,
+                            "placeholder": "0.00",
+                            "min": 0
                         },
                         {
                             "key": "currency",
-                            "label": "Currency (ISO)",
+                            "label": "Currency",
                             "type": "text",
-                            "required": true
+                            "required": true,
+                            "default": "USD",
+                            "placeholder": "USD"
                         },
                         {
                             "key": "recurring_interval",
                             "label": "Recurring Interval",
                             "type": "select",
+                            "required": false,
                             "options": [
+                                {
+                                    "label": "One Time",
+                                    "value": ""
+                                },
                                 {
                                     "label": "Day",
                                     "value": "day"
@@ -14530,7 +14718,9 @@
                             "key": "recurring_interval_count",
                             "label": "Recurring Interval Count",
                             "type": "number",
-                            "required": true
+                            "required": false,
+                            "default": 1,
+                            "min": 1
                         },
                         {
                             "key": "mode",
@@ -14612,9 +14802,38 @@
                             "required": true
                         },
                         {
+                            "key": "name",
+                            "label": "Product Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "update_status",
+                            "label": "Product Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "label": "Published",
+                                    "value": "published"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                }
+                            ]
+                        },
+                        {
                             "key": "data",
-                            "label": "Product Data (JSON)",
-                            "type": "textarea"
+                            "label": "Additional Product Data (JSON)",
+                            "type": "textarea",
+                            "required": false
                         },
                         {
                             "key": "mode",
@@ -14698,11 +14917,6 @@
                             "required": true
                         },
                         {
-                            "key": "query",
-                            "label": "Query (JSON)",
-                            "type": "textarea"
-                        },
-                        {
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
@@ -14777,9 +14991,69 @@
                     "key": "create_coupon",
                     "schema": [
                         {
-                            "key": "data",
-                            "label": "Coupon Data (JSON)",
-                            "type": "textarea"
+                            "key": "code",
+                            "label": "Coupon Code",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "SUMMER20"
+                        },
+                        {
+                            "key": "discount_type",
+                            "label": "Discount Type",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "label": "Percentage",
+                                    "value": "percentage"
+                                },
+                                {
+                                    "label": "Fixed Amount",
+                                    "value": "fixed"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "discount_amount",
+                            "label": "Discount Amount",
+                            "type": "number",
+                            "required": true,
+                            "placeholder": "10",
+                            "min": 0
+                        },
+                        {
+                            "key": "currency",
+                            "label": "Currency",
+                            "type": "text",
+                            "required": false,
+                            "default": "USD"
+                        },
+                        {
+                            "key": "duration",
+                            "label": "Duration",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "label": "Once",
+                                    "value": "once"
+                                },
+                                {
+                                    "label": "Forever",
+                                    "value": "forever"
+                                },
+                                {
+                                    "label": "Repeating",
+                                    "value": "repeating"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "duration_in_months",
+                            "label": "Duration in Months",
+                            "type": "number",
+                            "required": false,
+                            "min": 1
                         },
                         {
                             "key": "mode",
@@ -14826,9 +15100,39 @@
                             "required": true
                         },
                         {
+                            "key": "code",
+                            "label": "Coupon Code",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "discount_type",
+                            "label": "Discount Type",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "label": "Percentage",
+                                    "value": "percentage"
+                                },
+                                {
+                                    "label": "Fixed Amount",
+                                    "value": "fixed"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "discount_amount",
+                            "label": "Discount Amount",
+                            "type": "number",
+                            "required": false,
+                            "min": 0
+                        },
+                        {
                             "key": "data",
-                            "label": "Coupon Data (JSON)",
-                            "type": "textarea"
+                            "label": "Additional Coupon Data (JSON)",
+                            "type": "textarea",
+                            "required": false
                         },
                         {
                             "key": "mode",
@@ -14912,11 +15216,6 @@
                             "required": true
                         },
                         {
-                            "key": "query",
-                            "label": "Query (JSON)",
-                            "type": "textarea"
-                        },
-                        {
                             "key": "mode",
                             "label": "Mode",
                             "type": "select",
@@ -14991,9 +15290,65 @@
                     "key": "create_subscription",
                     "schema": [
                         {
-                            "key": "data",
-                            "label": "Subscription Data (JSON)",
-                            "type": "textarea"
+                            "key": "customer_id",
+                            "label": "Customer ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "customers",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "price_id",
+                            "label": "Price ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "surecart",
+                                "query": "prices",
+                                "select": [
+                                    "id",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "quantity",
+                            "label": "Quantity",
+                            "type": "number",
+                            "required": true,
+                            "default": 1,
+                            "placeholder": "quantity",
+                            "min": 1
+                        },
+                        {
+                            "key": "subscription_status",
+                            "label": "Subscription Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "label": "Active",
+                                    "value": "active"
+                                },
+                                {
+                                    "label": "Trialing",
+                                    "value": "trialing"
+                                },
+                                {
+                                    "label": "Paused",
+                                    "value": "paused"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "cancelled"
+                                }
+                            ]
                         },
                         {
                             "key": "mode",
@@ -15040,9 +15395,37 @@
                             "required": true
                         },
                         {
-                            "key": "data",
-                            "label": "Subscription Data (JSON)",
-                            "type": "textarea"
+                            "key": "subscription_status",
+                            "label": "Subscription Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "label": "Active",
+                                    "value": "active"
+                                },
+                                {
+                                    "label": "Trialing",
+                                    "value": "trialing"
+                                },
+                                {
+                                    "label": "Paused",
+                                    "value": "paused"
+                                },
+                                {
+                                    "label": "Cancelled",
+                                    "value": "cancelled"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "quantity",
+                            "label": "Quantity",
+                            "type": "number",
+                            "required": true,
+                            "default": 1,
+                            "placeholder": "quantity",
+                            "min": 1
                         },
                         {
                             "key": "mode",
@@ -15085,11 +15468,6 @@
                             "label": "Page",
                             "type": "number",
                             "required": true
-                        },
-                        {
-                            "key": "query",
-                            "label": "Query (JSON)",
-                            "type": "textarea"
                         },
                         {
                             "key": "mode",

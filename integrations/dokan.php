@@ -1175,35 +1175,35 @@ class Dokan extends IntegrationBase {
 
 	public static function withdraws_query( $q ): array {
 		$q = is_array( $q ) ? $q : [];
-
 		$options = [
 			[
 				'name' => 'any',
-				'label' => 'Any Withdraw'
+			    'label' => 'Any Withdraw'
 			]
 		];
 
-		$args      = [
-			'limit' => max( 1, (int) ( $q['limit'] ?? 50 ) ),
-			'offset' => 0
-		];
+		$limit = max( 1, min( 500, (int) ( $q['limit'] ?? 100 ) ) );
 		$vendor_id = self::parse_positive_int( $q['vendor_id'] ?? 0 );
+		$args = [
+			'limit' => $limit, 'offset' => 0
+		];
 		if ( $vendor_id > 0 ) {
 			$args['user_id'] = $vendor_id;
 		}
-
+		$seen = [];
 		foreach ( self::resolve_withdraw_collection( $args ) as $withdraw ) {
-			$payload     = self::build_withdraw_payload( $withdraw );
-			$withdraw_id = (int) ( $payload['withdraw_id'] ?? 0 );
-			if ( $withdraw_id <= 0 ) {
+			$payload = self::build_withdraw_payload( $withdraw );
+			$id = self::parse_positive_int( $payload['withdraw_id'] ?? 0 );
+			if ( $id <= 0 || isset( $seen[ $id ] ) ) {
 				continue;
 			}
+			$seen[ $id ] = true;
+			$status = (string) ( $payload['status'] ?? 'pending' );
 			$options[] = [
-				'name'  => (string) $withdraw_id,
-				'label' => '#' . $withdraw_id . ' - ' . ucfirst( (string) ( $payload['status'] ?? 'pending' ) ),
+				'name' => (string) $id,
+				'label' => '#' . $id . ' - ' . ucfirst( $status )
 			];
 		}
-
 		return $options;
 	}
 
@@ -1345,31 +1345,31 @@ class Dokan extends IntegrationBase {
 	}
 
 	private static function resolve_withdraw_entity( $value ) {
-		if ( is_object( $value ) && method_exists( $value, 'get_id' ) ) {
-			return $value;
+		global $wpdb;
+
+		if ( is_object( $value ) || is_array( $value ) ) {
+			$id = self::parse_positive_int( $value );
+			if ( $id > 0 ) {
+				$value = $id;
+			} else {
+				return null;
+			}
 		}
 
 		$withdraw_id = self::parse_positive_int( $value );
-		if ( $withdraw_id <= 0 || ! function_exists( 'dokan' ) ) {
+		if ( $withdraw_id <= 0 ) {
 			return null;
 		}
 
-		$app = dokan();
-		if ( ! is_object( $app ) || ! isset( $app->withdraw ) || ! is_object( $app->withdraw ) ) {
+		$table = $wpdb->prefix . 'dokan_withdraw';
+		$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
+		if ( $exists !== $table ) {
 			return null;
 		}
 
-		if ( method_exists( $app->withdraw, 'get' ) ) {
-			return $app->withdraw->get( $withdraw_id );
-		}
-		if ( method_exists( $app->withdraw, 'find' ) ) {
-			return $app->withdraw->find( $withdraw_id );
-		}
-		if ( method_exists( $app->withdraw, 'get_withdraw' ) ) {
-			return $app->withdraw->get_withdraw( $withdraw_id );
-		}
-
-		return null;
+		return $wpdb->get_row(
+			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d LIMIT 1", $withdraw_id )
+		);
 	}
 
 	private static function build_withdraw_payload( $withdraw, array $extra = [] ): array {
@@ -1377,32 +1377,26 @@ class Dokan extends IntegrationBase {
 			return [];
 		}
 
-		$raw_id      = is_object( $withdraw ) && method_exists( $withdraw, 'get_id' )
-			? $withdraw->get_id()
-			: ( $withdraw['id'] ?? 0 );
-		$withdraw_id = self::parse_positive_int( $raw_id );
+		$get = static function ( $source, $key, $default = '' ) {
+			if ( is_object( $source ) && isset( $source->{$key} ) ) {
+				return $source->{$key};
+			}
+			if ( is_array( $source ) && array_key_exists( $key, $source ) ) {
+				return $source[ $key ];
+			}
+			return $default;
+		};
+
+		$withdraw_id = self::parse_positive_int( $get( $withdraw, 'id', 0 ) );
 		if ( $withdraw_id <= 0 ) {
 			return [];
 		}
 
-		$raw_vendor_id = is_object( $withdraw ) && method_exists( $withdraw, 'get_user_id' )
-			? $withdraw->get_user_id()
-			: ( $withdraw['user_id'] ?? 0 );
-		$vendor_id = self::parse_positive_int( $raw_vendor_id );
-
-		$raw_status = is_object( $withdraw ) && method_exists( $withdraw, 'get_status' )
-			? $withdraw->get_status()
-			: ( $withdraw['status'] ?? '' );
-		$status      = self::normalize_withdraw_status( $raw_status );
-		$status_code = is_numeric( $raw_status )
-			? (int) $raw_status
-			: self::resolve_withdraw_status_code( $status );
-
-		$amount  = is_object( $withdraw ) && method_exists( $withdraw, 'get_amount' ) ? (float) $withdraw->get_amount() : (float) ( $withdraw['amount'] ?? 0 );
-		$method  = is_object( $withdraw ) && method_exists( $withdraw, 'get_method' ) ? (string) $withdraw->get_method() : (string) ( $withdraw['method'] ?? '' );
-		$date    = is_object( $withdraw ) && method_exists( $withdraw, 'get_date' ) ? (string) $withdraw->get_date() : (string) ( $withdraw['date'] ?? '' );
-		$note    = is_object( $withdraw ) && method_exists( $withdraw, 'get_note' ) ? (string) $withdraw->get_note() : (string) ( $withdraw['note'] ?? '' );
-		$details = is_object( $withdraw ) && method_exists( $withdraw, 'get_details' ) ? $withdraw->get_details() : ( $withdraw['details'] ?? [] );
+		$vendor_id = self::parse_positive_int( $get( $withdraw, 'user_id', 0 ) );
+		$raw_status = $get( $withdraw, 'status', 0 );
+		$status = self::normalize_withdraw_status( $raw_status );
+		$status_code = is_numeric( $raw_status ) ? (int) $raw_status : self::resolve_withdraw_status_code( $status );
+		$details = $get( $withdraw, 'details', [] );
 
 		return array_merge(
 			[
@@ -1411,10 +1405,10 @@ class Dokan extends IntegrationBase {
 				'vendor'      => $vendor_id > 0 ? self::build_vendor_payload_from_id( $vendor_id ) : [],
 				'status'      => $status,
 				'status_code' => $status_code,
-				'amount'      => $amount,
-				'method'      => $method,
-				'date'        => $date,
-				'note'        => $note,
+				'amount'      => (float) $get( $withdraw, 'amount', 0 ),
+				'method'      => (string) $get( $withdraw, 'method', '' ),
+				'date'        => (string) $get( $withdraw, 'date', '' ),
+				'note'        => (string) $get( $withdraw, 'note', '' ),
 				'details'     => is_array( $details ) ? $details : [ 'value' => $details ],
 			],
 			$extra
@@ -1467,35 +1461,46 @@ class Dokan extends IntegrationBase {
 	}
 
 	private static function resolve_withdraw_collection( array $args ): array {
-		if ( ! function_exists( 'dokan' ) ) {
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'dokan_withdraw';
+		$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
+		if ( $exists !== $table ) {
 			return [];
 		}
 
-		$app = dokan();
-		if ( ! is_object( $app ) || ! isset( $app->withdraw ) || ! is_object( $app->withdraw ) ) {
-			return [];
+		$limit = max( 1, min( 500, (int) ( $args['limit'] ?? 50 ) ) );
+		$offset = max( 0, (int) ( $args['offset'] ?? 0 ) );
+		$where = [];
+		$params = [];
+
+		if ( isset( $args['user_id'] ) ) {
+			$user_id = self::parse_positive_int( $args['user_id'] );
+			if ( $user_id > 0 ) {
+				$where[] = 'user_id = %d';
+				$params[] = $user_id;
+			}
 		}
 
-		$result = null;
-		if ( method_exists( $app->withdraw, 'all' ) ) {
-			$result = $app->withdraw->all( $args );
-		} elseif ( method_exists( $app->withdraw, 'get_withdraw_requests' ) ) {
-			$result = $app->withdraw->get_withdraw_requests(
-				$args['user_id'] ?? '',
-				$args['status'] ?? 0,
-				$args['limit'] ?? 20,
-				$args['offset'] ?? 0
-			);
+		if ( isset( $args['status'] ) && '' !== $args['status'] && 'any' !== $args['status'] ) {
+			$status = is_numeric( $args['status'] ) ? (int) $args['status'] : self::resolve_withdraw_status_code( sanitize_key( (string) $args['status'] ) );
+			if ( in_array( $status, [ 0, 1, 2 ], true ) ) {
+				$where[] = 'status = %d';
+				$params[] = $status;
+			}
 		}
 
-		if ( is_object( $result ) && isset( $result->withdraws ) && is_array( $result->withdraws ) ) {
-			return $result->withdraws;
+		$sql = "SELECT * FROM {$table}";
+		if ( ! empty( $where ) ) {
+			$sql .= ' WHERE ' . implode( ' AND ', $where );
 		}
-		if ( is_object( $result ) && isset( $result->items ) && is_array( $result->items ) ) {
-			return $result->items;
-		}
+		$sql .= ' ORDER BY id DESC LIMIT %d OFFSET %d';
+		$params[] = $limit;
+		$params[] = $offset;
 
-		return is_array( $result ) ? $result : [];
+		$query = $wpdb->prepare( $sql, $params );
+		$rows = $wpdb->get_results( $query );
+		return is_array( $rows ) ? $rows : [];
 	}
 
 	private static function matches_id_filter( array $config, string $config_key, int $actual_id ): bool {
