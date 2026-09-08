@@ -501,10 +501,7 @@ class Paymattic extends IntegrationBase {
 	}
 
 	public static function get_output_ports(): array {
-		return [
-			'main' => 'Main output',
-			'error' => 'Error output',
-		];
+		return [ 'main', 'error' ];
 	}
 
 	private static function resolve_form_submitted( array $args, array $config ) {

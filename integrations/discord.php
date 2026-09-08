@@ -503,7 +503,8 @@ class Discord extends IntegrationBase {
 				return self::error( __( 'Channel not found.', 'zaplane' ), $input );
 
 			case 'create_a_channel_invite':
-				$channel_id = $config['channel_id'] ?? '86400';
+				// FIX: was defaulting to '86400' (copy-paste from max_age) instead of ''.
+				$channel_id = $config['channel_id'] ?? '';
 				return self::success( array_merge( $input, [
 					'channel' => self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/invites", [
 						'max_age'   => (int) ( $config['max_age'] ?? 86400 ),
@@ -551,7 +552,8 @@ class Discord extends IntegrationBase {
 				] ) );
 
 			case 'get_many_message':
-				$channel_id = $config['channel_id'] ?? '10';
+				// FIX: was defaulting to '10' (copy-paste from limit) instead of ''.
+				$channel_id = $config['channel_id'] ?? '';
 				$limit      = max( 1, min( 100, (int) ( $config['limit'] ?? 10 ) ) );
 				return self::success( array_merge( $input, [
 					'messages' => self::api_request( $bot_token, 'GET', "/channels/{$channel_id}/messages?limit={$limit}" ),
@@ -1011,6 +1013,7 @@ class Discord extends IntegrationBase {
 	private static function extract_credentials( array $params ): array {
 		$connection_id = $params['where']['connection_id']
 			?? $params['connection_id']
+			?? $params['data']['connection_id']
 			?? 0;
 
 		return self::get_decrypted_credentials( (int) $connection_id );

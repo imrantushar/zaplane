@@ -13,6 +13,10 @@ class Spectra extends IntegrationBase {
 	public static function get_slug(): string {
 		return 'spectra';
 	}
+
+	public static function get_name(): string {
+		return 'Spectra Legacy';
+	}
 	public static function get_icon(): string {
 		return 'spectra.svg';
 	}

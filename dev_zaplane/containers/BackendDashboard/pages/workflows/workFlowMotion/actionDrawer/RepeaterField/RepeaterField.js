@@ -1,7 +1,7 @@
 import { FieldArray } from "formik";
 import { FiTrash2 } from "react-icons/fi";
 import { __ } from "@wordpress/i18n";
-import ActionFieldRenderer from "../ActionFieldRenderer/ActionFieldRenderer";
+import ActionFieldRenderer from "../../ActionDrawer/ActionFieldRenderer/ActionFieldRenderer";
 import { buildEmptyRow } from "./helper";
 import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
 

@@ -76,17 +76,21 @@ trait ProductActionsTrait {
 			$meta_args['fulfillment_type'],
 			$meta_args['stock_status'],
 			$meta_args['payment_type'],
-			$meta_args['total_stock']
+			$meta_args['total_stock'],
+			$meta_args['price'],
+			$meta_args['compare_price']
 		);
+
+		self::apply_product_taxonomies_and_media( $product_id, $config );
 
 		return self::main_response(
 			array_merge(
 				$input,
 				[
-					'product_id'  => $product_id,
-					'product'     => self::load_product_payload( $product_id ),
-					'created'     => true,
-					'event_time'  => current_time( 'mysql' ),
+					'product_id' => $product_id,
+					'product'    => self::load_product_payload( $product_id ),
+					'created'    => true,
+					'event_time' => current_time( 'mysql' ),
 				]
 			)
 		);
@@ -128,6 +132,9 @@ trait ProductActionsTrait {
 			return self::error_response( 'Product update failed', $input );
 		}
 
+		self::apply_product_variation_updates( $product_id, $config );
+		self::apply_product_taxonomies_and_media( $product_id, $config );
+
 		return self::main_response(
 			array_merge(
 				$input,
@@ -139,5 +146,67 @@ trait ProductActionsTrait {
 				]
 			)
 		);
+	}
+
+	private static function apply_product_variation_updates( int $product_id, array $config ): void {
+		$variation_class = '\\FluentCart\\App\\Models\\ProductVariation';
+		if ( $product_id <= 0 || ! class_exists( $variation_class ) || ! method_exists( $variation_class, 'query' ) ) {
+			return;
+		}
+
+		$data = [];
+
+		if ( isset( $config['price'] ) && '' !== $config['price'] ) {
+			$data['item_price'] = (float) $config['price'];
+		}
+		if ( isset( $config['compare_price'] ) && '' !== $config['compare_price'] ) {
+			$data['compare_price'] = (float) $config['compare_price'];
+		}
+		if ( isset( $config['total_stock'] ) && '' !== $config['total_stock'] ) {
+			$total_stock          = max( 0, (int) $config['total_stock'] );
+			$data['total_stock']  = $total_stock;
+			$data['available']    = $total_stock > 0 ? 1 : 0;
+		}
+		$stock_status = self::sanitize_select_config_value( $config, 'stock_status', '' );
+		if ( '' !== $stock_status ) {
+			$data['stock_status'] = $stock_status;
+		}
+		$payment_type = self::sanitize_select_config_value( $config, 'payment_type', '' );
+		if ( '' !== $payment_type ) {
+			$data['payment_type'] = $payment_type;
+		}
+		$fulfillment_type = self::sanitize_select_config_value( $config, 'fulfillment_type', '' );
+		if ( '' !== $fulfillment_type ) {
+			$data['fulfillment_type'] = $fulfillment_type;
+		}
+
+		if ( empty( $data ) ) {
+			return;
+		}
+
+		try {
+			$variation_class::query()->where( 'post_id', $product_id )->update( $data );
+		} catch ( \Throwable $e ) {
+			unset( $e );
+		}
+	}
+
+	private static function action_delete_product( array $config, array $input ): array {
+		$product_id = self::resolve_entity_id_for_action( $config, $input, 'product_id', [ 'product' ] );
+		if ( $product_id <= 0 ) {
+			return self::error_response( 'Product ID is required', $input );
+		}
+
+		if ( ! wp_delete_post( $product_id, true ) ) {
+			return self::error_response( 'Product deletion failed', $input );
+		}
+
+		return self::main_response(
+			array_merge( $input, [ 'product_id' => $product_id, 'deleted' => true, 'event_time' => current_time( 'mysql' ) ] )
+		);
+	}
+
+	private static function action_get_product_variants( array $config, array $input ): array {
+		return self::relation_list_response( $config, $input, 'product_id', [ 'product' ], self::product_model_class(), 'variations', 'items' );
 	}
 }

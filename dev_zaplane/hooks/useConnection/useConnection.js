@@ -9,6 +9,7 @@ import {
     resetAuthFields,
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 import { integrations } from "@ZAPUtils/helper";
+import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 
 const INITIAL_STATE = {
     drawerStep: "select",
@@ -145,7 +146,7 @@ const useConnection = () => {
 
                 event.data.data?.success
                     ? resolve(event.data.data)
-                    : reject(new Error("OAuth authentication failed."));
+                    : reject(new Error(event.data.data?.message || "OAuth authentication failed."));
             };
 
             window.addEventListener("message", handler);
@@ -155,7 +156,8 @@ const useConnection = () => {
 
     const saveConnection = useCallback(async () => {
         if (!selectedApp || !selectedAuthType) return;
-        
+        if (loadingOAuth) return;
+
 
         if (selectedAuthType === "oauth2") {
             try {
@@ -175,6 +177,13 @@ const useConnection = () => {
                 closeDrawer();
             } catch (e) {
                 console.error("OAuth error:", e);
+                dispatch(
+                    showNotification({
+                        message: e.message || "OAuth authentication failed.",
+                        isShow: true,
+                        type: "error",
+                    })
+                );
             } finally {
                 setLoadingOAuth(false);
             }
@@ -191,7 +200,7 @@ const useConnection = () => {
             dispatch(fetchConnections());
             closeDrawer();
         }
-    }, [selectedApp, selectedAuthType, credentials, dispatch, openOAuthPopup, closeDrawer]);
+    }, [selectedApp, selectedAuthType, credentials, dispatch, openOAuthPopup, closeDrawer, loadingOAuth]);
 
 
     const authTypes = authFields?.available_auth_types || {};

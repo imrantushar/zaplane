@@ -15,7 +15,7 @@ class Weforms extends IntegrationBase {
 	}
 
 	public static function get_name(): string {
-		return 'We Forms';
+		return 'weForms';
 	}
 
 	public static function get_icon(): string {
