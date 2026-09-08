@@ -3,12 +3,11 @@
 All notable changes to Zaplane are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.2.0] - 2026-09-08
 
-Everything on `revamp-ui`, ahead of `next-release`. The dashboard is rebuilt, the
-workflow canvas is retyped, modules become opt-in and discoverable, and Zaplane
-gains an MCP server. Integration coverage grows from **998 to 1,070** triggers and
-actions across **93** apps and tools.
+The dashboard is rebuilt, the workflow canvas is retyped, modules become opt-in
+and discoverable, and Zaplane gains an MCP server. Integration coverage grows from
+**998 to 1,070** triggers and actions across **93** apps and tools.
 
 ### Added — Integrations
 - **aBlocks** — a new app with a **Form Submitted** trigger for aBlocks
