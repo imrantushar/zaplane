@@ -2,7 +2,7 @@
 namespace Zaplane\Integrations\Surecart;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 trait SubscriptionActionsTrait {
@@ -76,24 +76,24 @@ trait SubscriptionActionsTrait {
 		] );
 	}
 
-    protected static function action_update_subscription( array $config, array $input ): array {
-        $data = [];
+	protected static function action_update_subscription( array $config, array $input ): array {
+		$data = [];
 
-        if ( ! empty( $config['subscription_status'] ) ) {
-            $data['status'] = $config['subscription_status'];
-        }
-        if ( isset( $config['quantity'] ) && '' !== $config['quantity'] ) {
-            $data['quantity'] = max( 1, (int) $config['quantity'] );
-        }
+		if ( ! empty( $config['subscription_status'] ) ) {
+			$data['status'] = $config['subscription_status'];
+		}
+		if ( isset( $config['quantity'] ) && '' !== $config['quantity'] ) {
+			$data['quantity'] = max( 1, (int) $config['quantity'] );
+		}
 
-        return self::update_model( \SureCart\Models\Subscription::class, $config, 'subscription_id', $data, 'subscription' );
-    }
+		return self::update_model( \SureCart\Models\Subscription::class, $config, 'subscription_id', $data, 'subscription' );
+	}
 
-    protected static function action_get_subscriptions_all( array $config, array $input ): array {
-        return self::list_models( \SureCart\Models\Subscription::class, $config, 'subscriptions' );
-    }
+	protected static function action_get_subscriptions_all( array $config, array $input ): array {
+		return self::list_models( \SureCart\Models\Subscription::class, $config, 'subscriptions' );
+	}
 
-    protected static function action_get_subscription_single( array $config, array $input ): array {
-        return self::get_model_single( \SureCart\Models\Subscription::class, $config, 'subscription_id', 'subscription' );
-    }
+	protected static function action_get_subscription_single( array $config, array $input ): array {
+		return self::get_model_single( \SureCart\Models\Subscription::class, $config, 'subscription_id', 'subscription' );
+	}
 }

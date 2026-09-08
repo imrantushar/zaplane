@@ -331,7 +331,7 @@ trait NodeHelperTrait {
 		];
 	}
 
-		private static function relation_list_response( array $config, array $input, string $id_key, array $entity_keys, string $model_class, string $relation, string $result_key ): array {
+	private static function relation_list_response( array $config, array $input, string $id_key, array $entity_keys, string $model_class, string $relation, string $result_key ): array {
 		$entity_id = self::resolve_entity_id_for_action( $config, $input, $id_key, $entity_keys );
 		if ( $entity_id <= 0 ) {
 			return self::error_response( ucfirst( str_replace( '_', ' ', $id_key ) ) . ' is required', $input );
@@ -348,7 +348,7 @@ trait NodeHelperTrait {
 		}
 
 		return self::main_response(
-			array_merge( $input, [ $id_key => $entity_id, $result_key => $items ] )
+		array_merge( $input, [ $id_key => $entity_id, $result_key => $items ] )
 		);
 	}
 

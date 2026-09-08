@@ -462,290 +462,290 @@ class FluentCart extends IntegrationBase {
 		];
 	}
 
-		public static function get_action_config_schema( string $action ): array {
+	public static function get_action_config_schema( string $action ): array {
 		$schemas = [
-			'get_orders_all' => [
-				...self::field_limit_page(),
-				...self::field_search(),
-			],
-			'get_order_single' => [
-				...self::field_order_id(),
-			],
-			'create_order' => [
-				...self::field_products(),
-				...self::field_customer_id(),
-				...self::field_order_status(),
-				...self::field_shipping_status(),
-				...self::field_fulfillment_type(),
-				...self::field_order_type(),
-				...self::field_order_mode(),
-				...self::field_payment_method(),
-				...self::field_payment_method_title(),
-				...self::field_payment_status(),
-				...self::field_currency_code(),
-				...self::field_subtotal(),
-				...self::field_discount_tax(),
-				...self::field_manual_discount_total(),
-				...self::field_coupon_discount_total(),
-				...self::field_shipping_tax(),
-				...self::field_shipping_total(),
-				...self::field_tax_total(),
-				...self::field_total_amount(),
-				...self::field_exchange_rate(),
-				...self::field_tax_behavior(),
-				...self::field_order_note(),
-			],
-			'update_order' => [
-				...self::field_order_id(),
-				...self::field_customer_id(),
-				...self::field_order_status(),
-				...self::field_shipping_status(),
-				...self::field_fulfillment_type(),
-				...self::field_order_type(),
-				...self::field_order_mode(),
-				...self::field_payment_method(),
-				...self::field_payment_method_title(),
-				...self::field_payment_status(),
-				...self::field_currency_code(),
-				...self::field_subtotal(),
-				...self::field_discount_tax(),
-				...self::field_manual_discount_total(),
-				...self::field_coupon_discount_total(),
-				...self::field_shipping_tax(),
-				...self::field_shipping_total(),
-				...self::field_tax_total(),
-				...self::field_total_amount(),
-				...self::field_exchange_rate(),
-				...self::field_tax_behavior(),
-				...self::field_order_note(),
-			],
-			'delete_order' => [
-				...self::field_order_id(),
-			],
-			'get_order_transactions' => [
-				...self::field_order_id(),
-			],
-			'get_order_subscriptions' => [
-				...self::field_order_id(),
-			],
-			'get_order_items' => [
-				...self::field_order_id(),
-			],
-			'get_order_customer' => [
-				...self::field_order_id(),
-			],
-			'get_order_metadata_all' => [
-				...self::field_order_id(),
-			],
-			'get_order_metadata_single' => [
-				...self::field_order_id(),
-				...self::field_metadata_key(),
-			],
-			'update_order_metadata' => [
-				...self::field_order_id(),
-				...self::field_metadata_key(),
-				...self::field_metadata_value(),
-			],
-			'delete_order_metadata' => [
-				...self::field_order_id(),
-				...self::field_metadata_key(),
-			],
-			'get_order_coupons' => [
-				...self::field_order_id(),
-			],
-			'get_order_shipping_address' => [
-				...self::field_order_id(),
-			],
-			'get_order_billing_address' => [
-				...self::field_order_id(),
-			],
-			'get_order_addresses' => [
-				...self::field_order_id(),
-			],
-			'get_order_licenses' => [
-				...self::field_order_id(),
-			],
-			'get_order_labels' => [
-				...self::field_order_id(),
-			],
-			'get_order_renewals' => [
-				...self::field_order_id(),
-			],
-			'get_order_tax_rates' => [
-				...self::field_order_id(),
-			],
-			'update_order_status' => [
-				...self::field_order_id(),
-				...self::field_order_status(),
-			],
-			'get_total_paid_amount' => [
-				...self::field_order_id(),
-			],
-			'get_total_refund_amount' => [
-				...self::field_order_id(),
-			],
-			'generate_receipt_number' => [
-				...self::field_order_id(),
-			],
-			'get_receipt_url' => [
-				...self::field_order_id(),
-			],
-			'update_payment_status' => [
-				...self::field_order_id(),
-				...self::field_payment_status(),
-			],
-			'update_shipping_status' => [
-				...self::field_order_id(),
-				...self::field_shipping_status(),
-			],
-			'get_transactions_all' => [
-				...self::field_limit_page(),
-				...self::field_search(),
-			],
-			'get_transaction_single' => [
-				...self::field_transaction_id(),
-			],
-			'get_refund_transactions' => [
-				...self::field_order_id(),
-			],
-			'get_latest_transaction' => [
-				...self::field_order_id(),
-			],
-			'get_customers_all' => [
-				...self::field_limit_page(),
-				...self::field_search(),
-			],
-			'get_customer_single' => [
-				...self::field_customer_id(),
-			],
-			'create_customer' => [
-				...self::field_customer_fields_mapping(),
-			],
-			'update_customer' => [
-				...self::field_customer_id(),
-				...self::field_customer_fields_mapping(),
-			],
-			'delete_customer' => [
-				...self::field_customer_id(),
-			],
-			'get_customer_orders' => [
-				...self::field_customer_id(),
-			],
-			'get_customer_subscriptions' => [
-				...self::field_customer_id(),
-			],
-			'get_customer_shipping_address' => [
-				...self::field_customer_id(),
-			],
-			'get_customer_billing_address' => [
-				...self::field_customer_id(),
-			],
-			'get_customer_primary_shipping_address' => [
-				...self::field_customer_id(),
-			],
-			'get_customer_primary_billing_address' => [
-				...self::field_customer_id(),
-			],
-			'get_customer_metadata' => [
-				...self::field_customer_id(),
-			],
-			'get_customer_labels' => [
-				...self::field_customer_id(),
-			],
-			'get_subscriptions_all' => [
-				...self::field_limit_page(),
-				...self::field_search(),
-			],
-			'get_subscription_single' => [
-				...self::field_subscription_id(),
-			],
-			'get_current_subscription' => [
-				...self::field_order_id(),
-			],
-			'get_subscription_transactions' => [
-				...self::field_subscription_id(),
-			],
-			'get_products_all' => [
-				...self::field_limit_page(),
-				...self::field_search(),
-			],
-			'get_product_single' => [
-				...self::field_product_id(),
-			],
-			'create_product' => [
-				...self::create_product_schema_fields(),
-			],
-			'update_product' => [
-				...self::field_product_id(),
-				...self::create_product_schema_fields(),
-			],
-			'delete_product' => [
-				...self::field_product_id(),
-			],
-			'get_product_variants' => [
-				...self::field_product_id(),
-			],
-			'get_coupons_all' => [
-				...self::field_limit_page(),
-				...self::field_search(),
-			],
-			'get_coupon_single' => [
-				...self::field_coupon_id(),
-			],
-			'create_coupon' => [
-				...self::field_coupon_fields(),
-			],
-			'update_coupon' => [
-				...self::field_coupon_id(),
-				...self::field_coupon_fields(),
-			],
-			'delete_coupon' => [
-				...self::field_coupon_id(),
-			],
-			'get_licenses_all' => [
-				...self::field_limit_page(),
-				...self::field_search(),
-			],
-			'get_license_single' => [
-				...self::field_license_id(),
-			],
-			'add_action' => [
-				[
-					'key'      => 'hook_name',
-					'label'    => 'Hook Name',
-					'type'     => 'text',
-					'required' => true,
-				],
-				[
-					'key'   => 'accepted_args',
-					'label' => 'Accepted Args',
-					'type'  => 'number',
-				],
-			],
-			'do_action' => [
-				[
-					'key'      => 'hook_name',
-					'label'    => 'Hook Name',
-					'type'     => 'text',
-					'required' => true,
-				],
-				[
-					'key'   => 'arg_1',
-					'label' => 'Argument 1',
-					'type'  => 'expression',
-				],
-				[
-					'key'   => 'arg_2',
-					'label' => 'Argument 2',
-					'type'  => 'expression',
-				],
-			],
+		'get_orders_all' => [
+			...self::field_limit_page(),
+			...self::field_search(),
+		],
+		'get_order_single' => [
+			...self::field_order_id(),
+		],
+		'create_order' => [
+			...self::field_products(),
+			...self::field_customer_id(),
+			...self::field_order_status(),
+			...self::field_shipping_status(),
+			...self::field_fulfillment_type(),
+			...self::field_order_type(),
+			...self::field_order_mode(),
+			...self::field_payment_method(),
+			...self::field_payment_method_title(),
+			...self::field_payment_status(),
+			...self::field_currency_code(),
+			...self::field_subtotal(),
+			...self::field_discount_tax(),
+			...self::field_manual_discount_total(),
+			...self::field_coupon_discount_total(),
+			...self::field_shipping_tax(),
+			...self::field_shipping_total(),
+			...self::field_tax_total(),
+			...self::field_total_amount(),
+			...self::field_exchange_rate(),
+			...self::field_tax_behavior(),
+			...self::field_order_note(),
+		],
+		'update_order' => [
+			...self::field_order_id(),
+			...self::field_customer_id(),
+			...self::field_order_status(),
+			...self::field_shipping_status(),
+			...self::field_fulfillment_type(),
+			...self::field_order_type(),
+			...self::field_order_mode(),
+			...self::field_payment_method(),
+			...self::field_payment_method_title(),
+			...self::field_payment_status(),
+			...self::field_currency_code(),
+			...self::field_subtotal(),
+			...self::field_discount_tax(),
+			...self::field_manual_discount_total(),
+			...self::field_coupon_discount_total(),
+			...self::field_shipping_tax(),
+			...self::field_shipping_total(),
+			...self::field_tax_total(),
+			...self::field_total_amount(),
+			...self::field_exchange_rate(),
+			...self::field_tax_behavior(),
+			...self::field_order_note(),
+		],
+		'delete_order' => [
+			...self::field_order_id(),
+		],
+		'get_order_transactions' => [
+			...self::field_order_id(),
+		],
+		'get_order_subscriptions' => [
+			...self::field_order_id(),
+		],
+		'get_order_items' => [
+			...self::field_order_id(),
+		],
+		'get_order_customer' => [
+			...self::field_order_id(),
+		],
+		'get_order_metadata_all' => [
+			...self::field_order_id(),
+		],
+		'get_order_metadata_single' => [
+			...self::field_order_id(),
+			...self::field_metadata_key(),
+		],
+		'update_order_metadata' => [
+			...self::field_order_id(),
+			...self::field_metadata_key(),
+			...self::field_metadata_value(),
+		],
+		'delete_order_metadata' => [
+			...self::field_order_id(),
+			...self::field_metadata_key(),
+		],
+		'get_order_coupons' => [
+			...self::field_order_id(),
+		],
+		'get_order_shipping_address' => [
+			...self::field_order_id(),
+		],
+		'get_order_billing_address' => [
+			...self::field_order_id(),
+		],
+		'get_order_addresses' => [
+			...self::field_order_id(),
+		],
+		'get_order_licenses' => [
+			...self::field_order_id(),
+		],
+		'get_order_labels' => [
+			...self::field_order_id(),
+		],
+		'get_order_renewals' => [
+			...self::field_order_id(),
+		],
+		'get_order_tax_rates' => [
+			...self::field_order_id(),
+		],
+		'update_order_status' => [
+			...self::field_order_id(),
+			...self::field_order_status(),
+		],
+		'get_total_paid_amount' => [
+			...self::field_order_id(),
+		],
+		'get_total_refund_amount' => [
+			...self::field_order_id(),
+		],
+		'generate_receipt_number' => [
+			...self::field_order_id(),
+		],
+		'get_receipt_url' => [
+			...self::field_order_id(),
+		],
+		'update_payment_status' => [
+			...self::field_order_id(),
+			...self::field_payment_status(),
+		],
+		'update_shipping_status' => [
+			...self::field_order_id(),
+			...self::field_shipping_status(),
+		],
+		'get_transactions_all' => [
+			...self::field_limit_page(),
+			...self::field_search(),
+		],
+		'get_transaction_single' => [
+			...self::field_transaction_id(),
+		],
+		'get_refund_transactions' => [
+			...self::field_order_id(),
+		],
+		'get_latest_transaction' => [
+			...self::field_order_id(),
+		],
+		'get_customers_all' => [
+			...self::field_limit_page(),
+			...self::field_search(),
+		],
+		'get_customer_single' => [
+			...self::field_customer_id(),
+		],
+		'create_customer' => [
+			...self::field_customer_fields_mapping(),
+		],
+		'update_customer' => [
+			...self::field_customer_id(),
+			...self::field_customer_fields_mapping(),
+		],
+		'delete_customer' => [
+			...self::field_customer_id(),
+		],
+		'get_customer_orders' => [
+			...self::field_customer_id(),
+		],
+		'get_customer_subscriptions' => [
+			...self::field_customer_id(),
+		],
+		'get_customer_shipping_address' => [
+			...self::field_customer_id(),
+		],
+		'get_customer_billing_address' => [
+			...self::field_customer_id(),
+		],
+		'get_customer_primary_shipping_address' => [
+			...self::field_customer_id(),
+		],
+		'get_customer_primary_billing_address' => [
+			...self::field_customer_id(),
+		],
+		'get_customer_metadata' => [
+			...self::field_customer_id(),
+		],
+		'get_customer_labels' => [
+			...self::field_customer_id(),
+		],
+		'get_subscriptions_all' => [
+			...self::field_limit_page(),
+			...self::field_search(),
+		],
+		'get_subscription_single' => [
+			...self::field_subscription_id(),
+		],
+		'get_current_subscription' => [
+			...self::field_order_id(),
+		],
+		'get_subscription_transactions' => [
+			...self::field_subscription_id(),
+		],
+		'get_products_all' => [
+			...self::field_limit_page(),
+			...self::field_search(),
+		],
+		'get_product_single' => [
+			...self::field_product_id(),
+		],
+		'create_product' => [
+			...self::create_product_schema_fields(),
+		],
+		'update_product' => [
+			...self::field_product_id(),
+			...self::create_product_schema_fields(),
+		],
+		'delete_product' => [
+			...self::field_product_id(),
+		],
+		'get_product_variants' => [
+			...self::field_product_id(),
+		],
+		'get_coupons_all' => [
+			...self::field_limit_page(),
+			...self::field_search(),
+		],
+		'get_coupon_single' => [
+			...self::field_coupon_id(),
+		],
+		'create_coupon' => [
+			...self::field_coupon_fields(),
+		],
+		'update_coupon' => [
+			...self::field_coupon_id(),
+			...self::field_coupon_fields(),
+		],
+		'delete_coupon' => [
+			...self::field_coupon_id(),
+		],
+		'get_licenses_all' => [
+			...self::field_limit_page(),
+			...self::field_search(),
+		],
+		'get_license_single' => [
+			...self::field_license_id(),
+		],
+		'add_action' => [
+			[
+				'key'      => 'hook_name',
+				'label'    => 'Hook Name',
+				'type'     => 'text',
+				'required' => true,
+			],
+			[
+				'key'   => 'accepted_args',
+				'label' => 'Accepted Args',
+				'type'  => 'number',
+			],
+		],
+		'do_action' => [
+			[
+				'key'      => 'hook_name',
+				'label'    => 'Hook Name',
+				'type'     => 'text',
+				'required' => true,
+			],
+			[
+				'key'   => 'arg_1',
+				'label' => 'Argument 1',
+				'type'  => 'expression',
+			],
+			[
+				'key'   => 'arg_2',
+				'label' => 'Argument 2',
+				'type'  => 'expression',
+			],
+		],
 		];
 
 		return $schemas[ $action ] ?? [];
 	}
 
-		public static function execute_node( array $node, array $input ): array {
+	public static function execute_node( array $node, array $input ): array {
 		$event  = self::resolve_node_event( $node, 'action' );
 		$config = self::resolve_node_config( $node );
 
