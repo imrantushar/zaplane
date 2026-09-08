@@ -9,6 +9,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import { plugin_root_url } from "@ZAPUtils/helper";
 import ImportWorkflow from "./workFlowMotion/ImportWorkflow";
 import WorkflowTable from "@ZAPComponents/WorkflowTable";
+import Teaser from "@ZAPComponents/Teaser";
 const CreateWorkflows = ({
   onNavigateToEdit,
   title = __('Workflows', 'zaplane'),
@@ -36,6 +37,7 @@ const CreateWorkflows = ({
       </SubTopBar>
 
       <div className="zaplane-page-content">
+        <Teaser screen="workflows" />
         <WorkflowTable onNavigateToEdit={onNavigateToEdit} />
       </div>
 

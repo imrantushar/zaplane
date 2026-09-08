@@ -106,6 +106,7 @@ Yes. You can chain multiple actions and insert delay, condition, filter, iterato
 * StoreEngine — order, subscription and product triggers plus actions.
 * AI (Chat Model) — generate replies with Anthropic, OpenAI, or WordPress Core AI.
 * AI Agent — autonomous tool-calling agent with Chat Model, Memory and Tools sub-nodes, plus MCP server support.
+* AI access (MCP server) — let Claude, Cursor or any Model Context Protocol client read your automations and build new ones from a description. Off by default; scoped, revocable tokens.
 * Conversation Memory — durable, keyed chat history for AI conversations.
 * Business Knowledge — a searchable knowledge base the AI Agent can query; sync from StoreEngine products.
 * Custom Apps — build your own integrations (REST or same-site WordPress hooks) without code changes.

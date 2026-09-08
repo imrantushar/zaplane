@@ -9,6 +9,7 @@ import ZAPDrawer from "@ZAPComponents/Drawer";
 import useConnection from "@ZAPHooks/useConnection/useConnection";
 import ZAPLoading from "@ZAPComponents/Loading";
 import PageLayout from "@ZAPComponents/PageLayout";
+import Teaser from "@ZAPComponents/Teaser";
 import DrawerItemList from "@ZAPComponents/SearchableDrawerList/DrawerItemList";
 import SearchableDrawerList from "@ZAPComponents/SearchableDrawerList";
 const Connections = () => {
@@ -46,6 +47,8 @@ const Connections = () => {
             </button>
         }
     >
+        <Teaser screen="connections" />
+
         <ConnectionTable />
 
         <ZAPDrawer

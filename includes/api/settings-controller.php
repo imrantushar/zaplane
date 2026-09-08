@@ -38,6 +38,26 @@ class SettingsController extends WP_REST_Controller {
 			],
 		] );
 
+		// The module registry, so the Modules screen renders from one definition
+		// instead of a second copy kept in JavaScript.
+		register_rest_route( $this->namespace, '/modules', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'get_modules' ],
+			'permission_callback' => [ $this, 'permissions_check' ],
+		] );
+
+		register_rest_route( $this->namespace, '/teasers', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'get_teasers' ],
+			'permission_callback' => [ $this, 'permissions_check' ],
+		] );
+
+		register_rest_route( $this->namespace, '/teasers/(?P<key>[a-z0-9_]+)/dismiss', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'dismiss_teaser' ],
+			'permission_callback' => [ $this, 'permissions_check' ],
+		] );
+
 		// The feature-filtered admin menu, so the SPA sidebar can refetch live
 		// after a module is toggled (no full page reload).
 		register_rest_route( $this->namespace, '/menu', [
@@ -66,5 +86,28 @@ class SettingsController extends WP_REST_Controller {
 
 	public function get_menu() {
 		return rest_ensure_response( Helper::get_admin_menu_list() );
+	}
+
+	public function get_modules() {
+		return rest_ensure_response( array_values( Settings::modules() ) );
+	}
+
+	public function get_teasers( $request ) {
+		$screen = (string) ( $request->get_param( 'screen' ) ?? '' );
+
+		if ( '' !== $screen ) {
+			return rest_ensure_response( \Zaplane\Features\Teasers::for_screen( $screen ) );
+		}
+
+		return rest_ensure_response( \Zaplane\Features\Teasers::all_visible() );
+	}
+
+	public function dismiss_teaser( $request ) {
+		$key = (string) $request['key'];
+
+		return rest_ensure_response( [
+			'dismissed' => \Zaplane\Features\Teasers::dismiss( $key ),
+			'key'       => $key,
+		] );
 	}
 }

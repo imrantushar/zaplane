@@ -5,6 +5,42 @@ All notable changes to Zaplane are documented here. This project adheres to
 
 ## [Unreleased]
 
+### Added — MCP server
+- Zaplane now presents itself to AI clients (Claude, Cursor, anything speaking the
+  Model Context Protocol) at `POST /wp-json/zaplane/v1/mcp`, with a **Settings →
+  AI access** panel to switch it on and manage tokens. Off by default.
+- **Workflow authoring over MCP** — `search_capabilities` narrows hundreds of
+  triggers and actions to a shortlist from a plain-language description,
+  `describe_app` returns exact field schemas, `validate_graph` checks a draft, and
+  `create_workflow` turns intent into a real draft on the canvas. Node ids,
+  positions, labels, icons, trigger hooks and edges are filled in automatically.
+- **Scoped, revocable tokens** — `read`, `write` and `run` are separate, `run` is
+  never granted by default, secrets are stored hashed, and `tools/list` only
+  advertises what the presenting token can call.
+- Tools for diagnosing runs (`list_runs`, `get_run`), reading and editing existing
+  workflows, and listing connections.
+
+### Added — Modules and discovery
+- **MCP is a module.** Optional features are now declared once in a registry that
+  the settings defaults, the sanitizer, the admin-menu filter and the Modules
+  screen all read from — the dashboard no longer keeps a second hardcoded copy in
+  JavaScript. A module with its own settings panel gets a **Configure** link.
+- **Feature teasers** — a dismissible card on the screen where an unused module
+  would have helped (AI access on Workflows, Custom Apps on Connections, Business
+  Knowledge on the Dashboard), so an existing user finds out a feature exists
+  without reading a changelog. Relevance is a predicate rather than an on/off
+  check, since a module can be enabled and still unused, and a teaser retires
+  itself once the thing it suggests has happened. Dismissals are per user, and
+  new teasers can be registered through the `zaplane/feature_teasers` filter.
+
+### Fixed — MCP server
+- The `Authorization` header is now also read from `HTTP_AUTHORIZATION` /
+  `REDIRECT_HTTP_AUTHORIZATION`, so Apache under CGI no longer causes silent 401s.
+- Workflows created over MCP are attributed to the token's owner instead of being
+  saved with no user.
+- A workflow calling back into its own site's MCP endpoint can no longer start
+  another run, which could re-enter the workflow that made the call.
+
 ### Added — Integrations
 - **ABlocks** — a **Form Submitted** trigger for aBlocks form-builder forms, with an optional per-form filter. Requires a companion `ablocks/form_builder/after_submission` action hook shipped in the aBlocks plugin.
 

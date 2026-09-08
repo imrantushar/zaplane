@@ -89,14 +89,73 @@ class Settings {
 	}
 
 	/**
+	 * The optional modules a site owner can switch on and off.
+	 *
+	 * One registry, read by four things that used to each keep their own copy:
+	 * the settings defaults, the sanitizer, the admin-menu filter, and the
+	 * Modules screen in the dashboard (which is rendered from this over REST
+	 * rather than from a hardcoded list in JavaScript).
+	 *
+	 * - `menu`  — submenu slug suffix hidden while the module is off.
+	 * - `panel` — a settings tab that configures this module, shown once it is on.
+	 * - `since` — the version that introduced it, used to badge it as new.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	public static function modules(): array {
+		return [
+			'custom_apps' => [
+				'key'         => 'custom_apps',
+				'title'       => __( 'Custom Apps', 'zaplane' ),
+				'description' => __( 'Build your own integrations from the UI — any external REST API, or hooks on this site. When off, the Custom Apps menu is hidden.', 'zaplane' ),
+				'default'     => true,
+				'menu'        => 'custom-apps',
+				'panel'       => '',
+				'since'       => '1.1.0',
+			],
+			'knowledge'   => [
+				'key'         => 'knowledge',
+				'title'       => __( 'Business Knowledge', 'zaplane' ),
+				'description' => __( 'A searchable knowledge base the AI Agent can answer from. Sync any post type — products, docs, policies. When off, the Business Knowledge menu is hidden.', 'zaplane' ),
+				'default'     => true,
+				'menu'        => 'knowledge',
+				'panel'       => '',
+				'since'       => '1.1.0',
+			],
+			'mcp_server'  => [
+				'key'         => 'mcp_server',
+				'title'       => __( 'AI access (MCP)', 'zaplane' ),
+				'description' => __( 'Let Claude, Cursor or any Model Context Protocol client read your automations and build new ones from a plain-language description. Configure it under AI access.', 'zaplane' ),
+				// This one hands an outside AI client real power over the site, so it
+				// stays off until a site owner turns it on and issues a token.
+				'default'     => false,
+				'menu'        => '',
+				'panel'       => 'mcp',
+				'panel_label' => __( 'AI access', 'zaplane' ),
+				'since'       => '1.2.0',
+			],
+		];
+	}
+
+	/**
+	 * Default on/off state for every module, derived from the registry.
+	 *
+	 * @return array<string,bool>
+	 */
+	private static function module_defaults(): array {
+		$out = [];
+		foreach ( self::modules() as $key => $module ) {
+			$out[ $key ] = (bool) $module['default'];
+		}
+		return $out;
+	}
+
+	/**
 	 * @return array<string,mixed>
 	 */
 	public static function defaults(): array {
 		return [
-			'features' => [
-				'custom_apps' => true,
-				'knowledge'   => true,
-			],
+			'features' => self::module_defaults(),
 			'theme'    => [
 				'default_mode' => 'light',
 				'light'        => self::default_light_palette(),
@@ -160,12 +219,13 @@ class Settings {
 		if ( ! is_array( $menu ) ) {
 			return $menu;
 		}
-		if ( ! self::feature_enabled( 'custom_apps' ) ) {
-			unset( $menu[ ZAPLANE_PLUGIN_SLUG . '-custom-apps' ] );
+		foreach ( self::modules() as $key => $module ) {
+			if ( '' === $module['menu'] || self::feature_enabled( $key ) ) {
+				continue;
+			}
+			unset( $menu[ ZAPLANE_PLUGIN_SLUG . '-' . $module['menu'] ] );
 		}
-		if ( ! self::feature_enabled( 'knowledge' ) ) {
-			unset( $menu[ ZAPLANE_PLUGIN_SLUG . '-knowledge' ] );
-		}
+
 		return $menu;
 	}
 
