@@ -5,6 +5,19 @@ All notable changes to Zaplane are documented here. This project adheres to
 
 ## [Unreleased]
 
+Everything on `revamp-ui`, ahead of `next-release`. The dashboard is rebuilt, the
+workflow canvas is retyped, modules become opt-in and discoverable, and Zaplane
+gains an MCP server. Integration coverage grows from **998 to 1,070** triggers and
+actions across **93** apps and tools.
+
+### Added — Integrations
+- **aBlocks** — a new app with a **Form Submitted** trigger for aBlocks
+  form-builder forms and an optional per-form filter. Requires the companion
+  `ablocks/form_builder/after_submission` hook shipped in the aBlocks plugin.
+- **FluentCart** — a large expansion: **21 new triggers and 52 new actions**,
+  covering carts (items added, removed, updated, completed), coupons, licences,
+  customers, orders, products and subscriptions.
+
 ### Added — MCP server
 - Zaplane now presents itself to AI clients (Claude, Cursor, anything speaking the
   Model Context Protocol) at `POST /wp-json/zaplane/v1/mcp`, with a **Settings →
@@ -33,6 +46,17 @@ All notable changes to Zaplane are documented here. This project adheres to
   itself once the thing it suggests has happened. Dismissals are per user, and
   new teasers can be registered through the `zaplane/feature_teasers` filter.
 
+### Changed — Integrations
+- **SureCart** — the coupon, customer, order, product and subscription actions and
+  their shared helper were substantially reworked (~1,000 lines) for consistent
+  field handling and error reporting. No triggers or actions were added or
+  removed, so existing workflows keep working.
+- **Dokan** — the `withdraw_request_pending` trigger was removed; withdrawal
+  events are covered by the remaining withdraw triggers.
+- **FluentCart** — `order_paid_done` was removed in favour of the new order
+  triggers above. **A workflow still using it will need its trigger re-selected.**
+- StoreEngine licensing SDK updated to 1.5.6.
+
 ### Changed — Dark theme
 - **Secondary text failed contrast.** `--zaplane-text-muted` sat at 3.70:1 and
   `--zaplane-placeholder` at 3.54:1 against the card, both under the 4.5:1 minimum
@@ -51,12 +75,6 @@ All notable changes to Zaplane are documented here. This project adheres to
   the area line were likewise fixed light-mode values, and the line was a blue
   that was not even the brand. All of it now follows the palette, along with the
   status dots in the empty state.
-
-### Fixed — Settings
-- The Appearance screen kept a hand-copied duplicate of both palettes in
-  JavaScript, which had already drifted from the PHP: six tokens never appeared in
-  the editor at all, and "Reset to default" wrote stale colours. Rows and defaults
-  now come from the server over `GET /zaplane/v1/palette`.
 
 ### Changed — Workflow canvas
 - **The node card is a surface again.** It used to fill with
@@ -112,6 +130,33 @@ All notable changes to Zaplane are documented here. This project adheres to
   card saying which module is not enabled, with a one-click switch to turn it on
   without leaving the half-built workflow.
 
+### Performance
+- **The shipped dashboard bundle drops from 23.8 MB to 1.6 MB.** `next-release`
+  had an unminified development build committed to `assets/build/app.js`; this is
+  a production build, and it is what every admin page load was downloading.
+
+### Fixed — Integrations
+- OAuth callbacks no longer surface a raw failure when a provider errors midway —
+  the exception is caught and reported back to the connection window.
+- **aBlocks** form triggers no longer serve stale cached form data.
+- **Dokan** trigger registration, and **Paymattic** and **Slack** action fixes.
+
+### Fixed — Editor and dashboard
+- Required fields are now marked with an asterisk in node configuration.
+- Log history gains a tab filter; the log table, JSON test-output view and
+  run-details UI were corrected.
+- Fullscreen mode on the workflow canvas.
+- Custom app checkboxes, multi-app selection, and a Redux state issue that could
+  leave a stale selection behind.
+- Editor colour and stylesheet issues, including in dark mode, and a select
+  control that was unreadable on the dark ground.
+
+### Fixed — Settings
+- The Appearance screen kept a hand-copied duplicate of both palettes in
+  JavaScript, which had already drifted from the PHP: six tokens never appeared in
+  the editor at all, and "Reset to default" wrote stale colours. Rows and defaults
+  now come from the server over `GET /zaplane/v1/palette`.
+
 ### Fixed — Modules
 - The discovery card no longer pairs a neutral grey border with a blue-tinted
   background, which read as muddy. Surface, border, accent and rules are now all
@@ -133,9 +178,6 @@ All notable changes to Zaplane are documented here. This project adheres to
   saved with no user.
 - A workflow calling back into its own site's MCP endpoint can no longer start
   another run, which could re-enter the workflow that made the call.
-
-### Added — Integrations
-- **ABlocks** — a **Form Submitted** trigger for aBlocks form-builder forms, with an optional per-form filter. Requires a companion `ablocks/form_builder/after_submission` action hook shipped in the aBlocks plugin.
 
 ## [1.1.0] - 2026-07-13
 
