@@ -7,6 +7,8 @@ namespace Zaplane\Tests {
 		private static array $transients       = [];
 		private static array $posts            = [];
 		private static array $postMeta         = [];
+		private static array $userMeta         = [];
+		private static array $filters          = [];
 		private static array $users            = [];
 		private static array $comments         = [];
 		private static array $terms            = [];
@@ -19,11 +21,71 @@ namespace Zaplane\Tests {
 		private static array $scheduledActions   = [];
 		private static array $enqueuedNodeRuns   = [];
 
+		public static function addFilter( string $tag, callable $callback, int $priority ): void {
+			self::$filters[ $tag ][ $priority ][] = $callback;
+		}
+
+		public static function removeFilter( string $tag, $callback, int $priority ): void {
+			foreach ( self::$filters[ $tag ][ $priority ] ?? [] as $i => $registered ) {
+				if ( $registered === $callback ) {
+					unset( self::$filters[ $tag ][ $priority ][ $i ] );
+				}
+			}
+		}
+
+		public static function hasFilter( string $tag ): bool {
+			foreach ( self::$filters[ $tag ] ?? [] as $callbacks ) {
+				if ( ! empty( $callbacks ) ) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/** @return mixed */
+		public static function applyFilters( string $tag, $value, array $args ) {
+			if ( empty( self::$filters[ $tag ] ) ) {
+				return $value;
+			}
+
+			$byPriority = self::$filters[ $tag ];
+			ksort( $byPriority );
+
+			foreach ( $byPriority as $callbacks ) {
+				foreach ( $callbacks as $callback ) {
+					$value = $callback( $value, ...$args );
+				}
+			}
+
+			return $value;
+		}
+
+		/** @return mixed */
+		public static function getUserMeta( int $userId, string $key, bool $single ) {
+			$value = self::$userMeta[ $userId ][ $key ] ?? null;
+
+			if ( null === $value ) {
+				return $single ? '' : [];
+			}
+
+			return $single ? $value : [ $value ];
+		}
+
+		public static function setUserMeta( int $userId, string $key, $value ): void {
+			self::$userMeta[ $userId ][ $key ] = $value;
+		}
+
+		public static function deleteUserMeta( int $userId, string $key ): void {
+			unset( self::$userMeta[ $userId ][ $key ] );
+		}
+
 		public static function reset(): void {
 			self::$options          = [];
 			self::$transients       = [];
 			self::$posts            = [];
 			self::$postMeta         = [];
+			self::$userMeta         = [];
+			self::$filters          = [];
 			self::$users            = [];
 			self::$comments         = [];
 			self::$terms            = [];
@@ -554,9 +616,29 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'add_filter' ) ) {
+		function add_filter( string $tag, $callback, int $priority = 10, int $accepted_args = 1 ): bool {
+			WPMocks::addFilter( $tag, $callback, $priority );
+			return true;
+		}
+	}
+
+	if ( ! function_exists( 'remove_filter' ) ) {
+		function remove_filter( string $tag, $callback, int $priority = 10 ): bool {
+			WPMocks::removeFilter( $tag, $callback, $priority );
+			return true;
+		}
+	}
+
+	if ( ! function_exists( 'has_filter' ) ) {
+		function has_filter( string $tag, $callback = false ) {
+			return WPMocks::hasFilter( $tag );
+		}
+	}
+
 	if ( ! function_exists( 'apply_filters' ) ) {
 		function apply_filters( string $tag, $value, ...$args ) {
-			return $value;
+			return WPMocks::applyFilters( $tag, $value, $args );
 		}
 	}
 
@@ -1318,18 +1400,20 @@ namespace {
 
 	if ( ! function_exists( 'get_user_meta' ) ) {
 		function get_user_meta( $user_id, $key = '', $single = false ) {
-			return $single ? '' : [];
+			return WPMocks::getUserMeta( (int) $user_id, (string) $key, (bool) $single );
 		}
 	}
 
 	if ( ! function_exists( 'update_user_meta' ) ) {
 		function update_user_meta( $user_id, $meta_key, $meta_value, $prev_value = '' ) {
+			WPMocks::setUserMeta( (int) $user_id, (string) $meta_key, $meta_value );
 			return true;
 		}
 	}
 
 	if ( ! function_exists( 'delete_user_meta' ) ) {
 		function delete_user_meta( $user_id, $meta_key, $meta_value = '' ) {
+			WPMocks::deleteUserMeta( (int) $user_id, (string) $meta_key );
 			return true;
 		}
 	}
@@ -1561,6 +1645,38 @@ namespace {
 				$args = get_object_vars( $args );
 			}
 			return array_merge( $defaults, (array) $args );
+		}
+	}
+
+	if ( ! function_exists( 'wp_generate_password' ) ) {
+		function wp_generate_password( int $length = 12, bool $special_chars = true, bool $extra_special_chars = false ): string {
+			$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+			if ( $special_chars ) {
+				$chars .= '!@#$%^&*()';
+			}
+			$out = '';
+			for ( $i = 0; $i < $length; $i++ ) {
+				$out .= $chars[ random_int( 0, strlen( $chars ) - 1 ) ];
+			}
+			return $out;
+		}
+	}
+
+	if ( ! function_exists( 'untrailingslashit' ) ) {
+		function untrailingslashit( string $value ): string {
+			return rtrim( $value, '/\\' );
+		}
+	}
+
+	if ( ! function_exists( 'trailingslashit' ) ) {
+		function trailingslashit( string $value ): string {
+			return untrailingslashit( $value ) . '/';
+		}
+	}
+
+	if ( ! function_exists( 'wp_unslash' ) ) {
+		function wp_unslash( $value ) {
+			return is_string( $value ) ? stripslashes( $value ) : $value;
 		}
 	}
 
