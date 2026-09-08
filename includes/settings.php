@@ -103,7 +103,7 @@ class Settings {
 	 * @return array<string,array<string,mixed>>
 	 */
 	public static function modules(): array {
-		return [
+		$modules = [
 			'custom_apps' => [
 				'key'         => 'custom_apps',
 				'title'       => __( 'Custom Apps', 'zaplane' ),
@@ -143,6 +143,18 @@ class Settings {
 				'since'       => '1.2.0',
 			],
 		];
+
+		/**
+		 * Filter the registered modules.
+		 *
+		 * Adding one here makes it appear on the Modules screen, saveable, and
+		 * eligible for the discovery card, with no other change. A callback must
+		 * not call feature_enabled() — the settings defaults are derived from this
+		 * list, so that would recurse.
+		 *
+		 * @param array<string,array<string,mixed>> $modules
+		 */
+		return (array) apply_filters( 'zaplane/modules', $modules );
 	}
 
 	/**

@@ -37,44 +37,70 @@ hides its menu entry when off. A module declaring a `panel` also gets a
 
 `mcp_server` is a module like any other — the AI access tab is its panel.
 
-## Feature teasers
+## Feature discovery
 
-A module added in a later release is invisible to the people who would benefit
-most: someone who installed Zaplane for one workflow has no reason to reopen
-Settings, and will not read a changelog. `Zaplane\Features\Teasers` puts a short,
-dismissible card on the screen where the module would have been useful.
+Modules are opt-in, so a fresh site has every optional feature off and no reason
+to discover any of them: someone who installed Zaplane for one workflow will not
+reopen Settings and will not read a changelog. `Zaplane\Features\Teasers`
+answers that in two places, for two different moments.
 
-- **Workflows** → AI access, while MCP is off.
-- **Connections** → Custom Apps, while nobody has built one.
-- **Dashboard** → Business Knowledge, while nothing has been synced.
+### Browsing — the module card
 
-Every module is **opt-in**, so a teaser shows exactly while its module is off and
-stops the moment it is switched on. Acting on the suggestion is also how it goes
-away. `relevant` stays a callable rather than a bare flag check so a teaser can
-ask a harder question than "is this on".
+`Teasers::spotlight( $screen )` returns **every module that is off**, in one
+card, each row with a one-click switch. Showing them together rather than one at
+a time is the point: the question a new user has is "what does this thing do",
+not "should I enable this particular feature".
 
-### In the builder
+The module that matters most on the current screen leads the list and is marked
+**Useful here** — context without hiding the rest. That mapping is ordering only,
+and is filterable:
 
-The more useful placement is the one where the user is already trying to use the
-thing. No integration is hidden when its module is off — that would break
-workflows already using it — so the builder will otherwise hand you a node from a
-module you never enabled and say nothing.
+```php
+add_filter( 'zaplane/module_screen_relevance', function ( $map ) {
+    $map['recipes'] = 'my_module';
+    return $map;
+} );
+```
 
-`<Teaser app="knowledge" />` in the action drawer asks
-`Teasers::for_app( $slug )`, which resolves the slug to its owning module via
-`Settings::module_for_app()` (declared per module in `apps`, or resolved at
-runtime for user-defined Custom Apps). When that module is off it returns a card
-carrying `activates`, which turns the call to action into a **one-click switch**
-rather than a link — nobody should have to abandon a half-built workflow to go
-and flip something in Settings. That card is not dismissible: it describes the
-node in front of you, not a suggestion to file away.
+Rendered with `<Teaser screen="workflows" />` on Workflows, the Dashboard and
+Connections.
+
+**Dismissal records which modules were on offer at the time.** A module shipped
+in a later release therefore surfaces on its own, rather than being buried by a
+dismissal that predates it — and without dragging back the ones already waved
+away. Dismissals are per user, so one administrator hiding the card does not hide
+it for colleagues.
+
+### Acting — the builder prompt
+
+The more useful placement, because the user is already trying to use the thing.
+No integration is hidden when its module is off — that would break workflows
+already using one — so the builder would otherwise hand you a node from a module
+you never enabled and say nothing.
+
+`<Teaser app="knowledge" />` in the action drawer asks `Teasers::for_app( $slug )`,
+which resolves the slug to its owning module via `Settings::module_for_app()`
+(declared per module in `apps`, or resolved at runtime for user-defined Custom
+Apps). It carries `activates`, so the call to action is a **switch, not a link** —
+nobody should have to abandon a half-built workflow to go and flip something in
+Settings. It is not dismissible: it describes the node in front of you, not a
+suggestion to file away.
 
 > **Watch the `.then()` here.** `window.ZaplaneGlobal.settings` is frozen, and the
 > bundle runs in strict mode, so writing to it throws. When that write lived
 > inside the success handler alongside a broad `.catch()`, activation succeeded
 > server-side while the card claimed it had failed. Keep post-request work out of
-> the success path, or use the two-argument `then()` so only a failed request can
-> be treated as one.
+> the success path, or use the two-argument `then()` so only a failed request is
+> treated as one.
+
+### Colour
+
+The card derives its surface, border, accent and rules from
+`var(--zaplane-primary)` through `color-mix`, so it reads as one colour at
+different strengths and follows the palette into dark mode. An earlier version
+paired the neutral `--zaplane-border-color` with a blue-tinted background; two
+unrelated hues at similar lightness look muddy. `color-mix` is used rather than
+Tailwind's `/opacity` syntax, which does not work against a CSS custom property.
 
 ## Upgrades
 

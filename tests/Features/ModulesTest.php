@@ -55,29 +55,35 @@ class ModulesTest extends TestCase {
 	/**
 	 * @test
 	 */
-	public function a_teaser_never_sends_a_user_to_a_panel_that_is_hidden(): void {
+	public function nothing_offers_to_send_a_user_to_a_panel_that_is_hidden(): void {
 		// A module's settings panel only exists while the module is on, so a panel
 		// belonging to an off-by-default module is not a place to send anyone.
-		$unreachable = [];
+		$hidden = [];
 		foreach ( Settings::modules() as $module ) {
 			if ( '' !== $module['panel'] && ! $module['default'] ) {
-				$unreachable[ $module['panel'] ] = $module['key'];
+				$hidden[ $module['panel'] ] = $module['key'];
 			}
 		}
 
 		$this->assertNotEmpty(
-			$unreachable,
+			$hidden,
 			'No module ships with a hidden panel, so this guard would pass vacuously.'
 		);
 
-		foreach ( \Zaplane\Features\Teasers::registry() as $key => $teaser ) {
-			$panel = (string) ( $teaser['cta_panel'] ?? '' );
+		// The builder prompt switches the module on where the user stands rather
+		// than linking anywhere, which is what keeps it out of this trap.
+		$prompt = \Zaplane\Features\Teasers::for_app( 'knowledge' );
+		$this->assertNotEmpty( $prompt['activates'] );
+		$this->assertArrayNotHasKey( 'cta_panel', $prompt );
 
-			$this->assertArrayNotHasKey(
-				$panel,
-				$unreachable,
-				$key . ' links to the "' . $panel . '" panel, hidden while ' . ( $unreachable[ $panel ] ?? '' ) . ' is off.'
-			);
+		// The spotlight lists modules but never links at one of their panels.
+		foreach ( \Zaplane\Features\Teasers::spotlight( 'workflows' )['modules'] as $module ) {
+			if ( isset( $hidden[ $module['panel'] ] ) ) {
+				$this->assertFalse(
+					Settings::feature_enabled( $module['key'] ),
+					$module['key'] . ' advertises a panel that is hidden while it is off.'
+				);
+			}
 		}
 	}
 

@@ -11,190 +11,148 @@ class TeasersTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		// The store memoizes its envelope for the request; drop it so each test
-		// starts with no custom apps.
 		ManifestStore::flush_cache();
 	}
 
-	/** Register a minimal custom app through the store's own API. */
 	private function addCustomApp(): void {
 		ManifestStore::save(
 			[
-				'slug'    => 'acme',
-				'name'    => 'Acme',
-				'actions' => [],
+				'slug'     => 'acme',
+				'name'     => 'Acme',
+				'actions'  => [],
 				'triggers' => [],
 			]
 		);
 	}
 
+	/** @return array<int,string> */
+	private function listed( ?array $spotlight ): array {
+		return null === $spotlight ? [] : array_column( $spotlight['modules'], 'key' );
+	}
+
+	/* ------------------------------ spotlight ------------------------------ */
+
 	/**
 	 * @test
 	 */
-	public function every_teaser_points_at_a_real_module_and_a_real_screen(): void {
-		$modules = Settings::modules();
+	public function it_lists_every_module_that_is_off_in_one_card(): void {
+		$spotlight = Teasers::spotlight( 'workflows' );
 
-		$this->assertNotEmpty( Teasers::registry() );
+		$this->assertNotNull( $spotlight );
+		$this->assertSame( Teasers::SPOTLIGHT_KEY, $spotlight['key'] );
 
-		foreach ( Teasers::registry() as $key => $teaser ) {
-			$this->assertSame( $key, $teaser['key'] );
-			$this->assertNotEmpty( $teaser['screen'], $key . ' has no screen.' );
-			$this->assertNotEmpty( $teaser['title'], $key . ' has no title.' );
-			$this->assertNotEmpty( $teaser['body'], $key . ' has no body.' );
-			$this->assertNotEmpty( $teaser['cta_label'], $key . ' has no call to action.' );
+		// Every module ships off, so all of them should be on offer.
+		$listed = $this->listed( $spotlight );
+		sort( $listed );
 
-			$module = (string) ( $teaser['module'] ?? '' );
-			$this->assertArrayHasKey(
-				$module,
-				$modules,
-				$key . ' names module "' . $module . '", which is not registered.'
-			);
-			$this->assertIsCallable( $teaser['relevant'], $key . ' has no relevance predicate.' );
+		$expected = array_keys( Settings::modules() );
+		sort( $expected );
+
+		$this->assertSame( $expected, $listed );
+	}
+
+	/**
+	 * @test
+	 */
+	public function each_listed_module_carries_what_the_card_renders(): void {
+		foreach ( Teasers::spotlight( 'workflows' )['modules'] as $module ) {
+			$this->assertNotEmpty( $module['key'] );
+			$this->assertNotEmpty( $module['title'] );
+			$this->assertNotEmpty( $module['description'] );
+			$this->assertIsBool( $module['relevant_here'] );
 		}
 	}
 
 	/**
 	 * @test
 	 */
-	public function at_most_one_teaser_is_registered_per_screen(): void {
-		$screens = array_column( Teasers::registry(), 'screen' );
+	public function the_module_the_screen_is_about_is_listed_first_and_marked(): void {
+		$workflows = Teasers::spotlight( 'workflows' );
+		$this->assertSame( 'mcp_server', $workflows['modules'][0]['key'] );
+		$this->assertTrue( $workflows['modules'][0]['relevant_here'] );
 
-		$this->assertSame(
-			count( $screens ),
-			count( array_unique( $screens ) ),
-			'Two teasers share a screen; only one would ever show.'
-		);
+		$connections = Teasers::spotlight( 'connections' );
+		$this->assertSame( 'custom_apps', $connections['modules'][0]['key'] );
+
+		// Exactly one row may claim relevance.
+		$this->assertCount( 1, array_filter( array_column( $workflows['modules'], 'relevant_here' ) ) );
 	}
 
 	/**
 	 * @test
 	 */
-	public function a_teaser_shows_while_its_module_is_off(): void {
-		$teaser = Teasers::for_screen( 'workflows' );
+	public function an_unknown_screen_still_lists_everything_just_unordered(): void {
+		$spotlight = Teasers::spotlight( 'logs' );
 
-		$this->assertNotNull( $teaser );
-		$this->assertSame( 'mcp_on_workflows', $teaser['key'] );
-		$this->assertSame( 'mcp_server', $teaser['module'] );
-		// Modules, not the AI-access panel: that panel is hidden while the
-		// module is off, which is exactly what this teaser is asking for.
-		$this->assertSame( 'modules', $teaser['cta_panel'] );
+		$this->assertNotNull( $spotlight );
+		$this->assertCount( count( Settings::modules() ), $spotlight['modules'] );
+		$this->assertSame( [], array_filter( array_column( $spotlight['modules'], 'relevant_here' ) ) );
 	}
 
 	/**
 	 * @test
 	 */
-	public function enabling_the_module_retires_its_teaser(): void {
-		$this->assertNotNull( Teasers::for_screen( 'workflows' ) );
+	public function a_module_that_is_on_drops_off_the_card(): void {
+		Settings::save( [ 'features' => [ 'knowledge' => true ] ] );
 
-		Settings::save( [ 'features' => [ 'mcp_server' => true ] ] );
+		$listed = $this->listed( Teasers::spotlight( 'workflows' ) );
 
-		$this->assertNull(
-			Teasers::for_screen( 'workflows' ),
-			'Accepting the suggestion should be enough to stop showing it.'
-		);
+		$this->assertNotContains( 'knowledge', $listed );
+		$this->assertContains( 'mcp_server', $listed );
 	}
 
 	/**
 	 * @test
 	 */
-	public function dismissing_a_teaser_hides_it_and_leaves_the_others_alone(): void {
-		$this->assertNotNull( Teasers::for_screen( 'workflows' ) );
-		$this->assertNotNull( Teasers::for_screen( 'connections' ) );
+	public function the_card_disappears_once_every_module_is_on(): void {
+		$features = [];
+		foreach ( array_keys( Settings::modules() ) as $key ) {
+			$features[ $key ] = true;
+		}
+		Settings::save( [ 'features' => $features ] );
 
-		$this->assertTrue( Teasers::dismiss( 'mcp_on_workflows' ) );
+		$this->assertNull( Teasers::spotlight( 'workflows' ) );
+	}
 
-		$this->assertNull( Teasers::for_screen( 'workflows' ) );
-		$this->assertNotNull( Teasers::for_screen( 'connections' ) );
+	/* ------------------------------ dismissal ------------------------------ */
+
+	/**
+	 * @test
+	 */
+	public function dismissing_hides_the_card(): void {
+		$this->assertNotNull( Teasers::spotlight( 'workflows' ) );
+
+		$this->assertTrue( Teasers::dismiss( Teasers::SPOTLIGHT_KEY ) );
+
+		$this->assertNull( Teasers::spotlight( 'workflows' ) );
+		$this->assertNull( Teasers::spotlight( 'dashboard' ) );
 	}
 
 	/**
 	 * @test
 	 */
-	public function every_module_being_opt_in_means_every_teaser_starts_visible(): void {
-		$this->assertNotNull( Teasers::for_screen( 'workflows' ) );
-		$this->assertNotNull( Teasers::for_screen( 'connections' ) );
-		$this->assertNotNull( Teasers::for_screen( 'dashboard' ) );
+	public function a_module_added_after_a_dismissal_brings_the_card_back(): void {
+		Teasers::dismiss( Teasers::SPOTLIGHT_KEY );
+		$this->assertNull( Teasers::spotlight( 'workflows' ) );
+
+		// A later release adds a module the dismissal could not have covered.
+		$this->registerLaterModule();
+
+		$spotlight = Teasers::spotlight( 'workflows' );
+
+		$this->assertNotNull( $spotlight, 'A dismissal should not bury modules that did not exist yet.' );
+		$this->assertSame( [ 'later_module' ], $this->listed( $spotlight ) );
 	}
 
 	/**
 	 * @test
 	 */
-	public function switching_the_module_on_is_all_it_takes_to_retire_a_teaser(): void {
-		$this->assertNotNull( Teasers::for_screen( 'connections' ) );
-
-		Settings::save( [ 'features' => [ 'custom_apps' => true ] ] );
-
-		$this->assertNull(
-			Teasers::for_screen( 'connections' ),
-			'A module that is on has nothing left to advertise.'
-		);
+	public function only_the_spotlight_key_can_be_dismissed(): void {
+		$this->assertFalse( Teasers::dismiss( 'something_else' ) );
+		$this->assertFalse( Teasers::dismiss( '' ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function a_predicate_that_throws_hides_its_teaser_rather_than_the_screen(): void {
-		\add_filter(
-			'zaplane/feature_teasers',
-			function ( $teasers ) {
-				$teasers['boom'] = [
-					'key'       => 'boom',
-					'screen'    => 'logs',
-					'module'    => 'knowledge',
-					'title'     => 'Boom',
-					'body'      => 'Body',
-					'cta_label' => 'Go',
-					'cta_panel' => 'modules',
-					'relevant'  => static function (): bool {
-						throw new \RuntimeException( 'table missing' );
-					},
-				];
-				return $teasers;
-			}
-		);
-
-		$this->assertNull( Teasers::for_screen( 'logs' ) );
-	}
-
-	/**
-	 * @test
-	 */
-	public function dismissing_twice_is_harmless_and_an_unknown_key_is_refused(): void {
-		$this->assertTrue( Teasers::dismiss( 'mcp_on_workflows' ) );
-		$this->assertTrue( Teasers::dismiss( 'mcp_on_workflows' ) );
-		$this->assertFalse( Teasers::dismiss( 'not_a_teaser' ) );
-	}
-
-	/**
-	 * @test
-	 */
-	public function a_screen_with_no_teaser_returns_nothing(): void {
-		$this->assertNull( Teasers::for_screen( 'logs' ) );
-		$this->assertNull( Teasers::for_screen( '' ) );
-	}
-
-	/**
-	 * @test
-	 */
-	public function all_visible_is_keyed_by_screen_and_shrinks_as_modules_are_enabled(): void {
-		$visible = Teasers::all_visible();
-
-		$this->assertArrayHasKey( 'workflows', $visible );
-		$this->assertArrayHasKey( 'connections', $visible );
-		$this->assertSame( 'mcp_on_workflows', $visible['workflows']['key'] );
-
-		Settings::save(
-			[
-				'features' => [
-					'mcp_server'  => true,
-					'custom_apps' => true,
-					'knowledge'   => true,
-				],
-			]
-		);
-
-		$this->assertSame( [], Teasers::all_visible(), 'With every module on, nothing is left to advertise.' );
-	}
+	/* -------------------------------- builder ------------------------------ */
 
 	/**
 	 * @test
@@ -241,24 +199,31 @@ class TeasersTest extends TestCase {
 	/**
 	 * @test
 	 */
-	public function the_registry_can_be_extended_by_a_filter(): void {
+	public function the_builder_prompt_is_not_dismissible(): void {
+		// It describes the node in front of you, so there is nothing to file away.
+		$this->assertArrayNotHasKey( 'dismissible', Teasers::for_app( 'knowledge' ) );
+		$this->assertFalse( Teasers::dismiss( 'app_module_off_knowledge' ) );
+	}
+
+	/* ----------------------------------------------------------------------- */
+
+	/** Pretend a later release shipped an extra module. */
+	private function registerLaterModule(): void {
 		\add_filter(
-			'zaplane/feature_teasers',
-			function ( $teasers ) {
-				$teasers['extra'] = [
-					'key'       => 'extra',
-					'screen'    => 'recipes',
-					'module'    => 'knowledge',
-					'title'     => 'Extra',
-					'body'      => 'Body',
-					'cta_label' => 'Go',
-					'cta_panel' => 'modules',
-					'relevant'  => static fn(): bool => true,
+			'zaplane/modules',
+			static function ( $modules ) {
+				$modules['later_module'] = [
+					'key'         => 'later_module',
+					'title'       => 'Later Module',
+					'description' => 'Shipped after the user dismissed the card.',
+					'default'     => false,
+					'menu'        => '',
+					'panel'       => '',
+					'apps'        => [],
+					'since'       => '9.9.9',
 				];
-				return $teasers;
+				return $modules;
 			}
 		);
-
-		$this->assertSame( 'extra', Teasers::for_screen( 'recipes' )['key'] );
 	}
 }

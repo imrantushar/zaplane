@@ -106,12 +106,9 @@ class SettingsController extends WP_REST_Controller {
 			return rest_ensure_response( \Zaplane\Features\Teasers::for_app( $app ) );
 		}
 
-		$screen = (string) ( $request->get_param( 'screen' ) ?? '' );
-		if ( '' !== $screen ) {
-			return rest_ensure_response( \Zaplane\Features\Teasers::for_screen( $screen ) );
-		}
-
-		return rest_ensure_response( \Zaplane\Features\Teasers::all_visible() );
+		return rest_ensure_response(
+			\Zaplane\Features\Teasers::spotlight( (string) ( $request->get_param( 'screen' ) ?? '' ) )
+		);
 	}
 
 	public function activate_module( $request ) {

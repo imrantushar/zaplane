@@ -39,12 +39,21 @@ All notable changes to Zaplane are documented here. This project adheres to
   a one-time migration pins any module without an explicit saved value to what it
   used to resolve to, so nothing disappears on update. Fresh installs get the
   opt-in defaults.
+- **One card listing every module you have not switched on**, on Workflows, the
+  Dashboard and Connections, each row with a one-click switch and the module most
+  relevant to that screen leading and marked. Dismissing records what was on offer
+  at the time, so a module added in a later release surfaces on its own instead of
+  being buried — and without dragging back the ones already waved away.
 - **A prompt in the builder.** No integration is hidden when its module is off —
   that would break workflows already using it — so picking such a node now shows a
   card saying which module is not enabled, with a one-click switch to turn it on
   without leaving the half-built workflow.
 
 ### Fixed — Modules
+- The discovery card no longer pairs a neutral grey border with a blue-tinted
+  background, which read as muddy. Surface, border, accent and rules are now all
+  derived from the primary through `color-mix`, so the card is one colour at
+  different strengths and follows the palette into dark mode.
 - A partial settings save no longer resets modules it did not mention. Saves were
   based on the defaults rather than on what was in effect, which was harmless
   while modules defaulted on and would have silently switched them off now that

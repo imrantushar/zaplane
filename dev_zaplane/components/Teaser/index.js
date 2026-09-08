@@ -1,127 +1,210 @@
-import React, { useEffect, useState } from 'react';
-import { __ } from '@wordpress/i18n';
-import { FiArrowRight, FiX } from 'react-icons/fi';
+import React, { useCallback, useEffect, useState } from 'react';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { FiArrowRight, FiX, FiZap } from 'react-icons/fi';
 import { API, admin_url, namespace } from '@ZAPUtils/helper';
 
 /**
- * A card telling the user about a module they have not switched on.
+ * Surfaces modules this site has not switched on.
  *
- * Two modes, both answered server-side by Zaplane\Features\Teasers:
+ * Two shapes, both answered server-side by Zaplane\Features\Teasers:
  *
- *   <Teaser screen="workflows" />   what belongs on this page
- *   <Teaser app="knowledge" />      the node just picked belongs to a module
- *                                   this site has not enabled
- *
- * The app form carries `activates`, which turns the call to action into a
- * one-click switch rather than a link — nobody should have to abandon a
- * half-built workflow to go and flip something in Settings. It is also not
- * dismissible, because it describes the node in front of you rather than making
- * a suggestion you might want to file away.
+ *   <Teaser screen="workflows" />  every module that is off, one card, each with
+ *                                 a switch. The module this screen is about
+ *                                 leads and is marked.
+ *   <Teaser app="knowledge" />     the node just picked belongs to a module that
+ *                                 is off. Not dismissible — it describes what is
+ *                                 in front of you.
  *
  * Renders nothing when the server has nothing to say, so adding or retiring a
- * teaser needs no change here.
+ * module needs no change here.
  */
+
+/**
+ * Notice colours.
+ *
+ * A neutral grey border around a blue-tinted panel reads as muddy, because the
+ * two are unrelated hues. Deriving the border and accent from the same primary
+ * the background is tinted with keeps the card one colour at different
+ * strengths. color-mix is used rather than Tailwind's `/opacity` syntax, which
+ * does not work against a CSS custom property.
+ */
+const TINT = {
+  surface: 'color-mix(in srgb, var(--zaplane-primary) 6%, var(--zaplane-background))',
+  border: 'color-mix(in srgb, var(--zaplane-primary) 22%, transparent)',
+  accent: 'color-mix(in srgb, var(--zaplane-primary) 12%, transparent)',
+  rule: 'color-mix(in srgb, var(--zaplane-primary) 14%, transparent)',
+};
+
+const Shell = ({ children, onDismiss }) => (
+  <div
+    className="relative mb-6 overflow-hidden rounded-lg"
+    style={{ background: TINT.surface, border: `1px solid ${TINT.border}` }}
+  >
+    {/* A left accent reads as "notice" without needing a heavier border. */}
+    <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px]" style={{ background: 'var(--zaplane-primary)' }} />
+    <div className="py-4 pl-5 pr-4">{children}</div>
+    {onDismiss && (
+      <button
+        type="button"
+        onClick={onDismiss}
+        aria-label={__('Dismiss', 'zaplane')}
+        title={__('Dismiss', 'zaplane')}
+        className="absolute right-3 top-3 rounded-[4px] p-1 text-[var(--zaplane-font-secondary-color)] hover:text-[var(--zaplane-font-color)]"
+      >
+        <FiX size={16} />
+      </button>
+    )}
+  </div>
+);
+
+const ActivateButton = ({ label, busy, onClick, subtle }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={busy}
+    className={`inline-flex shrink-0 items-center justify-center rounded-[4px] px-3 py-1.5 text-[12px] font-semibold transition-opacity ${
+      busy ? 'cursor-wait opacity-60' : 'cursor-pointer hover:opacity-90'
+    }`}
+    style={
+      subtle
+        ? { background: 'transparent', border: `1px solid ${TINT.border}`, color: 'var(--zaplane-primary)' }
+        : { background: 'var(--zaplane-primary)', color: '#fff' }
+    }
+  >
+    {busy ? __('Turning on…', 'zaplane') : label}
+  </button>
+);
+
 const Teaser = ({ screen, app, onActivated }) => {
-  const [teaser, setTeaser] = useState(null);
-  const [leaving, setLeaving] = useState(false);
-  const [activating, setActivating] = useState(false);
+  const [data, setData] = useState(null);
+  const [hidden, setHidden] = useState(false);
+  const [busyKey, setBusyKey] = useState(null);
+  const [done, setDone] = useState([]);
 
-  useEffect(() => {
-    let cancelled = false;
-    setTeaser(null);
-    setLeaving(false);
-
-    if (!screen && !app) return undefined;
+  const load = useCallback(() => {
+    if (!screen && !app) return;
 
     API.get(`${namespace}teasers`, { params: app ? { app } : { screen } })
-      .then(res => {
-        if (!cancelled && res.data && res.data.key) setTeaser(res.data);
-      })
+      .then(res => setData(res.data && res.data.key ? res.data : null))
       .catch(() => {
         // Discovery is a nicety; a failure here must never break the page.
       });
-
-    return () => {
-      cancelled = true;
-    };
   }, [screen, app]);
 
-  if (!teaser || leaving) return null;
+  useEffect(() => {
+    setData(null);
+    setHidden(false);
+    setDone([]);
+    load();
+  }, [load]);
+
+  if (!data || hidden) return null;
+
+  const activate = key => {
+    setBusyKey(key);
+    API.post(`${namespace}modules/${key}/activate`).then(
+      () => {
+        // Nothing else in this handler: window.ZaplaneGlobal.settings is frozen,
+        // and writing to it under the bundle's strict mode throws, which a shared
+        // catch would then report as a failed save.
+        setBusyKey(null);
+        setDone(current => [...current, key]);
+        if (onActivated) onActivated(key);
+      },
+      () => setBusyKey(null)
+    );
+  };
 
   const dismiss = () => {
-    setLeaving(true);
-    API.post(`${namespace}teasers/${teaser.key}/dismiss`).catch(() => {});
+    setHidden(true);
+    API.post(`${namespace}teasers/${data.key}/dismiss`).catch(() => {});
   };
 
-  const activate = () => {
-    setActivating(true);
-    API.post(`${namespace}modules/${teaser.activates}/activate`)
-      // Only the request failing may reset the button. Doing more work inside
-      // then() risks a throw here being reported as a failed save: the injected
-      // ZaplaneGlobal.settings snapshot is frozen, and writing to it under the
-      // bundle's strict mode threw, so the module was switched on server-side
-      // while the card claimed nothing had happened. The server is the source of
-      // truth and the snapshot is re-read on the next page load, so leave it be.
-      .then(
-        () => {
-          setLeaving(true);
-          if (onActivated) onActivated(teaser.activates);
-        },
-        () => setActivating(false)
-      );
-  };
+  /* ------------------------- one node, one module ------------------------- */
 
-  const target = `${admin_url}admin.php?page=zaplane-settings${teaser.cta_panel ? `&tab=${teaser.cta_panel}` : ''}`;
+  if (data.activates) {
+    if (done.includes(data.activates)) return null;
+
+    return (
+      <Shell>
+        <div className="flex items-start gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="text-[14px] font-semibold text-[var(--zaplane-font-color)]">{data.title}</div>
+            <p className="mb-0 mt-1 text-[13px] leading-[1.55] text-[var(--zaplane-font-secondary-color)]">{data.body}</p>
+          </div>
+          <ActivateButton label={data.cta_label} busy={busyKey === data.activates} onClick={() => activate(data.activates)} />
+        </div>
+      </Shell>
+    );
+  }
+
+  /* ------------------------- every module that is off --------------------- */
+
+  const remaining = (data.modules || []).filter(m => !done.includes(m.key));
+  if (!remaining.length) return null;
 
   return (
-    <div className={`relative flex items-start gap-4 rounded-lg border border-[var(--zaplane-border-color)] bg-[var(--zaplane-second-primary)] p-4 ${teaser.activates ? 'mb-4' : 'mb-6 pr-10'}`}>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="rounded-full bg-[var(--zaplane-primary)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-            {teaser.activates ? __('Module off', 'zaplane') : __('Did you know', 'zaplane')}
-          </span>
-          <span className="text-[14px] font-semibold text-[var(--zaplane-font-color)]">{teaser.title}</span>
-        </div>
-        <p className="mb-0 mt-1.5 text-[13px] leading-[1.55] text-[var(--zaplane-font-secondary-color)]">{teaser.body}</p>
-        {teaser.cta_label && teaser.activates && (
-          <button
-            type="button"
-            onClick={activate}
-            disabled={activating}
-            className={`mt-3 inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1.5 text-[13px] font-semibold text-white transition-opacity ${
-              activating ? 'cursor-wait opacity-60' : 'cursor-pointer hover:opacity-90'
-            }`}
-            style={{ backgroundColor: 'var(--zaplane-primary)' }}
-          >
-            {activating ? __('Turning on…', 'zaplane') : teaser.cta_label}
-          </button>
-        )}
-
-        {teaser.cta_label && !teaser.activates && (
-          <a
-            href={target}
-            className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--zaplane-primary)] no-underline hover:underline"
-          >
-            {teaser.cta_label}
-            <FiArrowRight size={14} />
-          </a>
-        )}
+    <Shell onDismiss={dismiss}>
+      <div className="flex items-center gap-2 pr-6">
+        <span
+          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+          style={{ background: TINT.accent, color: 'var(--zaplane-primary)' }}
+        >
+          <FiZap size={13} />
+        </span>
+        <span className="text-[14px] font-semibold text-[var(--zaplane-font-color)]">{data.title}</span>
+        <span className="text-[12px] text-[var(--zaplane-text-muted)]">
+          {sprintf(
+            /* translators: %d: number of modules that are switched off. */
+            _n('%d not turned on', '%d not turned on', remaining.length, 'zaplane'),
+            remaining.length
+          )}
+        </span>
       </div>
 
-      {/* A page-level suggestion can be put away; a note about the node you are
-          configuring cannot, since it would just be wrong to hide it. */}
-      {!teaser.activates && (
-        <button
-          type="button"
-          onClick={dismiss}
-          aria-label={__('Dismiss', 'zaplane')}
-          title={__('Dismiss', 'zaplane')}
-          className="absolute right-3 top-3 rounded-[4px] p-1 text-[var(--zaplane-font-secondary-color)] hover:text-[var(--zaplane-font-color)]"
-        >
-          <FiX size={16} />
-        </button>
-      )}
-    </div>
+      <p className="mb-0 mt-1.5 text-[13px] text-[var(--zaplane-font-secondary-color)]">{data.body}</p>
+
+      <div className="mt-3 flex flex-col" style={{ borderTop: `1px solid ${TINT.rule}` }}>
+        {remaining.map(module => (
+          <div
+            key={module.key}
+            className="flex items-start justify-between gap-4 py-3"
+            style={{ borderBottom: `1px solid ${TINT.rule}` }}
+          >
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] font-semibold text-[var(--zaplane-font-color)]">{module.title}</span>
+                {module.relevant_here && (
+                  <span
+                    className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ background: TINT.accent, color: 'var(--zaplane-primary)' }}
+                  >
+                    {__('Useful here', 'zaplane')}
+                  </span>
+                )}
+              </div>
+              <p className="mb-0 mt-0.5 text-[12.5px] leading-[1.5] text-[var(--zaplane-font-secondary-color)]">
+                {module.description}
+              </p>
+            </div>
+            <ActivateButton
+              label={__('Turn on', 'zaplane')}
+              busy={busyKey === module.key}
+              onClick={() => activate(module.key)}
+              subtle
+            />
+          </div>
+        ))}
+      </div>
+
+      <a
+        href={`${admin_url}admin.php?page=zaplane-settings&tab=modules`}
+        className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-[var(--zaplane-primary)] no-underline hover:underline"
+      >
+        {__('Manage all modules', 'zaplane')}
+        <FiArrowRight size={13} />
+      </a>
+    </Shell>
   );
 };
 
