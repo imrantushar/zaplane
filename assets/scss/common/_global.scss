@@ -1,18 +1,18 @@
 :root {
     --zaplane-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
     --zaplane-primary: #006BFF;
-    --zaplane-second-primary: #DAEAFF;
+    --zaplane-second-primary: #E3E7FF;
     --zaplane-secondary: #f5f5f5;
     --zaplane-secondary-color: #F6F7F8;
-    --zaplane-border-color: #CBD1D7;
+    --zaplane-border-color: #DFE1E5;
     --zaplane-body-background: #F6F7F8;
     --zaplane-background: #FFFFFF;
-    --zaplane-font-color: #141A24;
-    --zaplane-font-secondary-color: #737373;
+    --zaplane-font-color: #131D2B;
+    --zaplane-font-secondary-color: #575E6C;
     --zaplane-text-muted: #738496;
-    --zaplane-danger: #e44a3f;
+    --zaplane-danger: #E2483D;
     --zaplane-warning: #FDB022;
-    --zaplane-success: #16A34A;
+    --zaplane-success: #00AD6B;
     --zaplane-placeholder: #A2ADB9;
     // Aliases for a few legacy references in component styles. Resolved lazily,
     // so they follow the active (light/dark) values of the vars they point at.
@@ -20,7 +20,37 @@
     --zaplane-gray-color: var(--zaplane-font-secondary-color);
     --zaplane-shadow: 0 0 1px 0 rgba(212, 212, 216, 0.30) inset, 0 8px 16px 0 rgba(24, 24, 27, 0.10);
     --zaplane-shadow-2: 0 0 1px 0 rgba(20, 26, 36, 0.20), 0 1px 2px 0 rgba(20, 26, 36, 0.10);
+    --zaplane-shadow-menu: 0 0 1px 0 rgba(20, 26, 36, 0.30), 0 8px 16px 0 rgba(20, 26, 36, 0.10);
     --zaplane-gray: #F6F7F8;
+
+    // Base/neutral tokens (previously hardcoded #fff/#000 throughout components)
+    --zaplane-white: #fff;
+    --zaplane-black: #000;
+    --zaplane-icon-check: #f8f8f8;
+    --zaplane-btn-text: #444;
+    --zaplane-disabled-bg: #E5E5E6;
+    --zaplane-overlay-dark: rgba(0, 0, 0, 0.1);
+    --zaplane-overlay-light: rgba(0, 0, 0, 0.08);
+    --zaplane-focus-ring: rgba(49, 130, 206, 0.1);
+
+    // Extra semantic accents (not covered by primary/danger/success/warning)
+    --zaplane-info: #7B68EE;
+    --zaplane-info-light: rgba(123, 104, 238, 0.2);
+    --zaplane-red: #f94d4d;
+    --zaplane-red-light: rgba(249, 77, 77, 0.2);
+
+    // Notification component tokens
+    --zaplane-notification-shadow: 0px 12px 72px -8px rgba(16, 24, 40, 0.25);
+    --zaplane-notification-error: #FF4D4D;
+    --zaplane-notification-error-light: #FFEDED;
+
+    // Status pill tokens
+    --zaplane-status-success: #16A34A;
+    --zaplane-status-success-bg: rgba(22, 163, 74, 0.1);
+    --zaplane-status-failed: #DC2626;
+    --zaplane-status-failed-bg: rgba(220, 38, 38, 0.1);
+    --zaplane-status-pending: #EAB308;
+    --zaplane-status-pending-bg: rgba(234, 179, 8, 0.1);
 }
 
 // .wp-admin{
@@ -93,7 +123,7 @@
         &__menu {
             background: var(--zaplane-background);
             min-width: 100%;
-            box-shadow: 0 0 1px 0 rgba(20, 26, 36, 0.30), 0 8px 16px 0 rgba(20, 26, 36, 0.10);
+            box-shadow: var(--zaplane-shadow-menu);
         }
 
         &__option {
@@ -130,11 +160,11 @@
         }
 
         &__multi-value__label {
-            color: #fff !important;
+            color: var(--zaplane-white) !important;
         }
 
         &__multi-value__remove {
-            color: #E2483D;
+            color: var(--zaplane-danger);
         }
 
         &__single-value {
@@ -220,13 +250,13 @@
     transform: translate(-50%, -50%);
     width: 8px;
     height: 8px;
-    background-color: white;
+    background-color: var(--zaplane-white);
     border-radius: 50%;
 }
 
 .zaplane-radio-input:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    box-shadow: 0 0 0 3px var(--zaplane-focus-ring);
 }
 
 .zaplane-radio-input:hover {
@@ -263,8 +293,8 @@ input.zaplane-checkbox:checked::before {
     top: 2px !important;
     width: 4px !important;
     height: 9px !important;
-    border-right: 2px solid white !important;
-    border-bottom: 2px solid white !important;
+    border-right: 2px solid var(--zaplane-white) !important;
+    border-bottom: 2px solid var(--zaplane-white) !important;
     transform: rotate(45deg) !important;
     float: none !important;
     display: block !important;
@@ -274,7 +304,7 @@ input.zaplane-checkbox:checked::before {
 
 input.zaplane-checkbox:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    box-shadow: 0 0 0 3px var(--zaplane-focus-ring);
 }
 
 input.zaplane-checkbox:hover {

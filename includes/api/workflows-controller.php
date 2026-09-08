@@ -650,7 +650,8 @@ class WorkflowsController extends WP_REST_Controller {
 				if ( 'trigger' === $nodeType ) {
 					// 1) Reuse the most recent real capture of this trigger from ANY
 					// workflow, so a new workflow inherits its fields.
-					$sample = \Zaplane\Framework\Core\Automation::get_trigger_sample( $integration, $event );
+					$triggerConfig = is_array( $node['data']['config'] ?? null ) ? $node['data']['config'] : [];
+					$sample        = \Zaplane\Framework\Core\Automation::get_trigger_sample( $integration, $event, $triggerConfig );
 
 					// 2) Fall back to the integration's declared trigger sample.
 					if ( empty( $sample ) && $instance ) {
