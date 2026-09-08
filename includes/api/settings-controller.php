@@ -46,6 +46,15 @@ class SettingsController extends WP_REST_Controller {
 			'permission_callback' => [ $this, 'permissions_check' ],
 		] );
 
+		// The palette definition, so the Appearance screen renders its rows and its
+		// "Reset to default" from the same values a fresh install gets. It used to
+		// keep a hand-copied duplicate in JavaScript, which had already drifted.
+		register_rest_route( $this->namespace, '/palette', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'get_palette' ],
+			'permission_callback' => [ $this, 'permissions_check' ],
+		] );
+
 		register_rest_route( $this->namespace, '/teasers', [
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => [ $this, 'get_teasers' ],
@@ -94,6 +103,16 @@ class SettingsController extends WP_REST_Controller {
 
 	public function get_menu() {
 		return rest_ensure_response( Helper::get_admin_menu_list() );
+	}
+
+	public function get_palette() {
+		return rest_ensure_response( [
+			'fields'   => Settings::palette_keys(),
+			'defaults' => [
+				'light' => Settings::default_light_palette(),
+				'dark'  => Settings::default_dark_palette(),
+			],
+		] );
 	}
 
 	public function get_modules() {

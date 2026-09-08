@@ -25,6 +25,7 @@ class Settings {
 	public static function palette_keys(): array {
 		return [
 			[ 'key' => '--zaplane-primary', 'label' => 'Primary' ],
+			[ 'key' => '--zaplane-primary-strong', 'label' => 'Primary (solid fill)' ],
 			[ 'key' => '--zaplane-second-primary', 'label' => 'Primary (soft)' ],
 			[ 'key' => '--zaplane-secondary', 'label' => 'Secondary' ],
 			[ 'key' => '--zaplane-secondary-color', 'label' => 'Surface' ],
@@ -53,6 +54,9 @@ class Settings {
 	public static function default_light_palette(): array {
 		return [
 			'--zaplane-primary'              => '#006BFF',
+			// The fill under a white button label. In light this is the brand
+			// itself, which already clears 4.5:1; dark has to go deeper.
+			'--zaplane-primary-strong'       => '#006BFF',
 			'--zaplane-second-primary'       => '#DAEAFF',
 			'--zaplane-secondary'            => '#F5F5F5',
 			'--zaplane-secondary-color'      => '#F6F7F8',
@@ -86,24 +90,34 @@ class Settings {
 	public static function default_dark_palette(): array {
 		return [
 			'--zaplane-primary'              => '#4C8DFF',
-			'--zaplane-second-primary'       => '#172A45',
-			'--zaplane-secondary'            => '#1F2630',
-			'--zaplane-secondary-color'      => '#1E242C',
-			'--zaplane-background'           => '#171C24',
-			'--zaplane-body-background'      => '#0F141A',
-			'--zaplane-canvas'               => '#0B0E13',
-			'--zaplane-border-color'         => '#2C333F',
-			'--zaplane-font-color'           => '#E6E9EF',
-			'--zaplane-font-secondary-color' => '#9AA4B2',
-			'--zaplane-text-muted'           => '#6B7684',
-			'--zaplane-placeholder'          => '#6B7280',
-			'--zaplane-success'              => '#34D399',
-			'--zaplane-warning'              => '#FBBF24',
-			'--zaplane-danger'               => '#F87171',
-			'--zaplane-gray'                 => '#1E242C',
+			// A blue bright enough to read as an accent on the dark ground is too
+			// light to sit under a white label, and one dark enough for the label
+			// is too dim as an accent. No single value does both, so the solid
+			// fill is its own token: 5.17:1 under white, where the accent gave 3.2.
+			'--zaplane-primary-strong'       => '#2563EB',
+			'--zaplane-second-primary'       => '#16263C',
+			'--zaplane-secondary'            => '#212732',
+			'--zaplane-secondary-color'      => '#1A1F27',
+			'--zaplane-background'           => '#161A21',
+			'--zaplane-body-background'      => '#0E1116',
+			'--zaplane-canvas'               => '#0A0C10',
+			// Raised from #2C333F. A border doing separation work has to be seen.
+			'--zaplane-border-color'         => '#303845',
+			// Pulled back off near-white. 14:1 on a ground this dark halates;
+			// this holds 13.5:1 without the glare.
+			'--zaplane-font-color'           => '#DCE3EC',
+			'--zaplane-font-secondary-color' => '#A7B3C2',
+			// Both of these used to fail AA outright — 3.70:1 and 3.54:1 — which is
+			// why secondary text read as washed out.
+			'--zaplane-text-muted'           => '#8794A6',
+			'--zaplane-placeholder'          => '#7C8899',
+			'--zaplane-success'              => '#3DD68C',
+			'--zaplane-warning'              => '#F5B544',
+			'--zaplane-danger'               => '#FB7185',
+			'--zaplane-gray'                 => '#1A1F27',
 			// Lightened so each stays legible against #0B0E13 rather than being a
 			// straight reuse of the light values.
-			'--zaplane-cat-trigger'          => '#34D399',
+			'--zaplane-cat-trigger'          => '#3DD68C',
 			'--zaplane-cat-action'           => '#4C8DFF',
 			'--zaplane-cat-tool'             => '#F5A524',
 			'--zaplane-cat-ai'               => '#A78BFA',

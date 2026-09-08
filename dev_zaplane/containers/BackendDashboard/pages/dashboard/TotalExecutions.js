@@ -20,16 +20,16 @@ const TotalExecutions = () => {
           <AreaChart data={monthly_executions} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3182CE" stopOpacity={0.1} />
-                <stop offset="95%" stopColor="#3182CE" stopOpacity={0} />
+                <stop offset="5%" stopColor="var(--zaplane-primary)" stopOpacity={0.1} />
+                <stop offset="95%" stopColor="var(--zaplane-primary)" stopOpacity={0} />
               </linearGradient>
             </defs>
 
-            <CartesianGrid strokeDasharray="0" vertical={false} stroke="#EDF2F7" />
+            <CartesianGrid strokeDasharray="0" vertical={false} stroke="var(--zaplane-border-color)" />
 
             <XAxis 
               dataKey="month" 
-              tick={{ fontSize: 12, fill: '#718096' }} 
+              tick={{ fontSize: 12, fill: 'var(--zaplane-text-muted)' }} 
               axisLine={false} 
               tickLine={false} 
               dy={10}
@@ -37,24 +37,32 @@ const TotalExecutions = () => {
 
             <YAxis 
               allowDecimals={false} 
-              tick={{ fontSize: 12, fill: '#718096' }} 
+              tick={{ fontSize: 12, fill: 'var(--zaplane-text-muted)' }} 
               axisLine={false} 
               tickLine={false} 
             />
 
             <Tooltip 
-              contentStyle={{ borderRadius: '8px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+              contentStyle={{
+                borderRadius: '8px',
+                background: 'var(--zaplane-background)',
+                border: '1px solid var(--zaplane-border-color)',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.25)',
+              }}
+              labelStyle={{ color: 'var(--zaplane-font-color)' }}
+              itemStyle={{ color: 'var(--zaplane-font-secondary-color)' }}
+              cursor={{ stroke: 'var(--zaplane-border-color)' }}
             />
 
             <Area 
               type="monotone" 
               dataKey="runs" 
               name="Runs" 
-              stroke="#3182CE" 
+              stroke="var(--zaplane-primary)" 
               fill="url(#colorValue)" 
               strokeWidth={3} 
               dot={false} 
-              activeDot={{ r: 6, strokeWidth: 0, fill: '#3182CE' }}
+              activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--zaplane-primary)' }}
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -62,4 +70,4 @@ const TotalExecutions = () => {
     </div>
   );
 };
-export default TotalExecutions;
+export default TotalExecutions;

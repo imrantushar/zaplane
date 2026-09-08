@@ -1,7 +1,9 @@
 import { round } from "lodash"
 
 export const primaryBtn = {
-    background: "var(--zaplane-primary)",
+    // The solid fill, not the accent. The accent has to stay bright enough to
+    // read on a dark ground, which leaves it too light under a white label.
+    background: "var(--zaplane-primary-strong)",
     color: "#fff",
     fontWeight: "500",
     fontSize: '14px',

@@ -33,6 +33,31 @@ All notable changes to Zaplane are documented here. This project adheres to
   itself once the thing it suggests has happened. Dismissals are per user, and
   new teasers can be registered through the `zaplane/feature_teasers` filter.
 
+### Changed — Dark theme
+- **Secondary text failed contrast.** `--zaplane-text-muted` sat at 3.70:1 and
+  `--zaplane-placeholder` at 3.54:1 against the card, both under the 4.5:1 minimum
+  — which is why secondary text read as washed out. They now measure 5.66:1 and
+  4.85:1. Primary text comes back off near-white (14.06:1 → 13.49:1), which stops
+  it halating on a ground this dark, and the border rises from 1.35:1 to 1.48:1 so
+  it can do the separation work it is asked to do.
+- **A white button label was unreadable on the accent.** No single blue works for
+  both jobs: bright enough to read as an accent on the dark ground is too light
+  under a white label, and dark enough for the label is too dim as an accent. The
+  solid fill is now its own token, `--zaplane-primary-strong`, giving 5.17:1 under
+  white where the accent gave 3.20:1. Light mode already cleared the bar, so it
+  keeps the brand value.
+- **The dashboard chart ignored the theme entirely.** Gridlines were a hardcoded
+  `#EDF2F7`, which glared white on the dark ground; axis labels, the tooltip and
+  the area line were likewise fixed light-mode values, and the line was a blue
+  that was not even the brand. All of it now follows the palette, along with the
+  status dots in the empty state.
+
+### Fixed — Settings
+- The Appearance screen kept a hand-copied duplicate of both palettes in
+  JavaScript, which had already drifted from the PHP: six tokens never appeared in
+  the editor at all, and "Reset to default" wrote stale colours. Rows and defaults
+  now come from the server over `GET /zaplane/v1/palette`.
+
 ### Changed — Workflow canvas
 - **The node card is a surface again.** It used to fill with
   `--zaplane-secondary-color`, which is the same value the canvas paints, so a node
