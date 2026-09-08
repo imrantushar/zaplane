@@ -47,3 +47,25 @@
     transform: rotate(360deg);
   }
 }
+/* The canvas needs a value of its own. It used to paint the same colour the node
+   card filled with, so a node was visible only because of its border — which is
+   why that border had to be so heavy. */
+.zaplane_flowcanvas .react-flow {
+  background: var(--zaplane-canvas);
+}
+
+.zaplane_flowcanvas .react-flow__background {
+  color: color-mix(in srgb, var(--zaplane-font-color) 13%, transparent);
+}
+
+/* Hover and selection follow the node's own category hue, set inline as
+   --zaplane-node-hue, rather than a Tailwind indigo that ignores the theme. */
+.zaplane-node-body:hover {
+  border-color: color-mix(in srgb, var(--zaplane-node-hue, var(--zaplane-primary)) 55%, transparent) !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 4px 12px -4px rgba(16, 24, 40, 0.10);
+}
+
+.react-flow__node.selected .zaplane-node-body {
+  border-color: var(--zaplane-node-hue, var(--zaplane-primary)) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--zaplane-node-hue, var(--zaplane-primary)) 18%, transparent);
+}

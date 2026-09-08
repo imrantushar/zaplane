@@ -30,6 +30,7 @@ class Settings {
 			[ 'key' => '--zaplane-secondary-color', 'label' => 'Surface' ],
 			[ 'key' => '--zaplane-background', 'label' => 'Background' ],
 			[ 'key' => '--zaplane-body-background', 'label' => 'Body background' ],
+			[ 'key' => '--zaplane-canvas', 'label' => 'Canvas' ],
 			[ 'key' => '--zaplane-border-color', 'label' => 'Border' ],
 			[ 'key' => '--zaplane-font-color', 'label' => 'Text' ],
 			[ 'key' => '--zaplane-font-secondary-color', 'label' => 'Text (secondary)' ],
@@ -39,6 +40,10 @@ class Settings {
 			[ 'key' => '--zaplane-warning', 'label' => 'Warning' ],
 			[ 'key' => '--zaplane-danger', 'label' => 'Danger' ],
 			[ 'key' => '--zaplane-gray', 'label' => 'Gray' ],
+			[ 'key' => '--zaplane-cat-trigger', 'label' => 'Node · trigger' ],
+			[ 'key' => '--zaplane-cat-action', 'label' => 'Node · action' ],
+			[ 'key' => '--zaplane-cat-tool', 'label' => 'Node · tool' ],
+			[ 'key' => '--zaplane-cat-ai', 'label' => 'Node · AI' ],
 		];
 	}
 
@@ -53,6 +58,9 @@ class Settings {
 			'--zaplane-secondary-color'      => '#F6F7F8',
 			'--zaplane-background'           => '#FFFFFF',
 			'--zaplane-body-background'      => '#F6F7F8',
+			// The canvas must not equal the node fill, or a node is only visible
+			// because of its border — which is what forced the border to be heavy.
+			'--zaplane-canvas'               => '#EDF0F4',
 			'--zaplane-border-color'         => '#CBD1D7',
 			'--zaplane-font-color'           => '#141A24',
 			'--zaplane-font-secondary-color' => '#737373',
@@ -62,6 +70,13 @@ class Settings {
 			'--zaplane-warning'              => '#FDB022',
 			'--zaplane-danger'               => '#E44A3F',
 			'--zaplane-gray'                 => '#F6F7F8',
+			// Node categories. Actions take the brand hue because they are the
+			// default case; the rest are spaced far enough apart to be told apart
+			// at a glance when the canvas is zoomed out and labels are unreadable.
+			'--zaplane-cat-trigger'          => '#0E9F6E',
+			'--zaplane-cat-action'           => '#006BFF',
+			'--zaplane-cat-tool'             => '#D97706',
+			'--zaplane-cat-ai'               => '#7C3AED',
 		];
 	}
 
@@ -76,6 +91,7 @@ class Settings {
 			'--zaplane-secondary-color'      => '#1E242C',
 			'--zaplane-background'           => '#171C24',
 			'--zaplane-body-background'      => '#0F141A',
+			'--zaplane-canvas'               => '#0B0E13',
 			'--zaplane-border-color'         => '#2C333F',
 			'--zaplane-font-color'           => '#E6E9EF',
 			'--zaplane-font-secondary-color' => '#9AA4B2',
@@ -85,6 +101,12 @@ class Settings {
 			'--zaplane-warning'              => '#FBBF24',
 			'--zaplane-danger'               => '#F87171',
 			'--zaplane-gray'                 => '#1E242C',
+			// Lightened so each stays legible against #0B0E13 rather than being a
+			// straight reuse of the light values.
+			'--zaplane-cat-trigger'          => '#34D399',
+			'--zaplane-cat-action'           => '#4C8DFF',
+			'--zaplane-cat-tool'             => '#F5A524',
+			'--zaplane-cat-ai'               => '#A78BFA',
 		];
 	}
 

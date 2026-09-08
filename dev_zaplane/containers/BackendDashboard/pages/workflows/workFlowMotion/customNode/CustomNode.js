@@ -6,6 +6,7 @@ import FloatingEdge from "../floatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
 import { formatLabel, integrations } from "@ZAPUtils/helper";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
+import { CATEGORY_LABELS, hueMix, nodeCategory, nodeHue } from "./helper";
 
 const addPortBtnStyle = {
   display: "inline-flex",
@@ -76,11 +77,14 @@ export default function CustomNode({
   const isTrigger = data?.action === "trigger";
   const canRemove = isTrigger ? !isSelectApp : hasPort;
 
+  const category = nodeCategory(data);
+  const hue = nodeHue(data);
+
   const handleStyle = {
     width: 8,
     height: 8,
     borderRadius: "8px",
-    background: "#6366f1", // purple-dot color
+    background: hue,
     border: "none",
   };
 
@@ -95,19 +99,23 @@ export default function CustomNode({
   }, [id, isAgent, isSubNode, isLR, ports.length, updateNodeInternals]);
 
   return (
-    <div className="zaplane-custom-node-wrapper" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ position: 'relative' }}>
+    <div className="zaplane-custom-node-wrapper" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ position: 'relative', '--zaplane-node-hue': hue }}>
       
-      {/* NODE LABEL */}
-      <div className="zaplane-node-label" style={{ 
-        position: 'absolute', 
-        top: -25, 
-        left: 0, 
-        fontSize: '13px', 
-        fontWeight: '500', 
-        color: 'var(--zaplane-font-color)' 
-      }}>
-        {formattedAction || "Action"}
-      </div>
+      {/* NODE LABEL — only while the node is still a placeholder. Once an app is
+          chosen the category strip inside the card says the same thing without
+          floating outside the node's own bounds. */}
+      {isSelectApp && (
+        <div className="zaplane-node-label" style={{
+          position: 'absolute',
+          top: -25,
+          left: 0,
+          fontSize: '13px',
+          fontWeight: '500',
+          color: 'var(--zaplane-font-color)'
+        }}>
+          {formattedAction || "Action"}
+        </div>
+      )}
 
       {/* DELETE BUTTON */}
       {canRemove && hovered && (
@@ -135,22 +143,22 @@ export default function CustomNode({
       )}
 
       {/* NODE BODY */}
-      <div 
+      <div
         style={{
-          padding: '12px 16px',
-          minWidth: '220px',
-          minHeight: '64px',
-          background: 'var(--zaplane-secondary-color)',
-          border: '1px solid var(--zaplane-border-color)',
-          borderRadius: '8px',
-          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-          display: 'flex',
-          alignItems: 'center',
+          minWidth: '236px',
+          // A surface, not a rectangle of border. The card used to fill with
+          // --zaplane-secondary-color, which is the same value the canvas paints,
+          // so the border was the only thing separating the two.
+          background: 'var(--zaplane-background)',
+          border: `1px solid ${hueMix(category, 26)}`,
+          borderRadius: '9px',
+          boxShadow: '0 1px 2px 0 rgba(16, 24, 40, 0.05)',
+          overflow: 'hidden',
           cursor: 'pointer',
-          transition: 'all 0.2s ease',
-        }} 
+          transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+        }}
         onClick={data.onOpenDrawer}
-        className="zaplane-node-body hover:border-indigo-400"
+        className="zaplane-node-body"
       >
         {/* TARGET HANDLE */}
         {data?.action !== "trigger" && (
@@ -161,8 +169,30 @@ export default function CustomNode({
           />
         )}
 
+        {/* CATEGORY STRIP — what the node is, in a word and a hue. Replaces the
+            floating label that used to sit above the card and collide with
+            whatever was laid out there. */}
+        {!isSelectApp && (
+          <div
+            className="flex items-center gap-[6px]"
+            style={{
+              padding: '5px 11px',
+              background: hueMix(category, 9, 'var(--zaplane-background)'),
+              borderBottom: `1px solid ${hueMix(category, 18)}`,
+              fontSize: '9.5px',
+              fontWeight: 600,
+              letterSpacing: '0.09em',
+              textTransform: 'uppercase',
+              color: hueMix(category, 78, 'var(--zaplane-font-color)'),
+            }}
+          >
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: hue, display: 'block' }} />
+            {__(CATEGORY_LABELS[category], "zaplane")}
+          </div>
+        )}
+
         {/* NODE CONTENT */}
-        <div className="flex flex-row items-center gap-3 w-full">
+        <div className="flex flex-row items-center gap-3 w-full" style={{ padding: '10px 11px' }}>
           <div className="zaplane-node-icon flex-shrink-0">
             {isSelectApp ? (
               <div style={{
@@ -173,7 +203,7 @@ export default function CustomNode({
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '8px',
-                border: '1px solid var(--zaplane-border-color)'
+                border: '1px dashed var(--zaplane-border-color)'
               }}>
                 <FaPlus size={14} color="var(--zaplane-font-secondary-color)" />
               </div>
@@ -211,7 +241,7 @@ export default function CustomNode({
 
         {/* SOURCE HANDLES — one connectable, labelled handle per output branch */}
         {isSubNode ? (
-          <Handle type="source" id="sub_out" position={Position.Top} style={{ ...handleStyle, background: "#a855f7" }} />
+          <Handle type="source" id="sub_out" position={Position.Top} style={{ ...handleStyle, background: "var(--zaplane-cat-ai)" }} />
         ) : isMultiPort ? (
           ports.map((port, i) => {
             // Fixed spacing centred on the node so ports never overlap, however
@@ -288,7 +318,7 @@ export default function CustomNode({
                   type="target"
                   id={sp.id}
                   position={Position.Bottom}
-                  style={{ ...handleStyle, background: "#a855f7", left: pos }}
+                  style={{ ...handleStyle, background: "var(--zaplane-cat-ai)", left: pos }}
                 />
                 <div
                   style={{
@@ -304,7 +334,7 @@ export default function CustomNode({
                 >
                   {!connected && (
                     <>
-                      <span style={{ width: 0, height: 14, borderLeft: "1.5px dashed #C4B5FD" }} />
+                      <span style={{ width: 0, height: 14, borderLeft: "1.5px dashed color-mix(in srgb, var(--zaplane-cat-ai) 45%, transparent)" }} />
                       <button
                         type="button"
                         title={sprintf(__("Add %s", "zaplane"), sp.label)}
@@ -316,9 +346,9 @@ export default function CustomNode({
                           width: 22,
                           height: 22,
                           borderRadius: "50%",
-                          border: "1px dashed #a855f7",
+                          border: "1px dashed var(--zaplane-cat-ai)",
                           background: "var(--zaplane-background)",
-                          color: "#a855f7",
+                          color: "var(--zaplane-cat-ai)",
                           cursor: "pointer",
                           padding: 0,
                           pointerEvents: "auto",
@@ -334,9 +364,12 @@ export default function CustomNode({
                       marginTop: connected ? 8 : 5,
                       fontSize: 10,
                       fontWeight: 500,
-                      color: "#7C3AED",
+                      color: "var(--zaplane-cat-ai)",
                       whiteSpace: "nowrap",
-                      background: "rgba(255,255,255,0.9)",
+                      // Was a hardcoded white, which reads as a light chip on the
+                      // dark canvas. The label sits over the canvas, so it takes
+                      // the canvas colour.
+                      background: "var(--zaplane-canvas)",
                       borderRadius: 4,
                       padding: "0 4px",
                     }}

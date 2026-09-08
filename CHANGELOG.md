@@ -33,6 +33,29 @@ All notable changes to Zaplane are documented here. This project adheres to
   itself once the thing it suggests has happened. Dismissals are per user, and
   new teasers can be registered through the `zaplane/feature_teasers` filter.
 
+### Changed — Workflow canvas
+- **The node card is a surface again.** It used to fill with
+  `--zaplane-secondary-color`, which is the same value the canvas paints, so a node
+  was visible only because of its border — which is why that border had to be so
+  heavy. A new `--zaplane-canvas` token separates the two, cards fill with the
+  surface colour, and the border drops to a hairline.
+- **Nodes are typed by colour.** Trigger, action, tool and AI each get a token
+  (`--zaplane-cat-*`, with a dark-mode pair), applied to a header strip, the icon
+  tile, the handles, and the connector leaving the node — so a glance shows what
+  feeds what without reading a label. The floating label above each card is gone;
+  it said the same thing while colliding with whatever was laid out above.
+- **One stroke per connector.** Edges drew a soft base path plus a dashed overlay
+  at near-full opacity on a permanent loop, with an arrow landing on top of the
+  target handle. Now a single stroke in the source node's hue, with the arrow
+  inset to clear the handle. The moving dashes are kept for edges marked as
+  running, so motion means data is moving through right now — nothing sets that
+  flag yet; wiring live run state to the canvas is still to do.
+- **Every canvas colour now comes from the palette.** Thirteen hardcoded values
+  are gone: `indigo-400`/`indigo-500` on hover, `#a855f7`/`#C4B5FD`/`#7C3AED` on
+  the AI sub-node ports, a white chip that showed as a light box in dark mode, and
+  the Yes/No branch labels, which now use the success and danger tokens so a
+  semantic colour still reads over a coloured edge.
+
 ### Changed — Modules are now opt-in
 - Every module ships switched **off**, including Custom Apps and Business
   Knowledge, which previously defaulted on. Existing sites keep whatever they had:
