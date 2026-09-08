@@ -94,7 +94,7 @@
         &__menu {
             background: var(--zaplane-background);
             min-width: 100%;
-            box-shadow: 0 0 1px 0 rgba(20, 26, 36, 0.30), 0 8px 16px 0 rgba(20, 26, 36, 0.10);
+            box-shadow: var(--zaplane-shadow-menu);
         }
 
         &__option {
@@ -134,11 +134,11 @@
         }
 
         &__multi-value__label {
-            color: #fff !important;
+            color: var(--zaplane-white) !important;
         }
 
         &__multi-value__remove {
-            color: #E2483D;
+            color: var(--zaplane-danger);
         }
 
         &__single-value {
@@ -348,13 +348,13 @@
     transform: translate(-50%, -50%);
     width: 8px;
     height: 8px;
-    background-color: white;
+    background-color: var(--zaplane-white);
     border-radius: 50%;
 }
 
 .zaplane-radio-input:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    box-shadow: 0 0 0 3px var(--zaplane-focus-ring);
 }
 
 .zaplane-radio-input:hover {
