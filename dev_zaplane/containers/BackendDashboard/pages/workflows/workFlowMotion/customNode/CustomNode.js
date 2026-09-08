@@ -56,7 +56,6 @@ export default function CustomNode({
   const hasOutgoingEdge = edges.some(e => e.source === id);
   const isLR = canvasLayout === "LR";
   const isSelectApp = data.app === "Select an app";
-  const formattedAction = data?.action?.charAt(0).toUpperCase() + data?.action?.slice(1);
   const ports = getNodePorts(data);
   const isMultiPort = ports.length > 1;
   // The AI Agent accepts sub-nodes wired into its bottom: a chat model, a memory
@@ -101,22 +100,6 @@ export default function CustomNode({
   return (
     <div className="zaplane-custom-node-wrapper" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ position: 'relative', '--zaplane-node-hue': hue }}>
       
-      {/* NODE LABEL — only while the node is still a placeholder. Once an app is
-          chosen the category strip inside the card says the same thing without
-          floating outside the node's own bounds. */}
-      {isSelectApp && (
-        <div className="zaplane-node-label" style={{
-          position: 'absolute',
-          top: -25,
-          left: 0,
-          fontSize: '13px',
-          fontWeight: '500',
-          color: 'var(--zaplane-font-color)'
-        }}>
-          {formattedAction || "Action"}
-        </div>
-      )}
-
       {/* REMOVE CONTROL — a real button, so the whole target is clickable and it
           can be reached from the keyboard. The click used to sit on the icon
           itself, leaving the padding around it dead, and the chip filled with
@@ -180,9 +163,10 @@ export default function CustomNode({
 
         {/* CATEGORY STRIP — what the node is, in a word and a hue. Replaces the
             floating label that used to sit above the card and collide with
-            whatever was laid out there. */}
-        {!isSelectApp && (
-          <div
+            whatever was laid out there. Shown on an empty node too: it is still
+            a trigger or an action, and that is the one thing worth knowing
+            before it has been filled in. */}
+        <div
             className="flex items-center gap-[6px]"
             style={{
               padding: '5px 11px',
@@ -197,8 +181,7 @@ export default function CustomNode({
           >
             <span style={{ width: 5, height: 5, borderRadius: '50%', background: hue, display: 'block' }} />
             {__(CATEGORY_LABELS[category], "zaplane")}
-          </div>
-        )}
+        </div>
 
         {/* NODE CONTENT */}
         <div className="flex flex-row items-center gap-3 w-full" style={{ padding: '10px 11px' }}>
@@ -233,18 +216,18 @@ export default function CustomNode({
               {isSelectApp ? __(data.app, "zaplane") : sprintf(__("%s", "zaplane"), formatLabel(data.event))}
             </span>
 
-            {!isSelectApp && (
-              <span style={{ 
-                fontSize: '12px', 
-                color: 'var(--zaplane-font-secondary-color)',
-                display: 'block',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
-              }} className="zaplane-sub-title">
-                {sprintf(__("%s", "zaplane"), data.app)}
-              </span>
-            )}
+            <span style={{
+              fontSize: '12px',
+              color: 'var(--zaplane-font-secondary-color)',
+              display: 'block',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }} className="zaplane-sub-title">
+              {isSelectApp
+                ? (isTrigger ? __("Choose a trigger", "zaplane") : __("Choose an action", "zaplane"))
+                : sprintf(__("%s", "zaplane"), data.app)}
+            </span>
           </div>
         </div>
 

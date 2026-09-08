@@ -69,6 +69,13 @@ All notable changes to Zaplane are documented here. This project adheres to
   tile, the handles, and the connector leaving the node — so a glance shows what
   feeds what without reading a label. The floating label above each card is gone;
   it said the same thing while colliding with whatever was laid out above.
+- **An empty node looks like a filled one.** A node that had not been given an app
+  yet was a different component: no category strip, a plain label floating above
+  the card, a single line of text and a shorter box. It now uses the same strip,
+  the same two-line body and the same geometry — an empty node is still a trigger
+  or an action, which is the one thing worth knowing before it is filled in — with
+  a dashed tile and a "Choose a trigger" hint marking it as unset. The floating
+  label is gone in both states.
 - **One stroke per connector.** Edges drew a soft base path plus a dashed overlay
   at near-full opacity on a permanent loop, with an arrow landing on top of the
   target handle. Now a single stroke in the source node's hue, with the arrow
