@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Handle, Position, useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { FaRegCopy, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import FloatingEdge from "../floatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
 import { formatLabel, integrations } from "@ZAPUtils/helper";
@@ -117,29 +117,38 @@ export default function CustomNode({
         </div>
       )}
 
-      {/* DELETE BUTTON */}
-      {canRemove && hovered && (
-        <div
-          style={{
-            position: 'absolute',
-            top: -10,
-            right: -10,
-            zIndex: 10,
-            pointerEvents: 'auto',
-            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-          }}
-          className="flex flex-row items-center bg-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)] p-[6px] rounded-[4px] cursor-pointer"
-        >
-          <RiDeleteBin5Line style={{ width: "16px", height: "16px" }} onClick={e => {
+      {/* REMOVE CONTROL — a real button, so the whole target is clickable and it
+          can be reached from the keyboard. The click used to sit on the icon
+          itself, leaving the padding around it dead, and the chip filled with
+          --zaplane-border-color: a border value used as a fill, which is why it
+          read as a muddy grey square against the card. */}
+      {canRemove && (
+        <button
+          type="button"
+          aria-label={isTrigger ? __("Reset trigger", "zaplane") : __("Delete step", "zaplane")}
+          title={isTrigger ? __("Reset trigger", "zaplane") : __("Delete step", "zaplane")}
+          onClick={e => {
             e.stopPropagation();
             if (isTrigger) {
               data?.resetTrigger(id);
             } else {
               data?.deleteNode(id);
             }
-          }} className="cursor-pointer" />
-          {!data?.action && <FaRegCopy style={{ width: "16px", height: "16px" }} />}
-        </div>
+          }}
+          className="zaplane-node-remove"
+          style={{
+            position: 'absolute',
+            top: -10,
+            right: -10,
+            zIndex: 10,
+            // Kept mounted so it can take focus, but an invisible control must
+            // not swallow clicks aimed at the card corner behind it.
+            opacity: hovered ? 1 : 0,
+            pointerEvents: hovered ? 'auto' : 'none',
+          }}
+        >
+          <RiDeleteBin5Line style={{ width: "14px", height: "14px" }} />
+        </button>
       )}
 
       {/* NODE BODY */}

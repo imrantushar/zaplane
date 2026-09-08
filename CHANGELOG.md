@@ -50,6 +50,14 @@ All notable changes to Zaplane are documented here. This project adheres to
   inset to clear the handle. The moving dashes are kept for edges marked as
   running, so motion means data is moving through right now — nothing sets that
   flag yet; wiring live run state to the canvas is still to do.
+- **The remove control on a node is a real button.** The click handler used to sit
+  on the trash glyph rather than the control, so the padding around it did
+  nothing; it was a `div` with no label, no keyboard access and no focus state;
+  and it filled with `--zaplane-border-color` — a border value used as a fill,
+  which is why it read as a muddy grey square. It is now a labelled button on its
+  own surface that reddens on hover, says "Reset trigger" on a trigger and "Delete
+  step" elsewhere, and reveals itself on focus so it can be reached without a
+  mouse. A dead copy button that could never render was removed with it.
 - **Every canvas colour now comes from the palette.** Thirteen hardcoded values
   are gone: `indigo-400`/`indigo-500` on hover, `#a855f7`/`#C4B5FD`/`#7C3AED` on
   the AI sub-node ports, a white chip that showed as a light box in dark mode, and
