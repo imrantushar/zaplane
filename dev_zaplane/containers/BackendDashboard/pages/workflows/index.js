@@ -17,8 +17,8 @@ const CreateWorkflows = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   return <>
       {renderTopBar ? renderTopBar({}) : <TopBar leftContent={() => <>
-              <div height="40px" width="40px" className="flex rounded-[20px] bg-var(--zaplane-second-primary) items-center justify-center">
-                <img src={`${plugin_root_url}assets/images/zaplane.svg`} />
+              <div style={{height:'40px', width:'40px', background:'var(--zaplane-second-primary)'}} className="flex rounded-[20px] items-center justify-center">
+                <img src={`${plugin_root_url}assets/images/zaplane.svg`} alt="Zaplane" />
               </div>
   
               <IoIosArrowForward />
