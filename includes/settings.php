@@ -108,18 +108,23 @@ class Settings {
 				'key'         => 'custom_apps',
 				'title'       => __( 'Custom Apps', 'zaplane' ),
 				'description' => __( 'Build your own integrations from the UI — any external REST API, or hooks on this site. When off, the Custom Apps menu is hidden.', 'zaplane' ),
-				'default'     => true,
+				'default'     => false,
 				'menu'        => 'custom-apps',
 				'panel'       => '',
+				// Custom apps are user-defined, so the slugs are resolved at runtime
+				// rather than listed here.
+				'apps'        => [],
+				'owns_custom_apps' => true,
 				'since'       => '1.1.0',
 			],
 			'knowledge'   => [
 				'key'         => 'knowledge',
 				'title'       => __( 'Business Knowledge', 'zaplane' ),
 				'description' => __( 'A searchable knowledge base the AI Agent can answer from. Sync any post type — products, docs, policies. When off, the Business Knowledge menu is hidden.', 'zaplane' ),
-				'default'     => true,
+				'default'     => false,
 				'menu'        => 'knowledge',
 				'panel'       => '',
+				'apps'        => [ 'knowledge' ],
 				'since'       => '1.1.0',
 			],
 			'mcp_server'  => [
@@ -132,9 +137,45 @@ class Settings {
 				'menu'        => '',
 				'panel'       => 'mcp',
 				'panel_label' => __( 'AI access', 'zaplane' ),
+				// Nothing on the canvas corresponds to the MCP server; the MCP Client
+				// tool is the other direction and is not gated by this.
+				'apps'        => [],
 				'since'       => '1.2.0',
 			],
 		];
+	}
+
+	/**
+	 * The module that owns an integration slug, or null when nothing does.
+	 *
+	 * No integration is hidden when its module is off — that would break
+	 * workflows already using it — so this is what lets the builder notice it is
+	 * offering a node from a module the site has not switched on.
+	 */
+	public static function module_for_app( string $slug ): ?string {
+		if ( '' === $slug ) {
+			return null;
+		}
+
+		foreach ( self::modules() as $key => $module ) {
+			if ( in_array( $slug, (array) ( $module['apps'] ?? [] ), true ) ) {
+				return $key;
+			}
+		}
+
+		// User-defined apps belong to whichever module claims them, and their slugs
+		// are only known at runtime.
+		foreach ( self::modules() as $key => $module ) {
+			if ( empty( $module['owns_custom_apps'] ) ) {
+				continue;
+			}
+			if ( class_exists( '\Zaplane\CustomApps\ManifestStore' )
+				&& array_key_exists( $slug, \Zaplane\CustomApps\ManifestStore::all() ) ) {
+				return $key;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -235,7 +276,12 @@ class Settings {
 	 */
 	private static function sanitize( array $input ): array {
 		$defaults = self::defaults();
-		$out      = $defaults;
+
+		// Base a save on what is currently in effect, not on the defaults. Settings
+		// are stored as a whole tree, so starting from defaults means a partial
+		// save — activating one module from a teaser, say — silently resets every
+		// key the caller did not mention back to its default.
+		$out = self::get();
 
 		// Features: booleans only.
 		if ( isset( $input['features'] ) && is_array( $input['features'] ) ) {

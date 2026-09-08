@@ -96,6 +96,8 @@ class ModulesTest extends TestCase {
 		foreach ( Settings::modules() as $key => $module ) {
 			$this->assertSame( $module['default'], $features[ $key ] );
 		}
+
+		$this->assertSame( [], array_filter( $features ), 'Nothing should be on out of the box.' );
 	}
 
 	/**
@@ -107,8 +109,45 @@ class ModulesTest extends TestCase {
 		Settings::save( [ 'features' => [ 'mcp_server' => true ] ] );
 
 		$this->assertTrue( Settings::feature_enabled( 'mcp_server' ) );
-		// Untouched modules keep their defaults rather than being wiped.
+		// Untouched modules are left as they were rather than being wiped.
+		$this->assertFalse( Settings::feature_enabled( 'knowledge' ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function every_module_is_opt_in(): void {
+		foreach ( Settings::modules() as $key => $module ) {
+			$this->assertFalse( $module['default'], $key . ' should ship switched off.' );
+			$this->assertFalse( Settings::feature_enabled( $key ) );
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function activating_one_module_does_not_switch_off_the_others(): void {
+		Settings::save( [ 'features' => [ 'knowledge' => true ] ] );
+		Settings::save( [ 'features' => [ 'custom_apps' => true ] ] );
+
+		// A partial save must merge over what is in effect, not reset to defaults.
 		$this->assertTrue( Settings::feature_enabled( 'knowledge' ) );
+		$this->assertTrue( Settings::feature_enabled( 'custom_apps' ) );
+		$this->assertFalse( Settings::feature_enabled( 'mcp_server' ) );
+
+		Settings::save( [ 'features' => [ 'knowledge' => false ] ] );
+
+		$this->assertFalse( Settings::feature_enabled( 'knowledge' ) );
+		$this->assertTrue( Settings::feature_enabled( 'custom_apps' ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function an_integration_slug_resolves_to_the_module_that_owns_it(): void {
+		$this->assertSame( 'knowledge', Settings::module_for_app( 'knowledge' ) );
+		$this->assertNull( Settings::module_for_app( 'woocommerce' ) );
+		$this->assertNull( Settings::module_for_app( '' ) );
 	}
 
 	/**
@@ -121,6 +160,7 @@ class ModulesTest extends TestCase {
 			'zaplane-knowledge'    => [ 'title' => 'Business Knowledge' ],
 		];
 
+		Settings::save( [ 'features' => [ 'custom_apps' => true, 'knowledge' => true ] ] );
 		$this->assertArrayHasKey( 'zaplane-custom-apps', Settings::filter_admin_menu( $menu ) );
 
 		Settings::save( [ 'features' => [ 'custom_apps' => false ] ] );

@@ -110,24 +110,23 @@ class TeasersTest extends TestCase {
 	/**
 	 * @test
 	 */
-	public function an_enabled_but_unused_module_is_still_advertised(): void {
-		// custom_apps ships enabled, so an off-switch gate would never fire; what
-		// makes it worth mentioning is that nobody has built one.
-		$this->assertTrue( Settings::feature_enabled( 'custom_apps' ) );
+	public function every_module_being_opt_in_means_every_teaser_starts_visible(): void {
+		$this->assertNotNull( Teasers::for_screen( 'workflows' ) );
 		$this->assertNotNull( Teasers::for_screen( 'connections' ) );
+		$this->assertNotNull( Teasers::for_screen( 'dashboard' ) );
 	}
 
 	/**
 	 * @test
 	 */
-	public function using_the_module_retires_its_teaser(): void {
+	public function switching_the_module_on_is_all_it_takes_to_retire_a_teaser(): void {
 		$this->assertNotNull( Teasers::for_screen( 'connections' ) );
 
-		$this->addCustomApp();
+		Settings::save( [ 'features' => [ 'custom_apps' => true ] ] );
 
 		$this->assertNull(
 			Teasers::for_screen( 'connections' ),
-			'Once a custom app exists there is nothing left to suggest.'
+			'A module that is on has nothing left to advertise.'
 		);
 	}
 
@@ -184,15 +183,59 @@ class TeasersTest extends TestCase {
 		$this->assertArrayHasKey( 'connections', $visible );
 		$this->assertSame( 'mcp_on_workflows', $visible['workflows']['key'] );
 
-		// Turning MCP on, and giving the other two something to show for
-		// themselves, should leave nothing to advertise.
-		Settings::save( [ 'features' => [ 'mcp_server' => true ] ] );
+		Settings::save(
+			[
+				'features' => [
+					'mcp_server'  => true,
+					'custom_apps' => true,
+					'knowledge'   => true,
+				],
+			]
+		);
+
+		$this->assertSame( [], Teasers::all_visible(), 'With every module on, nothing is left to advertise.' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function a_node_from_a_switched_off_module_is_flagged_in_the_builder(): void {
+		$teaser = Teasers::for_app( 'knowledge' );
+
+		$this->assertNotNull( $teaser );
+		$this->assertSame( 'knowledge', $teaser['module'] );
+		$this->assertSame( 'knowledge', $teaser['activates'], 'It should offer to switch the module on inline.' );
+		$this->assertStringContainsString( 'Business Knowledge', $teaser['title'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function the_builder_says_nothing_once_the_module_is_on(): void {
+		Settings::save( [ 'features' => [ 'knowledge' => true ] ] );
+
+		$this->assertNull( Teasers::for_app( 'knowledge' ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function a_node_belonging_to_no_module_is_never_flagged(): void {
+		$this->assertNull( Teasers::for_app( 'woocommerce' ) );
+		$this->assertNull( Teasers::for_app( 'slack' ) );
+		$this->assertNull( Teasers::for_app( '' ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function a_user_defined_app_is_attributed_to_the_custom_apps_module(): void {
 		$this->addCustomApp();
 
-		$remaining = array_keys( Teasers::all_visible() );
+		$teaser = Teasers::for_app( 'acme' );
 
-		$this->assertNotContains( 'workflows', $remaining );
-		$this->assertNotContains( 'connections', $remaining );
+		$this->assertNotNull( $teaser );
+		$this->assertSame( 'custom_apps', $teaser['activates'] );
 	}
 
 	/**

@@ -52,6 +52,14 @@ class SettingsController extends WP_REST_Controller {
 			'permission_callback' => [ $this, 'permissions_check' ],
 		] );
 
+		// One-click activation from wherever a teaser appears, so nobody has to
+		// abandon a half-built workflow to go and flip a switch.
+		register_rest_route( $this->namespace, '/modules/(?P<key>[a-z0-9_]+)/activate', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'activate_module' ],
+			'permission_callback' => [ $this, 'permissions_check' ],
+		] );
+
 		register_rest_route( $this->namespace, '/teasers/(?P<key>[a-z0-9_]+)/dismiss', [
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => [ $this, 'dismiss_teaser' ],
@@ -93,13 +101,33 @@ class SettingsController extends WP_REST_Controller {
 	}
 
 	public function get_teasers( $request ) {
-		$screen = (string) ( $request->get_param( 'screen' ) ?? '' );
+		$app = (string) ( $request->get_param( 'app' ) ?? '' );
+		if ( '' !== $app ) {
+			return rest_ensure_response( \Zaplane\Features\Teasers::for_app( $app ) );
+		}
 
+		$screen = (string) ( $request->get_param( 'screen' ) ?? '' );
 		if ( '' !== $screen ) {
 			return rest_ensure_response( \Zaplane\Features\Teasers::for_screen( $screen ) );
 		}
 
 		return rest_ensure_response( \Zaplane\Features\Teasers::all_visible() );
+	}
+
+	public function activate_module( $request ) {
+		$key = (string) $request['key'];
+
+		if ( ! isset( Settings::modules()[ $key ] ) ) {
+			return new \WP_Error( 'unknown_module', 'Unknown module: ' . $key, [ 'status' => 404 ] );
+		}
+
+		Settings::save( [ 'features' => [ $key => true ] ] );
+
+		return rest_ensure_response( [
+			'activated' => true,
+			'key'       => $key,
+			'features'  => Settings::get()['features'],
+		] );
 	}
 
 	public function dismiss_teaser( $request ) {

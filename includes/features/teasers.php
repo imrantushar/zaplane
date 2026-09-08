@@ -17,11 +17,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * have been useful — the AI-access prompt on Workflows, Custom Apps on
  * Connections — rather than relying on anyone reading a changelog.
  *
- * Relevance is a predicate, not just "is the module off". Two of the three
- * modules ship enabled, so an off-switch gate would have meant their prompts
- * never appeared; what actually makes them worth advertising is that the module
- * is on and nobody has used it yet. Either way the prompt retires itself once
- * the thing it suggests has happened, so acting on it is also how it goes away.
+ * Modules are opt-in, so a teaser is worth showing exactly while its module is
+ * off, and stops the moment it is switched on — acting on the suggestion is also
+ * how it goes away. Relevance stays a predicate rather than a bare flag check so
+ * a teaser can ask a harder question than "is this on".
+ *
+ * Two placements. `for_screen()` answers "what belongs on the Workflows page",
+ * while `for_app()` answers "the node just picked in the builder belongs to a
+ * module this site has not switched on" — the more useful moment of the two,
+ * because the user is already trying to use the thing.
  *
  * Dismissals are per user — one administrator hiding a card should not hide it
  * for their colleagues. At most one teaser shows per screen.
@@ -57,17 +61,17 @@ class Teasers {
 				'cta_panel'   => 'modules',
 				// Worth saying while nobody has built one — whether that is because
 				// the module is off, or on and untouched.
-				'relevant'    => static fn(): bool => ! Settings::feature_enabled( 'custom_apps' ) || ! self::has_custom_apps(),
+				'relevant'    => static fn(): bool => ! Settings::feature_enabled( 'custom_apps' ),
 			],
 			'knowledge_on_dashboard'     => [
 				'key'         => 'knowledge_on_dashboard',
 				'screen'      => 'dashboard',
 				'module'      => 'knowledge',
 				'title'       => __( 'Teach the AI Agent about your business', 'zaplane' ),
-				'body'        => __( 'Business Knowledge syncs your products, docs or policies into a searchable base the AI Agent answers from, so replies quote your catalogue instead of guessing. Nothing has been synced yet.', 'zaplane' ),
+				'body'        => __( 'Business Knowledge syncs your products, docs or policies into a searchable base the AI Agent answers from, so replies quote your catalogue instead of guessing.', 'zaplane' ),
 				'cta_label'   => __( 'Add business knowledge', 'zaplane' ),
 				'cta_panel'   => 'modules',
-				'relevant'    => static fn(): bool => ! Settings::feature_enabled( 'knowledge' ) || ! self::has_knowledge(),
+				'relevant'    => static fn(): bool => ! Settings::feature_enabled( 'knowledge' ),
 			],
 		];
 
@@ -121,6 +125,52 @@ class Teasers {
 		}
 
 		return null;
+	}
+
+	/**
+	 * A prompt for an integration whose module is switched off, or null.
+	 *
+	 * Nodes stay available when their module is off, so that a workflow already
+	 * using one keeps running. The cost is that the builder will happily hand you
+	 * a node from a module you never enabled and say nothing; this is what it
+	 * says instead.
+	 *
+	 * Not dismissible: it is a fact about the node in front of you, not a
+	 * suggestion to file away.
+	 *
+	 * @return array<string,mixed>|null
+	 */
+	public static function for_app( string $slug ): ?array {
+		$module_key = Settings::module_for_app( $slug );
+
+		if ( null === $module_key || Settings::feature_enabled( $module_key ) ) {
+			return null;
+		}
+
+		$module = Settings::modules()[ $module_key ] ?? null;
+		if ( null === $module ) {
+			return null;
+		}
+
+		return [
+			'key'       => 'app_module_off_' . $module_key,
+			'screen'    => 'builder',
+			'module'    => $module_key,
+			'title'     => sprintf(
+				/* translators: %s: module name, e.g. Business Knowledge. */
+				__( '%s is switched off', 'zaplane' ),
+				$module['title']
+			),
+			'body'      => sprintf(
+				/* translators: %s: module description. */
+				__( 'You can still add this step, but the module it belongs to is not enabled on this site. %s', 'zaplane' ),
+				$module['description']
+			),
+			'cta_label' => __( 'Turn it on', 'zaplane' ),
+			'cta_panel' => 'modules',
+			// Offered inline so nobody has to leave a half-built workflow.
+			'activates' => $module_key,
+		];
 	}
 
 	/**
@@ -188,22 +238,6 @@ class Teasers {
 		} catch ( \Throwable $e ) {
 			return false;
 		}
-	}
-
-	private static function has_custom_apps(): bool {
-		if ( ! class_exists( '\Zaplane\CustomApps\ManifestStore' ) ) {
-			return false;
-		}
-
-		return ! empty( \Zaplane\CustomApps\ManifestStore::all() );
-	}
-
-	private static function has_knowledge(): bool {
-		if ( ! class_exists( '\Zaplane\Models\Knowledge' ) ) {
-			return false;
-		}
-
-		return \Zaplane\Models\Knowledge::count() > 0;
 	}
 
 	/**

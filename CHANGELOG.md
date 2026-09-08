@@ -33,6 +33,27 @@ All notable changes to Zaplane are documented here. This project adheres to
   itself once the thing it suggests has happened. Dismissals are per user, and
   new teasers can be registered through the `zaplane/feature_teasers` filter.
 
+### Changed — Modules are now opt-in
+- Every module ships switched **off**, including Custom Apps and Business
+  Knowledge, which previously defaulted on. Existing sites keep whatever they had:
+  a one-time migration pins any module without an explicit saved value to what it
+  used to resolve to, so nothing disappears on update. Fresh installs get the
+  opt-in defaults.
+- **A prompt in the builder.** No integration is hidden when its module is off —
+  that would break workflows already using it — so picking such a node now shows a
+  card saying which module is not enabled, with a one-click switch to turn it on
+  without leaving the half-built workflow.
+
+### Fixed — Modules
+- A partial settings save no longer resets modules it did not mention. Saves were
+  based on the defaults rather than on what was in effect, which was harmless
+  while modules defaulted on and would have silently switched them off now that
+  they do not.
+- Activating a module from a teaser reported failure while actually succeeding:
+  the success handler wrote to the frozen `ZaplaneGlobal.settings` snapshot, which
+  throws under the bundle's strict mode, and a broad `catch` treated that as a
+  failed request.
+
 ### Fixed — MCP server
 - The `Authorization` header is now also read from `HTTP_AUTHORIZATION` /
   `REDIRECT_HTTP_AUTHORIZATION`, so Apache under CGI no longer causes silent 401s.

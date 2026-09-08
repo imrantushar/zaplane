@@ -1,5 +1,6 @@
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { integrations } from "@ZAPUtils/helper";
+import Teaser from "@ZAPComponents/Teaser";
 import { useFormikContext } from "formik";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
@@ -268,6 +269,11 @@ const {
       {!mode && !search && !selectedItem && <DrawerModeList setMode={setMode} setSelectedItem={setSelectedItem} isTrigger={isTrigger} source={source} TOOLS={TOOLS} port={port} />}
 
       {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={(item) => setSelectedItem(mode === "tools" ? { ...item, mode: "tools" } : item)} setMode={setMode} />}
+
+      {/* The picked node's module may not be switched on. Nodes stay usable
+          either way, so this is the only place that says so — and it offers to
+          switch it on without leaving the half-built workflow. */}
+      {selectedItem && <Teaser app={selectedItem?.id} />}
 
       {selectedItem && <ZAPTab value={step} onChange={values?.actionType ? (newStep) => {
         if (step === "select" && newStep !== "select") {
