@@ -1,86 +1,34 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { __ } from '@wordpress/i18n';
-import { FiDroplet, FiGrid } from 'react-icons/fi';
+import { FiCpu, FiDroplet, FiGrid } from 'react-icons/fi';
 import PageLayout from '@ZAPComponents/PageLayout';
 import { getSettings, saveSettings } from '@ZAPRedux/Slices/settingSlice/settingSlice';
 import { fetchAdminMenuItems } from '@ZAPRedux/Slices/menuSlice/menuSlice';
 import { applyThemePalettes, useThemeMode } from '@ZAPUtils/theme';
+import McpTab from './McpTab';
+import { API, namespace, useQuery } from '@ZAPUtils/helper';
 
-// The customizable palette variables, in display order (mirrors PHP palette_keys()).
-const PALETTE_FIELDS = [
-  ['--zaplane-primary', __('Primary', 'zaplane')],
-  ['--zaplane-second-primary', __('Primary (soft)', 'zaplane')],
-  ['--zaplane-secondary', __('Secondary', 'zaplane')],
-  ['--zaplane-secondary-color', __('Surface', 'zaplane')],
-  ['--zaplane-background', __('Background', 'zaplane')],
-  ['--zaplane-body-background', __('Body background', 'zaplane')],
-  ['--zaplane-border-color', __('Border', 'zaplane')],
-  ['--zaplane-font-color', __('Text', 'zaplane')],
-  ['--zaplane-font-secondary-color', __('Text (secondary)', 'zaplane')],
-  ['--zaplane-text-muted', __('Text (muted)', 'zaplane')],
-  ['--zaplane-placeholder', __('Placeholder', 'zaplane')],
-  ['--zaplane-success', __('Success', 'zaplane')],
-  ['--zaplane-warning', __('Warning', 'zaplane')],
-  ['--zaplane-danger', __('Danger', 'zaplane')],
-  ['--zaplane-gray', __('Gray', 'zaplane')],
-];
-
-// Default palettes — mirror PHP Settings::default_light_palette()/default_dark_palette().
-const DEFAULT_PALETTES = {
-  light: {
-    '--zaplane-primary': '#006BFF',
-    '--zaplane-second-primary': '#DAEAFF',
-    '--zaplane-secondary': '#F5F5F5',
-    '--zaplane-secondary-color': '#F6F7F8',
-    '--zaplane-background': '#FFFFFF',
-    '--zaplane-body-background': '#F6F7F8',
-    '--zaplane-border-color': '#CBD1D7',
-    '--zaplane-font-color': '#141A24',
-    '--zaplane-font-secondary-color': '#737373',
-    '--zaplane-text-muted': '#738496',
-    '--zaplane-placeholder': '#A2ADB9',
-    '--zaplane-success': '#16A34A',
-    '--zaplane-warning': '#FDB022',
-    '--zaplane-danger': '#E44A3F',
-    '--zaplane-gray': '#F6F7F8',
-  },
-  dark: {
-    '--zaplane-primary': '#4C8DFF',
-    '--zaplane-second-primary': '#172A45',
-    '--zaplane-secondary': '#1F2630',
-    '--zaplane-secondary-color': '#1E242C',
-    '--zaplane-background': '#171C24',
-    '--zaplane-body-background': '#0F141A',
-    '--zaplane-border-color': '#2C333F',
-    '--zaplane-font-color': '#E6E9EF',
-    '--zaplane-font-secondary-color': '#9AA4B2',
-    '--zaplane-text-muted': '#6B7684',
-    '--zaplane-placeholder': '#6B7280',
-    '--zaplane-success': '#34D399',
-    '--zaplane-warning': '#FBBF24',
-    '--zaplane-danger': '#F87171',
-    '--zaplane-gray': '#1E242C',
-  },
-};
-
-const FEATURE_FIELDS = [
-  {
-    key: 'custom_apps',
-    title: __('Custom Apps', 'zaplane'),
-    description: __('Build and manage your own integration apps. When off, the Custom Apps menu is hidden.', 'zaplane'),
-  },
-  {
-    key: 'knowledge',
-    title: __('Business Knowledge', 'zaplane'),
-    description: __('Store knowledge sources for the AI agent. When off, the Business Knowledge menu is hidden.', 'zaplane'),
-  },
-];
-
-const TABS = [
+// Palette rows and defaults come from the server — see GET /zaplane/v1/palette.
+// They used to be duplicated here by hand and had drifted from the PHP, so the
+// editor was missing tokens and "Reset to default" wrote stale colours.
+const BASE_TABS = [
   { key: 'appearance', label: __('Appearance', 'zaplane'), icon: FiDroplet },
   { key: 'modules', label: __('Modules', 'zaplane'), icon: FiGrid },
 ];
+
+// A module's settings panel is a page like any other page a module owns: it only
+// exists while the module is on, the same rule that hides its admin menu entry.
+const PANEL_ICONS = { mcp: FiCpu };
+
+const panelTabs = (modules, features) =>
+  modules
+    .filter(m => m.panel && !!features?.[m.key])
+    .map(m => ({
+      key: m.panel,
+      label: m.panel_label || m.title,
+      icon: PANEL_ICONS[m.panel] || FiCpu,
+    }));
 
 const clone = obj => JSON.parse(JSON.stringify(obj));
 
@@ -131,7 +79,7 @@ const SectionTitle = ({ title, description }) => (
   </div>
 );
 
-const AppearanceTab = ({ form, activeMode, setActiveMode, setDefaultMode, paletteTab, setPaletteTab, setColor, resetPalette }) => {
+const AppearanceTab = ({ form, paletteFields, paletteTab, setPaletteTab, setActiveMode, setColor, resetPalette }) => {
   const modes = [
     { value: 'light', label: __('Light', 'zaplane') },
     { value: 'dark', label: __('Dark', 'zaplane') },
@@ -161,12 +109,12 @@ const AppearanceTab = ({ form, activeMode, setActiveMode, setDefaultMode, palett
           </button>
         </div>
         <div className="grid grid-cols-1 gap-x-10 md:grid-cols-2">
-          {PALETTE_FIELDS.map(([varName, label]) => (
+          {paletteFields.map(field => (
             <ColorRow
-              key={varName}
-              label={label}
-              value={form.theme?.[paletteTab]?.[varName]}
-              onChange={val => setColor(paletteTab, varName, val)}
+              key={field.key}
+              label={field.label}
+              value={form.theme?.[paletteTab]?.[field.key]}
+              onChange={val => setColor(paletteTab, field.key, val)}
             />
           ))}
         </div>
@@ -175,19 +123,33 @@ const AppearanceTab = ({ form, activeMode, setActiveMode, setDefaultMode, palett
   );
 };
 
-const ModulesTab = ({ form, setFeature }) => (
+const ModulesTab = ({ form, modules, setFeature, setActiveTab }) => (
   <div>
     <SectionTitle title={__('Modules', 'zaplane')} description={__('Turn optional features on or off. Disabled modules are removed from the menu.', 'zaplane')} />
     <div className="flex flex-col divide-y divide-[var(--zaplane-border-color)]">
-      {FEATURE_FIELDS.map(f => (
-        <div key={f.key} className="flex items-center justify-between gap-4 py-4 first:pt-0">
-          <div>
-            <div className="text-[14px] font-medium text-[var(--zaplane-font-color)]">{f.title}</div>
-            <div className="mt-0.5 text-[13px] text-[var(--zaplane-font-secondary-color)]">{f.description}</div>
+      {modules.map(module => {
+        const on = !!form.features?.[module.key];
+        return (
+          <div key={module.key} className="flex items-center justify-between gap-4 py-4 first:pt-0">
+            <div>
+              <div className="text-[14px] font-medium text-[var(--zaplane-font-color)]">{module.title}</div>
+              <div className="mt-0.5 text-[13px] text-[var(--zaplane-font-secondary-color)]">{module.description}</div>
+              {/* A module with its own settings panel links straight to it, but
+                  only once it is on — there is nothing to configure otherwise. */}
+              {module.panel && on && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(module.panel)}
+                  className="mt-1.5 cursor-pointer border-0 bg-transparent p-0 text-[13px] font-semibold text-[var(--zaplane-primary)] hover:underline"
+                >
+                  {__('Configure', 'zaplane')} →
+                </button>
+              )}
+            </div>
+            <Toggle checked={on} onChange={val => setFeature(module.key, val)} />
           </div>
-          <Toggle checked={!!form.features?.[f.key]} onChange={val => setFeature(f.key, val)} />
-        </div>
-      ))}
+        );
+      })}
     </div>
   </div>
 );
@@ -197,12 +159,23 @@ const Setting = () => {
   const { data, saving } = useSelector(state => state.setting);
   const { mode: activeMode, set: setActiveMode } = useThemeMode();
   const [form, setForm] = useState(data ? clone(data) : null);
-  const [activeTab, setActiveTab] = useState('appearance');
+  const query = useQuery();
+  // A teaser can link here with ?tab=modules, so land where it promised.
+  const requestedTab = query.get('tab');
+  const [activeTab, setActiveTab] = useState(requestedTab || 'appearance');
+  const [modules, setModules] = useState([]);
+  const [palette, setPalette] = useState({ fields: [], defaults: { light: {}, dark: {} } });
   const [paletteTab, setPaletteTab] = useState(activeMode);
   const savedRef = useRef(data);
 
   useEffect(() => {
     dispatch(getSettings());
+    API.get(`${namespace}modules`)
+      .then(res => setModules(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setModules([]));
+    API.get(`${namespace}palette`)
+      .then(res => res.data?.fields && setPalette(res.data))
+      .catch(() => {});
   }, [dispatch]);
 
   useEffect(() => {
@@ -222,11 +195,10 @@ const Setting = () => {
   }, []);
 
   const setFeature = (key, val) => setForm(f => ({ ...f, features: { ...f.features, [key]: val } }));
-  const setDefaultMode = mode => setForm(f => ({ ...f, theme: { ...f.theme, default_mode: mode } }));
   const setColor = (variant, varName, value) =>
     setForm(f => ({ ...f, theme: { ...f.theme, [variant]: { ...f.theme[variant], [varName]: value } } }));
   const resetPalette = variant =>
-    setForm(f => ({ ...f, theme: { ...f.theme, [variant]: { ...DEFAULT_PALETTES[variant] } } }));
+    setForm(f => ({ ...f, theme: { ...f.theme, [variant]: { ...(palette.defaults?.[variant] || {}) } } }));
 
   const handleSave = async () => {
     if (!form) return;
@@ -239,6 +211,14 @@ const Setting = () => {
       dispatch(fetchAdminMenuItems());
     }
   };
+
+  const tabs = [...BASE_TABS, ...panelTabs(modules, form?.features)];
+
+  // Switching a module off takes its panel away; don't strand the user on a tab
+  // that no longer exists (or one a stale ?tab= asked for).
+  useEffect(() => {
+    if (tabs.length && !tabs.some(t => t.key === activeTab)) setActiveTab('modules');
+  }, [tabs.map(t => t.key).join(), activeTab]);
 
   // Only surface the branded, enabled save button when there are unsaved edits.
   const isDirty = !!form && !!data && JSON.stringify(form) !== JSON.stringify(data);
@@ -265,7 +245,7 @@ const Setting = () => {
           {/* Left sidebar tabs */}
           <nav className="w-full shrink-0 rounded-lg border border-[var(--zaplane-border-color)] bg-[var(--zaplane-background)] p-2 md:w-[220px]">
             <div className="flex flex-row gap-1 md:flex-col">
-              {TABS.map(tab => {
+              {tabs.map(tab => {
                 const Icon = tab.icon;
                 const active = activeTab === tab.key;
                 return (
@@ -287,17 +267,18 @@ const Setting = () => {
             {activeTab === 'appearance' ? (
               <AppearanceTab
                 form={form}
-                activeMode={activeMode}
-                setActiveMode={setActiveMode}
-                setDefaultMode={setDefaultMode}
+                paletteFields={palette.fields}
                 paletteTab={paletteTab}
                 setPaletteTab={setPaletteTab}
+                setActiveMode={setActiveMode}
                 setColor={setColor}
                 resetPalette={resetPalette}
               />
-            ) : (
-              <ModulesTab form={form} setFeature={setFeature} />
-            )}
+            ) : activeTab === 'modules' ? (
+              <ModulesTab form={form} modules={modules} setFeature={setFeature} setActiveTab={setActiveTab} />
+            ) : activeTab === 'mcp' ? (
+              <McpTab />
+            ) : null}
           </div>
         </div>
       )}

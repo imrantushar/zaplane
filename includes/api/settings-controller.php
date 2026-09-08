@@ -38,6 +38,43 @@ class SettingsController extends WP_REST_Controller {
 			],
 		] );
 
+		// The module registry, so the Modules screen renders from one definition
+		// instead of a second copy kept in JavaScript.
+		register_rest_route( $this->namespace, '/modules', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'get_modules' ],
+			'permission_callback' => [ $this, 'permissions_check' ],
+		] );
+
+		// The palette definition, so the Appearance screen renders its rows and its
+		// "Reset to default" from the same values a fresh install gets. It used to
+		// keep a hand-copied duplicate in JavaScript, which had already drifted.
+		register_rest_route( $this->namespace, '/palette', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'get_palette' ],
+			'permission_callback' => [ $this, 'permissions_check' ],
+		] );
+
+		register_rest_route( $this->namespace, '/teasers', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'get_teasers' ],
+			'permission_callback' => [ $this, 'permissions_check' ],
+		] );
+
+		// One-click activation from wherever a teaser appears, so nobody has to
+		// abandon a half-built workflow to go and flip a switch.
+		register_rest_route( $this->namespace, '/modules/(?P<key>[a-z0-9_]+)/activate', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'activate_module' ],
+			'permission_callback' => [ $this, 'permissions_check' ],
+		] );
+
+		register_rest_route( $this->namespace, '/teasers/(?P<key>[a-z0-9_]+)/dismiss', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'dismiss_teaser' ],
+			'permission_callback' => [ $this, 'permissions_check' ],
+		] );
+
 		// The feature-filtered admin menu, so the SPA sidebar can refetch live
 		// after a module is toggled (no full page reload).
 		register_rest_route( $this->namespace, '/menu', [
@@ -66,5 +103,55 @@ class SettingsController extends WP_REST_Controller {
 
 	public function get_menu() {
 		return rest_ensure_response( Helper::get_admin_menu_list() );
+	}
+
+	public function get_palette() {
+		return rest_ensure_response( [
+			'fields'   => Settings::palette_keys(),
+			'defaults' => [
+				'light' => Settings::default_light_palette(),
+				'dark'  => Settings::default_dark_palette(),
+			],
+		] );
+	}
+
+	public function get_modules() {
+		return rest_ensure_response( array_values( Settings::modules() ) );
+	}
+
+	public function get_teasers( $request ) {
+		$app = (string) ( $request->get_param( 'app' ) ?? '' );
+		if ( '' !== $app ) {
+			return rest_ensure_response( \Zaplane\Features\Teasers::for_app( $app ) );
+		}
+
+		return rest_ensure_response(
+			\Zaplane\Features\Teasers::spotlight( (string) ( $request->get_param( 'screen' ) ?? '' ) )
+		);
+	}
+
+	public function activate_module( $request ) {
+		$key = (string) $request['key'];
+
+		if ( ! isset( Settings::modules()[ $key ] ) ) {
+			return new \WP_Error( 'unknown_module', 'Unknown module: ' . $key, [ 'status' => 404 ] );
+		}
+
+		Settings::save( [ 'features' => [ $key => true ] ] );
+
+		return rest_ensure_response( [
+			'activated' => true,
+			'key'       => $key,
+			'features'  => Settings::get()['features'],
+		] );
+	}
+
+	public function dismiss_teaser( $request ) {
+		$key = (string) $request['key'];
+
+		return rest_ensure_response( [
+			'dismissed' => \Zaplane\Features\Teasers::dismiss( $key ),
+			'key'       => $key,
+		] );
 	}
 }

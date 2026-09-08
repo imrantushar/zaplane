@@ -10,6 +10,7 @@ import { deshboardSumary, topExecutedFlows } from '@ZAPRedux/Slices/dashboardSli
 import OverviewSection from './OverviewSection/OverviewSection';
 import CreateWorkflowModal from '@ZAPComponents/CreateWorkflowModal';
 import PageLayout from '@ZAPComponents/PageLayout';
+import Teaser from '@ZAPComponents/Teaser';
 export default function Dashboard() {
   const dispatch = useDispatch();
   const {
@@ -34,6 +35,8 @@ export default function Dashboard() {
       }
     >
       <div className="flex flex-col gap-6">
+        <Teaser screen="dashboard" />
+
         <OverviewSection />
         
         <TotalExecutions />
