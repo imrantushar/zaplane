@@ -237,6 +237,10 @@ class Mcpclient extends IntegrationBase {
 		$headers = [
 			'Content-Type' => 'application/json',
 			'Accept'       => 'application/json, text/event-stream',
+			// Identifies the calling site. Zaplane is both an MCP client and an MCP
+			// server, so a server that sees its own address here is being called
+			// back into by a workflow it started, and refuses to run another.
+			'X-Zaplane-Origin' => home_url(),
 		];
 		if ( '' !== $token ) {
 			$headers['Authorization'] = 'Bearer ' . $token;

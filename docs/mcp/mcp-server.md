@@ -1,0 +1,138 @@
+# MCP server
+
+Zaplane can present itself to an AI client — Claude, Cursor, or anything else
+that speaks the [Model Context Protocol](https://modelcontextprotocol.io) — over
+a single JSON-RPC endpoint. The client can then read what this site automates,
+**build new workflows from a description**, and diagnose failed runs.
+
+Zaplane is also an MCP *client* (the **MCP Client** tool node, and the AI Agent's
+`mcp_server_url` field). This document is about the server side.
+
+## Turning it on
+
+**Zaplane → Settings → AI access.** Off by default; nothing is reachable until a
+site owner enables it *and* issues a token.
+
+1. Toggle **Enable the MCP endpoint** and press **Save changes**.
+2. Under **Issue a token**, name the client, pick its scopes, press **Issue token**.
+3. Copy the token — it is shown once and is not recoverable.
+
+The endpoint is:
+
+```
+POST <site>/wp-json/zaplane/v1/mcp
+Authorization: Bearer <token>
+```
+
+Protocol revision `2025-06-18`, Streamable HTTP in single-JSON-response mode.
+`initialize`, `ping`, `tools/list` and `tools/call` are implemented, including
+batched requests and notification acks. There is no SSE channel and no session
+id — the server is stateless.
+
+## Scopes
+
+A token carries scopes, and `tools/list` only advertises what that token may
+call, so a client is never shown a tool it would be refused.
+
+| Scope   | Grants |
+|---------|--------|
+| `read`  | Browse apps, workflows, runs, connections, knowledge. |
+| `write` | Create and edit workflows, sync knowledge. Implies `read`. |
+| `run`   | Start workflows for real. |
+
+`run` is never granted by default. Everything else is reversible and
+inspectable; running a workflow sends the mail, takes the payment and posts to
+the other services, so it is opted into deliberately.
+
+Tokens are stored as a SHA-256 of the secret, so a database read cannot be
+replayed against the endpoint. Each is revocable on its own and records when it
+was last used.
+
+## Tools
+
+**Discovery** — `search_capabilities`, `list_apps`, `describe_app`
+
+**Authoring** — `validate_graph`, `create_workflow`, `update_workflow`,
+`set_workflow_status`, `create_workflow_from_recipe`
+
+**Inspection** — `list_workflows`, `get_workflow`, `list_recipes`, `list_runs`,
+`get_run`, `list_connections`
+
+**Knowledge** — `search_knowledge`, `list_businesses`, `sync_content`
+
+**Execution** — `run_workflow`
+
+### Building a workflow
+
+There are hundreds of triggers and actions across every installed app, so the
+intended path is narrow-then-read:
+
+1. `search_capabilities` with a plain-language description → a ranked shortlist.
+2. `describe_app` on a slug from that list → every field, its type, whether it is
+   required, and the allowed values for fixed selects.
+3. `validate_graph` on the draft → errors before anything is written.
+4. `create_workflow` → a draft on the canvas.
+
+A node only needs its intent:
+
+```json
+{
+  "title": "Notify on completed order",
+  "graph": {
+    "nodes": [
+      { "type": "trigger", "data": { "app": "woocommerce", "event": "order_status_completed" } },
+      { "type": "action",  "data": { "app": "slack", "event": "send_message",
+        "config": { "channel": "orders", "text": "Order {{1.order_id}} completed" } } }
+    ]
+  }
+}
+```
+
+Node ids, canvas positions, labels, icons, the trigger's WordPress hook and
+straight-line edges are all filled in from the integration manifest. Supply
+`edges` yourself only for branching (Router, Condition) or to wire an AI Agent's
+`ai_tool` / `ai_memory` / `ai_model` handles.
+
+**Node ids must be numeric strings** (`"1"`, `"2"`) if you supply them. The run
+engine reads them back as integers, so an id like `"send_email"` saves and
+renders but collapses every node onto key 0 at run time. Omit them and they are
+assigned for you.
+
+New workflows are created as **drafts**, and apps needing a connection are left
+unlinked — the site owner picks the account in the editor. Use
+`list_connections` to find an id, or `set_workflow_status` to go live once it
+is wired up (which re-validates and refuses a graph that would not run).
+
+## Behaviour worth knowing
+
+**Header stripping.** Apache under CGI/FastCGI drops `Authorization` before PHP
+sees it. The server falls back to `HTTP_AUTHORIZATION` and
+`REDIRECT_HTTP_AUTHORIZATION`, so this does not present as unexplained 401s.
+
+**Self-reference.** A workflow whose AI Agent points at this same site would be
+able to start the workflow that is calling it. The MCP client sends
+`X-Zaplane-Origin`; when the server sees its own address there it refuses
+`run_workflow` while still allowing reads.
+
+**Rate limit.** 120 calls per token per minute; over that the endpoint returns
+401 until the window rolls.
+
+**Tool failures** come back as `isError` results with a readable message rather
+than JSON-RPC protocol errors, so the model can correct itself. Only an unknown
+method or unknown tool is a protocol error.
+
+## Authentication and remote clients
+
+Authentication is a static bearer token. The MCP authorization spec describes
+OAuth 2.1 with dynamic client registration, which some hosted clients require;
+until that is implemented, connect through a bridge that can set a header, e.g.
+
+```bash
+npx mcp-remote https://example.com/wp-json/zaplane/v1/mcp --header "Authorization: Bearer <token>"
+```
+
+## Pre-existing tokens
+
+A token issued before scopes existed (the single `zaplane_mcp_token` option) is
+still accepted and is treated as holding every scope, so an already-connected
+client keeps working. Replace it with a scoped token when convenient.

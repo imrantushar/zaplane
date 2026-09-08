@@ -4,27 +4,36 @@ namespace Zaplane\API;
 
 use WP_REST_Controller;
 use WP_REST_Server;
-use WP_Error;
 use Zaplane\Framework\Classes\Container;
-use Zaplane\Models\Recipe;
-use Zaplane\Services\BlueprintService;
+use Zaplane\Mcp\ToolRegistry;
+use Zaplane\Mcp\TokenStore;
+use Zaplane\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Model Context Protocol (MCP) server for Zaplane.
+ * Model Context Protocol server.
  *
- * Exposes Zaplane's automation surface to AI clients (Claude, ChatGPT, Cursor)
- * over a JSON-RPC endpoint at POST /wp-json/zaplane/v1/mcp, authenticated with a
- * bearer token. Implements the core MCP methods (initialize, tools/list,
- * tools/call) using the Streamable-HTTP single-JSON-response mode.
+ * Exposes Zaplane's automation surface to AI clients over JSON-RPC at
+ * POST /wp-json/zaplane/v1/mcp, in the Streamable-HTTP single-JSON-response
+ * mode. Implements initialize, ping, tools/list and tools/call.
+ *
+ * Off until a site owner turns it on, then reachable only with a scoped token
+ * issued from the settings screen. tools/list is filtered to what the presenting
+ * token may actually call, so a read-only client is never shown a tool it would
+ * be refused.
+ *
+ * @see \Zaplane\Mcp\ToolRegistry for the tools themselves.
+ * @see \Zaplane\Mcp\TokenStore   for tokens and scopes.
  */
 class McpController extends WP_REST_Controller {
 
 	private const PROTOCOL_VERSION = '2025-06-18';
-	private const TOKEN_OPTION      = 'zaplane_mcp_token';
+
+	/** Calls allowed per token per minute. */
+	private const RATE_LIMIT = 120;
 
 	protected ?Container $container;
 
@@ -34,63 +43,192 @@ class McpController extends WP_REST_Controller {
 	}
 
 	public function register_routes(): void {
-		register_rest_route( $this->namespace, '/mcp', [
+		register_rest_route(
+			$this->namespace,
+			'/mcp',
 			[
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => [ $this, 'handle_rpc' ],
-				'permission_callback' => [ $this, 'check_bearer' ],
-			],
-		] );
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'handle_rpc' ],
+					'permission_callback' => [ $this, 'check_bearer' ],
+				],
+			]
+		);
 
-		// Admin-only: returns the endpoint URL + bearer token to paste into an AI client.
-		register_rest_route( $this->namespace, '/mcp/info', [
+		$admin = fn() => current_user_can( 'manage_options' );
+
+		// Endpoint URL, whether the feature is on, and the issued tokens
+		// (never their secrets).
+		register_rest_route(
+			$this->namespace,
+			'/mcp/info',
 			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'info' ],
-				'permission_callback' => fn() => current_user_can( 'manage_options' ),
-			],
-		] );
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'info' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/tokens',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'create_token' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/tokens/(?P<id>[a-z0-9]+)',
+			[
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'delete_token' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
 	}
 
-	/* ---------------------------------------------------------------------- */
+	/* ------------------------------- admin -------------------------------- */
 
 	public function info() {
-		return rest_ensure_response( [
-			'url'   => rest_url( $this->namespace . '/mcp' ),
-			'token' => self::get_or_create_token(),
-		] );
+		return rest_ensure_response(
+			[
+				'enabled'   => self::enabled(),
+				'url'       => rest_url( $this->namespace . '/mcp' ),
+				'protocol'  => self::PROTOCOL_VERSION,
+				'scopes'    => TokenStore::ALL_SCOPES,
+				'tokens'    => TokenStore::all(),
+				'tool_count' => count( ToolRegistry::definitions() ),
+			]
+		);
 	}
 
-	public static function get_or_create_token(): string {
-		$token = (string) get_option( self::TOKEN_OPTION, '' );
-		if ( '' === $token ) {
-			$token = wp_generate_password( 48, false );
-			update_option( self::TOKEN_OPTION, $token, false );
-		}
-		return $token;
+	public function create_token( $request ) {
+		$body = (array) $request->get_json_params();
+
+		$issued = TokenStore::issue(
+			(string) ( $body['name'] ?? '' ),
+			(array) ( $body['scopes'] ?? TokenStore::DEFAULT_SCOPES ),
+			get_current_user_id()
+		);
+
+		// The secret is in this response and nowhere else.
+		return rest_ensure_response( $issued );
 	}
 
+	public function delete_token( $request ) {
+		$revoked = TokenStore::revoke( (string) $request['id'] );
+
+		return rest_ensure_response(
+			[
+				'revoked' => $revoked,
+				'id'      => (string) $request['id'],
+			]
+		);
+	}
+
+	/* -------------------------------- auth -------------------------------- */
+
+	public static function enabled(): bool {
+		return Settings::feature_enabled( 'mcp_server' );
+	}
+
+	/**
+	 * Resolve the presented bearer token. Stashed on the request so handle_rpc
+	 * can read the scopes without resolving twice.
+	 *
+	 * @param \WP_REST_Request $request
+	 */
 	public function check_bearer( $request ): bool {
-		$expected = (string) get_option( self::TOKEN_OPTION, '' );
-		if ( '' === $expected ) {
-			return false; // not configured yet
-		}
-
-		$header = (string) $request->get_header( 'authorization' );
-		if ( stripos( $header, 'bearer ' ) !== 0 ) {
+		if ( ! self::enabled() ) {
 			return false;
 		}
-		$token = trim( substr( $header, 7 ) );
 
-		return hash_equals( $expected, $token );
+		$token = TokenStore::resolve( self::bearer( $request ) );
+		if ( null === $token ) {
+			return false;
+		}
+
+		if ( ! self::within_rate_limit( (string) $token['id'] ) ) {
+			return false;
+		}
+
+		$request->set_param( '_zaplane_mcp_token', $token );
+
+		return true;
 	}
 
-	/* ---------------------------------------------------------------------- */
+	/**
+	 * Pull the bearer value out of the request.
+	 *
+	 * Falls back to the CGI variables because Apache under CGI/FastCGI drops the
+	 * Authorization header before PHP sees it, which otherwise presents as every
+	 * call failing to authenticate for no visible reason.
+	 *
+	 * @param \WP_REST_Request $request
+	 */
+	private static function bearer( $request ): string {
+		$header = (string) $request->get_header( 'authorization' );
+
+		if ( '' === $header ) {
+			foreach ( [ 'HTTP_AUTHORIZATION', 'REDIRECT_HTTP_AUTHORIZATION' ] as $key ) {
+				if ( ! empty( $_SERVER[ $key ] ) ) {
+					$header = sanitize_text_field( wp_unslash( (string) $_SERVER[ $key ] ) );
+					break;
+				}
+			}
+		}
+
+		if ( 0 !== stripos( $header, 'bearer ' ) ) {
+			return '';
+		}
+
+		return trim( substr( $header, 7 ) );
+	}
+
+	private static function within_rate_limit( string $token_id ): bool {
+		$key   = 'zaplane_mcp_rl_' . md5( $token_id );
+		$count = (int) get_transient( $key );
+
+		if ( $count >= self::RATE_LIMIT ) {
+			return false;
+		}
+
+		set_transient( $key, $count + 1, MINUTE_IN_SECONDS );
+
+		return true;
+	}
+
+	/**
+	 * True when this request came from this same site's MCP client — a workflow
+	 * calling back into the server that started it.
+	 *
+	 * @param \WP_REST_Request $request
+	 */
+	private static function is_self_call( $request ): bool {
+		$origin = trim( (string) $request->get_header( 'x-zaplane-origin' ) );
+
+		if ( '' === $origin ) {
+			return false;
+		}
+
+		return untrailingslashit( $origin ) === untrailingslashit( home_url() );
+	}
+
+	/* ------------------------------- JSON-RPC ----------------------------- */
 
 	public function handle_rpc( $request ) {
 		$body = $request->get_json_params();
 
-		// Fall back to raw body if the client didn't send a JSON content-type.
+		// Fall back to the raw body when the client didn't set a JSON content type.
 		if ( null === $body || [] === $body ) {
 			$decoded = json_decode( (string) $request->get_body(), true );
 			if ( is_array( $decoded ) ) {
@@ -98,408 +236,173 @@ class McpController extends WP_REST_Controller {
 			}
 		}
 
-		// Batch request.
+		$token = (array) ( $request->get_param( '_zaplane_mcp_token' ) ?? [] );
+		$self  = self::is_self_call( $request );
+
+		// Batch.
 		if ( is_array( $body ) && isset( $body[0] ) ) {
 			$out = [];
-			foreach ( $body as $msg ) {
-				$resp = $this->dispatch( (array) $msg );
-				if ( null !== $resp ) {
-					$out[] = $resp;
+			foreach ( $body as $message ) {
+				$response = $this->dispatch( (array) $message, $token, $self );
+				if ( null !== $response ) {
+					$out[] = $response;
 				}
 			}
 			return rest_ensure_response( $out );
 		}
 
-		$resp = $this->dispatch( (array) $body );
+		$response = $this->dispatch( (array) $body, $token, $self );
 
-		// Notifications (no id) get an empty 202-style ack.
-		if ( null === $resp ) {
+		// Notifications get an ack with no body.
+		if ( null === $response ) {
 			return new \WP_REST_Response( null, 202 );
 		}
 
-		return rest_ensure_response( $resp );
+		return rest_ensure_response( $response );
 	}
 
-	private function dispatch( array $msg ) {
-		$method = $msg['method'] ?? '';
-		$id     = $msg['id'] ?? null;
-		$params = $msg['params'] ?? [];
+	/**
+	 * @param array<string,mixed> $message
+	 * @param array<string,mixed> $token
+	 * @return array<string,mixed>|null
+	 */
+	private function dispatch( array $message, array $token, bool $self ) {
+		$method = (string) ( $message['method'] ?? '' );
+		$id     = $message['id'] ?? null;
+		$params = (array) ( $message['params'] ?? [] );
+		$scopes = (array) ( $token['scopes'] ?? [] );
 
-		// Notifications have no id — acknowledge without a response body.
-		if ( null === $id && 0 === strpos( (string) $method, 'notifications/' ) ) {
+		if ( null === $id && 0 === strpos( $method, 'notifications/' ) ) {
 			return null;
 		}
 
 		switch ( $method ) {
 			case 'initialize':
-				return self::result( $id, [
-					'protocolVersion' => self::PROTOCOL_VERSION,
-					'capabilities'    => [ 'tools' => [ 'listChanged' => false ] ],
-					'serverInfo'      => [
-						'name'    => 'Zaplane',
-						'version' => defined( 'ZAPLANE_VERSION' ) ? ZAPLANE_VERSION : '1.0.0',
-					],
-				] );
+				return self::result(
+					$id,
+					[
+						'protocolVersion' => self::PROTOCOL_VERSION,
+						'capabilities'    => [ 'tools' => [ 'listChanged' => false ] ],
+						'serverInfo'      => [
+							'name'    => 'Zaplane',
+							'version' => defined( 'ZAPLANE_VERSION' ) ? ZAPLANE_VERSION : '1.0.0',
+						],
+						'instructions'    => 'Automation for this WordPress site. To build a workflow: search_capabilities to find the trigger and actions, describe_app for their exact config fields, validate_graph to check your draft, then create_workflow. To diagnose one: list_runs then get_run.',
+					]
+				);
 
 			case 'ping':
 				return self::result( $id, (object) [] );
 
 			case 'tools/list':
-				return self::result( $id, [ 'tools' => array_values( self::tool_defs() ) ] );
+				return self::result( $id, [ 'tools' => ToolRegistry::schemas( $scopes ) ] );
 
 			case 'tools/call':
-				return $this->call_tool( $id, $params );
+				return $this->call_tool( $id, $params, $token, $self );
 		}
 
 		return self::error( $id, -32601, 'Method not found: ' . $method );
 	}
 
-	/* ---------------------------------------------------------------------- */
-
-	private function call_tool( $id, array $params ) {
-		$name = $params['name'] ?? '';
+	/**
+	 * @param array<string,mixed> $params
+	 * @param array<string,mixed> $token
+	 * @return array<string,mixed>
+	 */
+	private function call_tool( $id, array $params, array $token, bool $self ) {
+		$name = (string) ( $params['name'] ?? '' );
 		$args = (array) ( $params['arguments'] ?? [] );
 
-		$map = [
-			'list_integrations'           => 'tool_list_integrations',
-			'list_workflows'              => 'tool_list_workflows',
-			'run_workflow'                => 'tool_run_workflow',
-			'list_recipes'                => 'tool_list_recipes',
-			'create_workflow_from_recipe' => 'tool_create_workflow_from_recipe',
-			'list_runs'                   => 'tool_list_runs',
-			'search_knowledge'            => 'tool_search_knowledge',
-			'list_businesses'             => 'tool_list_businesses',
-			'sync_content'                => 'tool_sync_content',
-		];
-
-		if ( ! isset( $map[ $name ] ) ) {
+		$required = ToolRegistry::scope_for( $name );
+		if ( null === $required ) {
 			return self::error( $id, -32602, 'Unknown tool: ' . $name );
 		}
 
+		if ( ! TokenStore::has_scope( $token, $required ) ) {
+			return self::tool_error(
+				$id,
+				sprintf(
+					'This token does not have the "%s" scope, which "%s" requires. Issue a new token with that scope from Zaplane → Settings.',
+					$required,
+					$name
+				)
+			);
+		}
+
+		// A workflow whose AI Agent points back at this site could otherwise start
+		// the workflow that is calling, and so on. Reads are harmless; starting a
+		// run is not.
+		if ( $self && TokenStore::SCOPE_RUN === $required ) {
+			return self::tool_error(
+				$id,
+				'Refused: this call came from this same site, so running a workflow here could re-enter the workflow that made the call.'
+			);
+		}
+
 		try {
-			$data = $this->{$map[ $name ]}( $args );
+			$data = ToolRegistry::call( $name, $args, $token );
 		} catch ( \Throwable $e ) {
-			return self::result( $id, [
+			return self::tool_error( $id, $e->getMessage() );
+		}
+
+		return self::result(
+			$id,
+			[
 				'content' => [
 					[
 						'type' => 'text',
-						'text' => 'Error: ' . $e->getMessage()
-					]
+						'text' => (string) wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ),
+					],
 				],
-				'isError' => true,
-			] );
-		}
-
-		return self::result( $id, [
-			'content' => [
-				[
-					'type' => 'text',
-					'text' => wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )
-				]
-			],
-		] );
-	}
-
-	/* ----------------------------- Tools ---------------------------------- */
-
-	private function tool_list_integrations( array $args ): array {
-		$file = ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json';
-		if ( ! file_exists( $file ) ) {
-			return [
-				'apps' => [],
-				'tools' => []
-			];
-		}
-		$m    = json_decode( file_get_contents( $file ), true ); // phpcs:ignore
-		$apps = [];
-		foreach ( (array) ( $m['apps'] ?? [] ) as $slug => $a ) {
-			$apps[] = [
-				'slug'     => $slug,
-				'name'     => $a['name'] ?? $slug,
-				'triggers' => array_keys( $a['triggers'] ?? [] ),
-				'actions'  => array_keys( $a['actions'] ?? [] ),
-			];
-		}
-		$tools = [];
-		foreach ( (array) ( $m['tools'] ?? [] ) as $slug => $a ) {
-			$tools[] = [
-				'slug' => $slug,
-				'name' => $a['name'] ?? $slug,
-				'actions' => array_keys( $a['actions'] ?? [] )
-			];
-		}
-		return [
-			'apps' => $apps,
-			'tools' => $tools
-		];
-	}
-
-	private function tool_list_workflows( array $args ): array {
-		global $wpdb;
-		$t = $wpdb->prefix . 'zaplane_workflows';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( "SELECT id, title, status FROM {$t} ORDER BY id DESC LIMIT 100", ARRAY_A );
-		return [ 'workflows' => is_array( $rows ) ? $rows : [] ];
-	}
-
-	private function tool_run_workflow( array $args ): array {
-		$id = (int) ( $args['workflow_id'] ?? 0 );
-		if ( ! $id ) {
-			throw new \Exception( 'workflow_id is required.' );
-		}
-		if ( ! function_exists( 'zaplane_run_workflow' ) ) {
-			throw new \Exception( 'Run engine unavailable.' );
-		}
-		$data   = isset( $args['data'] ) && is_array( $args['data'] ) ? $args['data'] : [];
-		$run_id = zaplane_run_workflow( $id, $data );
-		if ( ! $run_id ) {
-			throw new \Exception( 'Failed to start workflow (not found or no active version).' );
-		}
-		return [
-			'started' => true,
-			'run_id' => $run_id,
-			'workflow_id' => $id
-		];
-	}
-
-	private function tool_list_recipes( array $args ): array {
-		global $wpdb;
-		$t = $wpdb->prefix . 'zaplane_recipes';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( "SELECT id, title, description FROM {$t} ORDER BY id ASC LIMIT 200", ARRAY_A );
-		return [ 'recipes' => is_array( $rows ) ? $rows : [] ];
-	}
-
-	private function tool_create_workflow_from_recipe( array $args ): array {
-		$recipe_id = (int) ( $args['recipe_id'] ?? 0 );
-		$recipe    = $recipe_id ? Recipe::find( $recipe_id ) : null;
-		if ( ! $recipe ) {
-			throw new \Exception( 'Recipe not found.' );
-		}
-		$blueprint = $recipe->getBlueprint();
-		if ( empty( $blueprint ) ) {
-			throw new \Exception( 'Recipe blueprint is empty.' );
-		}
-		$title    = sanitize_text_field( (string) ( $args['title'] ?? '' ) );
-		$workflow = ( new BlueprintService() )->import( $blueprint, $title );
-
-		return [
-			'workflow_id'           => $workflow->id,
-			'title'                 => $workflow->title,
-			'status'                => $workflow->status,
-			'connections_to_relink' => $blueprint['connections'] ?? [],
-		];
-	}
-
-	private function tool_list_runs( array $args ): array {
-		global $wpdb;
-		$limit = min( 100, max( 1, (int) ( $args['limit'] ?? 20 ) ) );
-		$t     = $wpdb->prefix . 'zaplane_runs';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT id, workflow_id, status, started_at, finished_at FROM {$t} ORDER BY id DESC LIMIT %d", $limit ), ARRAY_A );
-		return [ 'runs' => is_array( $rows ) ? $rows : [] ];
-	}
-
-	private function tool_search_knowledge( array $args ): array {
-		if ( ! class_exists( '\Zaplane\Integrations\Knowledge' ) ) {
-			throw new \Exception( 'Knowledge integration unavailable.' );
-		}
-		$node = [
-			'data' => [
-				'event' => 'retrieve',
-				'config' => [
-					'business_key' => (string) ( $args['business_key'] ?? '' ),
-					'query'        => (string) ( $args['query'] ?? '' ),
-					'limit'        => (int) ( $args['limit'] ?? 5 ),
-				]
 			]
-		];
-		$res  = \Zaplane\Integrations\Knowledge::execute_node( $node, [] );
-		$data = $res['data'] ?? [];
-		return [
-			'context' => $data['context'] ?? '',
-			'matches' => $data['matches'] ?? [],
-		];
+		);
 	}
 
-	private function tool_list_businesses( array $args ): array {
-		global $wpdb;
-		$t = \Zaplane\Models\Knowledge::getTable();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( "SELECT business_key, COUNT(*) AS entries FROM {$t} GROUP BY business_key ORDER BY business_key ASC", ARRAY_A );
-		return [ 'businesses' => is_array( $rows ) ? $rows : [] ];
-	}
+	/* ------------------------------- helpers ------------------------------ */
 
-	private function tool_sync_content( array $args ): array {
-		if ( ! class_exists( '\Zaplane\Integrations\Knowledge' ) ) {
-			throw new \Exception( 'Knowledge integration unavailable.' );
-		}
-		$business = (string) ( $args['business_key'] ?? '' );
-		if ( '' === trim( $business ) ) {
-			throw new \Exception( 'business_key is required.' );
-		}
-		$config = [
-			'post_type'   => (string) ( $args['post_type'] ?? '' ),
-			'post_status' => (string) ( $args['post_status'] ?? 'publish' ),
-			'meta_keys'   => (string) ( $args['meta_keys'] ?? '' ),
-			'taxonomies'  => (string) ( $args['taxonomies'] ?? '' ),
-			'limit'       => (int) ( $args['limit'] ?? 0 ),
-			'prune'       => isset( $args['prune'] ) && false === $args['prune'] ? 'no' : 'yes',
-		];
-		$res  = \Zaplane\Integrations\Knowledge::action_sync_content( $business, $config, [] );
-		$data = $res['data'] ?? [];
-		if ( empty( $data['success'] ) ) {
-			throw new \Exception( (string) ( $data['error'] ?? 'Sync failed.' ) );
-		}
-		return [
-			'success'   => true,
-			'synced'    => (int) ( $data['synced'] ?? 0 ),
-			'pruned'    => (int) ( $data['pruned'] ?? 0 ),
-			'post_type' => $data['post_type'] ?? $config['post_type'],
-		];
-	}
-
-	/* --------------------------- Tool schemas ----------------------------- */
-
-	private static function tool_defs(): array {
-		$obj = fn( $props = [], $required = [] ) => [
-			'type'       => 'object',
-			'properties' => (object) $props,
-			'required'   => $required,
-		];
-
-		return [
-			[
-				'name'        => 'list_integrations',
-				'description' => 'List all available Zaplane integrations with their triggers and actions.',
-				'inputSchema' => $obj(),
-			],
-			[
-				'name'        => 'list_workflows',
-				'description' => 'List Zaplane workflows (id, title, status).',
-				'inputSchema' => $obj(),
-			],
-			[
-				'name'        => 'run_workflow',
-				'description' => 'Run a Zaplane workflow now by id, with optional trigger data.',
-				'inputSchema' => $obj( [
-					'workflow_id' => [
-						'type' => 'integer',
-						'description' => 'Workflow id to run.'
-					],
-					'data'        => [
-						'type' => 'object',
-						'description' => 'Optional trigger data passed to the workflow.'
-					],
-				], [ 'workflow_id' ] ),
-			],
-			[
-				'name'        => 'list_recipes',
-				'description' => 'List available Zaplane recipes (workflow templates).',
-				'inputSchema' => $obj(),
-			],
-			[
-				'name'        => 'create_workflow_from_recipe',
-				'description' => 'Create a new workflow from a recipe id. Connections must be re-linked afterward.',
-				'inputSchema' => $obj( [
-					'recipe_id' => [
-						'type' => 'integer',
-						'description' => 'Recipe id to instantiate.'
-					],
-					'title'     => [
-						'type' => 'string',
-						'description' => 'Optional title for the new workflow.'
-					],
-				], [ 'recipe_id' ] ),
-			],
-			[
-				'name'        => 'list_runs',
-				'description' => 'List recent workflow runs and their status.',
-				'inputSchema' => $obj( [
-					'limit' => [
-						'type' => 'integer',
-						'description' => 'Max runs to return (default 20).'
-					],
-				] ),
-			],
-			[
-				'name'        => 'search_knowledge',
-				'description' => 'Search a business knowledge base (products, prices, FAQ) for relevant entries.',
-				'inputSchema' => $obj( [
-					'business_key' => [
-						'type' => 'string',
-						'description' => 'Business key, e.g. business_a.'
-					],
-					'query'        => [
-						'type' => 'string',
-						'description' => 'What to search for.'
-					],
-					'limit'        => [
-						'type' => 'integer',
-						'description' => 'Max results (default 5).'
-					],
-				], [ 'business_key', 'query' ] ),
-			],
-			[
-				'name'        => 'list_businesses',
-				'description' => 'List the business keys that have knowledge entries, with entry counts.',
-				'inputSchema' => $obj(),
-			],
-			[
-				'name'        => 'sync_content',
-				'description' => 'Sync a WordPress post type (posts, pages, products, or any CPT) into a business knowledge base. Each item becomes one entry.',
-				'inputSchema' => $obj( [
-					'business_key' => [
-						'type' => 'string',
-						'description' => 'Business key to sync into, e.g. business_a.'
-					],
-					'post_type'    => [
-						'type' => 'string',
-						'description' => 'Post type slug to sync, e.g. post, page, product.'
-					],
-					'post_status'  => [
-						'type' => 'string',
-						'description' => 'Status to include (default publish).'
-					],
-					'meta_keys'    => [
-						'type' => 'string',
-						'description' => 'Optional comma-separated custom field keys to append.'
-					],
-					'taxonomies'   => [
-						'type' => 'string',
-						'description' => 'Optional comma-separated taxonomies whose terms to append.'
-					],
-					'limit'        => [
-						'type' => 'integer',
-						'description' => 'Max items to sync (0 = all).'
-					],
-					'prune'        => [
-						'type' => 'boolean',
-						'description' => 'Remove synced entries whose source item no longer exists (full sync only). Default true.'
-					],
-				], [ 'business_key', 'post_type' ] ),
-			],
-		];
-	}
-
-	/* --------------------------- JSON-RPC helpers ------------------------- */
-
+	/**
+	 * @param mixed $result
+	 * @return array<string,mixed>
+	 */
 	private static function result( $id, $result ): array {
 		return [
 			'jsonrpc' => '2.0',
-			'id' => $id,
-			'result' => $result
+			'id'      => $id,
+			'result'  => $result,
 		];
 	}
 
+	/**
+	 * A failure the model should see and can act on, rather than a protocol error.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private static function tool_error( $id, string $message ): array {
+		return self::result(
+			$id,
+			[
+				'content' => [
+					[
+						'type' => 'text',
+						'text' => 'Error: ' . $message,
+					],
+				],
+				'isError' => true,
+			]
+		);
+	}
+
+	/**
+	 * @return array<string,mixed>
+	 */
 	private static function error( $id, int $code, string $message ): array {
 		return [
 			'jsonrpc' => '2.0',
-			'id' => $id,
-			'error' => [
-				'code' => $code,
-				'message' => $message
-			]
+			'id'      => $id,
+			'error'   => [
+				'code'    => $code,
+				'message' => $message,
+			],
 		];
 	}
 }
