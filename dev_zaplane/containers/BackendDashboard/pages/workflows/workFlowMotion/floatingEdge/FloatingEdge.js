@@ -38,11 +38,11 @@ const FloatingEdge = ({
     ...(isLR ? {
       width: `${lineLength}px`,
       height: "0px",
-      borderTop: "2px dashed #D1D5DB",
+      borderTop: "2px dashed var(--zaplane-border-color)",
     } : {
       width: "0px",
       height: `${lineLength}px`,
-      borderLeft: "2px dashed #D1D5DB",
+      borderLeft: "2px dashed var(--zaplane-border-color)",
     })
   };
 
@@ -52,12 +52,12 @@ const FloatingEdge = ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#ffffff",
-    border: "1.5px dashed #D1D5DB",
+    backgroundColor: "var(--zaplane-background)",
+    border: "1.5px dashed var(--zaplane-border-color)",
     borderRadius: "50%",
     cursor: "pointer",
     transition: "all 0.2s ease",
-    color: "#6B7280",
+    color: "var(--zaplane-font-secondary-color)",
     boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
     pointerEvents: "auto",
   };
@@ -71,7 +71,7 @@ const FloatingEdge = ({
           openDrawerFromAdd();
         }}
         style={buttonStyle}
-        className="zaplane-add-node-button hover:border-indigo-400 hover:text-indigo-500 hover:scale-110"
+        className="zaplane-add-node-button hover:scale-110"
       >
         <FaPlus size={12} />
       </div>

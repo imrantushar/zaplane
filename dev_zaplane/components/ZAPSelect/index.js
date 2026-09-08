@@ -69,15 +69,49 @@ const ZAPSelect = ({
         menuPortalTarget={document.body}
         menuPosition="fixed"
         styles={{
+          // react-select injects white backgrounds/near-black text via inline
+          // styles that beat our SCSS classes — so theme the relevant slots here
+          // with CSS variables (they resolve to the active light/dark palette).
           menuPortal: (base) => ({
             ...base,
             zIndex: 100001
+          }),
+          control: (base, state) => ({
+            ...base,
+            backgroundColor: "var(--zaplane-background)",
+            borderColor: state.isFocused ? "var(--zaplane-primary)" : "var(--zaplane-border-color)",
+            boxShadow: "none",
+            "&:hover": { borderColor: "var(--zaplane-border-color)" }
+          }),
+          menu: (base) => ({
+            ...base,
+            backgroundColor: "var(--zaplane-background)",
+            border: "1px solid var(--zaplane-border-color)",
+            overflow: "hidden"
           }),
           menuList: (base) => ({
             ...base,
             maxHeight: 250,
             overflowY: "auto"
-          })
+          }),
+          option: (base, state) => ({
+            ...base,
+            cursor: "pointer",
+            color: state.isSelected ? "var(--zaplane-primary)" : "var(--zaplane-font-color)",
+            backgroundColor: state.isSelected
+              ? "var(--zaplane-second-primary)"
+              : state.isFocused
+              ? "var(--zaplane-secondary-color)"
+              : "transparent",
+            "&:active": { backgroundColor: "var(--zaplane-secondary-color)" }
+          }),
+          singleValue: (base) => ({ ...base, color: "var(--zaplane-font-color)" }),
+          input: (base) => ({ ...base, color: "var(--zaplane-font-color)" }),
+          placeholder: (base) => ({ ...base, color: "var(--zaplane-placeholder)" }),
+          dropdownIndicator: (base) => ({ ...base, color: "var(--zaplane-text-muted)" }),
+          indicatorSeparator: (base) => ({ ...base, backgroundColor: "var(--zaplane-border-color)" }),
+          multiValue: (base) => ({ ...base, backgroundColor: "var(--zaplane-primary)" }),
+          multiValueLabel: (base) => ({ ...base, color: "#fff" })
         }}
       />
     </div>

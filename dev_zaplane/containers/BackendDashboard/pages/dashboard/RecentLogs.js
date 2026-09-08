@@ -76,36 +76,36 @@ const RecentLogs = ({
       <div className="mb-6 opacity-40">
         {/* Simple SVG illustration matching the mockup pattern */}
         <svg width="240" height="120" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="20" cy="20" r="4" fill="#68D391" />
-          <circle cx="35" cy="20" r="4" fill="#F6AD55" />
-          <circle cx="50" cy="20" r="4" fill="#FC8181" />
-          <rect x="20" y="40" width="40" height="4" rx="2" fill="#EDF2F7" />
-          <rect x="80" y="40" width="40" height="4" rx="2" fill="#EDF2F7" />
-          <rect x="140" y="40" width="40" height="4" rx="2" fill="#EDF2F7" />
-          <rect x="200" y="40" width="20" height="4" rx="2" fill="#EDF2F7" />
-          <circle cx="30" cy="65" r="8" fill="#E2E8F0" />
-          <rect x="50" y="65" width="30" height="4" rx="2" fill="#EDF2F7" />
-          <rect x="100" y="65" width="30" height="4" rx="2" fill="#EDF2F7" />
-          <rect x="150" y="65" width="30" height="4" rx="2" fill="#EDF2F7" />
-          <rect x="200" y="65" width="20" height="4" rx="2" fill="#EDF2F7" />
-          <circle cx="30" cy="95" r="8" fill="#E2E8F0" />
-          <rect x="50" y="95" width="30" height="4" rx="2" fill="#EDF2F7" />
-          <rect x="100" y="95" width="30" height="4" rx="2" fill="#EDF2F7" />
-          <rect x="150" y="95" width="30" height="4" rx="2" fill="#EDF2F7" />
-          <rect x="200" y="95" width="20" height="4" rx="2" fill="#EDF2F7" />
+          <circle cx="20" cy="20" r="4" fill="var(--zaplane-success)" />
+          <circle cx="35" cy="20" r="4" fill="var(--zaplane-warning)" />
+          <circle cx="50" cy="20" r="4" fill="var(--zaplane-danger)" />
+          <rect x="20" y="40" width="40" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <rect x="80" y="40" width="40" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <rect x="140" y="40" width="40" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <rect x="200" y="40" width="20" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <circle cx="30" cy="65" r="8" fill="var(--zaplane-border-color)" />
+          <rect x="50" y="65" width="30" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <rect x="100" y="65" width="30" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <rect x="150" y="65" width="30" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <rect x="200" y="65" width="20" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <circle cx="30" cy="95" r="8" fill="var(--zaplane-border-color)" />
+          <rect x="50" y="95" width="30" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <rect x="100" y="95" width="30" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <rect x="150" y="95" width="30" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
+          <rect x="200" y="95" width="20" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
         </svg>
       </div>
-      <h3 className="text-[#2D3748] text-[20px] font-[600] mb-2">{__("No Data Available!!!", "zaplane")}</h3>
-      <p className="text-[#718096] text-[14px]">{__("Please, create data to see the available list here.", "zaplane")}</p>
+      <h3 className="text-[var(--zaplane-font-color)] text-[20px] font-[600] mb-2">{__("No Data Available!!!", "zaplane")}</h3>
+      <p className="text-[var(--zaplane-text-muted)] text-[14px]">{__("Please, create data to see the available list here.", "zaplane")}</p>
     </div>
   );
 
   const tableData = Array.isArray(data.runs) ? data.runs.slice(0, 5) : [];
 
   return (
-    <div className="bg-white rounded-[8px] border border-[#E2E8F0] w-full min-h-[400px] flex flex-col">
+    <div className="bg-[var(--zaplane-background)] rounded-[8px] border border-[var(--zaplane-border-color)] w-full min-h-[400px] flex flex-col">
       <div className="p-6">
-        <span className="text-[#4A5568] text-[16px] font-[500]">
+        <span className="text-[var(--zaplane-font-secondary-color)] text-[16px] font-[500]">
           {__("Recently Created Flow", "zaplane")}
         </span>
       </div>

@@ -5,6 +5,7 @@ import { useFormikContext } from 'formik';
 import React, { useEffect } from 'react';
 import ReactJson from 'react-json-view';
 import { useDispatch, useSelector } from 'react-redux';
+import { zaplaneJsonViewTheme } from '@ZAPUtils/jsonViewTheme';
 const TestDetails = ({
   id,
   workFlow,
@@ -23,24 +24,24 @@ const TestDetails = ({
   const outputData = singleNodeExecution[id]?.output || selectedOutput;
   const isNode = source === "node";
   useEffect(() => {
-    dispatch(resetSingleNodeExecution());
+    dispatch(resetSingleNodeExecution(id));
   }, [id, dispatch]);
   if (isLoading) return <ZAPLoading />;
   if (!outputData || Object.keys(outputData).length === 0 && isNode) return null;
-  return <div style={{overflow:'hidden'}} className="flex flex-col gap-4">
-            <div className="p-3 border rounded-md bg-var(--zaplane-gray)">
+  return <div className="flex flex-col gap-4">
+            <div className="p-3 border border-[var(--zaplane-border-color)] rounded-md bg-[var(--zaplane-gray)]" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
                 <span className="zaplane-label font-[bold] mb-2">
                     {__('Input', 'zaplane')}
                 </span>
 
-                <ReactJson src={inputData} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} />
+                <ReactJson src={inputData} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} theme={zaplaneJsonViewTheme} />
             </div>
 
-            <div className="p-3 border rounded-md bg-var(--zaplane-gray)">
+            <div className="p-3 border border-[var(--zaplane-border-color)] rounded-md bg-[var(--zaplane-gray)]" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
                 <span className="font-[bold] mb-2">
                     {__('Output', 'zaplane')}
                 </span>
-                <ReactJson src={outputData} name="root" collapsed={2} enableClipboard={false} displayDataTypes={false} />
+                <ReactJson src={outputData} name="root" collapsed={2} enableClipboard={false} displayDataTypes={false} theme={zaplaneJsonViewTheme} />
             </div>
         </div>;
 };

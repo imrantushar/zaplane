@@ -63,11 +63,11 @@ const VersionHistoryTable = ({
     textAlign: "center"
   }, {
     name: __('Status', 'zaplane'),
-    cell: row => <span className={` ${
+    cell: row => <span className={`${
       row.is_active
-        ? "text-green-500 bg-green-100"
-        : "text-gray-500 bg-gray-100"
-    } px-2 py-0.5 rounded-md text-[xs] $`}>
+        ? "text-green-600 bg-green-100"
+        : "text-[var(--zaplane-font-secondary-color)] bg-[var(--zaplane-secondary-color)]"
+    } px-2 py-0.5 rounded-md text-xs`}>
           {row.is_active ? "Active" : "Inactive"}
         </span>,
     columnWidth: "120px"
@@ -75,7 +75,7 @@ const VersionHistoryTable = ({
     name: __('Action', 'zaplane'),
     cell: row => <div justify="flex-end" className="flex flex-row items-center gap-1">
           {!row.is_active && <ZAPTooltip content={__("Active version", 'zaplane')}>
-              <button className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border" onClick={() => dispatch(versionActive({
+              <button className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)]" onClick={() => dispatch(versionActive({
           id,
           versionID: row.id
         }))}>
@@ -83,7 +83,7 @@ const VersionHistoryTable = ({
               </button>
             </ZAPTooltip>}
           <ZAPTooltip content={__("Prevew Version", 'zaplane')}>
-            <button className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border" onClick={() => dispatch(getPreviewOldVersion({
+            <button className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)]" onClick={() => dispatch(getPreviewOldVersion({
           id,
           versionID: row.id
         }))}>

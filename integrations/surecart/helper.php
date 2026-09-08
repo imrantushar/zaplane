@@ -42,7 +42,7 @@ trait Helper {
 		return null;
 	}
 
-	protected static function create_model( string $class, array $config, string $key ): array {
+	protected static function create_model( string $class, array $config, array $data, string $key ): array {
 		$error = self::ensure_surecart();
 		if ( null !== $error ) {
 			return $error;
@@ -51,22 +51,23 @@ trait Helper {
 			return self::error( 'Model class not found', [ 'class' => $class ] );
 		}
 
-		$data = self::parse_json_array( $config['data'] ?? [] );
-		$model = new $class();
-		self::apply_model_context( $model, $config );
+		$query = self::apply_model_context_static( $class, $config );
 
-		$result = $model->create( $data );
+		$result = $query ? $query->create( $data ) : $class::create( $data );
 		if ( false === $result ) {
 			return self::error( 'Create failed' );
 		}
 		if ( is_wp_error( $result ) ) {
-			return self::error( $result->get_error_message(), [ 'code' => $result->get_error_code() ] );
+			return self::error( $result->get_error_message(), [
+				'code'    => $result->get_error_code(),
+				'details' => $result->get_error_data(),
+			] );
 		}
 
 		return self::respond( [ $key => self::model_to_array( $result ) ] );
 	}
 
-	protected static function update_model( string $class, array $config, string $id_key, string $key ): array {
+	protected static function update_model( string $class, array $config, string $id_key, array $data, string $key ): array {
 		$error = self::ensure_surecart();
 		if ( null !== $error ) {
 			return $error;
@@ -80,11 +81,9 @@ trait Helper {
 			return self::error( 'ID is required', [ 'field' => $id_key ] );
 		}
 
-		$data = self::parse_json_array( $config['data'] ?? [] );
-		$model = new $class( $id );
-		self::apply_model_context( $model, $config );
+		$data['id'] = $id;
 
-		$result = $model->update( $data );
+		$result = $class::update( $data );
 		if ( false === $result ) {
 			return self::error( 'Update failed' );
 		}
@@ -109,10 +108,7 @@ trait Helper {
 			return self::error( 'ID is required', [ 'field' => $id_key ] );
 		}
 
-		$model = new $class( $id );
-		self::apply_model_context( $model, $config );
-
-		$result = $model->delete( $id );
+		$result = $class::delete( $id );
 		if ( false === $result ) {
 			return self::error( 'Delete failed' );
 		}
@@ -140,11 +136,10 @@ trait Helper {
 			return self::error( 'ID is required', [ 'field' => $id_key ] );
 		}
 
-		$model = new $class();
-		self::apply_model_context( $model, $config );
+		$query  = self::apply_model_context_static( $class, $config );
+		$result = $query ? $query->find( $id ) : $class::find( $id );
 
-		$result = $model->find( $id );
-		if ( false === $result ) {
+		if ( false === $result || null === $result ) {
 			return self::error( 'Not found' );
 		}
 		if ( is_wp_error( $result ) ) {
@@ -154,7 +149,7 @@ trait Helper {
 		return self::respond( [ $key => self::model_to_array( $result ) ] );
 	}
 
-	protected static function list_models( string $class, array $config ): array {
+	protected static function list_models( string $class, array $config, string $items_key = 'items' ): array {
 		$error = self::ensure_surecart();
 		if ( null !== $error ) {
 			return $error;
@@ -164,52 +159,47 @@ trait Helper {
 		}
 
 		$pagination = self::get_pagination_args( $config );
-		$query = self::parse_json_array( $config['query'] ?? [] );
+		$query      = self::apply_model_context_static( $class, $config );
+		$base       = $query ?: $class;
 
-		$model = new $class();
-		self::apply_model_context( $model, $config );
-		if ( ! empty( $query ) ) {
-			$model->where( $query );
-		}
-
-		$collection = $model->paginate([
-			'page' => $pagination['page'],
-			'per_page' => $pagination['limit'],
-		]);
+		$collection = $base::paginate(
+			[
+				'page'     => $pagination['page'],
+				'per_page' => $pagination['limit'],
+			]
+		);
 
 		if ( is_wp_error( $collection ) ) {
 			return self::error( $collection->get_error_message(), [ 'code' => $collection->get_error_code() ] );
 		}
 
 		$items = [];
-		$data = $collection->data ?? [];
+		$data  = $collection->data ?? [];
 		if ( is_array( $data ) ) {
 			foreach ( $data as $item ) {
 				$items[] = self::model_to_array( $item );
 			}
 		}
 
-		return self::respond([
-			'count' => (int) ( $collection->total() ?? count( $items ) ),
-			'items' => $items,
-			'page' => $pagination['page'],
-			'limit' => $pagination['limit'],
-		]);
+		return self::respond(
+			[
+				'count' => (int) ( $collection->total() ?? count( $items ) ),
+				$items_key => $items,
+				'page'  => $pagination['page'],
+				'limit' => $pagination['limit'],
+			]
+		);
 	}
 
-	protected static function apply_model_context( $model, array $config ): void {
-		$mode = $config['mode'] ?? '';
-		if ( '' !== $mode ) {
-			$mode = self::normalize_mode( $mode );
-			if ( '' !== $mode ) {
-				$model->setMode( $mode );
-			}
+	protected static function apply_model_context_static( string $class, array $config ) {
+		$query  = null;
+		$expand = self::parse_list( $config['expand'] ?? [] );
+
+		if ( ! empty( $expand ) ) {
+			$query = $class::with( $expand );
 		}
 
-		$expand = self::parse_list( $config['expand'] ?? [] );
-		if ( ! empty( $expand ) ) {
-			$model->with( $expand );
-		}
+		return $query;
 	}
 
 	protected static function normalize_mode( $mode ): string {
@@ -311,58 +301,106 @@ trait Helper {
 		return array_values( array_filter( array_map( 'trim', explode( ',', $value ) ), 'strlen' ) );
 	}
 
-	protected static function build_product_data_from_manual( array $config ): array {
-		$data = [];
-
-		$name = trim( (string) ( $config['name'] ?? '' ) );
-		if ( '' !== $name ) {
-			$data['name'] = $name;
+	protected static function build_billing_address( array $config ): array {
+		$rows = $config['billing_address'] ?? [];
+		if ( ! is_array( $rows ) ) {
+			return [];
 		}
 
-		$description = $config['description'] ?? '';
-		if ( '' !== $description ) {
-			$data['description'] = $description;
-		}
+		$key_map = [
+			'first_name'  => 'name', // combined below if last_name also present
+			'last_name'   => 'name',
+			'email'       => 'email',
+			'company'     => 'company',
+			'address'     => 'address',
+			'address_2'   => 'address_2',
+			'city'        => 'city',
+			'state'       => 'state',
+			'postal_code' => 'zip',
+			'country'     => 'country',
+			'phone'       => 'phone',
+		];
 
-		$status = self::normalize_product_status( $config['product_status'] ?? ( $config['status'] ?? '' ) );
-		if ( '' !== $status ) {
-			$data['status'] = $status;
-		}
+		$first_name = '';
+		$last_name  = '';
+		$address    = [];
 
-		$price = [];
-		$amount = $config['price_amount'] ?? '';
-		if ( '' !== $amount && is_numeric( $amount ) ) {
-			$price['amount'] = (int) $amount;
-		}
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$field = (string) ( $row['field'] ?? '' );
+			$value = $row['value'] ?? '';
+			if ( '' === $field || '' === $value ) {
+				continue;
+			}
 
-		$currency = strtoupper( trim( (string) ( $config['currency'] ?? '' ) ) );
-		if ( '' !== $currency ) {
-			$price['currency'] = $currency;
-		}
+			if ( 'first_name' === $field ) {
+				$first_name = (string) $value;
+				continue;
+			}
+			if ( 'last_name' === $field ) {
+				$last_name = (string) $value;
+				continue;
+			}
 
-		$interval = strtolower( trim( (string) ( $config['recurring_interval'] ?? '' ) ) );
-		if ( '' !== $interval ) {
-			$price['recurring_interval'] = $interval;
-			$count = $config['recurring_interval_count'] ?? 1;
-			if ( '' !== $count && null !== $count ) {
-				$price['recurring_interval_count'] = max( 1, (int) $count );
+			if ( isset( $key_map[ $field ] ) ) {
+				$address[ $key_map[ $field ] ] = $value;
 			}
 		}
 
-		if ( ! empty( $price ) ) {
-			$data['prices'] = [ $price ];
+		$name = trim( $first_name . ' ' . $last_name );
+		if ( '' !== $name ) {
+			$address['name'] = $name;
+		}
+
+		return $address;
+	}
+
+	protected static function build_product_data_from_manual( array $config ): array {
+		$data = [];
+
+		if ( isset( $config['name'] ) && '' !== $config['name'] ) {
+			$data['name'] = $config['name'];
+		}
+		if ( isset( $config['description'] ) && '' !== $config['description'] ) {
+			$data['description'] = $config['description'];
+		}
+
+		$status = self::normalize_product_status( $config['product_status'] ?? '' );
+		if ( '' !== $status ) {
+			$data['status'] = $status;
 		}
 
 		return $data;
 	}
 
-	protected static function normalize_product_status( $status ): string {
-		$status = strtolower( trim( (string) $status ) );
-		if ( 0 === strpos( $status, 'surecart_product_' ) ) {
-			return substr( $status, strlen( 'surecart_product_' ) );
+	protected static function build_price_data_from_manual( array $config ): array {
+		$price = [];
+
+		if ( isset( $config['price_amount'] ) && '' !== $config['price_amount'] ) {
+			// SureCart amounts are in the smallest currency unit (cents), like Stripe.
+			$price['amount'] = (int) round( ( (float) $config['price_amount'] ) * 100 );
+		}
+		if ( ! empty( $config['currency'] ) ) {
+			$price['currency'] = strtolower( (string) $config['currency'] );
+		}
+		if ( ! empty( $config['recurring_interval'] ) ) {
+			$price['recurring_interval']       = $config['recurring_interval'];
+			$price['recurring_interval_count'] = max( 1, (int) ( $config['recurring_interval_count'] ?? 1 ) );
 		}
 
-		return $status;
+		return $price;
+	}
+
+	protected static function normalize_product_status( $status ): string {
+		$map = [
+			'surecart_product_published' => 'published',
+			'surecart_product_draft'     => 'draft',
+			'surecart_product_archived'  => 'archived',
+		];
+		$status = (string) $status;
+		return $map[ $status ] ?? $status;
 	}
 
 	protected static function get_pagination_args( array $config, int $default_limit = 20 ): array {
@@ -425,6 +463,20 @@ trait Helper {
 				'label' => 'Query (JSON)',
 				'type' => 'textarea',
 			]
+		];
+	}
+
+	protected static function field_quantity(): array {
+		return [
+			[
+				'key'         => 'quantity',
+				'label'       => 'Quantity',
+				'type'        => 'number',
+				'required'    => true,
+				'default'     => 1,
+				'placeholder' => 'quantity',
+				'min'         => 1,
+			],
 		];
 	}
 
@@ -493,6 +545,54 @@ trait Helper {
 		];
 	}
 
+	protected static function field_price_id(): array {
+		return [
+			[
+				'key' => 'price_id',
+				'label' => 'Price ID',
+				'type' => 'select',
+				'dynamic' => [
+					'integration' => 'surecart',
+					'query' => 'prices',
+					'select' => [ 'id', 'label' ],
+				],
+				'required' => true,
+			]
+		];
+	}
+
+	protected static function field_order_status(): array {
+		return [
+			[
+				'key'      => 'order_status',
+				'label'    => 'Order Status',
+				'type'     => 'select',
+				'required' => true,
+				'options'  => [
+					[ 'label' => 'Pending', 'value' => 'pending' ],
+					[ 'label' => 'Processing', 'value' => 'processing' ],
+				],
+			],
+		];
+	}
+
+	protected static function field_subscription_status(): array {
+		return [
+			[
+				'key'      => 'subscription_status',
+				'label'    => 'Subscription Status',
+				'type'     => 'select',
+				'required' => false,
+				'options'  => [
+					[ 'label' => 'Active', 'value' => 'active' ],
+					[ 'label' => 'Trialing', 'value' => 'trialing' ],
+					[ 'label' => 'Paused', 'value' => 'paused' ],
+					[ 'label' => 'Cancelled', 'value' => 'cancelled' ],
+				],
+			],
+		];
+	}
+
 	protected static function field_coupon_id(): array {
 		return [
 			[
@@ -506,6 +606,43 @@ trait Helper {
 				],
 				'required' => true,
 			]
+		];
+	}
+
+	protected static function field_billing_address(): array {
+		return [
+			[
+				'key'      => 'billing_address',
+				'label'    => 'Map Billing Address',
+				'type'     => 'repeater',
+				'required' => false,
+				'fields'   => [
+					[
+						'key'     => 'field',
+						'label'   => 'Field',
+						'type'    => 'select',
+						'options' => [
+							[ 'label' => 'First Name', 'value' => 'first_name' ],
+							[ 'label' => 'Last Name', 'value' => 'last_name' ],
+							[ 'label' => 'Email', 'value' => 'email' ],
+							[ 'label' => 'Company', 'value' => 'company' ],
+							[ 'label' => 'Address', 'value' => 'address' ],
+							[ 'label' => 'Address Line 2', 'value' => 'address_2' ],
+							[ 'label' => 'City', 'value' => 'city' ],
+							[ 'label' => 'State', 'value' => 'state' ],
+							[ 'label' => 'Postal Code', 'value' => 'postal_code' ],
+							[ 'label' => 'Country', 'value' => 'country' ],
+							[ 'label' => 'Phone', 'value' => 'phone' ],
+						],
+					],
+					[
+						'key'         => 'value',
+						'label'       => 'Value',
+						'type'        => 'text',
+						'placeholder' => 'Enter value or map a field',
+					],
+				],
+			],
 		];
 	}
 
@@ -538,11 +675,21 @@ trait Helper {
 	}
 
 	public static function query_coupons( $q ): array {
-		return self::query_surecart_models( \SureCart\Models\Coupon::class, $q, 'coupon' );
+		return self::query_surecart_models( \SureCart\Models\Promotion::class, $q, 'coupon' );
+	}
+
+	protected static function merge_expand( array $config, array $additional ): array {
+		$existing         = self::parse_list( $config['expand'] ?? [] );
+		$config['expand'] = array_values( array_unique( array_merge( $existing, $additional ) ) );
+		return $config;
 	}
 
 	public static function query_subscriptions( $q ): array {
 		return self::query_surecart_models( \SureCart\Models\Subscription::class, $q, 'subscription' );
+	}
+
+	public static function query_prices( $q ): array {
+		return self::query_surecart_models( \SureCart\Models\Price::class, $q, 'price' );
 	}
 
 	protected static function query_surecart_models( string $class, $q, string $type ): array {
@@ -554,23 +701,32 @@ trait Helper {
 			return [];
 		}
 
-		$q = is_array( $q ) ? $q : [];
-		$limit = self::normalize_dynamic_limit( $q );
+		$q      = is_array( $q ) ? $q : [];
+		$limit  = self::normalize_dynamic_limit( $q );
 		$search = self::normalize_dynamic_search( $q );
 
-		$model = new $class();
-		$collection = $model->paginate([
-			'page' => 1,
-			'per_page' => $limit,
-		]);
+		if ( 'coupon' === $type ) {
+			$base = $class::with( [ 'coupon' ] );
+		} elseif ( 'price' === $type ) {
+			$base = $class::with( [ 'product' ] );
+		} else {
+			$base = $class;
+		}
 
-		$data = $collection->data ?? [];
+		$collection = $base::paginate(
+			[
+				'page'     => 1,
+				'per_page' => $limit,
+			]
+		);
+
+		$data  = $collection->data ?? [];
 		$items = [];
 
 		if ( is_array( $data ) ) {
 			foreach ( $data as $item ) {
 				$values = self::model_to_array( $item );
-				$id = $values['id'] ?? '';
+				$id     = $values['id'] ?? '';
 				if ( '' === $id ) {
 					continue;
 				}
@@ -586,10 +742,17 @@ trait Helper {
 					$label = $values['code'] ?? '';
 				} elseif ( 'subscription' === $type ) {
 					$label = $values['name'] ?? $values['status'] ?? '';
+				} elseif ( 'price' === $type ) {
+					$label = self::format_price_label( $values );
 				}
 
 				if ( '' === $label ) {
 					$label = ucfirst( $type ) . ' #' . $id;
+				}
+
+				if ( in_array( $type, [ 'customer', 'price', 'product', 'order', 'subscription', 'coupon' ], true ) ) {
+					$is_live = array_key_exists( 'live_mode', $values ) ? (bool) $values['live_mode'] : true;
+					$label   = ( $is_live ? '[Live] ' : '[Test] ' ) . $label;
 				}
 
 				if ( ! self::matches_dynamic_search( $search, $label ) ) {
@@ -597,7 +760,7 @@ trait Helper {
 				}
 
 				$item_row = [
-					'id' => (string) $id,
+					'id'    => (string) $id,
 					'label' => $label,
 				];
 
@@ -613,6 +776,31 @@ trait Helper {
 		}//end if
 
 		return array_slice( $items, 0, $limit );
+	}
+
+	protected static function format_price_label( array $values ): string {
+		$product_name = '';
+		$product      = $values['product'] ?? '';
+		if ( is_array( $product ) ) {
+			$product_name = $product['name'] ?? '';
+		}
+
+		$amount_part = '';
+		if ( isset( $values['amount'] ) ) {
+			$amount_part = number_format( ( (int) $values['amount'] ) / 100, 2 );
+			if ( ! empty( $values['currency'] ) ) {
+				$amount_part .= ' ' . strtoupper( (string) $values['currency'] );
+			}
+		}
+		if ( ! empty( $values['recurring_interval'] ) ) {
+			$amount_part .= '/' . $values['recurring_interval'];
+		}
+
+		$label = trim( $product_name . ( '' !== $amount_part ? ' — ' . $amount_part : '' ) );
+		if ( '' === $label ) {
+			$label = $values['name'] ?? '';
+		}
+		return $label;
 	}
 
 	protected static function normalize_dynamic_limit( array $q ): int {

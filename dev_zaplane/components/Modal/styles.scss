@@ -1,11 +1,63 @@
+// Smooth modal entrance: fade the overlay, fade + rise the frame.
+@keyframes zaplane-modal-overlay-in {
+       from { opacity: 0; }
+       to   { opacity: 1; }
+}
+@keyframes zaplane-modal-frame-in {
+       from { opacity: 0; transform: translateY(12px) scale(0.98); }
+       to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.components-modal__screen-overlay:has(.zaplane-wp-modal){
+       animation: zaplane-modal-overlay-in 0.2s ease;
+}
+
 .zaplane-wp-modal{
        width: 600px;
        min-height: 220px;
-       .components-button{
-              background: var(--zaplane-body-background);
+       // WP positions .components-modal__header as position:absolute; it only stays
+       // inside the frame if the frame is a containing block. WP relies on its own
+       // transform (animation-fill-mode:forwards) for that — which our entrance
+       // animation overrides — so establish the containing block explicitly.
+       position: relative;
+       animation: zaplane-modal-frame-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+       // The modal frame renders outside .zaplane-scope; theme it explicitly so
+       // dark mode doesn't leave WP core's white frame.
+       background: var(--zaplane-background) !important;
+       color: var(--zaplane-font-color);
+       border: 1px solid var(--zaplane-border-color);
+
+       .components-modal__header{
+              background: var(--zaplane-background);
+              border-bottom: 1px solid var(--zaplane-border-color);
        }
 
-.components-button:hover:not(:disabled,[aria-disabled=true]){
-       color: var(--zaplane-primary);
-}
+       .components-modal__header-heading{
+              color: var(--zaplane-font-color);
+       }
+
+       // Close (X) button in the modal header
+       .components-modal__header .components-button{
+              width: 35px;
+              height: 35px;
+              min-width: 35px;
+              padding: 0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 50%;
+              border: 1px solid var(--zaplane-border-color);
+              background: var(--zaplane-secondary-color);
+              color: var(--zaplane-font-color);
+
+              svg{
+                     width: 18px;
+                     height: 18px;
+                     fill: currentColor;
+              }
+
+              &:hover:not(:disabled,[aria-disabled=true]){
+                     background: var(--zaplane-border-color);
+                     color: var(--zaplane-primary);
+              }
+       }
 }

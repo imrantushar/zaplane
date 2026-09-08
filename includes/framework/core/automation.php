@@ -164,6 +164,13 @@ class Automation {
 			}
 
 			$integration = $this->container->get( 'integrations' )->get( strtolower( $trigger['app'] ) );
+			// A workflow can outlive its integration (plugin removed, custom app
+			// deleted). Without this the whole hook fataled, taking down every
+			// other workflow listening on the same event.
+			if ( ! $integration ) {
+				continue;
+			}
+
 			$payload = $integration::resolve_trigger( $trigger['graph_node']['data'], $args );
 			if ( ! $payload ) {
 				continue;
@@ -192,11 +199,11 @@ class Automation {
 		// NodeRun gets the clean payload — __wp_user_id must not appear in node outputs.
 		$this->spawn_node_run( $run->id, $nodeKey, $payload, null, $this->extract_node_meta( $trigger['graph_node'] ) );
 
-		// Remember this payload as the shared sample for the trigger (app+event)
-		// so other workflows using the same trigger can map its fields without
-		// re-capturing.
+		// Remember this payload as the shared sample for the trigger (app+event
+		// +config) so other workflows using the exact same trigger can map its
+		// fields without re-capturing.
 		$gnode = $trigger['graph_node']['data'] ?? [];
-		self::store_trigger_sample( $gnode['app'] ?? '', $gnode['event'] ?? '', $payload );
+		self::store_trigger_sample( $gnode['app'] ?? '', $gnode['event'] ?? '', $payload, is_array( $gnode['config'] ?? null ) ? $gnode['config'] : [] );
 
 		return $run->id;
 	}
@@ -205,28 +212,48 @@ class Automation {
 	 * Persist the most recent payload for a trigger, keyed by app+event (NOT by
 	 * workflow), so any workflow that uses the same trigger can reuse it as
 	 * sample data for field mapping without capturing again.
+	 *
+	 * $config is the trigger node's saved config (e.g. the selected form_id for
+	 * a form-builder trigger). Triggers whose payload shape depends on which
+	 * specific entity is selected (different forms have different fields) must
+	 * not share a sample across different selections — folding $config into the
+	 * key keeps "Form A" and "Form B" from bleeding into each other's picker.
 	 */
-	public static function store_trigger_sample( string $app, string $event, array $payload ): void {
+	public static function store_trigger_sample( string $app, string $event, array $payload, array $config = [] ): void {
 		$app   = sanitize_key( $app );
 		$event = sanitize_key( $event );
 		if ( '' === $app || '' === $event || empty( $payload ) ) {
 			return;
 		}
-		Option::set( 'zaplane_trigger_sample_' . $app . '__' . $event, $payload, 'no' );
+		Option::set( self::trigger_sample_option_name( $app, $event, $config ), $payload, 'no' );
 	}
 
 	/**
-	 * Read the shared sample payload previously captured for a trigger (app+event).
-	 * Returns [] when nothing has been captured for it yet.
+	 * Read the shared sample payload previously captured for a trigger
+	 * (app+event+config). Returns [] when nothing has been captured for it yet.
 	 */
-	public static function get_trigger_sample( string $app, string $event ): array {
+	public static function get_trigger_sample( string $app, string $event, array $config = [] ): array {
 		$app   = sanitize_key( $app );
 		$event = sanitize_key( $event );
 		if ( '' === $app || '' === $event ) {
 			return [];
 		}
-		$value = Option::get( 'zaplane_trigger_sample_' . $app . '__' . $event );
+		$value = Option::get( self::trigger_sample_option_name( $app, $event, $config ) );
 		return is_array( $value ) ? $value : [];
+	}
+
+	/**
+	 * Triggers with no config selector keep the plain app__event key (no change
+	 * for the common case). A non-empty config appends a short hash of it so
+	 * different selections (e.g. different forms) get distinct cache entries.
+	 */
+	private static function trigger_sample_option_name( string $app, string $event, array $config ): string {
+		$name = 'zaplane_trigger_sample_' . $app . '__' . $event;
+		if ( ! empty( $config ) ) {
+			ksort( $config );
+			$name .= '__' . substr( md5( (string) wp_json_encode( $config ) ), 0, 12 );
+		}
+		return $name;
 	}
 
 	public static function get_instance(): ?self {

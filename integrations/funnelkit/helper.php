@@ -171,7 +171,7 @@ trait Helper {
 					]
 				);
 
-			case 'import_completed':
+			case 'import_complete':
 				$module_id = self::resolve_funnel_id_from_value( $args[0] ?? null );
 				$funnel_id = $module_id;
 				if ( $funnel_id <= 0 ) {
@@ -1003,4 +1003,3 @@ trait Helper {
 		];
 	}
 }
-

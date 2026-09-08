@@ -4,7 +4,7 @@ Tags: automation, workflow, woocommerce, marketing automation, crm
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -101,6 +101,32 @@ Yes. You can chain multiple actions and insert delay, condition, filter, iterato
 
 == Changelog ==
 
+= 1.2.0 =
+**New integrations**
+* aBlocks — a Form Submitted trigger for aBlocks form-builder forms.
+* FluentCart — 21 new triggers and 52 new actions across carts, coupons, licences, customers, orders, products and subscriptions.
+
+**AI access (MCP server)**
+* Let Claude, Cursor or any Model Context Protocol client read your automations and build new ones from a plain-language description. Off by default, behind scoped and revocable tokens.
+
+**Modules**
+* Optional features are now opt-in and switched off on a fresh install. Existing sites keep whatever they had.
+* A card on the Workflows, Dashboard and Connections screens lists what you have not turned on, with a one-click switch. Picking a step whose module is off now says so in the builder and offers to enable it there.
+
+**Workflow canvas**
+* Nodes are colour-typed as trigger, action, tool or AI, on the card and on the connector leaving it, so a glance shows what feeds what.
+* Node cards now sit on a canvas of their own colour instead of sharing it, connectors draw a single stroke instead of three, and the delete control is a real, keyboard-reachable button.
+
+**Appearance**
+* The dark theme was rebuilt for legibility — secondary text and button labels previously fell below the accessible contrast minimum.
+* The dashboard chart now follows your palette instead of fixed light-mode colours.
+
+**Performance**
+* The admin bundle drops from 23.8 MB to 1.6 MB.
+
+**Removed**
+* The Dokan "Withdraw Request Pending" and FluentCart "Order Paid Done" triggers. A workflow still using either will need its trigger re-selected.
+
 = 1.1.0 =
 **New integrations**
 * StoreEngine — order, subscription and product triggers plus actions.
@@ -139,6 +165,9 @@ Yes. You can chain multiple actions and insert delay, condition, filter, iterato
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Adds aBlocks and a large FluentCart expansion, an optional MCP server, a retyped workflow canvas and a rebuilt dark theme. Optional modules are now off by default on new sites; existing sites keep their current settings. Two triggers were removed — Dokan "Withdraw Request Pending" and FluentCart "Order Paid Done" — so any workflow using them needs its trigger re-selected.
 
 = 1.1.0 =
 Major feature release: StoreEngine, AI Agent (with MCP), AI Chat Model, Memory, Business Knowledge, Custom Apps, a bidirectional Webhook app, and many new tools and flow-control nodes.

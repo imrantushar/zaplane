@@ -317,11 +317,13 @@ class ConnectionsController extends WP_REST_Controller {
 			$this->send_oauth_html( false, 'No authorization code received' );
 		}
 
-		$oauth  = $this->get_oauth_handler();
-		$result = $oauth->handle_callback( $state, $code );
+		$oauth = $this->get_oauth_handler();
 
-		if ( is_wp_error( $result ) ) {
-			$this->send_oauth_html( false, $result->get_error_message() );
+		try {
+			$result = $oauth->handle_callback( $state, $code );
+		} catch ( \Throwable $e ) {
+			$this->send_oauth_html( false, $e->getMessage() );
+			return;
 		}
 
 		$this->send_oauth_html( true, 'Connection created successfully', $result );
@@ -361,7 +363,14 @@ class ConnectionsController extends WP_REST_Controller {
 			'connection_id' => $connection_id,
 		];
 
-		$json = wp_json_encode( $data );
+		// This is interpolated straight into a <script> block on a route that is
+		// unauthenticated by necessity, and $data carries the provider's own
+		// error_description from the query string. Today the payload cannot break
+		// out only because json_encode escapes forward slashes by default, so
+		// "</script>" arrives as "<\/script>" — anyone adding
+		// JSON_UNESCAPED_SLASHES for readability would silently turn this into
+		// reflected XSS. JSON_HEX_TAG makes the guarantee explicit instead.
+		$json = wp_json_encode( $data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
 
 		// Build a minimal but valid HTML page
 		$html = '<!DOCTYPE html>'

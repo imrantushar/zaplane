@@ -126,10 +126,12 @@ class ARForm extends IntegrationBase {
 			is_plugin_active( self::ARFORMS_PLUGIN_INDEX )
 		) {
 			global $wpdb;
+			// No placeholders here, so prepare() would only earn a _doing_it_wrong
+			// notice from core ("The query argument of %s must have a
+			// placeholder."). The only interpolation is $wpdb->prefix.
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$forms = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT id, name FROM {$wpdb->prefix}arf_forms WHERE is_template = 0 AND status = 'published'"
-				)
+				"SELECT id, name FROM {$wpdb->prefix}arf_forms WHERE is_template = 0 AND status = 'published'"
 			);
 
 			if ( ! empty( $forms ) ) {

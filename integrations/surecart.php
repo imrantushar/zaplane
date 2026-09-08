@@ -26,11 +26,13 @@ class Surecart extends IntegrationBase {
 		return 'surecart';
 	}
 
+	public static function get_name(): string {
+		return 'SureCart';
+	}
+
 	public static function get_icon(): string {
 		return 'surecart.svg';
 	}
-
-
 
 	public static function get_triggers(): array {
 		return [
@@ -38,13 +40,13 @@ class Surecart extends IntegrationBase {
 				'label' => 'Purchase Created',
 				'hook' => 'surecart/purchase_created'
 			],
-			'purchase_invoked' => [
-				'label' => 'Purchase Invoked',
-				'hook' => 'surecart/purchase_invoked'
-			],
 			'purchase_revoked' => [
 				'label' => 'Purchase Revoked',
 				'hook' => 'surecart/purchase_revoked'
+			],
+			'purchase_invoked' => [
+				'label' => 'Purchase Invoked',
+				'hook' => 'surecart/purchase_invoked'
 			],
 			'checkout_confirmed' => [
 				'label' => 'Checkout Confirmed',
@@ -362,28 +364,28 @@ class Surecart extends IntegrationBase {
 
 	public static function get_actions(): array {
 		return [
-			'create_order' => [ 'label' => 'Create Order' ],
-			'update_order' => [ 'label' => 'Update Order' ],
-			'get_orders_all' => [ 'label' => 'Get Orders (All)' ],
-			'get_order_single' => [ 'label' => 'Get Order (Single)' ],
-			'create_customer' => [ 'label' => 'Create Customer' ],
-			'update_customer' => [ 'label' => 'Update Customer' ],
-			'get_customers_all' => [ 'label' => 'Get Customers (All)' ],
-			'get_customer_single' => [ 'label' => 'Get Customer (Single)' ],
-			'create_product_manual' => [ 'label' => 'Create Product (Manual)' ],
-			'create_product' => [ 'label' => 'Create Product (JSON)' ],
-			'update_product' => [ 'label' => 'Update Product' ],
-			'delete_product' => [ 'label' => 'Delete Product' ],
-			'get_products_all' => [ 'label' => 'Get Products (All)' ],
-			'get_product_single' => [ 'label' => 'Get Product (Single)' ],
-			'create_coupon' => [ 'label' => 'Create Coupon' ],
-			'update_coupon' => [ 'label' => 'Update Coupon' ],
-			'delete_coupon' => [ 'label' => 'Delete Coupon' ],
-			'get_coupons_all' => [ 'label' => 'Get Coupons (All)' ],
-			'get_coupon_single' => [ 'label' => 'Get Coupon (Single)' ],
-			'create_subscription' => [ 'label' => 'Create Subscription' ],
-			'update_subscription' => [ 'label' => 'Update Subscription' ],
-			'get_subscriptions_all' => [ 'label' => 'Get Subscriptions (All)' ],
+			'create_order'            => [ 'label' => 'Create Order' ],
+			'update_order'            => [ 'label' => 'Update Order' ],
+			'get_orders_all'          => [ 'label' => 'Get Orders (All)' ],
+			'get_order_single'        => [ 'label' => 'Get Order (Single)' ],
+			'create_customer'         => [ 'label' => 'Create Customer' ],
+			'update_customer'         => [ 'label' => 'Update Customer' ],
+			'get_customers_all'       => [ 'label' => 'Get Customers (All)' ],
+			'get_customer_single'     => [ 'label' => 'Get Customer (Single)' ],
+			'create_product_manual'   => [ 'label' => 'Create Product (Manual)' ],
+			'create_product'          => [ 'label' => 'Create Product (JSON)' ],
+			'update_product'          => [ 'label' => 'Update Product' ],
+			'delete_product'          => [ 'label' => 'Delete Product' ],
+			'get_products_all'        => [ 'label' => 'Get Products (All)' ],
+			'get_product_single'      => [ 'label' => 'Get Product (Single)' ],
+			'create_coupon'           => [ 'label' => 'Create Coupon' ],
+			'update_coupon'           => [ 'label' => 'Update Coupon' ],
+			'delete_coupon'           => [ 'label' => 'Delete Coupon' ],
+			'get_coupons_all'         => [ 'label' => 'Get Coupons (All)' ],
+			'get_coupon_single'       => [ 'label' => 'Get Coupon (Single)' ],
+			'create_subscription'     => [ 'label' => 'Create Subscription' ],
+			'update_subscription'     => [ 'label' => 'Update Subscription' ],
+			'get_subscriptions_all'   => [ 'label' => 'Get Subscriptions (All)' ],
 			'get_subscription_single' => [ 'label' => 'Get Subscription (Single)' ],
 		];
 	}
@@ -391,42 +393,90 @@ class Surecart extends IntegrationBase {
 	public static function get_action_config_schema( string $action ): array {
 		$schemas = [
 			'create_order' => [
-				...self::field_data( 'Order Data (JSON)' ),
+				...self::field_price_id(),
+				...self::field_quantity(),
+				...self::field_order_status(),
+				...self::field_billing_address(),
 				...self::field_mode(),
 				...self::field_expand(),
+				...self::field_data( 'Advanced Order Data (JSON)' ),
 			],
 			'update_order' => [
 				...self::field_order_id(),
-				...self::field_data( 'Order Data (JSON)' ),
+				...self::field_billing_address(),
 				...self::field_mode(),
 				...self::field_expand(),
+				...self::field_data( 'Advanced Order Data (JSON)' ),
 			],
 			'get_orders_all' => [
 				...self::field_limit_page(),
-				...self::field_query(),
-				...self::field_mode(),
-				...self::field_expand(),
+
 			],
 			'get_order_single' => [
 				...self::field_order_id(),
 				...self::field_mode(),
 				...self::field_expand(),
 			],
-
 			'create_customer' => [
-				...self::field_data( 'Customer Data (JSON)' ),
+				[
+					'key'         => 'email',
+					'label'       => 'Email',
+					'type'        => 'text',
+					'required'    => true,
+					'placeholder' => 'customer@example.com',
+				],
+				[
+					'key'         => 'first_name',
+					'label'       => 'First Name',
+					'type'        => 'text',
+					'required'    => false,
+				],
+				[
+					'key'         => 'last_name',
+					'label'       => 'Last Name',
+					'type'        => 'text',
+					'required'    => false,
+				],
+				[
+					'key'         => 'phone',
+					'label'       => 'Phone',
+					'type'        => 'number',
+					'required'    => false,
+				],
 				...self::field_mode(),
 				...self::field_expand(),
 			],
 			'update_customer' => [
 				...self::field_customer_id(),
-				...self::field_data( 'Customer Data (JSON)' ),
+				[
+					'key'         => 'email',
+					'label'       => 'Email',
+					'type'        => 'text',
+					'required'    => false,
+				],
+				[
+					'key'         => 'first_name',
+					'label'       => 'First Name',
+					'type'        => 'text',
+					'required'    => false,
+				],
+				[
+					'key'         => 'last_name',
+					'label'       => 'Last Name',
+					'type'        => 'text',
+					'required'    => false,
+				],
+				[
+					'key'         => 'phone',
+					'label'       => 'Phone',
+					'type'        => 'number',
+					'required'    => false,
+				],
 				...self::field_mode(),
 				...self::field_expand(),
 			],
 			'get_customers_all' => [
 				...self::field_limit_page(),
-				...self::field_query(),
 				...self::field_mode(),
 				...self::field_expand(),
 			],
@@ -435,79 +485,91 @@ class Surecart extends IntegrationBase {
 				...self::field_mode(),
 				...self::field_expand(),
 			],
-
 			'create_product_manual' => [
 				[
-					'key' => 'name',
-					'label' => 'Product Name',
-					'type' => 'text',
-					'required' => true
+					'key'         => 'name',
+					'label'       => 'Product Name',
+					'type'        => 'text',
+					'required'    => true,
+					'placeholder' => 'Enter product name',
 				],
 				[
-					'key' => 'description',
-					'label' => 'Description',
-					'type' => 'textarea'
+					'key'         => 'description',
+					'label'       => 'Description',
+					'type'        => 'textarea',
+					'required'    => false,
 				],
 				[
-					'key' => 'product_status',
-					'label' => 'Status',
-					'type' => 'select',
+					'key'      => 'product_status',
+					'label'    => 'Product Status',
+					'type'     => 'select',
 					'required' => true,
-					'options' => [
+					'options'  => [
 						[
 							'label' => 'Published',
-							'value' => 'surecart_product_published'
+							'value' => 'surecart_product_published',
 						],
 						[
 							'label' => 'Draft',
-							'value' => 'surecart_product_draft'
+							'value' => 'surecart_product_draft',
 						],
 						[
 							'label' => 'Archived',
 							'value' => 'surecart_product_archived'
 						],
-					]
+					],
 				],
 				[
-					'key' => 'price_amount',
-					'label' => 'Price Amount (minor unit)',
-					'type' => 'number',
-					'required' => true
+					'key'         => 'price_amount',
+					'label'       => 'Price Amount',
+					'type'        => 'number',
+					'required'    => true,
+					'placeholder' => '0.00',
+					'min'         => 0,
 				],
 				[
-					'key' => 'currency',
-					'label' => 'Currency (ISO)',
-					'type' => 'text',
-					'required' => true
+					'key'         => 'currency',
+					'label'       => 'Currency',
+					'type'        => 'text',
+					'required'    => true,
+					'default'     => 'USD',
+					'placeholder' => 'USD',
 				],
 				[
-					'key' => 'recurring_interval',
-					'label' => 'Recurring Interval',
-					'type' => 'select',
-					'options' => [
+					'key'      => 'recurring_interval',
+					'label'    => 'Recurring Interval',
+					'type'     => 'select',
+					'required' => false,
+					'options'  => [
+						[
+							'label' => 'One Time',
+							'value' => '',
+						],
 						[
 							'label' => 'Day',
-							'value' => 'day'
+							'value' => 'day',
 						],
 						[
 							'label' => 'Week',
-							'value' => 'week'
+							'value' => 'week',
 						],
 						[
 							'label' => 'Month',
-							'value' => 'month'
+							'value' => 'month',
 						],
 						[
 							'label' => 'Year',
-							'value' => 'year'
+							'value' => 'year',
 						],
-					]
+					],
 				],
 				[
-					'key' => 'recurring_interval_count',
-					'label' => 'Recurring Interval Count',
-					'type' => 'number',
-					'required' => true
+					'key'         => 'recurring_interval_count',
+					'label'       => 'Recurring Interval Count',
+					'type'        => 'number',
+					'required'    => false,
+					'default'     => 1,
+					'min'         => 1,
 				],
 				...self::field_mode(),
 				...self::field_expand(),
@@ -519,7 +581,40 @@ class Surecart extends IntegrationBase {
 			],
 			'update_product' => [
 				...self::field_product_id(),
-				...self::field_data( 'Product Data (JSON)' ),
+				[
+					'key'         => 'name',
+					'label'       => 'Product Name',
+					'type'        => 'text',
+					'required'    => false,
+				],
+				[
+					'key'         => 'description',
+					'label'       => 'Description',
+					'type'        => 'textarea',
+					'required'    => false,
+				],
+				[
+					'key'      => 'update_status',
+					'label'    => 'Product Status',
+					'type'     => 'select',
+					'required' => false,
+					'options'  => [
+						[
+							'label' => 'Published',
+							'value' => 'published',
+						],
+						[
+							'label' => 'Draft',
+							'value' => 'draft',
+						],
+					],
+				],
+				[
+					'key'         => 'data',
+					'label'       => 'Additional Product Data (JSON)',
+					'type'        => 'textarea',
+					'required'    => false,
+				],
 				...self::field_mode(),
 				...self::field_expand(),
 			],
@@ -529,7 +624,6 @@ class Surecart extends IntegrationBase {
 			],
 			'get_products_all' => [
 				...self::field_limit_page(),
-				...self::field_query(),
 				...self::field_mode(),
 				...self::field_expand(),
 			],
@@ -538,15 +632,112 @@ class Surecart extends IntegrationBase {
 				...self::field_mode(),
 				...self::field_expand(),
 			],
-
 			'create_coupon' => [
-				...self::field_data( 'Coupon Data (JSON)' ),
+				[
+					'key'         => 'code',
+					'label'       => 'Coupon Code',
+					'type'        => 'text',
+					'required'    => true,
+					'placeholder' => 'SUMMER20',
+				],
+				[
+					'key'      => 'discount_type',
+					'label'    => 'Discount Type',
+					'type'     => 'select',
+					'required' => true,
+					'options'  => [
+						[
+							'label' => 'Percentage',
+							'value' => 'percentage',
+						],
+						[
+							'label' => 'Fixed Amount',
+							'value' => 'fixed',
+						],
+					],
+				],
+				[
+					'key'         => 'discount_amount',
+					'label'       => 'Discount Amount',
+					'type'        => 'number',
+					'required'    => true,
+					'placeholder' => '10',
+					'min'         => 0,
+				],
+				[
+					'key'         => 'currency',
+					'label'       => 'Currency',
+					'type'        => 'text',
+					'required'    => false,
+					'default'     => 'USD',
+				],
+				[
+					'key'      => 'duration',
+					'label'    => 'Duration',
+					'type'     => 'select',
+					'required' => false,
+					'options'  => [
+						[
+							'label' => 'Once',
+							'value' => 'once',
+						],
+						[
+							'label' => 'Forever',
+							'value' => 'forever',
+						],
+						[
+							'label' => 'Repeating',
+							'value' => 'repeating',
+						],
+					],
+				],
+				[
+					'key'         => 'duration_in_months',
+					'label'       => 'Duration in Months',
+					'type'        => 'number',
+					'required'    => false,
+					'min'         => 1,
+				],
 				...self::field_mode(),
 				...self::field_expand(),
 			],
 			'update_coupon' => [
 				...self::field_coupon_id(),
-				...self::field_data( 'Coupon Data (JSON)' ),
+				[
+					'key'         => 'code',
+					'label'       => 'Coupon Code',
+					'type'        => 'text',
+					'required'    => false,
+				],
+				[
+					'key'      => 'discount_type',
+					'label'    => 'Discount Type',
+					'type'     => 'select',
+					'required' => false,
+					'options'  => [
+						[
+							'label' => 'Percentage',
+							'value' => 'percentage',
+						],
+						[
+							'label' => 'Fixed Amount',
+							'value' => 'fixed',
+						],
+					],
+				],
+				[
+					'key'         => 'discount_amount',
+					'label'       => 'Discount Amount',
+					'type'        => 'number',
+					'required'    => false,
+					'min'         => 0,
+				],
+				[
+					'key'         => 'data',
+					'label'       => 'Additional Coupon Data (JSON)',
+					'type'        => 'textarea',
+					'required'    => false,
+				],
 				...self::field_mode(),
 				...self::field_expand(),
 			],
@@ -556,7 +747,6 @@ class Surecart extends IntegrationBase {
 			],
 			'get_coupons_all' => [
 				...self::field_limit_page(),
-				...self::field_query(),
 				...self::field_mode(),
 				...self::field_expand(),
 			],
@@ -565,21 +755,23 @@ class Surecart extends IntegrationBase {
 				...self::field_mode(),
 				...self::field_expand(),
 			],
-
 			'create_subscription' => [
-				...self::field_data( 'Subscription Data (JSON)' ),
+				...self::field_customer_id(),
+				...self::field_price_id(),
+				...self::field_quantity(),
+				...self::field_subscription_status(),
 				...self::field_mode(),
 				...self::field_expand(),
 			],
 			'update_subscription' => [
 				...self::field_subscription_id(),
-				...self::field_data( 'Subscription Data (JSON)' ),
+				...self::field_subscription_status(),
+				...self::field_quantity(),
 				...self::field_mode(),
 				...self::field_expand(),
 			],
 			'get_subscriptions_all' => [
 				...self::field_limit_page(),
-				...self::field_query(),
 				...self::field_mode(),
 				...self::field_expand(),
 			],
@@ -589,8 +781,9 @@ class Surecart extends IntegrationBase {
 				...self::field_expand(),
 			],
 		];
-
-		return $schemas[ $action ] ?? [];
+		return isset($schemas[$action])
+			? $schemas[$action]
+			: [];
 	}
 
 	public static function get_dynamic_queries(): array {
@@ -600,6 +793,7 @@ class Surecart extends IntegrationBase {
 			'products' => [ self::class, 'query_products' ],
 			'coupons' => [ self::class, 'query_coupons' ],
 			'subscriptions' => [ self::class, 'query_subscriptions' ],
+			'prices' => [ self::class, 'query_prices' ],
 		];
 	}
 

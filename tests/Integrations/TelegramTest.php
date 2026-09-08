@@ -341,12 +341,106 @@ class TelegramTest extends IntegrationTestCase {
 		$this->assertEquals( 'alice', $result['telegram_from_username'] );
 	}
 
-	public function test_trigger_message_received_handles_empty_args(): void {
-		$node   = $this->makeTriggerNode( 'message_received' );
-		$result = Telegram::resolve_trigger( $node, [] );
+	/**
+	 * An empty hook arg has to be rejected, not turned into a payload of empty
+	 * strings — otherwise the router starts a run with nothing in it.
+	 */
+	public function test_trigger_message_received_rejects_empty_args(): void {
+		$node = $this->makeTriggerNode( 'message_received' );
 
-		$this->assertIsArray( $result );
-		$this->assertEquals( '', $result['telegram_text'] );
+		$this->assertFalse( Telegram::resolve_trigger( $node, [] ) );
+		$this->assertFalse( Telegram::resolve_trigger( $node, [ [] ] ) );
+	}
+
+	// ========== WEBHOOK DELIVERY ==========
+
+	/**
+	 * Telegram delivery is the only way these triggers can ever fire, so the
+	 * endpoint has to accept it at all.
+	 */
+	public function test_supports_incoming_webhooks(): void {
+		$this->assertTrue( Telegram::supports_webhook() );
+	}
+
+	public function test_parse_webhook_event_unwraps_the_update_envelope(): void {
+		$parsed = Telegram::parse_webhook_event( $this->makeUpdateRequest( [
+			'update_id' => 90210,
+			'message'   => [
+				'message_id' => 42,
+				'from'       => [ 'id' => 111, 'first_name' => 'Alice', 'is_bot' => false ],
+				'chat'       => [ 'id' => 111, 'type' => 'private' ],
+				'text'       => 'Hello bot!',
+				'date'       => 1700000000,
+			],
+		] ) );
+
+		$this->assertIsArray( $parsed );
+		$this->assertSame( 'message_received', $parsed['event'] );
+		$this->assertSame( 42, $parsed['payload']['message_id'] );
+
+		// The payload has to be the message object resolve_trigger consumes.
+		$node   = $this->makeTriggerNode( 'message_received' );
+		$result = Telegram::resolve_trigger( $node, [ $parsed['payload'] ] );
+		$this->assertSame( 'Hello bot!', $result['telegram_text'] );
+	}
+
+	public function test_parse_webhook_event_routes_slash_commands(): void {
+		$parsed = Telegram::parse_webhook_event( $this->makeUpdateRequest( [
+			'message' => [
+				'message_id' => 55,
+				'from'       => [ 'id' => 222, 'first_name' => 'Bob' ],
+				'chat'       => [ 'id' => 222, 'type' => 'private' ],
+				'text'       => '/start welcome',
+			],
+		] ) );
+
+		$this->assertSame( 'command_received', $parsed['event'] );
+	}
+
+	public function test_parse_webhook_event_skips_non_text_and_bot_updates(): void {
+		// A callback query carries no message at all.
+		$this->assertNull( Telegram::parse_webhook_event( $this->makeUpdateRequest( [
+			'callback_query' => [ 'id' => '1' ],
+		] ) ) );
+
+		// A join notice is a message with no text.
+		$this->assertNull( Telegram::parse_webhook_event( $this->makeUpdateRequest( [
+			'message' => [ 'message_id' => 1, 'chat' => [ 'id' => 5 ], 'new_chat_members' => [] ],
+		] ) ) );
+
+		// Another bot's message would otherwise loop.
+		$this->assertNull( Telegram::parse_webhook_event( $this->makeUpdateRequest( [
+			'message' => [
+				'message_id' => 2,
+				'from'       => [ 'id' => 9, 'is_bot' => true ],
+				'chat'       => [ 'id' => 5 ],
+				'text'       => 'beep',
+			],
+		] ) ) );
+	}
+
+	public function test_webhook_signature_checks_the_secret_token(): void {
+		$request = $this->makeUpdateRequest( [ 'message' => [ 'text' => 'hi' ] ] );
+
+		// Unset secret: allowed, so first-time setup isn't a chicken-and-egg.
+		$this->assertTrue( Telegram::verify_webhook_signature( $request ) );
+
+		update_option( 'zaplane_webhook_config', [ 'telegram' => [ 'secret_token' => 's3cret' ] ] );
+
+		$this->assertFalse( Telegram::verify_webhook_signature( $request ) );
+
+		$request->set_header( 'x_telegram_bot_api_secret_token', 's3cret' );
+		$this->assertTrue( Telegram::verify_webhook_signature( $request ) );
+
+		delete_option( 'zaplane_webhook_config' );
+	}
+
+	private function makeUpdateRequest( array $update ): \WP_REST_Request {
+		$request = new \WP_REST_Request( 'POST', '/zaplane/v1/incoming/telegram' );
+		$request->set_body( (string) wp_json_encode( $update ) );
+		$request->set_header( 'content-type', 'application/json' );
+
+		return $request;
 	}
 
 	public function test_trigger_command_received_returns_payload(): void {

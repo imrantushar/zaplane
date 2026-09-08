@@ -3,6 +3,7 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPLoading from "@ZAPComponents/Loading";
 import ReactJson from "react-json-view";
 import { useSelector } from "react-redux";
+import { zaplaneJsonViewTheme } from "@ZAPUtils/jsonViewTheme";
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { LuChevronDown } from 'react-icons/lu';
 
@@ -26,15 +27,15 @@ const LogDetails = ({
           const input = log?.input_json || {};
           const output = log?.output_json || {};
           return (
-            <Disclosure key={log.id} as="div" className="border border-gray-200 p-3 rounded-lg my-2">
+            <Disclosure key={log.id} as="div" className="border border-[var(--zaplane-border-color)] p-3 rounded-lg my-2">
               {({ open }) => (
                 <>
-                  <DisclosureButton className="flex w-full justify-between items-center bg-white px-2  text-left text-sm font-medium focus:outline-none">
+                  <DisclosureButton className="flex w-full justify-between items-center bg-[var(--zaplane-background)] px-2  text-left text-sm font-medium focus:outline-none">
                     <div className="flex flex-col flex-1">
                       <span className="zaplane-label font-medium">
                         {sprintf(__('%s', 'zaplane'), log?.node?.app)}
                       </span>
-                      <span className="text-gray-500">
+                      <span className="text-[var(--zaplane-font-secondary-color)]">
                         {sprintf(__('%s', 'zaplane'), log?.node?.event)}
                       </span>
                     </div>
@@ -47,24 +48,24 @@ const LogDetails = ({
                         {__(log.status, 'zaplane')}
                       </span>
                       <LuChevronDown
-                        className={`${open ? 'rotate-180 transform' : ''} h-5 w-5 text-gray-500`}
+                        className={`${open ? 'rotate-180 transform' : ''} h-5 w-5 text-[var(--zaplane-font-secondary-color)]`}
                       />
                     </div>
                   </DisclosureButton>
-                  <DisclosurePanel className="px-2 pt-4 pb-2 text-sm text-gray-500">
+                  <DisclosurePanel className="px-2 pt-4 pb-2 text-sm text-[var(--zaplane-font-secondary-color)]">
                     <div className="flex flex-col gap-4 items-stretch">
-                      <div className="p-3 border rounded-md bg-gray-50" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
+                      <div className="p-3 border border-[var(--zaplane-border-color)] rounded-md bg-[var(--zaplane-secondary-color)]" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
                         <span className="zaplane-label font-bold mb-2 block">
                           {__('Input', 'zaplane')}
                         </span>
-                        <ReactJson src={input} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} />
+                        <ReactJson src={input} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} theme={zaplaneJsonViewTheme} />
                       </div>
 
-                      <div className="p-3 border rounded-md bg-gray-50" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
-                        <span className="font-bold mb-2 block text-gray-800">
+                      <div className="p-3 border border-[var(--zaplane-border-color)] rounded-md bg-[var(--zaplane-secondary-color)]" style={{ overflowWrap: 'break-word', wordBreak: 'break-all', overflowX: 'auto' }}>
+                        <span className="font-bold mb-2 block text-[var(--zaplane-font-color)]">
                           {__('Output', 'zaplane')}
                         </span>
-                        <ReactJson src={output} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} />
+                        <ReactJson src={output} name="root" collapsed={1} enableClipboard={false} displayDataTypes={false} theme={zaplaneJsonViewTheme} />
                       </div>
                     </div>
                   </DisclosurePanel>

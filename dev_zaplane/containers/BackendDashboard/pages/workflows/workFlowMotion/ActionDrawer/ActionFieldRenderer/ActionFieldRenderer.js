@@ -6,7 +6,7 @@ import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
 import ZAPCheckbox from "@ZAPComponents/ZAPCheckbox";
 import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
-import RepeaterField from "../RepeaterField/RepeaterField";
+import RepeaterField from "../../actionDrawer/RepeaterField/RepeaterField";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
@@ -54,7 +54,7 @@ const ActionFieldRenderer = ({
 
   const ErrorMsg = () => {
     return fieldError ? (
-      <p className="text-red-500 text-xs mt-1">{fieldError}</p>
+      <p className="text-[var(--zaplane-danger)] text-xs mt-1">{fieldError}</p>
     ) : null;
   }
 
@@ -70,7 +70,7 @@ const ActionFieldRenderer = ({
           return (
             <div className="flex flex-col gap-2">
               {field.label && <span className="zaplane-label">{__(field.label, "zaplane")}</span>}
-              <p className="text-gray-500 text-xs">
+              <p className="text-[var(--zaplane-font-secondary-color)] text-xs">
                 {__("Save the workflow to generate its webhook URL.", "zaplane")}
               </p>
             </div>
@@ -199,7 +199,7 @@ const ActionFieldRenderer = ({
         <div className="flex flex-col gap-2">
           <span className="zaplane-label">
             {__(field.label, "zaplane")}
-            {field.required && <span className="text-red-500 ml-[2px]">*</span>}
+            {field.required && <span className="text-[var(--zaplane-danger)] ml-[2px]">*</span>}
           </span>
 
           {value ? (
@@ -216,7 +216,7 @@ const ActionFieldRenderer = ({
                 <button
                   type="button"
                   onClick={() => { setFieldValue(field.key, ""); }}
-                  className="text-[13px] text-red-500 bg-transparent border-0 cursor-pointer p-0"
+                  className="text-[13px] text-[var(--zaplane-danger)] bg-transparent border-0 cursor-pointer p-0"
                 >
                   {__("Remove", "zaplane")}
                 </button>

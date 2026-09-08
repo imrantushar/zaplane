@@ -25,7 +25,7 @@
 	&__divider {
 		width: 1px;
 		height: 20px;
-		background: #d1d5db;
+		background: var(--zaplane-border-color);
 	}
 
 	&__delete {
@@ -47,14 +47,14 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		color: #9ca3af;
+		color: var(--zaplane-text-muted);
 		background: transparent;
 		border: 0;
 		cursor: pointer;
 		padding: 0;
 
 		&:hover {
-			color: #4b5563;
+			color: var(--zaplane-font-secondary-color);
 		}
 	}
 }

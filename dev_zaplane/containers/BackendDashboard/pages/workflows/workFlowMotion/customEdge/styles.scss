@@ -9,36 +9,40 @@
   pointer-events: auto;
 }
 
-// Soft base line — brightens on hover.
+/* One stroke, in the hue of the node it leaves, so a glance shows what feeds
+   what. This used to be two stacked paths — a soft base plus a dashed overlay
+   at near-full opacity — which is what made the canvas look busy. */
 .zaplane-custom-edge .zaplane-edge-base {
-  stroke: color-mix(in srgb, var(--zaplane-primary) 35%, transparent);
-  stroke-width: 2;
+  stroke: color-mix(in srgb, var(--zaplane-edge-hue, var(--zaplane-primary)) 45%, transparent);
+  stroke-width: 1.5;
+  fill: none;
   transition: stroke 0.2s ease, stroke-width 0.2s ease;
 }
-.zaplane-custom-edge:hover .zaplane-edge-base {
-  stroke: var(--zaplane-primary);
-  stroke-width: 2.5;
+
+.zaplane-custom-edge:hover .zaplane-edge-base,
+.zaplane-custom-edge.selected .zaplane-edge-base {
+  stroke: var(--zaplane-edge-hue, var(--zaplane-primary));
+  stroke-width: 2;
 }
 
-// Wide invisible line so the edge is easy to hover.
+/* Wide invisible line so the edge is easy to hover. */
 .zaplane-custom-edge .zaplane-edge-hit {
   stroke: transparent;
   stroke-width: 18;
   fill: none;
 }
 
-// Animated flow overlay — moving dashes indicate direction of data flow.
-.zaplane-custom-edge .zaplane-edge-flow {
+/* Motion means "data is moving through this right now". The dashes used to run
+   on every edge forever, which said nothing and cost frames on a large flow.
+   Applied only when an edge carries data.running — nothing sets that yet;
+   wiring live run state to the canvas is still to do. */
+.zaplane-custom-edge.is-running .zaplane-edge-flow {
   fill: none;
-  stroke: var(--zaplane-primary);
+  stroke: var(--zaplane-edge-hue, var(--zaplane-primary));
   stroke-width: 2;
   stroke-linecap: round;
   stroke-dasharray: 4 9;
   animation: zaplane-edge-dash 0.7s linear infinite;
-  opacity: 0.9;
-}
-.zaplane-custom-edge:hover .zaplane-edge-flow {
-  stroke-width: 2.5;
 }
 
 @keyframes zaplane-edge-dash {
@@ -47,7 +51,13 @@
   }
 }
 
-// Fallback for the default class React Flow may still apply.
+@media (prefers-reduced-motion: reduce) {
+  .zaplane-custom-edge.is-running .zaplane-edge-flow {
+    animation: none;
+  }
+}
+
+/* Fallback for the default class React Flow may still apply. */
 .react-flow__edge-path {
-  stroke: color-mix(in srgb, var(--zaplane-primary) 35%, transparent);
+  stroke: color-mix(in srgb, var(--zaplane-edge-hue, var(--zaplane-primary)) 45%, transparent);
 }

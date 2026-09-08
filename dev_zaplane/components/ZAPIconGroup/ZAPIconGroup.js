@@ -26,7 +26,7 @@ const ZAPIconGroup = ({
     return <img src={`${plugin_root_url}assets/images/button.svg`} style={{ width: '40px', height: '40px' }} />;
   }
 
-  return <div className="flex border border-[#E5E7EB] rounded-[4px] overflow-hidden bg-white w-fit">
+  return <div className="flex border border-[var(--zaplane-border-color)] rounded-[4px] overflow-hidden bg-[var(--zaplane-background)] w-fit">
     {visibleIcons.map((icon, index) => {
       const isAbsolute = isAbsoluteIcon(icon);
       const isImage = isAbsolute || icon?.endsWith(".svg");
@@ -34,9 +34,9 @@ const ZAPIconGroup = ({
       const isLast = index === visibleIcons.length - 1 && remaining === 0;
 
       return <div key={index} style={{
-        borderRight: isLast ? 'none' : '1px solid #E5E7EB',
+        borderRight: isLast ? 'none' : '1px solid var(--zaplane-border-color)',
         padding: '4px 10px'
-      }} className="flex h-[36px] min-w-[40px] justify-center items-center bg-[#F9FAFB]">
+      }} className="flex h-[36px] min-w-[40px] justify-center items-center bg-[var(--zaplane-secondary-color)]">
         {isImage ? <img src={iconSrc} alt={icon} style={{
           width: '20px',
           height: '20px',
@@ -45,7 +45,7 @@ const ZAPIconGroup = ({
       </div>;
     })}
 
-    {remaining > 0 && <div className="flex px-3 h-[36px] justify-center items-center bg-[#F9FAFB] min-w-[40px]">
+    {remaining > 0 && <div className="flex px-3 h-[36px] justify-center items-center bg-[var(--zaplane-secondary-color)] min-w-[40px]">
       <span className="zaplane-sub-title">
         +{remaining}
       </span>

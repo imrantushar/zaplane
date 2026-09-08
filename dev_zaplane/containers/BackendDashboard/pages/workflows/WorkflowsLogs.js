@@ -64,12 +64,12 @@ const WorkflowsLogs = ({
           setActiveRunId(row.id);
           setDrawerOpen(true);
           dispatch(nodeLogsRunDetails(row.id));
-        }} className="flex p-[5px 6px] justify-center items-center rounded-[2.917px] border cursor-pointer">
+        }} className="flex p-[5px_6px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)] cursor-pointer">
               <HistoryIcon height="20px" width="20px" />
             </div>
           </ZAPTooltip>
           <ZAPTooltip content={__("Re-Try", 'zaplane')}>
-            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex p-[5px 6px] justify-center items-center rounded-[2.917px] border cursor-pointer">
+            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex p-[5px_6px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)] cursor-pointer">
               <ReExcutionIcon height="20px" width="20px" />
             </div>
           </ZAPTooltip>

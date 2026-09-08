@@ -3,11 +3,12 @@
  * Plugin Name:     Zaplane
  * Plugin URI:      https://zaplane.app/
  * Description:     WordPress Automation Plugin
- * Version:         1.1.0
+ * Version:         1.2.0
  * Author:          kodezen
  * Author URI:      https://kodezen.com
  * License:         GPL-3.0+
  * Text Domain:     zaplane
+ * Domain Path:     /languages
  *
  * Requires PHP: 7.4
  * Tested up to: 6.8
@@ -56,7 +57,7 @@ final class Zaplane {
 	}
 
 	public function define_constants(): void {
-		define( 'ZAPLANE_VERSION', '1.1.0' );
+		define( 'ZAPLANE_VERSION', '1.2.0' );
 		define( 'ZAPLANE_ALLOW_LOGS', true );
 		define( 'ZAPLANE_PLUGIN_SLUG', 'zaplane' );
 		define( 'ZAPLANE_PLUGIN_FILE', __FILE__ );
@@ -109,6 +110,9 @@ final class Zaplane {
 	}
 
 	public function init_plugin(): void {
+		// Feature-toggle gating (hides disabled feature pages from menu + SPA).
+		\Zaplane\Settings::boot();
+
 		// Register user-defined Custom Apps into the integration registry before
 		// anything reads it (automation boot below, and later REST controllers).
 		\Zaplane\CustomApps\Loader::boot();

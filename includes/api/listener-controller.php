@@ -347,11 +347,14 @@ class ListenerController extends WP_REST_Controller {
 		]);
 
 		// Make this capture reusable as sample data in other workflows that use
-		// the same trigger (app+event), so they don't have to capture again.
+		// the exact same trigger (app+event+config), so they don't have to
+		// capture again. Scoping by config keeps different selections (e.g. a
+		// different form) from leaking each other's fields.
 		\Zaplane\Framework\Core\Automation::store_trigger_sample(
 			$triggerNode['data']['app'] ?? '',
 			$triggerNode['data']['event'] ?? '',
-			$payload
+			$payload,
+			is_array( $triggerNode['data']['config'] ?? null ) ? $triggerNode['data']['config'] : []
 		);
 
 		$graph      = $version->getGraph();

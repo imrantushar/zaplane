@@ -315,8 +315,58 @@ class Slack extends IntegrationBase {
 		return [];
 	}
 
+	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( 'channel_created' === $trigger ) {
+			return [];
+		}
+
+		return [
+			[
+				'key'         => 'channel',
+				'label'       => 'Channel ID',
+				'type'        => 'text',
+				'placeholder' => 'C012AB3CD',
+				'help'        => 'Optional. Only continue when the event came from this channel.',
+			],
+		];
+	}
+
+	/**
+	 * The webhook hands us the Slack event object (already merged with team_id /
+	 * api_app_id by parse_webhook_event), so it is returned as-is — its keys are
+	 * exactly what get_trigger_sample_output() advertises and what workflows map
+	 * against. The previous version wrapped it as [ 'message' => $args[0] ],
+	 * which meant `text`, `user` and `channel` never existed on the payload.
+	 */
 	public static function resolve_trigger( array $node, array $args ) {
-		return [ 'message' => $args[0] ?? '' ];
+		$payload = $args[0] ?? null;
+
+		if ( ! is_array( $payload ) || empty( $payload ) ) {
+			return false;
+		}
+
+		// Never react to our own posts. Without this a workflow that both listens
+		// for messages and sends one re-triggers itself indefinitely.
+		if ( ! empty( $payload['bot_id'] ) || 'bot_message' === ( $payload['subtype'] ?? '' ) ) {
+			return false;
+		}
+
+		$config  = $node['data']['config'] ?? ( $node['config'] ?? [] );
+		$channel = is_array( $config ) ? trim( (string) ( $config['channel'] ?? '' ) ) : '';
+
+		if ( '' !== $channel ) {
+			// reaction_added / file_shared nest the channel differently to message.
+			$actual = (string) (
+				$payload['channel']
+				?? $payload['channel_id']
+				?? ( $payload['item']['channel'] ?? '' )
+			);
+			if ( $channel !== $actual ) {
+				return false;
+			}
+		}
+
+		return $payload;
 	}
 
 	public static function execute_node( array $node, array $input ): array {
@@ -598,12 +648,26 @@ class Slack extends IntegrationBase {
 		];
 	}
 
+	/**
+	 * Slack grants exactly the scopes requested here — nothing more. Each
+	 * trigger/action below needs its own scope or Slack silently drops it
+	 * (an event is never delivered, or an API call fails with
+	 * "missing_scope"), so this list has to cover every trigger and action
+	 * this integration declares, not just the common ones.
+	 */
 	public static function get_oauth_scopes(): array {
 		return [
-			'chat:write',
-			'channels:read',
-			'users:read',
-			'im:write',
+			'chat:write',      // send_message, send_dm
+			'im:write',        // send_dm (conversations.open)
+			'channels:read',   // channel_created event, channel lookups
+			'channels:history', // message_received event
+			'app_mentions:read', // app_mention event
+			'reactions:read',  // reaction_added event
+			'reactions:write', // add_reaction action
+			'files:read',      // file_shared event
+			'users:read',      // get_user_info
+			'channels:manage', // create_channel, invite_to_channel, set_topic (public)
+			'groups:write',    // create_channel, invite_to_channel, set_topic (private)
 		];
 	}
 
@@ -804,8 +868,39 @@ class Slack extends IntegrationBase {
 
 
 
+	public static function get_webhook_setup_fields(): array {
+		return [
+			[
+				'key'      => 'signing_secret',
+				'label'    => 'Signing Secret',
+				'type'     => 'password',
+				'required' => true,
+				'help'     => 'Slack app → Basic Information → App Credentials → Signing Secret. Without it this endpoint accepts unsigned requests from anyone.',
+			],
+		];
+	}
+
+	/**
+	 * Slack verifies the Request URL by POSTing {"type":"url_verification",
+	 * "challenge":"..."} to it and requires the challenge echoed back. Returning
+	 * null here (as parse_webhook_event did) made Slack see the generic
+	 * {"received":true} envelope and refuse to enable Event Subscriptions.
+	 */
+	public static function handle_webhook_handshake( \WP_REST_Request $request ): ?array {
+		$body = $request->get_json_params();
+
+		if ( ! is_array( $body ) || 'url_verification' !== ( $body['type'] ?? '' ) ) {
+			return null;
+		}
+
+		return [
+			'body'         => (string) ( $body['challenge'] ?? '' ),
+			'content_type' => 'text/plain',
+		];
+	}
+
 	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
-		$signing_secret = get_option( 'zaplane_slack_signing_secret', '' );
+		$signing_secret = self::get_webhook_setting( 'signing_secret', 'zaplane_slack_signing_secret' );
 
 		if ( empty( $signing_secret ) ) {
 			return true;

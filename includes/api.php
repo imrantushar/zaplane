@@ -44,6 +44,7 @@ class API implements ModuleInterface {
 		( new \Zaplane\API\HitlController( $this->container ) )->register_routes();
 		( new \Zaplane\API\KnowledgeController( $this->container ) )->register_routes();
 		( new \Zaplane\API\McpController( $this->container ) )->register_routes();
+		( new \Zaplane\API\SettingsController( $this->container ) )->register_routes();
 
 		register_rest_route('zaplane/v1', '/runs/(?P<id>\d+)', [
 			'methods'  => 'GET',
@@ -70,6 +71,13 @@ class API implements ModuleInterface {
 				$integration = $integrationLoader->get( $req['integration'] );
 
 				if ( ! $integration ) {
+					return [];
+				}
+
+				// Not part of IntegrationBase — an integration only declares it when
+				// it has dynamic selects. Calling it blind fataled the whole route
+				// for every integration that doesn't.
+				if ( ! method_exists( $integration, 'get_dynamic_queries' ) ) {
 					return [];
 				}
 

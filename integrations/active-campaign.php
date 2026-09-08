@@ -32,15 +32,15 @@ class ActiveCampaign extends IntegrationBase {
 		return [
 			'form_submitted' => [
 				'label' => 'Form Submitted',
-				'hook'  => 'wp_loaded',
+				'hook'  => 'activecampaign_webhook_form_submitted',
 			],
 			'contact_subscribed' => [
 				'label' => 'Contact Subscribed',
-				'hook'  => 'wp_loaded',
+				'hook'  => 'activecampaign_webhook_contact_subscribed',
 			],
 			'contact_unsubscribed' => [
 				'label' => 'Contact Unsubscribed',
-				'hook'  => 'wp_loaded',
+				'hook'  => 'activecampaign_webhook_contact_unsubscribed',
 			],
 		];
 	}
@@ -213,15 +213,125 @@ class ActiveCampaign extends IntegrationBase {
 		];
 	}
 
+	/**
+	 * ActiveCampaign delivers events to a callback URL registered under
+	 * Settings → Developer → Webhooks.
+	 *
+	 * These triggers previously hung off `wp_loaded` and scraped $_POST when the
+	 * request happened to be aimed at the ActiveCampaign plugin's legacy
+	 * form_process.php. That fired a handler on every single request (admin,
+	 * REST and cron included) and only ever matched if the site still used that
+	 * endpoint — sites posting straight to <account>.activehosted.com never
+	 * triggered at all.
+	 */
 	public static function supports_webhook(): bool {
-		return false;
+		return true;
+	}
+
+	public static function get_webhook_setup_fields(): array {
+		return [
+			[
+				'key'      => 'shared_secret',
+				'label'    => 'Shared Secret',
+				'type'     => 'password',
+				'generate' => true,
+				'help'     => 'Optional. When set, append ?secret=<value> to the callback URL you register in ActiveCampaign; requests without it are rejected.',
+			],
+		];
+	}
+
+	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
+		$secret = self::get_webhook_setting( 'shared_secret' );
+
+		if ( '' === $secret ) {
+			return true;
+		}
+
+		$provided = trim( (string) ( $request->get_param( 'secret' ) ?: $request->get_header( 'x-zaplane-secret' ) ) );
+
+		return '' !== $provided && hash_equals( $secret, $provided );
+	}
+
+	/**
+	 * Normalise an ActiveCampaign webhook (form-encoded, contact[...] nesting)
+	 * into the payload shape resolve_trigger() already consumes.
+	 */
+	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
+		$body = $request->get_body_params();
+
+		if ( empty( $body ) ) {
+			$raw = (string) $request->get_body();
+			if ( '' !== $raw ) {
+				parse_str( $raw, $body );
+			}
+		}
+
+		if ( empty( $body ) ) {
+			$json = $request->get_json_params();
+			$body = is_array( $json ) ? $json : [];
+		}
+
+		if ( ! is_array( $body ) || empty( $body ) ) {
+			return null;
+		}
+
+		$type = strtolower( trim( (string) ( $body['type'] ?? '' ) ) );
+
+		$map = [
+			'subscribe'   => 'contact_subscribed',
+			'unsubscribe' => 'contact_unsubscribed',
+			'forward'     => 'form_submitted',
+		];
+
+		// A `subscribe` carrying a form id is a form submission as well; emit the
+		// more specific event so both trigger types stay usable.
+		$form_id = trim( (string) ( $body['form'] ?? '' ) );
+		$event   = $map[ $type ] ?? null;
+
+		if ( 'subscribe' === $type && '' !== $form_id ) {
+			$event = 'form_submitted';
+		}
+
+		if ( null === $event ) {
+			return null;
+		}
+
+		$contact = is_array( $body['contact'] ?? null ) ? $body['contact'] : [];
+		$lists   = [];
+
+		foreach ( (array) ( $body['list'] ?? [] ) as $list_id ) {
+			$list_id = trim( (string) $list_id );
+			if ( '' !== $list_id ) {
+				$lists[] = [ 'id' => $list_id ];
+			}
+		}
+
+		if ( empty( $lists ) && ! empty( $body['list'] ) && is_scalar( $body['list'] ) ) {
+			$lists[] = [ 'id' => trim( (string) $body['list'] ) ];
+		}
+
+		return [
+			'event'   => $event,
+			'payload' => [
+				'form'    => [ 'id' => $form_id ],
+				'action'  => 'unsubscribe' === $type ? 'unsub' : 'sub',
+				'type'    => $type,
+				'contact' => [
+					'id'         => (string) ( $contact['id'] ?? '' ),
+					'email'      => sanitize_email( (string) ( $contact['email'] ?? '' ) ),
+					'first_name' => (string) ( $contact['first_name'] ?? '' ),
+					'last_name'  => (string) ( $contact['last_name'] ?? '' ),
+					'phone'      => (string) ( $contact['phone'] ?? '' ),
+					'fields'     => is_array( $contact['fields'] ?? null ) ? $contact['fields'] : [],
+				],
+				'lists'   => $lists,
+				'message' => (string) ( $body['message'] ?? '' ),
+			],
+		];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
 		$payload = self::normalize_trigger_payload( $args[0] ?? null );
-		if ( null === $payload ) {
-			$payload = self::capture_form_process_payload();
-		}
 
 		if ( ! is_array( $payload ) || empty( $payload ) ) {
 			return false;
@@ -340,12 +450,18 @@ class ActiveCampaign extends IntegrationBase {
 		throw new \Exception( 'ActiveCampaign action type is missing or unsupported' );
 	}
 
+	/**
+	 * Actions here need an API URL + key, so this must be true: the dashboard
+	 * hides both the Connections entry and the node's connection picker unless
+	 * it is, which left every action falling back to the ActiveCampaign
+	 * plugin's own option and throwing when that plugin wasn't installed.
+	 */
 	public static function requires_connection(): bool {
-		return false;
+		return true;
 	}
 
 	public static function get_auth_type(): string {
-		return 'none';
+		return 'api_key';
 	}
 
 	public static function get_auth_fields( ?string $auth_type = null ): array {
@@ -866,90 +982,9 @@ class ActiveCampaign extends IntegrationBase {
 		return is_array( $payload ) && ! empty( $payload ) ? $payload : null;
 	}
 
-	private static function capture_form_process_payload(): ?array {
-		if ( 'POST' !== strtoupper( (string) ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ) {
-			return null;
-		}
 
-		$request_uri  = (string) ( $_SERVER['REQUEST_URI'] ?? '' );
-		$request_path = (string) parse_url( $request_uri, PHP_URL_PATH );
-		if ( '' === $request_path || ! preg_match( '#/activecampaign-subscription-forms/form_process\.php$#', $request_path ) ) {
-			return null;
-		}
 
-		$form_id = trim( (string) ( $_POST['f'] ?? '' ) );
-		$email   = sanitize_email( (string) ( $_POST['email'] ?? '' ) );
-		$lists   = self::normalize_request_lists( $_POST['nlbox'] ?? [] );
 
-		if ( '' === $form_id || '' === $email || empty( $lists ) ) {
-			return null;
-		}
-
-		$action     = self::normalize_request_action();
-		$names      = self::resolve_request_names();
-		$phone      = trim( (string) ( $_POST['phone'] ?? '' ) );
-		$fields     = isset( $_POST['field'] ) && is_array( $_POST['field'] ) ? $_POST['field'] : [];
-		$sync_value = isset( $_GET['sync'] ) ? (int) $_GET['sync'] : 0;
-
-		return [
-			'form'    => [
-				'id' => $form_id,
-			],
-			'action'  => $action,
-			'sync'    => $sync_value,
-			'contact' => [
-				'id'         => '',
-				'email'      => $email,
-				'first_name' => $names['first_name'],
-				'last_name'  => $names['last_name'],
-				'phone'      => $phone,
-				'fields'     => $fields,
-			],
-			'lists'   => $lists,
-			'message' => '',
-		];
-	}
-
-	private static function normalize_request_lists( $lists ): array {
-		if ( ! is_array( $lists ) ) {
-			return [];
-		}
-
-		$normalized = [];
-		foreach ( $lists as $list_id ) {
-			$list_id = trim( (string) $list_id );
-			if ( '' === $list_id ) {
-				continue;
-			}
-			$normalized[] = [ 'id' => $list_id ];
-		}
-
-		return $normalized;
-	}
-
-	private static function normalize_request_action(): string {
-		$action = (string) ( $_POST['act_radio'] ?? $_POST['act'] ?? 'sub' );
-		return 'unsub' === $action ? 'unsub' : 'sub';
-	}
-
-	private static function resolve_request_names(): array {
-		$full_name = trim( (string) ( $_POST['fullname'] ?? '' ) );
-		if ( '' !== $full_name ) {
-			$parts      = preg_split( '/\s+/', $full_name );
-			$first_name = (string) array_shift( $parts );
-			$last_name  = implode( ' ', $parts );
-
-			return [
-				'first_name' => $first_name,
-				'last_name'  => $last_name,
-			];
-		}
-
-		return [
-			'first_name' => trim( (string) ( $_POST['firstname'] ?? $_POST['first_name'] ?? '' ) ),
-			'last_name'  => trim( (string) ( $_POST['lastname'] ?? $_POST['last_name'] ?? '' ) ),
-		];
-	}
 
 	private static function matches_trigger_event( string $event, array $payload ): bool {
 		$action = (string) ( $payload['action'] ?? '' );

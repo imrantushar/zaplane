@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Handle, Position, useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { FaRegCopy, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import FloatingEdge from "../floatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
 import { formatLabel, integrations } from "@ZAPUtils/helper";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
+import { CATEGORY_LABELS, hueMix, nodeCategory, nodeHue } from "./helper";
 
 const addPortBtnStyle = {
   display: "inline-flex",
@@ -14,9 +15,9 @@ const addPortBtnStyle = {
   width: 16,
   height: 16,
   borderRadius: "50%",
-  border: "1px solid #9CA3AF",
-  background: "#fff",
-  color: "#6B7280",
+  border: "1px solid var(--zaplane-border-color)",
+  background: "var(--zaplane-background)",
+  color: "var(--zaplane-font-secondary-color)",
   cursor: "pointer",
   padding: 0,
   pointerEvents: "auto",
@@ -55,7 +56,6 @@ export default function CustomNode({
   const hasOutgoingEdge = edges.some(e => e.source === id);
   const isLR = canvasLayout === "LR";
   const isSelectApp = data.app === "Select an app";
-  const formattedAction = data?.action?.charAt(0).toUpperCase() + data?.action?.slice(1);
   const ports = getNodePorts(data);
   const isMultiPort = ports.length > 1;
   // The AI Agent accepts sub-nodes wired into its bottom: a chat model, a memory
@@ -76,11 +76,14 @@ export default function CustomNode({
   const isTrigger = data?.action === "trigger";
   const canRemove = isTrigger ? !isSelectApp : hasPort;
 
+  const category = nodeCategory(data);
+  const hue = nodeHue(data);
+
   const handleStyle = {
     width: 8,
     height: 8,
     borderRadius: "8px",
-    background: "#6366f1", // purple-dot color
+    background: hue,
     border: "none",
   };
 
@@ -95,62 +98,59 @@ export default function CustomNode({
   }, [id, isAgent, isSubNode, isLR, ports.length, updateNodeInternals]);
 
   return (
-    <div className="zaplane-custom-node-wrapper" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ position: 'relative' }}>
+    <div className="zaplane-custom-node-wrapper" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ position: 'relative', '--zaplane-node-hue': hue }}>
       
-      {/* NODE LABEL */}
-      <div className="zaplane-node-label" style={{ 
-        position: 'absolute', 
-        top: -25, 
-        left: 0, 
-        fontSize: '13px', 
-        fontWeight: '500', 
-        color: '#1f2937' 
-      }}>
-        {formattedAction || "Action"}
-      </div>
-
-      {/* DELETE BUTTON */}
-      {canRemove && hovered && (
-        <div
-          style={{
-            position: 'absolute',
-            top: -10,
-            right: -10,
-            zIndex: 10,
-            pointerEvents: 'auto',
-            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-          }}
-          className="flex flex-row items-center bg-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)] p-[6px] rounded-[4px] cursor-pointer"
-        >
-          <RiDeleteBin5Line style={{ width: "16px", height: "16px" }} onClick={e => {
+      {/* REMOVE CONTROL — a real button, so the whole target is clickable and it
+          can be reached from the keyboard. The click used to sit on the icon
+          itself, leaving the padding around it dead, and the chip filled with
+          --zaplane-border-color: a border value used as a fill, which is why it
+          read as a muddy grey square against the card. */}
+      {canRemove && (
+        <button
+          type="button"
+          aria-label={isTrigger ? __("Reset trigger", "zaplane") : __("Delete step", "zaplane")}
+          title={isTrigger ? __("Reset trigger", "zaplane") : __("Delete step", "zaplane")}
+          onClick={e => {
             e.stopPropagation();
             if (isTrigger) {
               data?.resetTrigger(id);
             } else {
               data?.deleteNode(id);
             }
-          }} className="cursor-pointer" />
-          {!data?.action && <FaRegCopy style={{ width: "16px", height: "16px" }} />}
-        </div>
+          }}
+          className="zaplane-node-remove"
+          style={{
+            position: 'absolute',
+            top: -10,
+            right: -10,
+            zIndex: 10,
+            // Kept mounted so it can take focus, but an invisible control must
+            // not swallow clicks aimed at the card corner behind it.
+            opacity: hovered ? 1 : 0,
+            pointerEvents: hovered ? 'auto' : 'none',
+          }}
+        >
+          <RiDeleteBin5Line style={{ width: "14px", height: "14px" }} />
+        </button>
       )}
 
       {/* NODE BODY */}
-      <div 
+      <div
         style={{
-          padding: '12px 16px',
-          minWidth: '220px',
-          minHeight: '64px',
-          background: '#F9FAFB',
-          border: '1px solid #E5E7EB',
-          borderRadius: '8px',
-          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-          display: 'flex',
-          alignItems: 'center',
+          minWidth: '236px',
+          // A surface, not a rectangle of border. The card used to fill with
+          // --zaplane-secondary-color, which is the same value the canvas paints,
+          // so the border was the only thing separating the two.
+          background: 'var(--zaplane-background)',
+          border: `1px solid ${hueMix(category, 26)}`,
+          borderRadius: '9px',
+          boxShadow: '0 1px 2px 0 rgba(16, 24, 40, 0.05)',
+          overflow: 'hidden',
           cursor: 'pointer',
-          transition: 'all 0.2s ease',
-        }} 
+          transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+        }}
         onClick={data.onOpenDrawer}
-        className="zaplane-node-body hover:border-indigo-400"
+        className="zaplane-node-body"
       >
         {/* TARGET HANDLE */}
         {data?.action !== "trigger" && (
@@ -161,21 +161,43 @@ export default function CustomNode({
           />
         )}
 
+        {/* CATEGORY STRIP — what the node is, in a word and a hue. Replaces the
+            floating label that used to sit above the card and collide with
+            whatever was laid out there. Shown on an empty node too: it is still
+            a trigger or an action, and that is the one thing worth knowing
+            before it has been filled in. */}
+        <div
+            className="flex items-center gap-[6px]"
+            style={{
+              padding: '5px 11px',
+              background: hueMix(category, 9, 'var(--zaplane-background)'),
+              borderBottom: `1px solid ${hueMix(category, 18)}`,
+              fontSize: '9.5px',
+              fontWeight: 600,
+              letterSpacing: '0.09em',
+              textTransform: 'uppercase',
+              color: hueMix(category, 78, 'var(--zaplane-font-color)'),
+            }}
+          >
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: hue, display: 'block' }} />
+            {__(CATEGORY_LABELS[category], "zaplane")}
+        </div>
+
         {/* NODE CONTENT */}
-        <div className="flex flex-row items-center gap-3 w-full">
+        <div className="flex flex-row items-center gap-3 w-full" style={{ padding: '10px 11px' }}>
           <div className="zaplane-node-icon flex-shrink-0">
             {isSelectApp ? (
               <div style={{
                 width: '32px',
                 height: '32px',
-                background: '#FFFFFF',
+                background: 'var(--zaplane-background)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '8px',
-                border: '1px solid #E5E7EB'
+                border: '1px dashed var(--zaplane-border-color)'
               }}>
-                <FaPlus size={14} color="#6B7280" />
+                <FaPlus size={14} color="var(--zaplane-font-secondary-color)" />
               </div>
             ) : (
               <ZAPIcon icon={data?.icon} name={data.app} />
@@ -185,7 +207,7 @@ export default function CustomNode({
             <span style={{ 
               fontSize: '14px', 
               fontWeight: '500', 
-              color: '#374151',
+              color: 'var(--zaplane-font-color)',
               display: 'block',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -194,24 +216,24 @@ export default function CustomNode({
               {isSelectApp ? __(data.app, "zaplane") : sprintf(__("%s", "zaplane"), formatLabel(data.event))}
             </span>
 
-            {!isSelectApp && (
-              <span style={{ 
-                fontSize: '12px', 
-                color: '#6B7280',
-                display: 'block',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
-              }} className="zaplane-sub-title">
-                {sprintf(__("%s", "zaplane"), data.app)}
-              </span>
-            )}
+            <span style={{
+              fontSize: '12px',
+              color: 'var(--zaplane-font-secondary-color)',
+              display: 'block',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }} className="zaplane-sub-title">
+              {isSelectApp
+                ? (isTrigger ? __("Choose a trigger", "zaplane") : __("Choose an action", "zaplane"))
+                : sprintf(__("%s", "zaplane"), data.app)}
+            </span>
           </div>
         </div>
 
         {/* SOURCE HANDLES — one connectable, labelled handle per output branch */}
         {isSubNode ? (
-          <Handle type="source" id="sub_out" position={Position.Top} style={{ ...handleStyle, background: "#a855f7" }} />
+          <Handle type="source" id="sub_out" position={Position.Top} style={{ ...handleStyle, background: "var(--zaplane-cat-ai)" }} />
         ) : isMultiPort ? (
           ports.map((port, i) => {
             // Fixed spacing centred on the node so ports never overlap, however
@@ -235,13 +257,13 @@ export default function CustomNode({
                   style={{
                     position: "absolute",
                     fontSize: 10,
-                    color: "#4B5563",
+                    color: "var(--zaplane-font-secondary-color)",
                     whiteSpace: "nowrap",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 6,
-                    background: "#fff",
-                    border: "1px solid #E5E7EB",
+                    background: "var(--zaplane-background)",
+                    border: "1px solid var(--zaplane-border-color)",
                     borderRadius: 6,
                     padding: "1px 6px",
                     boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
@@ -288,7 +310,7 @@ export default function CustomNode({
                   type="target"
                   id={sp.id}
                   position={Position.Bottom}
-                  style={{ ...handleStyle, background: "#a855f7", left: pos }}
+                  style={{ ...handleStyle, background: "var(--zaplane-cat-ai)", left: pos }}
                 />
                 <div
                   style={{
@@ -304,7 +326,7 @@ export default function CustomNode({
                 >
                   {!connected && (
                     <>
-                      <span style={{ width: 0, height: 14, borderLeft: "1.5px dashed #C4B5FD" }} />
+                      <span style={{ width: 0, height: 14, borderLeft: "1.5px dashed color-mix(in srgb, var(--zaplane-cat-ai) 45%, transparent)" }} />
                       <button
                         type="button"
                         title={sprintf(__("Add %s", "zaplane"), sp.label)}
@@ -316,9 +338,9 @@ export default function CustomNode({
                           width: 22,
                           height: 22,
                           borderRadius: "50%",
-                          border: "1px dashed #a855f7",
-                          background: "#fff",
-                          color: "#a855f7",
+                          border: "1px dashed var(--zaplane-cat-ai)",
+                          background: "var(--zaplane-background)",
+                          color: "var(--zaplane-cat-ai)",
                           cursor: "pointer",
                           padding: 0,
                           pointerEvents: "auto",
@@ -334,9 +356,12 @@ export default function CustomNode({
                       marginTop: connected ? 8 : 5,
                       fontSize: 10,
                       fontWeight: 500,
-                      color: "#7C3AED",
+                      color: "var(--zaplane-cat-ai)",
                       whiteSpace: "nowrap",
-                      background: "rgba(255,255,255,0.9)",
+                      // Was a hardcoded white, which reads as a light chip on the
+                      // dark canvas. The label sits over the canvas, so it takes
+                      // the canvas colour.
+                      background: "var(--zaplane-canvas)",
                       borderRadius: 4,
                       padding: "0 4px",
                     }}

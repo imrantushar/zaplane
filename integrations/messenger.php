@@ -133,8 +133,28 @@ class Messenger extends IntegrationBase {
 		];
 	}
 
+	public static function get_webhook_setup_fields(): array {
+		return [
+			[
+				'key'      => 'verify_token',
+				'label'    => 'Verify Token',
+				'type'     => 'password',
+				'generate' => true,
+				'required' => true,
+				'help'     => 'Invent a value, save it here, then paste the same string into Meta → Webhooks → Verify Token. Meta will not accept the callback URL until this matches.',
+			],
+			[
+				'key'      => 'app_secret',
+				'label'    => 'App Secret',
+				'type'     => 'password',
+				'required' => true,
+				'help'     => 'Meta app → Settings → Basic → App Secret. Used to check the X-Hub-Signature-256 on every delivery.',
+			],
+		];
+	}
+
 	public static function get_webhook_app_secret(): string {
-		$secret = (string) get_option( 'zaplane_webhook_app_secret_messenger', '' );
+		$secret = self::get_webhook_setting( 'app_secret', 'zaplane_webhook_app_secret_messenger' );
 
 		return (string) apply_filters( 'zaplane_webhook_app_secret', $secret, 'messenger' );
 	}

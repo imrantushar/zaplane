@@ -44,11 +44,11 @@ const ConnectionSelector = ({
         </components.MenuList>;
   return <>
             <div className="flex flex-col gap-2">
-                <span>{__("Select Connection", "zaplane")}<span className="text-red-500 ml-[2px]">*</span></span>
+                <span>{__("Select Connection", "zaplane")}<span className="text-[var(--zaplane-danger)] ml-[2px]">*</span></span>
                 <Select className="zaplane-select" classNamePrefix="zaplane-select" options={options} value={options?.find(o => o.value === values?.connection_id) || null} onChange={val => { setFieldValue("connection_id", val?.value); if (error) setFieldError("connection_id", undefined); }} placeholder={__("Select a connection", "zaplane")} isClearable components={{
         MenuList: CustomMenuList
       }} />
-                {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+                {error && <p className="text-[var(--zaplane-danger)] text-xs mt-1">{error}</p>}
             </div>
 
             <ConnectionPopaver appSlug={appSlug} isOpen={isPopoverOpen} onClose={() => setPopoverOpen(false)} onConnected={handleConnected} />

@@ -23,32 +23,44 @@ class IntegrationsController extends WP_REST_Controller {
 		register_rest_route($namespace, '/integrations', [
 			'methods'  => 'GET',
 			'callback' => [ $this, 'get_integrations' ],
-			'permission_callback' => '__return_true',
+			'permission_callback' => [ $this, 'permissions_check' ],
 		]);
 
 		register_rest_route($namespace, '/integrations/(?P<slug>[a-z0-9_-]+)/triggers', [
 			'methods'  => 'GET',
 			'callback' => [ $this, 'get_triggers' ],
-			'permission_callback' => '__return_true',
+			'permission_callback' => [ $this, 'permissions_check' ],
 		]);
 
 		register_rest_route($namespace, '/integrations/(?P<slug>[a-z0-9_-]+)/triggers/(?P<trigger>[a-z0-9_-]+)/schema', [
 			'methods'  => 'GET',
 			'callback' => [ $this, 'get_trigger_schema' ],
-			'permission_callback' => '__return_true',
+			'permission_callback' => [ $this, 'permissions_check' ],
 		]);
 
 		register_rest_route($namespace, '/integrations/(?P<slug>[a-z0-9_-]+)/actions', [
 			'methods'  => 'GET',
 			'callback' => [ $this, 'get_actions' ],
-			'permission_callback' => '__return_true',
+			'permission_callback' => [ $this, 'permissions_check' ],
 		]);
 
 		register_rest_route($namespace, '/integrations/(?P<slug>[a-z0-9_-]+)/actions/(?P<action>[a-z0-9_-]+)/schema', [
 			'methods'  => 'GET',
 			'callback' => [ $this, 'get_action_schema' ],
-			'permission_callback' => '__return_true',
+			'permission_callback' => [ $this, 'permissions_check' ],
 		]);
+	}
+
+	/**
+	 * These routes describe every installed integration and the exact shape of
+	 * its configuration. That is only ever needed by the workflow builder, which
+	 * is an administration screen — and in practice the builder does not call
+	 * them at all, since it reads the same catalogue from the payload injected
+	 * into the page. Left reachable they told any anonymous visitor which plugins
+	 * this site runs.
+	 */
+	public function permissions_check() {
+		return current_user_can( 'manage_options' );
 	}
 
 	public function get_integrations() {

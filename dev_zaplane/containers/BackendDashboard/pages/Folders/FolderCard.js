@@ -8,7 +8,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import WPModal from "@ZAPComponents/Modal/WPModal";
-import { outlineBtn, primaryBtn } from '../../../../../assets/scss/chakra/recipe';
+import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import { updateFolder, deleteFolder } from '@ZAPRedux/Slices/folderSlice/folderSlice';
 import ZAPInput from '@ZAPComponents/ZAPInput';
 const FolderCard = ({
@@ -93,10 +93,7 @@ const FolderCard = ({
             value={title}
             onChange={e => setTitle(e.target.value)}
           />
-          <div className="flex justify-end gap-3">
-            <button style={outlineBtn} onClick={() => setIsRenameOpen(false)}>
-              {__("Cancel", "zaplane")}
-            </button>
+          <div className="flex gap-3">
             <button style={primaryBtn} onClick={handleRename} disabled={!title.trim()}>
               {__("Update", "zaplane")}
             </button>

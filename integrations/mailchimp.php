@@ -380,12 +380,17 @@ class Mailchimp extends IntegrationBase {
 		return array_slice( $items, 0, $limit );
 	}
 
+	/**
+	 * Every action here authenticates with a Mailchimp API key, so this must be
+	 * true: the dashboard hides the Connections entry AND the node's connection
+	 * picker unless it is, which left every action running with no credentials.
+	 */
 	public static function requires_connection(): bool {
-		return false;
+		return true;
 	}
 
 	public static function get_auth_type(): string {
-		return 'none';
+		return 'api_key';
 	}
 
 	public static function get_auth_fields( $auth_type = null ): array {
@@ -433,8 +438,31 @@ class Mailchimp extends IntegrationBase {
 		return true;
 	}
 
+	public static function get_webhook_setup_fields(): array {
+		return [
+			[
+				'key'      => 'shared_secret',
+				'label'    => 'Shared Secret',
+				'type'     => 'password',
+				'generate' => true,
+				'help'     => 'Optional. When set, append ?secret=<value> to the callback URL you paste into Mailchimp; requests without it are rejected.',
+			],
+		];
+	}
+
+	/**
+	 * Mailchimp validates a webhook by GETting the callback URL once and
+	 * requiring a 200 before it will save it. It sends none of Meta's
+	 * hub.* parameters, so the inherited challenge handler rejected it with a
+	 * 403 and the webhook could never be created. An empty body is fine —
+	 * Mailchimp only looks at the status code.
+	 */
+	public static function verify_webhook_challenge( \WP_REST_Request $request ): ?string {
+		return '';
+	}
+
 	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
-		$secret = trim( (string) get_option( 'zaplane_mailchimp_webhook_secret', '' ) );
+		$secret = self::get_webhook_setting( 'shared_secret', 'zaplane_mailchimp_webhook_secret' );
 
 		if ( '' === $secret ) {
 			return true;

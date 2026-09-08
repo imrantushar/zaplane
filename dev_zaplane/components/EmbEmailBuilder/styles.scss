@@ -1,0 +1,51 @@
+// The email builder library styles its chrome (header, panels, block tiles,
+// search, quick-add menu, canvas empty-state) via a class-based stylesheet it
+// injects itself, with every color reading an `--emb-*` custom property that
+// falls back to its native light value. `suffix="zaplane"` adds
+// `.emb-embed-root--zaplane` to its root; mapping the properties there themes
+// the whole shell. One unconditional rule covers BOTH light and dark mode,
+// because `--zaplane-*` already resolves per the active `data-theme`.
+//
+// The email/form document being composed (`.emb-canvas-page`) is pinned back
+// to light inside the library's own stylesheet — no host rule needed.
+.emb-embed-root--zaplane {
+    --emb-shell-bg: var(--zaplane-background);
+    --emb-shell-border: var(--zaplane-border-color);
+    --emb-header-bg: var(--zaplane-background);
+    --emb-surface-bg: var(--zaplane-background);
+    --emb-surface-alt-bg: var(--zaplane-secondary-color);
+    --emb-border: var(--zaplane-border-color);
+    --emb-border-strong: var(--zaplane-border-color);
+    --emb-text: var(--zaplane-font-color);
+    --emb-text-secondary: var(--zaplane-font-secondary-color);
+    --emb-text-muted: var(--zaplane-text-muted);
+    // --emb-canvas-backdrop: var(--zaplane-body-background);
+    // Accent used by the Preview button, active device tab, active icon
+    // buttons, the "+" quick-add button, and the search/lib-item hover
+    // states — previously hardcoded to the library's own blue everywhere,
+    // so it never picked up the app's palette. Now themeable.
+    --emb-primary: var(--zaplane-primary);
+    .emb-canvas--zaplane {
+        .emb-canvas-page {
+            .emb-quick-add--zaplane {
+                .emb-split-btn {
+                    padding: 4px 10px;
+                    .emb-split-main {
+                        padding-right: 10px;
+                    }
+                }
+            }
+            .emb-quick-add-menu--zaplane {
+                padding: 4px 10px;
+            }
+        }
+    }
+    .emb-preview-btn--zaplane {
+        padding: 4px 10px;
+        border: 1px solid var(--zaplane-border-color);
+    }
+    // The Preview modal (.emb-preview-backdrop/-dialog/-header/-body/-frame
+    // etc.) renders as a plain child of .emb-embed-root, not inside
+    // .emb-canvas-page, so it needs no override here — it inherits the
+    // `--emb-*` vars mapped above through the normal DOM cascade.
+}

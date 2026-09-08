@@ -139,8 +139,15 @@ if ( ! function_exists( 'get_user_meta' ) ) {
             return $data;
         }
 
-        $value = $data[ $key ] ?? '';
-        return $single ? $value : [ $value ];
+        if ( array_key_exists( $key, $data ) ) {
+            return $single ? $data[ $key ] : [ $data[ $key ] ];
+        }
+
+        // This file is loaded as a priority mock, so it defines get_user_meta for
+        // every test, not just this integration's. Keys it does not own fall
+        // through to the shared store, otherwise anything that writes user meta
+        // reads back an empty string.
+        return \Zaplane\Tests\WPMocks::getUserMeta( (int) $user_id, (string) $key, (bool) $single );
     }
 }
 

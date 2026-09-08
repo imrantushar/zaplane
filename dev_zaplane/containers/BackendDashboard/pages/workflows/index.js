@@ -9,6 +9,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import { plugin_root_url } from "@ZAPUtils/helper";
 import ImportWorkflow from "./workFlowMotion/ImportWorkflow";
 import WorkflowTable from "@ZAPComponents/WorkflowTable";
+import Teaser from "@ZAPComponents/Teaser";
 const CreateWorkflows = ({
   onNavigateToEdit,
   title = __('Workflows', 'zaplane'),
@@ -17,8 +18,8 @@ const CreateWorkflows = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   return <>
       {renderTopBar ? renderTopBar({}) : <TopBar leftContent={() => <>
-              <div height="40px" width="40px" className="flex rounded-[20px] bg-var(--zaplane-second-primary) items-center justify-center">
-                <img src={`${plugin_root_url}assets/images/zaplane.svg`} />
+              <div style={{height:'40px', width:'40px', background:'var(--zaplane-second-primary)'}} className="flex rounded-[20px] items-center justify-center">
+                <img src={`${plugin_root_url}assets/images/zaplane.svg`} alt="Zaplane" />
               </div>
   
               <IoIosArrowForward />
@@ -36,6 +37,7 @@ const CreateWorkflows = ({
       </SubTopBar>
 
       <div className="zaplane-page-content">
+        <Teaser screen="workflows" />
         <WorkflowTable onNavigateToEdit={onNavigateToEdit} />
       </div>
 

@@ -82,12 +82,12 @@ const RunsTable = ({
           setActiveRunId(row.id);
           setDrawerOpen(true);
           dispatch(nodeLogsRunDetails(row.id));
-        }} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border">
+        }} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)]">
               <HistoryIcon height="20px" width="20px" />
             </div>
           </ZAPTooltip>
           <ZAPTooltip content={__("Re-Try", 'zaplane')}>
-            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border">
+            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)]">
               <ReExcutionIcon height="20px" width="20px" />
             </div>
           </ZAPTooltip>
