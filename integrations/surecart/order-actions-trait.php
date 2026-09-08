@@ -2,7 +2,7 @@
 namespace Zaplane\Integrations\Surecart;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 trait OrderActionsTrait {
@@ -217,11 +217,11 @@ trait OrderActionsTrait {
 		] );
 	}
 
-    protected static function action_get_orders_all( array $config, array $input ): array {
-        return self::list_models( \SureCart\Models\Order::class, $config, 'orders' );
-    }
+	protected static function action_get_orders_all( array $config, array $input ): array {
+		return self::list_models( \SureCart\Models\Order::class, $config, 'orders' );
+	}
 
-    protected static function action_get_order_single( array $config, array $input ): array {
-        return self::get_model_single( \SureCart\Models\Order::class, $config, 'order_id', 'order' );
-    }
+	protected static function action_get_order_single( array $config, array $input ): array {
+		return self::get_model_single( \SureCart\Models\Order::class, $config, 'order_id', 'order' );
+	}
 }

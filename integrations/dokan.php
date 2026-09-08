@@ -1178,7 +1178,7 @@ class Dokan extends IntegrationBase {
 		$options = [
 			[
 				'name' => 'any',
-			    'label' => 'Any Withdraw'
+				'label' => 'Any Withdraw'
 			]
 		];
 

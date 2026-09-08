@@ -337,13 +337,14 @@ class Lifter extends IntegrationBase {
 		];
 
 		global $wpdb;
+		// No placeholders, so prepare() would only earn a _doing_it_wrong notice
+		// from core. The only interpolation is $wpdb->posts.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$courses = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT ID, post_title FROM {$wpdb->posts}
+			"SELECT ID, post_title FROM {$wpdb->posts}
                     WHERE {$wpdb->posts}.post_status = 'publish'
                     AND {$wpdb->posts}.post_type = 'course'
                     ORDER BY post_title"
-			)
 		);
 
 		if ( ! empty( $courses ) ) {

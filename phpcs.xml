@@ -57,13 +57,16 @@
 		</properties>
 	</rule>
 
-	<rule ref="WordPress.NamingConventions.ValidVariableName">
-        <properties>
-            <property name="allowCamelCase" value="true"/>
-        </properties>
-    </rule>
+	<!-- WPCS 3 dropped the allowCamelCase property; camelCase is allowed by
+	     excluding the specific codes further down instead. -->
 
+	<!-- Short array syntax is used throughout and is deliberately allowed. WPCS 3
+	     moved this sniff from Generic.Arrays to Universal.Arrays; both are listed
+	     so the intent survives either version. -->
 	<rule ref="Generic.Arrays.DisallowShortArraySyntax.Found">
+		<severity>0</severity>
+	</rule>
+	<rule ref="Universal.Arrays.DisallowShortArraySyntax.Found">
 		<severity>0</severity>
 	</rule>
 
@@ -112,17 +115,17 @@
 		<exclude name="WordPress.NamingConventions.ValidHookName.NotLowercase" />
 		<exclude name="WordPress.WP.DiscouragedFunctions.wp_reset_query_wp_reset_query" />
 		<exclude name="WordPress.Arrays.CommaAfterArrayItem.NoComma" />
+		<!-- Renamed in WPCS 3; the rule above no longer matches on its own. -->
+		<exclude name="NormalizedArrays.Arrays.CommaAfterLast.MissingMultiLine" />
+		<exclude name="NormalizedArrays.Arrays.CommaAfterLast.MissingSingleLine" />
 		<exclude name="WordPress.NamingConventions.ValidVariableName.InterpolatedVariableNotSnakeCase" />
 		<exclude name="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase" />
 		<exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase" />
 		<exclude name="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid" />
 	</rule>
 
-	<rule ref="WordPress.WP.DeprecatedFunctions">
-		<properties>
-			<property name="minimum_supported_version" value="4.7" />
-		</properties>
-	</rule>
+	<!-- WPCS 3 reads the shared minimum_supported_wp_version config set above
+	     rather than a per-sniff minimum_supported_version property. -->
 	<rule ref="WordPress.NamingConventions.ValidHookName">
 		<properties>
 			<property name="additionalWordDelimiters" value="/-" />
