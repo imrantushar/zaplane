@@ -245,7 +245,7 @@ export default function FlowTopBar({
     <button
       disabled={!isFlowDirty}
       onClick={handleSubmit}
-      className="h-9 px-6 bg-[var(--zaplane-primary)] hover:opacity-90 active:scale-[0.98] text-white font-semibold rounded-[4px] transition-all shadow-sm shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="h-9 px-6 bg-[var(--zaplane-primary)] hover:opacity-90 active:scale-[0.98] text-white font-semibold rounded-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {__("Update", "zaplane")}
     </button>

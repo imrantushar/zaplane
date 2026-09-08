@@ -1,10 +1,8 @@
 import { round } from "lodash"
 
 export const primaryBtn = {
-    // The solid fill, not the accent. The accent has to stay bright enough to
-    // read on a dark ground, which leaves it too light under a white label.
-    background: "var(--zaplane-primary-strong)",
-    color: "#fff",
+    background: "var(--zaplane-primary)",
+    color: "var(--zaplane-white)",
     fontWeight: "500",
     fontSize: '14px',
     cursor: "pointer",
@@ -43,7 +41,7 @@ export const outlineBtn = {
 
 export const removeBtn = {
     background: "var(--zaplane-danger)",
-    color: "#fff",
+    color: "var(--zaplane-white)",
     cursor: "pointer",
 }
 
