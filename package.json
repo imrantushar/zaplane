@@ -5,6 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "wp-scripts build",
+    "dist": "node build-tools/build.mjs",
+    "dist:zip": "node build-tools/build.mjs --only=zip",
+    "dist:dev": "node build-tools/build.mjs --dev",
     "check-engines": "wp-scripts check-engines",
     "check-licenses": "wp-scripts check-licenses",
     "format": "wp-scripts format",
@@ -72,10 +75,12 @@
   "devDependencies": {
     "@wordpress/eslint-plugin": "^22.13.0",
     "ajv": "^8.18.0",
+    "archiver": "^8.0.0",
     "autoprefixer": "^10.5.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "clean-webpack-plugin": "^4.0.0",
     "fantasticon": "^3.0.0",
+    "ignore": "^7.0.8",
     "postcss": "^8.5.10",
     "redux-logger": "^3.0.6",
     "sass-loader": "^13.3.2",

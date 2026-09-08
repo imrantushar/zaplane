@@ -1,0 +1,21 @@
+{
+  "slug": "zaplane",
+  "textdomain": "zaplane",
+  "mainFile": "zaplane.php",
+  "languages": "languages",
+  "zipName": "{slug}.{version}.zip",
+  "outputDir": "..",
+
+  "steps": { "js": true, "composer": true, "strauss": false, "pot": true, "zip": true },
+
+  "js": { "install": "auto", "buildScript": "build" },
+
+  "composer": {
+    "flags": ["--no-dev", "--optimize-autoloader", "--prefer-dist", "--no-interaction"]
+  },
+
+  "zip": { "strictVendor": true },
+
+  "autoDownloadTools": true,
+  "toolVersions": { "wpCli": "2.12.0" }
+}
