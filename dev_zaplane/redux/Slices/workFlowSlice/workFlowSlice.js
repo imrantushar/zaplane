@@ -33,8 +33,17 @@ const workflowsSlice = createSlice({
 
 	},
 	reducers: {
-		resetSingleNodeExecution(state) {
-			// state.singleNodeExecution = null;
+		resetSingleNodeExecution(state, action) {
+			const nodeId = action.payload;
+			if (nodeId != null) {
+				// Node ids are per-graph sequential, so the same id is reused across
+				// different workflows (e.g. every trigger is often id 1). Clear just
+				// this node's cached execution so a freshly opened drawer never shows
+				// a stale result carried over from a different workflow's node.
+				delete state.singleNodeExecution[nodeId];
+			} else {
+				state.singleNodeExecution = {};
+			}
 			state.isLoading = false;
 		},
 		startApiCountdown(state, action) {
