@@ -59,7 +59,7 @@ function loadConfig() {
     mainFile: cfg.mainFile,
     version: cfg.version || pkgVersion || headers.Version || '0.0.0',
     languages: cfg.languages || 'languages',
-    steps: { js: true, composer: true, strauss: true, pot: true, zip: true, ...(cfg.steps || {}) },
+    steps: { manifest: false, js: true, composer: true, strauss: true, pot: true, zip: true, ...(cfg.steps || {}) },
     // install: true | false | "auto" (install only when node_modules is absent).
     // installCommand overrides the default npm ci / npm install (e.g. to add
     // --legacy-peer-deps for trees with peer-dep conflicts).
@@ -73,6 +73,9 @@ function loadConfig() {
       ...(cfg.composer || {}),
     },
     strauss: { command: null, ...(cfg.strauss || {}) },
+    // A plugin-owned command that regenerates a generated source file the zip
+    // must ship (Zaplane: the integration catalogue). Off unless configured.
+    manifest: { command: null, ...(cfg.manifest || {}) },
     // pot.command, when set, fully owns the POT step (e.g. a babel-aware
     // make-pot wrapper for large webpack bundles WP-CLI's parser cannot read).
     pot: { command: null, exclude: null, ...(cfg.pot || {}) },
@@ -207,6 +210,14 @@ async function runStrauss(cfg) {
 // ---------------------------------------------------------------------------
 // Step 3 — POT translation template
 // ---------------------------------------------------------------------------
+// Regenerates a source file the release must ship, before anything packages it.
+// Deliberately fails rather than skipping: a stale generated file is worse than
+// a build that stops, because it ships silently.
+async function buildManifest(cfg) {
+  if (!cfg.manifest.command) return;
+  run(cfg.manifest.command);
+}
+
 async function buildPot(cfg) {
   // Delegated mode: the plugin owns POT generation (e.g. a babel-aware make-pot
   // wrapper for large webpack bundles WP-CLI's Peast parser cannot read).
@@ -356,10 +367,15 @@ async function buildZip(cfg) {
     log(`↳ ${secs.toFixed(1)}s`);
   };
 
-  if (wanted('js'))       await timed('js', '1/4  Production JS build', () => buildJs(cfg));
-  if (wanted('composer')) await timed('composer', '2/4  Composer (no-dev) + Strauss', () => buildComposer(cfg));
-  if (wanted('pot'))      await timed('pot', '3/4  POT translation template', () => buildPot(cfg));
-  if (wanted('zip'))      await timed('zip', '4/4  Distribution zip', () => buildZip(cfg));
+  const total_steps = ['manifest', 'js', 'composer', 'pot', 'zip'].filter((n) => cfg.steps[n]).length;
+  let n = 0;
+  const label = (title) => `${++n}/${total_steps}  ${title}`;
+
+  if (wanted('manifest')) await timed('manifest', label('Generated manifest'), () => buildManifest(cfg));
+  if (wanted('js'))       await timed('js', label('Production JS build'), () => buildJs(cfg));
+  if (wanted('composer')) await timed('composer', label('Composer (no-dev) + Strauss'), () => buildComposer(cfg));
+  if (wanted('pot'))      await timed('pot', label('POT translation template'), () => buildPot(cfg));
+  if (wanted('zip'))      await timed('zip', label('Distribution zip'), () => buildZip(cfg));
 
   const total = (Date.now() - t0) / 1000;
   if (timings.length > 1) {

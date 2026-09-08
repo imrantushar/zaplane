@@ -18,10 +18,36 @@ node build-tools/build.mjs --no-download   # fail rather than fetch the wp-cli p
 
 | # | Step | How |
 |---|------|-----|
-| 1 | Production JS | `wp-scripts build`; the npm install is skipped when `node_modules` already exists |
-| 2 | Composer | `install --no-dev --optimize-autoloader`. Strauss is off — Zaplane does not prefix namespaces |
-| 3 | POT | `wp i18n make-pot` → `languages/zaplane.pot` |
-| 4 | Zip | built in Node from `.distignore` |
+| 1 | Integration manifest | `wp zaplane build:integration` → `assets/json/integrations.json` |
+| 2 | Production JS | `wp-scripts build`; the npm install is skipped when `node_modules` already exists |
+| 3 | Composer | `install --no-dev --optimize-autoloader`. Strauss is off — Zaplane does not prefix namespaces |
+| 4 | POT | `wp i18n make-pot` → `languages/zaplane.pot` |
+| 5 | Zip | built in Node from `.distignore` |
+
+The manifest runs first so the zip packages a freshly generated catalogue rather
+than whatever was last committed.
+
+## The manifest must not describe the machine that built it
+
+`build:integration` reads the live integration registry, so two things about the
+build machine used to leak into a file that ships to every site:
+
+* **Per-site state.** StoreEngine marks its subscription, membership, affiliate
+  and multi-vendor capabilities `disabled` by asking whether that addon is active
+  *right now*. Frozen into the catalogue, a build with the addon on hid the
+  warning from customers without it, and a build with it off greyed the
+  capability out for customers who had it. The command now drops `disabled` and
+  `disabled_reason`, keeping `requires_addon` — "this needs addon X" is true
+  everywhere; whether X is on is the site's own question.
+* **The hostname.** Fillout, Jotform and Typeform put a full webhook URL in a
+  `copy` field for the user to paste into the provider. Built from `rest_url()`,
+  the shipped catalogue carried `http://kodezen.local/...`, so every customer was
+  told to paste a developer's laptop address into their form. The build swaps the
+  REST root for `{{ZAPLANE_REST_URL}}` and each site swaps its own back in — the
+  same treatment `webhook_route` already had.
+
+Both are asserted by the build: regenerating on any machine should change nothing
+but `generated_at`.
 
 The zip lands in the parent `plugins/` folder as `zaplane.<version>.zip`
 (`outputDir: ".."` in [`build.config.json`](../build.config.json)).

@@ -5,17 +5,34 @@
   "languages": "languages",
   "zipName": "{slug}.{version}.zip",
   "outputDir": "..",
-
-  "steps": { "js": true, "composer": true, "strauss": false, "pot": true, "zip": true },
-
-  "js": { "install": "auto", "buildScript": "build" },
-
   "composer": {
-    "flags": ["--no-dev", "--optimize-autoloader", "--prefer-dist", "--no-interaction"]
+    "flags": [
+      "--no-dev",
+      "--optimize-autoloader",
+      "--prefer-dist",
+      "--no-interaction"
+    ]
   },
-
-  "zip": { "strictVendor": true },
-
+  "zip": {
+    "strictVendor": true
+  },
   "autoDownloadTools": true,
-  "toolVersions": { "wpCli": "2.12.0" }
+  "toolVersions": {
+    "wpCli": "2.12.0"
+  },
+  "steps": {
+    "manifest": true,
+    "js": true,
+    "composer": true,
+    "strauss": false,
+    "pot": true,
+    "zip": true
+  },
+  "manifest": {
+    "command": "wp zaplane build:integration"
+  },
+  "js": {
+    "install": "auto",
+    "buildScript": "build"
+  }
 }

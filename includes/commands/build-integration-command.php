@@ -16,6 +16,42 @@ class BuildIntegrationCommand extends Command {
 	protected string $signature = 'build:integration';
 	protected string $description = 'Generate integrations.json manifest from registered integrations';
 
+	/**
+	 * Drop per-site state from a manifest entry.
+	 *
+	 * Some integrations mark a capability `disabled` by asking whether a
+	 * companion addon is active right now — StoreEngine gates its subscription
+	 * actions that way. That answer belongs to whichever site is being asked, so
+	 * freezing it into a file that ships to every site is wrong in both
+	 * directions: build with the addon on and customers without it never see the
+	 * warning, build with it off and customers who have it see the capability
+	 * greyed out forever.
+	 *
+	 * `requires_addon` stays, because "this needs addon X" is true everywhere and
+	 * is the durable half of the same fact. Whether X is active is then a runtime
+	 * question for the site to answer.
+	 *
+	 * @param array<string,mixed> $entry
+	 * @return array<string,mixed>
+	 */
+	private static function strip_runtime_state( array $entry ): array {
+		foreach ( [ 'triggers', 'actions' ] as $bucket ) {
+			if ( empty( $entry[ $bucket ] ) || ! is_array( $entry[ $bucket ] ) ) {
+				continue;
+			}
+
+			foreach ( $entry[ $bucket ] as $key => $capability ) {
+				if ( ! is_array( $capability ) ) {
+					continue;
+				}
+				unset( $capability['disabled'], $capability['disabled_reason'] );
+				$entry[ $bucket ][ $key ] = $capability;
+			}
+		}
+
+		return $entry;
+	}
+
 	public function handle( array $args, array $assoc_args ): void {
 		$this->info( '🔨 Building integrations.json manifest...' );
 
@@ -47,6 +83,8 @@ class BuildIntegrationCommand extends Command {
 				continue;
 			}
 
+			$integration = self::strip_runtime_state( $integration );
+
 			if ( 'tool' === $integration['category'] ) {
 				$manifest['tools'][ $slug ] = $integration;
 				$toolCount++;
@@ -76,6 +114,11 @@ class BuildIntegrationCommand extends Command {
 		}
 
 		$json = wp_json_encode( $manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+
+		// Never let the build machine's hostname reach the shipped catalogue.
+		if ( is_string( $json ) ) {
+			$json = str_replace( rest_url(), IntegrationManifest::REST_URL_TOKEN, $json );
+		}
 
 		if ( false === $json ) {
 			$this->error( 'Failed to encode JSON' );

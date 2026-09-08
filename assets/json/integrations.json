@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-08 10:51:09",
+    "generated_at": "2026-09-08 12:56:18",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -1537,8 +1537,6 @@
                     "label": "User Added To Access Group",
                     "hook": "storeengine/membership/user_added_to_group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "user_added_to_group",
                     "schema": [],
                     "outputs": [
@@ -1549,8 +1547,6 @@
                     "label": "User Removed From Access Group",
                     "hook": "storeengine/membership/user_removed_from_group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "user_removed_from_group",
                     "schema": [],
                     "outputs": [
@@ -1561,8 +1557,6 @@
                     "label": "Access Group Created",
                     "hook": "save_post_storeengine_groups",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_created",
                     "schema": [],
                     "outputs": [
@@ -1573,8 +1567,6 @@
                     "label": "Access Group Updated",
                     "hook": "save_post_storeengine_groups",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_updated",
                     "schema": [],
                     "outputs": [
@@ -1585,8 +1577,6 @@
                     "label": "Access Group Deleted",
                     "hook": "delete_post_storeengine_groups",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "access_group_deleted",
                     "schema": [],
                     "outputs": [
@@ -1597,8 +1587,6 @@
                     "label": "Subscription Created",
                     "hook": "storeengine/after_create_subscription",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_created",
                     "schema": [],
                     "outputs": [
@@ -1609,8 +1597,6 @@
                     "label": "Subscription Status Changed (any)",
                     "hook": "storeengine/subscription/status_changed",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_status_changed",
                     "schema": [],
                     "outputs": [
@@ -1621,8 +1607,6 @@
                     "label": "Subscription Activated",
                     "hook": "storeengine/subscription/status_active",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_activated",
                     "schema": [],
                     "outputs": [
@@ -1633,8 +1617,6 @@
                     "label": "Subscription Paused (On Hold)",
                     "hook": "storeengine/subscription/status_on_hold",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_on_hold",
                     "schema": [],
                     "outputs": [
@@ -1645,8 +1627,6 @@
                     "label": "Subscription Cancelled",
                     "hook": "storeengine/subscription/status_cancelled",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_cancelled",
                     "schema": [],
                     "outputs": [
@@ -1657,8 +1637,6 @@
                     "label": "Subscription Expired",
                     "hook": "storeengine/subscription/status_expired",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_expired",
                     "schema": [],
                     "outputs": [
@@ -1669,8 +1647,6 @@
                     "label": "Subscription Renewal Payment Complete",
                     "hook": "storeengine/subscription/renewal_payment_complete",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewed",
                     "schema": [],
                     "outputs": [
@@ -1681,8 +1657,6 @@
                     "label": "Subscription Payment Complete",
                     "hook": "storeengine/subscription/payment_complete",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_payment_complete",
                     "schema": [],
                     "outputs": [
@@ -1693,8 +1667,6 @@
                     "label": "Subscription Renewal Failed",
                     "hook": "storeengine/subscription/failed_to_create_renewal_order",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_failed",
                     "schema": [],
                     "outputs": [
@@ -1705,8 +1677,6 @@
                     "label": "Subscription Trial Ended",
                     "hook": "storeengine/subscription/trial_ended",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_trial_ended",
                     "schema": [],
                     "outputs": [
@@ -1717,8 +1687,6 @@
                     "label": "Subscription Renewal Order Created",
                     "hook": "storeengine/api/after_create_renewal_order",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "subscription_renewal_order_created",
                     "schema": [],
                     "outputs": [
@@ -1729,8 +1697,6 @@
                     "label": "Vendor Registered",
                     "hook": "storeengine/multi_vendor/vendor_registered",
                     "requires_addon": "multi_vendor",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Multi-Vendor addon to be active.",
                     "key": "vendor_registered",
                     "schema": [],
                     "outputs": [
@@ -1741,8 +1707,6 @@
                     "label": "Vendor Approved",
                     "hook": "storeengine/multi_vendor/vendor_approved",
                     "requires_addon": "multi_vendor",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Multi-Vendor addon to be active.",
                     "key": "vendor_approved",
                     "schema": [],
                     "outputs": [
@@ -1753,8 +1717,6 @@
                     "label": "Vendor Suspended",
                     "hook": "storeengine/multi_vendor/vendor_suspended",
                     "requires_addon": "multi_vendor",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Multi-Vendor addon to be active.",
                     "key": "vendor_suspended",
                     "schema": [],
                     "outputs": [
@@ -1765,8 +1727,6 @@
                     "label": "Vendor Commission Computed",
                     "hook": "storeengine/multi_vendor/commission_computed",
                     "requires_addon": "multi_vendor",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Multi-Vendor addon to be active.",
                     "key": "vendor_commission_computed",
                     "schema": [],
                     "outputs": [
@@ -1777,8 +1737,6 @@
                     "label": "Vendor Withdrawal Requested",
                     "hook": "storeengine/multi_vendor/withdrawal_requested",
                     "requires_addon": "multi_vendor",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Multi-Vendor addon to be active.",
                     "key": "vendor_withdrawal_requested",
                     "schema": [],
                     "outputs": [
@@ -1789,8 +1747,6 @@
                     "label": "Vendor Withdrawal Status Changed",
                     "hook": "storeengine/multi_vendor/withdrawal_status_changed",
                     "requires_addon": "multi_vendor",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Multi-Vendor addon to be active.",
                     "key": "vendor_withdrawal_status_changed",
                     "schema": [],
                     "outputs": [
@@ -1801,8 +1757,6 @@
                     "label": "Affiliate Registered",
                     "hook": "storeengine/addons/affiliate/after_registration",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_registered",
                     "schema": [],
                     "outputs": [
@@ -1813,8 +1767,6 @@
                     "label": "Affiliate Status Updated",
                     "hook": "storeengine/addons/affiliate/update_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1825,8 +1777,6 @@
                     "label": "Affiliate Commission Status Updated",
                     "hook": "storeengine/addons/affiliate/update_commission_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_commission_status_updated",
                     "schema": [],
                     "outputs": [
@@ -1837,8 +1787,6 @@
                     "label": "Affiliate Payout Status Updated",
                     "hook": "storeengine/addons/affiliate/update_payout_status",
                     "requires_addon": "affiliate",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Affiliate addon to be active.",
                     "key": "affiliate_payout_status_updated",
                     "schema": [],
                     "outputs": [
@@ -2221,8 +2169,6 @@
                 "update_subscription_status": {
                     "label": "Update Subscription Status",
                     "requires_addon": "subscription",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Subscription addon to be active.",
                     "key": "update_subscription_status",
                     "schema": [
                         {
@@ -2267,8 +2213,6 @@
                 "grant_membership": {
                     "label": "Grant Membership (Add User To Group)",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "grant_membership",
                     "schema": [
                         {
@@ -2305,8 +2249,6 @@
                 "revoke_membership": {
                     "label": "Revoke Membership (Remove User From Group)",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "revoke_membership",
                     "schema": [
                         {
@@ -2337,8 +2279,6 @@
                 "create_access_group": {
                     "label": "Create Access Group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "create_access_group",
                     "schema": [
                         {
@@ -2407,8 +2347,6 @@
                 "update_access_group": {
                     "label": "Update Access Group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "update_access_group",
                     "schema": [
                         {
@@ -2471,8 +2409,6 @@
                 "delete_access_group": {
                     "label": "Delete Access Group",
                     "requires_addon": "membership",
-                    "disabled": true,
-                    "disabled_reason": "Requires the StoreEngine Membership addon to be active.",
                     "key": "delete_access_group",
                     "schema": [
                         {
@@ -6313,7 +6249,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "http://kodezen.local/wp-json/zaplane/v1/incoming/fillout",
+                            "value": "{{ZAPLANE_REST_URL}}zaplane/v1/incoming/fillout",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
@@ -12233,7 +12169,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "http://kodezen.local/wp-json/zaplane/v1/incoming/jotform",
+                            "value": "{{ZAPLANE_REST_URL}}zaplane/v1/incoming/jotform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Jotform \u2192 Your Form \u2192 Settings \u2192 Integrations \u2192 Webhooks \u2192 Paste & Save."
                         }
@@ -19766,7 +19702,7 @@
                             "key": "webhook_endpoint",
                             "label": "Webhook Endpoint URL",
                             "type": "copy",
-                            "value": "http://kodezen.local/wp-json/zaplane/v1/incoming/typeform",
+                            "value": "{{ZAPLANE_REST_URL}}zaplane/v1/incoming/typeform",
                             "readonly": true,
                             "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }

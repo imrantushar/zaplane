@@ -114,6 +114,7 @@ class Assets {
 		if ( empty( \Zaplane\CustomApps\ManifestStore::all() ) ) {
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 			$raw = is_readable( $file ) ? (string) file_get_contents( $file ) : '';
+			$raw = str_replace( \Zaplane\Framework\Core\IntegrationManifest::REST_URL_TOKEN, rest_url(), $raw );
 			return '' !== trim( $raw ) ? $raw : '{"apps":{},"tools":{}}';
 		}
 
@@ -138,7 +139,14 @@ class Assets {
 		$file = ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json';
 		if ( is_readable( $file ) ) {
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-			$decoded = json_decode( file_get_contents( $file ), true );
+			$decoded = json_decode(
+				str_replace(
+					\Zaplane\Framework\Core\IntegrationManifest::REST_URL_TOKEN,
+					rest_url(),
+					(string) file_get_contents( $file )
+				),
+				true
+			);
 			if ( is_array( $decoded ) ) {
 				$integrations = $decoded;
 			}

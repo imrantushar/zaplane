@@ -19,6 +19,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 class IntegrationManifest {
 
 	/**
+	 * Stands in for the site's REST root inside the built manifest.
+	 *
+	 * Some integrations put a full webhook URL in a `copy` field for the user to
+	 * paste into the provider. Built with rest_url(), that URL belongs to the
+	 * machine that ran the build — the shipped catalogue carried
+	 * `http://kodezen.local/...` for Fillout, Jotform and Typeform, so every
+	 * customer was told to paste a developer's laptop address into their form.
+	 * The build swaps the host out for this token and each site swaps its own
+	 * back in, the same way webhook_route is kept host-free.
+	 */
+	public const REST_URL_TOKEN = '{{ZAPLANE_REST_URL}}';
+
+
+	/**
 	 * Build the full manifest (apps + tools) from a set of integration instances.
 	 *
 	 * @param array<string,object> $instances Slug => instance, e.g. IntegrationLoader::all().

@@ -134,6 +134,19 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   had an unminified development build committed to `assets/build/app.js`; this is
   a production build, and it is what every admin page load was downloading.
 
+### Fixed — Shipped catalogue
+- **The integration catalogue described the machine that built it.** Fillout,
+  Jotform and Typeform show a webhook URL to copy into the provider; built from
+  `rest_url()` and frozen into `assets/json/integrations.json`, the shipped file
+  carried `http://kodezen.local/...`, so every site was told to paste a
+  developer's local address into its form. The REST root is now a placeholder the
+  site substitutes at render time, exactly as `webhook_route` already was.
+- StoreEngine's subscription, membership, affiliate and multi-vendor capabilities
+  are marked `disabled` by checking whether that addon is active. That answer
+  belongs to each site, but it was being frozen at build time — so the warning was
+  hidden from sites without the addon and shown forever to sites with it.
+  `requires_addon` still ships; the live check no longer does.
+
 ### Fixed — Integrations
 - OAuth callbacks no longer surface a raw failure when a provider errors midway —
   the exception is caught and reported back to the connection window.

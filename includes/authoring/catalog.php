@@ -47,7 +47,14 @@ class Catalog {
 		$file = ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json';
 		if ( is_readable( $file ) ) {
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-			$decoded = json_decode( (string) file_get_contents( $file ), true );
+			$decoded = json_decode(
+				str_replace(
+					IntegrationManifest::REST_URL_TOKEN,
+					rest_url(),
+					(string) file_get_contents( $file )
+				),
+				true
+			);
 			if ( is_array( $decoded ) ) {
 				$manifest = $decoded;
 			}
