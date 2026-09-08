@@ -41,6 +41,9 @@ package-lock.json
 build.sh
 build_output.log
 scripts
+build-tools
+build.config.json
+.build-cache
 
 # Docs (dev-facing; README.txt ships the user-facing changelog)
 CLAUDE.md

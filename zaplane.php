@@ -8,6 +8,7 @@
  * Author URI:      https://kodezen.com
  * License:         GPL-3.0+
  * Text Domain:     zaplane
+ * Domain Path:     /languages
  *
  * Requires PHP: 7.4
  * Tested up to: 6.8
