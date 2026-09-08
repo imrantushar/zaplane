@@ -3,6 +3,7 @@ import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from 'react-redux';
 import { createTokenConnection, fetchAuthFields, initOAuth } from '@ZAPRedux/Slices/connectionsSlice/connectionsSlice';
+import { showNotification } from '@ZAPRedux/Slices/notificationSlice/notificationSlice';
 import { primaryBtn } from '../../../../../../../../../assets/scss/chakra/recipe';
 import './styles.scss';
 import { formatLabel } from '@ZAPUtils/helper';
@@ -42,6 +43,30 @@ const ConnectionPopaver = props => {
   }, [authFields, selectedAuthType]);
   const handleConnect = async () => {
     if (!selectedAuthType) return;
+
+    const fields = authFields?.auth_fields || {};
+    const valueOf = key => credentials[key] ?? fields[key]?.default ?? "";
+    const isVisible = field => {
+      if (!field.depends_on) return true;
+      return Object.entries(field.depends_on).every(([k, v]) => {
+        const cur = valueOf(k);
+        return Array.isArray(v) ? v.includes(cur) : cur === v;
+      });
+    };
+    const missing = Object.entries(fields)
+      .filter(([, field]) => field.required && isVisible(field))
+      .filter(([fieldKey]) => !String(valueOf(fieldKey)).trim())
+      .map(([, field]) => field.label);
+
+    if (missing.length > 0) {
+      dispatch(showNotification({
+        message: `${missing.join(', ')} ${missing.length > 1 ? 'are' : 'is'} required.`,
+        isShow: true,
+        type: "error"
+      }));
+      return;
+    }
+
     setLoadingOAuth(true);
     if (selectedAuthType === "oauth2") {
       try {
@@ -135,6 +160,7 @@ const ConnectionPopaver = props => {
                                     ) : (
                                         <ZAPInput
                                             label={field.label}
+                                            isRequired={field.required}
                                             type={field.type === "password" ? "password" : "text"}
                                             placeholder={field.placeholder || ""}
                                             value={credentials[fieldKey] || ""}
