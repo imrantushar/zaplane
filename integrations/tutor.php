@@ -22,6 +22,14 @@ class Tutor extends IntegrationBase {
 		return 'tutorlms.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/tutor-lms/',
+			'action'  => 'https://zaplane.app/docs/tutor-lms/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'user_enroll_course' => [

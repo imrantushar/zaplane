@@ -22,6 +22,14 @@ class Wpuserfrontend extends IntegrationBase {
 		return 'wp-user-frontend.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/wp-user-frontend/',
+			'action'  => 'https://zaplane.app/docs/wp-user-frontend/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'post_form_submission' => [

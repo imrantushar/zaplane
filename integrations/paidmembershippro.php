@@ -25,6 +25,14 @@ class Paidmembershippro extends IntegrationBase {
 		return 'paidmembershippro.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/paid-memberships-pro/',
+			'action'  => 'https://zaplane.app/docs/action-memberships-pro/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'admin_assigns_membership' => [

@@ -21,6 +21,14 @@ class WooBookings extends IntegrationBase {
 		return 'woo.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/woocommerce-bookings/',
+			'action'  => 'https://zaplane.app/docs/woocommerce-bookings/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'booking_created' => [

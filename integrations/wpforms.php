@@ -22,6 +22,14 @@ class Wpforms extends IntegrationBase {
 		return 'wpforms.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/triggers-wpforms/',
+			'action'  => '',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

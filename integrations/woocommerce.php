@@ -44,6 +44,14 @@ class Woocommerce extends IntegrationBase {
 		return 'woo.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/woocommerce/',
+			'action'  => 'https://zaplane.app/docs/woocommerce/',
+		];
+	}
+
 	/** Trigger events the recipe tester can self-seed with real WooCommerce data. */
 	public static function get_seedable_triggers(): array {
 		return [

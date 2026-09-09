@@ -26,6 +26,14 @@ class Formidable extends IntegrationBase {
 		return 'formidable.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/formidable-forms/',
+			'action'  => 'https://zaplane.app/docs/formidable-forms/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

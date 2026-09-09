@@ -22,6 +22,14 @@ class Bookingcalendarcontactform extends IntegrationBase {
 		return 'bookingcalendarcontactform.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/booking-calendar/',
+			'action'  => 'https://zaplane.app/docs/booking-calendar/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

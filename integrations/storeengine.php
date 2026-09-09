@@ -21,6 +21,14 @@ class Storeengine extends IntegrationBase {
 		return 'storeengine.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/storeengine/',
+			'action'  => 'https://zaplane.app/docs/action-storeengine/',
+		];
+	}
+
 	private static function addon_active( string $addon ): bool {
 		if (
 			class_exists( '\StoreEngine\Utils\Helper' ) &&

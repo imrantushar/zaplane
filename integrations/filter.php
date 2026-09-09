@@ -23,6 +23,14 @@ class Filter extends IntegrationBase {
 		return 'filter';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/conditions-filters/',
+			'action'  => 'https://zaplane.app/docs/conditions-filters/',
+		];
+	}
+
 	public static function get_actions(): array {
 		return [
 			'filter' => [ 'label' => 'Filter' ],

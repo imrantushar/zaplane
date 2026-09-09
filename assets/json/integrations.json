@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-08 12:56:18",
+    "generated_at": "2026-09-09 11:43:54",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -150,7 +150,7 @@
                             "key": "user_id",
                             "label": "User Email",
                             "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged‑in user.",
                             "required": false
                         },
                         {
@@ -188,7 +188,7 @@
                             "key": "user_id",
                             "label": "User Email",
                             "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged‑in user.",
                             "required": false
                         },
                         {
@@ -226,7 +226,7 @@
                             "key": "user_id",
                             "label": "User Email",
                             "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged‑in user.",
                             "required": false
                         },
                         {
@@ -273,7 +273,7 @@
                             "key": "user_id",
                             "label": "User Email",
                             "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged‑in user.",
                             "required": false
                         },
                         {
@@ -296,6 +296,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/academy-lms/",
+                "action": "https://zaplane.app/docs/action-academy-lms/"
             }
         },
         "ablocks": {
@@ -334,7 +338,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/ablocks/",
+                "action": "https://zaplane.app/docs/ablocks/"
+            }
         },
         "gemcrm": {
             "slug": "gemcrm",
@@ -1110,7 +1118,7 @@
                             "label": "Subject",
                             "type": "expression",
                             "required": true,
-                            "placeholder": "Your subject line\u2026 (leave empty to use the template subject)"
+                            "placeholder": "Your subject line… (leave empty to use the template subject)"
                         },
                         {
                             "key": "content_source",
@@ -1137,7 +1145,7 @@
                             "depends_on": {
                                 "content_source": "template"
                             },
-                            "help": "Pick a saved template (designed on the Zaplane \u2192 Email Templates page). Its design is used as the email body.",
+                            "help": "Pick a saved template (designed on the Zaplane → Email Templates page). Its design is used as the email body.",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_email_template_query",
@@ -1155,7 +1163,7 @@
                             "depends_on": {
                                 "content_source": "custom"
                             },
-                            "placeholder": "Write your email here\u2026",
+                            "placeholder": "Write your email here…",
                             "merge_tags": [
                                 {
                                     "value": "{{contact.first_name}}",
@@ -1192,7 +1200,7 @@
                             "label": "Pre-header Text",
                             "type": "expression",
                             "required": false,
-                            "placeholder": "Short preview text shown in inbox\u2026"
+                            "placeholder": "Short preview text shown in inbox…"
                         },
                         {
                             "key": "from_email",
@@ -1250,6 +1258,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/gemcrm/",
+                "action": "https://zaplane.app/docs/action-gemcrm/"
             }
         },
         "storeengine": {
@@ -2383,7 +2395,7 @@
                             "options": [
                                 {
                                     "value": "",
-                                    "label": "\u2014 Keep current \u2014"
+                                    "label": "— Keep current —"
                                 },
                                 {
                                     "value": "publish",
@@ -2434,11 +2446,11 @@
                             "options": [
                                 {
                                     "value": "no",
-                                    "label": "No \u2014 Move to Trash"
+                                    "label": "No — Move to Trash"
                                 },
                                 {
                                     "value": "yes",
-                                    "label": "Yes \u2014 Permanently Delete"
+                                    "label": "Yes — Permanently Delete"
                                 }
                             ]
                         }
@@ -2447,6 +2459,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/storeengine/",
+                "action": "https://zaplane.app/docs/action-storeengine/"
             }
         },
         "activecampaign": {
@@ -2760,6 +2776,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": "https://zaplane.app/docs/action-activecampaign/"
             }
         },
         "advancecustomfields": {
@@ -3012,6 +3032,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": "https://zaplane.app/docs/action-advanced-custom-fields/"
             }
         },
         "ai": {
@@ -3046,7 +3070,7 @@
                                     "connection_id"
                                 ]
                             },
-                            "help": "Select an AI connection first \u2014 the list then shows only models for that provider."
+                            "help": "Select an AI connection first — the list then shows only models for that provider."
                         },
                         {
                             "key": "image_url",
@@ -3141,15 +3165,15 @@
                             "options": [
                                 {
                                     "value": "1024x1024",
-                                    "label": "Square 1024\u00d71024"
+                                    "label": "Square 1024×1024"
                                 },
                                 {
                                     "value": "1024x1792",
-                                    "label": "Portrait 1024\u00d71792"
+                                    "label": "Portrait 1024×1792"
                                 },
                                 {
                                     "value": "1792x1024",
-                                    "label": "Landscape 1792\u00d71024"
+                                    "label": "Landscape 1792×1024"
                                 }
                             ]
                         }
@@ -3168,7 +3192,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "https://example.com/voice-note.mp3",
-                            "help": "A reachable URL to the audio file (mp3, wav, m4a, webm\u2026). Requires an OpenAI connection."
+                            "help": "A reachable URL to the audio file (mp3, wav, m4a, webm…). Requires an OpenAI connection."
                         },
                         {
                             "key": "model",
@@ -3190,6 +3214,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/ai-openai/",
+                "action": "https://zaplane.app/docs/ai-openai/"
             }
         },
         "arform": {
@@ -3254,7 +3282,11 @@
                     }
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            }
         },
         "avadaform": {
             "slug": "avadaform",
@@ -3292,7 +3324,11 @@
                     }
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            }
         },
         "beaverbuilder": {
             "slug": "beaverbuilder",
@@ -3333,7 +3369,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            }
         },
         "bitform": {
             "slug": "bitform",
@@ -3371,7 +3411,11 @@
                     }
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/bit-form/",
+                "action": "https://zaplane.app/docs/bit-form/"
+            }
         },
         "bookingcalendarcontactform": {
             "slug": "bookingcalendarcontactform",
@@ -3394,7 +3438,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/booking-calendar/",
+                "action": "https://zaplane.app/docs/booking-calendar/"
+            }
         },
         "brevo": {
             "slug": "brevo",
@@ -3438,7 +3486,7 @@
                             "key": "attributes",
                             "label": "Custom Attributes",
                             "type": "key_value",
-                            "description": "Extra contact attributes sent under the \"attributes\" key (e.g. COMPANY \u2192 Acme)."
+                            "description": "Extra contact attributes sent under the \"attributes\" key (e.g. COMPANY → Acme)."
                         },
                         {
                             "key": "email_blacklisted",
@@ -3523,6 +3571,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "buddyboss": {
@@ -4368,6 +4420,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/buddyboss/",
+                "action": "https://zaplane.app/docs/action-buddyboss/"
             }
         },
         "coblocks": {
@@ -4391,7 +4447,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/coblocks/",
+                "action": "https://zaplane.app/docs/coblocks/"
+            }
         },
         "contact-form-7": {
             "slug": "contact-form-7",
@@ -4447,7 +4507,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/contact-form/",
+                "action": "https://zaplane.app/docs/contact-form/"
+            }
         },
         "discord": {
             "slug": "discord",
@@ -5200,6 +5264,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "divi": {
@@ -5223,7 +5291,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/divi-builder/",
+                "action": "https://zaplane.app/docs/divi-builder/"
+            }
         },
         "dokan": {
             "slug": "dokan",
@@ -5646,6 +5718,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "easydigitaldownload": {
@@ -6117,6 +6193,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/easy-digital-downloads/",
+                "action": "https://zaplane.app/docs/easy-digital-downloads/"
             }
         },
         "elementor": {
@@ -6140,7 +6220,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/elementor/",
+                "action": "https://zaplane.app/docs/elementor/"
+            }
         },
         "essentialblocks": {
             "slug": "essentialblocks",
@@ -6163,7 +6247,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/essential-blocks/",
+                "action": "https://zaplane.app/docs/essential-blocks/"
+            }
         },
         "eventscalendar": {
             "slug": "eventscalendar",
@@ -6213,7 +6301,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            }
         },
         "fillout": {
             "slug": "fillout",
@@ -6251,7 +6343,7 @@
                             "type": "copy",
                             "value": "{{ZAPLANE_REST_URL}}zaplane/v1/incoming/fillout",
                             "readonly": true,
-                            "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
+                            "help": "Copy this URL → Fillout Dashboard → Your Form → Integrate → Webhooks → Add Webhook → Paste & Save."
                         }
                     ],
                     "outputs": [
@@ -6259,7 +6351,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/fillout/",
+                "action": "https://zaplane.app/docs/fillout/"
+            }
         },
         "fluentcart": {
             "slug": "fluentcart",
@@ -9451,6 +9547,10 @@
                         "error"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/fluentcart/",
+                "action": "https://zaplane.app/docs/action-fluentcart/"
             }
         },
         "fluentcrm": {
@@ -10422,6 +10522,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/fluentcrm/",
+                "action": "https://zaplane.app/docs/action-fluentcrm/"
             }
         },
         "fluentform": {
@@ -10460,7 +10564,11 @@
                     }
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/fluent-forms/",
+                "action": "https://zaplane.app/docs/fluent-forms/"
+            }
         },
         "fluentsmtp": {
             "slug": "fluentsmtp",
@@ -10604,6 +10712,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/fluentsmtp/",
+                "action": "https://zaplane.app/docs/action-fluentsmtp/"
             }
         },
         "formidable": {
@@ -10642,7 +10754,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/formidable-forms/",
+                "action": "https://zaplane.app/docs/formidable-forms/"
+            }
         },
         "funnelkit": {
             "slug": "funnelkit",
@@ -11279,6 +11395,10 @@
                         "error"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/funnelkit/",
+                "action": "https://zaplane.app/docs/actions-funnelkit/"
             }
         },
         "gamipress": {
@@ -11432,7 +11552,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/gamipress/",
+                "action": "https://zaplane.app/docs/gamipress/"
+            }
         },
         "gmail": {
             "slug": "gmail",
@@ -11711,6 +11835,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "google-meet": {
@@ -11907,7 +12035,7 @@
                             "options": [
                                 {
                                     "value": "true",
-                                    "label": "Yes \u2014 send cancellation emails"
+                                    "label": "Yes — send cancellation emails"
                                 },
                                 {
                                     "value": "false",
@@ -11951,15 +12079,15 @@
                                 },
                                 {
                                     "value": "OPEN",
-                                    "label": "Open \u2014 anyone with the link"
+                                    "label": "Open — anyone with the link"
                                 },
                                 {
                                     "value": "TRUSTED",
-                                    "label": "Trusted \u2014 organisation members"
+                                    "label": "Trusted — organisation members"
                                 },
                                 {
                                     "value": "RESTRICTED",
-                                    "label": "Restricted \u2014 invited members only"
+                                    "label": "Restricted — invited members only"
                                 }
                             ],
                             "help": "Who can join this Meet space."
@@ -11986,6 +12114,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "gravityforms": {
@@ -12024,7 +12156,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/gravity-forms/",
+                "action": "https://zaplane.app/docs/gravity-forms/"
+            }
         },
         "groundhogg": {
             "slug": "groundhogg",
@@ -12095,7 +12231,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/groundhogg/",
+                "action": "https://zaplane.app/docs/groundhogg/"
+            }
         },
         "jetengine": {
             "slug": "jetengine",
@@ -12133,7 +12273,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/jetengine/",
+                "action": "https://zaplane.app/docs/jetengine/"
+            }
         },
         "jotform": {
             "slug": "jotform",
@@ -12171,7 +12315,7 @@
                             "type": "copy",
                             "value": "{{ZAPLANE_REST_URL}}zaplane/v1/incoming/jotform",
                             "readonly": true,
-                            "help": "Copy this URL \u2192 Jotform \u2192 Your Form \u2192 Settings \u2192 Integrations \u2192 Webhooks \u2192 Paste & Save."
+                            "help": "Copy this URL → Jotform → Your Form → Settings → Integrations → Webhooks → Paste & Save."
                         }
                     ],
                     "outputs": [
@@ -12461,6 +12605,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/jotform/",
+                "action": "https://zaplane.app/docs/action-jotform/"
             }
         },
         "kadenceblocks": {
@@ -12484,7 +12632,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/kadence-blocks/",
+                "action": "https://zaplane.app/docs/kadence-blocks/"
+            }
         },
         "learndash": {
             "slug": "learndash",
@@ -12746,7 +12898,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/learndash/",
+                "action": "https://zaplane.app/docs/learndash/"
+            }
         },
         "lifter": {
             "slug": "lifter",
@@ -12856,7 +13012,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/lifterlms/",
+                "action": "https://zaplane.app/docs/lifterlms/"
+            }
         },
         "mailchimp": {
             "slug": "mailchimp",
@@ -12998,7 +13158,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -13103,7 +13263,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -13134,7 +13294,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -13173,7 +13333,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -13212,7 +13372,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
+                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -13226,6 +13386,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "manual": {
@@ -13248,7 +13412,7 @@
                             "key": "note",
                             "label": "How it runs",
                             "type": "copy",
-                            "value": "This workflow runs when you click \u201cRun\u201d, or via zaplane_run_workflow( id, data )."
+                            "value": "This workflow runs when you click “Run”, or via zaplane_run_workflow( id, data )."
                         }
                     ],
                     "outputs": [
@@ -13256,7 +13420,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/manual/",
+                "action": "https://zaplane.app/docs/manual/"
+            }
         },
         "masterstudy": {
             "slug": "masterstudy",
@@ -13404,7 +13572,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/masterstudy-lms/",
+                "action": "https://zaplane.app/docs/masterstudy-lms/"
+            }
         },
         "memberpress": {
             "slug": "memberpress",
@@ -14582,6 +14754,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/memberpress-2/",
+                "action": "https://zaplane.app/docs/action-memberpress/"
             }
         },
         "messenger": {
@@ -14600,14 +14776,14 @@
                     "type": "password",
                     "generate": true,
                     "required": true,
-                    "help": "Invent a value, save it here, then paste the same string into Meta \u2192 Webhooks \u2192 Verify Token. Meta will not accept the callback URL until this matches."
+                    "help": "Invent a value, save it here, then paste the same string into Meta → Webhooks → Verify Token. Meta will not accept the callback URL until this matches."
                 },
                 {
                     "key": "app_secret",
                     "label": "App Secret",
                     "type": "password",
                     "required": true,
-                    "help": "Meta app \u2192 Settings \u2192 Basic \u2192 App Secret. Used to check the X-Hub-Signature-256 on every delivery."
+                    "help": "Meta app → Settings → Basic → App Secret. Used to check the X-Hub-Signature-256 on every delivery."
                 }
             ],
             "triggers": {
@@ -14646,6 +14822,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "metabox": {
@@ -14684,7 +14864,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/meta-box/",
+                "action": "https://zaplane.app/docs/meta-box/"
+            }
         },
         "metform": {
             "slug": "metform",
@@ -14707,7 +14891,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/metform/",
+                "action": "https://zaplane.app/docs/metform/"
+            }
         },
         "ninjaform": {
             "slug": "ninjaform",
@@ -14745,7 +14933,11 @@
                     }
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/ninja-forms/",
+                "action": "https://zaplane.app/docs/ninja-forms/"
+            }
         },
         "paidmembershippro": {
             "slug": "paidmembershippro",
@@ -14979,6 +15171,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/paid-memberships-pro/",
+                "action": "https://zaplane.app/docs/action-memberships-pro/"
             }
         },
         "paymattic": {
@@ -15341,6 +15537,10 @@
                         "error"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/paymattic-integration/",
+                "action": "https://zaplane.app/docs/paymattic-integration/"
             }
         },
         "profilebuilder": {
@@ -15409,7 +15609,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/profile-builder/",
+                "action": "https://zaplane.app/docs/profile-builder/"
+            }
         },
         "slack": {
             "slug": "slack",
@@ -15426,7 +15630,7 @@
                     "label": "Signing Secret",
                     "type": "password",
                     "required": true,
-                    "help": "Slack app \u2192 Basic Information \u2192 App Credentials \u2192 Signing Secret. Without it this endpoint accepts unsigned requests from anyone."
+                    "help": "Slack app → Basic Information → App Credentials → Signing Secret. Without it this endpoint accepts unsigned requests from anyone."
                 }
             ],
             "triggers": {
@@ -15682,6 +15886,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "spectra": {
@@ -15705,7 +15913,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/spectra-legacy/",
+                "action": "https://zaplane.app/docs/spectra-legacy/"
+            }
         },
         "surecart": {
             "slug": "surecart",
@@ -17252,6 +17464,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/surecart/",
+                "action": "https://zaplane.app/docs/action-surecart/"
             }
         },
         "sureform": {
@@ -17290,7 +17506,11 @@
                     }
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/sure-form/",
+                "action": "https://zaplane.app/docs/sure-form/"
+            }
         },
         "suremail": {
             "slug": "suremail",
@@ -17322,7 +17542,11 @@
                     }
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/suremail/",
+                "action": "https://zaplane.app/docs/suremail/"
+            }
         },
         "suremembers": {
             "slug": "suremembers",
@@ -17467,6 +17691,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/suremembers/",
+                "action": "https://zaplane.app/docs/action-suremembers/"
             }
         },
         "telegram": {
@@ -17791,7 +18019,7 @@
                             "label": "Question",
                             "placeholder": "What do you prefer?",
                             "required": true,
-                            "help": "The poll question (1\u2013300 characters)."
+                            "help": "The poll question (1–300 characters)."
                         },
                         {
                             "key": "options",
@@ -17799,7 +18027,7 @@
                             "label": "Options",
                             "placeholder": "Option A\nOption B\nOption C",
                             "required": true,
-                            "help": "One option per line (2\u201310 options required)."
+                            "help": "One option per line (2–10 options required)."
                         },
                         {
                             "key": "is_anonymous",
@@ -17822,6 +18050,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "trello": {
@@ -19550,6 +19782,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "tutor": {
@@ -19666,7 +19902,11 @@
                     }
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/tutor-lms/",
+                "action": "https://zaplane.app/docs/tutor-lms/"
+            }
         },
         "typeform": {
             "slug": "typeform",
@@ -19704,7 +19944,7 @@
                             "type": "copy",
                             "value": "{{ZAPLANE_REST_URL}}zaplane/v1/incoming/typeform",
                             "readonly": true,
-                            "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
+                            "help": "Copy this URL → Typeform Dashboard → Your Form → Connect → Webhooks → Add a webhook → Paste & Save."
                         }
                     ],
                     "outputs": [
@@ -19766,6 +20006,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/typeform/",
+                "action": "https://zaplane.app/docs/typeform/"
             }
         },
         "ultimatemember": {
@@ -19854,6 +20098,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/ultimate-member/",
+                "action": "https://zaplane.app/docs/action-ultimate-member/"
             }
         },
         "webhook": {
@@ -19972,7 +20220,7 @@
                                     "DELETE"
                                 ]
                             },
-                            "help": "Recommended. Build the body field by field \u2014 each value is safely encoded, so multi-line or quoted values (e.g. an AI reply) never break the JSON. Use \"@\" in a value to insert data from earlier steps.",
+                            "help": "Recommended. Build the body field by field — each value is safely encoded, so multi-line or quoted values (e.g. an AI reply) never break the JSON. Use \"@\" in a value to insert data from earlier steps.",
                             "fields": [
                                 {
                                     "key": "key",
@@ -20064,6 +20312,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/webhook/",
+                "action": "https://zaplane.app/docs/webhook/"
             }
         },
         "weforms": {
@@ -20102,7 +20354,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/weforms/",
+                "action": "https://zaplane.app/docs/weforms/"
+            }
         },
         "whatsapp": {
             "slug": "whatsapp",
@@ -20120,14 +20376,14 @@
                     "type": "password",
                     "generate": true,
                     "required": true,
-                    "help": "Invent a value, save it here, then paste the same string into Meta \u2192 WhatsApp \u2192 Configuration \u2192 Verify Token. Meta will not accept the callback URL until this matches."
+                    "help": "Invent a value, save it here, then paste the same string into Meta → WhatsApp → Configuration → Verify Token. Meta will not accept the callback URL until this matches."
                 },
                 {
                     "key": "app_secret",
                     "label": "App Secret",
                     "type": "password",
                     "required": true,
-                    "help": "Meta app \u2192 Settings \u2192 Basic \u2192 App Secret. Used to check the X-Hub-Signature-256 on every delivery."
+                    "help": "Meta app → Settings → Basic → App Secret. Used to check the X-Hub-Signature-256 on every delivery."
                 }
             ],
             "triggers": {
@@ -20381,6 +20637,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "woobookings": {
@@ -20643,6 +20903,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/woocommerce-bookings/",
+                "action": "https://zaplane.app/docs/woocommerce-bookings/"
             }
         },
         "woocommerce": {
@@ -23857,6 +24121,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/woocommerce/",
+                "action": "https://zaplane.app/docs/woocommerce/"
             }
         },
         "wordpress": {
@@ -28604,6 +28872,10 @@
                         "error"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/wordpress/",
+                "action": "https://zaplane.app/docs/wordpress/"
             }
         },
         "wpforms": {
@@ -28642,7 +28914,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/triggers-wpforms/",
+                "action": ""
+            }
         },
         "wpfunnels": {
             "slug": "wpfunnels",
@@ -29215,6 +29491,10 @@
                         "error"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/wpfunnels/",
+                "action": "https://zaplane.app/docs/wpfunnels/"
             }
         },
         "wpuserfrontend": {
@@ -29292,7 +29572,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/wp-user-frontend/",
+                "action": "https://zaplane.app/docs/wp-user-frontend/"
+            }
         },
         "zoom": {
             "slug": "zoom",
@@ -29351,7 +29635,7 @@
                             "label": "Start Time",
                             "placeholder": "2026-06-10T10:00:00",
                             "required": true,
-                            "help": "ISO 8601 format: YYYY-MM-DDTHH:MM:SS \u2014 e.g. 2026-06-10T10:00:00"
+                            "help": "ISO 8601 format: YYYY-MM-DDTHH:MM:SS — e.g. 2026-06-10T10:00:00"
                         },
                         {
                             "key": "duration",
@@ -29660,7 +29944,7 @@
                                 },
                                 {
                                     "value": "true",
-                                    "label": "Yes \u2014 send cancellation email"
+                                    "label": "Yes — send cancellation email"
                                 }
                             ]
                         }
@@ -29720,6 +30004,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/zoom/",
+                "action": "https://zaplane.app/docs/zoom/"
             }
         }
     },
@@ -29787,7 +30075,7 @@
                             "options": [
                                 {
                                     "value": "yes",
-                                    "label": "Yes \u2014 append the question and answer"
+                                    "label": "Yes — append the question and answer"
                                 },
                                 {
                                     "value": "no",
@@ -29801,6 +30089,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "condition": {
@@ -29954,6 +30246,10 @@
                         "false"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/conditions-filters/",
+                "action": "https://zaplane.app/docs/conditions-filters/"
             }
         },
         "csv": {
@@ -30061,7 +30357,7 @@
                                     "label": "Save as a file in the Media Library (returns a file URL)"
                                 }
                             ],
-                            "help": "Choose \u201cSave as a file\u201d to store the CSV in the Media Library and get a file URL / path you can attach to an email or link to."
+                            "help": "Choose “Save as a file” to store the CSV in the Media Library and get a file URL / path you can attach to an email or link to."
                         },
                         {
                             "key": "filename",
@@ -30072,13 +30368,17 @@
                             "depends_on": {
                                 "destination": "file"
                             },
-                            "help": "Name of the generated file. A \u201c.csv\u201d extension is added automatically if missing."
+                            "help": "Name of the generated file. A “.csv” extension is added automatically if missing."
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "datetime": {
@@ -30346,7 +30646,7 @@
                     ]
                 },
                 "boundary": {
-                    "label": "Start / End of\u2026",
+                    "label": "Start / End of…",
                     "key": "boundary",
                     "schema": [
                         {
@@ -30414,6 +30714,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "delay": {
@@ -30505,6 +30809,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "filter": {
@@ -30657,6 +30965,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/conditions-filters/",
+                "action": "https://zaplane.app/docs/conditions-filters/"
             }
         },
         "formatter": {
@@ -30847,7 +31159,7 @@
                                     "extract"
                                 ]
                             },
-                            "help": "e.g. /\\d+/ \u2014 first match is returned for Extract."
+                            "help": "e.g. /\\d+/ — first match is returned for Extract."
                         },
                         {
                             "key": "length",
@@ -30978,7 +31290,7 @@
                             "label": "Input",
                             "type": "expression",
                             "required": true,
-                            "help": "A number. For \"Math expression\" this is ignored \u2014 use the expression field."
+                            "help": "A number. For \"Math expression\" this is ignored — use the expression field."
                         },
                         {
                             "key": "operation",
@@ -31045,7 +31357,7 @@
                             "depends_on": {
                                 "operation": "math"
                             },
-                            "help": "e.g. {{5.price}} * 1.2 + 3 \u2014 supports + - * / % and parentheses."
+                            "help": "e.g. {{5.price}} * 1.2 + 3 — supports + - * / % and parentheses."
                         },
                         {
                             "key": "currency_symbol",
@@ -31244,6 +31556,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "http": {
@@ -31453,6 +31769,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/webhooks-api-requests-guide/",
+                "action": "https://zaplane.app/docs/webhooks-api-requests-guide/"
             }
         },
         "human_approval": {
@@ -31559,6 +31879,10 @@
                         "rejected"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "image_helper": {
@@ -31619,6 +31943,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "iterator": {
@@ -31643,7 +31971,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "Type @ to pick a list from an earlier step",
-                            "help": "Pick an array/list from a previous step (e.g. parsed CSV rows or an API list). The workflow runs once per item \u2014 read the current entry downstream with {{ item }} (also available: {{ index }}, {{ is_first }}, {{ is_last }}, {{ total }})."
+                            "help": "Pick an array/list from a previous step (e.g. parsed CSV rows or an API list). The workflow runs once per item — read the current entry downstream with {{ item }} (also available: {{ index }}, {{ is_first }}, {{ is_last }}, {{ total }})."
                         },
                         {
                             "key": "offset",
@@ -31665,6 +31993,10 @@
                         "done"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "json_parser": {
@@ -31715,6 +32047,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "knowledge": {
@@ -31739,7 +32075,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "query",
@@ -31747,7 +32083,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "{{1.text}}",
-                            "help": "The customer message \u2014 used to find the most relevant entries."
+                            "help": "The customer message — used to find the most relevant entries."
                         },
                         {
                             "key": "limit",
@@ -31771,7 +32107,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "title",
@@ -31809,7 +32145,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "post_type",
@@ -31817,7 +32153,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "post",
-                            "help": "The slug of the content to sync \u2014 e.g. post, page, product, docs. Each item becomes one knowledge entry (title + body)."
+                            "help": "The slug of the content to sync — e.g. post, page, product, docs. Each item becomes one knowledge entry (title + body)."
                         },
                         {
                             "key": "post_status",
@@ -31893,11 +32229,11 @@
                             "options": [
                                 {
                                     "value": "yes",
-                                    "label": "Yes \u2014 mirror the source (full sync only)"
+                                    "label": "Yes — mirror the source (full sync only)"
                                 },
                                 {
                                     "value": "no",
-                                    "label": "No \u2014 only add/update"
+                                    "label": "No — only add/update"
                                 }
                             ],
                             "help": "When on (and syncing all items), removes synced entries whose source item no longer exists. Manual entries are never touched."
@@ -31917,7 +32253,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "limit",
@@ -31935,11 +32271,11 @@
                             "options": [
                                 {
                                     "value": "yes",
-                                    "label": "Yes \u2014 mirror the catalog (full sync only)"
+                                    "label": "Yes — mirror the catalog (full sync only)"
                                 },
                                 {
                                     "value": "no",
-                                    "label": "No \u2014 only add/update"
+                                    "label": "No — only add/update"
                                 }
                             ],
                             "help": "When on (and syncing all products), removes synced entries whose product no longer exists. Manual entries are never touched."
@@ -31959,7 +32295,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "limit",
@@ -31984,13 +32320,17 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "mcp-client": {
@@ -32062,6 +32402,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "memory": {
@@ -32086,7 +32430,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "whatsapp:{{trigger.from}}",
-                            "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
+                            "help": "Unique per-conversation bucket — typically channel + sender id."
                         },
                         {
                             "key": "limit",
@@ -32094,7 +32438,7 @@
                             "type": "number",
                             "required": false,
                             "default": 10,
-                            "help": "How many recent turns to return (oldest\u2192newest)."
+                            "help": "How many recent turns to return (oldest→newest)."
                         }
                     ],
                     "outputs": [
@@ -32111,7 +32455,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "whatsapp:{{trigger.from}}",
-                            "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
+                            "help": "Unique per-conversation bucket — typically channel + sender id."
                         },
                         {
                             "key": "role",
@@ -32158,13 +32502,17 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "whatsapp:{{trigger.from}}",
-                            "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
+                            "help": "Unique per-conversation bucket — typically channel + sender id."
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "repeater": {
@@ -32195,7 +32543,7 @@
                                 },
                                 {
                                     "value": "range",
-                                    "label": "Number range (from \u2192 to)"
+                                    "label": "Number range (from → to)"
                                 }
                             ]
                         },
@@ -32242,6 +32590,10 @@
                         "done"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "router": {
@@ -32271,7 +32623,7 @@
                             "key": "routes",
                             "label": "Routes",
                             "type": "repeater",
-                            "help": "Add a route for each path. They are checked top to bottom \u2014 the run takes the first match, otherwise the Fallback path. Each route is a branch on the canvas; wire a node to it with the \u201c+\u201d.",
+                            "help": "Add a route for each path. They are checked top to bottom — the run takes the first match, otherwise the Fallback path. Each route is a branch on the canvas; wire a node to it with the “+”.",
                             "fields": [
                                 {
                                     "key": "operator",
@@ -32363,6 +32715,10 @@
                         "fallback"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "schedule": {
@@ -32428,7 +32784,11 @@
                     ]
                 }
             },
-            "actions": []
+            "actions": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            }
         },
         "sticky_note": {
             "slug": "sticky_note",
@@ -32481,6 +32841,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "variable": {
@@ -32543,6 +32907,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         },
         "xml": {
@@ -32593,6 +32961,10 @@
                         "main"
                     ]
                 }
+            },
+            "docs_url": {
+                "trigger": "",
+                "action": ""
             }
         }
     }

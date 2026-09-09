@@ -22,6 +22,14 @@ class Coblocks extends IntegrationBase {
 		return 'coblocks.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/coblocks/',
+			'action'  => 'https://zaplane.app/docs/coblocks/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'coblocks_form_submit' => [

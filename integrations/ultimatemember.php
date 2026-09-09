@@ -23,6 +23,14 @@ class Ultimatemember extends IntegrationBase {
 		return 'ultimatemember.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/ultimate-member/',
+			'action'  => 'https://zaplane.app/docs/action-ultimate-member/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'user_login' => [

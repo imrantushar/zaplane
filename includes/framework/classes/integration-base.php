@@ -87,6 +87,25 @@ abstract class IntegrationBase {
 		return 'app';
 	}
 
+	/**
+	 * Public zaplane.app/docs/ links for this integration, so the trigger/action
+	 * picker can offer a "View docs" link next to it instead of leaving the user
+	 * to search the knowledge base by hand.
+	 *
+	 * Most integrations have one page covering both triggers and actions — return
+	 * the same URL for both keys. A few have the trigger and action documented on
+	 * separate pages; only then set the two keys differently. Empty string means
+	 * no doc page exists yet for that half.
+	 *
+	 * @return array{trigger:string,action:string}
+	 */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => '',
+			'action'  => '',
+		];
+	}
+
 
 
 
