@@ -204,14 +204,45 @@ class McpController extends WP_REST_Controller {
 	public function info() {
 		return rest_ensure_response(
 			[
-				'enabled'   => self::enabled(),
-				'url'       => rest_url( $this->namespace . '/mcp' ),
-				'protocol'  => self::PROTOCOL_VERSION,
-				'scopes'    => TokenStore::ALL_SCOPES,
-				'tokens'    => TokenStore::all(),
+				'enabled'    => self::enabled(),
+				'url'        => rest_url( $this->namespace . '/mcp' ),
+				'protocol'   => self::PROTOCOL_VERSION,
+				'scopes'     => TokenStore::ALL_SCOPES,
+				'tokens'     => TokenStore::all(),
 				'tool_count' => count( ToolRegistry::definitions() ),
+				'reachable'  => self::publicly_reachable(),
 			]
 		);
+	}
+
+	/**
+	 * Whether a hosted connector could reach this site at all.
+	 *
+	 * One run by somebody else resolves the address from their servers, so a
+	 * development hostname or a private address is not a configuration mistake it
+	 * can report usefully — it simply never arrives, and the connector says it
+	 * could not register. Worth stating on the screen rather than leaving someone
+	 * to work it out from the other end.
+	 */
+	public static function publicly_reachable(): bool {
+		$host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+
+		if ( '' === $host || 'localhost' === $host ) {
+			return false;
+		}
+
+		// Development suffixes that resolve only on the machine running them.
+		if ( (bool) preg_match( '/\.(test|local|localhost|invalid|example|internal|lan|home|dev)$/', $host ) ) {
+			return false;
+		}
+
+		// A bare IP is only reachable if it is a routable one.
+		if ( filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			return (bool) filter_var( $host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE );
+		}
+
+		// Anything without a dot cannot be a public name.
+		return false !== strpos( $host, '.' );
 	}
 
 	public function create_token( $request ) {

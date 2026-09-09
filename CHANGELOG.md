@@ -50,6 +50,12 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   `home_url()` is bare that answers a `www.` request with bare URLs is, to that
   client, a different server. Any other Host is ignored, so nobody can make the
   site advertise an authorization server of their choosing.
+- The AI access panel now says **how to connect**: the three steps a hosted
+  connector takes, the two for a client you run yourself, and a copyable command
+  for the latter. It also warns when the site's address is not reachable from the
+  internet — a development hostname cannot be resolved by claude.ai or ChatGPT,
+  whose servers look it up from outside, and all they can report is that they
+  could not sign in.
 - The MCP endpoint answers **405** to `GET` and `DELETE`, with `Allow: POST`.
   Streamable HTTP reserves those verbs for an event stream and for ending a
   session, neither of which this server offers; the 404 they produced before
@@ -188,6 +194,9 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   control that was unreadable on the dark ground.
 
 ### Fixed — Settings
+- The **Run** scope pill had no background tint: Tailwind's `/opacity` syntax
+  needs a real colour to work on, and these are CSS variables. Uses `color-mix`,
+  like the teaser components already did.
 - **Save changes** is hidden when there is nothing to save, instead of showing a
   greyed-out button. A dead button reads as a save that failed, particularly on
   panels like AI access where nothing belongs to the settings form in the first

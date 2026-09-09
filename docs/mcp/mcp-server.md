@@ -130,6 +130,11 @@ method or unknown tool is a protocol error.
 
 Two ways in, for two kinds of client.
 
+Both are described on the **Settings → AI access** panel itself, which also warns
+when the site's address cannot be reached from the internet — a hosted connector
+resolves it from its own servers, so a development hostname never arrives and all
+it can report is that it could not sign in.
+
 **A token you paste.** Issue one under **Settings → AI access** and give it to a
 client you run yourself — Claude Code, Cursor, a script. It is presented as
 `Authorization: Bearer <token>`, never expires, and is revoked from that same

@@ -47,13 +47,18 @@ const CopyButton = ({ value, label }) => {
   );
 };
 
+// Tints come from color-mix, not Tailwind's `/opacity` syntax: that needs a real
+// colour to work on, and these are CSS variables.
+const tint = (token, pct) => `color-mix(in srgb, var(${token}) ${pct}%, transparent)`;
+
 const ScopePill = ({ scope }) => (
   <span
-    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+    className="rounded-full px-2 py-0.5 text-[11px] font-medium"
+    style={
       scope === 'run'
-        ? 'bg-[var(--zaplane-warning)]/15 text-[var(--zaplane-warning)]'
-        : 'bg-[var(--zaplane-second-primary)] text-[var(--zaplane-primary)]'
-    }`}
+        ? { background: tint('--zaplane-warning', 15), color: 'var(--zaplane-warning)' }
+        : { background: 'var(--zaplane-second-primary)', color: 'var(--zaplane-primary)' }
+    }
   >
     {scope}
   </span>
@@ -111,6 +116,7 @@ const McpTab = () => {
   };
 
   const tokens = info?.tokens || [];
+  const cliCommand = `claude mcp add --transport http zaplane ${info?.url || ''} --header "Authorization: Bearer YOUR_TOKEN"`;
 
   return (
     <div className="flex flex-col gap-8">
@@ -139,13 +145,61 @@ const McpTab = () => {
             <p className="mt-2 text-[12px] text-[var(--zaplane-text-muted)]">
               {__('Protocol', 'zaplane')} {info.protocol} · {info.tool_count} {__('tools', 'zaplane')}
             </p>
-            {/* Hosted connectors have nowhere to paste a token, so they sign in
-                instead. Saying so here saves a support round trip. */}
-            <p className="mt-1 text-[12px] text-[var(--zaplane-text-muted)]">
-              {__(
-                'A hosted connector — claude.ai, ChatGPT — needs only this URL. It will send you here to approve it, and appear below as a connected app.',
-                'zaplane'
-              )}
+
+            {/* A connector run by someone else resolves this address from their
+                servers. On a development hostname it never arrives, and all the
+                connector can say is that it could not sign in — so say it here,
+                where the cause is visible. */}
+            {info.reachable === false && (
+              <p
+                className="mt-3 rounded-[4px] px-3 py-2 text-[12px] text-[var(--zaplane-font-color)]"
+                style={{
+                  background: tint('--zaplane-warning', 12),
+                  border: `1px solid ${tint('--zaplane-warning', 45)}`,
+                }}
+              >
+                {__(
+                  'This address is not reachable from the internet, so claude.ai and ChatGPT cannot connect to it — their servers look it up from outside your machine. Clients running on this computer, such as Claude Code or Cursor, work fine.',
+                  'zaplane'
+                )}
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-[6px] border border-[var(--zaplane-border-color)] p-4">
+            <div className="text-[13px] font-medium text-[var(--zaplane-font-color)]">
+              {__('Connecting a client', 'zaplane')}
+            </div>
+
+            <div className="mt-3 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+              <div className="font-semibold text-[var(--zaplane-font-color)]">
+                {__('claude.ai, ChatGPT and other hosted connectors', 'zaplane')}
+              </div>
+              <ol className="mt-1 list-decimal space-y-1 pl-4">
+                <li>{__('Paste the endpoint URL above into the connector. Nothing else is needed — no token.', 'zaplane')}</li>
+                <li>{__('It sends you back here to approve the request. Sign in as an administrator.', 'zaplane')}</li>
+                <li>{__('Choose what to allow, then Approve. The client appears below as a connected app.', 'zaplane')}</li>
+              </ol>
+            </div>
+
+            <div className="mt-4 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+              <div className="font-semibold text-[var(--zaplane-font-color)]">
+                {__('Claude Code, Cursor and other clients you run yourself', 'zaplane')}
+              </div>
+              <ol className="mt-1 list-decimal space-y-1 pl-4">
+                <li>{__('Issue a token below and copy it — it is shown once.', 'zaplane')}</li>
+                <li>{__('Add the endpoint URL to the client, sending the token as an Authorization header.', 'zaplane')}</li>
+              </ol>
+              <div className="mt-2 flex items-center gap-2">
+                <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-[4px] border border-[var(--zaplane-border-color)] bg-[var(--zaplane-secondary-color)] px-3 py-2 text-[11px] text-[var(--zaplane-font-color)]">
+                  {cliCommand}
+                </code>
+                <CopyButton value={cliCommand} />
+              </div>
+            </div>
+
+            <p className="mt-4 text-[12px] text-[var(--zaplane-text-muted)]">
+              {__('Either way, a client can only do what its scopes allow, and revoking it below disconnects it immediately.', 'zaplane')}
             </p>
           </div>
 
