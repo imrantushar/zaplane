@@ -37,6 +37,22 @@ class McpController extends WP_REST_Controller {
 
 	protected ?Container $container;
 
+	/**
+	 * The token this request authenticated with, handed from check_bearer to
+	 * handle_rpc.
+	 *
+	 * Held on the instance rather than stashed on the request. set_param() writes
+	 * into the request's JSON parameter set, which *is* the decoded body — and
+	 * when that body is a JSON array, as a JSON-RPC batch is, the stash becomes an
+	 * extra element of it. The dispatcher then answered a message the client never
+	 * sent, echoing the token's id back as that response's id. The same instance
+	 * serves check_bearer and handle_rpc for a request, so a property is both
+	 * simpler and inert.
+	 *
+	 * @var array<string,mixed>
+	 */
+	private array $token = [];
+
 	public function __construct( ?Container $container = null ) {
 		$this->container = $container;
 		$this->namespace = 'zaplane/v1';
@@ -146,22 +162,52 @@ class McpController extends WP_REST_Controller {
 	 * can read the scopes without resolving twice.
 	 *
 	 * @param \WP_REST_Request $request
+	 * @return bool|\WP_Error True when allowed, false for 401, WP_Error to pick
+	 *                        the status (429 when throttled).
 	 */
-	public function check_bearer( $request ): bool {
+	public function check_bearer( $request ) {
 		if ( ! self::enabled() ) {
 			return false;
 		}
 
 		$token = TokenStore::resolve( self::bearer( $request ) );
 		if ( null === $token ) {
+			// RFC 6750: a 401 from a bearer-protected resource states the scheme.
+			// Without it a client only sees an opaque refusal and cannot tell how
+			// it was meant to authenticate.
+			if ( ! headers_sent() ) {
+				// A fixed realm names the protection space, which is what a realm is
+				// for; the site title would leak into an unauthenticated response
+				// for no benefit.
+				header( 'WWW-Authenticate: Bearer realm="Zaplane MCP"', true );
+			}
+
 			return false;
 		}
 
-		if ( ! self::within_rate_limit( (string) $token['id'] ) ) {
-			return false;
+		$retry_after = self::rate_limit_retry_after( (string) $token['id'] );
+		if ( $retry_after > 0 ) {
+			// Returning false here would render as 401 "you are not allowed to do
+			// that", which a client reads as a bad credential — so it stops
+			// retrying, or worse, drops the connection and asks to re-authorise.
+			// Throttling is temporary and has to say so.
+			if ( ! headers_sent() ) {
+				header( 'Retry-After: ' . $retry_after );
+			}
+
+			return new \WP_Error(
+				'zaplane_mcp_rate_limited',
+				sprintf(
+					/* translators: 1: calls allowed per minute, 2: seconds until the window resets. */
+					__( 'Rate limit reached: %1$d calls per minute. Retry in %2$d seconds.', 'zaplane' ),
+					self::RATE_LIMIT,
+					$retry_after
+				),
+				[ 'status' => 429 ]
+			);
 		}
 
-		$request->set_param( '_zaplane_mcp_token', $token );
+		$this->token = $token;
 
 		return true;
 	}
@@ -194,17 +240,57 @@ class McpController extends WP_REST_Controller {
 		return trim( substr( $header, 7 ) );
 	}
 
-	private static function within_rate_limit( string $token_id ): bool {
-		$key   = 'zaplane_mcp_rl_' . md5( $token_id );
-		$count = (int) get_transient( $key );
+	/**
+	 * Memoized per request — see below for why that matters.
+	 *
+	 * @var array<string,int>
+	 */
+	private static array $rate_checked = [];
 
-		if ( $count >= self::RATE_LIMIT ) {
-			return false;
+	/**
+	 * Count this call against the token's window.
+	 *
+	 * Returns the seconds until the window resets once the limit is reached, or
+	 * 0 while there is room. A client that is told to back off needs to know for
+	 * how long, so the window carries its own reset time rather than relying on
+	 * the transient's opaque TTL.
+	 *
+	 * The result is memoized because WordPress calls a route's
+	 * permission_callback twice on a real HTTP request: once to authorise the
+	 * call, then again from rest_send_allow_header() on rest_post_dispatch,
+	 * which re-invokes it to work out the Allow header
+	 * (wp-includes/rest-api.php). A counter incremented in a permission callback
+	 * therefore charges two against the quota for every one call, halving the
+	 * limit — 120/min behaved as 60/min. Internal dispatch via rest_do_request()
+	 * skips rest_post_dispatch, so this only shows up over real HTTP.
+	 */
+	private static function rate_limit_retry_after( string $token_id ): int {
+		if ( isset( self::$rate_checked[ $token_id ] ) ) {
+			return self::$rate_checked[ $token_id ];
 		}
 
-		set_transient( $key, $count + 1, MINUTE_IN_SECONDS );
+		$key   = 'zaplane_mcp_rl_' . md5( $token_id );
+		$now   = time();
+		$state = get_transient( $key );
 
-		return true;
+		if ( ! is_array( $state ) || empty( $state['reset'] ) || $state['reset'] <= $now ) {
+			$state = [
+				'count' => 0,
+				'reset' => $now + MINUTE_IN_SECONDS,
+			];
+		}
+
+		if ( $state['count'] >= self::RATE_LIMIT ) {
+			self::$rate_checked[ $token_id ] = max( 1, (int) $state['reset'] - $now );
+			return self::$rate_checked[ $token_id ];
+		}
+
+		++$state['count'];
+		set_transient( $key, $state, max( 1, (int) $state['reset'] - $now ) );
+
+		self::$rate_checked[ $token_id ] = 0;
+
+		return 0;
 	}
 
 	/**
@@ -236,7 +322,7 @@ class McpController extends WP_REST_Controller {
 			}
 		}
 
-		$token = (array) ( $request->get_param( '_zaplane_mcp_token' ) ?? [] );
+		$token = $this->token;
 		$self  = self::is_self_call( $request );
 
 		// Batch.

@@ -184,6 +184,26 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   failed request.
 
 ### Fixed — MCP server
+- **A JSON-RPC batch came back with an extra response.** The token was stashed on
+  the request with `set_param()`, which writes into the decoded JSON body — and
+  when that body is an array, as a batch is, the stash became an element of it. The
+  server answered a message the client never sent, echoing the token's id back as
+  that response's id. It is held on the controller instead.
+- **Hitting the rate limit reported `401 Sorry, you are not allowed to do that`.**
+  A client reads that as a rejected credential and stops retrying, or asks to
+  re-authorise. Throttling now answers `429` with `Retry-After` and says how long
+  to wait.
+- **The limit was half what it claimed.** WordPress calls a route's
+  `permission_callback` twice per HTTP request — once to authorise, then again from
+  `rest_send_allow_header()` — so the counter charged two per call and 120/min
+  behaved as 60/min. The check is memoized per request.
+- A `401` now carries `WWW-Authenticate: Bearer`, so a client can tell how it was
+  meant to authenticate instead of seeing an opaque refusal.
+- **Activating a workflow no longer succeeds when a step has no connection.** A
+  missing connection is advisory while the graph is a draft — the author links the
+  account afterwards — but going live with one means the workflow fires and
+  silently does nothing. Findings now carry a code so activation can block on that
+  one without matching message text.
 - The `Authorization` header is now also read from `HTTP_AUTHORIZATION` /
   `REDIRECT_HTTP_AUTHORIZATION`, so Apache under CGI no longer causes silent 401s.
 - Workflows created over MCP are attributed to the token's owner instead of being

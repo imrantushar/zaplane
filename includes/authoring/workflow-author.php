@@ -258,6 +258,23 @@ class WorkflowAuthor {
 					'Workflow ' . $workflow_id . ' cannot go live: ' . self::format_errors( $report['errors'] )
 				);
 			}
+
+			// A node whose app needs credentials is only a warning while the graph
+			// is a draft — the author links the account afterwards. Going live is a
+			// different bar: the step cannot run at all without one, so activating
+			// would produce a workflow that fires and silently does nothing.
+			$blocking = array_values(
+				array_filter(
+					$report['warnings'],
+					static fn( $w ) => 'missing_connection' === ( $w['code'] ?? '' )
+				)
+			);
+
+			if ( $blocking ) {
+				throw new \InvalidArgumentException(
+					'Workflow ' . $workflow_id . ' cannot go live: ' . self::format_errors( $blocking )
+				);
+			}
 		}
 
 		$workflow->status = $status;
