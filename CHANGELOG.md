@@ -43,6 +43,18 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   access** like any other, and can be revoked there. Access tokens last an hour
   and are refreshed; a spent refresh token is retired with the access token it
   replaced.
+- The discovery documents describe the site under **the host the request arrived
+  on**, when that host is this site under another name — only a `www.` apart. A
+  client checks that the resource it was told about has the same origin as the
+  address you typed, and abandons the whole flow when it does not; a site whose
+  `home_url()` is bare that answers a `www.` request with bare URLs is, to that
+  client, a different server. Any other Host is ignored, so nobody can make the
+  site advertise an authorization server of their choosing.
+- The MCP endpoint answers **405** to `GET` and `DELETE`, with `Allow: POST`.
+  Streamable HTTP reserves those verbs for an event stream and for ending a
+  session, neither of which this server offers; the 404 they produced before
+  reads as "no such endpoint", which is how opening the URL in a browser came to
+  look like a broken route.
 
 ### Added — Modules and discovery
 - **MCP is a module.** Optional features are now declared once in a registry that
@@ -176,6 +188,10 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   control that was unreadable on the dark ground.
 
 ### Fixed — Settings
+- **Save changes** is hidden when there is nothing to save, instead of showing a
+  greyed-out button. A dead button reads as a save that failed, particularly on
+  panels like AI access where nothing belongs to the settings form in the first
+  place.
 - The Appearance screen kept a hand-copied duplicate of both palettes in
   JavaScript, which had already drifted from the PHP: six tokens never appeared in
   the editor at all, and "Reset to default" wrote stale colours. Rows and defaults

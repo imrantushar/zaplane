@@ -224,19 +224,18 @@ const Setting = () => {
   const isDirty = !!form && !!data && JSON.stringify(form) !== JSON.stringify(data);
   const canSave = isDirty && !saving;
 
-  const saveButton = (
+  // Nothing to save is not the same as a save that failed. A greyed-out button
+  // reads as the second, so tabs with nothing on them (AI access issues tokens
+  // through its own controls) show no button at all rather than a dead one.
+  const saveButton = canSave || saving ? (
     <button
       onClick={handleSave}
       disabled={!canSave}
-      className={`inline-flex items-center gap-2 rounded-[4px] px-4 py-2 text-[13px] font-semibold transition-colors ${
-        canSave
-          ? 'bg-[var(--zaplane-primary)] text-white hover:opacity-90 cursor-pointer'
-          : 'bg-[var(--zaplane-secondary-color)] text-[var(--zaplane-text-muted)] cursor-not-allowed'
-      }`}
+      className="inline-flex items-center gap-2 rounded-[4px] bg-[var(--zaplane-primary)] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
     >
       {saving ? __('Saving…', 'zaplane') : __('Save changes', 'zaplane')}
     </button>
-  );
+  ) : null;
 
   return (
     <PageLayout title={__('Settings', 'zaplane')} heading={__('Settings', 'zaplane')} actions={saveButton}>

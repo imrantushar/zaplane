@@ -306,6 +306,85 @@ class ServerTest extends TestCase {
 	}
 
 	/**
+	 * A client compares the resource we publish against the address the person
+	 * typed and abandons the flow on an origin mismatch — before registration,
+	 * which is what "couldn't register with your sign-in service" actually means.
+	 * A site reached as www. must therefore describe itself as www.
+	 *
+	 * @test
+	 */
+	public function it_describes_itself_under_the_host_the_request_arrived_on(): void {
+		// The harness' site is http://example.com.
+		$_SERVER['HTTP_HOST'] = 'www.example.com';
+		$this->assertSame( 'http://www.example.com', Discovery::origin() );
+		$this->assertStringStartsWith( 'http://www.example.com/', Discovery::resource_url() );
+		$this->assertSame( [ 'http://www.example.com' ], Discovery::protected_resource_document()['authorization_servers'] );
+
+		// A request that arrived over TLS is published as https. The reverse never
+		// happens: an http request to an https site does not downgrade the URLs a
+		// client is told to send its tokens to.
+		$_SERVER['HTTPS'] = 'on';
+		$this->assertSame( 'https://www.example.com', Discovery::origin() );
+		unset( $_SERVER['HTTPS'] );
+
+		$_SERVER['HTTP_HOST'] = 'example.com';
+		$this->assertSame( 'http://example.com', Discovery::origin() );
+
+		// Reflecting any Host would let a stranger publish a document naming an
+		// authorization server of their choosing.
+		$_SERVER['HTTP_HOST'] = 'evil.example.net';
+		$this->assertSame( 'http://example.com', Discovery::origin() );
+
+		$_SERVER['HTTP_HOST'] = 'example.com.attacker.test';
+		$this->assertSame( 'http://example.com', Discovery::origin() );
+
+		unset( $_SERVER['HTTP_HOST'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_treats_www_as_the_same_site_and_nothing_else(): void {
+		$this->assertTrue( Discovery::same_site( 'www.example.com', 'example.com' ) );
+		$this->assertTrue( Discovery::same_site( 'example.com', 'www.example.com' ) );
+		$this->assertTrue( Discovery::same_site( 'EXAMPLE.com:443', 'example.com' ) );
+
+		$this->assertFalse( Discovery::same_site( 'evil.com', 'example.com' ) );
+		$this->assertFalse( Discovery::same_site( 'example.com.evil.com', 'example.com' ) );
+		$this->assertFalse( Discovery::same_site( 'wwwexample.com', 'example.com' ) );
+		$this->assertFalse( Discovery::same_site( '', 'example.com' ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_refuses_a_token_request_naming_another_sites_resource(): void {
+		$result = Server::token(
+			$this->request(
+				[
+					'grant_type' => 'authorization_code',
+					'resource'   => 'https://somewhere-else.example/wp-json/zaplane/v1/mcp',
+				]
+			)
+		);
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'invalid_target', $result->get_error_code() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_accepts_this_sites_resource_however_it_is_spelled(): void {
+		$host = (string) wp_parse_url( Discovery::resource_url(), PHP_URL_HOST );
+
+		foreach ( [ Discovery::resource_url(), 'https://www.' . $host . '/wp-json/zaplane/v1/mcp', '' ] as $resource ) {
+			$result = $this->exchangeRaw( [ 'resource' => $resource ] );
+			$this->assertIsArray( $result, 'resource "' . $resource . '" should be accepted' );
+		}
+	}
+
+	/**
 	 * @test
 	 */
 	public function the_discovery_documents_describe_endpoints_that_exist(): void {

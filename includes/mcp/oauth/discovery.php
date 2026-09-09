@@ -35,15 +35,94 @@ class Discovery {
 
 	/** The URL a 401 points at, so the client can find everything else. */
 	public static function protected_resource_url(): string {
-		return home_url( '/.well-known/' . self::PROTECTED_RESOURCE );
+		return self::url( home_url( '/.well-known/' . self::PROTECTED_RESOURCE ) );
 	}
 
 	public static function issuer(): string {
-		return untrailingslashit( home_url() );
+		return untrailingslashit( self::url( home_url() ) );
 	}
 
 	public static function resource_url(): string {
-		return rest_url( 'zaplane/v1/mcp' );
+		return self::url( rest_url( 'zaplane/v1/mcp' ) );
+	}
+
+	/**
+	 * Rewrite one of this site's own URLs onto the host the request arrived on.
+	 *
+	 * A client checks that the `resource` we publish has the same origin as the
+	 * address the person typed, and abandons the whole flow when it does not — no
+	 * registration, no consent, just "could not register with your sign-in
+	 * service". So a site whose home_url() is https://example.com cannot answer
+	 * a request for https://www.example.com with documents naming the bare domain:
+	 * to that client they describe a different server.
+	 *
+	 * @param string $url A URL built from home_url() or rest_url().
+	 */
+	public static function url( string $url ): string {
+		$origin = self::origin();
+		$parts  = wp_parse_url( $url );
+
+		if ( ! is_array( $parts ) ) {
+			return $url;
+		}
+
+		$rest = ( $parts['path'] ?? '' )
+			. ( isset( $parts['query'] ) ? '?' . $parts['query'] : '' )
+			. ( isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '' );
+
+		return $origin . $rest;
+	}
+
+	/**
+	 * The scheme and host every published URL should carry.
+	 *
+	 * The request's own host is used when it is this site under another name —
+	 * only a `www.` prefix apart — and the canonical host otherwise. Reflecting
+	 * an arbitrary Host header would let anyone publish a document pointing at an
+	 * authorization server of their choosing, so the match is checked first. The
+	 * scheme is never downgraded: https stays https.
+	 */
+	public static function origin(): string {
+		$home   = wp_parse_url( home_url() );
+		$host   = strtolower( (string) ( $home['host'] ?? '' ) );
+		$port   = isset( $home['port'] ) ? ':' . $home['port'] : '';
+		$secure = 'https' === ( $home['scheme'] ?? 'http' ) || is_ssl();
+
+		$requested = self::requested_host();
+
+		if ( '' !== $requested && self::same_site( $requested, $host ) ) {
+			return ( $secure ? 'https' : 'http' ) . '://' . $requested;
+		}
+
+		return ( $secure ? 'https' : 'http' ) . '://' . $host . $port;
+	}
+
+	/**
+	 * True when two hostnames are the same site, give or take a www.
+	 *
+	 * @param string $a One hostname, optionally with a port.
+	 * @param string $b The other.
+	 */
+	public static function same_site( string $a, string $b ): bool {
+		$strip = static function ( string $host ): string {
+			$host = strtolower( $host );
+			// Drop a port, then a leading www.
+			$host = (string) preg_replace( '/:\d+$/', '', $host );
+			return (string) preg_replace( '/^www\./', '', $host );
+		};
+
+		return '' !== $strip( $a ) && $strip( $a ) === $strip( $b );
+	}
+
+	/** The Host header, reduced to characters a hostname can contain. */
+	private static function requested_host(): string {
+		if ( empty( $_SERVER['HTTP_HOST'] ) ) {
+			return '';
+		}
+
+		$host = strtolower( wp_unslash( (string) $_SERVER['HTTP_HOST'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reduced to a hostname below, then matched against this site's own.
+
+		return (string) preg_replace( '/[^a-z0-9.\-:\[\]]/', '', $host );
 	}
 
 	public static function maybe_serve(): void {
@@ -89,9 +168,9 @@ class Discovery {
 			// Not a REST route: the consent screen needs the signed-in cookie user,
 			// which the REST stack discards when no wp_rest nonce is present.
 			'authorization_endpoint'                => Server::authorize_url(),
-			'token_endpoint'                        => rest_url( 'zaplane/v1/oauth/token' ),
-			'registration_endpoint'                 => rest_url( 'zaplane/v1/oauth/register' ),
-			'revocation_endpoint'                   => rest_url( 'zaplane/v1/oauth/revoke' ),
+			'token_endpoint'                        => self::url( rest_url( 'zaplane/v1/oauth/token' ) ),
+			'registration_endpoint'                 => self::url( rest_url( 'zaplane/v1/oauth/register' ) ),
+			'revocation_endpoint'                   => self::url( rest_url( 'zaplane/v1/oauth/revoke' ) ),
 			'scopes_supported'                      => TokenStore::ALL_SCOPES,
 			'response_types_supported'              => [ 'code' ],
 			'grant_types_supported'                 => [ 'authorization_code', 'refresh_token' ],

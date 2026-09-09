@@ -47,14 +47,46 @@ class Server {
 		'scope',
 		'code_challenge',
 		'code_challenge_method',
+		'resource',
 	];
 
 	public static function boot(): void {
 		add_action( 'parse_request', [ self::class, 'maybe_authorize' ], 0 );
 	}
 
+	/**
+	 * Where the person is sent to approve a client.
+	 *
+	 * Deliberately the canonical host, even when discovery is answering under
+	 * another name for the same site. Consent is the one step that needs a signed
+	 * in WordPress user, and WordPress keeps that on one host: the login cookie is
+	 * set for the site's own hostname, wp_login_url() points at site_url(), and
+	 * wp_safe_redirect() will not send anyone back to a host outside home_url().
+	 * A consent screen on the www. alias would therefore ask for a login and then
+	 * be unable to return to itself. The endpoints that follow have no cookie to
+	 * lose and stay on the host the client is talking to.
+	 */
 	public static function authorize_url(): string {
 		return home_url( '/' . self::AUTHORIZE_PATH );
+	}
+
+	/**
+	 * RFC 8707: a client names the resource server it wants a token for. Honour
+	 * it only when it is this site — a token minted here must never be usable as
+	 * one issued for somewhere else. Compared per site rather than per exact URL,
+	 * so a www. spelling is not treated as a different server.
+	 *
+	 * @param string $target The `resource` parameter, empty when not sent.
+	 */
+	private static function resource_ours( string $target ): bool {
+		if ( '' === $target ) {
+			return true; // Not sent. Older clients do not send one.
+		}
+
+		$host = (string) wp_parse_url( $target, PHP_URL_HOST );
+		$mine = (string) wp_parse_url( Discovery::resource_url(), PHP_URL_HOST );
+
+		return '' !== $host && Discovery::same_site( $host, $mine );
 	}
 
 	/* ------------------------------ register ------------------------------ */
@@ -140,6 +172,10 @@ class Server {
 			self::bounce( $redirect_uri, $state, 'invalid_request', 'PKCE with code_challenge_method=S256 is required.' );
 		}
 
+		if ( ! self::resource_ours( self::query( 'resource' ) ) ) {
+			self::bounce( $redirect_uri, $state, 'invalid_target', 'That resource is not served by this site.' );
+		}
+
 		$requested = preg_split( '/[\s,+]+/', self::query( 'scope' ), -1, PREG_SPLIT_NO_EMPTY );
 		$scopes    = TokenStore::sanitize_scopes( is_array( $requested ) ? $requested : [] );
 		if ( empty( $scopes ) ) {
@@ -215,6 +251,10 @@ class Server {
 	public static function token( $request ) {
 		if ( ! Settings::feature_enabled( 'mcp_server' ) ) {
 			return new \WP_Error( 'invalid_request', 'The MCP server is not enabled on this site.', [ 'status' => 404 ] );
+		}
+
+		if ( ! self::resource_ours( (string) $request->get_param( 'resource' ) ) ) {
+			return new \WP_Error( 'invalid_target', 'That resource is not served by this site.', [ 'status' => 400 ] );
 		}
 
 		$grant = (string) $request->get_param( 'grant_type' );

@@ -70,6 +70,17 @@ class McpController extends WP_REST_Controller {
 					'callback'            => [ $this, 'handle_rpc' ],
 					'permission_callback' => [ $this, 'check_bearer' ],
 				],
+				[
+					// Streamable HTTP reserves GET for a server-initiated event
+					// stream and DELETE for ending a session. This server does
+					// neither, and the spec is specific that the answer is then 405
+					// — not the 404 an unregistered method would give, which reads
+					// as "this endpoint does not exist" to a client and to anyone
+					// who opens the URL in a browser.
+					'methods'             => 'GET, DELETE',
+					'callback'            => [ $this, 'method_not_allowed' ],
+					'permission_callback' => '__return_true',
+				],
 			]
 		);
 
@@ -114,6 +125,27 @@ class McpController extends WP_REST_Controller {
 		);
 
 		$this->register_oauth_routes();
+
+		// rest_send_allow_header() rebuilds Allow from the handlers whose
+		// permission_callback passes. On an unauthenticated request that is the
+		// 405 handler and not the POST one, so the header ends up advertising
+		// exactly the two methods this endpoint refuses. Put it back afterwards.
+		add_filter( 'rest_post_dispatch', [ $this, 'correct_allow_header' ], 20, 3 );
+	}
+
+	/**
+	 * @param \WP_HTTP_Response $response
+	 * @param \WP_REST_Server   $server
+	 * @param \WP_REST_Request  $request
+	 * @return \WP_HTTP_Response
+	 */
+	public function correct_allow_header( $response, $server, $request ) {
+		if ( $response instanceof \WP_REST_Response
+			&& '/' . $this->namespace . '/mcp' === (string) $response->get_matched_route() ) {
+			$response->header( 'Allow', 'POST' );
+		}
+
+		return $response;
 	}
 
 	/**
@@ -262,6 +294,17 @@ class McpController extends WP_REST_Controller {
 		$this->token = $token;
 
 		return true;
+	}
+
+	/**
+	 * @return \WP_Error
+	 */
+	public function method_not_allowed() {
+		return new \WP_Error(
+			'zaplane_mcp_method_not_allowed',
+			__( 'The MCP endpoint accepts POST. It has no event stream to open and no session to end.', 'zaplane' ),
+			[ 'status' => 405 ]
+		);
 	}
 
 	/**

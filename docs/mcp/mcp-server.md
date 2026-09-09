@@ -117,6 +117,11 @@ able to start the workflow that is calling it. The MCP client sends
 **Rate limit.** 120 calls per token per minute; over that the endpoint returns
 429 with `Retry-After` until the window rolls.
 
+**POST only.** The endpoint answers 405 with `Allow: POST` to `GET` and `DELETE`.
+Streamable HTTP reserves those for a server-initiated event stream and for ending
+a session, and this server offers neither — so opening the URL in a browser shows
+a 405, not a working page and not a missing route.
+
 **Tool failures** come back as `isError` results with a readable message rather
 than JSON-RPC protocol errors, so the model can correct itself. Only an unknown
 method or unknown tool is a protocol error.
@@ -165,6 +170,25 @@ tokens, and revoking one there disconnects it.
 
 If the site's MCP module is off, all of this 404s — the site does not advertise
 an authorization server it isn't running.
+
+### www, and why it used to fail
+
+A client compares the `resource` in the discovery document against the address
+you gave it, and requires the two to have the same origin. If it does not match
+it stops there — before registering — and reports that it could not register with
+your sign-in service.
+
+So the documents are built from the host the request arrived on, not from
+`home_url()`, whenever that host is this site under another name (a `www.` prefix
+either way). Paste `https://www.example.com/...` and the documents say
+`www.example.com`; paste the bare domain and they say the bare domain. Any other
+Host is ignored — reflecting one would let a stranger publish a document naming
+an authorization server of their own.
+
+The consent screen is the exception: it stays on the site's canonical host,
+because that is where the login cookie lives, where `wp_login_url()` points, and
+the only host `wp_safe_redirect()` will return to. A consent page on the alias
+would ask for a login and then be unable to find its way back.
 
 Nothing here replaces the token flow, and a client that can set a header does not
 need OAuth. If you would rather keep a static token with a hosted client, a

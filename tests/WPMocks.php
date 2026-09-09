@@ -561,6 +561,12 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'is_ssl' ) ) {
+		function is_ssl(): bool {
+			return ! empty( $_SERVER['HTTPS'] ) && 'off' !== $_SERVER['HTTPS'];
+		}
+	}
+
 	if ( ! function_exists( 'esc_url_raw' ) ) {
 		function esc_url_raw( $url ) {
 			// WP strips whitespace and control characters; no HTML escaping, since
