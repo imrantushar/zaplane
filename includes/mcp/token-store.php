@@ -50,6 +50,8 @@ class TokenStore {
 				'user_id'      => (int) $record['user_id'],
 				'created_at'   => (string) $record['created_at'],
 				'last_used_at' => $record['last_used_at'] ?? null,
+				'client_id'    => (string) ( $record['client_id'] ?? '' ),
+				'expires_at'   => (int) ( $record['expires_at'] ?? 0 ),
 			];
 		}
 
@@ -63,7 +65,7 @@ class TokenStore {
 	 * @param array<int,string> $scopes
 	 * @return array<string,mixed>
 	 */
-	public static function issue( string $name, array $scopes = self::DEFAULT_SCOPES, int $user_id = 0 ): array {
+	public static function issue( string $name, array $scopes = self::DEFAULT_SCOPES, int $user_id = 0, array $opts = [] ): array {
 		$name = sanitize_text_field( $name );
 		if ( '' === trim( $name ) ) {
 			$name = 'MCP client';
@@ -77,6 +79,16 @@ class TokenStore {
 		$id     = strtolower( wp_generate_password( 12, false ) );
 		$secret = wp_generate_password( 48, false );
 
+		// An OAuth-issued token belongs to a registered client and expires; one
+		// created by hand in the settings screen does neither.
+		$client_id  = isset( $opts['client_id'] ) ? (string) $opts['client_id'] : '';
+		$expires_in = isset( $opts['expires_in'] ) ? (int) $opts['expires_in'] : 0;
+
+		$refresh = '';
+		if ( ! empty( $opts['with_refresh'] ) ) {
+			$refresh = wp_generate_password( 48, false );
+		}
+
 		$records   = self::records();
 		$records[] = [
 			'id'           => $id,
@@ -86,16 +98,21 @@ class TokenStore {
 			'user_id'      => $user_id ?: get_current_user_id(),
 			'created_at'   => current_time( 'mysql' ),
 			'last_used_at' => null,
+			'client_id'    => $client_id,
+			'expires_at'   => $expires_in > 0 ? time() + $expires_in : 0,
+			'refresh_hash' => '' !== $refresh ? hash( 'sha256', $refresh ) : '',
 		];
 
 		self::persist( $records );
 
 		return [
-			'id'      => $id,
-			'name'    => $name,
-			'scopes'  => $scopes,
-			'token'   => 'zpl_' . $id . '.' . $secret,
-			'user_id' => (int) end( $records )['user_id'],
+			'id'            => $id,
+			'name'          => $name,
+			'scopes'        => $scopes,
+			'token'         => 'zpl_' . $id . '.' . $secret,
+			'refresh_token' => '' !== $refresh ? 'zpr_' . $id . '.' . $refresh : '',
+			'expires_in'    => $expires_in,
+			'user_id'       => (int) end( $records )['user_id'],
 		];
 	}
 
@@ -139,6 +156,12 @@ class TokenStore {
 					return null;
 				}
 
+				// An OAuth access token is short-lived; the client is expected to
+				// present its refresh token once this lapses.
+				if ( ! empty( $record['expires_at'] ) && $record['expires_at'] <= time() ) {
+					return null;
+				}
+
 				self::touch( $index );
 
 				return $record;
@@ -158,6 +181,32 @@ class TokenStore {
 				'user_id' => 0,
 				'legacy'  => true,
 			];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Trade a refresh token for the record it belongs to.
+	 *
+	 * @return array<string,mixed>|null
+	 */
+	public static function resolve_refresh( string $presented ): ?array {
+		$presented = trim( $presented );
+		if ( 0 !== strpos( $presented, 'zpr_' ) || false === strpos( $presented, '.' ) ) {
+			return null;
+		}
+
+		[ $id, $secret ] = explode( '.', substr( $presented, 4 ), 2 );
+
+		foreach ( self::records() as $record ) {
+			if ( $record['id'] !== $id || '' === (string) $record['refresh_hash'] ) {
+				continue;
+			}
+
+			return hash_equals( (string) $record['refresh_hash'], hash( 'sha256', $secret ) )
+				? $record
+				: null;
 		}
 
 		return null;
@@ -228,6 +277,9 @@ class TokenStore {
 				'user_id'      => (int) ( $record['user_id'] ?? 0 ),
 				'created_at'   => (string) ( $record['created_at'] ?? '' ),
 				'last_used_at' => $record['last_used_at'] ?? null,
+				'client_id'    => (string) ( $record['client_id'] ?? '' ),
+				'expires_at'   => (int) ( $record['expires_at'] ?? 0 ),
+				'refresh_hash' => (string) ( $record['refresh_hash'] ?? '' ),
 			];
 		}
 
