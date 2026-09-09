@@ -31,6 +31,18 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   advertises what the presenting token can call.
 - Tools for diagnosing runs (`list_runs`, `get_run`), reading and editing existing
   workflows, and listing connections.
+- **OAuth 2.1, so hosted AI clients can connect at all.** A connector run by
+  someone else — claude.ai, ChatGPT — is never handed a token, because there is
+  nowhere for a person to paste one; it expects to discover an authorization
+  server and ask for its own. Zaplane now is one: the two `/.well-known/`
+  discovery documents (RFC 9728 and RFC 8414), dynamic client registration
+  (RFC 7591), and the authorization-code flow with PKCE. The 401 from the MCP
+  endpoint carries the `resource_metadata` pointer that starts it off.
+  Connecting still ends at a consent screen only an administrator can approve,
+  and the token it issues acts as that administrator, appears in **Settings → AI
+  access** like any other, and can be revoked there. Access tokens last an hour
+  and are refreshed; a spent refresh token is retired with the access token it
+  replaced.
 
 ### Added — Modules and discovery
 - **MCP is a module.** Optional features are now declared once in a registry that

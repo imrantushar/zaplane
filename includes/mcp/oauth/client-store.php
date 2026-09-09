@@ -43,9 +43,21 @@ class ClientStore {
 			throw new \InvalidArgumentException( 'redirect_uris must contain at least one https (or loopback http) URI without a fragment.' );
 		}
 
+		$name = sanitize_text_field( (string) ( $metadata['client_name'] ?? 'MCP client' ) );
+
+		// A connector that re-registers on every reconnect — several do — would
+		// otherwise push a new row each time and walk the whole cap in a week.
+		// Handing back the existing registration costs nothing: a client_id is
+		// public, and the client is still useless until an administrator approves
+		// it for this particular authorization, with its own PKCE challenge.
+		$existing = self::find( $name, $redirects );
+		if ( null !== $existing ) {
+			return $existing;
+		}
+
 		$client = [
 			'client_id'     => 'zpc_' . strtolower( wp_generate_password( 20, false ) ),
-			'client_name'   => sanitize_text_field( (string) ( $metadata['client_name'] ?? 'MCP client' ) ),
+			'client_name'   => $name,
 			'redirect_uris' => $redirects,
 			'created_at'    => current_time( 'mysql' ),
 		];
@@ -65,6 +77,29 @@ class ClientStore {
 	}
 
 	/**
+	 * An already-registered client with exactly this name and these redirects.
+	 *
+	 * @param string            $name      Client name as registered.
+	 * @param array<int,string> $redirects Redirect URIs, in any order.
+	 * @return array<string,mixed>|null
+	 */
+	private static function find( string $name, array $redirects ): ?array {
+		sort( $redirects );
+
+		foreach ( self::all() as $client ) {
+			$known = (array) $client['redirect_uris'];
+			sort( $known );
+
+			if ( (string) $client['client_name'] === $name && $known === $redirects ) {
+				return $client;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param string $client_id Identifier handed out at registration.
 	 * @return array<string,mixed>|null
 	 */
 	public static function get( string $client_id ): ?array {
@@ -77,6 +112,9 @@ class ClientStore {
 	 *
 	 * Comparing whole strings rather than prefixes is deliberate: prefix matching
 	 * is how an open redirector becomes a token thief.
+	 *
+	 * @param array<string,mixed> $client       The stored registration.
+	 * @param string              $redirect_uri The address being asked for.
 	 */
 	public static function redirect_allowed( array $client, string $redirect_uri ): bool {
 		foreach ( (array) $client['redirect_uris'] as $known ) {
@@ -109,8 +147,10 @@ class ClientStore {
 	}
 
 	/**
-	 * https everywhere, except loopback, which is how a desktop client receives
+	 * HTTPS everywhere, except loopback, which is how a desktop client receives
 	 * its redirect. A fragment is never valid on a redirect URI.
+	 *
+	 * @param string $uri Candidate redirect URI.
 	 */
 	private static function is_valid_redirect( string $uri ): bool {
 		$parts = wp_parse_url( $uri );

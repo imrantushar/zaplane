@@ -561,6 +561,14 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'esc_url_raw' ) ) {
+		function esc_url_raw( $url ) {
+			// WP strips whitespace and control characters; no HTML escaping, since
+			// the result is meant for headers and requests rather than markup.
+			return trim( (string) preg_replace( '/[\x00-\x1F\x7F]/', '', (string) $url ) );
+		}
+	}
+
 	if ( ! function_exists( 'wp_strip_all_tags' ) ) {
 		function wp_strip_all_tags( string $text, bool $remove_breaks = false ): string {
 			$text = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );

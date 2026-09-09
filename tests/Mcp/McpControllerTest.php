@@ -90,6 +90,24 @@ class McpControllerTest extends TestCase {
 	}
 
 	/**
+	 * A hosted connector is given nothing but this endpoint's URL. The pointer in
+	 * the 401 is the only thing it can follow to find out that OAuth exists here.
+	 *
+	 * @test
+	 */
+	public function the_challenge_points_at_the_protected_resource_document(): void {
+		$challenge = McpController::challenge();
+
+		$this->assertStringStartsWith( 'Bearer ', $challenge );
+		$this->assertStringContainsString( 'realm="Zaplane MCP"', $challenge );
+		$this->assertStringContainsString(
+			'resource_metadata="' . \Zaplane\Mcp\OAuth\Discovery::protected_resource_url() . '"',
+			$challenge
+		);
+		$this->assertStringContainsString( '/.well-known/oauth-protected-resource', $challenge );
+	}
+
+	/**
 	 * @test
 	 */
 	public function throttling_is_counted_once_per_request(): void {

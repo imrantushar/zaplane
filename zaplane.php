@@ -118,6 +118,12 @@ final class Zaplane {
 		\Zaplane\CustomApps\Loader::boot();
 		\Zaplane\CustomApps\Poller::boot();
 
+		// OAuth for the MCP endpoint. Both of these claim front-end URLs — the two
+		// /.well-known/ documents and the consent screen — so they hook parse_request
+		// rather than rest_api_init, and must be registered on every request.
+		\Zaplane\Mcp\OAuth\Discovery::boot();
+		\Zaplane\Mcp\OAuth\Server::boot();
+
 		// Initialize modules first
 		$modules = $this->container->get( 'modules' );
 		$modules->boot();

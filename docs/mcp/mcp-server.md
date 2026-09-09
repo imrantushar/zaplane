@@ -115,17 +115,60 @@ able to start the workflow that is calling it. The MCP client sends
 `run_workflow` while still allowing reads.
 
 **Rate limit.** 120 calls per token per minute; over that the endpoint returns
-401 until the window rolls.
+429 with `Retry-After` until the window rolls.
 
 **Tool failures** come back as `isError` results with a readable message rather
 than JSON-RPC protocol errors, so the model can correct itself. Only an unknown
 method or unknown tool is a protocol error.
 
-## Authentication and remote clients
+## Authentication
 
-Authentication is a static bearer token. The MCP authorization spec describes
-OAuth 2.1 with dynamic client registration, which some hosted clients require;
-until that is implemented, connect through a bridge that can set a header, e.g.
+Two ways in, for two kinds of client.
+
+**A token you paste.** Issue one under **Settings → AI access** and give it to a
+client you run yourself — Claude Code, Cursor, a script. It is presented as
+`Authorization: Bearer <token>`, never expires, and is revoked from that same
+screen.
+
+**OAuth, for clients you don't run.** A hosted connector — claude.ai, ChatGPT —
+has nowhere for you to paste a token, so it expects to find an authorization
+server and ask for one. Paste the endpoint URL into the connector and it will
+walk the rest itself:
+
+```
+https://example.com/wp-json/zaplane/v1/mcp
+```
+
+What happens behind that: the connector calls the endpoint, gets a 401 carrying
+`WWW-Authenticate: Bearer realm="Zaplane MCP", resource_metadata="…"`, follows
+that pointer to `/.well-known/oauth-protected-resource` (RFC 9728), reads
+`/.well-known/oauth-authorization-server` (RFC 8414) to find the endpoints,
+registers itself (RFC 7591), and sends you to a consent screen. **You must be
+signed in as an administrator to approve it.** The token it receives acts as the
+account that approved it.
+
+| | |
+|---|---|
+| Consent | `https://example.com/zaplane-oauth/authorize` |
+| Register | `POST /wp-json/zaplane/v1/oauth/register` |
+| Token | `POST /wp-json/zaplane/v1/oauth/token` |
+| Revoke | `POST /wp-json/zaplane/v1/oauth/revoke` |
+
+PKCE with `S256` is required — `plain` is not accepted. Authorization codes last
+a minute and are spent once, whether or not the exchange succeeds. Access tokens
+last an hour; the refresh token that comes with one is rotated on use, and the
+pair it replaces stops working immediately. Every client is public: there are no
+client secrets to store or leak.
+
+Approved connectors appear in **Settings → AI access** alongside hand-issued
+tokens, and revoking one there disconnects it.
+
+If the site's MCP module is off, all of this 404s — the site does not advertise
+an authorization server it isn't running.
+
+Nothing here replaces the token flow, and a client that can set a header does not
+need OAuth. If you would rather keep a static token with a hosted client, a
+bridge still works:
 
 ```bash
 npx mcp-remote https://example.com/wp-json/zaplane/v1/mcp --header "Authorization: Bearer <token>"

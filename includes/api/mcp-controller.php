@@ -5,6 +5,8 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_REST_Server;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Mcp\OAuth\Discovery;
+use Zaplane\Mcp\OAuth\Server as OAuthServer;
 use Zaplane\Mcp\ToolRegistry;
 use Zaplane\Mcp\TokenStore;
 use Zaplane\Settings;
@@ -110,6 +112,59 @@ class McpController extends WP_REST_Controller {
 				],
 			]
 		);
+
+		$this->register_oauth_routes();
+	}
+
+	/**
+	 * The machine-to-machine half of the OAuth flow.
+	 *
+	 * Open by design: a client has no credential to present until it has
+	 * registered, and registration on its own grants nothing — a client becomes
+	 * useful only once an administrator approves it on the consent screen. The
+	 * consent screen itself is not here; it is a front-end URL, because the REST
+	 * stack discards the cookie-signed-in user when no wp_rest nonce is sent.
+	 *
+	 * @see \Zaplane\Mcp\OAuth\Server
+	 */
+	private function register_oauth_routes(): void {
+		$public = '__return_true';
+
+		register_rest_route(
+			$this->namespace,
+			'/oauth/register',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ OAuthServer::class, 'register' ],
+					'permission_callback' => $public,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/oauth/token',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ OAuthServer::class, 'token' ],
+					'permission_callback' => $public,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/oauth/revoke',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ OAuthServer::class, 'revoke' ],
+					'permission_callback' => $public,
+				],
+			]
+		);
 	}
 
 	/* ------------------------------- admin -------------------------------- */
@@ -176,10 +231,7 @@ class McpController extends WP_REST_Controller {
 			// Without it a client only sees an opaque refusal and cannot tell how
 			// it was meant to authenticate.
 			if ( ! headers_sent() ) {
-				// A fixed realm names the protection space, which is what a realm is
-				// for; the site title would leak into an unauthenticated response
-				// for no benefit.
-				header( 'WWW-Authenticate: Bearer realm="Zaplane MCP"', true );
+				header( 'WWW-Authenticate: ' . self::challenge(), true );
 			}
 
 			return false;
@@ -210,6 +262,25 @@ class McpController extends WP_REST_Controller {
 		$this->token = $token;
 
 		return true;
+	}
+
+	/**
+	 * The value of the WWW-Authenticate header on a 401.
+	 *
+	 * A fixed realm names the protection space, which is what a realm is for; the
+	 * site title would leak into an unauthenticated response for no benefit.
+	 *
+	 * resource_metadata is the part a hosted connector needs (RFC 9728). Such a
+	 * client arrives holding nothing but this endpoint's URL, and this pointer is
+	 * the only way it can find the authorization server. Without it there is
+	 * nothing to follow, and the client reports — correctly — that the server does
+	 * not implement OAuth.
+	 */
+	public static function challenge(): string {
+		return sprintf(
+			'Bearer realm="Zaplane MCP", resource_metadata="%s"',
+			esc_url_raw( Discovery::protected_resource_url() )
+		);
 	}
 
 	/**

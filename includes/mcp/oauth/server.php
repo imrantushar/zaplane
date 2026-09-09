@@ -140,7 +140,8 @@ class Server {
 			self::bounce( $redirect_uri, $state, 'invalid_request', 'PKCE with code_challenge_method=S256 is required.' );
 		}
 
-		$scopes = TokenStore::sanitize_scopes( preg_split( '/[\s,+]+/', self::query( 'scope' ), -1, PREG_SPLIT_NO_EMPTY ) ?: [] );
+		$requested = preg_split( '/[\s,+]+/', self::query( 'scope' ), -1, PREG_SPLIT_NO_EMPTY );
+		$scopes    = TokenStore::sanitize_scopes( is_array( $requested ) ? $requested : [] );
 		if ( empty( $scopes ) ) {
 			$scopes = TokenStore::DEFAULT_SCOPES;
 		}
@@ -155,9 +156,11 @@ class Server {
 			self::fail_page( __( 'Only an administrator can connect an AI client to this site.', 'zaplane' ) );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading the verb, not form data; the branch it opens checks a nonce first.
 		if ( 'POST' === strtoupper( (string) ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) ) {
 			check_admin_referer( 'zaplane_mcp_consent' );
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- check_admin_referer() above.
 			if ( ! isset( $_POST['approve'] ) ) {
 				self::bounce( $redirect_uri, $state, 'access_denied', 'The request was declined.' );
 			}
@@ -169,8 +172,11 @@ class Server {
 	}
 
 	/**
-	 * @param array<string,mixed> $client
-	 * @param array<int,string>   $scopes
+	 * @param array<string,mixed> $client       The approved client.
+	 * @param string              $redirect_uri Where the code is delivered.
+	 * @param string              $state        Client state, echoed back untouched.
+	 * @param string              $challenge    The PKCE challenge the code is bound to.
+	 * @param array<int,string>   $scopes       Scopes the administrator approved.
 	 */
 	private static function grant( array $client, string $redirect_uri, string $state, string $challenge, array $scopes ): void {
 		$code = 'zac_' . wp_generate_password( 40, false );
@@ -307,7 +313,10 @@ class Server {
 	}
 
 	/**
-	 * @param array<int,string> $scopes
+	 * @param string            $name      Label the token is listed under.
+	 * @param array<int,string> $scopes    Scopes to grant.
+	 * @param int               $user_id   The administrator the token acts as.
+	 * @param string            $client_id The registered client it belongs to.
 	 * @return array<string,mixed>
 	 */
 	private static function mint( string $name, array $scopes, int $user_id, string $client_id ): array {
@@ -438,13 +447,22 @@ class Server {
 		return add_query_arg( $args, self::authorize_url() );
 	}
 
+	/**
+	 * One authorization-request parameter, scrubbed.
+	 *
+	 * These arrive on the query string of a GET the client constructed, before
+	 * anyone has consented to anything, so there is no nonce to check yet — the
+	 * one branch that changes state, approval, checks its own.
+	 *
+	 * @param string $key Parameter name.
+	 */
 	private static function query( string $key ): string {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recycled,WordPress.Security.NonceVerification.Missing -- Public OAuth parameters; the state-changing branch checks a nonce of its own.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- See above.
 		if ( ! isset( $_GET[ $key ] ) || ! is_scalar( $_GET[ $key ] ) ) {
 			return '';
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recycled,WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- scrub() is the sanitizer; see its note.
 		return self::scrub( wp_unslash( (string) $_GET[ $key ] ) );
 	}
 
@@ -458,6 +476,8 @@ class Server {
 	 * parameter into an injected header — and cap the length. Deliberately not
 	 * sanitize_text_field(): that deletes percent-encoded octets, which would
 	 * quietly corrupt a redirect_uri or an opaque state value.
+	 *
+	 * @param string $value Raw request value.
 	 */
 	private static function scrub( string $value ): string {
 		return substr( trim( (string) preg_replace( '/[\x00-\x1F\x7F]/', '', $value ) ), 0, 2048 );

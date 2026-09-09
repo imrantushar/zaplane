@@ -139,6 +139,14 @@ const McpTab = () => {
             <p className="mt-2 text-[12px] text-[var(--zaplane-text-muted)]">
               {__('Protocol', 'zaplane')} {info.protocol} · {info.tool_count} {__('tools', 'zaplane')}
             </p>
+            {/* Hosted connectors have nowhere to paste a token, so they sign in
+                instead. Saying so here saves a support round trip. */}
+            <p className="mt-1 text-[12px] text-[var(--zaplane-text-muted)]">
+              {__(
+                'A hosted connector — claude.ai, ChatGPT — needs only this URL. It will send you here to approve it, and appear below as a connected app.',
+                'zaplane'
+              )}
+            </p>
           </div>
 
           {freshToken && (
@@ -211,6 +219,13 @@ const McpTab = () => {
                         {token.scopes.map(scope => (
                           <ScopePill key={scope} scope={scope} />
                         ))}
+                        {/* A row nobody remembers creating is confusing. Say when
+                            it arrived through a connector's own sign-in instead. */}
+                        {token.client_id ? (
+                          <span className="rounded-full bg-[var(--zaplane-second-primary)] px-2 py-0.5 text-[11px] font-medium text-[var(--zaplane-font-secondary-color)]">
+                            {__('connected app', 'zaplane')}
+                          </span>
+                        ) : null}
                         <span className="text-[12px] text-[var(--zaplane-text-muted)]">
                           {token.last_used_at
                             ? `${__('last used', 'zaplane')} ${token.last_used_at}`
