@@ -90,6 +90,7 @@ const McpTab = () => {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
   const [runWorkflows, setRunWorkflows] = useState([]);
+  const [expiresDays, setExpiresDays] = useState(0);
   const [scopes, setScopes] = useState(['read', 'write']);
   const [issuing, setIssuing] = useState(false);
   // Shown once, immediately after issuing — the server never returns it again.
@@ -122,10 +123,12 @@ const McpTab = () => {
         scopes,
         // Only meaningful with run; an empty list means every workflow.
         workflows: scopes.includes('run') ? runWorkflows : [],
+        expires_days: expiresDays,
       });
       setFreshToken(res.data);
       setName('');
       setRunWorkflows([]);
+      setExpiresDays(0);
       await load();
     } finally {
       setIssuing(false);
@@ -566,6 +569,25 @@ const McpTab = () => {
               </div>
             )}
 
+            <div className="mt-3 flex items-center gap-2 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+              <span>{__('Expires', 'zaplane')}</span>
+              <select
+                value={expiresDays}
+                onChange={e => setExpiresDays(Number(e.target.value))}
+                className="rounded-[4px] border border-[var(--zaplane-border-color)] bg-[var(--zaplane-background)] px-2 py-1 text-[12px] text-[var(--zaplane-font-color)]"
+              >
+                <option value={0}>{__('never', 'zaplane')}</option>
+                <option value={30}>{__('in 30 days', 'zaplane')}</option>
+                <option value={90}>{__('in 90 days', 'zaplane')}</option>
+                <option value={365}>{__('in a year', 'zaplane')}</option>
+              </select>
+              {expiresDays === 0 && (
+                <span className="text-[var(--zaplane-text-muted)]">
+                  {__('— a token pasted into a config outlives the reason for it.', 'zaplane')}
+                </span>
+              )}
+            </div>
+
             <button
               type="button"
               onClick={issue}
@@ -614,6 +636,21 @@ const McpTab = () => {
                 {__('View activity', 'zaplane')}
               </a>
             </div>
+
+            <label className="mt-3 flex items-start gap-2 border-t border-[var(--zaplane-border-color)] pt-3 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+              <input
+                type="checkbox"
+                className="mt-[2px]"
+                checked={!!info?.alerts}
+                onChange={async e => {
+                  await API.post(`${namespace}mcp/alerts`, { enabled: e.target.checked });
+                  await load();
+                }}
+              />
+              <span>
+                {__('Email me the first time a client runs a workflow for real, and if one is refused repeatedly.', 'zaplane')}
+              </span>
+            </label>
           </div>
 
           {clients.length > 0 && (
@@ -667,6 +704,11 @@ const McpTab = () => {
                         ))}
                         {/* A row nobody remembers creating is confusing. Say when
                             it arrived through a connector's own sign-in instead. */}
+                        {token.expires_at > 0 ? (
+                          <span className="text-[12px] text-[var(--zaplane-text-muted)]">
+                            {__('expires', 'zaplane')} {new Date(token.expires_at * 1000).toLocaleDateString()}
+                          </span>
+                        ) : null}
                         {(token.workflows || []).length > 0 ? (
                           <span className="text-[12px] text-[var(--zaplane-text-muted)]">
                             {sprintf(

@@ -88,6 +88,17 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   the registration behind it. The panel now lists them, says which are actually
   connected, and removing one revokes its tokens too — a token outliving its
   registration is access with no visible origin.
+- **An email the first time a client runs a workflow for real, and when one is
+  refused repeatedly.** Issuing a run-scoped token is a decision someone made
+  once, possibly without reading the third checkbox; the moment it is used is
+  when they would want to know. Five refusals in ten minutes from one token is
+  either a misconfiguration or something trying, and one notice per token per
+  hour keeps it from becoming noise. Only these two — a notice that arrives
+  constantly is one nobody reads, and the log holds everything else. Switchable
+  from the panel.
+- **Tokens can be given a lifetime.** OAuth tokens last an hour and rotate; one
+  pasted into a config lasted forever. Choose 30 days, 90, a year, or never when
+  issuing, and the expiry shows on the token.
 - **A `run` token can name the workflows it may start.** Holding `run` used to
   mean holding it over every workflow on the site, which made it an
   all-or-nothing decision — and clients ask for it by default. Tick Run when

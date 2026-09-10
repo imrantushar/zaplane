@@ -5,6 +5,7 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_REST_Server;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Mcp\Alerts;
 use Zaplane\Mcp\AuditLog;
 use Zaplane\Mcp\OAuth\ClientStore;
 use Zaplane\Mcp\OAuth\Discovery;
@@ -177,6 +178,18 @@ class McpController extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/mcp/alerts',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'set_alerts' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/mcp/audit',
 			[
 				[
@@ -293,6 +306,7 @@ class McpController extends WP_REST_Controller {
 				'reachable'  => self::publicly_reachable(),
 				// Enough to choose which workflows a run-scoped token may start.
 				'workflows'  => self::workflow_choices(),
+				'alerts'     => Alerts::enabled(),
 			]
 		);
 	}
@@ -354,11 +368,17 @@ class McpController extends WP_REST_Controller {
 	public function create_token( $request ) {
 		$body = (array) $request->get_json_params();
 
+		// Days, or 0 for a token that never lapses.
+		$expires_days = max( 0, (int) ( $body['expires_days'] ?? 0 ) );
+
 		$issued = TokenStore::issue(
 			(string) ( $body['name'] ?? '' ),
 			(array) ( $body['scopes'] ?? TokenStore::DEFAULT_SCOPES ),
 			get_current_user_id(),
-			[ 'workflows' => (array) ( $body['workflows'] ?? [] ) ]
+			[
+				'workflows'  => (array) ( $body['workflows'] ?? [] ),
+				'expires_in' => $expires_days * DAY_IN_SECONDS,
+			]
 		);
 
 		// The secret is in this response and nowhere else.
@@ -451,6 +471,16 @@ class McpController extends WP_REST_Controller {
 			__( 'The MCP endpoint accepts POST. It has no event stream to open and no session to end.', 'zaplane' ),
 			[ 'status' => 405 ]
 		);
+	}
+
+	/**
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public function set_alerts( $request ) {
+		Alerts::set_enabled( (bool) $request->get_param( 'enabled' ) );
+
+		return rest_ensure_response( [ 'alerts' => Alerts::enabled() ] );
 	}
 
 	/**

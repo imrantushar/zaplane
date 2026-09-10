@@ -263,7 +263,9 @@ issued before this have and what "any" still means. A refused call names the
 workflows the token does cover, and the refusal is recorded in the log.
 
 The restriction lives on the token, so revoking or reissuing is how you change
-it.
+it. The same form sets a lifetime — 30 days, 90, a year, or never. OAuth tokens
+expire and rotate on their own; one pasted into a config only stops when you say
+so.
 
 ## What clients have been doing
 

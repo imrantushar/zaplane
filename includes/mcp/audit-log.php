@@ -64,6 +64,7 @@ class AuditLog {
 			);
 
 			self::maybe_prune();
+			Alerts::consider( $token, $tool, $outcome );
 		} catch ( \Throwable $e ) {
 			// Recording is not the job. Losing a row is better than losing a call.
 			return;
