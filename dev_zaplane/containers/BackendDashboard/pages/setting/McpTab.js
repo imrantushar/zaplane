@@ -417,15 +417,31 @@ const McpTab = () => {
                 <CopyButton value={cliFor(freshToken.token)} label={__('Copy command', 'zaplane')} />
               </div>
 
+              {/* Connector dialogs ask for the name and the value in separate
+                  fields, and pasting the bare token into the value — without the
+                  scheme word — is the usual way this goes wrong. */}
               <div className="mt-3 text-[12px] text-[var(--zaplane-font-secondary-color)]">
-                {__('For anything else, send it on every request as this header:', 'zaplane')}
+                {__('For anything else, send this header on every request:', 'zaplane')}
               </div>
-              <div className="mt-1.5 flex items-center gap-2">
-                <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-[4px] bg-[var(--zaplane-background)] px-3 py-2 text-[11px] text-[var(--zaplane-font-color)]">
-                  Authorization: Bearer {freshToken.token}
-                </code>
-                <CopyButton value={`Authorization: Bearer ${freshToken.token}`} label={__('Copy header', 'zaplane')} />
+              <div className="mt-1.5 flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-[52px] shrink-0 text-[11px] text-[var(--zaplane-text-muted)]">{__('Name', 'zaplane')}</span>
+                  <code className="flex-1 rounded-[4px] bg-[var(--zaplane-background)] px-3 py-2 text-[11px] text-[var(--zaplane-font-color)]">
+                    Authorization
+                  </code>
+                  <CopyButton value="Authorization" label={__('Copy', 'zaplane')} />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-[52px] shrink-0 text-[11px] text-[var(--zaplane-text-muted)]">{__('Value', 'zaplane')}</span>
+                  <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-[4px] bg-[var(--zaplane-background)] px-3 py-2 text-[11px] text-[var(--zaplane-font-color)]">
+                    Bearer {freshToken.token}
+                  </code>
+                  <CopyButton value={`Bearer ${freshToken.token}`} label={__('Copy', 'zaplane')} />
+                </div>
               </div>
+              <p className="mt-1.5 text-[11px] text-[var(--zaplane-text-muted)]">
+                {__('The word Bearer is part of the value. Pasting the token on its own is refused.', 'zaplane')}
+              </p>
 
               {(freshToken.scopes || []).includes('run') && (
                 <p className="mt-3 text-[12px]" style={{ color: 'var(--zaplane-warning)' }}>

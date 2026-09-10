@@ -140,6 +140,13 @@ client you run yourself — Claude Code, Cursor, a script. It is presented as
 `Authorization: Bearer <token>`, never expires, and is revoked from that same
 screen.
 
+A connector dialog usually asks for the header in two fields. The name is
+`Authorization` and the value is `Bearer <token>` — **the scheme word is part of
+the value**, and pasting the token alone is refused with a 401. In a dialog that
+also offers an authentication mode, choose the one meaning "no sign-in / uses an
+API key": a static token is not OAuth, and selecting an OAuth mode alongside it
+will send the connector looking for a sign-in flow it does not need.
+
 **A WordPress application password.** Issue one at Users → Profile → Application
 Passwords and send it as Basic auth — `Authorization: Basic base64(user:password)`.
 Core authenticates it before Zaplane sees the request, so there is no Zaplane

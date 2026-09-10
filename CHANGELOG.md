@@ -68,6 +68,10 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
 - The count appears as a **bubble on the Zaplane menu**, like pending comments.
   An admin notice is not dependable for this: plugins remove them wholesale, and
   Zaplane's own screens do too so the app is not framed by other people's banners.
+- The header is offered as **two fields, name and value**, because that is how a
+  connector dialog asks for it — with a note that `Bearer` is part of the value.
+  Pasting the token on its own is the usual way this goes wrong, and it fails
+  with a plain 401 that says nothing about the cause.
 - A freshly issued token now comes with **the command to use it**, with the token
   already in place rather than a placeholder, plus the raw header for anything
   else. The instructions sat at the top of the panel while the token appeared at
