@@ -194,6 +194,21 @@ tokens, and revoking one there disconnects it.
 If the site's MCP module is off, all of this 404s — the site does not advertise
 an authorization server it isn't running.
 
+### Identifying by URL instead of registering
+
+A client may use an https URL as its `client_id`, serving a JSON document that
+describes itself. Zaplane fetches and validates that document instead of keeping
+a registration — which is what the connector dialogs recommend, since dynamic
+registration otherwise leaves a row for every client that ever connects.
+
+The document must name itself: its `client_id` must equal the URL it was fetched
+from, or it is refused. Beyond that: https with a path and no fragment, a 200
+answer, no redirects followed, at most 5KB read, and at least one usable
+`redirect_uri`. Private and reserved addresses are refused before the request is
+made — the URL is chosen by a stranger and this server makes the call, which is
+the one place this feature could become a way to reach things only the site can
+reach.
+
 ### www, and why it used to fail
 
 A client compares the `resource` in the discovery document against the address

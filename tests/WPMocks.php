@@ -914,6 +914,39 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'wp_safe_remote_get' ) ) {
+		function wp_safe_remote_get( string $url, array $args = [] ) {
+			// The real one refuses private and reserved hosts before connecting.
+			if ( ! wp_http_validate_url( $url ) ) {
+				return new \WP_Error( 'http_request_failed', 'A valid URL was not provided.' );
+			}
+			return wp_remote_get( $url, $args );
+		}
+	}
+
+	if ( ! function_exists( 'wp_http_validate_url' ) ) {
+		function wp_http_validate_url( $url ) {
+			$parts = wp_parse_url( (string) $url );
+			$host  = strtolower( (string) ( $parts['host'] ?? '' ) );
+
+			if ( ! in_array( strtolower( (string) ( $parts['scheme'] ?? '' ) ), [ 'http', 'https' ], true ) ) {
+				return false;
+			}
+
+			// Enough of core's rule to test against: loopback, link-local and the
+			// private ranges are refused.
+			$blocked = [ 'localhost', '::1' ];
+			if ( in_array( $host, $blocked, true ) ) {
+				return false;
+			}
+			if ( preg_match( '/^(127\.|10\.|0\.|169\.254\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)/', $host ) ) {
+				return false;
+			}
+
+			return $url;
+		}
+	}
+
 	if ( ! function_exists( 'wp_remote_get' ) ) {
 		function wp_remote_get( string $url, array $args = [] ) {
 			$next = WPMocks::nextHttpResponse();

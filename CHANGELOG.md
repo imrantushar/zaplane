@@ -88,6 +88,18 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   the registration behind it. The panel now lists them, says which are actually
   connected, and removing one revokes its tokens too — a token outliving its
   registration is access with no visible origin.
+- **A client can identify itself by URL instead of registering** (Client ID
+  Metadata Document). This is the option the connector dialogs mark
+  *Recommended*, and it failed until now because Zaplane did not support it —
+  every new user met an error on the default setting. It also leaves no row
+  behind, which is why it is recommended: dynamic registration accumulates one
+  per client on a busy site.
+
+  The whole risk is the fetch: a stranger chooses the URL and this server makes
+  the request. Private and reserved addresses are refused before connecting —
+  loopback, the LAN ranges, and the cloud-metadata address — redirects are not
+  followed, the read is capped at 5KB, only a 200 counts, the document must name
+  itself as the URL it was found at, and failures are never cached.
 - **An email the first time a client runs a workflow for real, and when one is
   refused repeatedly.** Issuing a run-scoped token is a decision someone made
   once, possibly without reading the third checkbox; the moment it is used is

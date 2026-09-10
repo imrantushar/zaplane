@@ -150,9 +150,12 @@ class ClientStore {
 	 * HTTPS everywhere, except loopback, which is how a desktop client receives
 	 * its redirect. A fragment is never valid on a redirect URI.
 	 *
+	 * Shared with ClientIdDocument, which applies the same rule to redirects it
+	 * reads out of a fetched document.
+	 *
 	 * @param string $uri Candidate redirect URI.
 	 */
-	private static function is_valid_redirect( string $uri ): bool {
+	public static function is_valid_redirect( string $uri ): bool {
 		$parts = wp_parse_url( $uri );
 
 		if ( ! $parts || empty( $parts['scheme'] ) || ! empty( $parts['fragment'] ) ) {

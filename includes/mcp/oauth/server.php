@@ -71,6 +71,27 @@ class Server {
 	}
 
 	/**
+	 * The client behind an identifier, however it identifies itself.
+	 *
+	 * Either one that registered here, or one that is a URL serving its own
+	 * metadata. Callers should not have to care which.
+	 *
+	 * @param string $client_id The presented identifier.
+	 * @return array<string,mixed>|null
+	 */
+	public static function client_for( string $client_id ): ?array {
+		if ( '' === $client_id ) {
+			return null;
+		}
+
+		if ( ClientIdDocument::is_client_id_url( $client_id ) ) {
+			return ClientIdDocument::resolve( $client_id );
+		}
+
+		return ClientStore::get( $client_id );
+	}
+
+	/**
 	 * RFC 8707: a client names the resource server it wants a token for. Honour
 	 * it only when it is this site — a token minted here must never be usable as
 	 * one issued for somewhere else. Compared per site rather than per exact URL,
@@ -151,7 +172,7 @@ class Server {
 		$challenge    = self::query( 'code_challenge' );
 		$method       = strtoupper( self::query( 'code_challenge_method' ) );
 
-		$client = '' !== $client_id ? ClientStore::get( $client_id ) : null;
+		$client = self::client_for( $client_id );
 
 		// Anything wrong with the client or its redirect is shown here rather than
 		// bounced onward: redirecting to an address we have not verified is how a
