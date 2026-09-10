@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { FiCheck, FiCopy, FiTrash2 } from 'react-icons/fi';
+import { FiTrash2 } from 'react-icons/fi';
+import CopyButton from './CopyButton';
+import ConnectClient from './ConnectClient';
 import { API, namespace, route_path } from '@ZAPUtils/helper';
 
 // Mirrors TokenStore::ALL_SCOPES. Ordered least to most dangerous.
@@ -22,30 +24,6 @@ const SCOPES = [
   },
 ];
 
-const CopyButton = ({ value, label }) => {
-  const [copied, setCopied] = useState(false);
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch (e) {
-      // Clipboard is blocked outside a secure context; the value stays selectable.
-    }
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={copy}
-      className="inline-flex shrink-0 items-center gap-1.5 rounded-[4px] border border-[var(--zaplane-border-color)] px-2.5 py-1.5 text-[12px] font-medium text-[var(--zaplane-font-secondary-color)] hover:text-[var(--zaplane-primary)]"
-    >
-      {copied ? <FiCheck size={13} /> : <FiCopy size={13} />}
-      {copied ? __('Copied', 'zaplane') : label || __('Copy', 'zaplane')}
-    </button>
-  );
-};
 
 // Tints come from color-mix, not Tailwind's `/opacity` syntax: that needs a real
 // colour to work on, and these are CSS variables.
@@ -257,7 +235,7 @@ const McpTab = () => {
         <h3 className="text-[15px] font-semibold text-[var(--zaplane-font-color)]">{__('AI access (MCP)', 'zaplane')}</h3>
         <p className="mt-1 text-[13px] text-[var(--zaplane-font-secondary-color)]">
           {__(
-            'Point an AI client — Claude, Cursor, or anything that speaks the Model Context Protocol — at the endpoint below and give it a token. It can then read this site\'s automations and build new ones.',
+            'Point an AI client — Claude, Cursor, or anything that speaks the Model Context Protocol — at the endpoint below. It can then read this site\'s automations and build new ones, within whatever you allow it.',
             'zaplane'
           )}
         </p>
@@ -355,54 +333,7 @@ const McpTab = () => {
             </div>
           )}
 
-          <div className="rounded-[6px] border border-[var(--zaplane-border-color)] p-4">
-            <div className="text-[13px] font-medium text-[var(--zaplane-font-color)]">
-              {__('Connecting a client', 'zaplane')}
-            </div>
-
-            <div className="mt-3 text-[12px] text-[var(--zaplane-font-secondary-color)]">
-              <div className="font-semibold text-[var(--zaplane-font-color)]">
-                {__('claude.ai, ChatGPT and other hosted connectors', 'zaplane')}
-              </div>
-              <ol className="mt-1 list-decimal space-y-1 pl-4">
-                <li>{__('Paste the endpoint URL above into the connector. Nothing else is needed — no token.', 'zaplane')}</li>
-                <li>{__('It sends you back here to approve the request. Sign in as an administrator.', 'zaplane')}</li>
-                <li>{__('Choose what to allow, then Approve. The client appears below as a connected app.', 'zaplane')}</li>
-              </ol>
-            </div>
-
-            <div className="mt-4 text-[12px] text-[var(--zaplane-font-secondary-color)]">
-              <div className="font-semibold text-[var(--zaplane-font-color)]">
-                {__('Claude Code, Cursor and other clients you run yourself', 'zaplane')}
-              </div>
-              <ol className="mt-1 list-decimal space-y-1 pl-4">
-                <li>{__('Issue a token below and copy it — it is shown once.', 'zaplane')}</li>
-                <li>{__('Add the endpoint URL to the client, sending the token as an Authorization header.', 'zaplane')}</li>
-              </ol>
-              <div className="mt-2 flex items-center gap-2">
-                <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-[4px] border border-[var(--zaplane-border-color)] bg-[var(--zaplane-secondary-color)] px-3 py-2 text-[11px] text-[var(--zaplane-font-color)]">
-                  {cliCommand}
-                </code>
-                <CopyButton value={cliCommand} />
-              </div>
-            </div>
-
-            <div className="mt-4 text-[12px] text-[var(--zaplane-font-secondary-color)]">
-              <div className="font-semibold text-[var(--zaplane-font-color)]">
-                {__('Or use a WordPress application password', 'zaplane')}
-              </div>
-              <p className="mt-1">
-                {__(
-                  'Make one under Users → Profile → Application Passwords and send it as Basic auth. Nothing to issue here, and you revoke it on that same screen. It can read and build, but never run workflows for real.',
-                  'zaplane'
-                )}
-              </p>
-            </div>
-
-            <p className="mt-4 text-[12px] text-[var(--zaplane-text-muted)]">
-              {__('However a client connects, it can only do what its scopes allow, and revoking it disconnects it immediately.', 'zaplane')}
-            </p>
-          </div>
+          <ConnectClient url={info.url} />
 
           {/* A client that cannot connect reports the symptom from outside —
               "could not reach", "could not register" — which says nothing about

@@ -135,6 +135,9 @@ when the site's address cannot be reached from the internet — a hosted connect
 resolves it from its own servers, so a development hostname never arrives and all
 it can report is that it could not sign in.
 
+The AI access panel carries the steps for each client, so the rest of this
+section is background rather than something to follow by hand.
+
 **A token you paste.** Issue one under **Settings → AI access** and give it to a
 client you run yourself — Claude Code, Cursor, a script. It is presented as
 `Authorization: Bearer <token>`, never expires, and is revoked from that same

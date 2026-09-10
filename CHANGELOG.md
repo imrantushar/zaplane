@@ -88,6 +88,12 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   the registration behind it. The panel now lists them, says which are actually
   connected, and removing one revokes its tokens too — a token outliving its
   registration is access with no visible origin.
+- **Connecting a client is now per client, not one set of generic steps.** Pick
+  Claude.ai, ChatGPT, Claude Code, Cursor or Other and the panel shows the three
+  steps for that one, with the command or configuration already filled in.
+  Claude.ai gets a link that opens its add-connector dialog with the name and URL
+  in place. Claude Code no longer needs a token at all — it signs in through the
+  browser on first use, which was true before and went unsaid.
 - **A client can identify itself by URL instead of registering** (Client ID
   Metadata Document). This is the option the connector dialogs mark
   *Recommended*, and it failed until now because Zaplane did not support it —
