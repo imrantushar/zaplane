@@ -311,7 +311,12 @@ class Telegram extends IntegrationBase {
 			'telegram_date'           => $update['date'] ?? '',
 		];
 
-		$event = $node['data']['event'] ?? '';
+		// automation.php's trigger dispatcher calls resolve_trigger() with the
+		// graph node's already-unwrapped `data` object, so the event key lives
+		// at $node['event'] here — not $node['data']['event']. Reading the wrong
+		// path meant $event was always empty, so Command Received never got its
+		// telegram_command / telegram_command_args fields.
+		$event = $node['event'] ?? '';
 
 		if ( 'command_received' === $event ) {
 			$parts   = explode( ' ', $text, 2 );

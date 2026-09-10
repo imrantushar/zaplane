@@ -22,6 +22,14 @@ class FluentForm extends IntegrationBase {
 		return 'fluentform.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/fluent-forms/',
+			'action'  => 'https://zaplane.app/docs/fluent-forms/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'submission_inserted' => [

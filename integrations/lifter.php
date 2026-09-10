@@ -23,6 +23,14 @@ class Lifter extends IntegrationBase {
 		return 'lifter.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/lifterlms/',
+			'action'  => 'https://zaplane.app/docs/lifterlms/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'user_enroll_course' => [

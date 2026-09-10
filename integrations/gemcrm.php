@@ -27,6 +27,14 @@ class Gemcrm extends IntegrationBase {
 		return 'crm.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/gemcrm/',
+			'action'  => 'https://zaplane.app/docs/action-gemcrm/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'contact_created' => [

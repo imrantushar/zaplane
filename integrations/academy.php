@@ -26,6 +26,14 @@ class Academy extends IntegrationBase {
 		return 'academy.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/academy-lms/',
+			'action'  => 'https://zaplane.app/docs/action-academy-lms/',
+		];
+	}
+
 	// -------------------------------------------------------------------------
 	// TRIGGERS
 	// -------------------------------------------------------------------------

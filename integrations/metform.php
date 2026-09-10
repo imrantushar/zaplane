@@ -16,6 +16,13 @@ class Metform extends IntegrationBase {
 	public static function get_icon(): string {
 		return 'metform.svg';
 	}
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/metform/',
+			'action'  => 'https://zaplane.app/docs/metform/',
+		];
+	}
 	public static function get_triggers(): array {
 		return [
 			'metform_after_store_form_data' => [

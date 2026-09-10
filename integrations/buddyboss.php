@@ -28,6 +28,14 @@ class Buddyboss extends IntegrationBase {
 		return 'buddyboss.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/buddyboss/',
+			'action'  => 'https://zaplane.app/docs/action-buddyboss/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'account_activated' => [

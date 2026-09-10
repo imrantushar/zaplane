@@ -86,6 +86,7 @@ class IntegrationManifest {
 			// ZaplaneGlobal.rest_url at render time.
 			'webhook_route'       => $class::supports_webhook() ? $class::get_webhook_route() : '',
 			'webhook_setup'       => $class::supports_webhook() ? array_values( $class::get_webhook_setup_fields() ) : [],
+			'docs_url'            => $class::get_docs_url(),
 			'triggers'            => [],
 			'actions'             => [],
 		];

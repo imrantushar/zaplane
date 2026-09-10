@@ -34,6 +34,14 @@ class EasyDigitalDownload extends IntegrationBase {
 		return 'easydigitaldownload.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/easy-digital-downloads/',
+			'action'  => 'https://zaplane.app/docs/easy-digital-downloads/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'purchase_product' => [

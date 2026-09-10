@@ -30,6 +30,14 @@ class Ai extends IntegrationBase {
 		return 'ai.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/ai-openai/',
+			'action'  => 'https://zaplane.app/docs/ai-openai/',
+		];
+	}
+
 	public static function get_category(): string {
 		return 'app';
 	}

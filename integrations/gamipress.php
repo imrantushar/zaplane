@@ -24,6 +24,14 @@ class Gamipress extends IntegrationBase {
 		return 'gamipress.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/gamipress/',
+			'action'  => 'https://zaplane.app/docs/gamipress/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'user_earns_rank' => [

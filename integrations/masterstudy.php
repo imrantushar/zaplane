@@ -21,6 +21,14 @@ class Masterstudy extends IntegrationBase {
 		return 'master-study-lms.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/masterstudy-lms/',
+			'action'  => 'https://zaplane.app/docs/masterstudy-lms/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'user_enroll_course' => [
