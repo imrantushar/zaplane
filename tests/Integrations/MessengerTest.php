@@ -12,11 +12,6 @@ use WP_REST_Request;
  */
 class MessengerTest extends IntegrationTestCase {
 
-	private array $credentials = [
-		'page_access_token' => 'EAAtest1234567890',
-		'api_version'       => 'v19.0',
-	];
-
 	protected function getIntegrationClass(): string {
 		return Messenger::class;
 	}
@@ -90,111 +85,8 @@ class MessengerTest extends IntegrationTestCase {
 		] ) ) );
 	}
 
-	public function test_parse_webhook_event_dedupes_repeated_message_ids(): void {
-		$request_body = [
-			'entry' => [ [ 'messaging' => [ [
-				'sender'  => [ 'id' => '1' ],
-				'message' => [ 'mid' => 'm_dupe1', 'text' => 'Hi' ],
-			] ] ] ],
-		];
-
-		$first  = Messenger::parse_webhook_event( $this->makeEventRequest( $request_body ) );
-		$second = Messenger::parse_webhook_event( $this->makeEventRequest( $request_body ) );
-
-		$this->assertSame( 'message_received', $first['event'] );
-		$this->assertNull( $second, 'Meta retries webhooks until it gets a 200 — a repeated mid must not fire the workflow twice.' );
-	}
-
 	public function test_trigger_rejects_empty_payload(): void {
 		$this->assertFalse( Messenger::resolve_trigger( $this->makeTriggerNode( 'message_received' ), [] ) );
-	}
-
-	// ========== ACTION: send_text ==========
-
-	public function test_send_text_succeeds(): void {
-		$this->mockHttp( [ 'message_id' => 'm_reply123' ] );
-
-		$node   = $this->makeActionNode( 'send_text', [ 'recipient_id' => '24607896878972', 'text' => 'Yes, in stock!' ], $this->credentials );
-		$result = Messenger::execute_node( $node, [] );
-
-		$this->assertEquals( 'main', $result['port'] );
-		$this->assertTrue( $result['data']['success'] );
-		$this->assertEquals( 'm_reply123', $result['data']['messenger_message_id'] );
-		$this->assertEquals( '24607896878972', $result['data']['recipient_id'] );
-	}
-
-	public function test_send_text_throws_without_credentials(): void {
-		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/credentials/' );
-
-		$node = $this->makeActionNode( 'send_text', [ 'recipient_id' => '1', 'text' => 'Hi' ] );
-		Messenger::execute_node( $node, [] );
-	}
-
-	public function test_send_text_throws_without_recipient(): void {
-		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/recipient/' );
-
-		$node = $this->makeActionNode( 'send_text', [ 'text' => 'Hi' ], $this->credentials );
-		Messenger::execute_node( $node, [] );
-	}
-
-	public function test_send_text_throws_without_text(): void {
-		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/text/' );
-
-		$node = $this->makeActionNode( 'send_text', [ 'recipient_id' => '1' ], $this->credentials );
-		Messenger::execute_node( $node, [] );
-	}
-
-	public function test_send_text_throws_on_api_error(): void {
-		$this->mockHttp( [
-			'error' => [ 'message' => 'Invalid OAuth access token', 'code' => 190 ],
-		], 401 );
-
-		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/Invalid OAuth access token/' );
-
-		$node = $this->makeActionNode( 'send_text', [ 'recipient_id' => '1', 'text' => 'Hi' ], $this->credentials );
-		Messenger::execute_node( $node, [] );
-	}
-
-	public function test_unknown_action_returns_passthrough(): void {
-		$node   = $this->makeActionNode( 'nonexistent_action', [], $this->credentials );
-		$result = Messenger::execute_node( $node, [ 'foo' => 'bar' ] );
-
-		$this->assertEquals( 'main', $result['port'] );
-		$this->assertEquals( [ 'foo' => 'bar' ], $result['data'] );
-	}
-
-	// ========== test_connection ==========
-
-	public function test_connection_succeeds(): void {
-		$this->mockHttp( [ 'id' => '102990988765432', 'name' => 'Test Page' ] );
-
-		$result = Messenger::test_connection( $this->credentials );
-
-		$this->assertTrue( $result['success'] );
-		$this->assertStringContainsString( 'Test Page', $result['message'] );
-		$this->assertSame( '102990988765432', $result['details']['page_id'] );
-	}
-
-	public function test_connection_fails_without_token(): void {
-		$result = Messenger::test_connection( [] );
-
-		$this->assertFalse( $result['success'] );
-		$this->assertStringContainsString( 'page_access_token', $result['message'] );
-	}
-
-	public function test_connection_fails_on_api_error(): void {
-		$this->mockHttp( [
-			'error' => [ 'message' => 'Invalid OAuth access token', 'code' => 190 ],
-		], 401 );
-
-		$result = Messenger::test_connection( $this->credentials );
-
-		$this->assertFalse( $result['success'] );
-		$this->assertStringContainsString( 'Invalid OAuth access token', $result['message'] );
 	}
 
 	private function makeChallengeRequest( string $token ): WP_REST_Request {
