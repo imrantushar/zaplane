@@ -192,9 +192,14 @@ asked per user (`wp_is_application_passwords_available_for_user`), not per site:
 a site can allow application passwords generally and still withhold them from a
 role, and the site-wide question would offer a button whose destination refuses.
 
-Capped at `read` and `write`. An application password is the whole user, with no
-way to withhold a single capability, so `run` is never granted through one; that
-scope needs an issued token or an approved OAuth grant. Note also that a site can
+Zaplane caps it at `read` and `write`. That is a cap on Zaplane, not on the
+credential: an application password is the whole user and authenticates every
+REST route on the site, so `run` is never granted through one — that scope needs
+an issued token or an approved OAuth grant — but nothing stops the holder using
+core's own routes. Say so where somebody is deciding, which is why Zaplane adds
+a line to core's consent screen (`wp_authorize_application_password_form`,
+gated on its own `app_id`) describing what it will do with the credential rather
+than what the credential can do. Note also that a site can
 switch application passwords off entirely (`wp_is_application_passwords_available`),
 and some security plugins do.
 

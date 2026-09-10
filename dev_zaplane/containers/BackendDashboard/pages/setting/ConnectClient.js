@@ -262,7 +262,7 @@ const ConnectClient = ({ url, header, reachable = true, canCreate = false, onCre
         {client.needsCredential && !header && canCreate && (
           <div className="mb-3 flex flex-wrap items-center gap-2 rounded-[4px] border border-dashed border-[var(--zaplane-border-color)] px-3 py-2.5">
             <span className="flex-1 text-[12px] text-[var(--zaplane-font-secondary-color)]">
-              {__('This client cannot sign in through a browser, so it needs a credential in the file.', 'zaplane')}
+              {__('This client cannot sign in through a browser, so it needs a credential in the file — a WordPress application password, which signs in as you.', 'zaplane')}
             </span>
             <button
               type="button"

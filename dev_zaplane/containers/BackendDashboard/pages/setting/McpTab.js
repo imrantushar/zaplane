@@ -503,7 +503,7 @@ const McpTab = () => {
                 {__('Create a credential to paste', 'zaplane')}
               </div>
               <p className="mb-3 text-[12px] text-[var(--zaplane-font-secondary-color)]">
-                {__('For a client that cannot sign in through a browser. WordPress asks you to approve it and hands over the credential — Zaplane never stores one. It can read and build, but never run workflows for real.', 'zaplane')}
+                {__('For a client that cannot sign in through a browser. WordPress asks you to approve it and hands over the credential — Zaplane never stores one. Zaplane will let it read and build, but never run a workflow for real.', 'zaplane')}
               </p>
               <div className="flex items-center gap-2">
                 <input
@@ -633,7 +633,7 @@ const McpTab = () => {
                 {__('Pasted credentials', 'zaplane')}
               </div>
               <p className="mb-3 text-[12px] text-[var(--zaplane-text-muted)]">
-                {__('WordPress application passwords made here. They are yours — a colleague sees their own, on their profile.', 'zaplane')}
+                {__('WordPress application passwords made here. They are yours — a colleague sees their own, on their profile. Each is a sign-in to your whole account, not only to Zaplane, so revoke any you have stopped using.', 'zaplane')}
               </p>
               <div className="flex flex-col divide-y divide-[var(--zaplane-border-color)]">
                 {info.connections.map(c => (

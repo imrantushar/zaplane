@@ -125,6 +125,10 @@ final class Zaplane {
 		\Zaplane\Mcp\OAuth\Server::boot();
 		\Zaplane\Mcp\OAuth\PendingStore::boot();
 
+		// A line on core's consent screen saying what the credential is for. Core
+		// serves every application from that one screen and cannot know.
+		\Zaplane\Mcp\Connections::boot();
+
 		// Initialize modules first
 		$modules = $this->container->get( 'modules' );
 		$modules->boot();

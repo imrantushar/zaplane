@@ -45,6 +45,40 @@ class Connections {
 	 * them from a role. Asking only the site-wide question would offer a button
 	 * whose destination refuses.
 	 */
+	public static function boot(): void {
+		add_action( 'wp_authorize_application_password_form', [ self::class, 'say_what_it_is_for' ], 10, 1 );
+	}
+
+	/**
+	 * Say what this credential is for, on the screen where somebody decides.
+	 *
+	 * Core's consent screen asks for "access to your account", which is accurate
+	 * and tells you nothing: it is one screen serving every application, and it
+	 * cannot know what any of them intends. Zaplane does, and this is the only
+	 * moment the answer is worth anything.
+	 *
+	 * Carefully worded as what Zaplane will do with it, never as what the
+	 * credential is limited to. An application password authenticates every REST
+	 * route on the site, not only this plugin's — capping MCP at read and write
+	 * caps Zaplane, not the password. Saying otherwise here would be a promise
+	 * this code is in no position to keep.
+	 *
+	 * @param array<string,mixed> $request The application's request.
+	 */
+	public static function say_what_it_is_for( $request ): void {
+		if ( self::APP_ID !== ( is_array( $request ) ? ( $request['app_id'] ?? '' ) : '' ) ) {
+			return;
+		}
+
+		printf(
+			'<p class="description">%s</p>',
+			esc_html__(
+				'Zaplane will use this to let an AI client read your workflows and build new ones. It will not start one for real — that needs a separate approval. Like any application password, this is a sign-in to your whole account, so treat it as you would your own password.',
+				'zaplane'
+			)
+		);
+	}
+
 	public static function available(): bool {
 		return function_exists( 'wp_is_application_passwords_available_for_user' )
 			&& wp_is_application_passwords_available_for_user( get_current_user_id() );

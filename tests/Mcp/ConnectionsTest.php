@@ -61,6 +61,48 @@ class ConnectionsTest extends TestCase {
 	}
 
 	/**
+	 * Core's screen serves every application. A note meant for one of them must
+	 * not appear on somebody else's approval.
+	 *
+	 * @test
+	 */
+	public function the_consent_note_appears_only_on_zaplane_s_own_request(): void {
+		$reflection = new \ReflectionClass( Connections::class );
+		$ours       = $reflection->getConstant( 'APP_ID' );
+
+		foreach ( [ [ 'app_id' => 'somebody-else' ], [], [ 'app_id' => '' ], 'not an array' ] as $request ) {
+			ob_start();
+			Connections::say_what_it_is_for( $request );
+			$this->assertSame( '', ob_get_clean(), 'Nothing should be printed for another application' );
+		}
+
+		ob_start();
+		Connections::say_what_it_is_for( [ 'app_id' => $ours ] );
+		$printed = ob_get_clean();
+
+		$this->assertStringContainsString( 'read your workflows', $printed );
+		$this->assertStringContainsString( 'whole account', $printed );
+	}
+
+	/**
+	 * The note says what Zaplane will do, never what the credential is limited
+	 * to — an application password authenticates every route on the site.
+	 *
+	 * @test
+	 */
+	public function the_consent_note_promises_nothing_it_cannot_keep(): void {
+		$reflection = new \ReflectionClass( Connections::class );
+
+		ob_start();
+		Connections::say_what_it_is_for( [ 'app_id' => $reflection->getConstant( 'APP_ID' ) ] );
+		$printed = strtolower( ob_get_clean() );
+
+		foreach ( [ 'can only', 'limited to', 'restricted to', 'cannot do anything else' ] as $overclaim ) {
+			$this->assertStringNotContainsString( $overclaim, $printed );
+		}
+	}
+
+	/**
 	 * Nothing here should keep a credential — core does that, and keeping a
 	 * second copy would defeat the point of using core at all.
 	 *

@@ -184,6 +184,17 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   including when WordPress refuses because this account is not allowed one — and
   it only offers the button when core would honour it, which is a question asked
   **per user**, not per site, since a role can be withheld from it.
+- **Core's consent screen now says what the credential is for.** It asks for
+  "access to your account", which is accurate and tells you nothing — it is one
+  screen serving every application and cannot know what any of them intends.
+  Zaplane adds a line to its own request saying that an AI client will read and
+  build workflows and will not start one for real. Worded as what Zaplane will
+  do with the credential, never as what the credential is limited to: an
+  application password authenticates every REST route on the site, so capping
+  MCP at read and write caps Zaplane, not the password. The panel used to blur
+  that, next to the button that mints one, and now says it plainly in both
+  places. The note appears only on Zaplane's own request; every other
+  application's approval is untouched.
 - **The panel no longer blanks when you change something on it.** Every save
   refetched the panel, and the panel hid itself while fetching — so ticking a
   checkbox made the whole screen vanish and rebuild. A setting that makes the

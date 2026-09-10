@@ -1846,6 +1846,12 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'esc_html__' ) ) {
+		function esc_html__( $text, $domain = 'default' ) {
+			return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+		}
+	}
+
 	if ( ! function_exists( 'wp_validate_redirect' ) ) {
 		function wp_validate_redirect( $location, $fallback_url = '' ) {
 			$host = wp_parse_url( (string) $location, PHP_URL_HOST );
