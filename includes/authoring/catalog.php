@@ -140,6 +140,26 @@ class Catalog {
 	 *
 	 * @return array<string,mixed>|null
 	 */
+	/**
+	 * The hook a trigger is listed under.
+	 *
+	 * A few triggers declare several — ACF's user-field update listens on both
+	 * added_ and updated_user_meta — and casting that array to a string produced
+	 * a PHP warning and the literal text "Array" where a hook name belonged.
+	 * One node carries one hook, so the first is the one that describes it.
+	 *
+	 * @param array<string,mixed> $cap
+	 */
+	public static function primary_hook( array $cap ): string {
+		$hook = $cap['hook'] ?? '';
+
+		if ( is_array( $hook ) ) {
+			$hook = reset( $hook );
+		}
+
+		return is_scalar( $hook ) ? (string) $hook : '';
+	}
+
 	public static function describe_app( string $slug ): ?array {
 		$entry = self::entry( $slug );
 		if ( null === $entry ) {
@@ -271,7 +291,7 @@ class Catalog {
 		];
 
 		if ( 'trigger' === $type ) {
-			$shaped['hook'] = (string) ( $cap['hook'] ?? '' );
+			$shaped['hook'] = self::primary_hook( $cap );
 		}
 
 		// Optional flags an integration may set (disabled, requires_addon, …) are

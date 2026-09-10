@@ -358,7 +358,7 @@ class WorkflowAuthor {
 		// The engine matches a fired WordPress hook back to the trigger node, so
 		// this has to be the manifest's hook, not whatever the caller guessed.
 		if ( 'trigger' === $type && ! empty( $capability['hook'] ) ) {
-			$data['hook'] = (string) $capability['hook'];
+			$data['hook'] = Catalog::primary_hook( $capability );
 		}
 
 		return $data;
