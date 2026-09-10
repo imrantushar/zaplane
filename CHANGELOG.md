@@ -9,6 +9,41 @@ The dashboard is rebuilt, the workflow canvas is retyped, modules become opt-in
 and discoverable, and Zaplane gains an MCP server. Integration coverage grows from
 **998 to 1,070** triggers and actions across **93** apps and tools.
 
+### Security
+- **Merge tags are parsed now, not compiled and handed to `eval()`.** The tag
+  inside `{{ … }}` was rewritten into PHP — identifiers became array lookups —
+  and everything that was not an identifier went through untouched: operators,
+  parentheses, semicolons, `$`, braces, backticks. That is a filter with a hole
+  in it rather than a sandbox. Worse, `{{a.b(c.d)}}` compiled to
+  `$data["a"]["b"]($data["c"]["d"])` — a function call whose name was read out
+  of the run's own data. Every node's configuration is resolved against that
+  data before the node executes, and for a webhook-triggered workflow the data
+  is a JSON body posted by a stranger.
+
+  There is a small parser in its place. Paths, numbers, strings, `true`/`false`/
+  `null`, the arithmetic, comparison and logical operators, and parentheses for
+  grouping — the same language as before, minus the parts nobody asked for.
+  There is no production for a function call, which is why one can no longer be
+  written. Anything outside the grammar resolves to nothing, as an unresolvable
+  tag always has.
+- **An outbound request can no longer be aimed inside your network.** The
+  Webhook action, the HTTP Request action and every Custom App ask the
+  `zaplane_http_block_request` filter before connecting — and nothing answered
+  it, so the only check that ran was that the scheme was http or https. Since a
+  node's configuration is resolved at run time, a URL containing a merge tag is
+  chosen by whatever triggered the workflow, and the response comes back into
+  the run: a way to read whatever this server can reach and the caller cannot —
+  another site on the same host, an admin panel on a private address, the cloud
+  metadata service at 169.254.169.254.
+
+  Loopback, private, link-local, carrier-grade-NAT and reserved addresses are
+  refused by default, on every address a hostname resolves to rather than only
+  the first, and a host that resolves to nothing is refused rather than passed
+  on. The filter still has the last word, and a site with an internal service a
+  workflow legitimately calls can name it through
+  `zaplane_http_allowed_private_hosts` — matched as a whole hostname, so one
+  entry cannot admit a lookalike.
+
 ### Added — Integrations
 - **aBlocks** — a new app with a **Form Submitted** trigger for aBlocks
   form-builder forms and an optional per-form filter. Requires the companion

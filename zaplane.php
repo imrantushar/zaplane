@@ -121,6 +121,11 @@ final class Zaplane {
 		// OAuth for the MCP endpoint. Both of these claim front-end URLs — the two
 		// /.well-known/ documents and the consent screen — so they hook parse_request
 		// rather than rest_api_init, and must be registered on every request.
+		// Where an outbound request from a workflow may go. Registered before
+		// anything can make one, and on every request: a workflow runs from cron
+		// and from a webhook, not only from wp-admin.
+		\Zaplane\HttpGuard::boot();
+
 		\Zaplane\Mcp\OAuth\Discovery::boot();
 		\Zaplane\Mcp\OAuth\Server::boot();
 
