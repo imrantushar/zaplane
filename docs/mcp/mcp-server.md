@@ -50,7 +50,8 @@ was last used.
 
 ## Tools
 
-**Discovery** — `search_capabilities`, `list_apps`, `describe_app`
+**Discovery** — `search_capabilities`, `list_apps`, `describe_app`,
+`list_field_options`
 
 **Authoring** — `validate_graph`, `create_workflow`, `update_workflow`,
 `set_workflow_status`, `create_workflow_from_recipe`
@@ -70,8 +71,26 @@ intended path is narrow-then-read:
 1. `search_capabilities` with a plain-language description → a ranked shortlist.
 2. `describe_app` on a slug from that list → every field, its type, whether it is
    required, and the allowed values for fixed selects.
-3. `validate_graph` on the draft → errors before anything is written.
-4. `create_workflow` → a draft on the canvas.
+3. `list_field_options` for any field carrying `dynamic` → the values this
+   particular site can offer.
+4. `validate_graph` on the draft → errors before anything is written.
+5. `create_workflow` → a draft on the canvas.
+
+Step 3 is not optional. **412 of the 1,070 triggers and actions have a required
+field whose options live on the site** — which course, which product, which form
+— and `describe_app` returns no list for them, because only the site knows.
+Guessing an id produces a workflow that saves and then never matches anything, so
+`validate_graph` and `create_workflow` now resolve those lists and refuse a value
+the site does not have:
+
+```
+Field "course_id" got "999999", which does not exist on this site.
+Call list_field_options for academy/user_enroll_course and use one of: any, 113, 111
+```
+
+A lookup that cannot run — its companion plugin is inactive — or one that comes
+back empty is a **warning**, never an error: a site with no courses yet still has
+to be able to author against them.
 
 A node only needs its intent:
 

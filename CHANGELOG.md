@@ -390,6 +390,22 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   throws under the bundle's strict mode, and a broad `catch` treated that as a
   failed request.
 
+### Added — MCP server
+- **`list_field_options`** resolves the values a config field can take on this
+  site — which course, which product, which form, which CRM list — through the
+  same lookup registry the workflow editor's own pickers use. **412 of the 1,070
+  triggers and actions have a required field like that**, and `describe_app`
+  cannot answer for them, so a client had no way to fill them in; 377 of those 412
+  are now answerable, the rest being lookups already broken in their own
+  integrations.
+- **A value the site does not have is now rejected instead of saved.** Dynamic
+  fields were skipped during validation because the options were unknown, so a
+  guessed id saved clean and the workflow then never matched anything.
+  `validate_graph` and `create_workflow` resolve the list and name both the tool
+  to call and the values that would work. A lookup that cannot run, or one that
+  comes back empty, stays a warning — a site with no courses yet must still be
+  able to author against them.
+
 ### Fixed — MCP server
 - **A JSON-RPC batch came back with an extra response.** The token was stashed on
   the request with `set_param()`, which writes into the decoded JSON body — and

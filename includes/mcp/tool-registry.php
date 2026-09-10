@@ -68,9 +68,23 @@ class ToolRegistry {
 				],
 				'required'    => [],
 			],
+			'list_field_options' => [
+				'scope'       => TokenStore::SCOPE_READ,
+				'description' => 'Resolve the allowed values for a config field whose options live on this site — a course, a product, a form, a Slack channel, a CRM list. describe_app marks such a field with "dynamic" and gives it no options list, because only the site knows them. Roughly a third of all capabilities have a required field like this, and guessing an id produces a workflow that saves and then never matches anything, so call this for every dynamic field before writing the node.',
+				'properties'  => [
+					'app'    => $s( 'App or tool slug.' ),
+					'event'  => $s( 'The trigger or action key the field belongs to.' ),
+					'field'  => $s( 'The field key, e.g. course_id.' ),
+					'config' => [
+						'type'        => 'object',
+						'description' => 'The config decided so far. Some lists depend on an earlier choice — a form\'s fields need its form_id — so pass what you already have.',
+					],
+				],
+				'required'    => [ 'app', 'event', 'field' ],
+			],
 			'describe_app' => [
 				'scope'       => TokenStore::SCOPE_READ,
-				'description' => 'Full detail for one app: every trigger and action it exposes, each with the exact config fields, types, required flags and allowed option values. This is what you need to write a valid workflow node.',
+				'description' => 'Full detail for one app: every trigger and action it exposes, each with the exact config fields, types, required flags and allowed option values. This is what you need to write a valid workflow node. A field carrying "dynamic" has no fixed options — call list_field_options for it.',
 				'properties'  => [
 					'slug' => $s( 'App or tool slug, from list_apps or search_capabilities.' ),
 				],
@@ -301,6 +315,8 @@ class ToolRegistry {
 				return [ 'apps' => Catalog::list_apps( (string) ( $args['category'] ?? '' ) ) ];
 			case 'describe_app':
 				return self::describe_app( $args );
+			case 'list_field_options':
+				return self::list_field_options( $args );
 			case 'validate_graph':
 				return self::validate_graph( $args );
 			case 'test_workflow':
@@ -381,6 +397,69 @@ class ToolRegistry {
 		}
 
 		return $app;
+	}
+
+	/**
+	 * @param array<string,mixed> $args
+	 * @return array<string,mixed>
+	 */
+	private static function list_field_options( array $args ): array {
+		$app   = trim( (string) ( $args['app'] ?? '' ) );
+		$event = trim( (string) ( $args['event'] ?? '' ) );
+		$key   = trim( (string) ( $args['field'] ?? '' ) );
+
+		if ( '' === $app || '' === $event || '' === $key ) {
+			throw new \InvalidArgumentException( 'app, event and field are all required.' );
+		}
+
+		$config = ( isset( $args['config'] ) && is_array( $args['config'] ) ) ? $args['config'] : [];
+		$result = Catalog::field_options( $app, $event, $key, $config );
+
+		if ( null === $result ) {
+			$capability = Catalog::find_capability( $app, $event );
+			if ( null === $capability ) {
+				throw new \InvalidArgumentException(
+					sprintf( '"%s" is not a trigger or action of app "%s".', $event, $app )
+				);
+			}
+			throw new \InvalidArgumentException(
+				sprintf(
+					'Field "%s" is not in %s/%s. Fields: %s',
+					$key,
+					$app,
+					$event,
+					implode( ', ', array_column( (array) $capability['schema'], 'key' ) )
+				)
+			);
+		}
+
+		if ( ! $result['resolved'] ) {
+			throw new \RuntimeException( (string) $result['error'] );
+		}
+
+		if ( ! $result['dynamic'] ) {
+			return [
+				'app'     => $app,
+				'event'   => $event,
+				'field'   => $key,
+				'dynamic' => false,
+				'options' => $result['options'],
+				'hint'    => empty( $result['options'] )
+					? 'This field takes a free value; there is no list to choose from.'
+					: 'These options ship with the app, so describe_app already returned them.',
+			];
+		}
+
+		return [
+			'app'     => $app,
+			'event'   => $event,
+			'field'   => $key,
+			'dynamic' => true,
+			'options' => $result['options'],
+			'hint'    => $result['options']
+				? 'Use one of these "value"s verbatim in the node config.'
+				: 'Nothing to choose from — this site has none yet.',
+		];
 	}
 
 	/**
