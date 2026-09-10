@@ -285,6 +285,61 @@ class GraphValidatorTest extends TestCase {
 	/**
 	 * @test
 	 */
+	public function findings_carry_a_machine_readable_code(): void {
+		$graph            = $this->validGraph();
+		$graph['nodes'][] = [
+			'id'       => '3',
+			'type'     => 'action',
+			'position' => [
+				'x' => 760,
+				'y' => 200,
+			],
+			'data'     => [
+				'app'    => 'slack',
+				'event'  => 'send_message',
+				'config' => [
+					'channel' => 'general',
+					'text'    => 'hi',
+				],
+			],
+		];
+		$graph['edges'][] = [
+			'id'     => 'e2-3',
+			'source' => '2',
+			'target' => '3',
+		];
+
+		$report = GraphValidator::check( $graph );
+
+		// set_status() singles this one out to block activation, so it has to be
+		// identifiable without matching on the message text.
+		$this->assertContains( 'missing_connection', array_column( $report['warnings'], 'code' ) );
+
+		foreach ( array_merge( $report['errors'], $report['warnings'] ) as $finding ) {
+			$this->assertArrayHasKey( 'code', $finding );
+			$this->assertNotEmpty( $finding['code'] );
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function a_broken_graph_still_reports_a_code_on_every_error(): void {
+		$graph = $this->validGraph();
+		$graph['nodes'][0]['id']     = 'trigger_1';
+		$graph['edges'][0]['source'] = 'trigger_1';
+
+		$report = GraphValidator::check( $graph );
+
+		$this->assertFalse( $report['valid'] );
+		foreach ( $report['errors'] as $error ) {
+			$this->assertNotEmpty( $error['code'] );
+		}
+	}
+
+	/**
+	 * @test
+	 */
 	public function an_orphan_action_is_a_warning_not_an_error(): void {
 		$graph            = $this->validGraph();
 		$graph['nodes'][] = [

@@ -178,7 +178,11 @@ class GraphValidator {
 		}
 
 		if ( ! empty( $entry['requires_connection'] ) && empty( $data['connection_id'] ) ) {
-			$this->warn( $where, sprintf( 'App "%s" needs a connection; none is linked yet.', $app ) );
+			$this->warn(
+				$where,
+				sprintf( 'App "%s" needs a connection; none is linked yet.', $app ),
+				'missing_connection'
+			);
 		}
 
 		$this->validate_config( $where, (array) $capability['schema'], (array) ( $data['config'] ?? [] ) );
@@ -446,15 +450,22 @@ class GraphValidator {
 
 	/* --------------------------------------------------------------------- */
 
-	private function error( string $where, string $message ): void {
+	private function error( string $where, string $message, string $code = 'invalid' ): void {
 		$this->errors[] = [
+			'code'    => $code,
 			'where'   => $where,
 			'message' => $message,
 		];
 	}
 
-	private function warn( string $where, string $message ): void {
+	/**
+	 * A code is carried so a caller can single one finding out without matching
+	 * on message text — set_status() blocks activation on `missing_connection`,
+	 * which is only advisory while the graph is still a draft.
+	 */
+	private function warn( string $where, string $message, string $code = 'advisory' ): void {
 		$this->warnings[] = [
+			'code'    => $code,
 			'where'   => $where,
 			'message' => $message,
 		];

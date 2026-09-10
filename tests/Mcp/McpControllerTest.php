@@ -92,6 +92,26 @@ class McpControllerTest extends TestCase {
 	/**
 	 * @test
 	 */
+	public function throttling_is_counted_once_per_request(): void {
+		$issued     = TokenStore::issue( 'Client' );
+		$controller = new McpController();
+
+		// WordPress calls a route's permission_callback twice on a real HTTP
+		// request — once to authorise, then again from rest_send_allow_header() —
+		// so a counter that is not memoized charges two per call and halves the
+		// limit. Two checks inside one request must cost one.
+		$request = $this->request( [], $issued['token'] );
+
+		$this->assertTrue( $controller->check_bearer( $request ) );
+		$this->assertTrue(
+			$controller->check_bearer( $request ),
+			'The second check in the same request must not consume more quota.'
+		);
+	}
+
+	/**
+	 * @test
+	 */
 	public function it_reads_the_bearer_from_the_cgi_variable_when_the_header_was_stripped(): void {
 		$issued     = TokenStore::issue( 'Client' );
 		$controller = new McpController();
@@ -168,6 +188,38 @@ class McpControllerTest extends TestCase {
 
 		$this->assertSame( 202, $response->get_status() );
 		$this->assertNull( $response->get_data() );
+	}
+
+	/**
+	 * @test
+	 */
+	public function a_batch_answers_exactly_the_messages_it_was_sent(): void {
+		$issued     = TokenStore::issue( 'Client', TokenStore::ALL_SCOPES );
+		$controller = new McpController();
+		$request    = $this->request(
+			[
+				[
+					'jsonrpc' => '2.0',
+					'id'      => 1,
+					'method'  => 'ping',
+				],
+				[
+					'jsonrpc' => '2.0',
+					'id'      => 2,
+					'method'  => 'ping',
+				],
+			],
+			$issued['token']
+		);
+
+		$controller->check_bearer( $request );
+		$response = (array) $controller->handle_rpc( $request )->get_data();
+
+		// Authenticating must not add anything to the body. Stashing the token via
+		// set_param() used to append it to the decoded JSON array, so a two-message
+		// batch came back with three responses, the third carrying the token's id.
+		$this->assertCount( 2, $response );
+		$this->assertSame( [ 1, 2 ], array_column( $response, 'id' ) );
 	}
 
 	/**
