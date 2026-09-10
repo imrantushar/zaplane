@@ -278,7 +278,6 @@ class ServerTest extends TestCase {
 		$_POST['scope'] = [ 'read' ];
 
 		$reflection = new \ReflectionMethod( Server::class, 'ticked' );
-		$reflection->setAccessible( true );
 
 		$this->assertSame( [ 'read' ], $reflection->invoke( null, [ 'read', 'write', 'run' ] ) );
 

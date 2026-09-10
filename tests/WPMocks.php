@@ -1816,6 +1816,31 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'remove_query_arg' ) ) {
+		function remove_query_arg( $key, $url = '' ): string {
+			$url   = (string) $url;
+			$parts = explode( '?', $url, 2 );
+
+			if ( ! isset( $parts[1] ) ) {
+				return $url;
+			}
+
+			parse_str( $parts[1], $query );
+
+			foreach ( (array) $key as $one ) {
+				unset( $query[ $one ] );
+			}
+
+			return $query ? $parts[0] . '?' . http_build_query( $query ) : $parts[0];
+		}
+	}
+
+	if ( ! function_exists( 'admin_url' ) ) {
+		function admin_url( $path = '', $scheme = 'admin' ): string {
+			return 'http://example.com/wp-admin/' . ltrim( (string) $path, '/' );
+		}
+	}
+
 	// ── WooCommerce stubs ─────────────────────────────────────────────────────
 
 	if ( ! function_exists( 'wc_get_orders' ) ) {

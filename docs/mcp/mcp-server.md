@@ -130,7 +130,7 @@ method or unknown tool is a protocol error.
 
 Three ways in, for three kinds of client.
 
-Both are described on the **Settings → AI access** panel itself, which also warns
+All three are described on the **Settings → AI access** panel itself, which also warns
 when the site's address cannot be reached from the internet — a hosted connector
 resolves it from its own servers, so a development hostname never arrives and all
 it can report is that it could not sign in.
@@ -150,10 +150,20 @@ also offers an authentication mode, choose the one meaning "no sign-in / uses an
 API key": a static token is not OAuth, and selecting an OAuth mode alongside it
 will send the connector looking for a sign-in flow it does not need.
 
-**A WordPress application password.** Issue one at Users → Profile → Application
-Passwords and send it as Basic auth — `Authorization: Basic base64(user:password)`.
+**A WordPress application password.** Press **Create credential** on the AI
+access panel. It hands the browser to core's own Authorize Application screen
+with the name filled in, and brings it back with the password shown once and the
+`Authorization: Basic base64(user:password)` header assembled ready to paste.
 Core authenticates it before Zaplane sees the request, so there is no Zaplane
-token to issue or lose, and it is revoked from the same screen it was made on.
+token to issue or lose.
+
+Zaplane keeps nothing of its own here — `Zaplane\Mcp\Connections` is a hundred
+lines over `WP_Application_Passwords`, and holds no credential, no table and no
+option. It stamps each one it creates with a fixed `app_id`, which is the only
+thing that makes the panel's list a list: it shows the credentials made through
+this screen and refuses to revoke one created for anything else. They are
+ordinary application passwords, so they also appear — and can be revoked — at
+Users → Profile → Application Passwords.
 
 Capped at `read` and `write`. An application password is the whole user, with no
 way to withhold a single capability, so `run` is never granted through one; that

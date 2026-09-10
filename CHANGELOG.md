@@ -149,6 +149,18 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   application password is the whole user, with no way to withhold one capability,
   so the scope that sends mail and takes payments still has to be asked for
   deliberately.
+- **The panel makes one for you, through WordPress's own screen.** Getting an
+  application password meant leaving Zaplane, finding Users → Profile, scrolling
+  past everything else on it, and remembering what to name the thing — so the
+  quickest way in was also the least discoverable. **Create credential** now
+  hands you to core's Authorize Application screen with the name already filled
+  in, and brings you back to the panel with the password shown once and the
+  Basic header assembled ready to paste. Nothing is duplicated to do it: core
+  asks, core hashes, core stores, core revokes, and the panel reads its list and
+  calls its delete. The credentials it made are stamped as Zaplane's, so the
+  panel lists only those and will not revoke one somebody created for something
+  else. They also still appear on the profile page, because they are the same
+  credentials.
 - The MCP endpoint answers **405** to `GET` and `DELETE`, with `Allow: POST`.
   Streamable HTTP reserves those verbs for an event stream and for ending a
   session, neither of which this server offers; the 404 they produced before

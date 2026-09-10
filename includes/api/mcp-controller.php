@@ -7,6 +7,7 @@ use WP_REST_Server;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Mcp\Alerts;
 use Zaplane\Mcp\AuditLog;
+use Zaplane\Mcp\Connections;
 use Zaplane\Mcp\OAuth\ClientStore;
 use Zaplane\Mcp\OAuth\Discovery;
 use Zaplane\Mcp\OAuth\PendingStore;
@@ -106,11 +107,23 @@ class McpController extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/mcp/tokens',
+			'/mcp/connections/authorize-url',
 			[
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'create_token' ],
+					'callback'            => [ $this, 'connection_authorize_url' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/connections/(?P<uuid>[a-f0-9-]{36})',
+			[
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'delete_connection' ],
 					'permission_callback' => $admin,
 				],
 			]
@@ -307,6 +320,10 @@ class McpController extends WP_REST_Controller {
 				// Enough to choose which workflows a run-scoped token may start.
 				'workflows'  => self::workflow_choices(),
 				'alerts'     => Alerts::enabled(),
+				// Credentials people paste live in core's application passwords now,
+				// so the screen needs core's own consent URL rather than a form.
+				'app_passwords_available' => Connections::available(),
+				'connections'             => Connections::all(),
 			]
 		);
 	}
@@ -335,55 +352,6 @@ class McpController extends WP_REST_Controller {
 		}
 	}
 
-	/**
-	 * Whether a hosted connector could reach this site at all.
-	 *
-	 * One run by somebody else resolves the address from their servers, so a
-	 * development hostname or a private address is not a configuration mistake it
-	 * can report usefully — it simply never arrives, and the connector says it
-	 * could not register. Worth stating on the screen rather than leaving someone
-	 * to work it out from the other end.
-	 */
-	public static function publicly_reachable(): bool {
-		$host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
-
-		if ( '' === $host || 'localhost' === $host ) {
-			return false;
-		}
-
-		// Development suffixes that resolve only on the machine running them.
-		if ( (bool) preg_match( '/\.(test|local|localhost|invalid|example|internal|lan|home|dev)$/', $host ) ) {
-			return false;
-		}
-
-		// A bare IP is only reachable if it is a routable one.
-		if ( filter_var( $host, FILTER_VALIDATE_IP ) ) {
-			return (bool) filter_var( $host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE );
-		}
-
-		// Anything without a dot cannot be a public name.
-		return false !== strpos( $host, '.' );
-	}
-
-	public function create_token( $request ) {
-		$body = (array) $request->get_json_params();
-
-		// Days, or 0 for a token that never lapses.
-		$expires_days = max( 0, (int) ( $body['expires_days'] ?? 0 ) );
-
-		$issued = TokenStore::issue(
-			(string) ( $body['name'] ?? '' ),
-			(array) ( $body['scopes'] ?? TokenStore::DEFAULT_SCOPES ),
-			get_current_user_id(),
-			[
-				'workflows'  => (array) ( $body['workflows'] ?? [] ),
-				'expires_in' => $expires_days * DAY_IN_SECONDS,
-			]
-		);
-
-		// The secret is in this response and nowhere else.
-		return rest_ensure_response( $issued );
-	}
 
 	public function delete_token( $request ) {
 		$revoked = TokenStore::revoke( (string) $request['id'] );
@@ -569,6 +537,46 @@ class McpController extends WP_REST_Controller {
 	}
 
 	/**
+	 * Where to send someone to make a credential.
+	 *
+	 * Core's own screen does the asking, the making and the hashing; this only
+	 * decides what it will be called and where to come back to.
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function connection_authorize_url( $request ) {
+		if ( ! Connections::available() ) {
+			return new \WP_Error(
+				'unavailable',
+				__( 'Application passwords are switched off on this site. Connect through the sign-in flow instead.', 'zaplane' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$label = trim( (string) $request->get_param( 'label' ) );
+		$label = '' === $label ? __( 'Zaplane', 'zaplane' ) : 'Zaplane – ' . $label;
+
+		return rest_ensure_response(
+			[
+				'url' => Connections::authorize_url( $label, (string) $request->get_param( 'return_url' ) ),
+			]
+		);
+	}
+
+	/**
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function delete_connection( $request ) {
+		if ( ! Connections::forget( (string) $request['uuid'] ) ) {
+			return new \WP_Error( 'not_found', __( 'That connection is not one made here.', 'zaplane' ), [ 'status' => 404 ] );
+		}
+
+		return rest_ensure_response( [ 'revoked' => true ] );
+	}
+
+	/**
 	 * Connection requests waiting on a decision.
 	 *
 	 * @return \WP_REST_Response
@@ -611,6 +619,36 @@ class McpController extends WP_REST_Controller {
 		PendingStore::approve( $id, (array) $request->get_param( 'scopes' ) );
 
 		return rest_ensure_response( [ 'approved' => true ] );
+	}
+
+	/**
+	 * Whether a hosted connector could reach this site at all.
+	 *
+	 * One run by somebody else resolves the address from their servers, so a
+	 * development hostname or a private address is not a configuration mistake it
+	 * can report usefully — it simply never arrives, and the connector says it
+	 * could not register. Worth stating on the screen rather than leaving someone
+	 * to work it out from the other end.
+	 */
+	public static function publicly_reachable(): bool {
+		$host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+
+		if ( '' === $host || 'localhost' === $host ) {
+			return false;
+		}
+
+		// Development suffixes that resolve only on the machine running them.
+		if ( (bool) preg_match( '/\.(test|local|localhost|invalid|example|internal|lan|home|dev)$/', $host ) ) {
+			return false;
+		}
+
+		// A bare IP is only reachable if it is a routable one.
+		if ( filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			return (bool) filter_var( $host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE );
+		}
+
+		// Anything without a dot cannot be a public name.
+		return false !== strpos( $host, '.' );
 	}
 
 	/**
