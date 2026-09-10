@@ -1803,16 +1803,27 @@ namespace {
 	}
 
 	if ( ! function_exists( 'add_query_arg' ) ) {
+		/**
+		 * Core does not encode the values it appends — build_query() passes
+		 * $urlencode = false — so callers that need encoding do it themselves.
+		 * A mock that encoded here would make correct code look double-encoded.
+		 */
 		function add_query_arg( $key, $value = '', $url = '' ): string {
 			if ( is_array( $key ) ) {
 				$url   = (string) $value;
-				$query = http_build_query( $key );
+				$pairs = $key;
 			} else {
-				$query = urlencode( (string) $key ) . '=' . urlencode( (string) $value );
 				$url   = (string) $url;
+				$pairs = [ (string) $key => (string) $value ];
 			}
+
+			$parts = [];
+			foreach ( $pairs as $k => $v ) {
+				$parts[] = $k . '=' . $v;
+			}
+
 			$sep = strpos( $url, '?' ) !== false ? '&' : '?';
-			return $url . $sep . $query;
+			return $url . $sep . implode( '&', $parts );
 		}
 	}
 
@@ -1832,6 +1843,24 @@ namespace {
 			}
 
 			return $query ? $parts[0] . '?' . http_build_query( $query ) : $parts[0];
+		}
+	}
+
+	if ( ! function_exists( 'wp_validate_redirect' ) ) {
+		function wp_validate_redirect( $location, $fallback_url = '' ) {
+			$host = wp_parse_url( (string) $location, PHP_URL_HOST );
+
+			if ( null === $host ) {
+				return $location;
+			}
+
+			return 'example.com' === $host ? $location : $fallback_url;
+		}
+	}
+
+	if ( ! function_exists( 'wp_is_application_passwords_available_for_user' ) ) {
+		function wp_is_application_passwords_available_for_user( $user ): bool {
+			return true;
 		}
 	}
 

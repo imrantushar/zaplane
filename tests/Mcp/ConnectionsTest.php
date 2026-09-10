@@ -24,6 +24,34 @@ class ConnectionsTest extends TestCase {
 	}
 
 	/**
+	 * Approving and declining have to arrive back distinguishable, because core
+	 * says nothing about which one happened.
+	 *
+	 * @test
+	 */
+	public function the_two_return_addresses_are_told_apart(): void {
+		$url  = Connections::authorize_url( 'X', 'https://example.com/wp-admin/admin.php?page=zaplane-settings' );
+		$open = rawurldecode( $url );
+
+		$this->assertStringContainsString( 'zaplane_connect=done', $open );
+		$this->assertStringContainsString( 'zaplane_connect=cancelled', $open );
+	}
+
+	/**
+	 * Core sends to any domain on purpose. This screen does not need that, and a
+	 * freshly minted password is what follows the address.
+	 *
+	 * @test
+	 */
+	public function a_return_address_off_this_site_is_replaced(): void {
+		$url  = Connections::authorize_url( 'X', 'https://somewhere-else.example/collect' );
+		$open = rawurldecode( $url );
+
+		$this->assertStringNotContainsString( 'somewhere-else.example', $open );
+		$this->assertStringContainsString( 'page=zaplane-settings', $open );
+	}
+
+	/**
 	 * A credential made for something else is not this screen's to revoke.
 	 *
 	 * @test

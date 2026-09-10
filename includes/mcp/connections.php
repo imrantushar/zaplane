@@ -37,8 +37,17 @@ class Connections {
 	 */
 	private const APP_ID = 'b3f7c4de-6f2f-4a1b-9d6e-7a5c1f0e2d84';
 
+	/**
+	 * Whether this person can be issued one.
+	 *
+	 * Core asks the same question of its own screen, per user rather than per
+	 * site: a site can allow application passwords generally and still withhold
+	 * them from a role. Asking only the site-wide question would offer a button
+	 * whose destination refuses.
+	 */
 	public static function available(): bool {
-		return function_exists( 'wp_is_application_passwords_available' ) && wp_is_application_passwords_available();
+		return function_exists( 'wp_is_application_passwords_available_for_user' )
+			&& wp_is_application_passwords_available_for_user( get_current_user_id() );
 	}
 
 	/**
@@ -47,19 +56,40 @@ class Connections {
 	 * Core appends site_url, user_login and password to the success URL, so the
 	 * screen that returns has to strip them before anything writes them down.
 	 *
+	 * The two return addresses are marked differently, because core says nothing
+	 * about which one it took: approving arrives with a credential, declining
+	 * arrives with the address unchanged, and without a marker the screen cannot
+	 * tell somebody who changed their mind from somebody who just opened it.
+	 *
+	 * Both are held to this site first. Core sends to any domain on purpose —
+	 * an application password is often for something elsewhere, and it says so
+	 * in a comment where it declines to use wp_safe_redirect. This screen has no
+	 * such reason: it always comes back to wp-admin, so a return address that
+	 * points anywhere else is not one this panel asked for, and a freshly minted
+	 * password is what would follow it.
+	 *
 	 * @param string $label      What the connection will be called.
 	 * @param string $return_url Where to send the browser once approved.
 	 */
 	public static function authorize_url( string $label, string $return_url ): string {
+		$return_url = wp_validate_redirect( $return_url, self::panel_url() );
+
 		return add_query_arg(
 			[
 				'app_name'    => rawurlencode( $label ),
 				'app_id'      => self::APP_ID,
-				'success_url' => rawurlencode( $return_url ),
-				'reject_url'  => rawurlencode( remove_query_arg( 'zaplane_connect', $return_url ) ),
+				'success_url' => rawurlencode( add_query_arg( 'zaplane_connect', 'done', $return_url ) ),
+				'reject_url'  => rawurlencode( add_query_arg( 'zaplane_connect', 'cancelled', $return_url ) ),
 			],
 			admin_url( 'authorize-application.php' )
 		);
+	}
+
+	/**
+	 * The screen this flow belongs to, for when the caller names somewhere else.
+	 */
+	private static function panel_url(): string {
+		return admin_url( 'admin.php?page=' . ZAPLANE_PLUGIN_SLUG . '-settings&tab=mcp' );
 	}
 
 	/**

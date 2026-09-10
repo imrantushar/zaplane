@@ -165,6 +165,22 @@ this screen and refuses to revoke one created for anything else. They are
 ordinary application passwords, so they also appear — and can be revoked — at
 Users → Profile → Application Passwords.
 
+Two details of that hand-off are Zaplane's to get right rather than core's.
+**The return address is held to this site.** Core sends to any domain on
+purpose — an application password is often for something running elsewhere, and
+it says so in a comment where it declines to use `wp_safe_redirect` — but this
+screen always comes back to wp-admin, and a newly minted password is what
+follows the address. **And the two return addresses are marked differently**,
+because core says nothing about which one it took: approving arrives with a
+credential, declining arrives with the address unchanged. Without a marker the
+panel cannot tell somebody who changed their mind from somebody who has just
+opened it, so a cancelled attempt looked exactly like nothing having happened.
+
+The button is offered only when core would actually honour it. Availability is
+asked per user (`wp_is_application_passwords_available_for_user`), not per site:
+a site can allow application passwords generally and still withhold them from a
+role, and the site-wide question would offer a button whose destination refuses.
+
 Capped at `read` and `write`. An application password is the whole user, with no
 way to withhold a single capability, so `run` is never granted through one; that
 scope needs an issued token or an approved OAuth grant. Note also that a site can

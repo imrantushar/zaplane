@@ -161,6 +161,17 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   panel lists only those and will not revoke one somebody created for something
   else. They also still appear on the profile page, because they are the same
   credentials.
+
+  Two things in that hand-off are Zaplane's to get right rather than core's. The
+  return address is **held to this site** — core sends to any domain on purpose,
+  saying so where it declines to use `wp_safe_redirect`, but this screen always
+  comes back to wp-admin and a newly minted password is what follows the
+  address. And **approving and declining now arrive back distinguishable**: core
+  says nothing about which one it took, so a cancelled attempt used to look
+  exactly like nothing having happened. The panel says what happened either way,
+  including when WordPress refuses because this account is not allowed one — and
+  it only offers the button when core would honour it, which is a question asked
+  **per user**, not per site, since a role can be withheld from it.
 - The MCP endpoint answers **405** to `GET` and `DELETE`, with `Allow: POST`.
   Streamable HTTP reserves those verbs for an event stream and for ending a
   session, neither of which this server offers; the 404 they produced before

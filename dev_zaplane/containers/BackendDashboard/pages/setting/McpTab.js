@@ -21,6 +21,14 @@ const tint = (token, pct) => `color-mix(in srgb, var(${token}) ${pct}%, transpar
 const basicHeader = ({ user, password }) =>
   `Basic ${btoa(`${user}:${password}`)}`;
 
+// A REST failure carries a readable message; an outage carries none. Say the
+// specific thing when there is one, because "something went wrong" sends people
+// looking in the wrong place.
+const failureText = (e, fallback) => {
+  const said = e?.response?.data?.message;
+  return said ? `${fallback} ${said}` : fallback;
+};
+
 const PRIMARY = { background: 'var(--zaplane-primary)', color: '#fff' };
 
 const STATUS = {
@@ -83,6 +91,7 @@ const McpTab = () => {
   const [label, setLabel] = useState('');
   const [connecting, setConnecting] = useState(false);
   const [freshCredential, setFreshCredential] = useState(null);
+  const [notice, setNotice] = useState(null);
   const [clients, setClients] = useState([]);
   const [removing, setRemoving] = useState(null);
   const [pending, setPending] = useState([]);
@@ -92,16 +101,38 @@ const McpTab = () => {
   // Core returns from its consent screen with the credential on the query
   // string. Read it once, show it, and take it out of the address bar — a
   // password in browser history is a password written down.
+  //
+  // It can also return having done nothing: declined, or refused because this
+  // account is not allowed one. Those arrive as an address and no more, so
+  // without saying something here the screen looks like it was never left.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const password = params.get('password');
     const user = params.get('user_login');
+    const outcome = params.get('zaplane_connect');
 
     if (password && user) {
       setFreshCredential({ user, password });
-      params.delete('password');
-      params.delete('user_login');
-      params.delete('site_url');
+    } else if (params.get('error') === 'disabled') {
+      setNotice({
+        tone: 'warn',
+        text: __(
+          'WordPress will not issue an application password for this account. Ask whoever administers the site, or connect a client that can sign in through the browser.',
+          'zaplane'
+        ),
+      });
+    } else if (outcome === 'cancelled') {
+      setNotice({ tone: 'quiet', text: __('Cancelled — no credential was made.', 'zaplane') });
+    } else if (outcome === 'done') {
+      // Approved, but nothing came back with it.
+      setNotice({
+        tone: 'warn',
+        text: __('WordPress did not hand back a credential. Check Users → Profile before trying again, in case one was made anyway.', 'zaplane'),
+      });
+    }
+
+    if (password || outcome || params.get('error')) {
+      ['password', 'user_login', 'site_url', 'zaplane_connect', 'error'].forEach(k => params.delete(k));
       const rest = params.toString();
       window.history.replaceState({}, '', window.location.pathname + (rest ? `?${rest}` : '') + window.location.hash);
     }
@@ -109,6 +140,7 @@ const McpTab = () => {
 
   const startConnect = async () => {
     setConnecting(true);
+    setNotice(null);
     try {
       // Come back to this panel, not whichever one the page opens on: the
       // credential arrives on the query string and only this screen knows to
@@ -122,14 +154,21 @@ const McpTab = () => {
         return_url: back.toString(),
       });
       if (res.data?.url) window.location.href = res.data.url;
+    } catch (e) {
+      setNotice({ tone: 'warn', text: failureText(e, __('Could not start the approval.', 'zaplane')) });
     } finally {
       setConnecting(false);
     }
   };
 
   const revokeConnection = async uuid => {
-    await API.delete(`${namespace}mcp/connections/${uuid}`);
-    await load();
+    setNotice(null);
+    try {
+      await API.delete(`${namespace}mcp/connections/${uuid}`);
+      await load();
+    } catch (e) {
+      setNotice({ tone: 'warn', text: failureText(e, __('Could not revoke that credential.', 'zaplane')) });
+    }
   };
 
   const loadAudit = useCallback(async () => {
@@ -376,6 +415,35 @@ const McpTab = () => {
               </ul>
             )}
           </div>
+
+          {notice && (
+            <div
+              className="flex items-start gap-2 rounded-[6px] px-3 py-2.5 text-[12px]"
+              style={
+                notice.tone === 'warn'
+                  ? {
+                      background: tint('--zaplane-warning', 10),
+                      border: `1px solid ${tint('--zaplane-warning', 35)}`,
+                      color: 'var(--zaplane-font-color)',
+                    }
+                  : {
+                      background: 'var(--zaplane-background)',
+                      border: '1px solid var(--zaplane-border-color)',
+                      color: 'var(--zaplane-font-secondary-color)',
+                    }
+              }
+            >
+              <span className="flex-1">{notice.text}</span>
+              <button
+                type="button"
+                onClick={() => setNotice(null)}
+                className="shrink-0 text-[var(--zaplane-text-muted)]"
+                aria-label={__('Dismiss', 'zaplane')}
+              >
+                &times;
+              </button>
+            </div>
+          )}
 
           {freshCredential && (
             <div
