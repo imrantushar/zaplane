@@ -493,8 +493,9 @@ class Server {
 	 * @return array<int,string>
 	 */
 	private static function ticked( array $requested ): array {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- check_admin_referer() ran before this is called.
-		$raw = isset( $_POST['scope'] ) && is_array( $_POST['scope'] ) ? wp_unslash( $_POST['scope'] ) : []; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitize_scopes() below is the sanitizer.
+		// phpcs:disable WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- check_admin_referer() ran before this is reached, and sanitize_scopes() below is the sanitizer.
+		$raw = isset( $_POST['scope'] ) && is_array( $_POST['scope'] ) ? wp_unslash( $_POST['scope'] ) : [];
+		// phpcs:enable WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		$granted = array_values(
 			array_intersect( TokenStore::sanitize_scopes( array_map( 'strval', $raw ) ), $requested )
