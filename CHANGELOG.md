@@ -88,6 +88,45 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   the registration behind it. The panel now lists them, says which are actually
   connected, and removing one revokes its tokens too — a token outliving its
   registration is access with no visible origin.
+- **A client can identify itself by URL instead of registering** (Client ID
+  Metadata Document). This is the option the connector dialogs mark
+  *Recommended*, and it failed until now because Zaplane did not support it —
+  every new user met an error on the default setting. It also leaves no row
+  behind, which is why it is recommended: dynamic registration accumulates one
+  per client on a busy site.
+
+  The whole risk is the fetch: a stranger chooses the URL and this server makes
+  the request. Private and reserved addresses are refused before connecting —
+  loopback, the LAN ranges, and the cloud-metadata address — redirects are not
+  followed, the read is capped at 5KB, only a 200 counts, the document must name
+  itself as the URL it was found at, and failures are never cached.
+- **An email the first time a client runs a workflow for real, and when one is
+  refused repeatedly.** Issuing a run-scoped token is a decision someone made
+  once, possibly without reading the third checkbox; the moment it is used is
+  when they would want to know. Five refusals in ten minutes from one token is
+  either a misconfiguration or something trying, and one notice per token per
+  hour keeps it from becoming noise. Only these two — a notice that arrives
+  constantly is one nobody reads, and the log holds everything else. Switchable
+  from the panel.
+- **Tokens can be given a lifetime.** OAuth tokens last an hour and rotate; one
+  pasted into a config lasted forever. Choose 30 days, 90, a year, or never when
+  issuing, and the expiry shows on the token.
+- **A `run` token can name the workflows it may start.** Holding `run` used to
+  mean holding it over every workflow on the site, which made it an
+  all-or-nothing decision — and clients ask for it by default. Tick Run when
+  issuing a token and a list appears; choose the ones that client is for.
+  Choosing none keeps the old meaning, so nothing already issued narrows
+  underneath anyone. A refused workflow says which ones the token covers, and
+  the refusal is recorded.
+- **AI client activity is recorded, and lives on the Logs screen** beside workflow
+  runs — which is where people already go to find out what happened. Every tool
+  call: which client, whose account, which tool, how it went, how long it took.
+  Refusals too, because repeated attempts at a scope a client was never given is
+  the shape of something going wrong and is invisible if only successes are kept.
+  Filter by outcome, page through it, clear it. Arguments are never recorded: a
+  call carries whatever the model was working with, and copying that into a table
+  nobody prunes turns an audit trail into a second, quieter database of
+  everything. The settings panel links to it rather than trying to show it.
 - **A self-check on the AI access panel, for when a client will not connect.** An
   AI client can only report the symptom from outside — "could not reach", "could
   not register" — which says nothing about the cause. **Run check** tests the same

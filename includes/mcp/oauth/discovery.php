@@ -178,6 +178,9 @@ class Discovery {
 			'code_challenge_methods_supported'      => [ 'S256' ],
 			// Every client here is public, so there is no client secret to present.
 			'token_endpoint_auth_methods_supported' => [ 'none' ],
+			// A client may identify itself by URL instead of registering, which is
+			// what the connector dialogs recommend — it leaves no row behind.
+			'client_id_metadata_document_supported' => true,
 		];
 	}
 

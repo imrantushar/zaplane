@@ -5,6 +5,8 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_REST_Server;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Mcp\Alerts;
+use Zaplane\Mcp\AuditLog;
 use Zaplane\Mcp\OAuth\ClientStore;
 use Zaplane\Mcp\OAuth\Discovery;
 use Zaplane\Mcp\OAuth\PendingStore;
@@ -176,6 +178,35 @@ class McpController extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/mcp/alerts',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'set_alerts' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/audit',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'list_audit' ],
+					'permission_callback' => $admin,
+				],
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'clear_audit' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/mcp/diagnostics',
 			[
 				[
@@ -273,8 +304,35 @@ class McpController extends WP_REST_Controller {
 				'tokens'     => TokenStore::all(),
 				'tool_count' => count( ToolRegistry::definitions() ),
 				'reachable'  => self::publicly_reachable(),
+				// Enough to choose which workflows a run-scoped token may start.
+				'workflows'  => self::workflow_choices(),
+				'alerts'     => Alerts::enabled(),
 			]
 		);
+	}
+
+	/**
+	 * Id and title for every workflow, for the picker on a run-scoped token.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function workflow_choices(): array {
+		try {
+			return array_map(
+				fn( $w ) => [
+					'id'     => (int) $w['id'],
+					'title'  => '' !== (string) $w['title'] ? (string) $w['title'] : __( 'Untitled workflow', 'zaplane' ),
+					'status' => (string) $w['status'],
+				],
+				\Zaplane\Framework\Database\ORM\DB::table( 'workflows' )
+					->orderBy( 'id', 'DESC' )
+					->fresh()
+					->get()
+					->toArray()
+			);
+		} catch ( \Throwable $e ) {
+			return [];
+		}
 	}
 
 	/**
@@ -310,10 +368,17 @@ class McpController extends WP_REST_Controller {
 	public function create_token( $request ) {
 		$body = (array) $request->get_json_params();
 
+		// Days, or 0 for a token that never lapses.
+		$expires_days = max( 0, (int) ( $body['expires_days'] ?? 0 ) );
+
 		$issued = TokenStore::issue(
 			(string) ( $body['name'] ?? '' ),
 			(array) ( $body['scopes'] ?? TokenStore::DEFAULT_SCOPES ),
-			get_current_user_id()
+			get_current_user_id(),
+			[
+				'workflows'  => (array) ( $body['workflows'] ?? [] ),
+				'expires_in' => $expires_days * DAY_IN_SECONDS,
+			]
 		);
 
 		// The secret is in this response and nowhere else.
@@ -406,6 +471,47 @@ class McpController extends WP_REST_Controller {
 			__( 'The MCP endpoint accepts POST. It has no event stream to open and no session to end.', 'zaplane' ),
 			[ 'status' => 405 ]
 		);
+	}
+
+	/**
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public function set_alerts( $request ) {
+		Alerts::set_enabled( (bool) $request->get_param( 'enabled' ) );
+
+		return rest_ensure_response( [ 'alerts' => Alerts::enabled() ] );
+	}
+
+	/**
+	 * What AI clients have been doing.
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public function list_audit( $request ) {
+		$page     = (int) ( $request->get_param( 'page' ) ?: 1 );
+		$per_page = (int) ( $request->get_param( 'per_page' ) ?: 20 );
+
+		$result = AuditLog::page( $page, $per_page );
+
+		return rest_ensure_response(
+			[
+				'entries'  => $result['entries'],
+				'total'    => $result['total'],
+				'page'     => $page,
+				'per_page' => $per_page,
+			]
+		);
+	}
+
+	/**
+	 * @return \WP_REST_Response
+	 */
+	public function clear_audit() {
+		AuditLog::clear();
+
+		return rest_ensure_response( [ 'cleared' => true ] );
 	}
 
 	/**
@@ -914,7 +1020,13 @@ class McpController extends WP_REST_Controller {
 			return self::error( $id, -32602, 'Unknown tool: ' . $name );
 		}
 
+		$started = microtime( true );
+
 		if ( ! TokenStore::has_scope( $token, $required ) ) {
+			// A refusal is worth recording: repeated attempts at a scope a client
+			// was not given is the shape of something going wrong.
+			AuditLog::record( $token, $name, AuditLog::REFUSED, 'missing scope: ' . $required );
+
 			return self::tool_error(
 				$id,
 				sprintf(
@@ -928,7 +1040,28 @@ class McpController extends WP_REST_Controller {
 		// A workflow whose AI Agent points back at this site could otherwise start
 		// the workflow that is calling, and so on. Reads are harmless; starting a
 		// run is not.
+		// Holding `run` is not the same as holding it over everything. A token
+		// that named its workflows may start those and no others.
+		if ( TokenStore::SCOPE_RUN === $required ) {
+			$wanted = (int) ( $args['workflow_id'] ?? 0 );
+
+			if ( ! TokenStore::may_run( $token, $wanted ) ) {
+				AuditLog::record( $token, $name, AuditLog::REFUSED, 'workflow ' . $wanted . ' is outside this token' );
+
+				return self::tool_error(
+					$id,
+					sprintf(
+						'This token may only run workflows %s. Issue a token that includes workflow %d, or one with no workflow restriction.',
+						implode( ', ', array_map( 'strval', (array) $token['workflows'] ) ),
+						$wanted
+					)
+				);
+			}
+		}
+
 		if ( $self && TokenStore::SCOPE_RUN === $required ) {
+			AuditLog::record( $token, $name, AuditLog::REFUSED, 'self-referencing call' );
+
 			return self::tool_error(
 				$id,
 				'Refused: this call came from this same site, so running a workflow here could re-enter the workflow that made the call.'
@@ -938,8 +1071,12 @@ class McpController extends WP_REST_Controller {
 		try {
 			$data = ToolRegistry::call( $name, $args, $token );
 		} catch ( \Throwable $e ) {
+			AuditLog::record( $token, $name, AuditLog::FAILED, $e->getMessage(), self::elapsed( $started ) );
+
 			return self::tool_error( $id, $e->getMessage() );
 		}
+
+		AuditLog::record( $token, $name, AuditLog::OK, '', self::elapsed( $started ) );
 
 		return self::result(
 			$id,
@@ -955,6 +1092,14 @@ class McpController extends WP_REST_Controller {
 	}
 
 	/* ------------------------------- helpers ------------------------------ */
+
+	/**
+	 * @param float $started microtime(true) when the call began.
+	 */
+	private static function elapsed( float $started ): int {
+		return (int) round( ( microtime( true ) - $started ) * 1000 );
+	}
+
 
 	/**
 	 * @param mixed $result

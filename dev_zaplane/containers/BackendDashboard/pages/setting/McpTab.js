@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { FiCheck, FiCopy, FiTrash2 } from 'react-icons/fi';
-import { API, namespace } from '@ZAPUtils/helper';
+import { API, namespace, route_path } from '@ZAPUtils/helper';
 
 // Mirrors TokenStore::ALL_SCOPES. Ordered least to most dangerous.
 const SCOPES = [
@@ -89,6 +89,8 @@ const McpTab = () => {
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
+  const [runWorkflows, setRunWorkflows] = useState([]);
+  const [expiresDays, setExpiresDays] = useState(0);
   const [scopes, setScopes] = useState(['read', 'write']);
   const [issuing, setIssuing] = useState(false);
   // Shown once, immediately after issuing — the server never returns it again.
@@ -116,9 +118,17 @@ const McpTab = () => {
   const issue = async () => {
     setIssuing(true);
     try {
-      const res = await API.post(`${namespace}mcp/tokens`, { name, scopes });
+      const res = await API.post(`${namespace}mcp/tokens`, {
+        name,
+        scopes,
+        // Only meaningful with run; an empty list means every workflow.
+        workflows: scopes.includes('run') ? runWorkflows : [],
+        expires_days: expiresDays,
+      });
       setFreshToken(res.data);
       setName('');
+      setRunWorkflows([]);
+      setExpiresDays(0);
       await load();
     } finally {
       setIssuing(false);
@@ -135,11 +145,25 @@ const McpTab = () => {
   const tokens = info?.tokens || [];
   const [checks, setChecks] = useState(null);
   const [checking, setChecking] = useState(false);
+  const [auditCount, setAuditCount] = useState(0);
   const [clients, setClients] = useState([]);
   const [removing, setRemoving] = useState(null);
   const [pending, setPending] = useState([]);
   const [grants, setGrants] = useState({});
   const [deciding, setDeciding] = useState(null);
+
+  const loadAudit = useCallback(async () => {
+    try {
+      const res = await API.get(`${namespace}mcp/audit`, { params: { per_page: 1 } });
+      setAuditCount(res.data?.total || 0);
+    } catch (e) {
+      setAuditCount(0);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAudit();
+  }, [loadAudit]);
 
   const loadClients = useCallback(async () => {
     try {
@@ -509,6 +533,61 @@ const McpTab = () => {
                 </label>
               ))}
             </div>
+            {/* `run` over every workflow is a bigger grant than most people mean.
+                Naming the ones a client is for turns it into a decision. */}
+            {scopes.includes('run') && (info?.workflows || []).length > 0 && (
+              <div className="mt-3 rounded-[4px] border border-[var(--zaplane-border-color)] p-3">
+                <div className="text-[12px] font-medium text-[var(--zaplane-font-color)]">
+                  {__('Which workflows may it run?', 'zaplane')}
+                </div>
+                <p className="mt-0.5 text-[12px] text-[var(--zaplane-text-muted)]">
+                  {runWorkflows.length === 0
+                    ? __('Choosing none means every workflow, now and in future.', 'zaplane')
+                    : sprintf(
+                        /* translators: %d: number of chosen workflows. */
+                        _n( 'Limited to %d workflow.', 'Limited to %d workflows.', runWorkflows.length, 'zaplane' ),
+                        runWorkflows.length
+                      )}
+                </p>
+                <div className="mt-2 flex max-h-[150px] flex-col gap-1.5 overflow-y-auto">
+                  {(info?.workflows || []).map(w => (
+                    <label key={w.id} className="flex items-center gap-2 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+                      <input
+                        type="checkbox"
+                        checked={runWorkflows.includes(w.id)}
+                        onChange={() =>
+                          setRunWorkflows(cur =>
+                            cur.includes(w.id) ? cur.filter(x => x !== w.id) : [...cur, w.id]
+                          )
+                        }
+                      />
+                      <span className="truncate text-[var(--zaplane-font-color)]">{w.title}</span>
+                      <span className="text-[var(--zaplane-text-muted)]">#{w.id}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-3 flex items-center gap-2 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+              <span>{__('Expires', 'zaplane')}</span>
+              <select
+                value={expiresDays}
+                onChange={e => setExpiresDays(Number(e.target.value))}
+                className="rounded-[4px] border border-[var(--zaplane-border-color)] bg-[var(--zaplane-background)] px-2 py-1 text-[12px] text-[var(--zaplane-font-color)]"
+              >
+                <option value={0}>{__('never', 'zaplane')}</option>
+                <option value={30}>{__('in 30 days', 'zaplane')}</option>
+                <option value={90}>{__('in 90 days', 'zaplane')}</option>
+                <option value={365}>{__('in a year', 'zaplane')}</option>
+              </select>
+              {expiresDays === 0 && (
+                <span className="text-[var(--zaplane-text-muted)]">
+                  {__('— a token pasted into a config outlives the reason for it.', 'zaplane')}
+                </span>
+              )}
+            </div>
+
             <button
               type="button"
               onClick={issue}
@@ -524,6 +603,54 @@ const McpTab = () => {
             >
               {issuing ? __('Issuing…', 'zaplane') : __('Issue token', 'zaplane')}
             </button>
+          </div>
+
+          {/* The trail itself lives on the Logs screen, which has the room for
+              it. This is only the pointer, plus enough to know whether looking
+              is worth it. */}
+          <div className="rounded-[6px] border border-[var(--zaplane-border-color)] p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <div className="text-[13px] font-medium text-[var(--zaplane-font-color)]">
+                  {__('Activity', 'zaplane')}
+                </div>
+                <p className="mt-1 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+                  {auditCount > 0
+                    ? sprintf(
+                        /* translators: %d: number of recorded calls. */
+                        _n(
+                          '%d call recorded — what each client did, and on whose account. Arguments are never recorded.',
+                          '%d calls recorded — what each client did, and on whose account. Arguments are never recorded.',
+                          auditCount,
+                          'zaplane'
+                        ),
+                        auditCount
+                      )
+                    : __('Nothing recorded yet. Every tool call a client makes is logged here, arguments excluded.', 'zaplane')}
+                </p>
+              </div>
+              <a
+                href={`${route_path}admin.php?page=zaplane-logs`}
+                className="shrink-0 rounded-[4px] border border-[var(--zaplane-border-color)] px-3 py-1.5 text-[12px] font-medium text-[var(--zaplane-font-color)] hover:bg-[var(--zaplane-secondary-color)]"
+              >
+                {__('View activity', 'zaplane')}
+              </a>
+            </div>
+
+            <label className="mt-3 flex items-start gap-2 border-t border-[var(--zaplane-border-color)] pt-3 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+              <input
+                type="checkbox"
+                className="mt-[2px]"
+                checked={!!info?.alerts}
+                onChange={async e => {
+                  await API.post(`${namespace}mcp/alerts`, { enabled: e.target.checked });
+                  await load();
+                }}
+              />
+              <span>
+                {__('Email me the first time a client runs a workflow for real, and if one is refused repeatedly.', 'zaplane')}
+              </span>
+            </label>
           </div>
 
           {clients.length > 0 && (
@@ -577,6 +704,20 @@ const McpTab = () => {
                         ))}
                         {/* A row nobody remembers creating is confusing. Say when
                             it arrived through a connector's own sign-in instead. */}
+                        {token.expires_at > 0 ? (
+                          <span className="text-[12px] text-[var(--zaplane-text-muted)]">
+                            {__('expires', 'zaplane')} {new Date(token.expires_at * 1000).toLocaleDateString()}
+                          </span>
+                        ) : null}
+                        {(token.workflows || []).length > 0 ? (
+                          <span className="text-[12px] text-[var(--zaplane-text-muted)]">
+                            {sprintf(
+                              /* translators: %d: number of workflows the token is limited to. */
+                              _n( 'run limited to %d workflow', 'run limited to %d workflows', token.workflows.length, 'zaplane' ),
+                              token.workflows.length
+                            )}
+                          </span>
+                        ) : null}
                         {token.client_id ? (
                           <span className="rounded-full bg-[var(--zaplane-second-primary)] px-2 py-0.5 text-[11px] font-medium text-[var(--zaplane-font-secondary-color)]">
                             {__('connected app', 'zaplane')}

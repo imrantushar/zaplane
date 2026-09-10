@@ -194,6 +194,21 @@ tokens, and revoking one there disconnects it.
 If the site's MCP module is off, all of this 404s — the site does not advertise
 an authorization server it isn't running.
 
+### Identifying by URL instead of registering
+
+A client may use an https URL as its `client_id`, serving a JSON document that
+describes itself. Zaplane fetches and validates that document instead of keeping
+a registration — which is what the connector dialogs recommend, since dynamic
+registration otherwise leaves a row for every client that ever connects.
+
+The document must name itself: its `client_id` must equal the URL it was fetched
+from, or it is refused. Beyond that: https with a path and no fragment, a 200
+answer, no redirects followed, at most 5KB read, and at least one usable
+`redirect_uri`. Private and reserved addresses are refused before the request is
+made — the URL is chosen by a stranger and this server makes the call, which is
+the one place this feature could become a way to reach things only the site can
+reach.
+
 ### www, and why it used to fail
 
 A client compares the `resource` in the discovery document against the address
@@ -250,6 +265,37 @@ Removing a client revokes the tokens issued through it, and it will have to
 register and be approved again. Worth knowing before you tidy: an already
 connected client keeps pointing at its registration, and deleting that breaks it
 with an "unknown client" error that gives no clue why.
+
+## Limiting what `run` can start
+
+`run` is the scope that sends mail and takes payments, and holding it means
+holding it over every workflow — unless the token says otherwise. When issuing
+one, tick **Run** and a list of workflows appears; the token may then start those
+and no others.
+
+Choosing none means every workflow, now and in future, which is what tokens
+issued before this have and what "any" still means. A refused call names the
+workflows the token does cover, and the refusal is recorded in the log.
+
+The restriction lives on the token, so revoking or reissuing is how you change
+it. The same form sets a lifetime — 30 days, 90, a year, or never. OAuth tokens
+expire and rotate on their own; one pasted into a config only stops when you say
+so.
+
+## What clients have been doing
+
+**Zaplane → Logs → AI access.** Every tool call is recorded: the client, the
+account it acted as, the tool, the outcome, and how long it took. Refusals are
+kept alongside successes — a client repeatedly reaching for a scope it was never
+granted is worth seeing, and it is invisible if only successes are logged.
+
+Arguments are deliberately not recorded. A call carries whatever the model was
+working with, and a table of that which nobody remembers to prune is a second
+copy of your data with none of the care. Who, what and how it went is what the
+log is for.
+
+The trail is capped at 2000 rows and trimmed as new ones arrive. Clearing it is
+a button on that screen.
 
 ## When a client will not connect
 

@@ -158,4 +158,47 @@ class TokenStoreTest extends TestCase {
 	public function an_unnamed_token_still_gets_a_label(): void {
 		$this->assertSame( 'MCP client', TokenStore::issue( '   ' )['name'] );
 	}
+
+	/**
+	 * Holding `run` used to mean holding it over every workflow on the site.
+	 *
+	 * @test
+	 */
+	public function a_token_can_be_limited_to_particular_workflows(): void {
+		$issued = TokenStore::issue( 'Scoped', [ 'read', 'run' ], 1, [ 'workflows' => [ 3, 1, 3 ] ] );
+
+		$this->assertSame( [ 1, 3 ], $issued['workflows'], 'deduplicated and ordered' );
+
+		$record = TokenStore::resolve( $issued['token'] );
+		$this->assertTrue( TokenStore::may_run( $record, 1 ) );
+		$this->assertTrue( TokenStore::may_run( $record, 3 ) );
+		$this->assertFalse( TokenStore::may_run( $record, 2 ) );
+		$this->assertFalse( TokenStore::may_run( $record, 0 ), 'a missing workflow_id is not a wildcard' );
+	}
+
+	/**
+	 * Naming none keeps the old meaning, so nothing issued before this narrows
+	 * underneath whoever was using it.
+	 *
+	 * @test
+	 */
+	public function naming_no_workflows_still_means_all_of_them(): void {
+		$issued = TokenStore::issue( 'Unscoped', [ 'read', 'run' ], 1 );
+		$record = TokenStore::resolve( $issued['token'] );
+
+		$this->assertSame( [], $issued['workflows'] );
+		$this->assertTrue( TokenStore::may_run( $record, 1 ) );
+		$this->assertTrue( TokenStore::may_run( $record, 9999 ) );
+
+		// A record predating the field behaves the same.
+		$this->assertTrue( TokenStore::may_run( [ 'scopes' => [ 'run' ] ], 42 ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function workflow_ids_are_cleaned_before_they_are_stored(): void {
+		$this->assertSame( [ 2, 7 ], TokenStore::sanitize_workflows( [ '7', 2, 0, -4, 'x', 7 ] ) );
+		$this->assertSame( [], TokenStore::sanitize_workflows( [] ) );
+	}
 }

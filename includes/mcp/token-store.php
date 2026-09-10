@@ -52,6 +52,7 @@ class TokenStore {
 				'last_used_at' => $record['last_used_at'] ?? null,
 				'client_id'    => (string) ( $record['client_id'] ?? '' ),
 				'expires_at'   => (int) ( $record['expires_at'] ?? 0 ),
+				'workflows'    => array_values( (array) ( $record['workflows'] ?? [] ) ),
 			];
 		}
 
@@ -84,6 +85,10 @@ class TokenStore {
 		$client_id  = isset( $opts['client_id'] ) ? (string) $opts['client_id'] : '';
 		$expires_in = isset( $opts['expires_in'] ) ? (int) $opts['expires_in'] : 0;
 
+		// Which workflows `run` may start. Empty means every one of them, which is
+		// what a token issued before this existed has, and what "any" still means.
+		$workflows = self::sanitize_workflows( (array) ( $opts['workflows'] ?? [] ) );
+
 		$refresh = '';
 		if ( ! empty( $opts['with_refresh'] ) ) {
 			$refresh = wp_generate_password( 48, false );
@@ -101,6 +106,7 @@ class TokenStore {
 			'client_id'    => $client_id,
 			'expires_at'   => $expires_in > 0 ? time() + $expires_in : 0,
 			'refresh_hash' => '' !== $refresh ? hash( 'sha256', $refresh ) : '',
+			'workflows'    => $workflows,
 		];
 
 		self::persist( $records );
@@ -109,6 +115,7 @@ class TokenStore {
 			'id'            => $id,
 			'name'          => $name,
 			'scopes'        => $scopes,
+			'workflows'     => $workflows,
 			'token'         => 'zpl_' . $id . '.' . $secret,
 			'refresh_token' => '' !== $refresh ? 'zpr_' . $id . '.' . $refresh : '',
 			'expires_in'    => $expires_in,
@@ -234,6 +241,34 @@ class TokenStore {
 	}
 
 	/**
+	 * Whether this token may start a particular workflow.
+	 *
+	 * `run` is the scope that spends money and sends mail, and until now holding
+	 * it meant holding it over every workflow on the site. A token can now name
+	 * the ones it is for; naming none keeps the old meaning, so nothing issued
+	 * before this narrows underneath anyone.
+	 *
+	 * @param array<string,mixed> $record      The resolved token.
+	 * @param int                 $workflow_id The workflow being asked for.
+	 */
+	public static function may_run( array $record, int $workflow_id ): bool {
+		$allowed = self::sanitize_workflows( (array) ( $record['workflows'] ?? [] ) );
+
+		return empty( $allowed ) || in_array( $workflow_id, $allowed, true );
+	}
+
+	/**
+	 * @param array<int,mixed> $ids
+	 * @return array<int,int>
+	 */
+	public static function sanitize_workflows( array $ids ): array {
+		$clean = array_values( array_unique( array_filter( array_map( 'intval', $ids ), fn( $id ) => $id > 0 ) ) );
+		sort( $clean );
+
+		return $clean;
+	}
+
+	/**
 	 * @param array<string,mixed> $record
 	 */
 	public static function has_scope( array $record, string $scope ): bool {
@@ -300,6 +335,7 @@ class TokenStore {
 				'last_used_at' => $record['last_used_at'] ?? null,
 				'client_id'    => (string) ( $record['client_id'] ?? '' ),
 				'expires_at'   => (int) ( $record['expires_at'] ?? 0 ),
+				'workflows'    => array_values( (array) ( $record['workflows'] ?? [] ) ),
 				'refresh_hash' => (string) ( $record['refresh_hash'] ?? '' ),
 			];
 		}
