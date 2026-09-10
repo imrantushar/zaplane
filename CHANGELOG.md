@@ -68,6 +68,11 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
 - The count appears as a **bubble on the Zaplane menu**, like pending comments.
   An admin notice is not dependable for this: plugins remove them wholesale, and
   Zaplane's own screens do too so the app is not framed by other people's banners.
+- A freshly issued token now comes with **the command to use it**, with the token
+  already in place rather than a placeholder, plus the raw header for anything
+  else. The instructions sat at the top of the panel while the token appeared at
+  the bottom, so at the moment you had it in hand there was nothing telling you
+  what to do with it. A token carrying `run` says so, in the box.
 - **A self-check on the AI access panel, for when a client will not connect.** An
   AI client can only report the symptom from outside — "could not reach", "could
   not register" — which says nothing about the cause. **Run check** tests the same

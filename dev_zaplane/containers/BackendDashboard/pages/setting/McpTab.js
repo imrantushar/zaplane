@@ -191,7 +191,8 @@ const McpTab = () => {
     }
     setChecking(false);
   };
-  const cliCommand = `claude mcp add --transport http zaplane ${info?.url || ''} --header "Authorization: Bearer YOUR_TOKEN"`;
+  const cliFor = token => `claude mcp add --transport http zaplane ${info?.url || ''} --header "Authorization: Bearer ${token}"`;
+  const cliCommand = cliFor('YOUR_TOKEN');
 
   return (
     <div className="flex flex-col gap-8">
@@ -394,7 +395,7 @@ const McpTab = () => {
                 {__('Copy this token now', 'zaplane')}
               </div>
               <p className="mb-2 mt-0.5 text-[12px] text-[var(--zaplane-font-secondary-color)]">
-                {__('It is shown once and cannot be recovered. Paste it as the Bearer token in your AI client.', 'zaplane')}
+                {__('It is shown once and cannot be recovered.', 'zaplane')}
               </p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-[4px] bg-[var(--zaplane-background)] px-3 py-2 text-[12px] text-[var(--zaplane-font-color)]">
@@ -402,6 +403,35 @@ const McpTab = () => {
                 </code>
                 <CopyButton value={freshToken.token} label={__('Copy token', 'zaplane')} />
               </div>
+
+              {/* The instructions live at the top of this panel, but the token
+                  appears at the bottom — so repeat what to do with it, here,
+                  with the real token already in place rather than a placeholder. */}
+              <div className="mt-4 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+                {__('For Claude Code or Cursor, run this — it has the token in it already:', 'zaplane')}
+              </div>
+              <div className="mt-1.5 flex items-center gap-2">
+                <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-[4px] bg-[var(--zaplane-background)] px-3 py-2 text-[11px] text-[var(--zaplane-font-color)]">
+                  {cliFor(freshToken.token)}
+                </code>
+                <CopyButton value={cliFor(freshToken.token)} label={__('Copy command', 'zaplane')} />
+              </div>
+
+              <div className="mt-3 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+                {__('For anything else, send it on every request as this header:', 'zaplane')}
+              </div>
+              <div className="mt-1.5 flex items-center gap-2">
+                <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-[4px] bg-[var(--zaplane-background)] px-3 py-2 text-[11px] text-[var(--zaplane-font-color)]">
+                  Authorization: Bearer {freshToken.token}
+                </code>
+                <CopyButton value={`Authorization: Bearer ${freshToken.token}`} label={__('Copy header', 'zaplane')} />
+              </div>
+
+              {(freshToken.scopes || []).includes('run') && (
+                <p className="mt-3 text-[12px]" style={{ color: 'var(--zaplane-warning)' }}>
+                  {__('This token can run workflows for real — sending mail, taking payments. Treat it like a password.', 'zaplane')}
+                </p>
+              )}
             </div>
           )}
 
