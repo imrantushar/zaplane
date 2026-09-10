@@ -61,6 +61,12 @@ const SCOPE_LABELS = {
   run: 'Run for real',
 };
 
+const OUTCOME = {
+  ok:      { mark: '\u2713', color: 'var(--zaplane-success, #12b76a)' },
+  failed:  { mark: '\u2715', color: 'var(--zaplane-danger)' },
+  refused: { mark: '\u26a0', color: 'var(--zaplane-warning)' },
+};
+
 const STATUS = {
   ok:   { mark: '\u2713', color: 'var(--zaplane-success, #12b76a)' },
   warn: { mark: '\u26a0', color: 'var(--zaplane-warning)' },
@@ -135,11 +141,32 @@ const McpTab = () => {
   const tokens = info?.tokens || [];
   const [checks, setChecks] = useState(null);
   const [checking, setChecking] = useState(false);
+  const [audit, setAudit] = useState([]);
   const [clients, setClients] = useState([]);
   const [removing, setRemoving] = useState(null);
   const [pending, setPending] = useState([]);
   const [grants, setGrants] = useState({});
   const [deciding, setDeciding] = useState(null);
+
+  const loadAudit = useCallback(async () => {
+    try {
+      const res = await API.get(`${namespace}mcp/audit`);
+      setAudit(res.data?.entries || []);
+    } catch (e) {
+      setAudit([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAudit();
+  }, [loadAudit]);
+
+  const clearAudit = async () => {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(__('Clear the activity log? This cannot be undone.', 'zaplane'))) return;
+    await API.delete(`${namespace}mcp/audit`);
+    await loadAudit();
+  };
 
   const loadClients = useCallback(async () => {
     try {
@@ -525,6 +552,47 @@ const McpTab = () => {
               {issuing ? __('Issuing…', 'zaplane') : __('Issue token', 'zaplane')}
             </button>
           </div>
+
+          {audit.length > 0 && (
+            <div>
+              <div className="mb-1 flex items-center justify-between gap-4">
+                <div className="text-[13px] font-medium text-[var(--zaplane-font-color)]">
+                  {__('Recent activity', 'zaplane')}
+                </div>
+                <button
+                  type="button"
+                  onClick={clearAudit}
+                  className="text-[12px] text-[var(--zaplane-font-secondary-color)] hover:text-[var(--zaplane-danger)]"
+                >
+                  {__('Clear', 'zaplane')}
+                </button>
+              </div>
+              <p className="mb-3 text-[12px] text-[var(--zaplane-text-muted)]">
+                {__('What each client did, and on whose account. Arguments are never recorded.', 'zaplane')}
+              </p>
+              <div className="max-h-[280px] overflow-y-auto rounded-[4px] border border-[var(--zaplane-border-color)]">
+                <table className="w-full text-[12px]">
+                  <tbody>
+                    {audit.map(e => (
+                      <tr key={e.id} className="border-b border-[var(--zaplane-border-color)] last:border-0">
+                        <td className="px-3 py-2 align-top" style={{ color: OUTCOME[e.outcome]?.color }}>
+                          {OUTCOME[e.outcome]?.mark || '·'}
+                        </td>
+                        <td className="px-1 py-2 align-top font-medium text-[var(--zaplane-font-color)]">{e.tool}</td>
+                        <td className="px-3 py-2 align-top text-[var(--zaplane-text-muted)]">{e.token_name}</td>
+                        <td className="px-3 py-2 align-top text-right text-[var(--zaplane-text-muted)] whitespace-nowrap">
+                          {e.duration_ms ? `${e.duration_ms}ms` : ''}
+                        </td>
+                        <td className="px-3 py-2 align-top text-right text-[var(--zaplane-text-muted)] whitespace-nowrap">
+                          {e.created_at}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {clients.length > 0 && (
             <div>
