@@ -56,6 +56,13 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   internet — a development hostname cannot be resolved by claude.ai or ChatGPT,
   whose servers look it up from outside, and all they can report is that they
   could not sign in.
+- **WordPress application passwords work as a third way in.** Core already
+  authenticates them on REST requests, so a client that can send Basic auth needs
+  no Zaplane token at all, and revoking it is where a WordPress user already
+  looks — Users → Profile → Application Passwords. They never carry `run`: an
+  application password is the whole user, with no way to withhold one capability,
+  so the scope that sends mail and takes payments still has to be asked for
+  deliberately.
 - The MCP endpoint answers **405** to `GET` and `DELETE`, with `Allow: POST`.
   Streamable HTTP reserves those verbs for an event stream and for ending a
   session, neither of which this server offers; the 404 they produced before

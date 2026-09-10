@@ -198,8 +198,20 @@ const McpTab = () => {
               </div>
             </div>
 
+            <div className="mt-4 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+              <div className="font-semibold text-[var(--zaplane-font-color)]">
+                {__('Or use a WordPress application password', 'zaplane')}
+              </div>
+              <p className="mt-1">
+                {__(
+                  'Make one under Users → Profile → Application Passwords and send it as Basic auth. Nothing to issue here, and you revoke it on that same screen. It can read and build, but never run workflows for real.',
+                  'zaplane'
+                )}
+              </p>
+            </div>
+
             <p className="mt-4 text-[12px] text-[var(--zaplane-text-muted)]">
-              {__('Either way, a client can only do what its scopes allow, and revoking it below disconnects it immediately.', 'zaplane')}
+              {__('However a client connects, it can only do what its scopes allow, and revoking it disconnects it immediately.', 'zaplane')}
             </p>
           </div>
 

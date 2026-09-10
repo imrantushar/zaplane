@@ -561,6 +561,12 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'rest_get_authenticated_app_password' ) ) {
+		function rest_get_authenticated_app_password() {
+			return $GLOBALS['zaplane_test_app_password_uuid'] ?? null;
+		}
+	}
+
 	if ( ! function_exists( 'is_ssl' ) ) {
 		function is_ssl(): bool {
 			return ! empty( $_SERVER['HTTPS'] ) && 'off' !== $_SERVER['HTTPS'];
@@ -1446,7 +1452,9 @@ namespace {
 
 	if ( ! function_exists( 'current_user_can' ) ) {
 		function current_user_can( string $capability ): bool {
-			return false;
+			// Default false, as most tests expect. A test that needs a capable
+			// user sets the global rather than every test gaining one.
+			return in_array( $capability, (array) ( $GLOBALS['zaplane_test_caps'] ?? [] ), true );
 		}
 	}
 

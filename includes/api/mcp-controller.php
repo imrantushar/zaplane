@@ -289,6 +289,14 @@ class McpController extends WP_REST_Controller {
 		}
 
 		$token = TokenStore::resolve( self::bearer( $request ) );
+
+		// Nothing presented as a bearer? WordPress may already have authenticated
+		// this request by application password, which is a credential the site
+		// owner knows how to issue and revoke from a screen they already use.
+		if ( null === $token ) {
+			$token = self::application_password_grant();
+		}
+
 		if ( null === $token ) {
 			// RFC 6750: a 401 from a bearer-protected resource states the scheme.
 			// Without it a client only sees an opaque refusal and cannot tell how
@@ -336,6 +344,44 @@ class McpController extends WP_REST_Controller {
 			__( 'The MCP endpoint accepts POST. It has no event stream to open and no session to end.', 'zaplane' ),
 			[ 'status' => 405 ]
 		);
+	}
+
+	/**
+	 * Treat a WordPress application password as a way in.
+	 *
+	 * Core has already done the work by this point — it authenticates Basic auth
+	 * on REST requests itself — so this only decides whether to honour it. Using
+	 * one means no Zaplane token to issue, copy or lose, and revoking it is where
+	 * a WordPress user already looks: Users → Profile → Application Passwords.
+	 *
+	 * Never granted `run`. An application password is the whole user, with no way
+	 * to withhold one capability, so the scope that sends mail and takes payments
+	 * has to come from a credential that was asked for deliberately — an issued
+	 * token, or an approved OAuth grant.
+	 *
+	 * rest_get_authenticated_app_password() is what separates this from an
+	 * administrator who merely happens to be signed in: it is set only when the
+	 * request itself carried an application password.
+	 *
+	 * @return array<string,mixed>|null
+	 */
+	private static function application_password_grant(): ?array {
+		if ( ! function_exists( 'rest_get_authenticated_app_password' ) ) {
+			return null;
+		}
+
+		$uuid = rest_get_authenticated_app_password();
+
+		if ( ! $uuid || ! current_user_can( 'manage_options' ) ) {
+			return null;
+		}
+
+		return [
+			'id'      => 'app-' . $uuid,
+			'name'    => __( 'Application password', 'zaplane' ),
+			'scopes'  => TokenStore::DEFAULT_SCOPES,
+			'user_id' => get_current_user_id(),
+		];
 	}
 
 	/**

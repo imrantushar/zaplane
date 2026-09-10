@@ -128,7 +128,7 @@ method or unknown tool is a protocol error.
 
 ## Authentication
 
-Two ways in, for two kinds of client.
+Three ways in, for three kinds of client.
 
 Both are described on the **Settings → AI access** panel itself, which also warns
 when the site's address cannot be reached from the internet — a hosted connector
@@ -139,6 +139,17 @@ it can report is that it could not sign in.
 client you run yourself — Claude Code, Cursor, a script. It is presented as
 `Authorization: Bearer <token>`, never expires, and is revoked from that same
 screen.
+
+**A WordPress application password.** Issue one at Users → Profile → Application
+Passwords and send it as Basic auth — `Authorization: Basic base64(user:password)`.
+Core authenticates it before Zaplane sees the request, so there is no Zaplane
+token to issue or lose, and it is revoked from the same screen it was made on.
+
+Capped at `read` and `write`. An application password is the whole user, with no
+way to withhold a single capability, so `run` is never granted through one; that
+scope needs an issued token or an approved OAuth grant. Note also that a site can
+switch application passwords off entirely (`wp_is_application_passwords_available`),
+and some security plugins do.
 
 **OAuth, for clients you don't run.** A hosted connector — claude.ai, ChatGPT —
 has nowhere for you to paste a token, so it expects to find an authorization

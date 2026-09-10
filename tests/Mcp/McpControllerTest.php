@@ -90,6 +90,67 @@ class McpControllerTest extends TestCase {
 	}
 
 	/**
+	 * A WordPress application password is a credential the site owner already has
+	 * and already knows how to revoke, so it is honoured as a way in.
+	 *
+	 * @test
+	 */
+	public function it_accepts_a_wordpress_application_password(): void {
+		$GLOBALS['zaplane_test_app_password_uuid'] = 'e7f1c0aa-0000-4000-8000-000000000001';
+		$GLOBALS['zaplane_test_caps']              = [ 'manage_options' ];
+		$controller = new McpController();
+
+		$this->assertTrue( $controller->check_bearer( $this->request( [] ) ) );
+	}
+
+	/**
+	 * An application password is the whole user, with no way to withhold one
+	 * capability. So the scope that sends mail and takes payments must not ride
+	 * in on it — that has to be asked for deliberately.
+	 *
+	 * @test
+	 */
+	public function an_application_password_never_carries_the_run_scope(): void {
+		$GLOBALS['zaplane_test_app_password_uuid'] = 'e7f1c0aa-0000-4000-8000-000000000002';
+		$GLOBALS['zaplane_test_caps']              = [ 'manage_options' ];
+		$controller = new McpController();
+		$request    = $this->request( [] );
+
+		$this->assertTrue( $controller->check_bearer( $request ) );
+
+		$tools = $this->tool_names( $controller, $request );
+		$this->assertContains( 'list_apps', $tools );
+		$this->assertContains( 'create_workflow', $tools );
+		$this->assertNotContains( 'run_workflow', $tools );
+	}
+
+	/**
+	 * Being signed in is not the same as presenting a credential on the request.
+	 *
+	 * @test
+	 */
+	public function a_merely_signed_in_administrator_is_not_let_in(): void {
+		// Capable user, but no application password on the request and no bearer.
+		$GLOBALS['zaplane_test_caps'] = [ 'manage_options' ];
+		$controller                   = new McpController();
+
+		$this->assertFalse( $controller->check_bearer( $this->request( [] ) ) );
+	}
+
+	/**
+	 * @param \WP_REST_Request $request
+	 * @return array<int,string>
+	 */
+	private function tool_names( McpController $controller, $request ): array {
+		$response = $controller->handle_rpc(
+			$this->request( [ 'jsonrpc' => '2.0', 'id' => 1, 'method' => 'tools/list' ] )
+		);
+		$data = $response instanceof \WP_REST_Response ? $response->get_data() : $response;
+
+		return array_map( fn( $t ) => $t['name'], $data['result']['tools'] ?? [] );
+	}
+
+	/**
 	 * A hosted connector is given nothing but this endpoint's URL. The pointer in
 	 * the 401 is the only thing it can follow to find out that OAuth exists here.
 	 *
