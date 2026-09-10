@@ -67,24 +67,48 @@ class AuditLog {
 		} catch ( \Throwable $e ) {
 			// Recording is not the job. Losing a row is better than losing a call.
 			return;
-		}
+		}//end try
 	}
 
 	/**
 	 * The most recent entries, newest first.
 	 *
+	 * @param int $limit How many.
 	 * @return array<int,array<string,mixed>>
 	 */
 	public static function recent( int $limit = 50 ): array {
+		return self::page( 1, $limit )['entries'];
+	}
+
+	/**
+	 * One page of the trail, plus how many there are in total.
+	 *
+	 * @param int $page     One-based.
+	 * @param int $per_page Rows per page.
+	 * @return array{entries:array<int,array<string,mixed>>,total:int}
+	 */
+	public static function page( int $page = 1, int $per_page = 20 ): array {
+		$per_page = max( 1, min( 200, $per_page ) );
+		$page     = max( 1, $page );
+
 		try {
-			return DB::table( 'mcp_audit' )
+			$entries = DB::table( 'mcp_audit' )
 				->orderBy( 'id', 'DESC' )
-				->limit( max( 1, min( 200, $limit ) ) )
+				->limit( $per_page )
+				->offset( ( $page - 1 ) * $per_page )
 				->fresh()
 				->get()
 				->toArray();
+
+			return [
+				'entries' => $entries,
+				'total'   => (int) DB::table( 'mcp_audit' )->fresh()->count(),
+			];
 		} catch ( \Throwable $e ) {
-			return [];
+			return [
+				'entries' => [],
+				'total'   => 0,
+			];
 		}
 	}
 
@@ -108,10 +132,12 @@ class AuditLog {
 			return;
 		}
 
-		global $wpdb;
-
-		$table = \Zaplane\Framework\Database\ORM\Schema::getTable( 'mcp_audit' );
-		$floor = $wpdb->get_var( "SELECT id FROM {$table} ORDER BY id DESC LIMIT 1 OFFSET " . (int) self::KEEP ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is internal; the offset is an int constant.
+		$floor = DB::table( 'mcp_audit' )
+			->orderBy( 'id', 'DESC' )
+			->limit( 1 )
+			->offset( self::KEEP )
+			->fresh()
+			->value( 'id' );
 
 		if ( $floor ) {
 			DB::table( 'mcp_audit' )->where( 'id', '<=', (int) $floor )->delete();

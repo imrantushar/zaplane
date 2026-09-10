@@ -251,6 +251,21 @@ register and be approved again. Worth knowing before you tidy: an already
 connected client keeps pointing at its registration, and deleting that breaks it
 with an "unknown client" error that gives no clue why.
 
+## What clients have been doing
+
+**Zaplane → Logs → AI access.** Every tool call is recorded: the client, the
+account it acted as, the tool, the outcome, and how long it took. Refusals are
+kept alongside successes — a client repeatedly reaching for a scope it was never
+granted is worth seeing, and it is invisible if only successes are logged.
+
+Arguments are deliberately not recorded. A call carries whatever the model was
+working with, and a table of that which nobody remembers to prune is a second
+copy of your data with none of the care. Who, what and how it went is what the
+log is for.
+
+The trail is capped at 2000 rows and trimmed as new ones arrive. Clearing it is
+a button on that screen.
+
 ## When a client will not connect
 
 **Settings → AI access → Run check.** A client can only tell you it failed. This

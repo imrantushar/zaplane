@@ -88,6 +88,15 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   the registration behind it. The panel now lists them, says which are actually
   connected, and removing one revokes its tokens too — a token outliving its
   registration is access with no visible origin.
+- **AI client activity is recorded, and lives on the Logs screen** beside workflow
+  runs — which is where people already go to find out what happened. Every tool
+  call: which client, whose account, which tool, how it went, how long it took.
+  Refusals too, because repeated attempts at a scope a client was never given is
+  the shape of something going wrong and is invisible if only successes are kept.
+  Filter by outcome, page through it, clear it. Arguments are never recorded: a
+  call carries whatever the model was working with, and copying that into a table
+  nobody prunes turns an audit trail into a second, quieter database of
+  everything. The settings panel links to it rather than trying to show it.
 - **A self-check on the AI access panel, for when a client will not connect.** An
   AI client can only report the symptom from outside — "could not reach", "could
   not register" — which says nothing about the cause. **Run check** tests the same

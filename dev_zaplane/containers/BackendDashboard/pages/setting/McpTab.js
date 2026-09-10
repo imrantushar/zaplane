@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { FiCheck, FiCopy, FiTrash2 } from 'react-icons/fi';
-import { API, namespace } from '@ZAPUtils/helper';
+import { API, namespace, route_path } from '@ZAPUtils/helper';
 
 // Mirrors TokenStore::ALL_SCOPES. Ordered least to most dangerous.
 const SCOPES = [
@@ -59,12 +59,6 @@ const SCOPE_LABELS = {
   read: 'Read',
   write: 'Build',
   run: 'Run for real',
-};
-
-const OUTCOME = {
-  ok:      { mark: '\u2713', color: 'var(--zaplane-success, #12b76a)' },
-  failed:  { mark: '\u2715', color: 'var(--zaplane-danger)' },
-  refused: { mark: '\u26a0', color: 'var(--zaplane-warning)' },
 };
 
 const STATUS = {
@@ -141,7 +135,7 @@ const McpTab = () => {
   const tokens = info?.tokens || [];
   const [checks, setChecks] = useState(null);
   const [checking, setChecking] = useState(false);
-  const [audit, setAudit] = useState([]);
+  const [auditCount, setAuditCount] = useState(0);
   const [clients, setClients] = useState([]);
   const [removing, setRemoving] = useState(null);
   const [pending, setPending] = useState([]);
@@ -150,23 +144,16 @@ const McpTab = () => {
 
   const loadAudit = useCallback(async () => {
     try {
-      const res = await API.get(`${namespace}mcp/audit`);
-      setAudit(res.data?.entries || []);
+      const res = await API.get(`${namespace}mcp/audit`, { params: { per_page: 1 } });
+      setAuditCount(res.data?.total || 0);
     } catch (e) {
-      setAudit([]);
+      setAuditCount(0);
     }
   }, []);
 
   useEffect(() => {
     loadAudit();
   }, [loadAudit]);
-
-  const clearAudit = async () => {
-    // eslint-disable-next-line no-alert
-    if (!window.confirm(__('Clear the activity log? This cannot be undone.', 'zaplane'))) return;
-    await API.delete(`${namespace}mcp/audit`);
-    await loadAudit();
-  };
 
   const loadClients = useCallback(async () => {
     try {
@@ -553,46 +540,38 @@ const McpTab = () => {
             </button>
           </div>
 
-          {audit.length > 0 && (
-            <div>
-              <div className="mb-1 flex items-center justify-between gap-4">
+          {/* The trail itself lives on the Logs screen, which has the room for
+              it. This is only the pointer, plus enough to know whether looking
+              is worth it. */}
+          <div className="rounded-[6px] border border-[var(--zaplane-border-color)] p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
                 <div className="text-[13px] font-medium text-[var(--zaplane-font-color)]">
-                  {__('Recent activity', 'zaplane')}
+                  {__('Activity', 'zaplane')}
                 </div>
-                <button
-                  type="button"
-                  onClick={clearAudit}
-                  className="text-[12px] text-[var(--zaplane-font-secondary-color)] hover:text-[var(--zaplane-danger)]"
-                >
-                  {__('Clear', 'zaplane')}
-                </button>
+                <p className="mt-1 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+                  {auditCount > 0
+                    ? sprintf(
+                        /* translators: %d: number of recorded calls. */
+                        _n(
+                          '%d call recorded — what each client did, and on whose account. Arguments are never recorded.',
+                          '%d calls recorded — what each client did, and on whose account. Arguments are never recorded.',
+                          auditCount,
+                          'zaplane'
+                        ),
+                        auditCount
+                      )
+                    : __('Nothing recorded yet. Every tool call a client makes is logged here, arguments excluded.', 'zaplane')}
+                </p>
               </div>
-              <p className="mb-3 text-[12px] text-[var(--zaplane-text-muted)]">
-                {__('What each client did, and on whose account. Arguments are never recorded.', 'zaplane')}
-              </p>
-              <div className="max-h-[280px] overflow-y-auto rounded-[4px] border border-[var(--zaplane-border-color)]">
-                <table className="w-full text-[12px]">
-                  <tbody>
-                    {audit.map(e => (
-                      <tr key={e.id} className="border-b border-[var(--zaplane-border-color)] last:border-0">
-                        <td className="px-3 py-2 align-top" style={{ color: OUTCOME[e.outcome]?.color }}>
-                          {OUTCOME[e.outcome]?.mark || '·'}
-                        </td>
-                        <td className="px-1 py-2 align-top font-medium text-[var(--zaplane-font-color)]">{e.tool}</td>
-                        <td className="px-3 py-2 align-top text-[var(--zaplane-text-muted)]">{e.token_name}</td>
-                        <td className="px-3 py-2 align-top text-right text-[var(--zaplane-text-muted)] whitespace-nowrap">
-                          {e.duration_ms ? `${e.duration_ms}ms` : ''}
-                        </td>
-                        <td className="px-3 py-2 align-top text-right text-[var(--zaplane-text-muted)] whitespace-nowrap">
-                          {e.created_at}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <a
+                href={`${route_path}admin.php?page=zaplane-logs`}
+                className="shrink-0 rounded-[4px] border border-[var(--zaplane-border-color)] px-3 py-1.5 text-[12px] font-medium text-[var(--zaplane-font-color)] hover:bg-[var(--zaplane-secondary-color)]"
+              >
+                {__('View activity', 'zaplane')}
+              </a>
             </div>
-          )}
+          </div>
 
           {clients.length > 0 && (
             <div>

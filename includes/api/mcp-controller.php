@@ -433,9 +433,19 @@ class McpController extends WP_REST_Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function list_audit( $request ) {
-		$limit = (int) ( $request->get_param( 'limit' ) ?: 50 );
+		$page     = (int) ( $request->get_param( 'page' ) ?: 1 );
+		$per_page = (int) ( $request->get_param( 'per_page' ) ?: 20 );
 
-		return rest_ensure_response( [ 'entries' => AuditLog::recent( $limit ) ] );
+		$result = AuditLog::page( $page, $per_page );
+
+		return rest_ensure_response(
+			[
+				'entries'  => $result['entries'],
+				'total'    => $result['total'],
+				'page'     => $page,
+				'per_page' => $per_page,
+			]
+		);
 	}
 
 	/**
