@@ -3,6 +3,7 @@
 namespace Zaplane\Mcp;
 
 use Zaplane\Authoring\Catalog;
+use Zaplane\Authoring\GraphTester;
 use Zaplane\Authoring\GraphValidator;
 use Zaplane\Authoring\WorkflowAuthor;
 use Zaplane\Models\Connection;
@@ -87,6 +88,22 @@ class ToolRegistry {
 					],
 				],
 				'required'    => [ 'graph' ],
+			],
+			'test_workflow' => [
+				'scope'       => TokenStore::SCOPE_READ,
+				'description' => 'Dry-run a workflow: walk it in run order, resolve every {{...}} against sample data, and report what each field would actually contain — without executing anything. validate_graph proves the apps and fields are real; this proves the wiring carries data, catching the typo in {{2.post_title}} that otherwise only surfaces once the workflow is live and the mail has gone out. Pass workflow_id for a saved workflow or graph for an unsaved draft. Nothing is sent, charged or written.',
+				'properties'  => [
+					'workflow_id'  => $i( 'Saved workflow to test. Give this or graph, not both.' ),
+					'graph'        => [
+						'type'        => 'object',
+						'description' => 'An unsaved graph of { nodes: [...], edges: [...] }, to test before creating it.',
+					],
+					'trigger_data' => [
+						'type'        => 'object',
+						'description' => 'Realistic trigger output to resolve against, replacing the integration\'s declared sample. Use it to check the copy with a real name and course title.',
+					],
+				],
+				'required'    => [],
 			],
 			'create_workflow' => [
 				'scope'       => TokenStore::SCOPE_WRITE,
@@ -286,6 +303,8 @@ class ToolRegistry {
 				return self::describe_app( $args );
 			case 'validate_graph':
 				return self::validate_graph( $args );
+			case 'test_workflow':
+				return self::test_workflow( $args );
 			case 'create_workflow':
 				return self::create_workflow( $args, $token );
 			case 'update_workflow':
@@ -383,6 +402,53 @@ class ToolRegistry {
 			'warnings'         => $report['warnings'],
 			'normalized_graph' => $normalized,
 		];
+	}
+
+	/**
+	 * Dry-run a saved or unsaved graph. Resolves only — see GraphTester.
+	 *
+	 * @param array<string,mixed> $args
+	 * @return array<string,mixed>
+	 */
+	private static function test_workflow( array $args ): array {
+		$id    = (int) ( $args['workflow_id'] ?? 0 );
+		$graph = $args['graph'] ?? null;
+
+		if ( $id && is_array( $graph ) ) {
+			throw new \InvalidArgumentException( 'Give workflow_id or graph, not both.' );
+		}
+
+		$title = null;
+
+		if ( $id ) {
+			$workflow = Workflow::find( $id );
+			if ( ! $workflow ) {
+				throw new \InvalidArgumentException( 'Workflow ' . $id . ' not found.' );
+			}
+
+			$version = $workflow->activeVersion();
+			$graph   = $version ? $version->getGraph() : null;
+			$title   = $workflow->title;
+
+			if ( ! is_array( $graph ) ) {
+				throw new \RuntimeException( 'Workflow ' . $id . ' has no saved graph to test.' );
+			}
+		}
+
+		if ( ! is_array( $graph ) ) {
+			throw new \InvalidArgumentException( 'Pass workflow_id for a saved workflow, or graph for one you have not created yet.' );
+		}
+
+		$report = GraphTester::test( $graph, (array) ( $args['trigger_data'] ?? [] ) );
+
+		if ( $id ) {
+			$report = [
+				'workflow_id' => $id,
+				'title'       => $title,
+			] + $report;
+		}
+
+		return $report;
 	}
 
 	/**

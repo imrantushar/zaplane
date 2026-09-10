@@ -123,8 +123,12 @@ namespace Zaplane\Tests {
 			return self::$scheduledActions[ $hook ] ?? false;
 		}
 
-		public static function setHttpResponse( array $body, int $status = 200 ): void {
-			self::$httpResponses[] = [ 'body' => wp_json_encode( $body ), 'status' => $status ];
+		public static function setHttpResponse( array $body, int $status = 200, array $headers = [] ): void {
+			self::$httpResponses[] = [
+				'body'    => wp_json_encode( $body ),
+				'status'  => $status,
+				'headers' => array_change_key_case( $headers ),
+			];
 		}
 
 		public static function nextHttpResponse(): ?array {
@@ -561,6 +565,32 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( '_n' ) ) {
+		function _n( string $single, string $plural, int $number, string $domain = 'default' ): string {
+			return 1 === $number ? $single : $plural;
+		}
+	}
+
+	if ( ! function_exists( 'rest_get_authenticated_app_password' ) ) {
+		function rest_get_authenticated_app_password() {
+			return $GLOBALS['zaplane_test_app_password_uuid'] ?? null;
+		}
+	}
+
+	if ( ! function_exists( 'is_ssl' ) ) {
+		function is_ssl(): bool {
+			return ! empty( $_SERVER['HTTPS'] ) && 'off' !== $_SERVER['HTTPS'];
+		}
+	}
+
+	if ( ! function_exists( 'esc_url_raw' ) ) {
+		function esc_url_raw( $url ) {
+			// WP strips whitespace and control characters; no HTML escaping, since
+			// the result is meant for headers and requests rather than markup.
+			return trim( (string) preg_replace( '/[\x00-\x1F\x7F]/', '', (string) $url ) );
+		}
+	}
+
 	if ( ! function_exists( 'wp_strip_all_tags' ) ) {
 		function wp_strip_all_tags( string $text, bool $remove_breaks = false ): string {
 			$text = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
@@ -880,7 +910,40 @@ namespace {
 			if ( $next === null ) {
 				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
 			}
-			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'] ];
+			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'], 'headers' => $next['headers'] ?? [] ];
+		}
+	}
+
+	if ( ! function_exists( 'wp_safe_remote_get' ) ) {
+		function wp_safe_remote_get( string $url, array $args = [] ) {
+			// The real one refuses private and reserved hosts before connecting.
+			if ( ! wp_http_validate_url( $url ) ) {
+				return new \WP_Error( 'http_request_failed', 'A valid URL was not provided.' );
+			}
+			return wp_remote_get( $url, $args );
+		}
+	}
+
+	if ( ! function_exists( 'wp_http_validate_url' ) ) {
+		function wp_http_validate_url( $url ) {
+			$parts = wp_parse_url( (string) $url );
+			$host  = strtolower( (string) ( $parts['host'] ?? '' ) );
+
+			if ( ! in_array( strtolower( (string) ( $parts['scheme'] ?? '' ) ), [ 'http', 'https' ], true ) ) {
+				return false;
+			}
+
+			// Enough of core's rule to test against: loopback, link-local and the
+			// private ranges are refused.
+			$blocked = [ 'localhost', '::1' ];
+			if ( in_array( $host, $blocked, true ) ) {
+				return false;
+			}
+			if ( preg_match( '/^(127\.|10\.|0\.|169\.254\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)/', $host ) ) {
+				return false;
+			}
+
+			return $url;
 		}
 	}
 
@@ -890,7 +953,7 @@ namespace {
 			if ( $next === null ) {
 				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
 			}
-			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'] ];
+			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'], 'headers' => $next['headers'] ?? [] ];
 		}
 	}
 
@@ -903,6 +966,13 @@ namespace {
 	if ( ! function_exists( 'wp_remote_retrieve_response_code' ) ) {
 		function wp_remote_retrieve_response_code( $response ) {
 			return is_array( $response ) ? ( $response['response']['code'] ?? 200 ) : 0;
+		}
+	}
+
+	if ( ! function_exists( 'wp_remote_retrieve_header' ) ) {
+		function wp_remote_retrieve_header( $response, string $name ) {
+			$headers = is_array( $response ) ? ( $response['headers'] ?? [] ) : [];
+			return $headers[ strtolower( $name ) ] ?? '';
 		}
 	}
 
@@ -1430,9 +1500,19 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'wp_set_current_user' ) ) {
+		function wp_set_current_user( $id, $name = '' ) {
+			$GLOBALS['zaplane_test_current_user'] = (int) $id;
+
+			return (object) [ 'ID' => (int) $id ];
+		}
+	}
+
 	if ( ! function_exists( 'current_user_can' ) ) {
 		function current_user_can( string $capability ): bool {
-			return false;
+			// Default false, as most tests expect. A test that needs a capable
+			// user sets the global rather than every test gaining one.
+			return in_array( $capability, (array) ( $GLOBALS['zaplane_test_caps'] ?? [] ), true );
 		}
 	}
 
@@ -1731,16 +1811,76 @@ namespace {
 	}
 
 	if ( ! function_exists( 'add_query_arg' ) ) {
+		/**
+		 * Core does not encode the values it appends — build_query() passes
+		 * $urlencode = false — so callers that need encoding do it themselves.
+		 * A mock that encoded here would make correct code look double-encoded.
+		 */
 		function add_query_arg( $key, $value = '', $url = '' ): string {
 			if ( is_array( $key ) ) {
 				$url   = (string) $value;
-				$query = http_build_query( $key );
+				$pairs = $key;
 			} else {
-				$query = urlencode( (string) $key ) . '=' . urlencode( (string) $value );
 				$url   = (string) $url;
+				$pairs = [ (string) $key => (string) $value ];
 			}
+
+			$parts = [];
+			foreach ( $pairs as $k => $v ) {
+				$parts[] = $k . '=' . $v;
+			}
+
 			$sep = strpos( $url, '?' ) !== false ? '&' : '?';
-			return $url . $sep . $query;
+			return $url . $sep . implode( '&', $parts );
+		}
+	}
+
+	if ( ! function_exists( 'remove_query_arg' ) ) {
+		function remove_query_arg( $key, $url = '' ): string {
+			$url   = (string) $url;
+			$parts = explode( '?', $url, 2 );
+
+			if ( ! isset( $parts[1] ) ) {
+				return $url;
+			}
+
+			parse_str( $parts[1], $query );
+
+			foreach ( (array) $key as $one ) {
+				unset( $query[ $one ] );
+			}
+
+			return $query ? $parts[0] . '?' . http_build_query( $query ) : $parts[0];
+		}
+	}
+
+	if ( ! function_exists( 'esc_html__' ) ) {
+		function esc_html__( $text, $domain = 'default' ) {
+			return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+		}
+	}
+
+	if ( ! function_exists( 'wp_validate_redirect' ) ) {
+		function wp_validate_redirect( $location, $fallback_url = '' ) {
+			$host = wp_parse_url( (string) $location, PHP_URL_HOST );
+
+			if ( null === $host ) {
+				return $location;
+			}
+
+			return 'example.com' === $host ? $location : $fallback_url;
+		}
+	}
+
+	if ( ! function_exists( 'wp_is_application_passwords_available_for_user' ) ) {
+		function wp_is_application_passwords_available_for_user( $user ): bool {
+			return true;
+		}
+	}
+
+	if ( ! function_exists( 'admin_url' ) ) {
+		function admin_url( $path = '', $scheme = 'admin' ): string {
+			return 'http://example.com/wp-admin/' . ltrim( (string) $path, '/' );
 		}
 	}
 

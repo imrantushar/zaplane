@@ -5,6 +5,12 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_REST_Server;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Mcp\Alerts;
+use Zaplane\Mcp\AuditLog;
+use Zaplane\Mcp\Connections;
+use Zaplane\Mcp\OAuth\ClientStore;
+use Zaplane\Mcp\OAuth\Discovery;
+use Zaplane\Mcp\OAuth\Server as OAuthServer;
 use Zaplane\Mcp\ToolRegistry;
 use Zaplane\Mcp\TokenStore;
 use Zaplane\Settings;
@@ -68,6 +74,17 @@ class McpController extends WP_REST_Controller {
 					'callback'            => [ $this, 'handle_rpc' ],
 					'permission_callback' => [ $this, 'check_bearer' ],
 				],
+				[
+					// Streamable HTTP reserves GET for a server-initiated event
+					// stream and DELETE for ending a session. This server does
+					// neither, and the spec is specific that the answer is then 405
+					// — not the 404 an unregistered method would give, which reads
+					// as "this endpoint does not exist" to a client and to anyone
+					// who opens the URL in a browser.
+					'methods'             => 'GET, DELETE',
+					'callback'            => [ $this, 'method_not_allowed' ],
+					'permission_callback' => '__return_true',
+				],
 			]
 		);
 
@@ -89,11 +106,23 @@ class McpController extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/mcp/tokens',
+			'/mcp/connections/authorize-url',
 			[
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'create_token' ],
+					'callback'            => [ $this, 'connection_authorize_url' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/connections/(?P<uuid>[a-f0-9-]{36})',
+			[
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'delete_connection' ],
 					'permission_callback' => $admin,
 				],
 			]
@@ -110,6 +139,145 @@ class McpController extends WP_REST_Controller {
 				],
 			]
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/clients',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'list_clients' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/clients/(?P<id>zpc_[a-z0-9]+)',
+			[
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'delete_client' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/alerts',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'set_alerts' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/audit',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'list_audit' ],
+					'permission_callback' => $admin,
+				],
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'clear_audit' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/diagnostics',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'diagnostics' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		$this->register_oauth_routes();
+
+		// rest_send_allow_header() rebuilds Allow from the handlers whose
+		// permission_callback passes. On an unauthenticated request that is the
+		// 405 handler and not the POST one, so the header ends up advertising
+		// exactly the two methods this endpoint refuses. Put it back afterwards.
+		add_filter( 'rest_post_dispatch', [ $this, 'correct_allow_header' ], 20, 3 );
+	}
+
+	/**
+	 * @param \WP_HTTP_Response $response
+	 * @param \WP_REST_Server   $server
+	 * @param \WP_REST_Request  $request
+	 * @return \WP_HTTP_Response
+	 */
+	public function correct_allow_header( $response, $server, $request ) {
+		if ( $response instanceof \WP_REST_Response
+			&& '/' . $this->namespace . '/mcp' === (string) $response->get_matched_route() ) {
+			$response->header( 'Allow', 'POST' );
+		}
+
+		return $response;
+	}
+
+	/**
+	 * The machine-to-machine half of the OAuth flow.
+	 *
+	 * Open by design: a client has no credential to present until it has
+	 * registered, and registration on its own grants nothing — a client becomes
+	 * useful only once an administrator approves it on the consent screen. The
+	 * consent screen itself is not here; it is a front-end URL, because the REST
+	 * stack discards the cookie-signed-in user when no wp_rest nonce is sent.
+	 *
+	 * @see \Zaplane\Mcp\OAuth\Server
+	 */
+	private function register_oauth_routes(): void {
+		$public = '__return_true';
+
+		register_rest_route(
+			$this->namespace,
+			'/oauth/register',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ OAuthServer::class, 'register' ],
+					'permission_callback' => $public,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/oauth/token',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ OAuthServer::class, 'token' ],
+					'permission_callback' => $public,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/oauth/revoke',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ OAuthServer::class, 'revoke' ],
+					'permission_callback' => $public,
+				],
+			]
+		);
 	}
 
 	/* ------------------------------- admin -------------------------------- */
@@ -117,28 +285,48 @@ class McpController extends WP_REST_Controller {
 	public function info() {
 		return rest_ensure_response(
 			[
-				'enabled'   => self::enabled(),
-				'url'       => rest_url( $this->namespace . '/mcp' ),
-				'protocol'  => self::PROTOCOL_VERSION,
-				'scopes'    => TokenStore::ALL_SCOPES,
-				'tokens'    => TokenStore::all(),
+				'enabled'    => self::enabled(),
+				'url'        => rest_url( $this->namespace . '/mcp' ),
+				'protocol'   => self::PROTOCOL_VERSION,
+				'scopes'     => TokenStore::ALL_SCOPES,
+				'tokens'     => TokenStore::all(),
 				'tool_count' => count( ToolRegistry::definitions() ),
+				'reachable'  => self::publicly_reachable(),
+				// Enough to choose which workflows a run-scoped token may start.
+				'workflows'  => self::workflow_choices(),
+				'alerts'     => Alerts::enabled(),
+				// Credentials people paste live in core's application passwords now,
+				// so the screen needs core's own consent URL rather than a form.
+				'app_passwords_available' => Connections::available(),
+				'connections'             => Connections::all(),
 			]
 		);
 	}
 
-	public function create_token( $request ) {
-		$body = (array) $request->get_json_params();
-
-		$issued = TokenStore::issue(
-			(string) ( $body['name'] ?? '' ),
-			(array) ( $body['scopes'] ?? TokenStore::DEFAULT_SCOPES ),
-			get_current_user_id()
-		);
-
-		// The secret is in this response and nowhere else.
-		return rest_ensure_response( $issued );
+	/**
+	 * Id and title for every workflow, for the picker on a run-scoped token.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function workflow_choices(): array {
+		try {
+			return array_map(
+				fn( $w ) => [
+					'id'     => (int) $w['id'],
+					'title'  => '' !== (string) $w['title'] ? (string) $w['title'] : __( 'Untitled workflow', 'zaplane' ),
+					'status' => (string) $w['status'],
+				],
+				\Zaplane\Framework\Database\ORM\DB::table( 'workflows' )
+					->orderBy( 'id', 'DESC' )
+					->fresh()
+					->get()
+					->toArray()
+			);
+		} catch ( \Throwable $e ) {
+			return [];
+		}
 	}
+
 
 	public function delete_token( $request ) {
 		$revoked = TokenStore::revoke( (string) $request['id'] );
@@ -171,18 +359,36 @@ class McpController extends WP_REST_Controller {
 		}
 
 		$token = TokenStore::resolve( self::bearer( $request ) );
+
+		// Nothing presented as a bearer? WordPress may already have authenticated
+		// this request by application password, which is a credential the site
+		// owner knows how to issue and revoke from a screen they already use.
+		if ( null === $token ) {
+			$token = self::application_password_grant();
+		}
+
 		if ( null === $token ) {
 			// RFC 6750: a 401 from a bearer-protected resource states the scheme.
 			// Without it a client only sees an opaque refusal and cannot tell how
 			// it was meant to authenticate.
 			if ( ! headers_sent() ) {
-				// A fixed realm names the protection space, which is what a realm is
-				// for; the site title would leak into an unauthenticated response
-				// for no benefit.
-				header( 'WWW-Authenticate: Bearer realm="Zaplane MCP"', true );
+				header( 'WWW-Authenticate: ' . self::challenge(), true );
 			}
 
 			return false;
+		}
+
+		// Act as whoever the token belongs to, and hold them to what they can
+		// actually do. Without this the token's user was decoration: no user was
+		// ever set, no capability was ever checked, and every token — including
+		// one issued to somebody who has since been demoted or deleted — carried
+		// the same authority as an administrator's.
+		if ( ! self::assume( $token ) ) {
+			return new \WP_Error(
+				'zaplane_mcp_forbidden',
+				__( 'This credential belongs to an account that cannot manage this site.', 'zaplane' ),
+				[ 'status' => 403 ]
+			);
 		}
 
 		$retry_after = self::rate_limit_retry_after( (string) $token['id'] );
@@ -210,6 +416,430 @@ class McpController extends WP_REST_Controller {
 		$this->token = $token;
 
 		return true;
+	}
+
+	/**
+	 * Become the token's user, and say whether they may act at all.
+	 *
+	 * An application password has already been authenticated by core, so the
+	 * current user is set and this only re-asks the capability. A bearer token
+	 * has authenticated nobody — the request arrives with no user — so the
+	 * recorded one is applied here, which is what makes the capability question
+	 * meaningful and the audit trail true.
+	 *
+	 * Zaplane asks `manage_options` of everyone on every one of its screens.
+	 * A token cannot be a way around that, so it is asked here too, on every
+	 * call rather than once at issue: a token outlives the standing of the
+	 * person it was issued to, and demotion has to take effect.
+	 *
+	 * @param array<string,mixed> $token The resolved token.
+	 */
+	private static function assume( array $token ): bool {
+		$user_id = (int) ( $token['user_id'] ?? 0 );
+
+		// A token issued before scoping existed has no user recorded. It is
+		// honoured for compatibility, but it cannot be anybody, so there is no
+		// capability to check and nothing to become.
+		if ( ! empty( $token['legacy'] ) && 0 === $user_id ) {
+			return true;
+		}
+
+		if ( $user_id > 0 && get_current_user_id() !== $user_id ) {
+			wp_set_current_user( $user_id );
+		}
+
+		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * @return \WP_Error
+	 */
+	public function method_not_allowed() {
+		return new \WP_Error(
+			'zaplane_mcp_method_not_allowed',
+			__( 'The MCP endpoint accepts POST. It has no event stream to open and no session to end.', 'zaplane' ),
+			[ 'status' => 405 ]
+		);
+	}
+
+	/**
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public function set_alerts( $request ) {
+		Alerts::set_enabled( (bool) $request->get_param( 'enabled' ) );
+
+		return rest_ensure_response( [ 'alerts' => Alerts::enabled() ] );
+	}
+
+	/**
+	 * What AI clients have been doing.
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public function list_audit( $request ) {
+		$page     = (int) ( $request->get_param( 'page' ) ?: 1 );
+		$per_page = (int) ( $request->get_param( 'per_page' ) ?: 20 );
+
+		$result = AuditLog::page( $page, $per_page );
+
+		return rest_ensure_response(
+			[
+				'entries'  => $result['entries'],
+				'total'    => $result['total'],
+				'page'     => $page,
+				'per_page' => $per_page,
+			]
+		);
+	}
+
+	/**
+	 * @return \WP_REST_Response
+	 */
+	public function clear_audit() {
+		AuditLog::clear();
+
+		return rest_ensure_response( [ 'cleared' => true ] );
+	}
+
+	/**
+	 * Clients that registered themselves, with how many tokens each still holds.
+	 *
+	 * A registration is not access on its own, but it is the anchor a connected
+	 * client keeps pointing at, and until now there was no way to see one or take
+	 * it away.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function list_clients() {
+		$tokens = TokenStore::all();
+
+		$rows = array_values(
+			array_map(
+				fn( $c ) => [
+					'client_id'     => $c['client_id'],
+					'client_name'   => $c['client_name'],
+					'redirect_uris' => array_values( (array) $c['redirect_uris'] ),
+					'created_at'    => $c['created_at'] ?? '',
+					'token_count'   => count( array_filter( $tokens, fn( $t ) => (string) $t['client_id'] === (string) $c['client_id'] ) ),
+				],
+				ClientStore::all()
+			)
+		);
+
+		return rest_ensure_response( [ 'clients' => $rows ] );
+	}
+
+	/**
+	 * Remove a registration and everything issued through it.
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function delete_client( $request ) {
+		$id = (string) $request['id'];
+
+		if ( null === ClientStore::get( $id ) ) {
+			return new \WP_Error( 'not_found', __( 'That client is not registered.', 'zaplane' ), [ 'status' => 404 ] );
+		}
+
+		// Tokens first: a token outliving the registration it came from is access
+		// with no visible origin.
+		$revoked = TokenStore::revoke_for_client( $id );
+		ClientStore::forget( $id );
+
+		return rest_ensure_response(
+			[
+				'removed'         => true,
+				'tokens_revoked'  => $revoked,
+			]
+		);
+	}
+
+	/**
+	 * Where to send someone to make a credential.
+	 *
+	 * Core's own screen does the asking, the making and the hashing; this only
+	 * decides what it will be called and where to come back to.
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function connection_authorize_url( $request ) {
+		if ( ! Connections::available() ) {
+			return new \WP_Error(
+				'unavailable',
+				__( 'Application passwords are switched off on this site. Connect through the sign-in flow instead.', 'zaplane' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$label = trim( (string) $request->get_param( 'label' ) );
+		$label = '' === $label ? __( 'Zaplane', 'zaplane' ) : 'Zaplane – ' . $label;
+
+		return rest_ensure_response(
+			[
+				'url' => Connections::authorize_url( $label, (string) $request->get_param( 'return_url' ) ),
+			]
+		);
+	}
+
+	/**
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function delete_connection( $request ) {
+		if ( ! Connections::forget( (string) $request['uuid'] ) ) {
+			return new \WP_Error( 'not_found', __( 'That connection is not one made here.', 'zaplane' ), [ 'status' => 404 ] );
+		}
+
+		return rest_ensure_response( [ 'revoked' => true ] );
+	}
+
+	/**
+	 * Whether a hosted connector could reach this site at all.
+	 *
+	 * One run by somebody else resolves the address from their servers, so a
+	 * development hostname or a private address is not a configuration mistake it
+	 * can report usefully — it simply never arrives, and the connector says it
+	 * could not register. Worth stating on the screen rather than leaving someone
+	 * to work it out from the other end.
+	 */
+	public static function publicly_reachable(): bool {
+		$host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+
+		if ( '' === $host || 'localhost' === $host ) {
+			return false;
+		}
+
+		// Development suffixes that resolve only on the machine running them.
+		if ( (bool) preg_match( '/\.(test|local|localhost|invalid|example|internal|lan|home|dev)$/', $host ) ) {
+			return false;
+		}
+
+		// A bare IP is only reachable if it is a routable one.
+		if ( filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			return (bool) filter_var( $host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE );
+		}
+
+		// Anything without a dot cannot be a public name.
+		return false !== strpos( $host, '.' );
+	}
+
+	/**
+	 * Check this site's own MCP surface and say what is wrong in plain words.
+	 *
+	 * A client that cannot connect reports the symptom from the outside — "could
+	 * not reach", "could not register" — which says nothing about the cause. These
+	 * checks run from the site itself, where the cause is visible.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function diagnostics() {
+		$checks = [];
+
+		$checks[] = self::enabled()
+			? self::check( 'module', __( 'AI access module is on', 'zaplane' ), 'ok' )
+			: self::check(
+				'module',
+				__( 'AI access module is off', 'zaplane' ),
+				'fail',
+				__( 'Every request is refused before the credential is even looked at, so any client reports a sign-in failure. Turn it on under Settings → Modules.', 'zaplane' )
+			);
+
+		// With the module off, the endpoint and the discovery documents are meant
+		// to be unavailable. Probing them anyway would report two more failures
+		// with causes that are not the cause, burying the one that is.
+		if ( self::enabled() ) {
+			$checks[] = self::probe_endpoint();
+			$checks[] = self::probe_discovery();
+		} else {
+			$checks[] = self::check( 'endpoint', __( 'Endpoint — not checked while the module is off', 'zaplane' ), 'skip' );
+			$checks[] = self::check( 'discovery', __( 'Sign-in discovery — not checked while the module is off', 'zaplane' ), 'skip' );
+		}
+
+		$checks[] = self::publicly_reachable()
+			? self::check( 'reachable', __( 'Address is reachable from the internet', 'zaplane' ), 'ok' )
+			: self::check(
+				'reachable',
+				__( 'Address cannot be reached from the internet', 'zaplane' ),
+				'warn',
+				__( 'Hosted connectors such as claude.ai and ChatGPT look this address up from their own servers, so a development hostname never arrives and they report that they could not sign in. Clients running on this machine are unaffected.', 'zaplane' )
+			);
+
+		$checks[] = function_exists( 'wp_is_application_passwords_available' ) && wp_is_application_passwords_available()
+			? self::check( 'app_passwords', __( 'Application passwords are available', 'zaplane' ), 'ok' )
+			: self::check(
+				'app_passwords',
+				__( 'Application passwords are switched off', 'zaplane' ),
+				'warn',
+				__( 'A security plugin or a site filter has disabled them. Connect with an issued token or through OAuth instead.', 'zaplane' )
+			);
+
+		$tokens = count( TokenStore::all() );
+		$checks[] = $tokens > 0
+			/* translators: %d: number of credentials. */
+			? self::check( 'credentials', sprintf( _n( '%d credential issued', '%d credentials issued', $tokens, 'zaplane' ), $tokens ), 'ok' )
+			: self::check(
+				'credentials',
+				__( 'No credentials issued yet', 'zaplane' ),
+				'warn',
+				__( 'Nothing is connected. Issue a token below, use a WordPress application password, or let a hosted connector sign in.', 'zaplane' )
+			);
+
+		return rest_ensure_response( [ 'checks' => $checks ] );
+	}
+
+	/**
+	 * The endpoint should refuse an unauthenticated call, and say how to
+	 * authenticate while doing it. Anything else means something in front of
+	 * WordPress is answering instead.
+	 *
+	 * @return array<string,string>
+	 */
+	private static function probe_endpoint(): array {
+		$response = wp_remote_post(
+			rest_url( 'zaplane/v1/mcp' ),
+			[
+				'timeout'  => 10,
+				'headers'  => [ 'Content-Type' => 'application/json' ],
+				'body'     => wp_json_encode(
+					[
+						'jsonrpc' => '2.0',
+						'id'      => 1,
+						'method'  => 'ping',
+					]
+				),
+			]
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return self::check(
+				'endpoint',
+				__( 'The endpoint could not be reached from this site', 'zaplane' ),
+				'fail',
+				$response->get_error_message() . ' — ' . __( 'a certificate this server does not trust will also read like this. A hosted connector refuses an untrusted certificate outright.', 'zaplane' )
+			);
+		}
+
+		$code      = (int) wp_remote_retrieve_response_code( $response );
+		$challenge = (string) wp_remote_retrieve_header( $response, 'www-authenticate' );
+
+		if ( 401 !== $code ) {
+			return self::check(
+				'endpoint',
+				/* translators: %d: HTTP status code. */
+				sprintf( __( 'The endpoint answered %d, not 401', 'zaplane' ), $code ),
+				'fail',
+				__( 'An unauthenticated call should be refused with 401. Another status usually means a security plugin, firewall or cache is answering before WordPress does.', 'zaplane' )
+			);
+		}
+
+		if ( false === strpos( $challenge, 'resource_metadata' ) ) {
+			return self::check(
+				'endpoint',
+				__( 'The refusal carries no pointer to the sign-in service', 'zaplane' ),
+				'fail',
+				__( 'Hosted connectors follow that pointer to discover OAuth; without it they report that this server does not implement it. Something is stripping response headers.', 'zaplane' )
+			);
+		}
+
+		return self::check( 'endpoint', __( 'Endpoint answers and advertises how to sign in', 'zaplane' ), 'ok' );
+	}
+
+	/**
+	 * @return array<string,string>
+	 */
+	private static function probe_discovery(): array {
+		foreach ( [ Discovery::PROTECTED_RESOURCE, Discovery::AUTHORIZATION_SERVER ] as $name ) {
+			$response = wp_remote_get( home_url( '/.well-known/' . $name ), [ 'timeout' => 10 ] );
+
+			if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+				return self::check(
+					'discovery',
+					/* translators: %s: the well-known document name. */
+					sprintf( __( '/.well-known/%s is not being served', 'zaplane' ), $name ),
+					'fail',
+					__( 'A hosted connector reads these two documents before it can sign in. Some hosts serve /.well-known/ from disk, which shadows them; a static-cache plugin can do the same.', 'zaplane' )
+				);
+			}
+		}
+
+		return self::check( 'discovery', __( 'Sign-in discovery documents are being served', 'zaplane' ), 'ok' );
+	}
+
+	/**
+	 * @param string $key    Stable identifier for the check.
+	 * @param string $label  What was checked, in plain words.
+	 * @param string $status ok, warn, fail or skip.
+	 * @param string $fix    What to do about it, when there is something to do.
+	 * @return array<string,string>
+	 */
+	private static function check( string $key, string $label, string $status, string $fix = '' ): array {
+		return [
+			'key'    => $key,
+			'label'  => $label,
+			'status' => $status,
+			'fix'    => $fix,
+		];
+	}
+
+	/**
+	 * Treat a WordPress application password as a way in.
+	 *
+	 * Core has already done the work by this point — it authenticates Basic auth
+	 * on REST requests itself — so this only decides whether to honour it. Using
+	 * one means no Zaplane token to issue, copy or lose, and revoking it is where
+	 * a WordPress user already looks: Users → Profile → Application Passwords.
+	 *
+	 * Never granted `run`. An application password is the whole user, with no way
+	 * to withhold one capability, so the scope that sends mail and takes payments
+	 * has to come from a credential that was asked for deliberately — an issued
+	 * token, or an approved OAuth grant.
+	 *
+	 * rest_get_authenticated_app_password() is what separates this from an
+	 * administrator who merely happens to be signed in: it is set only when the
+	 * request itself carried an application password.
+	 *
+	 * @return array<string,mixed>|null
+	 */
+	private static function application_password_grant(): ?array {
+		if ( ! function_exists( 'rest_get_authenticated_app_password' ) ) {
+			return null;
+		}
+
+		$uuid = rest_get_authenticated_app_password();
+
+		if ( ! $uuid || ! current_user_can( 'manage_options' ) ) {
+			return null;
+		}
+
+		return [
+			'id'      => 'app-' . $uuid,
+			'name'    => __( 'Application password', 'zaplane' ),
+			'scopes'  => TokenStore::DEFAULT_SCOPES,
+			'user_id' => get_current_user_id(),
+		];
+	}
+
+	/**
+	 * The value of the WWW-Authenticate header on a 401.
+	 *
+	 * A fixed realm names the protection space, which is what a realm is for; the
+	 * site title would leak into an unauthenticated response for no benefit.
+	 *
+	 * resource_metadata is the part a hosted connector needs (RFC 9728). Such a
+	 * client arrives holding nothing but this endpoint's URL, and this pointer is
+	 * the only way it can find the authorization server. Without it there is
+	 * nothing to follow, and the client reports — correctly — that the server does
+	 * not implement OAuth.
+	 */
+	public static function challenge(): string {
+		return sprintf(
+			'Bearer realm="Zaplane MCP", resource_metadata="%s"',
+			esc_url_raw( Discovery::protected_resource_url() )
+		);
 	}
 
 	/**
@@ -404,7 +1034,13 @@ class McpController extends WP_REST_Controller {
 			return self::error( $id, -32602, 'Unknown tool: ' . $name );
 		}
 
+		$started = microtime( true );
+
 		if ( ! TokenStore::has_scope( $token, $required ) ) {
+			// A refusal is worth recording: repeated attempts at a scope a client
+			// was not given is the shape of something going wrong.
+			AuditLog::record( $token, $name, AuditLog::REFUSED, 'missing scope: ' . $required );
+
 			return self::tool_error(
 				$id,
 				sprintf(
@@ -418,7 +1054,28 @@ class McpController extends WP_REST_Controller {
 		// A workflow whose AI Agent points back at this site could otherwise start
 		// the workflow that is calling, and so on. Reads are harmless; starting a
 		// run is not.
+		// Holding `run` is not the same as holding it over everything. A token
+		// that named its workflows may start those and no others.
+		if ( TokenStore::SCOPE_RUN === $required ) {
+			$wanted = (int) ( $args['workflow_id'] ?? 0 );
+
+			if ( ! TokenStore::may_run( $token, $wanted ) ) {
+				AuditLog::record( $token, $name, AuditLog::REFUSED, 'workflow ' . $wanted . ' is outside this token' );
+
+				return self::tool_error(
+					$id,
+					sprintf(
+						'This token may only run workflows %s. Issue a token that includes workflow %d, or one with no workflow restriction.',
+						implode( ', ', array_map( 'strval', (array) $token['workflows'] ) ),
+						$wanted
+					)
+				);
+			}
+		}
+
 		if ( $self && TokenStore::SCOPE_RUN === $required ) {
+			AuditLog::record( $token, $name, AuditLog::REFUSED, 'self-referencing call' );
+
 			return self::tool_error(
 				$id,
 				'Refused: this call came from this same site, so running a workflow here could re-enter the workflow that made the call.'
@@ -428,8 +1085,12 @@ class McpController extends WP_REST_Controller {
 		try {
 			$data = ToolRegistry::call( $name, $args, $token );
 		} catch ( \Throwable $e ) {
+			AuditLog::record( $token, $name, AuditLog::FAILED, $e->getMessage(), self::elapsed( $started ) );
+
 			return self::tool_error( $id, $e->getMessage() );
 		}
+
+		AuditLog::record( $token, $name, AuditLog::OK, '', self::elapsed( $started ) );
 
 		return self::result(
 			$id,
@@ -445,6 +1106,14 @@ class McpController extends WP_REST_Controller {
 	}
 
 	/* ------------------------------- helpers ------------------------------ */
+
+	/**
+	 * @param float $started microtime(true) when the call began.
+	 */
+	private static function elapsed( float $started ): int {
+		return (int) round( ( microtime( true ) - $started ) * 1000 );
+	}
+
 
 	/**
 	 * @param mixed $result
