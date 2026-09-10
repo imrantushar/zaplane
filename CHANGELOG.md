@@ -77,6 +77,17 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   else. The instructions sat at the top of the panel while the token appeared at
   the bottom, so at the moment you had it in hand there was nothing telling you
   what to do with it. A token carrying `run` says so, in the box.
+- **The consent screen has a checkbox per scope, with `run` unticked.** It used
+  to be a single Approve button granting whatever the client asked for — and
+  clients ask for everything the server advertises, so the scope that sends mail
+  and takes payments was arriving without anyone deciding on it. Never grants
+  more than was requested, and ticking nothing falls back to read rather than to
+  everything.
+- **Registered clients are visible, and removable.** Apps that signed themselves
+  up were previously invisible and permanent: you could revoke a token but not
+  the registration behind it. The panel now lists them, says which are actually
+  connected, and removing one revokes its tokens too — a token outliving its
+  registration is access with no visible origin.
 - **A self-check on the AI access panel, for when a client will not connect.** An
   AI client can only report the symptom from outside — "could not reach", "could
   not register" — which says nothing about the cause. **Run check** tests the same

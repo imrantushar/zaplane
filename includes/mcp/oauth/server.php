@@ -204,7 +204,7 @@ class Server {
 				self::bounce( $redirect_uri, $state, 'access_denied', 'The request was declined.' );
 			}
 
-			self::grant( $client, $redirect_uri, $state, $challenge, $scopes );
+			self::grant( $client, $redirect_uri, $state, $challenge, self::ticked( $scopes ) );
 		}
 
 		self::consent_page( $client, $scopes );
@@ -442,10 +442,16 @@ class Server {
 			TokenStore::SCOPE_RUN   => __( 'Run workflows for real — sending mail, taking payments, posting to other services', 'zaplane' ),
 		];
 
+		// Every scope the client asked for is offered, but `run` starts unticked.
+		// Clients ask for everything the server advertises — mcp-remote sends
+		// `read write run` without being told to — so an approve-everything button
+		// hands out the scope that spends money without anyone deciding to.
 		$rows = '';
 		foreach ( $scopes as $scope ) {
-			$rows .= '<li><strong>' . esc_html( ucfirst( $scope ) ) . '</strong> — '
-				. esc_html( $labels[ $scope ] ?? $scope ) . '</li>';
+			$rows .= '<li><label><input type="checkbox" name="scope[]" value="' . esc_attr( $scope ) . '"'
+				. ( TokenStore::SCOPE_RUN === $scope ? '' : ' checked' ) . '> '
+				. '<strong>' . esc_html( ucfirst( $scope ) ) . '</strong> — '
+				. esc_html( $labels[ $scope ] ?? $scope ) . '</label></li>';
 		}
 
 		$body = '<p>' . sprintf(
@@ -453,8 +459,8 @@ class Server {
 			esc_html__( '%s is asking to:', 'zaplane' ),
 			'<strong>' . esc_html( (string) $client['client_name'] ) . '</strong>'
 		) . '</p>'
-			. '<ul>' . $rows . '</ul>'
 			. '<form method="post" action="' . esc_url( self::current_url() ) . '">'
+			. '<ul class="scopes">' . $rows . '</ul>'
 			. wp_nonce_field( 'zaplane_mcp_consent', '_wpnonce', true, false )
 			. '<button type="submit" name="approve" value="1" class="primary">' . esc_html__( 'Approve', 'zaplane' ) . '</button> '
 			. '<button type="submit" name="deny" value="1">' . esc_html__( 'Cancel', 'zaplane' ) . '</button>'
@@ -477,6 +483,26 @@ class Server {
 		);
 	}
 
+	/**
+	 * The scopes actually ticked, never more than the client asked for.
+	 *
+	 * Ticking nothing is treated as read rather than as everything: an empty box
+	 * is what a mis-click looks like, and it should not be the widest outcome.
+	 *
+	 * @param array<int,string> $requested What the client asked for.
+	 * @return array<int,string>
+	 */
+	private static function ticked( array $requested ): array {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- check_admin_referer() ran before this is called.
+		$raw = isset( $_POST['scope'] ) && is_array( $_POST['scope'] ) ? wp_unslash( $_POST['scope'] ) : []; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitize_scopes() below is the sanitizer.
+
+		$granted = array_values(
+			array_intersect( TokenStore::sanitize_scopes( array_map( 'strval', $raw ) ), $requested )
+		);
+
+		return empty( $granted ) ? [ TokenStore::SCOPE_READ ] : $granted;
+	}
+
 	private static function fail_page( string $message ): void {
 		status_header( 400 );
 		self::page( __( 'Cannot connect', 'zaplane' ), '<p>' . esc_html( $message ) . '</p>' );
@@ -495,6 +521,7 @@ class Server {
 			. 'body{font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f5f7;color:#141a24;margin:0;padding:48px 20px}'
 			. '.card{max-width:460px;margin:0 auto;background:#fff;border:1px solid #dcdfe4;border-radius:12px;padding:28px}'
 			. 'h1{font-size:19px;line-height:1.35;margin:0 0 14px}ul{padding-left:18px;margin:0 0 22px}li{margin-bottom:7px}'
+			. 'ul.scopes{list-style:none;padding:0}ul.scopes li{margin-bottom:10px}ul.scopes label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}'
 			. 'button{font:inherit;padding:9px 18px;border-radius:6px;border:1px solid #dcdfe4;background:#fff;cursor:pointer}'
 			. 'button.primary{background:#006BFF;border-color:#006BFF;color:#fff;font-weight:600}'
 			. '.muted{color:#6b7280;font-size:13px;margin:20px 0 0}'

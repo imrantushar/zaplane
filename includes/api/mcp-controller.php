@@ -5,6 +5,7 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_REST_Server;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Mcp\OAuth\ClientStore;
 use Zaplane\Mcp\OAuth\Discovery;
 use Zaplane\Mcp\OAuth\PendingStore;
 use Zaplane\Mcp\OAuth\Server as OAuthServer;
@@ -144,6 +145,30 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'decide_pending' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/clients',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'list_clients' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/clients/(?P<id>zpc_[a-z0-9]+)',
+			[
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'delete_client' ],
 					'permission_callback' => $admin,
 				],
 			]
@@ -380,6 +405,60 @@ class McpController extends WP_REST_Controller {
 			'zaplane_mcp_method_not_allowed',
 			__( 'The MCP endpoint accepts POST. It has no event stream to open and no session to end.', 'zaplane' ),
 			[ 'status' => 405 ]
+		);
+	}
+
+	/**
+	 * Clients that registered themselves, with how many tokens each still holds.
+	 *
+	 * A registration is not access on its own, but it is the anchor a connected
+	 * client keeps pointing at, and until now there was no way to see one or take
+	 * it away.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function list_clients() {
+		$tokens = TokenStore::all();
+
+		$rows = array_values(
+			array_map(
+				fn( $c ) => [
+					'client_id'     => $c['client_id'],
+					'client_name'   => $c['client_name'],
+					'redirect_uris' => array_values( (array) $c['redirect_uris'] ),
+					'created_at'    => $c['created_at'] ?? '',
+					'token_count'   => count( array_filter( $tokens, fn( $t ) => (string) $t['client_id'] === (string) $c['client_id'] ) ),
+				],
+				ClientStore::all()
+			)
+		);
+
+		return rest_ensure_response( [ 'clients' => $rows ] );
+	}
+
+	/**
+	 * Remove a registration and everything issued through it.
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function delete_client( $request ) {
+		$id = (string) $request['id'];
+
+		if ( null === ClientStore::get( $id ) ) {
+			return new \WP_Error( 'not_found', __( 'That client is not registered.', 'zaplane' ), [ 'status' => 404 ] );
+		}
+
+		// Tokens first: a token outliving the registration it came from is access
+		// with no visible origin.
+		$revoked = TokenStore::revoke_for_client( $id );
+		ClientStore::forget( $id );
+
+		return rest_ensure_response(
+			[
+				'removed'         => true,
+				'tokens_revoked'  => $revoked,
+			]
 		);
 	}
 

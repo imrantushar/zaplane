@@ -135,9 +135,42 @@ const McpTab = () => {
   const tokens = info?.tokens || [];
   const [checks, setChecks] = useState(null);
   const [checking, setChecking] = useState(false);
+  const [clients, setClients] = useState([]);
+  const [removing, setRemoving] = useState(null);
   const [pending, setPending] = useState([]);
   const [grants, setGrants] = useState({});
   const [deciding, setDeciding] = useState(null);
+
+  const loadClients = useCallback(async () => {
+    try {
+      const res = await API.get(`${namespace}mcp/clients`);
+      setClients(res.data?.clients || []);
+    } catch (e) {
+      setClients([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadClients();
+  }, [loadClients]);
+
+  const removeClient = async client => {
+    const warning = client.token_count > 0
+      ? __('Remove %s? Its token stops working immediately and it will have to sign in again.', 'zaplane')
+      : __('Remove %s? It will have to register again before it can connect.', 'zaplane');
+
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(warning.replace('%s', client.client_name))) return;
+
+    setRemoving(client.client_id);
+    try {
+      await API.delete(`${namespace}mcp/clients/${client.client_id}`);
+      await loadClients();
+      await load();
+    } finally {
+      setRemoving(null);
+    }
+  };
 
   const loadPending = useCallback(async () => {
     try {
@@ -492,6 +525,41 @@ const McpTab = () => {
               {issuing ? __('Issuing…', 'zaplane') : __('Issue token', 'zaplane')}
             </button>
           </div>
+
+          {clients.length > 0 && (
+            <div>
+              <div className="mb-1 text-[13px] font-medium text-[var(--zaplane-font-color)]">
+                {__('Registered clients', 'zaplane')}
+              </div>
+              <p className="mb-3 text-[12px] text-[var(--zaplane-text-muted)]">
+                {__('Apps that signed themselves up. Registering is not access on its own — approving one is. Removing a client also revokes what it holds.', 'zaplane')}
+              </p>
+              <div className="flex flex-col divide-y divide-[var(--zaplane-border-color)]">
+                {clients.map(c => (
+                  <div key={c.client_id} className="flex items-center justify-between gap-4 py-3 first:pt-0">
+                    <div className="min-w-0">
+                      <div className="truncate text-[14px] font-medium text-[var(--zaplane-font-color)]">{c.client_name}</div>
+                      <div className="mt-0.5 text-[12px] text-[var(--zaplane-text-muted)]">
+                        {c.token_count > 0
+                          ? __('connected', 'zaplane')
+                          : __('registered, never approved', 'zaplane')}
+                        {c.created_at ? ` · ${c.created_at}` : ''}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={removing === c.client_id}
+                      onClick={() => removeClient(c)}
+                      title={__('Remove', 'zaplane')}
+                      className="shrink-0 rounded-[4px] p-2 text-[var(--zaplane-font-secondary-color)] hover:text-[var(--zaplane-danger)] disabled:opacity-50"
+                    >
+                      <FiTrash2 size={15} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <div className="mb-3 text-[13px] font-medium text-[var(--zaplane-font-color)]">{__('Issued tokens', 'zaplane')}</div>

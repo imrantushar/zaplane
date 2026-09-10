@@ -269,6 +269,50 @@ class ServerTest extends TestCase {
 	}
 
 	/**
+	 * Clients ask for everything the server advertises, so an approve-everything
+	 * button hands out the scope that spends money without a decision.
+	 *
+	 * @test
+	 */
+	public function only_the_ticked_scopes_are_written_onto_the_code(): void {
+		$_POST['scope'] = [ 'read' ];
+
+		$reflection = new \ReflectionMethod( Server::class, 'ticked' );
+		$reflection->setAccessible( true );
+
+		$this->assertSame( [ 'read' ], $reflection->invoke( null, [ 'read', 'write', 'run' ] ) );
+
+		// Never more than the client asked for.
+		$_POST['scope'] = [ 'read', 'write', 'run' ];
+		$this->assertSame( [ 'read', 'write' ], $reflection->invoke( null, [ 'read', 'write' ] ) );
+
+		// A mis-click is not the widest outcome.
+		$_POST['scope'] = [];
+		$this->assertSame( [ 'read' ], $reflection->invoke( null, [ 'read', 'write', 'run' ] ) );
+
+		unset( $_POST['scope'] );
+	}
+
+	/**
+	 * A token outliving the registration it came from is access with no visible
+	 * origin, so removing a client takes its tokens with it.
+	 *
+	 * @test
+	 */
+	public function removing_a_client_revokes_what_it_holds(): void {
+		TokenStore::issue( 'From client A', [ 'read' ], 1, [ 'client_id' => 'zpc_a' ] );
+		TokenStore::issue( 'From client A too', [ 'read' ], 1, [ 'client_id' => 'zpc_a' ] );
+		TokenStore::issue( 'From client B', [ 'read' ], 1, [ 'client_id' => 'zpc_b' ] );
+		TokenStore::issue( 'Issued by hand', [ 'read' ], 1 );
+
+		$this->assertSame( 2, TokenStore::revoke_for_client( 'zpc_a' ) );
+
+		$names = array_column( TokenStore::all(), 'name' );
+		$this->assertSame( [ 'From client B', 'Issued by hand' ], $names );
+		$this->assertSame( 0, TokenStore::revoke_for_client( 'zpc_a' ), 'already gone' );
+	}
+
+	/**
 	 * @test
 	 */
 	public function it_registers_a_client_through_the_rest_shape(): void {

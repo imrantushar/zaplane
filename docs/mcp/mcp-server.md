@@ -240,6 +240,17 @@ authorization-code redirect, taking longer than usual. That is deliberate — no
 MCP client implements the grant designed for approving elsewhere (RFC 8628), so
 anything needing their cooperation would never be used.
 
+## Registered clients
+
+Apps that register themselves appear under **Settings → AI access → Registered
+clients**, marked *connected* or *registered, never approved*. Registering grants
+nothing on its own; approving one does.
+
+Removing a client revokes the tokens issued through it, and it will have to
+register and be approved again. Worth knowing before you tidy: an already
+connected client keeps pointing at its registration, and deleting that breaks it
+with an "unknown client" error that gives no clue why.
+
 ## When a client will not connect
 
 **Settings → AI access → Run check.** A client can only tell you it failed. This

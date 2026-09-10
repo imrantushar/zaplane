@@ -116,6 +116,27 @@ class TokenStore {
 		];
 	}
 
+	/**
+	 * Revoke every token issued to one registered client, and say how many.
+	 *
+	 * Removing a client without this would leave its tokens working while the
+	 * registration they came from no longer exists — access nobody can see the
+	 * origin of.
+	 *
+	 * @param string $client_id The registered client.
+	 */
+	public static function revoke_for_client( string $client_id ): int {
+		$records = self::records();
+		$kept    = array_values( array_filter( $records, fn( $r ) => (string) ( $r['client_id'] ?? '' ) !== $client_id ) );
+		$removed = count( $records ) - count( $kept );
+
+		if ( $removed > 0 ) {
+			self::persist( $kept );
+		}
+
+		return $removed;
+	}
+
 	/** Revoke one token by id. Returns false when nothing matched. */
 	public static function revoke( string $id ): bool {
 		$records = self::records();
