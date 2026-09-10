@@ -135,8 +135,19 @@ when the site's address cannot be reached from the internet — a hosted connect
 resolves it from its own servers, so a development hostname never arrives and all
 it can report is that it could not sign in.
 
-The AI access panel carries the steps for each client, so the rest of this
-section is background rather than something to follow by hand.
+The AI access panel installs this site into a client, so the rest of this
+section is background rather than something to follow by hand. Pick the client
+and it writes the file that client reads — the stdio bridge configuration for a
+desktop app, an HTTP entry for one that speaks it, a terminal command where
+that is the interface — names the path it belongs at on macOS, Windows or
+Linux, and offers it to copy or download. Where the client cannot sign in
+through a browser it offers to make the credential there and then, named after
+that client, and puts it in the file.
+
+One detail is easy to get wrong by hand and is why the bridge configuration
+looks the way it does: the header goes through `env` as `${ZAPLANE_AUTH}`
+rather than straight into `args`. A value containing a space does not survive
+being split back apart, and every Basic credential has one.
 
 **A token you paste.** Issue one under **Settings → AI access** and give it to a
 client you run yourself — Claude Code, Cursor, a script. It is presented as

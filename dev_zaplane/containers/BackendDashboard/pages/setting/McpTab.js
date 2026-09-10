@@ -60,15 +60,21 @@ const McpTab = () => {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  /**
+   * The whole panel is hidden while `loading`, so refetching after a change used
+   * to blank it and rebuild it — a setting that makes the screen vanish and come
+   * back reads as one that did not save. Only the first read shows that state;
+   * afterwards the panel stays put and the values change underneath it.
+   */
+  const load = useCallback(async ({ quiet = false } = {}) => {
+    if (!quiet) setLoading(true);
     try {
       const res = await API.get(`${namespace}mcp/info`);
       setInfo(res.data);
     } catch (e) {
-      setInfo(null);
+      if (!quiet) setInfo(null);
     } finally {
-      setLoading(false);
+      if (!quiet) setLoading(false);
     }
   }, []);
 
@@ -81,7 +87,7 @@ const McpTab = () => {
     // eslint-disable-next-line no-alert
     if (!window.confirm(__('Revoke this token? Any client using it stops working immediately.', 'zaplane'))) return;
     await API.delete(`${namespace}mcp/tokens/${id}`);
-    await load();
+    await load({ quiet: true });
   };
 
   const tokens = info?.tokens || [];
@@ -92,6 +98,7 @@ const McpTab = () => {
   const [connecting, setConnecting] = useState(false);
   const [freshCredential, setFreshCredential] = useState(null);
   const [notice, setNotice] = useState(null);
+  const [savingAlerts, setSavingAlerts] = useState(false);
   const [clients, setClients] = useState([]);
   const [removing, setRemoving] = useState(null);
   const [pending, setPending] = useState([]);
@@ -138,7 +145,10 @@ const McpTab = () => {
     }
   }, []);
 
-  const startConnect = async () => {
+  // The label comes from the field on this screen, or from whichever client the
+  // installer was showing — a credential called "Zaplane" tells you nothing when
+  // there are three of them.
+  const startConnect = async (forLabel = null) => {
     setConnecting(true);
     setNotice(null);
     try {
@@ -150,7 +160,7 @@ const McpTab = () => {
       back.searchParams.set('tab', 'mcp');
 
       const res = await API.post(`${namespace}mcp/connections/authorize-url`, {
-        label,
+        label: typeof forLabel === 'string' && forLabel ? forLabel : label,
         return_url: back.toString(),
       });
       if (res.data?.url) window.location.href = res.data.url;
@@ -165,7 +175,7 @@ const McpTab = () => {
     setNotice(null);
     try {
       await API.delete(`${namespace}mcp/connections/${uuid}`);
-      await load();
+      await load({ quiet: true });
     } catch (e) {
       setNotice({ tone: 'warn', text: failureText(e, __('Could not revoke that credential.', 'zaplane')) });
     }
@@ -209,7 +219,7 @@ const McpTab = () => {
     try {
       await API.delete(`${namespace}mcp/clients/${client.client_id}`);
       await loadClients();
-      await load();
+      await load({ quiet: true });
     } finally {
       setRemoving(null);
     }
@@ -245,7 +255,7 @@ const McpTab = () => {
     try {
       await API.post(`${namespace}mcp/pending/${id}`, { decision, scopes: grants[id] || [] });
       await loadPending();
-      await load();
+      await load({ quiet: true });
     } finally {
       setDeciding(null);
     }
@@ -372,7 +382,14 @@ const McpTab = () => {
             </div>
           )}
 
-          <ConnectClient url={info.url} />
+          <ConnectClient
+            url={info.url}
+            header={freshCredential ? basicHeader(freshCredential) : null}
+            reachable={info.reachable !== false}
+            canCreate={!!info.app_passwords_available}
+            creating={connecting}
+            onCreate={startConnect}
+          />
 
           {/* A client that cannot connect reports the symptom from outside —
               "could not reach", "could not register" — which says nothing about
@@ -546,13 +563,27 @@ const McpTab = () => {
             </div>
 
             <label className="mt-3 flex items-start gap-2 border-t border-[var(--zaplane-border-color)] pt-3 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+              {/* Reads a value that arrives after the first render, so without
+                  the guard it paints unticked and then flips — which on a slow
+                  reload looks exactly like a setting that did not save. */}
               <input
                 type="checkbox"
                 className="mt-[2px]"
                 checked={!!info?.alerts}
+                disabled={savingAlerts || !info}
                 onChange={async e => {
-                  await API.post(`${namespace}mcp/alerts`, { enabled: e.target.checked });
-                  await load();
+                  const enabled = e.target.checked;
+                  setSavingAlerts(true);
+                  setInfo(prev => (prev ? { ...prev, alerts: enabled } : prev));
+                  try {
+                    await API.post(`${namespace}mcp/alerts`, { enabled });
+                    await load({ quiet: true });
+                  } catch (err) {
+                    setInfo(prev => (prev ? { ...prev, alerts: !enabled } : prev));
+                    setNotice({ tone: 'warn', text: failureText(err, __('Could not change that setting.', 'zaplane')) });
+                  } finally {
+                    setSavingAlerts(false);
+                  }
                 }}
               />
               <span>

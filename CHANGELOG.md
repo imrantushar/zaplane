@@ -88,12 +88,24 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   the registration behind it. The panel now lists them, says which are actually
   connected, and removing one revokes its tokens too — a token outliving its
   registration is access with no visible origin.
-- **Connecting a client is now per client, not one set of generic steps.** Pick
-  Claude.ai, ChatGPT, Claude Code, Cursor or Other and the panel shows the three
-  steps for that one, with the command or configuration already filled in.
-  Claude.ai gets a link that opens its add-connector dialog with the name and URL
-  in place. Claude Code no longer needs a token at all — it signs in through the
-  browser on first use, which was true before and went unsaid.
+- **Connecting a client is now installing one.** Pick Claude Desktop, Claude
+  Code, Cursor, Claude.ai, ChatGPT or Other and the panel writes the file that
+  client reads, names the path it reads it from — on macOS, Windows or Linux —
+  and offers it to copy or download. Per-client steps replaced one set of
+  generic ones that was true for every client and useful for none.
+
+  A desktop client that speaks stdio gets the bridge configuration rather than a
+  URL it cannot use, with the header passed through the environment because a
+  value with a space in it does not survive being split back apart, and every
+  Basic credential has one. Where a client cannot sign in through a browser the
+  panel says so and offers to **make the credential right there**, named after
+  that client, and it lands in the configuration — that being the step people
+  otherwise do by hand and get wrong. Claude.ai gets a link that opens its
+  add-connector dialog with the name and URL in place, and both hosted clients
+  say plainly when this site cannot be reached from the internet, because
+  nothing below will work until it can. Claude Code needs no credential at all —
+  it signs in through the browser on first use, which was true before and went
+  unsaid.
 - **A client can identify itself by URL instead of registering** (Client ID
   Metadata Document). This is the option the connector dialogs mark
   *Recommended*, and it failed until now because Zaplane did not support it —
@@ -172,6 +184,13 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   including when WordPress refuses because this account is not allowed one — and
   it only offers the button when core would honour it, which is a question asked
   **per user**, not per site, since a role can be withheld from it.
+- **The panel no longer blanks when you change something on it.** Every save
+  refetched the panel, and the panel hid itself while fetching — so ticking a
+  checkbox made the whole screen vanish and rebuild. A setting that makes the
+  screen disappear and come back reads as one that did not save. Only the first
+  read shows a loading state now; the toggle also moves at once and rolls back
+  with a message if the save fails, rather than waiting on a round trip to say
+  anything.
 - The MCP endpoint answers **405** to `GET` and `DELETE`, with `Allow: POST`.
   Streamable HTTP reserves those verbs for an event stream and for ending a
   session, neither of which this server offers; the 404 they produced before
