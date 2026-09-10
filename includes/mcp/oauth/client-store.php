@@ -65,10 +65,19 @@ class ClientStore {
 		$clients = self::all();
 		$clients[ $client['client_id'] ] = $client;
 
-		// Oldest first out, so a burst of registrations cannot push out the client
-		// someone is actually using before the older ones go.
+		// Registration is open — a hosted connector signs itself up, unasked and
+		// unauthenticated — so a burst of them can push older entries past the
+		// cap. Oldest out first, and their tokens go with them: a token that
+		// outlives its registration is access with nothing left to show where it
+		// came from, and the client holding it would keep working while the panel
+		// showed nobody.
 		if ( count( $clients ) > self::MAX_CLIENTS ) {
+			$evicted = array_slice( $clients, 0, count( $clients ) - self::MAX_CLIENTS, true );
 			$clients = array_slice( $clients, -self::MAX_CLIENTS, null, true );
+
+			foreach ( array_keys( $evicted ) as $gone ) {
+				\Zaplane\Mcp\TokenStore::revoke_for_client( (string) $gone );
+			}
 		}
 
 		update_option( self::OPTION, $clients, false );

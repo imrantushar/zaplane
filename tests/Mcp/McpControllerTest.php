@@ -17,6 +17,11 @@ class McpControllerTest extends TestCase {
 		parent::setUp();
 		Catalog::flush();
 		$this->enableFeature();
+
+		// Every token now acts as its user and is held to what that user can do.
+		// These tests are about dispatch, so they run as somebody who may — the
+		// gate itself is tested on its own, below.
+		$GLOBALS['zaplane_test_caps'] = [ 'manage_options' ];
 	}
 
 	private function enableFeature( bool $on = true ): void {
@@ -163,6 +168,64 @@ class McpControllerTest extends TestCase {
 
 		$this->assertSame( 'fail', $endpoint['status'] );
 		$this->assertStringContainsString( 'pointer', $endpoint['label'] );
+	}
+
+	/**
+	 * The token acts as the account it was issued to, and is refused when that
+	 * account cannot manage this site.
+	 *
+	 * This is the whole point of recording a user on a token. Before, nothing
+	 * applied it: no user was set, no capability was asked, and a token issued
+	 * to anybody at all reached as far as an administrator's.
+	 *
+	 * @test
+	 */
+	public function a_token_is_refused_when_its_user_cannot_manage_the_site(): void {
+		$issued = TokenStore::issue( 'Client', TokenStore::DEFAULT_SCOPES, 42 );
+
+		$GLOBALS['zaplane_test_caps'] = [];
+
+		$controller = new McpController();
+		$result     = $controller->check_bearer( $this->request( [], $issued['token'] ) );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 403, $result->get_error_data()['status'] );
+	}
+
+	/**
+	 * Demotion has to take effect. The capability is asked on every call rather
+	 * than once when the token was made, so a token outliving the standing of
+	 * the person it was issued to stops working.
+	 *
+	 * @test
+	 */
+	public function the_capability_is_asked_on_every_call_not_once_at_issue(): void {
+		$issued     = TokenStore::issue( 'Client', TokenStore::DEFAULT_SCOPES, 42 );
+		$controller = new McpController();
+
+		$GLOBALS['zaplane_test_caps'] = [ 'manage_options' ];
+		$this->assertTrue( $controller->check_bearer( $this->request( [], $issued['token'] ) ) );
+
+		// Same token, same everything, after the account loses the capability.
+		$GLOBALS['zaplane_test_caps'] = [];
+		$this->assertInstanceOf( \WP_Error::class, $controller->check_bearer( $this->request( [], $issued['token'] ) ) );
+	}
+
+	/**
+	 * The token's user becomes the current user, which is what makes the
+	 * capability question meaningful and the audit trail true.
+	 *
+	 * @test
+	 */
+	public function the_token_s_user_becomes_the_current_user(): void {
+		$issued = TokenStore::issue( 'Client', TokenStore::DEFAULT_SCOPES, 4242 );
+
+		$GLOBALS['zaplane_test_caps'] = [ 'manage_options' ];
+		unset( $GLOBALS['zaplane_test_current_user'] );
+
+		( new McpController() )->check_bearer( $this->request( [], $issued['token'] ) );
+
+		$this->assertSame( 4242, $GLOBALS['zaplane_test_current_user'] ?? 0 );
 	}
 
 	/**

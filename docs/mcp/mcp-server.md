@@ -281,24 +281,29 @@ bridge still works:
 npx mcp-remote https://example.com/wp-json/zaplane/v1/mcp --header "Authorization: Bearer <token>"
 ```
 
-## Letting someone else connect
+## Who a credential acts as
 
-A person who cannot manage the site can still connect their own AI client. They
-start it as usual; the consent screen tells them an administrator has been asked,
-and waits. The administrator sees a count on the Zaplane menu and the request on
-**Settings → AI access**, with who asked and a checkbox per scope. Once they
-decide, the waiting page carries on by itself.
+Every credential acts as the account it was issued to, and every call asks
+whether that account may still `manage_options` — the capability Zaplane asks of
+everyone on every one of its own screens.
 
-The token acts as **the requester**, not the approver — allowing a colleague's
-client must not hand them authority they do not have — and carries only the
-scopes that were ticked, never more than the client asked for. Requests expire
-after 15 minutes.
+Asked on **every call**, not once when the credential was made. A credential
+outlives the standing of the person it was issued to, so demoting or deleting
+that account has to take effect, and does: the next call is refused with 403.
 
-Only signed-in users can leave a request, so the queue cannot be filled from
-outside. Nothing here changes the protocol: to the client this is the ordinary
-authorization-code redirect, taking longer than usual. That is deliberate — no
-MCP client implements the grant designed for approving elsewhere (RFC 8628), so
-anything needing their cooperation would never be used.
+This is why an application password and an issued token now behave the same way.
+Core authenticates the application password and sets the user; a bearer token
+authenticates nobody, so the recorded user is applied at the endpoint. Either
+way the same question follows, and the audit trail names somebody real.
+
+It used to be otherwise. A bearer token recorded a user and nothing applied it —
+no user was set, no capability was asked — so every token reached as far as an
+administrator's, whoever it had been issued to.
+
+That is also why somebody who cannot manage this site can no longer ask an
+administrator to let their client in. A credential issued to them would be
+refused on every call, so the consent screen says so rather than parking a
+request and producing one that does not work.
 
 ## Registered clients
 

@@ -56,18 +56,38 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   internet — a development hostname cannot be resolved by claude.ai or ChatGPT,
   whose servers look it up from outside, and all they can report is that they
   could not sign in.
-- **Someone who cannot manage the site can now ask to connect, and an
-  administrator lets them in.** They used to reach the consent screen and find a
-  dead end. Their request is parked instead, the administrator sees it — with who
-  asked, and per-scope checkboxes so `run` can be declined rather than accepted
-  wholesale — and the browser that is waiting carries on by itself once they
-  decide. The token acts as **the person who asked**, not the administrator who
-  allowed it, so approving a colleague's client does not quietly hand them more
-  authority than they have. Requests expire after 15 minutes, and only signed-in
-  users can leave one, so nobody can raise prompts in wp-admin from outside.
-- The count appears as a **bubble on the Zaplane menu**, like pending comments.
-  An admin notice is not dependable for this: plugins remove them wholesale, and
-  Zaplane's own screens do too so the app is not framed by other people's banners.
+- **Every credential acts as the account it was issued to, and is held to what
+  that account can do.** A token recorded a user and nothing applied it — no user
+  was set on the request, no capability was ever asked — so a token issued to
+  anybody at all reached exactly as far as an administrator's, and one issued to
+  an administrator who was later demoted or deleted kept working forever. The
+  endpoint now becomes the token's user and asks for `manage_options`, which is
+  what Zaplane asks of everyone on every one of its own screens. Asked on every
+  call rather than once at issue, so demotion takes effect.
+
+  This retires the queue that let somebody without `manage_options` ask an
+  administrator to allow their client. It was built on the premise that the
+  resulting token would act as the person who asked and so carry no more
+  authority than they had; it never did, and now that it does, such a token is
+  refused every time it is used. The consent screen says so plainly instead of
+  parking a request and producing a credential that does not work. The menu
+  bubble goes with it.
+- **Losing a registration now revokes what it held.** Registration is open and
+  unauthenticated — a hosted connector signs itself up unasked — so a burst of
+  it pushes older entries past the 50-client cap. Their tokens used to stay
+  behind: access still working, with nothing left to show where it came from,
+  which is the exact thing removing a client by hand was careful to avoid.
+- **A token's "last used" no longer lands on the wrong token, and no longer
+  writes on every call.** It was stamped by position in the stored list, and a
+  revoke between verifying and stamping shifts every later record down one. The
+  write was also a read-modify-write of the whole list on every authenticated
+  call, so two requests arriving together could lose each other's work —
+  including a token issued in between. Now keyed by id, and at most once a
+  minute.
+- **Tokens that can never be used again are cleared out** when the next one is
+  issued. Nothing pruned them before: an expired token was refused but kept
+  forever. One still holding a refresh token is left alone — it is waiting to be
+  renewed, not dead.
 - The header is offered as **two fields, name and value**, because that is how a
   connector dialog asks for it — with a note that `Bearer` is part of the value.
   Pasting the token on its own is the usual way this goes wrong, and it fails

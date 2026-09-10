@@ -10,7 +10,6 @@ use Zaplane\Mcp\AuditLog;
 use Zaplane\Mcp\Connections;
 use Zaplane\Mcp\OAuth\ClientStore;
 use Zaplane\Mcp\OAuth\Discovery;
-use Zaplane\Mcp\OAuth\PendingStore;
 use Zaplane\Mcp\OAuth\Server as OAuthServer;
 use Zaplane\Mcp\ToolRegistry;
 use Zaplane\Mcp\TokenStore;
@@ -136,30 +135,6 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_token' ],
-					'permission_callback' => $admin,
-				],
-			]
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/mcp/pending',
-			[
-				[
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'list_pending' ],
-					'permission_callback' => $admin,
-				],
-			]
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/mcp/pending/(?P<id>zpq_[a-z0-9]+)',
-			[
-				[
-					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'decide_pending' ],
 					'permission_callback' => $admin,
 				],
 			]
@@ -403,6 +378,19 @@ class McpController extends WP_REST_Controller {
 			return false;
 		}
 
+		// Act as whoever the token belongs to, and hold them to what they can
+		// actually do. Without this the token's user was decoration: no user was
+		// ever set, no capability was ever checked, and every token — including
+		// one issued to somebody who has since been demoted or deleted — carried
+		// the same authority as an administrator's.
+		if ( ! self::assume( $token ) ) {
+			return new \WP_Error(
+				'zaplane_mcp_forbidden',
+				__( 'This credential belongs to an account that cannot manage this site.', 'zaplane' ),
+				[ 'status' => 403 ]
+			);
+		}
+
 		$retry_after = self::rate_limit_retry_after( (string) $token['id'] );
 		if ( $retry_after > 0 ) {
 			// Returning false here would render as 401 "you are not allowed to do
@@ -428,6 +416,39 @@ class McpController extends WP_REST_Controller {
 		$this->token = $token;
 
 		return true;
+	}
+
+	/**
+	 * Become the token's user, and say whether they may act at all.
+	 *
+	 * An application password has already been authenticated by core, so the
+	 * current user is set and this only re-asks the capability. A bearer token
+	 * has authenticated nobody — the request arrives with no user — so the
+	 * recorded one is applied here, which is what makes the capability question
+	 * meaningful and the audit trail true.
+	 *
+	 * Zaplane asks `manage_options` of everyone on every one of its screens.
+	 * A token cannot be a way around that, so it is asked here too, on every
+	 * call rather than once at issue: a token outlives the standing of the
+	 * person it was issued to, and demotion has to take effect.
+	 *
+	 * @param array<string,mixed> $token The resolved token.
+	 */
+	private static function assume( array $token ): bool {
+		$user_id = (int) ( $token['user_id'] ?? 0 );
+
+		// A token issued before scoping existed has no user recorded. It is
+		// honoured for compatibility, but it cannot be anybody, so there is no
+		// capability to check and nothing to become.
+		if ( ! empty( $token['legacy'] ) && 0 === $user_id ) {
+			return true;
+		}
+
+		if ( $user_id > 0 && get_current_user_id() !== $user_id ) {
+			wp_set_current_user( $user_id );
+		}
+
+		return current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -574,51 +595,6 @@ class McpController extends WP_REST_Controller {
 		}
 
 		return rest_ensure_response( [ 'revoked' => true ] );
-	}
-
-	/**
-	 * Connection requests waiting on a decision.
-	 *
-	 * @return \WP_REST_Response
-	 */
-	public function list_pending() {
-		$rows = array_map(
-			fn( $r ) => [
-				'id'           => $r['id'],
-				'client_name'  => $r['client_name'],
-				'user_name'    => $r['user_name'],
-				'scopes'       => $r['scopes'],
-				'status'       => $r['status'],
-				'requested_at' => $r['requested_at'],
-			],
-			PendingStore::all()
-		);
-
-		return rest_ensure_response( [ 'pending' => $rows ] );
-	}
-
-	/**
-	 * Allow or refuse one, granting no more than the administrator ticked.
-	 *
-	 * @param \WP_REST_Request $request
-	 * @return \WP_REST_Response|\WP_Error
-	 */
-	public function decide_pending( $request ) {
-		$id = (string) $request['id'];
-
-		if ( null === PendingStore::find( $id ) ) {
-			return new \WP_Error( 'not_found', __( 'That request is no longer waiting.', 'zaplane' ), [ 'status' => 404 ] );
-		}
-
-		if ( 'approve' !== $request->get_param( 'decision' ) ) {
-			PendingStore::forget( $id );
-
-			return rest_ensure_response( [ 'denied' => true ] );
-		}
-
-		PendingStore::approve( $id, (array) $request->get_param( 'scopes' ) );
-
-		return rest_ensure_response( [ 'approved' => true ] );
 	}
 
 	/**

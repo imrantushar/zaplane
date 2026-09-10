@@ -1500,6 +1500,14 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'wp_set_current_user' ) ) {
+		function wp_set_current_user( $id, $name = '' ) {
+			$GLOBALS['zaplane_test_current_user'] = (int) $id;
+
+			return (object) [ 'ID' => (int) $id ];
+		}
+	}
+
 	if ( ! function_exists( 'current_user_can' ) ) {
 		function current_user_can( string $capability ): bool {
 			// Default false, as most tests expect. A test that needs a capable

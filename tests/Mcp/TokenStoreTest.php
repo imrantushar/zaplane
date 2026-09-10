@@ -201,4 +201,67 @@ class TokenStoreTest extends TestCase {
 		$this->assertSame( [ 2, 7 ], TokenStore::sanitize_workflows( [ '7', 2, 0, -4, 'x', 7 ] ) );
 		$this->assertSame( [], TokenStore::sanitize_workflows( [] ) );
 	}
+
+	/**
+	 * The stamp goes on the token that was used, not on whatever now sits where
+	 * it used to. This took an array index captured while verifying, and a
+	 * revoke in between shifts every later record down one.
+	 *
+	 * @test
+	 */
+	public function last_used_lands_on_the_token_that_was_used(): void {
+		$first  = TokenStore::issue( 'First' );
+		$second = TokenStore::issue( 'Second' );
+		$third  = TokenStore::issue( 'Third' );
+
+		// The record in front of it goes away, shifting the rest down.
+		TokenStore::revoke( $first['id'] );
+
+		TokenStore::resolve( $third['token'] );
+
+		foreach ( TokenStore::all() as $row ) {
+			if ( $third['id'] === $row['id'] ) {
+				$this->assertNotNull( $row['last_used_at'], 'The used token should be stamped' );
+			}
+
+			if ( $second['id'] === $row['id'] ) {
+				$this->assertNull( $row['last_used_at'], 'A token nobody used must not be stamped' );
+			}
+		}
+	}
+
+	/**
+	 * A token that expired with no refresh token can never be used again, so it
+	 * goes. One still holding a refresh token is not dead — it is waiting to be
+	 * renewed — and dropping it would end a working connection.
+	 *
+	 * @test
+	 */
+	public function issuing_clears_out_tokens_that_can_never_be_used_again(): void {
+		$dead  = TokenStore::issue( 'Lapsed', TokenStore::DEFAULT_SCOPES, 0, [ 'expires_in' => 1 ] );
+		$alive = TokenStore::issue( 'Lapsed but renewable', TokenStore::DEFAULT_SCOPES, 0, [ 'expires_in' => 1, 'with_refresh' => true ] );
+
+		$this->ageOut( $dead['id'] );
+		$this->ageOut( $alive['id'] );
+
+		TokenStore::issue( 'Something new' );
+
+		$ids = array_column( TokenStore::all(), 'id' );
+
+		$this->assertNotContains( $dead['id'], $ids );
+		$this->assertContains( $alive['id'], $ids, 'A refresh token is a way back; the record has to stay' );
+	}
+
+	/** Push a token's expiry well past the grace period. */
+	private function ageOut( string $id ): void {
+		$records = get_option( 'zaplane_mcp_tokens', [] );
+
+		foreach ( $records as $i => $record ) {
+			if ( $id === ( $record['id'] ?? '' ) ) {
+				$records[ $i ]['expires_at'] = time() - ( 30 * DAY_IN_SECONDS );
+			}
+		}
+
+		update_option( 'zaplane_mcp_tokens', $records, false );
+	}
 }

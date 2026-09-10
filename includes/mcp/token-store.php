@@ -94,7 +94,7 @@ class TokenStore {
 			$refresh = wp_generate_password( 48, false );
 		}
 
-		$records   = self::records();
+		$records   = self::prune( self::records() );
 		$records[] = [
 			'id'           => $id,
 			'name'         => $name,
@@ -176,7 +176,7 @@ class TokenStore {
 		if ( 0 === strpos( $presented, 'zpl_' ) && false !== strpos( $presented, '.' ) ) {
 			[ $id, $secret ] = explode( '.', substr( $presented, 4 ), 2 );
 
-			foreach ( $records as $index => $record ) {
+			foreach ( $records as $record ) {
 				if ( $record['id'] !== $id ) {
 					continue;
 				}
@@ -190,7 +190,7 @@ class TokenStore {
 					return null;
 				}
 
-				self::touch( $index );
+				self::touch( (string) $record['id'] );
 
 				return $record;
 			}
@@ -307,6 +307,41 @@ class TokenStore {
 	/**
 	 * @return array<int,array<string,mixed>>
 	 */
+	/**
+	 * Drop records that can never be used again.
+	 *
+	 * Only those: an access token that has lapsed but still carries a refresh
+	 * token is not dead, it is waiting to be renewed, and dropping it would end
+	 * a working connection. What goes is a token that expired with no way back.
+	 *
+	 * Done when a token is issued rather than on a schedule, because that is the
+	 * only moment this option grows and the only moment the cost is already
+	 * being paid.
+	 *
+	 * @param array<int,array<string,mixed>> $records
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function prune( array $records ): array {
+		// Long enough that a client which was merely switched off over a holiday
+		// still finds its token where it left it.
+		$grace = 7 * DAY_IN_SECONDS;
+
+		return array_values(
+			array_filter(
+				$records,
+				static function ( array $record ) use ( $grace ): bool {
+					$expires = (int) ( $record['expires_at'] ?? 0 );
+
+					if ( 0 === $expires || '' !== (string) ( $record['refresh_hash'] ?? '' ) ) {
+						return true;
+					}
+
+					return $expires + $grace > time();
+				}
+			)
+		);
+	}
+
 	private static function records(): array {
 		$raw = get_option( self::OPTION, [] );
 
@@ -350,15 +385,41 @@ class TokenStore {
 		update_option( self::OPTION, array_values( $records ), false );
 	}
 
-	private static function touch( int $index ): void {
+	/**
+	 * Stamp when a token was last used.
+	 *
+	 * By id, not by position. The index this used to take was captured while
+	 * verifying, and a revoke or an issue in between shifts every later record
+	 * down one — isset() still passes, and the stamp lands on somebody else's
+	 * token.
+	 *
+	 * And not on every call. This is a read-modify-write of one option holding
+	 * every token, so two requests arriving together can lose each other's work
+	 * — including a token issued between another request's read and its write.
+	 * A minute's resolution is all "last used" ever needed, and it takes the
+	 * write off the hot path for a client making hundreds of calls a minute.
+	 *
+	 * @param string $id The token that was just used.
+	 */
+	private static function touch( string $id ): void {
 		$records = self::records();
 
-		if ( ! isset( $records[ $index ] ) ) {
+		foreach ( $records as $i => $record ) {
+			if ( (string) $record['id'] !== $id ) {
+				continue;
+			}
+
+			$last = strtotime( (string) ( $record['last_used_at'] ?? '' ) );
+
+			if ( $last && ( time() - $last ) < MINUTE_IN_SECONDS ) {
+				return;
+			}
+
+			$records[ $i ]['last_used_at'] = current_time( 'mysql' );
+
+			self::persist( $records );
+
 			return;
 		}
-
-		$records[ $index ]['last_used_at'] = current_time( 'mysql' );
-
-		self::persist( $records );
 	}
 }

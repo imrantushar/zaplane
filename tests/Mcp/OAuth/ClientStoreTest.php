@@ -150,4 +150,28 @@ class ClientStoreTest extends TestCase {
 		$this->assertNull( ClientStore::get( $client['client_id'] ) );
 		$this->assertFalse( ClientStore::forget( $client['client_id'] ) );
 	}
+
+	/**
+	 * Registration is open and unauthenticated, so a burst of it can push older
+	 * entries past the cap. Their tokens have to go with them: one outliving its
+	 * registration is access with nothing left to show where it came from, and
+	 * the client holding it would keep working while the panel showed nobody.
+	 *
+	 * @test
+	 */
+	public function evicting_a_registration_revokes_what_it_holds(): void {
+		$victim = ClientStore::register( [ 'client_name' => 'First in', 'redirect_uris' => [ 'https://example.com/cb' ] ] );
+
+		\Zaplane\Mcp\TokenStore::issue( 'Its token', \Zaplane\Mcp\TokenStore::DEFAULT_SCOPES, 0, [ 'client_id' => $victim['client_id'] ] );
+
+		$this->assertCount( 1, \Zaplane\Mcp\TokenStore::all() );
+
+		// Fill past the cap, so the first one registered falls out.
+		for ( $i = 0; $i < 50; $i++ ) {
+			ClientStore::register( [ 'client_name' => 'Filler ' . $i, 'redirect_uris' => [ 'https://example.com/cb-' . $i ] ] );
+		}
+
+		$this->assertArrayNotHasKey( $victim['client_id'], ClientStore::all(), 'The oldest registration should have been evicted' );
+		$this->assertSame( [], \Zaplane\Mcp\TokenStore::all(), 'Its token must not outlive it' );
+	}
 }

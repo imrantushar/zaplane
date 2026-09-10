@@ -209,11 +209,13 @@ class Server {
 			exit;
 		}
 
-		// Not an administrator? Park the request rather than refusing it, and let
-		// this page wait. The client sees an ordinary authorization-code redirect
-		// that took a while, so nothing on its side has to understand any of this.
+		// Zaplane asks `manage_options` of everyone on every one of its screens,
+		// and a token cannot be a way around that — the endpoint asks the same
+		// question of every call. Somebody who cannot manage the site would be
+		// approving a credential that is refused the moment it is used, so say
+		// so here instead of issuing one.
 		if ( ! current_user_can( 'manage_options' ) ) {
-			self::await_approval( $client, $redirect_uri, $state, $challenge, $scopes );
+			self::refuse_page( $client );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading the verb, not form data; the branch it opens checks a nonce first.
@@ -232,46 +234,27 @@ class Server {
 	}
 
 	/**
-	 * Hold a request that an administrator has not decided on yet.
+	 * Tell somebody who cannot manage this site that this is not for them.
 	 *
-	 * The token this eventually mints belongs to the person who asked, not to the
-	 * administrator who allowed it — approving a colleague's client must not hand
-	 * them a credential that acts with more authority than they have.
+	 * This used to park the request for an administrator to allow, on the
+	 * reasoning that the token would act as the person who asked and so carry no
+	 * more authority than they had. It never did act as them — nothing applied
+	 * the recorded user, so every token had an administrator's reach — and now
+	 * that it does, a token issued to somebody without `manage_options` is
+	 * refused on every call. Approving one would have been a courtesy that
+	 * produced a credential which does not work.
 	 *
-	 * @param array<string,mixed> $client       The registered client.
-	 * @param string              $redirect_uri Already matched against the client.
-	 * @param string              $state        Client state, echoed back untouched.
-	 * @param string              $challenge    The PKCE challenge this is bound to.
-	 * @param array<int,string>   $scopes       What the client asked for.
+	 * @param array<string,mixed> $client The client asking to connect.
 	 */
-	private static function await_approval( array $client, string $redirect_uri, string $state, string $challenge, array $scopes ): void {
-		$pending = PendingStore::request( $client, $redirect_uri, $challenge, $scopes, get_current_user_id() );
-
-		if ( PendingStore::APPROVED === $pending['status'] ) {
-			// Spent on use, so an approval cannot be replayed for a second code.
-			PendingStore::forget( (string) $pending['id'] );
-
-			self::grant( $client, $redirect_uri, $state, $challenge, (array) $pending['granted'], (int) $pending['user_id'] );
-		}
-
-		self::waiting_page( $client );
-	}
-
-	/**
-	 * @param array<string,mixed> $client
-	 */
-	private static function waiting_page( array $client ): void {
+	private static function refuse_page( array $client ): void {
 		self::page(
-			__( 'Waiting for approval', 'zaplane' ),
+			__( 'You cannot approve this', 'zaplane' ),
 			'<p>' . sprintf(
 				/* translators: %s: the connecting application's name. */
-				esc_html__( 'An administrator has been asked to allow %s to connect. This page will continue on its own once they do.', 'zaplane' ),
+				esc_html__( '%s is asking to connect to this site through Zaplane, which only an administrator can allow.', 'zaplane' ),
 				'<strong>' . esc_html( (string) $client['client_name'] ) . '</strong>'
 			) . '</p>'
-			. '<p class="muted">' . esc_html__( 'You can leave this open. The request expires in 15 minutes.', 'zaplane' ) . '</p>'
-			// Reloading this same URL is the whole mechanism: every check goes back
-			// through the validation above rather than trusting a second entry point.
-			. '<script>setTimeout(function(){location.reload();},4000);</script>'
+			. '<p class="muted">' . esc_html__( 'Ask whoever administers this site to connect it from their own account. A credential issued to yours would be refused every time it was used.', 'zaplane' ) . '</p>'
 		);
 	}
 
