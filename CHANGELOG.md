@@ -56,6 +56,18 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   internet — a development hostname cannot be resolved by claude.ai or ChatGPT,
   whose servers look it up from outside, and all they can report is that they
   could not sign in.
+- **Someone who cannot manage the site can now ask to connect, and an
+  administrator lets them in.** They used to reach the consent screen and find a
+  dead end. Their request is parked instead, the administrator sees it — with who
+  asked, and per-scope checkboxes so `run` can be declined rather than accepted
+  wholesale — and the browser that is waiting carries on by itself once they
+  decide. The token acts as **the person who asked**, not the administrator who
+  allowed it, so approving a colleague's client does not quietly hand them more
+  authority than they have. Requests expire after 15 minutes, and only signed-in
+  users can leave one, so nobody can raise prompts in wp-admin from outside.
+- The count appears as a **bubble on the Zaplane menu**, like pending comments.
+  An admin notice is not dependable for this: plugins remove them wholesale, and
+  Zaplane's own screens do too so the app is not framed by other people's banners.
 - **A self-check on the AI access panel, for when a client will not connect.** An
   AI client can only report the symptom from outside — "could not reach", "could
   not register" — which says nothing about the cause. **Run check** tests the same
@@ -210,6 +222,10 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   control that was unreadable on the dark ground.
 
 ### Fixed — Settings
+- Primary buttons inside the AI access panel rendered as white text on a white
+  card. `bg-[var(--…)]` computed transparent there — something in the admin beats
+  the generated class — so **Issue token** and the new approval button were
+  invisible rather than merely unstyled.
 - The **Run** scope pill had no background tint: Tailwind's `/opacity` syntax
   needs a real colour to work on, and these are CSS variables. Uses `color-mix`,
   like the teaser components already did.

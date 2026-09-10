@@ -6,6 +6,7 @@ use WP_REST_Controller;
 use WP_REST_Server;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Mcp\OAuth\Discovery;
+use Zaplane\Mcp\OAuth\PendingStore;
 use Zaplane\Mcp\OAuth\Server as OAuthServer;
 use Zaplane\Mcp\ToolRegistry;
 use Zaplane\Mcp\TokenStore;
@@ -119,6 +120,30 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_token' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/pending',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'list_pending' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/mcp/pending/(?P<id>zpq_[a-z0-9]+)',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'decide_pending' ],
 					'permission_callback' => $admin,
 				],
 			]
@@ -356,6 +381,51 @@ class McpController extends WP_REST_Controller {
 			__( 'The MCP endpoint accepts POST. It has no event stream to open and no session to end.', 'zaplane' ),
 			[ 'status' => 405 ]
 		);
+	}
+
+	/**
+	 * Connection requests waiting on a decision.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function list_pending() {
+		$rows = array_map(
+			fn( $r ) => [
+				'id'           => $r['id'],
+				'client_name'  => $r['client_name'],
+				'user_name'    => $r['user_name'],
+				'scopes'       => $r['scopes'],
+				'status'       => $r['status'],
+				'requested_at' => $r['requested_at'],
+			],
+			PendingStore::all()
+		);
+
+		return rest_ensure_response( [ 'pending' => $rows ] );
+	}
+
+	/**
+	 * Allow or refuse one, granting no more than the administrator ticked.
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function decide_pending( $request ) {
+		$id = (string) $request['id'];
+
+		if ( null === PendingStore::find( $id ) ) {
+			return new \WP_Error( 'not_found', __( 'That request is no longer waiting.', 'zaplane' ), [ 'status' => 404 ] );
+		}
+
+		if ( 'approve' !== $request->get_param( 'decision' ) ) {
+			PendingStore::forget( $id );
+
+			return rest_ensure_response( [ 'denied' => true ] );
+		}
+
+		PendingStore::approve( $id, (array) $request->get_param( 'scopes' ) );
+
+		return rest_ensure_response( [ 'approved' => true ] );
 	}
 
 	/**

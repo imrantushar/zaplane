@@ -188,8 +188,11 @@ class Server {
 			exit;
 		}
 
+		// Not an administrator? Park the request rather than refusing it, and let
+		// this page wait. The client sees an ordinary authorization-code redirect
+		// that took a while, so nothing on its side has to understand any of this.
 		if ( ! current_user_can( 'manage_options' ) ) {
-			self::fail_page( __( 'Only an administrator can connect an AI client to this site.', 'zaplane' ) );
+			self::await_approval( $client, $redirect_uri, $state, $challenge, $scopes );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading the verb, not form data; the branch it opens checks a nonce first.
@@ -208,13 +211,59 @@ class Server {
 	}
 
 	/**
+	 * Hold a request that an administrator has not decided on yet.
+	 *
+	 * The token this eventually mints belongs to the person who asked, not to the
+	 * administrator who allowed it — approving a colleague's client must not hand
+	 * them a credential that acts with more authority than they have.
+	 *
+	 * @param array<string,mixed> $client       The registered client.
+	 * @param string              $redirect_uri Already matched against the client.
+	 * @param string              $state        Client state, echoed back untouched.
+	 * @param string              $challenge    The PKCE challenge this is bound to.
+	 * @param array<int,string>   $scopes       What the client asked for.
+	 */
+	private static function await_approval( array $client, string $redirect_uri, string $state, string $challenge, array $scopes ): void {
+		$pending = PendingStore::request( $client, $redirect_uri, $challenge, $scopes, get_current_user_id() );
+
+		if ( PendingStore::APPROVED === $pending['status'] ) {
+			// Spent on use, so an approval cannot be replayed for a second code.
+			PendingStore::forget( (string) $pending['id'] );
+
+			self::grant( $client, $redirect_uri, $state, $challenge, (array) $pending['granted'], (int) $pending['user_id'] );
+		}
+
+		self::waiting_page( $client );
+	}
+
+	/**
+	 * @param array<string,mixed> $client
+	 */
+	private static function waiting_page( array $client ): void {
+		self::page(
+			__( 'Waiting for approval', 'zaplane' ),
+			'<p>' . sprintf(
+				/* translators: %s: the connecting application's name. */
+				esc_html__( 'An administrator has been asked to allow %s to connect. This page will continue on its own once they do.', 'zaplane' ),
+				'<strong>' . esc_html( (string) $client['client_name'] ) . '</strong>'
+			) . '</p>'
+			. '<p class="muted">' . esc_html__( 'You can leave this open. The request expires in 15 minutes.', 'zaplane' ) . '</p>'
+			// Reloading this same URL is the whole mechanism: every check goes back
+			// through the validation above rather than trusting a second entry point.
+			. '<script>setTimeout(function(){location.reload();},4000);</script>'
+		);
+	}
+
+	/**
 	 * @param array<string,mixed> $client       The approved client.
 	 * @param string              $redirect_uri Where the code is delivered.
 	 * @param string              $state        Client state, echoed back untouched.
 	 * @param string              $challenge    The PKCE challenge the code is bound to.
 	 * @param array<int,string>   $scopes       Scopes the administrator approved.
+	 * @param int                 $user_id      Who the token acts as; 0 means the
+	 *                                          person on this page.
 	 */
-	private static function grant( array $client, string $redirect_uri, string $state, string $challenge, array $scopes ): void {
+	private static function grant( array $client, string $redirect_uri, string $state, string $challenge, array $scopes, int $user_id = 0 ): void {
 		$code = 'zac_' . wp_generate_password( 40, false );
 
 		set_transient(
@@ -225,7 +274,7 @@ class Server {
 				'redirect_uri' => $redirect_uri,
 				'challenge'    => $challenge,
 				'scopes'       => $scopes,
-				'user_id'      => get_current_user_id(),
+				'user_id'      => $user_id > 0 ? $user_id : get_current_user_id(),
 			],
 			self::CODE_TTL
 		);

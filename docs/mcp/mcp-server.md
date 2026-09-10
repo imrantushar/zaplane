@@ -214,6 +214,25 @@ bridge still works:
 npx mcp-remote https://example.com/wp-json/zaplane/v1/mcp --header "Authorization: Bearer <token>"
 ```
 
+## Letting someone else connect
+
+A person who cannot manage the site can still connect their own AI client. They
+start it as usual; the consent screen tells them an administrator has been asked,
+and waits. The administrator sees a count on the Zaplane menu and the request on
+**Settings → AI access**, with who asked and a checkbox per scope. Once they
+decide, the waiting page carries on by itself.
+
+The token acts as **the requester**, not the approver — allowing a colleague's
+client must not hand them authority they do not have — and carries only the
+scopes that were ticked, never more than the client asked for. Requests expire
+after 15 minutes.
+
+Only signed-in users can leave a request, so the queue cannot be filled from
+outside. Nothing here changes the protocol: to the client this is the ordinary
+authorization-code redirect, taking longer than usual. That is deliberate — no
+MCP client implements the grant designed for approving elsewhere (RFC 8628), so
+anything needing their cooperation would never be used.
+
 ## When a client will not connect
 
 **Settings → AI access → Run check.** A client can only tell you it failed. This

@@ -123,6 +123,7 @@ final class Zaplane {
 		// rather than rest_api_init, and must be registered on every request.
 		\Zaplane\Mcp\OAuth\Discovery::boot();
 		\Zaplane\Mcp\OAuth\Server::boot();
+		\Zaplane\Mcp\OAuth\PendingStore::boot();
 
 		// Initialize modules first
 		$modules = $this->container->get( 'modules' );

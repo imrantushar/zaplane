@@ -51,6 +51,16 @@ const CopyButton = ({ value, label }) => {
 // colour to work on, and these are CSS variables.
 const tint = (token, pct) => `color-mix(in srgb, var(${token}) ${pct}%, transparent)`;
 
+// Tailwind's bg-[var(--…)] loses to a more specific admin rule inside this app,
+// and computes transparent — a white label on a white card. Inline wins.
+const PRIMARY = { background: 'var(--zaplane-primary)', color: '#fff' };
+
+const SCOPE_LABELS = {
+  read: 'Read',
+  write: 'Build',
+  run: 'Run for real',
+};
+
 const STATUS = {
   ok:   { mark: '\u2713', color: 'var(--zaplane-success, #12b76a)' },
   warn: { mark: '\u26a0', color: 'var(--zaplane-warning)' },
@@ -125,6 +135,51 @@ const McpTab = () => {
   const tokens = info?.tokens || [];
   const [checks, setChecks] = useState(null);
   const [checking, setChecking] = useState(false);
+  const [pending, setPending] = useState([]);
+  const [grants, setGrants] = useState({});
+  const [deciding, setDeciding] = useState(null);
+
+  const loadPending = useCallback(async () => {
+    try {
+      const res = await API.get(`${namespace}mcp/pending`);
+      const rows = (res.data?.pending || []).filter(p => p.status === 'waiting');
+      setPending(rows);
+      // Everything asked for is pre-ticked except run, which has to be a choice.
+      setGrants(g => {
+        const next = { ...g };
+        rows.forEach(p => {
+          if (!next[p.id]) next[p.id] = p.scopes.filter(s => s !== 'run');
+        });
+        return next;
+      });
+    } catch (e) {
+      setPending([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadPending();
+    // Someone may be sitting on the waiting page right now.
+    const t = setInterval(loadPending, 10000);
+    return () => clearInterval(t);
+  }, [loadPending]);
+
+  const decide = async (id, decision) => {
+    setDeciding(id);
+    try {
+      await API.post(`${namespace}mcp/pending/${id}`, { decision, scopes: grants[id] || [] });
+      await loadPending();
+      await load();
+    } finally {
+      setDeciding(null);
+    }
+  };
+
+  const toggleGrant = (id, scope) =>
+    setGrants(g => {
+      const have = g[id] || [];
+      return { ...g, [id]: have.includes(scope) ? have.filter(s => s !== scope) : [...have, scope] };
+    });
 
   const runChecks = async () => {
     setChecking(true);
@@ -185,6 +240,62 @@ const McpTab = () => {
               </p>
             )}
           </div>
+
+          {pending.length > 0 && (
+            <div
+              className="rounded-[6px] p-4"
+              style={{ background: tint('--zaplane-primary', 6), border: `1px solid ${tint('--zaplane-primary', 30)}` }}
+            >
+              <div className="text-[13px] font-medium text-[var(--zaplane-font-color)]">
+                {__('Waiting for your approval', 'zaplane')}
+              </div>
+              <p className="mt-1 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+                {__('Someone who cannot manage this site has asked to connect an AI client. It acts as them, and only within what you allow here.', 'zaplane')}
+              </p>
+
+              <div className="mt-3 flex flex-col gap-3">
+                {pending.map(p => (
+                  <div key={p.id} className="rounded-[4px] border border-[var(--zaplane-border-color)] bg-[var(--zaplane-background)] p-3">
+                    <div className="text-[13px] text-[var(--zaplane-font-color)]">
+                      <strong>{p.client_name}</strong>
+                      {p.user_name ? ` ${__('for', 'zaplane')} ${p.user_name}` : ''}
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-3">
+                      {p.scopes.map(scope => (
+                        <label key={scope} className="flex items-center gap-1.5 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+                          <input
+                            type="checkbox"
+                            checked={(grants[p.id] || []).includes(scope)}
+                            onChange={() => toggleGrant(p.id, scope)}
+                          />
+                          {SCOPE_LABELS[scope] || scope}
+                        </label>
+                      ))}
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        type="button"
+                        disabled={deciding === p.id}
+                        onClick={() => decide(p.id, 'approve')}
+                        style={PRIMARY}
+                        className="rounded-[4px] px-3 py-1.5 text-[12px] font-semibold disabled:opacity-60"
+                      >
+                        {__('Allow', 'zaplane')}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={deciding === p.id}
+                        onClick={() => decide(p.id, 'deny')}
+                        className="rounded-[4px] border border-[var(--zaplane-border-color)] px-3 py-1.5 text-[12px] text-[var(--zaplane-font-color)] disabled:opacity-60"
+                      >
+                        {__('Refuse', 'zaplane')}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="rounded-[6px] border border-[var(--zaplane-border-color)] p-4">
             <div className="text-[13px] font-medium text-[var(--zaplane-font-color)]">
@@ -323,10 +434,13 @@ const McpTab = () => {
               type="button"
               onClick={issue}
               disabled={issuing || scopes.length === 0}
-              className={`mt-4 inline-flex items-center rounded-[4px] px-4 py-2 text-[13px] font-semibold transition-colors ${
+              style={
                 issuing || scopes.length === 0
-                  ? 'cursor-not-allowed bg-[var(--zaplane-secondary-color)] text-[var(--zaplane-text-muted)]'
-                  : 'cursor-pointer bg-[var(--zaplane-primary)] text-white hover:opacity-90'
+                  ? { background: 'var(--zaplane-secondary-color)', color: 'var(--zaplane-text-muted)' }
+                  : PRIMARY
+              }
+              className={`mt-4 inline-flex items-center rounded-[4px] px-4 py-2 text-[13px] font-semibold transition-colors ${
+                issuing || scopes.length === 0 ? 'cursor-not-allowed' : 'cursor-pointer hover:opacity-90'
               }`}
             >
               {issuing ? __('Issuing…', 'zaplane') : __('Issue token', 'zaplane')}
