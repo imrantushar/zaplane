@@ -291,8 +291,34 @@ class McpController extends WP_REST_Controller {
 				'tokens'     => TokenStore::all(),
 				'tool_count' => count( ToolRegistry::definitions() ),
 				'reachable'  => self::publicly_reachable(),
+				// Enough to choose which workflows a run-scoped token may start.
+				'workflows'  => self::workflow_choices(),
 			]
 		);
+	}
+
+	/**
+	 * Id and title for every workflow, for the picker on a run-scoped token.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function workflow_choices(): array {
+		try {
+			return array_map(
+				fn( $w ) => [
+					'id'     => (int) $w['id'],
+					'title'  => '' !== (string) $w['title'] ? (string) $w['title'] : __( 'Untitled workflow', 'zaplane' ),
+					'status' => (string) $w['status'],
+				],
+				\Zaplane\Framework\Database\ORM\DB::table( 'workflows' )
+					->orderBy( 'id', 'DESC' )
+					->fresh()
+					->get()
+					->toArray()
+			);
+		} catch ( \Throwable $e ) {
+			return [];
+		}
 	}
 
 	/**
@@ -331,7 +357,8 @@ class McpController extends WP_REST_Controller {
 		$issued = TokenStore::issue(
 			(string) ( $body['name'] ?? '' ),
 			(array) ( $body['scopes'] ?? TokenStore::DEFAULT_SCOPES ),
-			get_current_user_id()
+			get_current_user_id(),
+			[ 'workflows' => (array) ( $body['workflows'] ?? [] ) ]
 		);
 
 		// The secret is in this response and nowhere else.
@@ -983,6 +1010,25 @@ class McpController extends WP_REST_Controller {
 		// A workflow whose AI Agent points back at this site could otherwise start
 		// the workflow that is calling, and so on. Reads are harmless; starting a
 		// run is not.
+		// Holding `run` is not the same as holding it over everything. A token
+		// that named its workflows may start those and no others.
+		if ( TokenStore::SCOPE_RUN === $required ) {
+			$wanted = (int) ( $args['workflow_id'] ?? 0 );
+
+			if ( ! TokenStore::may_run( $token, $wanted ) ) {
+				AuditLog::record( $token, $name, AuditLog::REFUSED, 'workflow ' . $wanted . ' is outside this token' );
+
+				return self::tool_error(
+					$id,
+					sprintf(
+						'This token may only run workflows %s. Issue a token that includes workflow %d, or one with no workflow restriction.',
+						implode( ', ', array_map( 'strval', (array) $token['workflows'] ) ),
+						$wanted
+					)
+				);
+			}
+		}
+
 		if ( $self && TokenStore::SCOPE_RUN === $required ) {
 			AuditLog::record( $token, $name, AuditLog::REFUSED, 'self-referencing call' );
 

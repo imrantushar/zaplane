@@ -88,6 +88,13 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   the registration behind it. The panel now lists them, says which are actually
   connected, and removing one revokes its tokens too — a token outliving its
   registration is access with no visible origin.
+- **A `run` token can name the workflows it may start.** Holding `run` used to
+  mean holding it over every workflow on the site, which made it an
+  all-or-nothing decision — and clients ask for it by default. Tick Run when
+  issuing a token and a list appears; choose the ones that client is for.
+  Choosing none keeps the old meaning, so nothing already issued narrows
+  underneath anyone. A refused workflow says which ones the token covers, and
+  the refusal is recorded.
 - **AI client activity is recorded, and lives on the Logs screen** beside workflow
   runs — which is where people already go to find out what happened. Every tool
   call: which client, whose account, which tool, how it went, how long it took.

@@ -251,6 +251,20 @@ register and be approved again. Worth knowing before you tidy: an already
 connected client keeps pointing at its registration, and deleting that breaks it
 with an "unknown client" error that gives no clue why.
 
+## Limiting what `run` can start
+
+`run` is the scope that sends mail and takes payments, and holding it means
+holding it over every workflow — unless the token says otherwise. When issuing
+one, tick **Run** and a list of workflows appears; the token may then start those
+and no others.
+
+Choosing none means every workflow, now and in future, which is what tokens
+issued before this have and what "any" still means. A refused call names the
+workflows the token does cover, and the refusal is recorded in the log.
+
+The restriction lives on the token, so revoking or reissuing is how you change
+it.
+
 ## What clients have been doing
 
 **Zaplane → Logs → AI access.** Every tool call is recorded: the client, the

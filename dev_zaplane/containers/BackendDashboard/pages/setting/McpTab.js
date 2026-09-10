@@ -89,6 +89,7 @@ const McpTab = () => {
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
+  const [runWorkflows, setRunWorkflows] = useState([]);
   const [scopes, setScopes] = useState(['read', 'write']);
   const [issuing, setIssuing] = useState(false);
   // Shown once, immediately after issuing — the server never returns it again.
@@ -116,9 +117,15 @@ const McpTab = () => {
   const issue = async () => {
     setIssuing(true);
     try {
-      const res = await API.post(`${namespace}mcp/tokens`, { name, scopes });
+      const res = await API.post(`${namespace}mcp/tokens`, {
+        name,
+        scopes,
+        // Only meaningful with run; an empty list means every workflow.
+        workflows: scopes.includes('run') ? runWorkflows : [],
+      });
       setFreshToken(res.data);
       setName('');
+      setRunWorkflows([]);
       await load();
     } finally {
       setIssuing(false);
@@ -523,6 +530,42 @@ const McpTab = () => {
                 </label>
               ))}
             </div>
+            {/* `run` over every workflow is a bigger grant than most people mean.
+                Naming the ones a client is for turns it into a decision. */}
+            {scopes.includes('run') && (info?.workflows || []).length > 0 && (
+              <div className="mt-3 rounded-[4px] border border-[var(--zaplane-border-color)] p-3">
+                <div className="text-[12px] font-medium text-[var(--zaplane-font-color)]">
+                  {__('Which workflows may it run?', 'zaplane')}
+                </div>
+                <p className="mt-0.5 text-[12px] text-[var(--zaplane-text-muted)]">
+                  {runWorkflows.length === 0
+                    ? __('Choosing none means every workflow, now and in future.', 'zaplane')
+                    : sprintf(
+                        /* translators: %d: number of chosen workflows. */
+                        _n( 'Limited to %d workflow.', 'Limited to %d workflows.', runWorkflows.length, 'zaplane' ),
+                        runWorkflows.length
+                      )}
+                </p>
+                <div className="mt-2 flex max-h-[150px] flex-col gap-1.5 overflow-y-auto">
+                  {(info?.workflows || []).map(w => (
+                    <label key={w.id} className="flex items-center gap-2 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+                      <input
+                        type="checkbox"
+                        checked={runWorkflows.includes(w.id)}
+                        onChange={() =>
+                          setRunWorkflows(cur =>
+                            cur.includes(w.id) ? cur.filter(x => x !== w.id) : [...cur, w.id]
+                          )
+                        }
+                      />
+                      <span className="truncate text-[var(--zaplane-font-color)]">{w.title}</span>
+                      <span className="text-[var(--zaplane-text-muted)]">#{w.id}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <button
               type="button"
               onClick={issue}
@@ -624,6 +667,15 @@ const McpTab = () => {
                         ))}
                         {/* A row nobody remembers creating is confusing. Say when
                             it arrived through a connector's own sign-in instead. */}
+                        {(token.workflows || []).length > 0 ? (
+                          <span className="text-[12px] text-[var(--zaplane-text-muted)]">
+                            {sprintf(
+                              /* translators: %d: number of workflows the token is limited to. */
+                              _n( 'run limited to %d workflow', 'run limited to %d workflows', token.workflows.length, 'zaplane' ),
+                              token.workflows.length
+                            )}
+                          </span>
+                        ) : null}
                         {token.client_id ? (
                           <span className="rounded-full bg-[var(--zaplane-second-primary)] px-2 py-0.5 text-[11px] font-medium text-[var(--zaplane-font-secondary-color)]">
                             {__('connected app', 'zaplane')}
