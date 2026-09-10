@@ -123,8 +123,12 @@ namespace Zaplane\Tests {
 			return self::$scheduledActions[ $hook ] ?? false;
 		}
 
-		public static function setHttpResponse( array $body, int $status = 200 ): void {
-			self::$httpResponses[] = [ 'body' => wp_json_encode( $body ), 'status' => $status ];
+		public static function setHttpResponse( array $body, int $status = 200, array $headers = [] ): void {
+			self::$httpResponses[] = [
+				'body'    => wp_json_encode( $body ),
+				'status'  => $status,
+				'headers' => array_change_key_case( $headers ),
+			];
 		}
 
 		public static function nextHttpResponse(): ?array {
@@ -561,6 +565,12 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( '_n' ) ) {
+		function _n( string $single, string $plural, int $number, string $domain = 'default' ): string {
+			return 1 === $number ? $single : $plural;
+		}
+	}
+
 	if ( ! function_exists( 'rest_get_authenticated_app_password' ) ) {
 		function rest_get_authenticated_app_password() {
 			return $GLOBALS['zaplane_test_app_password_uuid'] ?? null;
@@ -900,7 +910,7 @@ namespace {
 			if ( $next === null ) {
 				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
 			}
-			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'] ];
+			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'], 'headers' => $next['headers'] ?? [] ];
 		}
 	}
 
@@ -910,7 +920,7 @@ namespace {
 			if ( $next === null ) {
 				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
 			}
-			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'] ];
+			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'], 'headers' => $next['headers'] ?? [] ];
 		}
 	}
 
@@ -923,6 +933,13 @@ namespace {
 	if ( ! function_exists( 'wp_remote_retrieve_response_code' ) ) {
 		function wp_remote_retrieve_response_code( $response ) {
 			return is_array( $response ) ? ( $response['response']['code'] ?? 200 ) : 0;
+		}
+	}
+
+	if ( ! function_exists( 'wp_remote_retrieve_header' ) ) {
+		function wp_remote_retrieve_header( $response, string $name ) {
+			$headers = is_array( $response ) ? ( $response['headers'] ?? [] ) : [];
+			return $headers[ strtolower( $name ) ] ?? '';
 		}
 	}
 

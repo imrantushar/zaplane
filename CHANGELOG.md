@@ -56,6 +56,15 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   internet — a development hostname cannot be resolved by claude.ai or ChatGPT,
   whose servers look it up from outside, and all they can report is that they
   could not sign in.
+- **A self-check on the AI access panel, for when a client will not connect.** An
+  AI client can only report the symptom from outside — "could not reach", "could
+  not register" — which says nothing about the cause. **Run check** tests the same
+  things the client does, from the site: whether the module is on, whether the
+  endpoint refuses an unauthenticated call with a pointer to the sign-in service,
+  whether the two discovery documents are actually served, whether the address is
+  reachable from the internet at all, and whether application passwords are
+  available. Each failure says what to do about it. A disabled module reports once
+  rather than cascading into three unrelated-looking failures.
 - **WordPress application passwords work as a third way in.** Core already
   authenticates them on REST requests, so a client that can send Basic auth needs
   no Zaplane token at all, and revoking it is where a WordPress user already

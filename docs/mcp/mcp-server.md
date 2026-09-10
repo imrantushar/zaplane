@@ -214,6 +214,25 @@ bridge still works:
 npx mcp-remote https://example.com/wp-json/zaplane/v1/mcp --header "Authorization: Bearer <token>"
 ```
 
+## When a client will not connect
+
+**Settings → AI access → Run check.** A client can only tell you it failed. This
+runs the same checks from the site, where the cause is visible:
+
+| Check | What a failure means |
+|---|---|
+| Module is on | Everything is refused before the credential is read, so any client reports a sign-in failure |
+| Endpoint refuses correctly | Anything but 401 means a security plugin, firewall or cache answered before WordPress did |
+| Refusal carries a discovery pointer | Without it a hosted connector concludes the server has no OAuth; something is stripping response headers |
+| Discovery documents are served | Some hosts serve `/.well-known/` from disk, shadowing them; static caches can too |
+| Address is reachable from the internet | A development hostname never arrives at claude.ai or ChatGPT, whose servers resolve it from outside |
+| Application passwords available | A security plugin has disabled them; use a token or OAuth instead |
+
+Two things that look like faults and are not: opening the endpoint URL in a
+browser returns **405**, because it is POST-only; and a `401` with a
+`WWW-Authenticate` header is the correct answer to an unauthenticated call, not a
+broken credential.
+
 ## Pre-existing tokens
 
 A token issued before scopes existed (the single `zaplane_mcp_token` option) is

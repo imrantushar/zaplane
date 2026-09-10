@@ -51,6 +51,13 @@ const CopyButton = ({ value, label }) => {
 // colour to work on, and these are CSS variables.
 const tint = (token, pct) => `color-mix(in srgb, var(${token}) ${pct}%, transparent)`;
 
+const STATUS = {
+  ok:   { mark: '\u2713', color: 'var(--zaplane-success, #12b76a)' },
+  warn: { mark: '\u26a0', color: 'var(--zaplane-warning)' },
+  fail: { mark: '\u2715', color: 'var(--zaplane-danger)' },
+  skip: { mark: '\u2013', color: 'var(--zaplane-text-muted)' },
+};
+
 const ScopePill = ({ scope }) => (
   <span
     className="rounded-full px-2 py-0.5 text-[11px] font-medium"
@@ -116,6 +123,19 @@ const McpTab = () => {
   };
 
   const tokens = info?.tokens || [];
+  const [checks, setChecks] = useState(null);
+  const [checking, setChecking] = useState(false);
+
+  const runChecks = async () => {
+    setChecking(true);
+    try {
+      const res = await API.get(`${namespace}mcp/diagnostics`);
+      setChecks(res.data?.checks || []);
+    } catch (e) {
+      setChecks([{ key: 'error', status: 'fail', label: __('Could not run the check', 'zaplane'), fix: e?.message || '' }]);
+    }
+    setChecking(false);
+  };
   const cliCommand = `claude mcp add --transport http zaplane ${info?.url || ''} --header "Authorization: Bearer YOUR_TOKEN"`;
 
   return (
@@ -213,6 +233,48 @@ const McpTab = () => {
             <p className="mt-4 text-[12px] text-[var(--zaplane-text-muted)]">
               {__('However a client connects, it can only do what its scopes allow, and revoking it disconnects it immediately.', 'zaplane')}
             </p>
+          </div>
+
+          {/* A client that cannot connect reports the symptom from outside —
+              "could not reach", "could not register" — which says nothing about
+              the cause. These checks run from the site, where it is visible. */}
+          <div className="rounded-[6px] border border-[var(--zaplane-border-color)] p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-[13px] font-medium text-[var(--zaplane-font-color)]">
+                  {__('A client cannot connect?', 'zaplane')}
+                </div>
+                <p className="mt-1 text-[12px] text-[var(--zaplane-font-secondary-color)]">
+                  {__('An AI client can only tell you it failed, not why. This checks the same things it does, from here.', 'zaplane')}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={runChecks}
+                disabled={checking}
+                className="shrink-0 rounded-[4px] border border-[var(--zaplane-border-color)] px-3 py-1.5 text-[12px] font-medium text-[var(--zaplane-font-color)] hover:bg-[var(--zaplane-secondary-color)] disabled:opacity-60"
+              >
+                {checking ? __('Checking…', 'zaplane') : __('Run check', 'zaplane')}
+              </button>
+            </div>
+
+            {checks && (
+              <ul className="mt-3 flex flex-col gap-2.5">
+                {checks.map(c => (
+                  <li key={c.key} className="flex gap-2.5 text-[12px]">
+                    <span className="mt-[3px] shrink-0" style={{ color: STATUS[c.status]?.color }}>
+                      {STATUS[c.status]?.mark || '•'}
+                    </span>
+                    <span>
+                      <span className="text-[var(--zaplane-font-color)]">{c.label}</span>
+                      {c.fix ? (
+                        <span className="mt-0.5 block text-[var(--zaplane-font-secondary-color)]">{c.fix}</span>
+                      ) : null}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {freshToken && (

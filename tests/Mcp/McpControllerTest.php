@@ -90,6 +90,82 @@ class McpControllerTest extends TestCase {
 	}
 
 	/**
+	 * @return array<string,string>
+	 */
+	private function diagnose(): array {
+		$checks = ( new McpController() )->diagnostics()->get_data()['checks'];
+
+		return array_column( $checks, 'status', 'key' );
+	}
+
+	/**
+	 * One real fault should not produce three diagnoses. With the module off the
+	 * endpoint and the discovery documents are *meant* to be unavailable, so
+	 * probing them would report causes that are not the cause.
+	 *
+	 * @test
+	 */
+	public function diagnostics_do_not_pile_false_causes_on_a_disabled_module(): void {
+		$this->enableFeature( false );
+
+		$status = $this->diagnose();
+
+		$this->assertSame( 'fail', $status['module'] );
+		$this->assertSame( 'skip', $status['endpoint'] );
+		$this->assertSame( 'skip', $status['discovery'] );
+	}
+
+	/**
+	 * @test
+	 */
+	public function diagnostics_pass_when_the_endpoint_refuses_correctly(): void {
+		TokenStore::issue( 'Some client' );
+
+		// The endpoint probe, then the two discovery documents.
+		\Zaplane\Tests\WPMocks::setHttpResponse( [], 401, [ 'www-authenticate' => 'Bearer realm="Zaplane MCP", resource_metadata="https://example.com/.well-known/oauth-protected-resource"' ] );
+		\Zaplane\Tests\WPMocks::setHttpResponse( [ 'resource' => 'x' ], 200 );
+		\Zaplane\Tests\WPMocks::setHttpResponse( [ 'issuer' => 'x' ], 200 );
+
+		$status = $this->diagnose();
+
+		$this->assertSame( 'ok', $status['module'] );
+		$this->assertSame( 'ok', $status['endpoint'] );
+		$this->assertSame( 'ok', $status['discovery'] );
+		$this->assertSame( 'ok', $status['credentials'] );
+	}
+
+	/**
+	 * Anything but a 401 means something in front of WordPress answered.
+	 *
+	 * @test
+	 */
+	public function diagnostics_flag_an_endpoint_that_does_not_refuse(): void {
+		\Zaplane\Tests\WPMocks::setHttpResponse( [ 'ok' => true ], 200 );
+
+		$checks = ( new McpController() )->diagnostics()->get_data()['checks'];
+		$endpoint = current( array_filter( $checks, fn( $c ) => 'endpoint' === $c['key'] ) );
+
+		$this->assertSame( 'fail', $endpoint['status'] );
+		$this->assertStringContainsString( '200', $endpoint['label'] );
+	}
+
+	/**
+	 * A refusal with no pointer is what a hosted connector reads as "this server
+	 * does not implement OAuth".
+	 *
+	 * @test
+	 */
+	public function diagnostics_flag_a_challenge_with_no_discovery_pointer(): void {
+		\Zaplane\Tests\WPMocks::setHttpResponse( [], 401, [ 'www-authenticate' => 'Bearer realm="Zaplane MCP"' ] );
+
+		$checks = ( new McpController() )->diagnostics()->get_data()['checks'];
+		$endpoint = current( array_filter( $checks, fn( $c ) => 'endpoint' === $c['key'] ) );
+
+		$this->assertSame( 'fail', $endpoint['status'] );
+		$this->assertStringContainsString( 'pointer', $endpoint['label'] );
+	}
+
+	/**
 	 * A WordPress application password is a credential the site owner already has
 	 * and already knows how to revoke, so it is honoured as a way in.
 	 *

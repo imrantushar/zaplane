@@ -124,6 +124,18 @@ class McpController extends WP_REST_Controller {
 			]
 		);
 
+		register_rest_route(
+			$this->namespace,
+			'/mcp/diagnostics',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'diagnostics' ],
+					'permission_callback' => $admin,
+				],
+			]
+		);
+
 		$this->register_oauth_routes();
 
 		// rest_send_allow_header() rebuilds Allow from the handlers whose
@@ -344,6 +356,164 @@ class McpController extends WP_REST_Controller {
 			__( 'The MCP endpoint accepts POST. It has no event stream to open and no session to end.', 'zaplane' ),
 			[ 'status' => 405 ]
 		);
+	}
+
+	/**
+	 * Check this site's own MCP surface and say what is wrong in plain words.
+	 *
+	 * A client that cannot connect reports the symptom from the outside — "could
+	 * not reach", "could not register" — which says nothing about the cause. These
+	 * checks run from the site itself, where the cause is visible.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function diagnostics() {
+		$checks = [];
+
+		$checks[] = self::enabled()
+			? self::check( 'module', __( 'AI access module is on', 'zaplane' ), 'ok' )
+			: self::check(
+				'module',
+				__( 'AI access module is off', 'zaplane' ),
+				'fail',
+				__( 'Every request is refused before the credential is even looked at, so any client reports a sign-in failure. Turn it on under Settings → Modules.', 'zaplane' )
+			);
+
+		// With the module off, the endpoint and the discovery documents are meant
+		// to be unavailable. Probing them anyway would report two more failures
+		// with causes that are not the cause, burying the one that is.
+		if ( self::enabled() ) {
+			$checks[] = self::probe_endpoint();
+			$checks[] = self::probe_discovery();
+		} else {
+			$checks[] = self::check( 'endpoint', __( 'Endpoint — not checked while the module is off', 'zaplane' ), 'skip' );
+			$checks[] = self::check( 'discovery', __( 'Sign-in discovery — not checked while the module is off', 'zaplane' ), 'skip' );
+		}
+
+		$checks[] = self::publicly_reachable()
+			? self::check( 'reachable', __( 'Address is reachable from the internet', 'zaplane' ), 'ok' )
+			: self::check(
+				'reachable',
+				__( 'Address cannot be reached from the internet', 'zaplane' ),
+				'warn',
+				__( 'Hosted connectors such as claude.ai and ChatGPT look this address up from their own servers, so a development hostname never arrives and they report that they could not sign in. Clients running on this machine are unaffected.', 'zaplane' )
+			);
+
+		$checks[] = function_exists( 'wp_is_application_passwords_available' ) && wp_is_application_passwords_available()
+			? self::check( 'app_passwords', __( 'Application passwords are available', 'zaplane' ), 'ok' )
+			: self::check(
+				'app_passwords',
+				__( 'Application passwords are switched off', 'zaplane' ),
+				'warn',
+				__( 'A security plugin or a site filter has disabled them. Connect with an issued token or through OAuth instead.', 'zaplane' )
+			);
+
+		$tokens = count( TokenStore::all() );
+		$checks[] = $tokens > 0
+			/* translators: %d: number of credentials. */
+			? self::check( 'credentials', sprintf( _n( '%d credential issued', '%d credentials issued', $tokens, 'zaplane' ), $tokens ), 'ok' )
+			: self::check(
+				'credentials',
+				__( 'No credentials issued yet', 'zaplane' ),
+				'warn',
+				__( 'Nothing is connected. Issue a token below, use a WordPress application password, or let a hosted connector sign in.', 'zaplane' )
+			);
+
+		return rest_ensure_response( [ 'checks' => $checks ] );
+	}
+
+	/**
+	 * The endpoint should refuse an unauthenticated call, and say how to
+	 * authenticate while doing it. Anything else means something in front of
+	 * WordPress is answering instead.
+	 *
+	 * @return array<string,string>
+	 */
+	private static function probe_endpoint(): array {
+		$response = wp_remote_post(
+			rest_url( 'zaplane/v1/mcp' ),
+			[
+				'timeout'  => 10,
+				'headers'  => [ 'Content-Type' => 'application/json' ],
+				'body'     => wp_json_encode(
+					[
+						'jsonrpc' => '2.0',
+						'id'      => 1,
+						'method'  => 'ping',
+					]
+				),
+			]
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return self::check(
+				'endpoint',
+				__( 'The endpoint could not be reached from this site', 'zaplane' ),
+				'fail',
+				$response->get_error_message() . ' — ' . __( 'a certificate this server does not trust will also read like this. A hosted connector refuses an untrusted certificate outright.', 'zaplane' )
+			);
+		}
+
+		$code      = (int) wp_remote_retrieve_response_code( $response );
+		$challenge = (string) wp_remote_retrieve_header( $response, 'www-authenticate' );
+
+		if ( 401 !== $code ) {
+			return self::check(
+				'endpoint',
+				/* translators: %d: HTTP status code. */
+				sprintf( __( 'The endpoint answered %d, not 401', 'zaplane' ), $code ),
+				'fail',
+				__( 'An unauthenticated call should be refused with 401. Another status usually means a security plugin, firewall or cache is answering before WordPress does.', 'zaplane' )
+			);
+		}
+
+		if ( false === strpos( $challenge, 'resource_metadata' ) ) {
+			return self::check(
+				'endpoint',
+				__( 'The refusal carries no pointer to the sign-in service', 'zaplane' ),
+				'fail',
+				__( 'Hosted connectors follow that pointer to discover OAuth; without it they report that this server does not implement it. Something is stripping response headers.', 'zaplane' )
+			);
+		}
+
+		return self::check( 'endpoint', __( 'Endpoint answers and advertises how to sign in', 'zaplane' ), 'ok' );
+	}
+
+	/**
+	 * @return array<string,string>
+	 */
+	private static function probe_discovery(): array {
+		foreach ( [ Discovery::PROTECTED_RESOURCE, Discovery::AUTHORIZATION_SERVER ] as $name ) {
+			$response = wp_remote_get( home_url( '/.well-known/' . $name ), [ 'timeout' => 10 ] );
+
+			if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+				return self::check(
+					'discovery',
+					/* translators: %s: the well-known document name. */
+					sprintf( __( '/.well-known/%s is not being served', 'zaplane' ), $name ),
+					'fail',
+					__( 'A hosted connector reads these two documents before it can sign in. Some hosts serve /.well-known/ from disk, which shadows them; a static-cache plugin can do the same.', 'zaplane' )
+				);
+			}
+		}
+
+		return self::check( 'discovery', __( 'Sign-in discovery documents are being served', 'zaplane' ), 'ok' );
+	}
+
+	/**
+	 * @param string $key    Stable identifier for the check.
+	 * @param string $label  What was checked, in plain words.
+	 * @param string $status ok, warn, fail or skip.
+	 * @param string $fix    What to do about it, when there is something to do.
+	 * @return array<string,string>
+	 */
+	private static function check( string $key, string $label, string $status, string $fix = '' ): array {
+		return [
+			'key'    => $key,
+			'label'  => $label,
+			'status' => $status,
+			'fix'    => $fix,
+		];
 	}
 
 	/**
