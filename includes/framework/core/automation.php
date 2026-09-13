@@ -25,6 +25,14 @@ class Automation {
 	protected Container $container;
 	protected array $registered_hooks = [];
 
+	/**
+	 * Events a Test Trigger listener caught in this request, so the run router
+	 * leaves them to the test. Keyed by claim_key().
+	 *
+	 * @var array<string,bool>
+	 */
+	protected array $claimed = [];
+
 	public static function init( Container $container ): self {
 		if ( ! self::$instance ) {
 			self::$instance = new self( $container );
@@ -154,6 +162,10 @@ class Automation {
 				$state['triggered_at'] = current_time( 'mysql' );
 
 				Option::set( $listener->option_name, $state, 'no' );
+
+				// The editor's poll runs this event as a test. The run router handles
+				// the same event right after this, and must not start a real run too.
+				$this->claimed[ self::claim_key( $workflowId, $node['id'] ) ] = true;
 				break;
 			}//end foreach
 		}//end foreach
@@ -194,26 +206,14 @@ class Automation {
 	}
 
 	/**
-	 * Whether a Test Trigger listener is waiting on this trigger. Real events for
-	 * the trigger being tested are left to the listener; the workflow's other
-	 * triggers keep running as normal.
+	 * Names an event that a Test Trigger listener caught, for one trigger of one
+	 * workflow.
 	 *
-	 * @param mixed      $state
+	 * @param int|string $workflow_id
 	 * @param int|string $node_id
 	 */
-	private static function is_listening_for( $state, $node_id ): bool {
-		if ( ! is_array( $state ) || 'listening' !== ( $state['status'] ?? '' ) ) {
-			return false;
-		}
-
-		$keys = isset( $state['node_keys'] ) && is_array( $state['node_keys'] )
-			? $state['node_keys']
-			: [ $state['node_key'] ?? null ];
-
-		$keys = array_map( 'strval', array_filter( $keys, static fn( $key ) => null !== $key && '' !== $key ) );
-
-		// A listener that recorded no trigger at all is waiting on the whole workflow.
-		return empty( $keys ) || in_array( (string) $node_id, $keys, true );
+	private static function claim_key( $workflow_id, $node_id ): string {
+		return (int) $workflow_id . ':' . (int) $node_id;
 	}
 
 	public function trigger_router() {
@@ -221,8 +221,12 @@ class Automation {
 
 		$args = func_get_args();
 		foreach ( Query::get_active_workflows_for_event( $event ) as $trigger ) {
-			$listenerState = Option::get( 'zaplane_listener_state_' . $trigger['workflow_id'] );
-			if ( self::is_listening_for( $listenerState, $trigger['id'] ) ) {
+			// A Test Trigger listener caught this very event for this trigger. Every
+			// other event runs for real, this trigger's next one included, so a
+			// listener that nobody polls can't hold a trigger back.
+			$claim = self::claim_key( $trigger['workflow_id'], $trigger['id'] );
+			if ( isset( $this->claimed[ $claim ] ) ) {
+				unset( $this->claimed[ $claim ] );
 				continue;
 			}
 

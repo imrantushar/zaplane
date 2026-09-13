@@ -43,6 +43,9 @@ All notable changes to Zaplane are documented here. This project adheres to
   runs the run again from the same trigger with the same data.
 - The schedule and inactive-customer triggers kept one "last fired" record per
   workflow. Each trigger now keeps its own, so two of them don't hold each other back.
+- Test Trigger and Test Flow Once ran the event they caught twice, once for real
+  and once as the test, and a test left waiting held back that trigger's real
+  events. The caught event now runs only as the test.
 
 ## [1.2.0] - 2026-09-08
 
