@@ -318,6 +318,120 @@ class TelegramTest extends IntegrationTestCase {
 		Telegram::execute_node( $node, [] );
 	}
 
+	// ========== ACTION: send_post ==========
+
+	public function test_send_post_succeeds(): void {
+		$this->mockHttp( [
+			'ok'     => true,
+			'result' => [ 'message_id' => 801, 'chat' => [ 'id' => 987654321 ], 'date' => 1700000008 ],
+		] );
+
+		$node   = $this->makeActionNode( 'send_post', [
+			'chat_id' => '987654321',
+			'text'    => 'Channel announcement',
+		], $this->credentials );
+		$result = Telegram::execute_node( $node, [] );
+
+		$this->assertEquals( 'main', $result['port'] );
+		$this->assertEquals( 801, $result['data']['telegram_message_id'] );
+		$this->assertEquals( '987654321', $result['data']['telegram_chat_id'] );
+		$this->assertEquals( 'sent', $result['data']['telegram_status'] );
+	}
+
+	public function test_send_post_succeeds_with_inline_buttons(): void {
+		$this->mockHttp( [
+			'ok'     => true,
+			'result' => [ 'message_id' => 802, 'chat' => [ 'id' => 987654321 ], 'date' => 1700000009 ],
+		] );
+
+		$node   = $this->makeActionNode( 'send_post', [
+			'chat_id'        => '987654321',
+			'text'           => 'Approve this order?',
+			'inline_buttons' => 'Approve:approve_order_88, Reject:reject_order_88',
+		], $this->credentials );
+		$result = Telegram::execute_node( $node, [] );
+
+		$this->assertEquals( 'main', $result['port'] );
+		$this->assertEquals( 802, $result['data']['telegram_message_id'] );
+	}
+
+	/**
+	 * Buttons field is optional — blank input must not attach reply_markup
+	 * or otherwise break the request.
+	 */
+	public function test_send_post_succeeds_without_inline_buttons(): void {
+		$this->mockHttp( [
+			'ok'     => true,
+			'result' => [ 'message_id' => 803, 'chat' => [ 'id' => 987654321 ], 'date' => 1700000010 ],
+		] );
+
+		$node   = $this->makeActionNode( 'send_post', [
+			'chat_id'        => '987654321',
+			'text'           => 'Plain post, no buttons',
+			'inline_buttons' => '',
+		], $this->credentials );
+		$result = Telegram::execute_node( $node, [] );
+
+		$this->assertEquals( 'main', $result['port'] );
+		$this->assertEquals( 803, $result['data']['telegram_message_id'] );
+	}
+
+	public function test_send_post_throws_without_chat_id(): void {
+		$this->expectException( \Exception::class );
+		$this->expectExceptionMessageMatches( '/chat_id/' );
+
+		$node = $this->makeActionNode( 'send_post', [ 'text' => 'Hello' ], $this->credentials );
+		Telegram::execute_node( $node, [] );
+	}
+
+	public function test_send_post_throws_without_text(): void {
+		$this->expectException( \Exception::class );
+		$this->expectExceptionMessageMatches( '/post text/' );
+
+		$node = $this->makeActionNode( 'send_post', [ 'chat_id' => '987654321' ], $this->credentials );
+		Telegram::execute_node( $node, [] );
+	}
+
+	public function test_send_post_throws_on_api_error(): void {
+		$this->mockHttp( [
+			'ok'          => false,
+			'error_code'  => 400,
+			'description' => 'Bad Request: chat not found',
+		], 400 );
+
+		$this->expectException( \Exception::class );
+		$this->expectExceptionMessageMatches( '/chat not found/' );
+
+		$node = $this->makeActionNode( 'send_post', [ 'chat_id' => '000', 'text' => 'Hi' ], $this->credentials );
+		Telegram::execute_node( $node, [] );
+	}
+
+	public function test_send_post_supports_parse_mode(): void {
+		$this->mockHttp( [
+			'ok'     => true,
+			'result' => [ 'message_id' => 804, 'chat' => [ 'id' => 111 ], 'date' => 1700000011 ],
+		] );
+
+		$node   = $this->makeActionNode( 'send_post', [
+			'chat_id'    => '111',
+			'text'       => '<b>Bold post</b>',
+			'parse_mode' => 'HTML',
+		], $this->credentials );
+		$result = Telegram::execute_node( $node, [] );
+
+		$this->assertEquals( 804, $result['data']['telegram_message_id'] );
+	}
+
+	public function test_send_post_schema_has_inline_buttons_field(): void {
+		$schema = Telegram::get_action_config_schema( 'send_post' );
+		$keys   = array_column( $schema, 'key' );
+
+		$this->assertContains( 'inline_buttons', $keys );
+
+		$field = array_values( array_filter( $schema, fn( $f ) => 'inline_buttons' === $f['key'] ) )[0];
+		$this->assertFalse( $field['required'], 'Inline Buttons field must be optional' );
+	}
+
 	// ========== TRIGGERS ==========
 
 	public function test_trigger_message_received_returns_payload(): void {
@@ -350,6 +464,305 @@ class TelegramTest extends IntegrationTestCase {
 
 		$this->assertFalse( Telegram::resolve_trigger( $node, [] ) );
 		$this->assertFalse( Telegram::resolve_trigger( $node, [ [] ] ) );
+	}
+
+	// ========== TRIGGER: callback_query_received ==========
+
+	public function test_trigger_callback_query_received_returns_payload(): void {
+		$args = [
+			[
+				'id'             => 'cbq_123',
+				'from'           => [ 'id' => 111, 'first_name' => 'Alice', 'username' => 'alice' ],
+				'message'        => [ 'message_id' => 55, 'chat' => [ 'id' => 111 ] ],
+				'chat_instance'  => 'abc123',
+				'data'           => 'approve_order_88',
+			],
+		];
+		$node   = $this->makeTriggerNode( 'callback_query_received' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertIsArray( $result );
+		$this->assertEquals( 'approve_order_88', $result['telegram_callback_data'] );
+		$this->assertEquals( 'cbq_123', $result['telegram_callback_id'] );
+		$this->assertEquals( 55, $result['telegram_message_id'] );
+		$this->assertEquals( 111, $result['telegram_chat_id'] );
+	}
+
+	// ========== TRIGGER: inline_query_received ==========
+
+	public function test_trigger_inline_query_received_returns_payload(): void {
+		$args = [
+			[
+				'id'     => 'iq_456',
+				'from'   => [ 'id' => 111, 'first_name' => 'Alice', 'username' => 'alice' ],
+				'query'  => 'pizza',
+				'offset' => '',
+			],
+		];
+		$node   = $this->makeTriggerNode( 'inline_query_received' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertIsArray( $result );
+		$this->assertEquals( 'pizza', $result['telegram_query_text'] );
+		$this->assertEquals( 'iq_456', $result['telegram_inline_query_id'] );
+	}
+
+	// ========== TRIGGER: poll_received ==========
+
+	public function test_trigger_poll_received_returns_payload(): void {
+		$args = [
+			[
+				'id'                => 'poll_789',
+				'question'          => 'Favourite colour?',
+				'options'           => [
+					[ 'text' => 'Red', 'voter_count' => 2 ],
+					[ 'text' => 'Blue', 'voter_count' => 1 ],
+				],
+				'total_voter_count' => 3,
+				'is_closed'         => false,
+			],
+		];
+		$node   = $this->makeTriggerNode( 'poll_received' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertIsArray( $result );
+		$this->assertEquals( 'poll_789', $result['telegram_poll_id'] );
+		$this->assertEquals( 3, $result['telegram_poll_total_votes'] );
+		$this->assertFalse( $result['telegram_poll_is_closed'] );
+	}
+
+	// ========== TRIGGER: pre_checkout_query_received ==========
+
+	public function test_trigger_pre_checkout_query_received_returns_payload(): void {
+		$args = [
+			[
+				'id'               => 'pcq_321',
+				'from'             => [ 'id' => 111, 'username' => 'alice' ],
+				'currency'         => 'USD',
+				'total_amount'     => 2500,
+				'invoice_payload'  => 'order_88',
+			],
+		];
+		$node   = $this->makeTriggerNode( 'pre_checkout_query_received' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertIsArray( $result );
+		$this->assertEquals( 'USD', $result['telegram_currency'] );
+		$this->assertEquals( 2500, $result['telegram_total_amount'] );
+	}
+
+	// ========== TRIGGER: shipping_query_received ==========
+
+	public function test_trigger_shipping_query_received_returns_payload(): void {
+		$args = [
+			[
+				'id'               => 'sq_654',
+				'from'             => [ 'id' => 111, 'username' => 'alice' ],
+				'invoice_payload'  => 'order_88',
+				'shipping_address' => [
+					'country_code' => 'US',
+					'state'        => 'NY',
+					'city'         => 'New York',
+					'post_code'    => '10001',
+				],
+			],
+		];
+		$node   = $this->makeTriggerNode( 'shipping_query_received' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertIsArray( $result );
+		$this->assertEquals( 'US', $result['telegram_shipping_country'] );
+		$this->assertEquals( '10001', $result['telegram_shipping_zip'] );
+	}
+
+	// ========== TRIGGER: edited_message / channel_post / edited_channel_post ==========
+
+	public function test_trigger_edited_message_received_returns_payload(): void {
+		$args = [
+			[
+				'message_id' => 60,
+				'from'       => [ 'id' => 111, 'first_name' => 'Alice' ],
+				'chat'       => [ 'id' => 111, 'type' => 'private' ],
+				'text'       => 'Edited text',
+				'date'       => 1700000000,
+				'edit_date'  => 1700000050,
+			],
+		];
+		$node   = $this->makeTriggerNode( 'edited_message_received' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertEquals( 'edited_message', $result['telegram_update_type'] );
+		$this->assertEquals( 1700000050, $result['telegram_edit_date'] );
+	}
+
+	public function test_trigger_channel_post_received_returns_payload(): void {
+		$args = [
+			[
+				'message_id' => 70,
+				'chat'       => [ 'id' => -1001234567890, 'type' => 'channel' ],
+				'text'       => 'Announcement',
+				'date'       => 1700000000,
+			],
+		];
+		$node   = $this->makeTriggerNode( 'channel_post_received' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertEquals( 'channel_post', $result['telegram_update_type'] );
+		$this->assertEquals( -1001234567890, $result['telegram_chat_id'] );
+	}
+
+	public function test_trigger_edited_channel_post_received_returns_payload(): void {
+		$args = [
+			[
+				'message_id' => 71,
+				'chat'       => [ 'id' => -1001234567890, 'type' => 'channel' ],
+				'text'       => 'Announcement (edited)',
+				'date'       => 1700000000,
+				'edit_date'  => 1700000060,
+			],
+		];
+		$node   = $this->makeTriggerNode( 'edited_channel_post_received' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertEquals( 'edited_channel_post', $result['telegram_update_type'] );
+	}
+
+	// ========== TRIGGER: all_updates (shape detection) ==========
+
+	public function test_trigger_all_updates_detects_message_shape(): void {
+		$args = [
+			[
+				'message_id' => 80,
+				'chat'       => [ 'id' => 111, 'type' => 'private' ],
+				'text'       => 'Hi',
+				'date'       => 1700000000,
+			],
+		];
+		$node   = $this->makeTriggerNode( 'all_updates' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertEquals( 'message', $result['telegram_update_type'] );
+	}
+
+	public function test_trigger_all_updates_detects_callback_query_shape(): void {
+		$args = [
+			[
+				'id'            => 'cbq_1',
+				'chat_instance' => 'abc',
+				'data'          => 'x',
+				'message'       => [ 'message_id' => 1, 'chat' => [ 'id' => 111 ] ],
+			],
+		];
+		$node   = $this->makeTriggerNode( 'all_updates' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertEquals( 'callback_query', $result['telegram_update_type'] );
+	}
+
+	public function test_trigger_all_updates_detects_poll_shape(): void {
+		$args = [
+			[ 'id' => 'p1', 'question' => 'Q?', 'options' => [], 'total_voter_count' => 0, 'is_closed' => false ],
+		];
+		$node   = $this->makeTriggerNode( 'all_updates' );
+		$result = Telegram::resolve_trigger( $node, $args );
+
+		$this->assertEquals( 'poll', $result['telegram_update_type'] );
+	}
+
+	// ========== resolve_trigger: connection_id routing ==========
+
+	public function test_resolve_trigger_skips_mismatched_connection_id(): void {
+		$node = $this->makeTriggerNode( 'message_received' );
+		$node['connection_id'] = 5;
+
+		$payload = [
+			'message_id' => 1,
+			'chat'       => [ 'id' => 111, 'type' => 'private' ],
+			'text'       => 'Hi',
+		];
+
+		// Delivered on a different bot's per-connection URL (id = 9) — must be skipped.
+		$this->assertFalse( Telegram::resolve_trigger( $node, [ $payload, 9 ] ) );
+
+		// Same connection id — must resolve.
+		$result = Telegram::resolve_trigger( $node, [ $payload, 5 ] );
+		$this->assertIsArray( $result );
+	}
+
+	public function test_resolve_trigger_allows_legacy_shared_url_regardless_of_connection(): void {
+		$node = $this->makeTriggerNode( 'message_received' );
+		$node['connection_id'] = 5;
+
+		$payload = [
+			'message_id' => 1,
+			'chat'       => [ 'id' => 111, 'type' => 'private' ],
+			'text'       => 'Hi',
+		];
+
+		// null source_connection_id = legacy shared URL, no id in the path.
+		$result = Telegram::resolve_trigger( $node, [ $payload, null ] );
+		$this->assertIsArray( $result );
+	}
+
+	// ========== get_update_type_for_event / get_allowed_updates_for_events ==========
+
+	public function test_get_update_type_for_event_maps_correctly(): void {
+		$this->assertEquals( 'message', Telegram::get_update_type_for_event( 'message_received' ) );
+		$this->assertEquals( 'message', Telegram::get_update_type_for_event( 'command_received' ) );
+		$this->assertEquals( 'callback_query', Telegram::get_update_type_for_event( 'callback_query_received' ) );
+		$this->assertEquals( '', Telegram::get_update_type_for_event( 'unknown_event' ) );
+	}
+
+	public function test_get_allowed_updates_for_events_deduplicates(): void {
+		$result = Telegram::get_allowed_updates_for_events( [ 'message_received', 'command_received' ] );
+
+		// Both map to 'message' — must appear only once.
+		$this->assertEquals( [ 'message' ], $result );
+	}
+
+	public function test_get_allowed_updates_for_events_expands_all_updates(): void {
+		$result = Telegram::get_allowed_updates_for_events( [ 'all_updates' ] );
+
+		$this->assertContains( 'message', $result );
+		$this->assertContains( 'callback_query', $result );
+		$this->assertContains( 'poll', $result );
+		$this->assertCount( 9, $result );
+	}
+
+	// ========== parse_webhook_event: remaining update types ==========
+
+	public function test_parse_webhook_event_routes_callback_query(): void {
+		$parsed = Telegram::parse_webhook_event( $this->makeUpdateRequest( [
+			'callback_query' => [
+				'id'            => 'cbq_1',
+				'chat_instance' => 'abc',
+				'data'          => 'approve_order_88',
+				'message'       => [ 'message_id' => 1, 'chat' => [ 'id' => 111 ] ],
+			],
+		] ) );
+
+		$this->assertSame( 'callback_query_received', $parsed['event'] );
+	}
+
+	public function test_parse_webhook_event_routes_poll(): void {
+		$parsed = Telegram::parse_webhook_event( $this->makeUpdateRequest( [
+			'poll' => [
+				'id'                => 'p1',
+				'question'          => 'Q?',
+				'options'           => [],
+				'total_voter_count' => 0,
+				'is_closed'         => false,
+			],
+		] ) );
+
+		$this->assertSame( 'poll_received', $parsed['event'] );
+	}
+
+	public function test_parse_webhook_event_returns_null_for_unwatched_update_types(): void {
+		// poll_answer, chat_member, my_chat_member, chosen_inline_result etc. aren't in $type_keys.
+		$this->assertNull( Telegram::parse_webhook_event( $this->makeUpdateRequest( [
+			'poll_answer' => [ 'poll_id' => 'p1' ],
+		] ) ) );
 	}
 
 	// ========== WEBHOOK DELIVERY ==========
