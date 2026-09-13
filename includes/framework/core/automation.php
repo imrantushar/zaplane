@@ -7,6 +7,7 @@ use Zaplane\Framework\Classes\ConnectionManager;
 use Zaplane\Framework\Classes\Expression;
 use Zaplane\Framework\Classes\GlobalContext;
 use Zaplane\Framework\Classes\Query;
+use Zaplane\Framework\Classes\TriggerNodes;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
 use Zaplane\Framework\Models\Option;
@@ -92,14 +93,11 @@ class Automation {
 
 			$any_listening = true;
 
-			$hook = $state['hook'] ?? '';
-			if ( ! $hook ) {
-				continue;
-			}
-
-			if ( ! isset( $this->registered_hooks[ 'listener_' . $hook ] ) ) {
-				add_action( $hook, [ $this, 'listener_hook_handler' ], 1, 99 );
-				$this->registered_hooks[ 'listener_' . $hook ] = true;
+			foreach ( self::listened_hooks( $state ) as $hook ) {
+				if ( ! isset( $this->registered_hooks[ 'listener_' . $hook ] ) ) {
+					add_action( $hook, [ $this, 'listener_hook_handler' ], 1, 99 );
+					$this->registered_hooks[ 'listener_' . $hook ] = true;
+				}
 			}
 		}
 
@@ -121,36 +119,101 @@ class Automation {
 				continue;
 			}
 
-			if ( ( $state['hook'] ?? '' ) !== $currentHook ) {
+			if ( ! in_array( $currentHook, self::listened_hooks( $state ), true ) ) {
 				continue;
 			}
 
-			$workflowId = $state['workflow_id'] ?? 0;
+			$workflowId     = $state['workflow_id'] ?? 0;
 			$hookInfoOption = 'zaplane_listener_hook_' . $workflowId;
-			$hookInfo = Option::get( $hookInfoOption );
+			$hookInfo       = Option::get( $hookInfoOption );
 
 			if ( ! $hookInfo || ! is_array( $hookInfo ) ) {
 				continue;
 			}
 
-			$node = $hookInfo['node'];
+			foreach ( self::listener_targets( $hookInfo ) as $target ) {
+				if ( ( $target['hook'] ?? '' ) !== $currentHook || ! is_array( $target['node'] ?? null ) ) {
+					continue;
+				}
 
-			$integration = $this->container->get( 'integrations' )->get( strtolower( $node['data']['app'] ) );
-			if ( ! $integration ) {
-				continue;
-			}
+				$node        = $target['node'];
+				$integration = $this->container->get( 'integrations' )->get( strtolower( (string) ( $node['data']['app'] ?? '' ) ) );
+				if ( ! $integration ) {
+					continue;
+				}
 
-			$payload = $integration::resolve_trigger( $node['data'], $args );
-			if ( ! $payload ) {
-				continue;
-			}
+				$payload = $integration::resolve_trigger( $node['data'], $args );
+				if ( ! $payload ) {
+					continue;
+				}
 
-			$state['status'] = 'triggered';
-			$state['data'] = $payload;
-			$state['triggered_at'] = current_time( 'mysql' );
+				$state['status'] = 'triggered';
+				$state['data']   = $payload;
+				// Which trigger fired, when the listener was waiting on several.
+				$state['node_key']     = (int) $node['id'];
+				$state['triggered_at'] = current_time( 'mysql' );
 
-			Option::set( $listener->option_name, $state, 'no' );
+				Option::set( $listener->option_name, $state, 'no' );
+				break;
+			}//end foreach
 		}//end foreach
+	}
+
+	/**
+	 * The hooks a Test Trigger listener waits on. A listener started before one
+	 * could wait on several triggers stored a single `hook`.
+	 *
+	 * @param array<string,mixed> $state
+	 * @return array<int,string>
+	 */
+	private static function listened_hooks( array $state ): array {
+		$hooks = isset( $state['hooks'] ) && is_array( $state['hooks'] ) ? $state['hooks'] : [ $state['hook'] ?? '' ];
+
+		return array_values( array_filter( $hooks, static fn( $hook ) => is_string( $hook ) && '' !== $hook ) );
+	}
+
+	/**
+	 * The trigger nodes a listener waits on, one entry per hook.
+	 *
+	 * @param array<string,mixed> $hookInfo
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function listener_targets( array $hookInfo ): array {
+		if ( isset( $hookInfo['targets'] ) && is_array( $hookInfo['targets'] ) ) {
+			return $hookInfo['targets'];
+		}
+
+		return isset( $hookInfo['node'] )
+			? [
+				[
+					'hook' => $hookInfo['hook'] ?? '',
+					'node' => $hookInfo['node'],
+				],
+			]
+			: [];
+	}
+
+	/**
+	 * Whether a Test Trigger listener is waiting on this trigger. Real events for
+	 * the trigger being tested are left to the listener; the workflow's other
+	 * triggers keep running as normal.
+	 *
+	 * @param mixed      $state
+	 * @param int|string $node_id
+	 */
+	private static function is_listening_for( $state, $node_id ): bool {
+		if ( ! is_array( $state ) || 'listening' !== ( $state['status'] ?? '' ) ) {
+			return false;
+		}
+
+		$keys = isset( $state['node_keys'] ) && is_array( $state['node_keys'] )
+			? $state['node_keys']
+			: [ $state['node_key'] ?? null ];
+
+		$keys = array_map( 'strval', array_filter( $keys, static fn( $key ) => null !== $key && '' !== $key ) );
+
+		// A listener that recorded no trigger at all is waiting on the whole workflow.
+		return empty( $keys ) || in_array( (string) $node_id, $keys, true );
 	}
 
 	public function trigger_router() {
@@ -159,7 +222,7 @@ class Automation {
 		$args = func_get_args();
 		foreach ( Query::get_active_workflows_for_event( $event ) as $trigger ) {
 			$listenerState = Option::get( 'zaplane_listener_state_' . $trigger['workflow_id'] );
-			if ( is_array( $listenerState ) && ( $listenerState['status'] ?? '' ) === 'listening' ) {
+			if ( self::is_listening_for( $listenerState, $trigger['id'] ) ) {
 				continue;
 			}
 
@@ -275,10 +338,16 @@ class Automation {
 	 * Programmatically start a workflow run with custom trigger data, bypassing
 	 * the normal WordPress hook system. The workflow must have an active version.
 	 *
-	 * Returns the Run ID on success, or false if the workflow or its active
-	 * version/trigger node could not be found.
+	 * A workflow can have several triggers. $trigger_node_id names the one the run
+	 * starts from. Without it the run starts from the workflow's Manual trigger,
+	 * or from its first trigger when it has no Manual one.
+	 *
+	 * Returns the Run ID on success, or false if the workflow, its active version
+	 * or the trigger could not be found.
+	 *
+	 * @param int|string|null $trigger_node_id
 	 */
-	public function run_workflow( int $workflow_id, array $data = [] ) {
+	public function run_workflow( int $workflow_id, array $data = [], $trigger_node_id = null ) {
 		$workflow = \Zaplane\Models\Workflow::find( $workflow_id );
 		if ( ! $workflow ) {
 			return false;
@@ -289,13 +358,7 @@ class Automation {
 			return false;
 		}
 
-		$triggerNode = null;
-		foreach ( $version->getGraph()['nodes'] ?? [] as $node ) {
-			if ( ( $node['type'] ?? '' ) === 'trigger' ) {
-				$triggerNode = $node;
-				break;
-			}
-		}
+		$triggerNode = TriggerNodes::resolve( $version->getGraph(), $trigger_node_id );
 
 		if ( ! $triggerNode ) {
 			return false;
@@ -387,8 +450,14 @@ class Automation {
 
 		$app = strtolower( $node['data']['app'] ?? '' );
 
-		$context = $this->buildNodeContext( $run->id, $run, $node );
+		$context     = $this->buildNodeContext( $run->id, $run, $node, $graph );
 		$resolveData = $input + $context;
+
+		// `trigger` is the data of whichever trigger started this run. It wins over
+		// a field of the same name in the step's input, or it couldn't be relied on.
+		if ( array_key_exists( 'trigger', $context ) ) {
+			$resolveData['trigger'] = $context['trigger'];
+		}
 
 		$node['_run_id'] = $run->id;
 		$node['_node_run_id'] = $nodeRun->id;
@@ -419,7 +488,7 @@ class Automation {
 
 		try {
 			if ( 'trigger' === $node['type'] ) {
-				$output = $input;
+				$output = TriggerNodes::apply_field_map( $node, $input );
 			} elseif ( in_array( $app, [ 'condition', 'filter' ], true ) ) {
 				$integration = $this->container->get( 'integrations' )->get( $app );
 				if ( ! $integration ) {
@@ -577,7 +646,7 @@ class Automation {
 
 
 
-	private function buildNodeContext( int $run_id, ?Run $run = null, array $node = [] ): array {
+	private function buildNodeContext( int $run_id, ?Run $run = null, array $node = [], array $graph = [] ): array {
 		$nodeRuns = NodeRun::where( 'run_id', $run_id )
 			->where( 'status', 'completed' )
 			->orderBy( 'id', 'asc' )
@@ -595,11 +664,17 @@ class Automation {
 			$context[ (string) $nr->node_key ] = is_array( $output ) ? $output : [ 'value' => $output ];
 		}
 
+		if ( $run && null !== $run->start_node_key && $graph ) {
+			$context = TriggerNodes::with_aliases( $context, $graph, (string) $run->start_node_key );
+		}
+
 		// Only inject global context groups that this node's config actually references.
 		// e.g. if config has {{wp.user_email}} we build the 'wp' group; if not, we skip it.
+		// A union, not array_merge(): node outputs are keyed by numeric id, and
+		// array_merge() renumbers numeric keys, which pointed {{1.…}} at the wrong step.
 		$prefixes = GlobalContext::detect_prefixes( $node['data']['config'] ?? [] );
 		if ( $prefixes ) {
-			$context = array_merge( $context, GlobalContext::build( $prefixes, $run ) );
+			$context = $context + GlobalContext::build( $prefixes, $run );
 		}
 
 		return $context;

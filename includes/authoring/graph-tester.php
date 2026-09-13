@@ -4,6 +4,7 @@ namespace Zaplane\Authoring;
 
 use Zaplane\Framework\Classes\Expression;
 use Zaplane\Framework\Classes\GlobalContext;
+use Zaplane\Framework\Classes\TriggerNodes;
 use Zaplane\Framework\Core\IntegrationLoader;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,14 +42,34 @@ class GraphTester {
 	/**
 	 * Resolve a graph against sample data.
 	 *
-	 * @param array<string,mixed> $graph        Raw or normalized graph.
-	 * @param array<string,mixed> $trigger_data Overrides the trigger's declared sample.
+	 * A workflow with several triggers is walked from one of them at a time, the
+	 * way it runs. The other triggers don't fire, so a step that reads them is
+	 * reported, unless the starting trigger matches its fields to theirs.
+	 *
+	 * @param array<string,mixed> $graph           Raw or normalized graph.
+	 * @param array<string,mixed> $trigger_data    Overrides the trigger's declared sample.
+	 * @param string|null         $trigger_node_id The trigger to start from. Defaults to the
+	 *                                             Manual trigger, else the first.
 	 * @return array<string,mixed>
+	 * @throws \InvalidArgumentException When $trigger_node_id is not a trigger in the graph.
 	 */
-	public static function test( array $graph, array $trigger_data = [] ): array {
+	public static function test( array $graph, array $trigger_data = [], ?string $trigger_node_id = null ): array {
 		$graph = WorkflowAuthor::normalize( $graph );
 		$nodes = (array) ( $graph['nodes'] ?? [] );
 		$edges = (array) ( $graph['edges'] ?? [] );
+
+		$start = TriggerNodes::resolve( $graph, $trigger_node_id );
+		if ( null !== $trigger_node_id && null === $start ) {
+			throw new \InvalidArgumentException( 'trigger_node_id ' . $trigger_node_id . ' is not a trigger in this graph.' );
+		}
+
+		// The triggers other than the starting one don't fire in this walk.
+		$skipped = [];
+		foreach ( TriggerNodes::all( $graph ) as $trigger ) {
+			if ( $start && (string) $trigger['id'] !== (string) $start['id'] ) {
+				$skipped[ (string) $trigger['id'] ] = true;
+			}
+		}
 
 		$by_id = [];
 		foreach ( $nodes as $node ) {
@@ -70,6 +91,10 @@ class GraphTester {
 		$warnings = [];
 
 		foreach ( $order as $id ) {
+			if ( isset( $skipped[ $id ] ) ) {
+				continue;
+			}
+
 			$node        = $by_id[ $id ];
 			$type        = (string) ( $node['type'] ?? 'action' );
 			$app         = strtolower( (string) ( $node['data']['app'] ?? '' ) );
@@ -86,6 +111,10 @@ class GraphTester {
 
 			if ( 'trigger' === $type ) {
 				[ $output, $source ] = self::trigger_output( $integration, $event, $trigger_data );
+
+				if ( is_array( $output ) ) {
+					$output = TriggerNodes::apply_field_map( $node, $output );
+				}
 			} else {
 				[ $resolved, $field_warnings ] = self::resolve_config(
 					(array) ( $node['data']['config'] ?? [] ),
@@ -93,7 +122,8 @@ class GraphTester {
 					$id,
 					$position,
 					$known,
-					$by_id
+					$by_id,
+					$skipped
 				);
 
 				$entry['config'] = $resolved;
@@ -108,6 +138,16 @@ class GraphTester {
 			if ( is_array( $output ) ) {
 				$context[ $id ] = $output;
 				$known[ $id ]   = true;
+
+				if ( 'trigger' === $type ) {
+					$context = TriggerNodes::with_aliases( $context, $graph, $id );
+					$target  = (string) ( $node['data']['field_map']['target'] ?? '' );
+
+					if ( '' !== $target && isset( $context[ $target ] ) ) {
+						$known[ $target ] = true;
+						unset( $skipped[ $target ] );
+					}
+				}
 			} elseif ( isset( $referenced[ $id ] ) ) {
 				$warnings[] = [
 					'node'     => $id,
@@ -132,6 +172,7 @@ class GraphTester {
 
 		return [
 			'ok'       => empty( $errors ),
+			'trigger'  => $start ? (string) $start['id'] : null,
 			'nodes'    => $results,
 			'warnings' => array_values( $warnings ),
 			'summary'  => self::summarize( $results, $warnings ),
@@ -186,13 +227,13 @@ class GraphTester {
 	 * @param array<string,mixed>  $by_id
 	 * @return array{0:array<string,mixed>,1:array<int,array<string,mixed>>}
 	 */
-	private static function resolve_config( array $config, array $context, string $node_id, array $position, array $known, array $by_id ): array {
+	private static function resolve_config( array $config, array $context, string $node_id, array $position, array $known, array $by_id, array $skipped = [] ): array {
 		$out      = [];
 		$warnings = [];
 
 		foreach ( $config as $key => $value ) {
 			if ( is_array( $value ) ) {
-				[ $nested, $nested_warnings ] = self::resolve_config( $value, $context, $node_id, $position, $known, $by_id );
+				[ $nested, $nested_warnings ] = self::resolve_config( $value, $context, $node_id, $position, $known, $by_id, $skipped );
 				$out[ $key ]                  = $nested;
 				$warnings                     = array_merge( $warnings, $nested_warnings );
 				continue;
@@ -211,7 +252,7 @@ class GraphTester {
 
 			$warnings = array_merge(
 				$warnings,
-				self::check_references( $value, $node_id, $key, $position, $known, $by_id ),
+				self::check_references( $value, $node_id, $key, $position, $known, $by_id, $skipped ),
 				self::check_empty_tokens( $value, $context, $node_id, (string) $key, $known )
 			);
 
@@ -305,7 +346,7 @@ class GraphTester {
 	 * @param array<string,mixed> $by_id
 	 * @return array<int,array<string,mixed>>
 	 */
-	private static function check_references( string $raw, string $node_id, string $field, array $position, array $known, array $by_id ): array {
+	private static function check_references( string $raw, string $node_id, string $field, array $position, array $known, array $by_id, array $skipped = [] ): array {
 		$warnings = [];
 
 		if ( ! preg_match_all( '/\{\{(.*?)\}\}/', $raw, $matches ) ) {
@@ -336,6 +377,22 @@ class GraphTester {
 					'severity' => 'error',
 					'code'     => 'unknown_node',
 					'message'  => sprintf( '"%s" references node %s, which is not in this graph.', $field, $root ),
+				];
+				continue;
+			}
+
+			if ( isset( $skipped[ $root ] ) ) {
+				$warnings[] = [
+					'node'     => $node_id,
+					'field'    => $field,
+					'severity' => 'warning',
+					'code'     => 'other_trigger_reference',
+					'message'  => sprintf(
+						'"%s" reads trigger %s, which does not fire in this test. When the workflow starts from another trigger this value is empty, unless that trigger matches its fields to trigger %s. {{trigger.…}} reads whichever trigger fired.',
+						$field,
+						$root,
+						$root
+					),
 				];
 				continue;
 			}

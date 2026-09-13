@@ -4,6 +4,7 @@ namespace Zaplane\Framework\Classes;
 
 use Zaplane\Models\Run;
 use Zaplane\Models\Workflow;
+use Zaplane\Models\WorkflowVersion;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -95,7 +96,9 @@ class GlobalContext {
 	 * @return array<string, array>
 	 */
 	public static function all_for_picker( ?Workflow $workflow = null ): array {
-		$wpUser = wp_get_current_user();
+		$wpUser  = wp_get_current_user();
+		$version = $workflow ? $workflow->activeVersion() : null;
+		$trigger = $version ? TriggerNodes::default_node( $version->getGraph() ) : null;
 
 		$context = [];
 
@@ -118,6 +121,21 @@ class GlobalContext {
 						'key' => 'workflow_status',
 						'type' => 'string',
 						'sample' => $workflow ? ( $workflow->status ?? 'active' ) : 'active'
+					],
+					[
+						'key' => 'trigger_node_id',
+						'type' => 'string',
+						'sample' => $trigger ? (string) $trigger['id'] : '1'
+					],
+					[
+						'key' => 'trigger_app',
+						'type' => 'string',
+						'sample' => $trigger ? (string) ( $trigger['data']['app'] ?? '' ) : ''
+					],
+					[
+						'key' => 'trigger_event',
+						'type' => 'string',
+						'sample' => $trigger ? (string) ( $trigger['data']['event'] ?? '' ) : ''
 					],
 				],
 			];
@@ -207,11 +225,32 @@ class GlobalContext {
 	 */
 	private static function build_workflow( ?Run $run ): array {
 		$workflow = $run ? Workflow::find( $run->workflow_id ) : null;
+		$trigger  = self::run_trigger( $run );
 
 		return [
 			'workflow_id'     => $workflow ? $workflow->id : 0,
 			'workflow_name'   => $workflow ? ( $workflow->title ?? $workflow->name ?? '' ) : '',
 			'workflow_status' => $workflow ? ( $workflow->status ?? 'active' ) : '',
+			// Which trigger started the run, so a Router or Condition can branch on
+			// it in a workflow that has several.
+			'trigger_node_id' => $trigger ? (string) $trigger['id'] : '',
+			'trigger_app'     => $trigger ? (string) ( $trigger['data']['app'] ?? '' ) : '',
+			'trigger_event'   => $trigger ? (string) ( $trigger['data']['event'] ?? '' ) : '',
 		];
+	}
+
+	/**
+	 * The trigger node a run started from, read from the version it ran on.
+	 *
+	 * @return array<string,mixed>|null
+	 */
+	private static function run_trigger( ?Run $run ): ?array {
+		if ( ! $run || null === $run->start_node_key ) {
+			return null;
+		}
+
+		$version = WorkflowVersion::find( (int) $run->workflow_version_id );
+
+		return $version ? TriggerNodes::find( $version->getGraph(), (string) $run->start_node_key ) : null;
 	}
 }

@@ -161,7 +161,7 @@ class Poller {
 
 		// Fire oldest-first so runs are chronological.
 		foreach ( array_reverse( $fresh ) as $item ) {
-			$automation->run_workflow( $workflow_id, $item );
+			$automation->run_workflow( $workflow_id, $item, $node_id );
 		}
 	}
 

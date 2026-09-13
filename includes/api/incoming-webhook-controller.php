@@ -6,6 +6,7 @@ use WP_REST_Server;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Core\IntegrationLoader;
+use Zaplane\Framework\Classes\TriggerNodes;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -52,6 +53,20 @@ class IncomingWebhookController extends WP_REST_Controller {
 		register_rest_route(
 			$this->namespace,
 			'/hook/(?P<id>\d+)',
+			[
+				[
+					'methods'             => [ WP_REST_Server::CREATABLE, WP_REST_Server::READABLE ],
+					'callback'            => [ $this, 'handle_workflow_hook' ],
+					'permission_callback' => '__return_true',
+				],
+			]
+		);
+
+		// One Catch Webhook trigger, for a workflow that can have several:
+		// /wp-json/zaplane/v1/hook/<workflow_id>/<trigger_node_id>
+		register_rest_route(
+			$this->namespace,
+			'/hook/(?P<id>\d+)/(?P<node>\d+)',
 			[
 				[
 					'methods'             => [ WP_REST_Server::CREATABLE, WP_REST_Server::READABLE ],
@@ -230,9 +245,10 @@ class IncomingWebhookController extends WP_REST_Controller {
 	}
 
 	/**
-	 * Generic catch-all webhook for a single workflow. Verifies the workflow is
-	 * active and uses the Webhook trigger, checks an optional secret, then runs
-	 * it with the request payload (JSON body + query params).
+	 * Generic catch-all webhook for a single workflow. Finds its Catch Webhook
+	 * trigger (the one in the URL, or the first one when the URL names none),
+	 * checks that trigger's optional secret, then runs the workflow from that
+	 * trigger with the request payload (JSON body + query params).
 	 */
 	public function handle_workflow_hook( \WP_REST_Request $request ) {
 		$id       = (int) $request->get_param( 'id' );
@@ -248,15 +264,18 @@ class IncomingWebhookController extends WP_REST_Controller {
 		}
 
 		$graph   = $version->getGraph();
-		$trigger = null;
-		foreach ( $graph['nodes'] ?? [] as $n ) {
-			if ( ( $n['type'] ?? '' ) === 'trigger' ) {
-				$trigger = $n;
+		$hooks   = TriggerNodes::of_app( $graph, 'webhook' );
+		$node_id = (string) ( $request->get_param( 'node' ) ?? '' );
+		$trigger = '' === $node_id ? ( $hooks[0] ?? null ) : null;
+
+		foreach ( '' === $node_id ? [] : $hooks as $hook ) {
+			if ( (string) $hook['id'] === $node_id ) {
+				$trigger = $hook;
 				break;
 			}
 		}
 
-		if ( ! $trigger || ( $trigger['data']['app'] ?? '' ) !== 'webhook' ) {
+		if ( ! $trigger ) {
 			return new WP_Error( 'no_webhook', 'This workflow does not use the Webhook trigger.', [ 'status' => 400 ] );
 		}
 
@@ -276,14 +295,14 @@ class IncomingWebhookController extends WP_REST_Controller {
 			$body = is_array( $body ) ? $body : [];
 		}
 		$query = (array) $request->get_query_params();
-		unset( $query['secret'], $query['id'] );
+		unset( $query['secret'], $query['id'], $query['node'], $query['rest_route'] );
 		$payload = array_merge( $query, $body );
 
 		if ( ! function_exists( 'zaplane_run_workflow' ) ) {
 			return new WP_Error( 'engine', 'Run engine unavailable.', [ 'status' => 500 ] );
 		}
 
-		$run_id = zaplane_run_workflow( $id, $payload );
+		$run_id = zaplane_run_workflow( $id, $payload, (string) $trigger['id'] );
 
 		return rest_ensure_response( [
 			'received' => true,
