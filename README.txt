@@ -103,7 +103,7 @@ Yes. You can chain multiple actions and insert delay, condition, filter, iterato
 
 = Where is the source code for the admin interface? =
 
-The JavaScript and CSS in `assets/build/` are compiled. Their complete, uncompiled source ships with the plugin: `dev_zaplane/` holds the React source and `assets/scss/` the Sass, with `package.json`, `webpack.config.js`, `tailwind.config.js` and `postcss.config.js` as the build setup. Each compiled file begins with a comment naming its source. To rebuild, run `npm install --legacy-peer-deps` and then `npm run build` in the plugin folder.
+In the plugin itself. `dev_zaplane/` holds the React source of the admin interface and `assets/scss/` its Sass; the files in `assets/build/` are compiled from them. See Source Code and Build Process for where each file is and how to build it.
 
 == Screenshots ==
 
@@ -247,6 +247,43 @@ HTTP Request, Send Webhook, Custom Apps, the MCP Client, the AI Agent's HTTP too
 
 = MCP client metadata =
 When the optional MCP server is on and an AI client identifies itself with a client ID that is a URL, Zaplane fetches that client's public metadata document from the URL to show you who is asking. Nothing about your site is sent.
+
+== Source Code and Build Process ==
+
+Only one part of Zaplane is compiled: the admin interface, which is a React app. Everything else, including all of the plugin's PHP in `includes/` and `integrations/`, runs exactly as it ships. The complete, uncompiled source of the admin interface is included in this plugin, together with everything needed to build it.
+
+= Where the development files are =
+
+* `dev_zaplane/` — the React source of the admin interface. `app.js` is the entry point and `app.scss` its base stylesheet.
+* `dev_zaplane/components/` — shared UI components, some with a `styles.scss` beside them.
+* `dev_zaplane/containers/BackendDashboard/` — the admin screens (`pages/`), including the workflow canvas, and the admin menu.
+* `dev_zaplane/redux/` — the Redux store and its slices.
+* `dev_zaplane/hooks/` and `dev_zaplane/utils/` — custom React hooks and helper functions.
+* `dev_zaplane/webpack/` — a small loader the build uses to point the email editor's placeholder images at files in `assets/images/`.
+* `assets/scss/` — the Sass for the admin interface; `backend.scss` is its entry.
+* `package.json`, `webpack.config.js`, `tailwind.config.js`, `postcss.config.js` and `jsconfig.json` — the JavaScript dependencies, build scripts and build configuration. The build runs on `@wordpress/scripts`, with Tailwind CSS and Autoprefixer through PostCSS.
+
+= Generated files =
+
+* `assets/build/app.js` — built from `dev_zaplane/app.js` and every module it imports.
+* `assets/build/app.css` and `assets/build/app-rtl.css` — built from the Sass above; the right-to-left file is generated from the same source.
+* `assets/build/app.asset.php` — written by the build: the script's WordPress dependencies and its version.
+
+Every generated `.js` and `.css` file starts with a comment that names its source and the commands that rebuild it.
+
+= Building the admin interface =
+
+You need Node.js 18.12 or newer and npm 8.19 or newer.
+
+1. Open a terminal in the plugin's folder, `wp-content/plugins/zaplane`.
+2. Install the dependencies: `npm install --legacy-peer-deps`
+3. Build the production files: `npm run build`
+
+The build writes minified files to `assets/build/`. While you work on the source, run `npm run start` instead: it rebuilds on every save, unminified and with source maps. Run `npm run build` again before using the plugin on a live site.
+
+`--legacy-peer-deps` is needed because one dependency, react-json-view, declares support only for older React versions, although it works with the version Zaplane uses.
+
+The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `composer install --no-dev` reinstalls it.
 
 == Changelog ==
 
