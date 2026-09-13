@@ -173,6 +173,19 @@ class TriggerNodesTest extends TestCase {
 		$this->assertSame( $payload, TriggerNodes::apply_field_map( [ 'id' => '2', 'data' => [] ], $payload ) );
 	}
 
+	public function test_a_field_map_reads_fields_named_with_hyphens(): void {
+		$node = [
+			'id'   => '2',
+			'type' => 'trigger',
+			'data' => [ 'field_map' => [ 'target' => '1', 'fields' => [ 'email' => '{{form_data.your-email}}', 'first_name' => '{{2.form_data.your-name}}' ] ] ],
+		];
+
+		$mapped = TriggerNodes::apply_field_map( $node, [ 'form_data' => [ 'your-email' => 'ada@example.test', 'your-name' => 'Ada' ] ] );
+
+		$this->assertSame( 'ada@example.test', $mapped['email'] );
+		$this->assertSame( 'Ada', $mapped['first_name'] );
+	}
+
 	public function test_trigger_holds_the_output_of_the_trigger_that_started_the_run(): void {
 		$context = TriggerNodes::with_aliases( [ 2 => [ 'email' => 'ada@example.test' ] ], $this->graph(), '2' );
 

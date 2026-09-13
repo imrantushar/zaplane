@@ -41,7 +41,9 @@ class Option extends WpModel {
 		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Required for WP option storage compatibility.
 		$serialized = is_array( $value ) || is_object( $value ) ? serialize( $value ) : $value;
 
-		$existing = static::where( 'option_name', $name )->first();
+		// Not from the query cache: a second write in the same request, such as two
+		// triggers saving the same sample, would otherwise insert the row again.
+		$existing = static::where( 'option_name', $name )->fresh()->first();
 
 		if ( $existing ) {
 			$existing->option_value = $serialized;
