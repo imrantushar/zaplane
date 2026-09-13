@@ -79,6 +79,7 @@ class Telegram extends IntegrationBase {
 	public static function get_actions(): array {
 		return [
 			'send_message'       => [ 'label' => 'Send Text Message or a Reply' ],
+			'send_post'          => [ 'label' => 'Post' ],
 			'send_photo'         => [ 'label' => 'Send Photo' ],
 			'send_document'      => [ 'label' => 'Send Document' ],
 			'send_video'         => [ 'label' => 'Send Video' ],
@@ -163,6 +164,50 @@ class Telegram extends IntegrationBase {
 							'value' => 'true',
 							'label' => 'Yes (silent)'
 						],
+					],
+				],
+			];
+		}//end if
+
+		if ( 'send_post' === $action ) {
+			return [
+				$chat_id_field,
+				[
+					'key'         => 'text',
+					'type'        => 'textarea',
+					'label'       => 'Post Text',
+					'placeholder' => 'Enter your post content... Use {{variable}} for dynamic values',
+					'required'    => true,
+				],
+				[
+					'key'         => 'inline_buttons',
+					'type'        => 'textarea',
+					'label'       => 'Inline Buttons',
+					'placeholder' => "Approve:approve_order_88, Reject:reject_order_88\nView Details:view_88",
+					'required'    => false,
+					'help'        => 'Optional. Each line = one row of buttons. Multiple buttons in a row separated by comma. Each button format: Label:callback_data',
+				],
+				[
+					'key'      => 'parse_mode',
+					'type'     => 'select',
+					'label'    => 'Parse Mode',
+					'required' => false,
+					'options'  => [
+						[ 'value' => '', 'label' => 'None' ],
+						[ 'value' => 'HTML', 'label' => 'HTML' ],
+						[ 'value' => 'Markdown', 'label' => 'Markdown' ],
+						[ 'value' => 'MarkdownV2', 'label' => 'MarkdownV2' ],
+					],
+					'help'     => 'Formatting mode for the post text.',
+				],
+				[
+					'key'      => 'disable_notification',
+					'type'     => 'select',
+					'label'    => 'Silent Post',
+					'required' => false,
+					'options'  => [
+						[ 'value' => 'false', 'label' => 'No (with notification)' ],
+						[ 'value' => 'true', 'label' => 'Yes (silent)' ],
 					],
 				],
 			];
@@ -583,16 +628,6 @@ class Telegram extends IntegrationBase {
 		return [];
 	}
 
-	/**
-	 * Detect which kind of Telegram Update object we were handed, purely from
-	 * its own shape. Needed because "All Updates" nodes receive whatever came
-	 * in, without the specific event name that a dedicated node (e.g.
-	 * "Callback Query") would have been dispatched under.
-	 *
-	 * message / edited_message / channel_post / edited_channel_post all share
-	 * the same message_id + chat shape, so those four are told apart by
-	 * chat.type (channel vs. not) and whether edit_date is present.
-	 */
 	private static function detect_update_shape( array $payload ): string {
 		if ( isset( $payload['message_id'], $payload['chat'] ) ) {
 			$is_channel = ( 'channel' === ( $payload['chat']['type'] ?? '' ) );
@@ -636,10 +671,6 @@ class Telegram extends IntegrationBase {
 		return 'unknown';
 	}
 
-	/**
-	 * Every Bot API update field name this integration resolves triggers for.
-	 * What "All Updates" expands to when computing allowed_updates.
-	 */
 	private const ALL_KNOWN_UPDATE_TYPES = [
 		'message',
 		'edited_message',
@@ -652,12 +683,6 @@ class Telegram extends IntegrationBase {
 		'shipping_query',
 	];
 
-	/**
-	 * Map a trigger event key to the Bot API update field name it corresponds
-	 * to — i.e. the value that belongs in setWebhook's allowed_updates array.
-	 * Command Received has no update field of its own; it's still a plain
-	 * 'message' at the Telegram API level, just filtered by leading '/'.
-	 */
 	public static function get_update_type_for_event( string $event ): string {
 		$map = [
 			'message_received'             => 'message',
@@ -675,14 +700,6 @@ class Telegram extends IntegrationBase {
 		return $map[ $event ] ?? '';
 	}
 
-	/**
-	 * Build the allowed_updates list for setWebhook from the event keys of
-	 * every active Telegram trigger node on a connection. Whatever calls
-	 * setWebhook (on Save, or on workflow activate/deactivate) needs to
-	 * gather every active trigger node's `event` for this connection across
-	 * all of that connection's workflows and pass the list here — this class
-	 * has no visibility into other workflows/nodes on its own.
-	 */
 	public static function get_allowed_updates_for_events( array $events ): array {
 		if ( in_array( 'all_updates', $events, true ) ) {
 			return self::ALL_KNOWN_UPDATE_TYPES;
@@ -1056,6 +1073,10 @@ class Telegram extends IntegrationBase {
 			return self::action_send_message( $node, $input, $token );
 		}
 
+		if ( 'send_post' === $action ) {
+			return self::action_send_post( $node, $input, $token );
+		}
+
 		if ( 'send_photo' === $action ) {
 			return self::action_send_media( $node, $input, $token, 'photo', 'sendPhoto' );
 		}
@@ -1140,21 +1161,6 @@ class Telegram extends IntegrationBase {
 		];
 	}
 
-	/**
-	 * Registers this site's webhook with Telegram for every active Telegram
-	 * connection, called automatically right after the Webhook Setup panel's
-	 * Save (see IntegrationBase::on_webhook_config_saved() /
-	 * IncomingWebhookController::update_webhook_config()).
-	 *
-	 * Each bot gets its OWN callback URL —
-	 * .../incoming/telegram/{connection_id} — instead of one shared URL, so
-	 * incoming updates can be attributed to the specific bot that sent them
-	 * (see resolve_trigger()'s connection_id check). This works identically
-	 * whether the site has one Telegram connection or several; the
-	 * secret_token itself stays shared across all of them, since it's only
-	 * used to authenticate "this really came from our own setWebhook call",
-	 * not to identify which bot.
-	 */
 	public static function on_webhook_config_saved( array $config ): void {
 		$secret_token = $config['secret_token'] ?? '';
 
@@ -1206,17 +1212,6 @@ class Telegram extends IntegrationBase {
 		return '' !== $provided && hash_equals( $secret, $provided );
 	}
 
-	/**
-	 * Unwrap Telegram's Update envelope down to the specific sub-object each
-	 * update type carries, and tag it with the trigger event key it matches.
-	 *
-	 * NOTE: this always returns a single ['event' => ...] pair. For the
-	 * "All Updates" trigger to actually fire, the webhook dispatcher that
-	 * calls this method needs to ALSO fire the 'telegram_webhook_all_updates'
-	 * hook (get_triggers()['all_updates']['hook']) for every delivery,
-	 * regardless of which specific event this returns — that's outside this
-	 * class, in the generic IncomingWebhookController-style dispatcher.
-	 */
 	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
 		$update = $request->get_json_params();
 

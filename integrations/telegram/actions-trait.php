@@ -57,6 +57,95 @@ trait ActionsTrait{
 		];
 	}
 
+	private static function action_send_post( array $node, array $input, string $token ): array {
+		$chat_id = $node['data']['config']['chat_id'] ?? '';
+		$text    = $node['data']['config']['text'] ?? '';
+
+		if ( empty( $chat_id ) ) {
+			throw new \Exception( 'Telegram: chat_id is required' );
+		}
+
+		if ( empty( $text ) ) {
+			throw new \Exception( 'Telegram: post text is required' );
+		}
+
+		$payload = [
+			'chat_id' => $chat_id,
+			'text'    => $text,
+		];
+
+		$parse_mode = $node['data']['config']['parse_mode'] ?? '';
+		if ( ! empty( $parse_mode ) ) {
+			$payload['parse_mode'] = $parse_mode;
+		}
+
+		$disable_notification = $node['data']['config']['disable_notification'] ?? 'false';
+		if ( 'true' === $disable_notification ) {
+			$payload['disable_notification'] = true;
+		}
+
+		$inline_buttons_raw = $node['data']['config']['inline_buttons'] ?? '';
+		if ( '' !== trim( $inline_buttons_raw ) ) {
+			$keyboard = self::parse_inline_buttons( $inline_buttons_raw );
+
+			if ( ! empty( $keyboard ) ) {
+				$payload['reply_markup'] = [ 'inline_keyboard' => $keyboard ];
+			}
+		}
+
+		$body = self::telegram_request( $token, 'sendMessage', $payload );
+
+		return [
+			'port' => 'main',
+			'data' => array_merge(
+				$input,
+				[
+					'telegram_message_id' => $body['result']['message_id'] ?? '',
+					'telegram_chat_id'    => $chat_id,
+					'telegram_status'     => 'sent',
+					'telegram_timestamp'  => time(),
+				]
+			),
+		];
+	}
+
+	private static function parse_inline_buttons( string $raw ): array {
+		$rows = array_filter( array_map( 'trim', explode( "\n", $raw ) ) );
+
+		$keyboard = [];
+
+		foreach ( $rows as $row ) {
+			$buttons = array_filter( array_map( 'trim', explode( ',', $row ) ) );
+			$row_out = [];
+
+			foreach ( $buttons as $button ) {
+				$pos = strrpos( $button, ':' );
+
+				if ( false === $pos ) {
+					continue;
+				}
+
+				$label = trim( substr( $button, 0, $pos ) );
+				$data  = trim( substr( $button, $pos + 1 ) );
+
+				if ( '' === $label || '' === $data ) {
+					continue;
+				}
+
+				$row_out[] = [
+					'text'          => $label,
+					'callback_data' => $data,
+				];
+			}
+
+			if ( ! empty( $row_out ) ) {
+				$keyboard[] = $row_out;
+			}
+		}
+
+		return $keyboard;
+	}
+
 	private static function action_send_media( array $node, array $input, string $token, string $field, string $method ): array {
 		$chat_id   = $node['data']['config']['chat_id'] ?? '';
 		$media_url = $node['data']['config'][ $field ] ?? '';
@@ -102,13 +191,6 @@ trait ActionsTrait{
 		];
 	}
 
-	/**
-	 * "Send Media" — Bit Flows-style single action with a Media Type
-	 * selector, instead of a separate action per media kind. Reuses
-	 * action_send_media() by remapping the generic 'media' config key onto
-	 * the type-specific key ('photo'/'document'/'video'/'audio') that
-	 * function expects — no duplicated request-building logic.
-	 */
 	private static function action_send_media_unified( array $node, array $input, string $token ): array {
 		$media_type = $node['data']['config']['media_type'] ?? '';
 
@@ -251,12 +333,6 @@ trait ActionsTrait{
 		];
 	}
 
-	/**
-	 * "Fetch Updates from Bot" — calls getUpdates directly. Telegram refuses
-	 * this while a webhook is registered (Conflict: can't use getUpdates
-	 * method while webhook is active), so the connection's webhook must be
-	 * deleted first if this action is used.
-	 */
 	private static function action_get_updates( array $node, array $input, string $token ): array {
 		$offset  = $node['data']['config']['offset'] ?? '';
 		$limit   = $node['data']['config']['limit'] ?? '';
@@ -348,11 +424,6 @@ trait ActionsTrait{
 		];
 	}
 
-	/**
-	 * "Create Invite Link" — createChatInviteLink. Telegram rejects
-	 * member_limit together with creates_join_request, so member_limit is
-	 * only sent when join-request approval is off.
-	 */
 	private static function action_create_invite_link( array $node, array $input, string $token ): array {
 		$chat_id              = $node['data']['config']['chat_id'] ?? '';
 		$name                 = $node['data']['config']['name'] ?? '';

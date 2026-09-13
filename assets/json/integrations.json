@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-13 05:29:05",
+    "generated_at": "2026-09-13 08:25:35",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -17877,6 +17877,79 @@
                             "key": "disable_notification",
                             "type": "select",
                             "label": "Silent Message",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "false",
+                                    "label": "No (with notification)"
+                                },
+                                {
+                                    "value": "true",
+                                    "label": "Yes (silent)"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_post": {
+                    "label": "Post",
+                    "key": "send_post",
+                    "schema": [
+                        {
+                            "key": "chat_id",
+                            "type": "text",
+                            "label": "Chat ID",
+                            "placeholder": "987654321 or @channelname",
+                            "required": true,
+                            "help": "Telegram chat/user ID or @username for public channels."
+                        },
+                        {
+                            "key": "text",
+                            "type": "textarea",
+                            "label": "Post Text",
+                            "placeholder": "Enter your post content... Use {{variable}} for dynamic values",
+                            "required": true
+                        },
+                        {
+                            "key": "inline_buttons",
+                            "type": "textarea",
+                            "label": "Inline Buttons",
+                            "placeholder": "Approve:approve_order_88, Reject:reject_order_88\nView Details:view_88",
+                            "required": false,
+                            "help": "Optional. Each line = one row of buttons. Multiple buttons in a row separated by comma. Each button format: Label:callback_data"
+                        },
+                        {
+                            "key": "parse_mode",
+                            "type": "select",
+                            "label": "Parse Mode",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "None"
+                                },
+                                {
+                                    "value": "HTML",
+                                    "label": "HTML"
+                                },
+                                {
+                                    "value": "Markdown",
+                                    "label": "Markdown"
+                                },
+                                {
+                                    "value": "MarkdownV2",
+                                    "label": "MarkdownV2"
+                                }
+                            ],
+                            "help": "Formatting mode for the post text."
+                        },
+                        {
+                            "key": "disable_notification",
+                            "type": "select",
+                            "label": "Silent Post",
                             "required": false,
                             "options": [
                                 {
