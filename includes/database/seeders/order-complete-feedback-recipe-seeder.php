@@ -2,8 +2,6 @@
 
 namespace Zaplane\Database\Seeders;
 
-use Zaplane\Models\Recipe;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,10 +14,6 @@ class OrderCompleteFeedbackRecipeSeeder {
 
 	private function seed_order_complete_feedback(): void {
 		$title = 'Order Complete Feedback Request';
-
-		if ( Recipe::where( 'title', $title )->first() ) {
-			return;
-		}
 
 		$graph = [
 			'nodes' => [
@@ -76,6 +70,7 @@ class OrderCompleteFeedbackRecipeSeeder {
 							'recipient_type' => 'custom',
 							'custom_email'   => '{{1.email}}',
 							'subject'        => 'How was your order, {{1.first_name}}? Share your feedback!',
+							'content_source' => 'custom',
 							'body'           => '<p>Hi {{1.first_name}},</p><p>Thank you for your order #{{1.order_number}}! We hope you\'re enjoying your purchase.</p><p>We\'d love to hear what you think. It only takes a minute:</p><p><a href="{{1.feedback_page_url}}">Leave Your Feedback</a></p><p>Your feedback helps us improve and serve you better.</p><p>Thank you for shopping with us!</p>',
 						],
 					],
@@ -135,7 +130,7 @@ class OrderCompleteFeedbackRecipeSeeder {
 			'connections' => [],
 		];
 
-		Recipe::create( [
+		RecipeSeeding::save( 'order-complete-feedback-request', [
 			'title'             => $title,
 			'description'       => 'Automatically request customer feedback after a WooCommerce order is completed. Waits 2 days, sends a personalised feedback request email with a unique link, then adds an internal note to the order recording that the request was sent.',
 			'blueprint'         => wp_json_encode( $blueprint ),

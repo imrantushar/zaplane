@@ -2,8 +2,6 @@
 
 namespace Zaplane\Database\Seeders;
 
-use Zaplane\Models\Recipe;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -31,10 +29,6 @@ class AiSupportAgentRecipeSeeder {
 
 	public function run(): void {
 		$title = 'AI Support Agent (Knowledge + Memory)';
-
-		if ( Recipe::where( 'title', $title )->first() ) {
-			return;
-		}
 
 		$conversation_key = 'chat:{{1.session_id}}';
 
@@ -282,7 +276,7 @@ class AiSupportAgentRecipeSeeder {
 			],
 		];
 
-		Recipe::create( [
+		RecipeSeeding::save( 'ai-support-agent', [
 			'title'             => $title,
 			'description'       => 'A full AI support agent: it selects its model from a Chat Model node, remembers the conversation via a Memory node (keyed by session_id), and answers from your Business Knowledge — wired as a tool it calls on demand. The user message and reply are saved to memory for the next turn. After importing: open the AI Agent node and link your AI connection, set the Business Knowledge node\'s Business Key to your bucket, then activate. POST { "message": "...", "reply_url": "https://...", "session_id": "..." }.',
 			'blueprint'         => wp_json_encode( $blueprint ),

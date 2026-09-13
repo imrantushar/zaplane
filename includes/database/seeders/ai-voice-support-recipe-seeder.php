@@ -2,8 +2,6 @@
 
 namespace Zaplane\Database\Seeders;
 
-use Zaplane\Models\Recipe;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -24,10 +22,6 @@ class AiVoiceSupportRecipeSeeder {
 
 	public function run(): void {
 		$title = 'Voice Support: Transcribe & Reply';
-
-		if ( Recipe::where( 'title', $title )->first() ) {
-			return;
-		}
 
 		$graph = [
 			'nodes' => [
@@ -198,7 +192,7 @@ class AiVoiceSupportRecipeSeeder {
 			],
 		];
 
-		Recipe::create( [
+		RecipeSeeding::save( 'voice-support-transcribe-reply', [
 			'title'             => $title,
 			'description'       => 'Transcribe a customer voice note (Whisper), retrieve the most relevant Business Knowledge, answer with an AI Agent, and post the transcript + reply back. After importing: link an OpenAI connection on the Transcribe step, link your AI connection on the AI Agent, set the Business Key on the Retrieve step, then activate. POST { "audio_url": "https://…/note.mp3", "reply_url": "https://…" }.',
 			'blueprint'         => wp_json_encode( $blueprint ),

@@ -2,8 +2,6 @@
 
 namespace Zaplane\Database\Seeders;
 
-use Zaplane\Models\Recipe;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,10 +14,6 @@ class BirthdayRecipeSeeder {
 
 	private function seed_birthday_discount(): void {
 		$title = 'Birthday Discount';
-
-		if ( Recipe::where( 'title', $title )->first() ) {
-			return;
-		}
 
 		$graph = [
 			'nodes' => [
@@ -82,6 +76,7 @@ class BirthdayRecipeSeeder {
 							'recipient_type' => 'contact',
 							'contact_id'     => '{{1.id}}',
 							'subject'        => '🎂 Happy Birthday {{1.first_name}} — Here\'s Your Exclusive Discount!',
+							'content_source' => 'custom',
 							'body'           => '<p>Hi {{1.first_name}},</p><p>Wishing you a wonderful birthday! As a special gift, here is your exclusive discount code:</p><p><strong>{{2.coupon.code}}</strong></p><p>Use it at checkout to get 20% off your next purchase. This code is valid for one use only, so treat yourself!</p><p>Happy Birthday! 🎉</p>',
 						],
 					],
@@ -122,6 +117,7 @@ class BirthdayRecipeSeeder {
 							'recipient_type' => 'contact',
 							'contact_id'     => '{{1.id}}',
 							'subject'        => 'Don\'t forget your birthday discount, {{1.first_name}}!',
+							'content_source' => 'custom',
 							'body'           => '<p>Hi {{1.first_name}},</p><p>Just a friendly reminder that your birthday discount is still waiting for you!</p><p><strong>{{2.coupon.code}}</strong></p><p>Use it before it expires. We\'d love to celebrate your special day with you.</p>',
 						],
 					],
@@ -166,7 +162,7 @@ class BirthdayRecipeSeeder {
 			'connections' => [],
 		];
 
-		Recipe::create( [
+		RecipeSeeding::save( 'birthday-discount', [
 			'title'             => $title,
 			'description'       => 'Automatically reward GemCRM contacts on their birthday. Sends a personalized discount coupon, waits 7 days, then sends a reminder email. Optionally applies a tag when the contact makes a purchase.',
 			'blueprint'         => wp_json_encode( $blueprint ),

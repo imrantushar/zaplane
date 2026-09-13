@@ -5,11 +5,13 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_REST_Server;
 use WP_Error;
+use Zaplane\Database\Seeders\RecipeSeeding;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Models\Recipe;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 use Zaplane\Services\BlueprintService;
+use Zaplane\Services\RecipeGroupService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -43,6 +45,11 @@ class RecipeController extends WP_REST_Controller {
 						'minimum'           => 1,
 						'maximum'           => 100,
 						'sanitize_callback' => 'absint',
+					],
+					'type'     => [
+						'type'    => 'string',
+						'enum'    => [ '', Recipe::TYPE_WORKFLOW, Recipe::TYPE_GROUP ],
+						'default' => '',
 					],
 				],
 			],
@@ -107,6 +114,20 @@ class RecipeController extends WP_REST_Controller {
 				],
 			],
 		] );
+
+		// A group recipe's setup: GET describes what it asks, POST creates the workflows.
+		register_rest_route( $this->namespace, '/recipes/(?P<id>\d+)/setup', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_setup' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'run_setup' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		] );
 	}
 
 	public function permissions_check(): bool {
@@ -116,9 +137,12 @@ class RecipeController extends WP_REST_Controller {
 	public function get_items( $request ) {
 		$page    = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
 		$perPage = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
+		$type    = (string) ( $request->get_param( 'type' ) ?? '' );
+		$byType  = in_array( $type, [ Recipe::TYPE_WORKFLOW, Recipe::TYPE_GROUP ], true );
 
-		$total   = Recipe::count();
-		$recipes = Recipe::orderBy( 'title', 'asc' )
+		$total   = $byType ? Recipe::where( 'type', $type )->count() : Recipe::count();
+		$query   = $byType ? Recipe::where( 'type', $type )->orderBy( 'title', 'asc' ) : Recipe::orderBy( 'title', 'asc' );
+		$recipes = $query
 			->forPage( $page, $perPage )
 			->get()
 			->map( fn( $r ) => $r->toResponse() )
@@ -173,6 +197,11 @@ class RecipeController extends WP_REST_Controller {
 		$recipe = Recipe::find( (int) $request['id'] );
 		if ( ! $recipe ) {
 			return new WP_Error( 'not_found', 'Recipe not found.', [ 'status' => 404 ] );
+		}
+
+		// A recipe that ships with the plugin would otherwise be seeded again on the next update.
+		if ( ! empty( $recipe->slug ) ) {
+			RecipeSeeding::dismiss( (string) $recipe->slug );
 		}
 
 		$recipe->delete();
@@ -242,6 +271,14 @@ class RecipeController extends WP_REST_Controller {
 			return new WP_Error( 'not_found', 'Recipe not found.', [ 'status' => 404 ] );
 		}
 
+		if ( $recipe->isGroup() ) {
+			return new WP_Error(
+				'group_recipe',
+				__( 'This recipe sets up several workflows. Use Run Group Recipe to choose them.', 'zaplane' ),
+				[ 'status' => 400 ]
+			);
+		}
+
 		$blueprint = $recipe->getBlueprint();
 
 		if ( empty( $blueprint ) ) {
@@ -262,5 +299,48 @@ class RecipeController extends WP_REST_Controller {
 			'status'                => $workflow->status,
 			'connections_to_relink' => $blueprint['connections'] ?? [],
 		] );
+	}
+
+	public function get_setup( $request ) {
+		$recipe = $this->group_recipe( (int) $request['id'] );
+		if ( is_wp_error( $recipe ) ) {
+			return $recipe;
+		}
+
+		return rest_ensure_response( ( new RecipeGroupService() )->setup( $recipe ) );
+	}
+
+	public function run_setup( $request ) {
+		$recipe = $this->group_recipe( (int) $request['id'] );
+		if ( is_wp_error( $recipe ) ) {
+			return $recipe;
+		}
+
+		try {
+			$result = ( new RecipeGroupService() )->install( $recipe, (array) ( $request->get_json_params() ?? [] ) );
+		} catch ( \InvalidArgumentException $e ) {
+			return new WP_Error( 'invalid_setup', $e->getMessage(), [ 'status' => 400 ] );
+		} catch ( \Throwable $e ) {
+			return new WP_Error( 'setup_failed', $e->getMessage(), [ 'status' => 500 ] );
+		}
+
+		return rest_ensure_response( $result );
+	}
+
+	/**
+	 * @return Recipe|WP_Error
+	 */
+	private function group_recipe( int $id ) {
+		$recipe = Recipe::find( $id );
+
+		if ( ! $recipe ) {
+			return new WP_Error( 'not_found', __( 'Recipe not found.', 'zaplane' ), [ 'status' => 404 ] );
+		}
+
+		if ( ! $recipe->isGroup() ) {
+			return new WP_Error( 'not_a_group', __( 'This recipe creates a single workflow, so it has no setup.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+
+		return $recipe;
 	}
 }

@@ -2,8 +2,6 @@
 
 namespace Zaplane\Database\Seeders;
 
-use Zaplane\Models\Recipe;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,10 +14,6 @@ class DefaultRecipesSeeder {
 
 	private function seed_woocommerce_abandoned_cart(): void {
 		$title = 'WooCommerce Abandoned Cart';
-
-		if ( Recipe::where( 'title', $title )->first() ) {
-			return;
-		}
 
 		// Node IDs must be strings — React Flow requires string IDs for rendering.
 		// Edges source/target must also be strings matching node IDs.
@@ -62,6 +56,7 @@ class DefaultRecipesSeeder {
 							'recipient_type' => 'custom',
 							'custom_email'   => '{{1.email}}',
 							'subject'        => 'You left something behind — your cart is waiting',
+							'content_source' => 'custom',
 							'body'           => '<p>Hi {{1.full_name}},</p><p>It looks like you left some items in your cart. Don\'t worry — we\'ve saved everything for you.</p><p><a href="{{1.recovery_link}}">Complete your purchase</a></p><p>If you have any questions, feel free to reply to this email.</p>',
 						],
 					],
@@ -102,6 +97,7 @@ class DefaultRecipesSeeder {
 							'recipient_type' => 'custom',
 							'custom_email'   => '{{1.email}}',
 							'subject'        => 'Last chance — your cart is about to expire',
+							'content_source' => 'custom',
 							'body'           => '<p>Hi {{1.full_name}},</p><p>This is a friendly reminder that the items in your cart are still available, but they may not be for long.</p><p><a href="{{1.recovery_link}}">Claim your cart now</a></p><p>If you\'ve already completed your purchase, please ignore this email.</p>',
 						],
 					],
@@ -141,7 +137,7 @@ class DefaultRecipesSeeder {
 			'connections' => [],
 		];
 
-		Recipe::create( [
+		RecipeSeeding::save( 'woocommerce-abandoned-cart', [
 			'title'             => $title,
 			'description'       => 'Automatically follow up with customers who abandoned their WooCommerce cart. Sends an initial email, waits 3 days, then sends a follow-up email.',
 			'blueprint'         => wp_json_encode( $blueprint ),

@@ -2,8 +2,6 @@
 
 namespace Zaplane\Database\Seeders;
 
-use Zaplane\Models\Recipe;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -27,10 +25,6 @@ class AiKnowledgeReplyRecipeSeeder {
 
 	public function run(): void {
 		$title = 'AI Reply with Business Knowledge';
-
-		if ( Recipe::where( 'title', $title )->first() ) {
-			return;
-		}
 
 		$graph = [
 			'nodes' => [
@@ -172,7 +166,7 @@ class AiKnowledgeReplyRecipeSeeder {
 			],
 		];
 
-		Recipe::create( [
+		RecipeSeeding::save( 'ai-reply-with-business-knowledge', [
 			'title'             => $title,
 			'description'       => 'Receive a question by webhook, retrieve the most relevant Business Knowledge entries, answer with an AI Agent grounded in that context, then POST the reply back to a URL from the request. After importing: set the Business Key on the Retrieve step to match your knowledge bucket, open the AI Agent node and pick your AI connection, then activate. Send a test POST with { "message": "...", "reply_url": "https://..." }.',
 			'blueprint'         => wp_json_encode( $blueprint ),

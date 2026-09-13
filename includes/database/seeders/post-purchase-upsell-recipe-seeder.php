@@ -2,8 +2,6 @@
 
 namespace Zaplane\Database\Seeders;
 
-use Zaplane\Models\Recipe;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,10 +14,6 @@ class PostPurchaseUpsellRecipeSeeder {
 
 	private function seed_post_purchase_upsell(): void {
 		$title = 'WooCommerce Post Purchase Upsell';
-
-		if ( Recipe::where( 'title', $title )->first() ) {
-			return;
-		}
 
 		$graph = [
 			'nodes' => [
@@ -80,6 +74,7 @@ class PostPurchaseUpsellRecipeSeeder {
 							'recipient_type' => 'custom',
 							'custom_email'   => '{{1.email}}',
 							'subject'        => 'Thank you for your order, {{1.first_name}}! Here\'s an exclusive offer just for you',
+							'content_source' => 'custom',
 							'body'           => '<p>Hi {{1.first_name}},</p><p>Thank you for your order #{{1.order_number}}! We really appreciate your purchase.</p><p>As a valued customer, we\'d like to offer you an exclusive discount on your next order:</p><p><strong>{{2.coupon.code}}</strong></p><p>Use this code at checkout to get 20% off. This offer is valid for one use only, so don\'t miss out!</p><p>We look forward to serving you again.</p>',
 						],
 					],
@@ -114,7 +109,7 @@ class PostPurchaseUpsellRecipeSeeder {
 			'connections' => [],
 		];
 
-		Recipe::create( [
+		RecipeSeeding::save( 'woocommerce-post-purchase-upsell', [
 			'title'             => $title,
 			'description'       => 'Automatically reward customers immediately after a WooCommerce order is placed. Creates a personalised discount coupon and sends it to the customer by email, encouraging a repeat purchase.',
 			'blueprint'         => wp_json_encode( $blueprint ),

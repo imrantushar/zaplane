@@ -2,8 +2,6 @@
 
 namespace Zaplane\Database\Seeders;
 
-use Zaplane\Models\Recipe;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -24,10 +22,6 @@ class AiWebhookAgentRecipeSeeder {
 
 	public function run(): void {
 		$title = 'AI Reply to Incoming Webhook';
-
-		if ( Recipe::where( 'title', $title )->first() ) {
-			return;
-		}
 
 		$graph = [
 			'nodes' => [
@@ -144,7 +138,7 @@ class AiWebhookAgentRecipeSeeder {
 			],
 		];
 
-		Recipe::create( [
+		RecipeSeeding::save( 'ai-reply-to-incoming-webhook', [
 			'title'             => $title,
 			'description'       => 'Receive a question by webhook, answer it with an AI Agent (searching your Business Knowledge), then POST the reply back to a URL from the request. After importing: open the AI Agent node, pick your AI connection, then activate. Send a test POST with { "message": "...", "reply_url": "https://..." }.',
 			'blueprint'         => wp_json_encode( $blueprint ),

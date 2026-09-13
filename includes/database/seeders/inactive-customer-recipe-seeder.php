@@ -2,8 +2,6 @@
 
 namespace Zaplane\Database\Seeders;
 
-use Zaplane\Models\Recipe;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,10 +14,6 @@ class InactiveCustomerRecipeSeeder {
 
 	private function seed_inactive_customer_winback(): void {
 		$title = 'Inactive Customer Win-back';
-
-		if ( Recipe::where( 'title', $title )->first() ) {
-			return;
-		}
 
 		$graph = [
 			'nodes' => [
@@ -61,6 +55,7 @@ class InactiveCustomerRecipeSeeder {
 							'recipient_type' => 'custom',
 							'custom_email'   => '{{1.email}}',
 							'subject'        => 'We miss you, {{1.first_name}}! Come back for something special',
+							'content_source' => 'custom',
 							'body'           => '<p>Hi {{1.first_name}},</p><p>It\'s been a while since your last order and we\'ve been thinking about you. We\'d love to have you back!</p><p>Stay tuned — an exclusive discount is on its way to thank you for being a valued customer.</p><p>If you have any questions, feel free to reply to this email.</p>',
 						],
 					],
@@ -124,6 +119,7 @@ class InactiveCustomerRecipeSeeder {
 							'recipient_type' => 'custom',
 							'custom_email'   => '{{1.email}}',
 							'subject'        => 'Your exclusive win-back offer is here, {{1.first_name}}!',
+							'content_source' => 'custom',
 							'body'           => '<p>Hi {{1.first_name}},</p><p>As a thank-you for being a loyal customer, here is a special discount just for you:</p><p><strong>{{4.coupon.code}}</strong></p><p>Use it at checkout to get 15% off your next purchase. This code is valid for one use only, so grab it before it\'s gone!</p><p>We can\'t wait to see you back.</p>',
 						],
 					],
@@ -168,7 +164,7 @@ class InactiveCustomerRecipeSeeder {
 			'connections' => [],
 		];
 
-		Recipe::create( [
+		RecipeSeeding::save( 'inactive-customer-win-back', [
 			'title'             => $title,
 			'description'       => 'Re-engage WooCommerce customers who have not ordered in a configurable number of days. Sends a reminder email, waits 7 days, creates a personal discount coupon, then sends the coupon by email. Tags are automatically removed from the GemCRM contact as soon as the customer places a new order.',
 			'blueprint'         => wp_json_encode( $blueprint ),
