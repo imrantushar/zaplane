@@ -79,6 +79,10 @@ const workflowsSlice = createSlice({
 			})
 			.addCase(updateWorkFlow.fulfilled, (state, action) => {
 				state.allWorkFlows = action.payload
+				// The save reports what looks wrong with the workflow's triggers.
+				if (Array.isArray(action.payload?.warnings) && state.workFlow) {
+					state.workFlow.warnings = action.payload.warnings;
+				}
 			})
 			.addCase(deleteWorkFlow.fulfilled, (state, action) => {
 				state.allWorkFlows = state.allWorkFlows.filter(

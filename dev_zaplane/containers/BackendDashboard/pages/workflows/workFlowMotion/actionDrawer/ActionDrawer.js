@@ -23,6 +23,7 @@ import DrawerModeList from "@ZAPComponents/SearchableDrawerList/DrawerItemList/D
 import DrawerItemList from "@ZAPComponents/SearchableDrawerList/DrawerItemList";
 import ActionFieldRenderer from "../ActionDrawer/ActionFieldRenderer/ActionFieldRenderer";
 import TestRun from "../ActionDrawer/TestRun/TestRun";
+import TriggerFieldMap from "./TriggerFieldMap/TriggerFieldMap";
 import DrawerSearchList from "@ZAPComponents/SearchableDrawerList/DrawerSearchList/DrawerSearchList";
 
 // Pragmatic email check for UI validation (not RFC-exhaustive): non-empty local
@@ -294,6 +295,18 @@ const {
           <div className="action-drowar-lists flex flex-col gap-4">
             {selectedActionFields?.length > 0 ? visibleFields.map(field => <ActionFieldRenderer key={field.key} field={field} value={values?.[field.key]} setFieldValue={setFieldValue} getKey={getKey} dynamicOptions={dynamicOptions} loadingFields={loadingFields} fetchDynamicOptions={fetchDynamicOptions} nodeId={node?.id} workFlow={workFlow} nodes={nodes} edges={edges} />) : <ZAPLabel label={__("No configuration required for this action.", "zaplane")} type="simple" />}
           </div>
+          {isTrigger && (
+            <TriggerFieldMap
+              node={node}
+              nodes={nodes}
+              workFlow={workFlow}
+              app={selectedItem?.id}
+              event={values?.actionType}
+              config={visibleFields.reduce((acc, f) => ({ ...acc, [f.key]: values?.[f.key] }), {})}
+              value={values?.field_map}
+              onChange={fieldMap => setFieldValue("field_map", fieldMap)}
+            />
+          )}
         </>
       }, {
         value: "test",

@@ -75,6 +75,8 @@ export const buildContinuePayload = (selectedItem, values, visibleFields) => {
     ...(selectedItem.mode && { mode: selectedItem.mode }),
     ...(values.hook && { hook: values.hook }),
     ...(values.connection_id && { connection_id: values.connection_id }),
+    // Set only by a trigger's field matching; null clears a match.
+    ...(values.field_map !== undefined && { field_map: values.field_map }),
   };
 };
 
