@@ -197,16 +197,26 @@ class TriggerAdvisor {
 					$missing = array_values( array_filter( $paths, static fn( $path ) => ! self::covers( $mapped, $path ) ) );
 
 					if ( $missing ) {
+						// The field is named by its id ({{3.…}}) and the trigger by its canvas
+						// number, which differ once a trigger has been deleted, so the message
+						// says which trigger the id belongs to.
 						$warnings[] = self::warning(
 							'trigger_field_gap',
 							$step,
 							sprintf(
-								/* translators: 1: step name, 2: the unmatched fields, e.g. {{1.first_name}}, 3: the other trigger, 4: trigger whose fields the step reads */
-								__( '%1$s reads %2$s, but %3$s does not match that to %4$s. When %3$s fires, it is empty.', 'zaplane' ),
+								/* translators: 1: step name, 2: the unmatched fields, e.g. {{1.first_name}}, 3: trigger whose fields the step reads, 4: the other trigger, 5: the other trigger's number, e.g. "Trigger 3" */
+								_n(
+									'%1$s reads %2$s from %3$s. The field match on %4$s leaves it out, so it is empty when %5$s fires.',
+									'%1$s reads %2$s from %3$s. The field match on %4$s leaves them out, so they are empty when %5$s fires.',
+									count( $missing ),
+									'zaplane'
+								),
 								self::step_name( $node ),
 								implode( ', ', array_map( static fn( $path ) => '{{' . $source . '.' . $path . '}}', $missing ) ),
+								$source_name,
 								$other_name,
-								$source_name
+								/* translators: %d: the trigger's number on the canvas */
+								sprintf( __( 'Trigger %d', 'zaplane' ), TriggerNodes::number( $graph, $other ) )
 							)
 						);
 					}
