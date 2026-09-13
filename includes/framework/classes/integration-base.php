@@ -231,6 +231,20 @@ abstract class IntegrationBase {
 	}
 
 	/**
+	 * Called by IncomingWebhookController::update_webhook_config() right after
+	 * the Webhook Setup panel's fields are persisted to zaplane_webhook_config.
+	 *
+	 * $config is the saved bucket for this integration (the same keys declared
+	 * in get_webhook_setup_fields(), e.g. ['secret_token' => '...']). Override
+	 * to push the new settings to the provider's own API — e.g. calling
+	 * Telegram's setWebhook — so Save actually (re)registers the webhook with
+	 * the provider instead of only persisting it locally. No-op by default:
+	 * most integrations (Slack, Meta) verify via a handshake instead and don't
+	 * need an outbound registration call at all.
+	 */
+	public static function on_webhook_config_saved( array $config ): void {}
+
+	/**
 	 * Read one saved webhook setting for this integration.
 	 *
 	 * Values live together under the `zaplane_webhook_config` option keyed by
@@ -421,5 +435,17 @@ abstract class IntegrationBase {
 
 	public static function get_webhook_url(): string {
 		return rest_url( static::get_webhook_route() );
+	}
+
+	/**
+	 * A distinct webhook URL for one specific connection of this integration,
+	 * e.g. .../incoming/telegram/42. Integrations that need to tell multiple
+	 * accounts/bots apart (so an incoming delivery can be attributed to the
+	 * connection it came from, and only that connection's trigger nodes fire)
+	 * register each connection at its own URL via this instead of the shared
+	 * get_webhook_url(). Works the same whether there's one connection or many.
+	 */
+	public static function get_webhook_url_for_connection( int $connection_id ): string {
+		return rest_url( static::get_webhook_route() . '/' . $connection_id );
 	}
 }

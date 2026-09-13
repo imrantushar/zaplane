@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-09 11:43:54",
+    "generated_at": "2026-09-13 05:29:05",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -12,6 +12,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/academy-lms/",
+                "action": "https://zaplane.app/docs/action-academy-lms/"
+            },
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -150,7 +154,7 @@
                             "key": "user_id",
                             "label": "User Email",
                             "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged‑in user.",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
                             "required": false
                         },
                         {
@@ -188,7 +192,7 @@
                             "key": "user_id",
                             "label": "User Email",
                             "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged‑in user.",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
                             "required": false
                         },
                         {
@@ -226,7 +230,7 @@
                             "key": "user_id",
                             "label": "User Email",
                             "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged‑in user.",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
                             "required": false
                         },
                         {
@@ -273,7 +277,7 @@
                             "key": "user_id",
                             "label": "User Email",
                             "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged‑in user.",
+                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
                             "required": false
                         },
                         {
@@ -296,10 +300,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/academy-lms/",
-                "action": "https://zaplane.app/docs/action-academy-lms/"
             }
         },
         "ablocks": {
@@ -312,6 +312,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/ablocks/",
+                "action": "https://zaplane.app/docs/ablocks/"
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -338,11 +342,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/ablocks/",
-                "action": "https://zaplane.app/docs/ablocks/"
-            }
+            "actions": []
         },
         "gemcrm": {
             "slug": "gemcrm",
@@ -354,6 +354,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/gemcrm/",
+                "action": "https://zaplane.app/docs/action-gemcrm/"
+            },
             "triggers": {
                 "contact_created": {
                     "label": "Contact Created",
@@ -1118,7 +1122,7 @@
                             "label": "Subject",
                             "type": "expression",
                             "required": true,
-                            "placeholder": "Your subject line… (leave empty to use the template subject)"
+                            "placeholder": "Your subject line\u2026 (leave empty to use the template subject)"
                         },
                         {
                             "key": "content_source",
@@ -1145,7 +1149,7 @@
                             "depends_on": {
                                 "content_source": "template"
                             },
-                            "help": "Pick a saved template (designed on the Zaplane → Email Templates page). Its design is used as the email body.",
+                            "help": "Pick a saved template (designed on the Zaplane \u2192 Email Templates page). Its design is used as the email body.",
                             "dynamic": {
                                 "integration": "gemcrm",
                                 "query": "gemcrm_email_template_query",
@@ -1163,7 +1167,7 @@
                             "depends_on": {
                                 "content_source": "custom"
                             },
-                            "placeholder": "Write your email here…",
+                            "placeholder": "Write your email here\u2026",
                             "merge_tags": [
                                 {
                                     "value": "{{contact.first_name}}",
@@ -1200,7 +1204,7 @@
                             "label": "Pre-header Text",
                             "type": "expression",
                             "required": false,
-                            "placeholder": "Short preview text shown in inbox…"
+                            "placeholder": "Short preview text shown in inbox\u2026"
                         },
                         {
                             "key": "from_email",
@@ -1258,10 +1262,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/gemcrm/",
-                "action": "https://zaplane.app/docs/action-gemcrm/"
             }
         },
         "storeengine": {
@@ -1274,6 +1274,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/storeengine/",
+                "action": "https://zaplane.app/docs/action-storeengine/"
+            },
             "triggers": {
                 "product_purchased": {
                     "label": "Product Purchased",
@@ -2395,7 +2399,7 @@
                             "options": [
                                 {
                                     "value": "",
-                                    "label": "— Keep current —"
+                                    "label": "\u2014 Keep current \u2014"
                                 },
                                 {
                                     "value": "publish",
@@ -2446,11 +2450,11 @@
                             "options": [
                                 {
                                     "value": "no",
-                                    "label": "No — Move to Trash"
+                                    "label": "No \u2014 Move to Trash"
                                 },
                                 {
                                     "value": "yes",
-                                    "label": "Yes — Permanently Delete"
+                                    "label": "Yes \u2014 Permanently Delete"
                                 }
                             ]
                         }
@@ -2459,10 +2463,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/storeengine/",
-                "action": "https://zaplane.app/docs/action-storeengine/"
             }
         },
         "activecampaign": {
@@ -2483,6 +2483,10 @@
                     "help": "Optional. When set, append ?secret=<value> to the callback URL you register in ActiveCampaign; requests without it are rejected."
                 }
             ],
+            "docs_url": {
+                "trigger": "",
+                "action": "https://zaplane.app/docs/action-activecampaign/"
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -2776,10 +2780,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": "https://zaplane.app/docs/action-activecampaign/"
             }
         },
         "advancecustomfields": {
@@ -2792,6 +2792,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": "https://zaplane.app/docs/action-advanced-custom-fields/"
+            },
             "triggers": {
                 "acf_save_post": {
                     "label": "ACF Fields Saved",
@@ -3032,10 +3036,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": "https://zaplane.app/docs/action-advanced-custom-fields/"
             }
         },
         "ai": {
@@ -3048,6 +3048,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/ai-openai/",
+                "action": "https://zaplane.app/docs/ai-openai/"
+            },
             "triggers": [],
             "actions": {
                 "generate_response": {
@@ -3070,7 +3074,7 @@
                                     "connection_id"
                                 ]
                             },
-                            "help": "Select an AI connection first — the list then shows only models for that provider."
+                            "help": "Select an AI connection first \u2014 the list then shows only models for that provider."
                         },
                         {
                             "key": "image_url",
@@ -3165,15 +3169,15 @@
                             "options": [
                                 {
                                     "value": "1024x1024",
-                                    "label": "Square 1024×1024"
+                                    "label": "Square 1024\u00d71024"
                                 },
                                 {
                                     "value": "1024x1792",
-                                    "label": "Portrait 1024×1792"
+                                    "label": "Portrait 1024\u00d71792"
                                 },
                                 {
                                     "value": "1792x1024",
-                                    "label": "Landscape 1792×1024"
+                                    "label": "Landscape 1792\u00d71024"
                                 }
                             ]
                         }
@@ -3192,7 +3196,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "https://example.com/voice-note.mp3",
-                            "help": "A reachable URL to the audio file (mp3, wav, m4a, webm…). Requires an OpenAI connection."
+                            "help": "A reachable URL to the audio file (mp3, wav, m4a, webm\u2026). Requires an OpenAI connection."
                         },
                         {
                             "key": "model",
@@ -3214,10 +3218,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/ai-openai/",
-                "action": "https://zaplane.app/docs/ai-openai/"
             }
         },
         "arform": {
@@ -3230,6 +3230,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit (Lite)",
@@ -3282,11 +3286,7 @@
                     }
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            }
+            "actions": []
         },
         "avadaform": {
             "slug": "avadaform",
@@ -3298,6 +3298,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -3324,11 +3328,7 @@
                     }
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            }
+            "actions": []
         },
         "beaverbuilder": {
             "slug": "beaverbuilder",
@@ -3340,6 +3340,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "contact_form_submission": {
                     "label": "Contact Form Submission",
@@ -3369,11 +3373,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            }
+            "actions": []
         },
         "bitform": {
             "slug": "bitform",
@@ -3385,6 +3385,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/bit-form/",
+                "action": "https://zaplane.app/docs/bit-form/"
+            },
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -3411,11 +3415,7 @@
                     }
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/bit-form/",
-                "action": "https://zaplane.app/docs/bit-form/"
-            }
+            "actions": []
         },
         "bookingcalendarcontactform": {
             "slug": "bookingcalendarcontactform",
@@ -3427,6 +3427,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/booking-calendar/",
+                "action": "https://zaplane.app/docs/booking-calendar/"
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -3438,11 +3442,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/booking-calendar/",
-                "action": "https://zaplane.app/docs/booking-calendar/"
-            }
+            "actions": []
         },
         "brevo": {
             "slug": "brevo",
@@ -3454,6 +3454,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "create_contact": {
@@ -3486,7 +3490,7 @@
                             "key": "attributes",
                             "label": "Custom Attributes",
                             "type": "key_value",
-                            "description": "Extra contact attributes sent under the \"attributes\" key (e.g. COMPANY → Acme)."
+                            "description": "Extra contact attributes sent under the \"attributes\" key (e.g. COMPANY \u2192 Acme)."
                         },
                         {
                             "key": "email_blacklisted",
@@ -3571,10 +3575,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "buddyboss": {
@@ -3587,6 +3587,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/buddyboss/",
+                "action": "https://zaplane.app/docs/action-buddyboss/"
+            },
             "triggers": {
                 "account_activated": {
                     "label": "Account Activated",
@@ -4420,10 +4424,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/buddyboss/",
-                "action": "https://zaplane.app/docs/action-buddyboss/"
             }
         },
         "coblocks": {
@@ -4436,6 +4436,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/coblocks/",
+                "action": "https://zaplane.app/docs/coblocks/"
+            },
             "triggers": {
                 "coblocks_form_submit": {
                     "label": "Form Submission",
@@ -4447,11 +4451,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/coblocks/",
-                "action": "https://zaplane.app/docs/coblocks/"
-            }
+            "actions": []
         },
         "contact-form-7": {
             "slug": "contact-form-7",
@@ -4463,6 +4463,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/contact-form/",
+                "action": "https://zaplane.app/docs/contact-form/"
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -4507,11 +4511,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/contact-form/",
-                "action": "https://zaplane.app/docs/contact-form/"
-            }
+            "actions": []
         },
         "discord": {
             "slug": "discord",
@@ -4523,6 +4523,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "create_channel": {
@@ -5264,10 +5268,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "divi": {
@@ -5280,6 +5280,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/divi-builder/",
+                "action": "https://zaplane.app/docs/divi-builder/"
+            },
             "triggers": {
                 "contact_form_submit": {
                     "label": "Contact Form Submitted",
@@ -5291,11 +5295,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/divi-builder/",
-                "action": "https://zaplane.app/docs/divi-builder/"
-            }
+            "actions": []
         },
         "dokan": {
             "slug": "dokan",
@@ -5307,6 +5307,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "new_seller_created": {
                     "label": "New Seller Created",
@@ -5718,10 +5722,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "easydigitaldownload": {
@@ -5734,6 +5734,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/easy-digital-downloads/",
+                "action": "https://zaplane.app/docs/easy-digital-downloads/"
+            },
             "triggers": {
                 "purchase_product": {
                     "label": "Product Purchased",
@@ -6193,10 +6197,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/easy-digital-downloads/",
-                "action": "https://zaplane.app/docs/easy-digital-downloads/"
             }
         },
         "elementor": {
@@ -6209,6 +6209,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/elementor/",
+                "action": "https://zaplane.app/docs/elementor/"
+            },
             "triggers": {
                 "elementor_pro/forms/new_record": {
                     "label": "Form New Record",
@@ -6220,11 +6224,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/elementor/",
-                "action": "https://zaplane.app/docs/elementor/"
-            }
+            "actions": []
         },
         "essentialblocks": {
             "slug": "essentialblocks",
@@ -6236,6 +6236,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/essential-blocks/",
+                "action": "https://zaplane.app/docs/essential-blocks/"
+            },
             "triggers": {
                 "eb_form_submit_before_email": {
                     "label": "Form Submission",
@@ -6247,11 +6251,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/essential-blocks/",
-                "action": "https://zaplane.app/docs/essential-blocks/"
-            }
+            "actions": []
         },
         "eventscalendar": {
             "slug": "eventscalendar",
@@ -6263,6 +6263,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "attendEvent": {
                     "label": "User attended an event",
@@ -6301,11 +6305,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            }
+            "actions": []
         },
         "fillout": {
             "slug": "fillout",
@@ -6317,6 +6317,10 @@
             "supports_webhook": true,
             "webhook_route": "zaplane/v1/incoming/fillout",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/fillout/",
+                "action": "https://zaplane.app/docs/fillout/"
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -6343,7 +6347,7 @@
                             "type": "copy",
                             "value": "{{ZAPLANE_REST_URL}}zaplane/v1/incoming/fillout",
                             "readonly": true,
-                            "help": "Copy this URL → Fillout Dashboard → Your Form → Integrate → Webhooks → Add Webhook → Paste & Save."
+                            "help": "Copy this URL \u2192 Fillout Dashboard \u2192 Your Form \u2192 Integrate \u2192 Webhooks \u2192 Add Webhook \u2192 Paste & Save."
                         }
                     ],
                     "outputs": [
@@ -6351,11 +6355,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/fillout/",
-                "action": "https://zaplane.app/docs/fillout/"
-            }
+            "actions": []
         },
         "fluentcart": {
             "slug": "fluentcart",
@@ -6367,6 +6367,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/fluentcart/",
+                "action": "https://zaplane.app/docs/action-fluentcart/"
+            },
             "triggers": {
                 "product_purchased": {
                     "label": "Product Purchased",
@@ -9547,10 +9551,6 @@
                         "error"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/fluentcart/",
-                "action": "https://zaplane.app/docs/action-fluentcart/"
             }
         },
         "fluentcrm": {
@@ -9563,6 +9563,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/fluentcrm/",
+                "action": "https://zaplane.app/docs/action-fluentcrm/"
+            },
             "triggers": {
                 "added_tag": {
                     "label": "Tag Added To Contact",
@@ -10522,10 +10526,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/fluentcrm/",
-                "action": "https://zaplane.app/docs/action-fluentcrm/"
             }
         },
         "fluentform": {
@@ -10538,6 +10538,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/fluent-forms/",
+                "action": "https://zaplane.app/docs/fluent-forms/"
+            },
             "triggers": {
                 "submission_inserted": {
                     "label": "Form Submitted",
@@ -10564,11 +10568,7 @@
                     }
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/fluent-forms/",
-                "action": "https://zaplane.app/docs/fluent-forms/"
-            }
+            "actions": []
         },
         "fluentsmtp": {
             "slug": "fluentsmtp",
@@ -10580,6 +10580,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/fluentsmtp/",
+                "action": "https://zaplane.app/docs/action-fluentsmtp/"
+            },
             "triggers": {
                 "email_sent": {
                     "label": "Email Sent",
@@ -10712,10 +10716,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/fluentsmtp/",
-                "action": "https://zaplane.app/docs/action-fluentsmtp/"
             }
         },
         "formidable": {
@@ -10728,6 +10728,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/formidable-forms/",
+                "action": "https://zaplane.app/docs/formidable-forms/"
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10754,11 +10758,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/formidable-forms/",
-                "action": "https://zaplane.app/docs/formidable-forms/"
-            }
+            "actions": []
         },
         "funnelkit": {
             "slug": "funnelkit",
@@ -10770,6 +10770,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/funnelkit/",
+                "action": "https://zaplane.app/docs/actions-funnelkit/"
+            },
             "triggers": {
                 "woofunnels_loaded": {
                     "label": "WooFunnels Loaded",
@@ -11395,10 +11399,6 @@
                         "error"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/funnelkit/",
-                "action": "https://zaplane.app/docs/actions-funnelkit/"
             }
         },
         "gamipress": {
@@ -11411,6 +11411,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/gamipress/",
+                "action": "https://zaplane.app/docs/gamipress/"
+            },
             "triggers": {
                 "user_earns_rank": {
                     "label": "User Earns Rank",
@@ -11552,11 +11556,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/gamipress/",
-                "action": "https://zaplane.app/docs/gamipress/"
-            }
+            "actions": []
         },
         "gmail": {
             "slug": "gmail",
@@ -11568,6 +11568,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "send_email": {
@@ -11835,10 +11839,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "google-meet": {
@@ -11851,6 +11851,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "create_meeting": {
@@ -12035,7 +12039,7 @@
                             "options": [
                                 {
                                     "value": "true",
-                                    "label": "Yes — send cancellation emails"
+                                    "label": "Yes \u2014 send cancellation emails"
                                 },
                                 {
                                     "value": "false",
@@ -12079,15 +12083,15 @@
                                 },
                                 {
                                     "value": "OPEN",
-                                    "label": "Open — anyone with the link"
+                                    "label": "Open \u2014 anyone with the link"
                                 },
                                 {
                                     "value": "TRUSTED",
-                                    "label": "Trusted — organisation members"
+                                    "label": "Trusted \u2014 organisation members"
                                 },
                                 {
                                     "value": "RESTRICTED",
-                                    "label": "Restricted — invited members only"
+                                    "label": "Restricted \u2014 invited members only"
                                 }
                             ],
                             "help": "Who can join this Meet space."
@@ -12114,10 +12118,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "gravityforms": {
@@ -12130,6 +12130,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/gravity-forms/",
+                "action": "https://zaplane.app/docs/gravity-forms/"
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -12156,11 +12160,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/gravity-forms/",
-                "action": "https://zaplane.app/docs/gravity-forms/"
-            }
+            "actions": []
         },
         "groundhogg": {
             "slug": "groundhogg",
@@ -12172,6 +12172,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/groundhogg/",
+                "action": "https://zaplane.app/docs/groundhogg/"
+            },
             "triggers": {
                 "created_contact": {
                     "label": "Created Contact",
@@ -12231,11 +12235,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/groundhogg/",
-                "action": "https://zaplane.app/docs/groundhogg/"
-            }
+            "actions": []
         },
         "jetengine": {
             "slug": "jetengine",
@@ -12247,6 +12247,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/jetengine/",
+                "action": "https://zaplane.app/docs/jetengine/"
+            },
             "triggers": {
                 "post_type_field_update": {
                     "label": "Updated JetEngine field on post type",
@@ -12273,11 +12277,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/jetengine/",
-                "action": "https://zaplane.app/docs/jetengine/"
-            }
+            "actions": []
         },
         "jotform": {
             "slug": "jotform",
@@ -12289,6 +12289,10 @@
             "supports_webhook": true,
             "webhook_route": "zaplane/v1/incoming/jotform",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/jotform/",
+                "action": "https://zaplane.app/docs/action-jotform/"
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -12315,7 +12319,7 @@
                             "type": "copy",
                             "value": "{{ZAPLANE_REST_URL}}zaplane/v1/incoming/jotform",
                             "readonly": true,
-                            "help": "Copy this URL → Jotform → Your Form → Settings → Integrations → Webhooks → Paste & Save."
+                            "help": "Copy this URL \u2192 Jotform \u2192 Your Form \u2192 Settings \u2192 Integrations \u2192 Webhooks \u2192 Paste & Save."
                         }
                     ],
                     "outputs": [
@@ -12605,10 +12609,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/jotform/",
-                "action": "https://zaplane.app/docs/action-jotform/"
             }
         },
         "kadenceblocks": {
@@ -12621,6 +12621,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/kadence-blocks/",
+                "action": "https://zaplane.app/docs/kadence-blocks/"
+            },
             "triggers": {
                 "kadence_blocks_advanced_form_submission": {
                     "label": "Form Submission",
@@ -12632,11 +12636,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/kadence-blocks/",
-                "action": "https://zaplane.app/docs/kadence-blocks/"
-            }
+            "actions": []
         },
         "learndash": {
             "slug": "learndash",
@@ -12648,6 +12648,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/learndash/",
+                "action": "https://zaplane.app/docs/learndash/"
+            },
             "triggers": {
                 "user_enroll_course": {
                     "label": "User Is Enrolled In A Course",
@@ -12898,11 +12902,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/learndash/",
-                "action": "https://zaplane.app/docs/learndash/"
-            }
+            "actions": []
         },
         "lifter": {
             "slug": "lifter",
@@ -12914,6 +12914,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/lifterlms/",
+                "action": "https://zaplane.app/docs/lifterlms/"
+            },
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -13012,11 +13016,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/lifterlms/",
-                "action": "https://zaplane.app/docs/lifterlms/"
-            }
+            "actions": []
         },
         "mailchimp": {
             "slug": "mailchimp",
@@ -13036,6 +13036,10 @@
                     "help": "Optional. When set, append ?secret=<value> to the callback URL you paste into Mailchimp; requests without it are rejected."
                 }
             ],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "subscribed": {
                     "label": "Subscriber Added",
@@ -13158,7 +13162,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -13263,7 +13267,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -13294,7 +13298,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -13333,7 +13337,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -13372,7 +13376,7 @@
                                 ]
                             },
                             "required": true,
-                            "help": "Find it in Mailchimp → Audience → Settings → Audience name and defaults."
+                            "help": "Find it in Mailchimp \u2192 Audience \u2192 Settings \u2192 Audience name and defaults."
                         },
                         {
                             "key": "email",
@@ -13386,10 +13390,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "manual": {
@@ -13402,6 +13402,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/manual/",
+                "action": "https://zaplane.app/docs/manual/"
+            },
             "triggers": {
                 "run_manually": {
                     "label": "Run Manually",
@@ -13412,7 +13416,7 @@
                             "key": "note",
                             "label": "How it runs",
                             "type": "copy",
-                            "value": "This workflow runs when you click “Run”, or via zaplane_run_workflow( id, data )."
+                            "value": "This workflow runs when you click \u201cRun\u201d, or via zaplane_run_workflow( id, data )."
                         }
                     ],
                     "outputs": [
@@ -13420,11 +13424,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/manual/",
-                "action": "https://zaplane.app/docs/manual/"
-            }
+            "actions": []
         },
         "masterstudy": {
             "slug": "masterstudy",
@@ -13436,6 +13436,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/masterstudy-lms/",
+                "action": "https://zaplane.app/docs/masterstudy-lms/"
+            },
             "triggers": {
                 "user_enroll_course": {
                     "label": "User Is Enrolled In A Course",
@@ -13572,11 +13576,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/masterstudy-lms/",
-                "action": "https://zaplane.app/docs/masterstudy-lms/"
-            }
+            "actions": []
         },
         "memberpress": {
             "slug": "memberpress",
@@ -13588,6 +13588,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/memberpress-2/",
+                "action": "https://zaplane.app/docs/action-memberpress/"
+            },
             "triggers": {
                 "member_added": {
                     "label": "Member Added",
@@ -14754,10 +14758,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/memberpress-2/",
-                "action": "https://zaplane.app/docs/action-memberpress/"
             }
         },
         "messenger": {
@@ -14776,16 +14776,20 @@
                     "type": "password",
                     "generate": true,
                     "required": true,
-                    "help": "Invent a value, save it here, then paste the same string into Meta → Webhooks → Verify Token. Meta will not accept the callback URL until this matches."
+                    "help": "Invent a value, save it here, then paste the same string into Meta \u2192 Webhooks \u2192 Verify Token. Meta will not accept the callback URL until this matches."
                 },
                 {
                     "key": "app_secret",
                     "label": "App Secret",
                     "type": "password",
                     "required": true,
-                    "help": "Meta app → Settings → Basic → App Secret. Used to check the X-Hub-Signature-256 on every delivery."
+                    "help": "Meta app \u2192 Settings \u2192 Basic \u2192 App Secret. Used to check the X-Hub-Signature-256 on every delivery."
                 }
             ],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -14822,10 +14826,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "metabox": {
@@ -14838,6 +14838,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/meta-box/",
+                "action": "https://zaplane.app/docs/meta-box/"
+            },
             "triggers": {
                 "form_submission": {
                     "label": "Form Submission",
@@ -14864,11 +14868,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/meta-box/",
-                "action": "https://zaplane.app/docs/meta-box/"
-            }
+            "actions": []
         },
         "metform": {
             "slug": "metform",
@@ -14880,6 +14880,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/metform/",
+                "action": "https://zaplane.app/docs/metform/"
+            },
             "triggers": {
                 "metform_after_store_form_data": {
                     "label": "Form Submitted",
@@ -14891,11 +14895,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/metform/",
-                "action": "https://zaplane.app/docs/metform/"
-            }
+            "actions": []
         },
         "ninjaform": {
             "slug": "ninjaform",
@@ -14907,6 +14907,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/ninja-forms/",
+                "action": "https://zaplane.app/docs/ninja-forms/"
+            },
             "triggers": {
                 "process_ninja_form": {
                     "label": "Form Submit",
@@ -14933,11 +14937,7 @@
                     }
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/ninja-forms/",
-                "action": "https://zaplane.app/docs/ninja-forms/"
-            }
+            "actions": []
         },
         "paidmembershippro": {
             "slug": "paidmembershippro",
@@ -14949,6 +14949,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/paid-memberships-pro/",
+                "action": "https://zaplane.app/docs/action-memberships-pro/"
+            },
             "triggers": {
                 "admin_assigns_membership": {
                     "label": "Admin Assigns a Membership Level to a User",
@@ -15171,10 +15175,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/paid-memberships-pro/",
-                "action": "https://zaplane.app/docs/action-memberships-pro/"
             }
         },
         "paymattic": {
@@ -15187,6 +15187,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/paymattic-integration/",
+                "action": "https://zaplane.app/docs/paymattic-integration/"
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -15537,10 +15541,6 @@
                         "error"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/paymattic-integration/",
-                "action": "https://zaplane.app/docs/paymattic-integration/"
             }
         },
         "profilebuilder": {
@@ -15553,6 +15553,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/profile-builder/",
+                "action": "https://zaplane.app/docs/profile-builder/"
+            },
             "triggers": {
                 "user_registration": {
                     "label": "User Registration",
@@ -15609,11 +15613,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/profile-builder/",
-                "action": "https://zaplane.app/docs/profile-builder/"
-            }
+            "actions": []
         },
         "slack": {
             "slug": "slack",
@@ -15630,9 +15630,13 @@
                     "label": "Signing Secret",
                     "type": "password",
                     "required": true,
-                    "help": "Slack app → Basic Information → App Credentials → Signing Secret. Without it this endpoint accepts unsigned requests from anyone."
+                    "help": "Slack app \u2192 Basic Information \u2192 App Credentials \u2192 Signing Secret. Without it this endpoint accepts unsigned requests from anyone."
                 }
             ],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -15886,10 +15890,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "spectra": {
@@ -15902,6 +15902,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/spectra-legacy/",
+                "action": "https://zaplane.app/docs/spectra-legacy/"
+            },
             "triggers": {
                 "uagb_form_success": {
                     "label": "Form Submission",
@@ -15913,11 +15917,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/spectra-legacy/",
-                "action": "https://zaplane.app/docs/spectra-legacy/"
-            }
+            "actions": []
         },
         "surecart": {
             "slug": "surecart",
@@ -15929,6 +15929,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/surecart/",
+                "action": "https://zaplane.app/docs/action-surecart/"
+            },
             "triggers": {
                 "purchase_created": {
                     "label": "Purchase Created",
@@ -17464,10 +17468,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/surecart/",
-                "action": "https://zaplane.app/docs/action-surecart/"
             }
         },
         "sureform": {
@@ -17480,6 +17480,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/sure-form/",
+                "action": "https://zaplane.app/docs/sure-form/"
+            },
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -17506,11 +17510,7 @@
                     }
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/sure-form/",
-                "action": "https://zaplane.app/docs/sure-form/"
-            }
+            "actions": []
         },
         "suremail": {
             "slug": "suremail",
@@ -17522,6 +17522,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/suremail/",
+                "action": "https://zaplane.app/docs/suremail/"
+            },
             "triggers": {
                 "email_sent_successfully": {
                     "label": "Email Sent Successfully",
@@ -17542,11 +17546,7 @@
                     }
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/suremail/",
-                "action": "https://zaplane.app/docs/suremail/"
-            }
+            "actions": []
         },
         "suremembers": {
             "slug": "suremembers",
@@ -17558,6 +17558,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/suremembers/",
+                "action": "https://zaplane.app/docs/action-suremembers/"
+            },
             "triggers": {
                 "access_group": {
                     "label": "User Added To Access Group",
@@ -17691,10 +17695,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/suremembers/",
-                "action": "https://zaplane.app/docs/action-suremembers/"
             }
         },
         "telegram": {
@@ -17712,9 +17712,13 @@
                     "label": "Secret Token",
                     "type": "password",
                     "generate": true,
-                    "help": "Pass the same value as secret_token when you call setWebhook. Telegram then sends it back on every request, which is how this endpoint tells real deliveries from forged ones."
+                    "help": "Telegram sends this back on every request, which is how this endpoint tells real deliveries from forged ones. Saving this automatically calls setWebhook for every connected bot, each on its own callback URL \u2014 no manual API call needed."
                 }
             ],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -17733,11 +17737,92 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "edited_message_received": {
+                    "label": "Edited Message",
+                    "hook": "telegram_webhook_edited_message",
+                    "key": "edited_message_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "channel_post_received": {
+                    "label": "Channel Post",
+                    "hook": "telegram_webhook_channel_post",
+                    "key": "channel_post_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "edited_channel_post_received": {
+                    "label": "Edited Channel Post",
+                    "hook": "telegram_webhook_edited_channel_post",
+                    "key": "edited_channel_post_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "callback_query_received": {
+                    "label": "Callback Query",
+                    "hook": "telegram_webhook_callback_query",
+                    "key": "callback_query_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "inline_query_received": {
+                    "label": "Inline Query",
+                    "hook": "telegram_webhook_inline_query",
+                    "key": "inline_query_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "poll_received": {
+                    "label": "Poll",
+                    "hook": "telegram_webhook_poll",
+                    "key": "poll_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "pre_checkout_query_received": {
+                    "label": "Pre-Checkout Query",
+                    "hook": "telegram_webhook_pre_checkout_query",
+                    "key": "pre_checkout_query_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "shipping_query_received": {
+                    "label": "Shipping Query",
+                    "hook": "telegram_webhook_shipping_query",
+                    "key": "shipping_query_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "all_updates": {
+                    "label": "All Updates",
+                    "hook": "telegram_webhook_all_updates",
+                    "key": "all_updates",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {
                 "send_message": {
-                    "label": "Send Text Message",
+                    "label": "Send Text Message or a Reply",
                     "key": "send_message",
                     "schema": [
                         {
@@ -17754,6 +17839,14 @@
                             "label": "Message Text",
                             "placeholder": "Enter your message... Use {{variable}} for dynamic values",
                             "required": true
+                        },
+                        {
+                            "key": "reply_to_message_id",
+                            "type": "text",
+                            "label": "Reply To Message ID",
+                            "placeholder": "{{telegram_message_id}}",
+                            "required": false,
+                            "help": "Leave blank to send as a new message, or provide a message_id to send as a reply."
                         },
                         {
                             "key": "parse_mode",
@@ -17929,6 +18022,62 @@
                         "main"
                     ]
                 },
+                "send_media": {
+                    "label": "Send Media",
+                    "key": "send_media",
+                    "schema": [
+                        {
+                            "key": "chat_id",
+                            "type": "text",
+                            "label": "Chat ID",
+                            "placeholder": "987654321 or @channelname",
+                            "required": true,
+                            "help": "Telegram chat/user ID or @username for public channels."
+                        },
+                        {
+                            "key": "media_type",
+                            "type": "select",
+                            "label": "Media Type",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "photo",
+                                    "label": "Photo"
+                                },
+                                {
+                                    "value": "document",
+                                    "label": "Document"
+                                },
+                                {
+                                    "value": "video",
+                                    "label": "Video"
+                                },
+                                {
+                                    "value": "audio",
+                                    "label": "Audio"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "media",
+                            "type": "text",
+                            "label": "Media URL",
+                            "placeholder": "https://example.com/file.jpg",
+                            "required": true,
+                            "help": "Publicly accessible URL \u2014 must match the selected Media Type."
+                        },
+                        {
+                            "key": "caption",
+                            "type": "text",
+                            "label": "Caption",
+                            "placeholder": "Optional caption",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "send_location": {
                     "label": "Send Location",
                     "key": "send_location",
@@ -18019,7 +18168,7 @@
                             "label": "Question",
                             "placeholder": "What do you prefer?",
                             "required": true,
-                            "help": "The poll question (1–300 characters)."
+                            "help": "The poll question (1\u2013300 characters)."
                         },
                         {
                             "key": "options",
@@ -18027,7 +18176,7 @@
                             "label": "Options",
                             "placeholder": "Option A\nOption B\nOption C",
                             "required": true,
-                            "help": "One option per line (2–10 options required)."
+                            "help": "One option per line (2\u201310 options required)."
                         },
                         {
                             "key": "is_anonymous",
@@ -18049,11 +18198,261 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "get_updates": {
+                    "label": "Fetch Updates from Bot",
+                    "key": "get_updates",
+                    "schema": [
+                        {
+                            "key": "offset",
+                            "type": "text",
+                            "label": "Offset",
+                            "placeholder": "{{telegram_last_update_id}}",
+                            "required": false,
+                            "help": "Identifier of the first update to return. Pass the last processed update_id + 1 to avoid re-fetching old updates."
+                        },
+                        {
+                            "key": "limit",
+                            "type": "text",
+                            "label": "Limit",
+                            "placeholder": "100",
+                            "required": false,
+                            "help": "Number of updates to fetch per call (1\u2013100). Defaults to 100."
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "text",
+                            "label": "Timeout (seconds)",
+                            "placeholder": "0",
+                            "required": false,
+                            "help": "Long-polling timeout in seconds. Leave at 0 for short polling. Note: Telegram rejects getUpdates while a webhook is active \u2014 delete the webhook first."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_contact": {
+                    "label": "Send Contact",
+                    "key": "send_contact",
+                    "schema": [
+                        {
+                            "key": "chat_id",
+                            "type": "text",
+                            "label": "Chat ID",
+                            "placeholder": "987654321 or @channelname",
+                            "required": true,
+                            "help": "Telegram chat/user ID or @username for public channels."
+                        },
+                        {
+                            "key": "phone_number",
+                            "type": "text",
+                            "label": "Phone Number",
+                            "placeholder": "+15551234567",
+                            "required": true,
+                            "help": "Contact phone number, in international format."
+                        },
+                        {
+                            "key": "first_name",
+                            "type": "text",
+                            "label": "First Name",
+                            "placeholder": "John",
+                            "required": true
+                        },
+                        {
+                            "key": "last_name",
+                            "type": "text",
+                            "label": "Last Name",
+                            "placeholder": "Doe",
+                            "required": false
+                        },
+                        {
+                            "key": "vcard",
+                            "type": "textarea",
+                            "label": "vCard",
+                            "placeholder": "Optional vCard-formatted additional data",
+                            "required": false,
+                            "help": "Additional contact data in vCard format (0\u20132048 bytes)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_invite_link": {
+                    "label": "Create Invite Link",
+                    "key": "create_invite_link",
+                    "schema": [
+                        {
+                            "key": "chat_id",
+                            "type": "text",
+                            "label": "Chat ID",
+                            "placeholder": "987654321 or @channelname",
+                            "required": true,
+                            "help": "Telegram chat/user ID or @username for public channels."
+                        },
+                        {
+                            "key": "name",
+                            "type": "text",
+                            "label": "Link Name",
+                            "placeholder": "Optional invite link name",
+                            "required": false,
+                            "help": "0\u201332 characters, shown to admins in the chat \u2014 not to invited users."
+                        },
+                        {
+                            "key": "expire_date",
+                            "type": "text",
+                            "label": "Expire Date (Unix timestamp)",
+                            "placeholder": "1782633600",
+                            "required": false,
+                            "help": "When the link stops working. Leave blank for no expiry."
+                        },
+                        {
+                            "key": "member_limit",
+                            "type": "text",
+                            "label": "Member Limit",
+                            "placeholder": "50",
+                            "required": false,
+                            "help": "Max number of users who can join via this link (1\u201399999). Ignored if join requests are required."
+                        },
+                        {
+                            "key": "creates_join_request",
+                            "type": "select",
+                            "label": "Requires Admin Approval",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "false",
+                                    "label": "No"
+                                },
+                                {
+                                    "value": "true",
+                                    "label": "Yes (join requests)"
+                                }
+                            ],
+                            "help": "If enabled, Member Limit cannot also be set."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "revoke_invite_link": {
+                    "label": "Revoke Invite Link",
+                    "key": "revoke_invite_link",
+                    "schema": [
+                        {
+                            "key": "chat_id",
+                            "type": "text",
+                            "label": "Chat ID",
+                            "placeholder": "987654321 or @channelname",
+                            "required": true,
+                            "help": "Telegram chat/user ID or @username for public channels."
+                        },
+                        {
+                            "key": "invite_link",
+                            "type": "text",
+                            "label": "Invite Link",
+                            "placeholder": "https://t.me/+AbCdEfGhIjK",
+                            "required": true,
+                            "help": "The invite link to revoke. Use {{telegram_invite_link}} from a previous Create Invite Link node."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "ban_user": {
+                    "label": "Ban User",
+                    "key": "ban_user",
+                    "schema": [
+                        {
+                            "key": "chat_id",
+                            "type": "text",
+                            "label": "Chat ID",
+                            "placeholder": "987654321 or @channelname",
+                            "required": true,
+                            "help": "Telegram chat/user ID or @username for public channels."
+                        },
+                        {
+                            "key": "user_id",
+                            "type": "text",
+                            "label": "User ID",
+                            "placeholder": "123456789",
+                            "required": true,
+                            "help": "Telegram numeric user ID of the member to ban."
+                        },
+                        {
+                            "key": "until_date",
+                            "type": "text",
+                            "label": "Until Date (Unix timestamp)",
+                            "placeholder": "1782633600",
+                            "required": false,
+                            "help": "When the ban lifts. Must be 30 seconds to 366 days out, otherwise treated as a permanent ban. Leave blank to ban permanently."
+                        },
+                        {
+                            "key": "revoke_messages",
+                            "type": "select",
+                            "label": "Delete Their Messages",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "false",
+                                    "label": "No"
+                                },
+                                {
+                                    "value": "true",
+                                    "label": "Yes, delete all recent messages"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unban_user": {
+                    "label": "Unban User",
+                    "key": "unban_user",
+                    "schema": [
+                        {
+                            "key": "chat_id",
+                            "type": "text",
+                            "label": "Chat ID",
+                            "placeholder": "987654321 or @channelname",
+                            "required": true,
+                            "help": "Telegram chat/user ID or @username for public channels."
+                        },
+                        {
+                            "key": "user_id",
+                            "type": "text",
+                            "label": "User ID",
+                            "placeholder": "123456789",
+                            "required": true,
+                            "help": "Telegram numeric user ID of the member to unban."
+                        },
+                        {
+                            "key": "only_if_banned",
+                            "type": "select",
+                            "label": "Only If Currently Banned",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "true",
+                                    "label": "Yes"
+                                },
+                                {
+                                    "value": "false",
+                                    "label": "No, always unban"
+                                }
+                            ],
+                            "help": "Do nothing if the user is already not banned, instead of erroring."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "trello": {
@@ -18066,6 +18465,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "create_card": {
@@ -19782,10 +20185,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "tutor": {
@@ -19798,6 +20197,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/tutor-lms/",
+                "action": "https://zaplane.app/docs/tutor-lms/"
+            },
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -19902,11 +20305,7 @@
                     }
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/tutor-lms/",
-                "action": "https://zaplane.app/docs/tutor-lms/"
-            }
+            "actions": []
         },
         "typeform": {
             "slug": "typeform",
@@ -19918,6 +20317,10 @@
             "supports_webhook": true,
             "webhook_route": "zaplane/v1/incoming/typeform",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/typeform/",
+                "action": "https://zaplane.app/docs/typeform/"
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -19944,7 +20347,7 @@
                             "type": "copy",
                             "value": "{{ZAPLANE_REST_URL}}zaplane/v1/incoming/typeform",
                             "readonly": true,
-                            "help": "Copy this URL → Typeform Dashboard → Your Form → Connect → Webhooks → Add a webhook → Paste & Save."
+                            "help": "Copy this URL \u2192 Typeform Dashboard \u2192 Your Form \u2192 Connect \u2192 Webhooks \u2192 Add a webhook \u2192 Paste & Save."
                         }
                     ],
                     "outputs": [
@@ -20006,10 +20409,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/typeform/",
-                "action": "https://zaplane.app/docs/typeform/"
             }
         },
         "ultimatemember": {
@@ -20022,6 +20421,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/ultimate-member/",
+                "action": "https://zaplane.app/docs/action-ultimate-member/"
+            },
             "triggers": {
                 "user_login": {
                     "label": "User Login",
@@ -20098,10 +20501,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/ultimate-member/",
-                "action": "https://zaplane.app/docs/action-ultimate-member/"
             }
         },
         "webhook": {
@@ -20114,6 +20513,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/webhook/",
+                "action": "https://zaplane.app/docs/webhook/"
+            },
             "triggers": {
                 "catch_hook": {
                     "label": "Catch Webhook",
@@ -20220,7 +20623,7 @@
                                     "DELETE"
                                 ]
                             },
-                            "help": "Recommended. Build the body field by field — each value is safely encoded, so multi-line or quoted values (e.g. an AI reply) never break the JSON. Use \"@\" in a value to insert data from earlier steps.",
+                            "help": "Recommended. Build the body field by field \u2014 each value is safely encoded, so multi-line or quoted values (e.g. an AI reply) never break the JSON. Use \"@\" in a value to insert data from earlier steps.",
                             "fields": [
                                 {
                                     "key": "key",
@@ -20312,10 +20715,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/webhook/",
-                "action": "https://zaplane.app/docs/webhook/"
             }
         },
         "weforms": {
@@ -20328,6 +20727,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/weforms/",
+                "action": "https://zaplane.app/docs/weforms/"
+            },
             "triggers": {
                 "weforms_entry_submission": {
                     "label": "Form Submission",
@@ -20354,11 +20757,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/weforms/",
-                "action": "https://zaplane.app/docs/weforms/"
-            }
+            "actions": []
         },
         "whatsapp": {
             "slug": "whatsapp",
@@ -20376,16 +20775,20 @@
                     "type": "password",
                     "generate": true,
                     "required": true,
-                    "help": "Invent a value, save it here, then paste the same string into Meta → WhatsApp → Configuration → Verify Token. Meta will not accept the callback URL until this matches."
+                    "help": "Invent a value, save it here, then paste the same string into Meta \u2192 WhatsApp \u2192 Configuration \u2192 Verify Token. Meta will not accept the callback URL until this matches."
                 },
                 {
                     "key": "app_secret",
                     "label": "App Secret",
                     "type": "password",
                     "required": true,
-                    "help": "Meta app → Settings → Basic → App Secret. Used to check the X-Hub-Signature-256 on every delivery."
+                    "help": "Meta app \u2192 Settings \u2192 Basic \u2192 App Secret. Used to check the X-Hub-Signature-256 on every delivery."
                 }
             ],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -20637,10 +21040,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "woobookings": {
@@ -20653,6 +21052,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/woocommerce-bookings/",
+                "action": "https://zaplane.app/docs/woocommerce-bookings/"
+            },
             "triggers": {
                 "booking_created": {
                     "label": "Booking Created",
@@ -20903,10 +21306,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/woocommerce-bookings/",
-                "action": "https://zaplane.app/docs/woocommerce-bookings/"
             }
         },
         "woocommerce": {
@@ -20919,6 +21318,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/woocommerce/",
+                "action": "https://zaplane.app/docs/woocommerce/"
+            },
             "triggers": {
                 "new_order": {
                     "label": "New Order Created",
@@ -24121,10 +24524,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/woocommerce/",
-                "action": "https://zaplane.app/docs/woocommerce/"
             }
         },
         "wordpress": {
@@ -24137,6 +24536,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/wordpress/",
+                "action": "https://zaplane.app/docs/wordpress/"
+            },
             "triggers": {
                 "publish_post": {
                     "label": "Post Published",
@@ -28872,10 +29275,6 @@
                         "error"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/wordpress/",
-                "action": "https://zaplane.app/docs/wordpress/"
             }
         },
         "wpforms": {
@@ -28888,6 +29287,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/triggers-wpforms/",
+                "action": ""
+            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -28914,11 +29317,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/triggers-wpforms/",
-                "action": ""
-            }
+            "actions": []
         },
         "wpfunnels": {
             "slug": "wpfunnels",
@@ -28930,6 +29329,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/wpfunnels/",
+                "action": "https://zaplane.app/docs/wpfunnels/"
+            },
             "triggers": {
                 "import_complete": {
                     "label": "Import Complete",
@@ -29491,10 +29894,6 @@
                         "error"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/wpfunnels/",
-                "action": "https://zaplane.app/docs/wpfunnels/"
             }
         },
         "wpuserfrontend": {
@@ -29507,6 +29906,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/wp-user-frontend/",
+                "action": "https://zaplane.app/docs/wp-user-frontend/"
+            },
             "triggers": {
                 "post_form_submission": {
                     "label": "Post Form Submission",
@@ -29572,11 +29975,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/wp-user-frontend/",
-                "action": "https://zaplane.app/docs/wp-user-frontend/"
-            }
+            "actions": []
         },
         "zoom": {
             "slug": "zoom",
@@ -29588,6 +29987,10 @@
             "supports_webhook": true,
             "webhook_route": "zaplane/v1/incoming/zoom",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/zoom/",
+                "action": "https://zaplane.app/docs/zoom/"
+            },
             "triggers": {
                 "meeting_started": {
                     "label": "Meeting Started",
@@ -29635,7 +30038,7 @@
                             "label": "Start Time",
                             "placeholder": "2026-06-10T10:00:00",
                             "required": true,
-                            "help": "ISO 8601 format: YYYY-MM-DDTHH:MM:SS — e.g. 2026-06-10T10:00:00"
+                            "help": "ISO 8601 format: YYYY-MM-DDTHH:MM:SS \u2014 e.g. 2026-06-10T10:00:00"
                         },
                         {
                             "key": "duration",
@@ -29944,7 +30347,7 @@
                                 },
                                 {
                                     "value": "true",
-                                    "label": "Yes — send cancellation email"
+                                    "label": "Yes \u2014 send cancellation email"
                                 }
                             ]
                         }
@@ -30004,10 +30407,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/zoom/",
-                "action": "https://zaplane.app/docs/zoom/"
             }
         }
     },
@@ -30022,6 +30421,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "run_agent": {
@@ -30075,7 +30478,7 @@
                             "options": [
                                 {
                                     "value": "yes",
-                                    "label": "Yes — append the question and answer"
+                                    "label": "Yes \u2014 append the question and answer"
                                 },
                                 {
                                     "value": "no",
@@ -30089,10 +30492,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "condition": {
@@ -30105,6 +30504,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/conditions-filters/",
+                "action": "https://zaplane.app/docs/conditions-filters/"
+            },
             "triggers": [],
             "actions": {
                 "if": {
@@ -30246,10 +30649,6 @@
                         "false"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/conditions-filters/",
-                "action": "https://zaplane.app/docs/conditions-filters/"
             }
         },
         "csv": {
@@ -30262,6 +30661,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "parse": {
@@ -30357,7 +30760,7 @@
                                     "label": "Save as a file in the Media Library (returns a file URL)"
                                 }
                             ],
-                            "help": "Choose “Save as a file” to store the CSV in the Media Library and get a file URL / path you can attach to an email or link to."
+                            "help": "Choose \u201cSave as a file\u201d to store the CSV in the Media Library and get a file URL / path you can attach to an email or link to."
                         },
                         {
                             "key": "filename",
@@ -30368,17 +30771,13 @@
                             "depends_on": {
                                 "destination": "file"
                             },
-                            "help": "Name of the generated file. A “.csv” extension is added automatically if missing."
+                            "help": "Name of the generated file. A \u201c.csv\u201d extension is added automatically if missing."
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "datetime": {
@@ -30391,6 +30790,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "now": {
@@ -30646,7 +31049,7 @@
                     ]
                 },
                 "boundary": {
-                    "label": "Start / End of…",
+                    "label": "Start / End of\u2026",
                     "key": "boundary",
                     "schema": [
                         {
@@ -30714,10 +31117,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "delay": {
@@ -30730,6 +31129,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "wait": {
@@ -30809,10 +31212,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "filter": {
@@ -30825,6 +31224,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/conditions-filters/",
+                "action": "https://zaplane.app/docs/conditions-filters/"
+            },
             "triggers": [],
             "actions": {
                 "filter": {
@@ -30965,10 +31368,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/conditions-filters/",
-                "action": "https://zaplane.app/docs/conditions-filters/"
             }
         },
         "formatter": {
@@ -30981,6 +31380,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "format_text": {
@@ -31159,7 +31562,7 @@
                                     "extract"
                                 ]
                             },
-                            "help": "e.g. /\\d+/ — first match is returned for Extract."
+                            "help": "e.g. /\\d+/ \u2014 first match is returned for Extract."
                         },
                         {
                             "key": "length",
@@ -31290,7 +31693,7 @@
                             "label": "Input",
                             "type": "expression",
                             "required": true,
-                            "help": "A number. For \"Math expression\" this is ignored — use the expression field."
+                            "help": "A number. For \"Math expression\" this is ignored \u2014 use the expression field."
                         },
                         {
                             "key": "operation",
@@ -31357,7 +31760,7 @@
                             "depends_on": {
                                 "operation": "math"
                             },
-                            "help": "e.g. {{5.price}} * 1.2 + 3 — supports + - * / % and parentheses."
+                            "help": "e.g. {{5.price}} * 1.2 + 3 \u2014 supports + - * / % and parentheses."
                         },
                         {
                             "key": "currency_symbol",
@@ -31556,10 +31959,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "http": {
@@ -31572,6 +31971,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/webhooks-api-requests-guide/",
+                "action": "https://zaplane.app/docs/webhooks-api-requests-guide/"
+            },
             "triggers": [],
             "actions": {
                 "request": {
@@ -31769,10 +32172,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/webhooks-api-requests-guide/",
-                "action": "https://zaplane.app/docs/webhooks-api-requests-guide/"
             }
         },
         "human_approval": {
@@ -31785,6 +32184,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "request_approval": {
@@ -31879,10 +32282,6 @@
                         "rejected"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "image_helper": {
@@ -31895,6 +32294,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "info": {
@@ -31943,10 +32346,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "iterator": {
@@ -31959,6 +32358,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "iterator": {
@@ -31971,7 +32374,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "Type @ to pick a list from an earlier step",
-                            "help": "Pick an array/list from a previous step (e.g. parsed CSV rows or an API list). The workflow runs once per item — read the current entry downstream with {{ item }} (also available: {{ index }}, {{ is_first }}, {{ is_last }}, {{ total }})."
+                            "help": "Pick an array/list from a previous step (e.g. parsed CSV rows or an API list). The workflow runs once per item \u2014 read the current entry downstream with {{ item }} (also available: {{ index }}, {{ is_first }}, {{ is_last }}, {{ total }})."
                         },
                         {
                             "key": "offset",
@@ -31993,10 +32396,6 @@
                         "done"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "json_parser": {
@@ -32009,6 +32408,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "parse": {
@@ -32047,10 +32450,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "knowledge": {
@@ -32063,6 +32462,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "retrieve": {
@@ -32075,7 +32478,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "query",
@@ -32083,7 +32486,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "{{1.text}}",
-                            "help": "The customer message — used to find the most relevant entries."
+                            "help": "The customer message \u2014 used to find the most relevant entries."
                         },
                         {
                             "key": "limit",
@@ -32107,7 +32510,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "title",
@@ -32145,7 +32548,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "post_type",
@@ -32153,7 +32556,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "post",
-                            "help": "The slug of the content to sync — e.g. post, page, product, docs. Each item becomes one knowledge entry (title + body)."
+                            "help": "The slug of the content to sync \u2014 e.g. post, page, product, docs. Each item becomes one knowledge entry (title + body)."
                         },
                         {
                             "key": "post_status",
@@ -32229,11 +32632,11 @@
                             "options": [
                                 {
                                     "value": "yes",
-                                    "label": "Yes — mirror the source (full sync only)"
+                                    "label": "Yes \u2014 mirror the source (full sync only)"
                                 },
                                 {
                                     "value": "no",
-                                    "label": "No — only add/update"
+                                    "label": "No \u2014 only add/update"
                                 }
                             ],
                             "help": "When on (and syncing all items), removes synced entries whose source item no longer exists. Manual entries are never touched."
@@ -32253,7 +32656,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "limit",
@@ -32271,11 +32674,11 @@
                             "options": [
                                 {
                                     "value": "yes",
-                                    "label": "Yes — mirror the catalog (full sync only)"
+                                    "label": "Yes \u2014 mirror the catalog (full sync only)"
                                 },
                                 {
                                     "value": "no",
-                                    "label": "No — only add/update"
+                                    "label": "No \u2014 only add/update"
                                 }
                             ],
                             "help": "When on (and syncing all products), removes synced entries whose product no longer exists. Manual entries are never touched."
@@ -32295,7 +32698,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         },
                         {
                             "key": "limit",
@@ -32320,17 +32723,13 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "business_a",
-                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key — just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
+                            "help": "A label that groups all knowledge for one business (e.g. \"business_a\" or \"acme_store\"). Not a license or API key \u2014 just a name you choose. Use the exact same value across Add, Sync, Retrieve and Clear so they read/write the same knowledge."
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "mcp-client": {
@@ -32343,6 +32742,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "list_tools": {
@@ -32402,10 +32805,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "memory": {
@@ -32418,6 +32817,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "get_history": {
@@ -32430,7 +32833,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "whatsapp:{{trigger.from}}",
-                            "help": "Unique per-conversation bucket — typically channel + sender id."
+                            "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
                         },
                         {
                             "key": "limit",
@@ -32438,7 +32841,7 @@
                             "type": "number",
                             "required": false,
                             "default": 10,
-                            "help": "How many recent turns to return (oldest→newest)."
+                            "help": "How many recent turns to return (oldest\u2192newest)."
                         }
                     ],
                     "outputs": [
@@ -32455,7 +32858,7 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "whatsapp:{{trigger.from}}",
-                            "help": "Unique per-conversation bucket — typically channel + sender id."
+                            "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
                         },
                         {
                             "key": "role",
@@ -32502,17 +32905,13 @@
                             "type": "expression",
                             "required": true,
                             "placeholder": "whatsapp:{{trigger.from}}",
-                            "help": "Unique per-conversation bucket — typically channel + sender id."
+                            "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "repeater": {
@@ -32525,6 +32924,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "repeat": {
@@ -32543,7 +32946,7 @@
                                 },
                                 {
                                     "value": "range",
-                                    "label": "Number range (from → to)"
+                                    "label": "Number range (from \u2192 to)"
                                 }
                             ]
                         },
@@ -32590,10 +32993,6 @@
                         "done"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "router": {
@@ -32606,6 +33005,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "route": {
@@ -32623,7 +33026,7 @@
                             "key": "routes",
                             "label": "Routes",
                             "type": "repeater",
-                            "help": "Add a route for each path. They are checked top to bottom — the run takes the first match, otherwise the Fallback path. Each route is a branch on the canvas; wire a node to it with the “+”.",
+                            "help": "Add a route for each path. They are checked top to bottom \u2014 the run takes the first match, otherwise the Fallback path. Each route is a branch on the canvas; wire a node to it with the \u201c+\u201d.",
                             "fields": [
                                 {
                                     "key": "operator",
@@ -32715,10 +33118,6 @@
                         "fallback"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "schedule": {
@@ -32731,6 +33130,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": {
                 "interval": {
                     "label": "On a Schedule",
@@ -32784,11 +33187,7 @@
                     ]
                 }
             },
-            "actions": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            }
+            "actions": []
         },
         "sticky_note": {
             "slug": "sticky_note",
@@ -32800,6 +33199,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "note": {
@@ -32841,10 +33244,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "variable": {
@@ -32857,6 +33256,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "set": {
@@ -32907,10 +33310,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         },
         "xml": {
@@ -32923,6 +33322,10 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
             "triggers": [],
             "actions": {
                 "parse": {
@@ -32961,10 +33364,6 @@
                         "main"
                     ]
                 }
-            },
-            "docs_url": {
-                "trigger": "",
-                "action": ""
             }
         }
     }
