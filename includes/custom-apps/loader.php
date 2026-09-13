@@ -9,28 +9,31 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Bridges stored manifests into the integration registry.
  *
  * The IntegrationLoader instantiates integrations by class name and the engine
- * calls their methods statically, so each custom app needs a distinct, named
- * class pinned to its slug. We synthesise those subclasses on the fly (one tiny
- * shell each, extending CustomAppBase) and register them via the
- * `zaplane_integrations` filter — no core files are touched.
- *
- * The synthesised class body contains nothing but a strictly-sanitised slug, so
- * there is no user-controlled code in the eval.
+ * calls their methods statically, so each custom app needs a class of its own
+ * pinned to its slug. Those classes are a fixed pool declared in slots.php: a
+ * manifest is bound to the next free slot as the registry is built through the
+ * `zaplane_integrations` filter. No code is generated at run time.
  */
 class Loader {
 
-	protected const CLASS_PREFIX = 'Zaplane\\Integrations\\CustomApp_';
+	protected const SLOT_PREFIX = 'Zaplane\\CustomApps\\Slots\\Slot';
+
+	/**
+	 * The slot class each custom app was bound to in this request.
+	 *
+	 * @var array<string,string>
+	 */
+	protected static array $bound = [];
 
 	public static function boot(): void {
 		add_filter( 'zaplane_integrations', [ self::class, 'register' ] );
 	}
 
 	/**
-	 * Deterministic class name for a slug (shared with any code that needs to
-	 * reference the generated class).
+	 * The class a custom app is registered under, or '' before it is bound.
 	 */
 	public static function class_name( string $slug ): string {
-		return self::CLASS_PREFIX . $slug;
+		return self::$bound[ $slug ] ?? '';
 	}
 
 	/**
@@ -68,32 +71,29 @@ class Loader {
 	}
 
 	/**
-	 * Ensure a per-slug CustomAppBase subclass exists, creating it if needed.
-	 * Returns the fully-qualified class name, or null on failure.
+	 * Bind the custom app to a slot class, once per request.
+	 * Returns the fully-qualified class name, or null when none is free.
 	 */
 	protected static function ensure_class( string $slug ): ?string {
-		$class = self::class_name( $slug );
-
-		if ( class_exists( $class ) ) {
-			return $class;
+		if ( isset( self::$bound[ $slug ] ) ) {
+			return self::$bound[ $slug ];
 		}
 
-		// Make sure the parent is loaded before we extend it.
+		// Make sure the parent is loaded before a slot extends it.
 		if ( ! class_exists( \Zaplane\Integrations\CustomAppBase::class ) ) {
 			return null;
 		}
 
-		$short = 'CustomApp_' . $slug;
+		require_once __DIR__ . '/slots.php';
 
-		// phpcs:ignore Squiz.PHP.Eval.Discouraged, WordPress.PHP.Eval.eval -- Synthesising a slug-pinned subclass; the only interpolated value is a strictly [a-z0-9_] slug.
-		eval(
-			sprintf(
-				'namespace Zaplane\\Integrations; class %s extends CustomAppBase { protected static string $slug = %s; }',
-				$short,
-				var_export( $slug, true )
-			)
-		);
+		$class = self::SLOT_PREFIX . ( count( self::$bound ) + 1 );
+		if ( ! class_exists( $class, false ) ) {
+			return null; // Every slot is taken.
+		}
 
-		return class_exists( $class ) ? $class : null;
+		$class::bind_slug( $slug );
+		self::$bound[ $slug ] = $class;
+
+		return $class;
 	}
 }

@@ -437,6 +437,12 @@ namespace Zaplane\Tests {
 }
 
 namespace {
+	if ( ! function_exists( 'wp_rand' ) ) {
+		function wp_rand( $min = 0, $max = 0 ) {
+			return random_int( (int) $min, (int) ( $max ? $max : 2147483647 ) );
+		}
+	}
+
 	use Zaplane\Tests\WPMocks;
 
 	$mock_dir = __DIR__ . '/mocks/';

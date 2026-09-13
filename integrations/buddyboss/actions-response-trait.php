@@ -1,6 +1,10 @@
 <?php
 namespace Zaplane\Integrations\Buddyboss;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait ActionsResponseTrait {
 
 	protected static function action_error( string $message, array $input = [] ): array {

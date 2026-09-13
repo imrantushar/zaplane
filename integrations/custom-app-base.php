@@ -20,6 +20,18 @@ abstract class CustomAppBase extends IntegrationBase {
 		return static::$slug;
 	}
 
+	/**
+	 * Pin a pooled slot class to the custom app it stands for.
+	 *
+	 * Every slot redeclares $slug, so this writes that slot's own copy, and only
+	 * once: a slot does not change apps within a request.
+	 */
+	public static function bind_slug( string $slug ): void {
+		if ( self::class !== static::class && '' === static::$slug ) {
+			static::$slug = $slug;
+		}
+	}
+
 	protected static function manifest(): array {
 		$manifest = ManifestStore::get( static::get_slug() );
 		return is_array( $manifest ) ? $manifest : [];
@@ -268,6 +280,25 @@ abstract class CustomAppBase extends IntegrationBase {
 	protected static function callable_error( string $callable ): ?string {
 		if ( '' === $callable ) {
 			return 'No function name was provided.';
+		}
+
+		/**
+		 * PHP functions a local Custom App may call.
+		 *
+		 * A manifest is data saved from an admin screen, and a function named there
+		 * runs with whatever arguments the workflow resolves — for a webhook trigger,
+		 * values a stranger posted. So nothing is callable by being typed in: a
+		 * function runs only after code on this site has listed it here.
+		 *
+		 * @param string[] $callables Function names, or "Class::method" strings.
+		 * @param string   $slug      The custom app asking.
+		 */
+		$allowed = array_map(
+			'strtolower',
+			array_map( 'strval', (array) apply_filters( 'zaplane_custom_app_callables', [], static::get_slug() ) )
+		);
+		if ( ! in_array( strtolower( $callable ), $allowed, true ) ) {
+			return sprintf( 'The function "%s" has not been allowed. Site code can allow it with the zaplane_custom_app_callables filter.', $callable );
 		}
 
 		$blocked = array_map(

@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$registry = [
+$zaplane_registry = [
 	'condition'           => [
 		'file'  => 'condition.php',
 		'class' => \Zaplane\Integrations\Condition::class,
@@ -379,26 +379,26 @@ $registry = [
 	],
 ];
 
-$priority = [
+$zaplane_priority = [
 	'academy',
 	'ablocks',
 	'gemcrm',
 	'storeengine',
 ];
 
-$priorityItems = [];
-foreach ( $priority as $key ) {
-	if ( isset( $registry[ $key ] ) ) {
-		$priorityItems[ $key ] = $registry[ $key ];
+$zaplane_priority_items = [];
+foreach ( $zaplane_priority as $zaplane_key ) {
+	if ( isset( $zaplane_registry[ $zaplane_key ] ) ) {
+		$zaplane_priority_items[ $zaplane_key ] = $zaplane_registry[ $zaplane_key ];
 	}
 }
 
-$remaining = array_diff_key( $registry, $priorityItems );
+$zaplane_remaining = array_diff_key( $zaplane_registry, $zaplane_priority_items );
 
-uksort( $remaining, function ( $a, $b ) {
+uksort( $zaplane_remaining, function ( $a, $b ) {
 	return strcasecmp( $a, $b );
 } );
 
-$finalRegistry = array_merge( $priorityItems, $remaining );
+$zaplane_final_registry = array_merge( $zaplane_priority_items, $zaplane_remaining );
 
-return [ 'registry' => $finalRegistry ];
+return [ 'registry' => $zaplane_final_registry ];

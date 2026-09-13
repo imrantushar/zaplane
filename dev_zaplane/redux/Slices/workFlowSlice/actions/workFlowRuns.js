@@ -44,7 +44,7 @@ export const getSingleRun = createAsyncThunk(
 				namespace + `node-runs/${parseInt(runId)}/retry`
 			);
 
-			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'zaplane'));
 
 			return res.data;
 

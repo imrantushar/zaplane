@@ -134,7 +134,7 @@ class ToolRegistry {
 			],
 			'update_workflow' => [
 				'scope'       => TokenStore::SCOPE_WRITE,
-				'description' => 'Replace an existing workflow\'s graph. A draft is edited in place; a live workflow keeps its version history.',
+				'description' => 'Replace an existing workflow\'s graph. A draft is edited in place; a live workflow keeps its version history. Changing a live workflow needs the run scope.',
 				'properties'  => [
 					'workflow_id' => $i( 'Workflow to update.' ),
 					'graph'       => [
@@ -146,7 +146,7 @@ class ToolRegistry {
 			],
 			'set_workflow_status' => [
 				'scope'       => TokenStore::SCOPE_WRITE,
-				'description' => 'Set a workflow to active, paused or draft. Going active re-validates the graph first and refuses if it would not run.',
+				'description' => 'Set a workflow to active, paused or draft. Going active re-validates the graph first and refuses if it would not run. Going active needs the run scope.',
 				'properties'  => [
 					'workflow_id' => $i( 'Workflow to change.' ),
 					'status'      => $s( 'One of: active, paused, draft.' ),
@@ -324,8 +324,12 @@ class ToolRegistry {
 			case 'create_workflow':
 				return self::create_workflow( $args, $token );
 			case 'update_workflow':
+				self::require_run_for_live( (int) ( $args['workflow_id'] ?? 0 ), $token, false );
 				return self::update_workflow( $args );
 			case 'set_workflow_status':
+				if ( 'active' === (string) ( $args['status'] ?? '' ) ) {
+					self::require_run_for_live( (int) ( $args['workflow_id'] ?? 0 ), $token, true );
+				}
 				return WorkflowAuthor::set_status(
 					(int) ( $args['workflow_id'] ?? 0 ),
 					(string) ( $args['status'] ?? '' )
@@ -354,7 +358,35 @@ class ToolRegistry {
 				return self::run_workflow( $args );
 		}
 
-		throw new \InvalidArgumentException( 'Unknown tool: ' . $name );
+		throw new \InvalidArgumentException( 'Unknown tool: ' . esc_html( $name ) );
+	}
+
+	/**
+	 * Taking a workflow live, or changing one that is, is running it.
+	 *
+	 * A live workflow fires on its own triggers — a schedule, a form, an order —
+	 * with every side effect the `run` scope exists to guard. So `write` may shape
+	 * a draft, but going live or editing a live workflow needs `run` for that
+	 * workflow. A call carrying no token is the site's own and is not asked.
+	 *
+	 * @param array<string,mixed> $token The resolved token record.
+	 * @throws \InvalidArgumentException When the token may not.
+	 */
+	private static function require_run_for_live( int $workflow_id, array $token, bool $activating ): void {
+		if ( empty( $token ) ) {
+			return;
+		}
+
+		if ( ! $activating ) {
+			$workflow = $workflow_id ? Workflow::find( $workflow_id ) : null;
+			if ( ! $workflow || ! $workflow->isActive() ) {
+				return;
+			}
+		}
+
+		if ( ! TokenStore::has_scope( $token, TokenStore::SCOPE_RUN ) || ! TokenStore::may_run( $token, $workflow_id ) ) {
+			throw new \InvalidArgumentException( 'Taking a workflow live, or changing one that is live, needs a token with the "run" scope for that workflow.' );
+		}
 	}
 
 	/* ------------------------------ handlers ------------------------------ */
@@ -393,7 +425,7 @@ class ToolRegistry {
 		$app  = '' === $slug ? null : Catalog::describe_app( $slug );
 
 		if ( null === $app ) {
-			throw new \InvalidArgumentException( 'Unknown app "' . $slug . '". Use list_apps or search_capabilities to find valid slugs.' );
+			throw new \InvalidArgumentException( 'Unknown app "' . esc_html( $slug ) . '". Use list_apps or search_capabilities to find valid slugs.' );
 		}
 
 		return $app;
@@ -419,22 +451,22 @@ class ToolRegistry {
 			$capability = Catalog::find_capability( $app, $event );
 			if ( null === $capability ) {
 				throw new \InvalidArgumentException(
-					sprintf( '"%s" is not a trigger or action of app "%s".', $event, $app )
+					sprintf( '"%s" is not a trigger or action of app "%s".', esc_html( $event ), esc_html( $app ) )
 				);
 			}
 			throw new \InvalidArgumentException(
 				sprintf(
 					'Field "%s" is not in %s/%s. Fields: %s',
-					$key,
-					$app,
-					$event,
-					implode( ', ', array_column( (array) $capability['schema'], 'key' ) )
+					esc_html( $key ),
+					esc_html( $app ),
+					esc_html( $event ),
+					esc_html( implode( ', ', array_column( (array) $capability['schema'], 'key' ) ) )
 				)
 			);
 		}
 
 		if ( ! $result['resolved'] ) {
-			throw new \RuntimeException( (string) $result['error'] );
+			throw new \RuntimeException( esc_html( (string) $result['error'] ) );
 		}
 
 		if ( ! $result['dynamic'] ) {
@@ -502,7 +534,7 @@ class ToolRegistry {
 		if ( $id ) {
 			$workflow = Workflow::find( $id );
 			if ( ! $workflow ) {
-				throw new \InvalidArgumentException( 'Workflow ' . $id . ' not found.' );
+				throw new \InvalidArgumentException( 'Workflow ' . (int) $id . ' not found.' );
 			}
 
 			$version = $workflow->activeVersion();
@@ -510,7 +542,7 @@ class ToolRegistry {
 			$title   = $workflow->title;
 
 			if ( ! is_array( $graph ) ) {
-				throw new \RuntimeException( 'Workflow ' . $id . ' has no saved graph to test.' );
+				throw new \RuntimeException( 'Workflow ' . (int) $id . ' has no saved graph to test.' );
 			}
 		}
 
@@ -575,7 +607,7 @@ class ToolRegistry {
 		$recipe    = $recipe_id ? Recipe::find( $recipe_id ) : null;
 
 		if ( ! $recipe ) {
-			throw new \InvalidArgumentException( 'Recipe ' . $recipe_id . ' not found.' );
+			throw new \InvalidArgumentException( 'Recipe ' . (int) $recipe_id . ' not found.' );
 		}
 
 		$blueprint = $recipe->getBlueprint();
@@ -631,7 +663,7 @@ class ToolRegistry {
 		$workflow = $id ? Workflow::find( $id ) : null;
 
 		if ( ! $workflow ) {
-			throw new \InvalidArgumentException( 'Workflow ' . $id . ' not found.' );
+			throw new \InvalidArgumentException( 'Workflow ' . (int) $id . ' not found.' );
 		}
 
 		$version = $workflow->activeVersion();
@@ -703,7 +735,7 @@ class ToolRegistry {
 		$run = $id ? Run::find( $id ) : null;
 
 		if ( ! $run ) {
-			throw new \InvalidArgumentException( 'Run ' . $id . ' not found.' );
+			throw new \InvalidArgumentException( 'Run ' . (int) $id . ' not found.' );
 		}
 
 		$steps = [];
@@ -800,8 +832,8 @@ class ToolRegistry {
 
 		$table = \Zaplane\Models\Knowledge::getTable();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( "SELECT business_key, COUNT(*) AS entries FROM {$table} GROUP BY business_key ORDER BY business_key ASC", ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT business_key, COUNT(*) AS entries FROM %i GROUP BY business_key ORDER BY business_key ASC', $table ), ARRAY_A );
 
 		return [ 'businesses' => is_array( $rows ) ? $rows : [] ];
 	}
@@ -836,7 +868,7 @@ class ToolRegistry {
 		$data = $res['data'] ?? [];
 
 		if ( empty( $data['success'] ) ) {
-			throw new \RuntimeException( (string) ( $data['error'] ?? 'Sync failed.' ) );
+			throw new \RuntimeException( esc_html( (string) ( $data['error'] ?? 'Sync failed.' ) ) );
 		}
 
 		return [
@@ -865,7 +897,7 @@ class ToolRegistry {
 		$run_id = zaplane_run_workflow( $id, $data );
 
 		if ( ! $run_id ) {
-			throw new \RuntimeException( 'Could not start workflow ' . $id . ' — it does not exist, or has no active version with a trigger.' );
+			throw new \RuntimeException( 'Could not start workflow ' . (int) $id . ' — it does not exist, or has no active version with a trigger.' );
 		}
 
 		return [

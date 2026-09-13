@@ -30,7 +30,7 @@ class Option extends WpModel {
 	}
 
 	public static function get( string $name, $default = null ) {
-		$option = static::where( 'option_name', $name )->first();
+		$option = static::where( 'option_name', $name )->fresh()->first();
 		if ( ! $option ) {
 			return $default;
 		}
@@ -41,7 +41,7 @@ class Option extends WpModel {
 		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Required for WP option storage compatibility.
 		$serialized = is_array( $value ) || is_object( $value ) ? serialize( $value ) : $value;
 
-		$existing = static::where( 'option_name', $name )->first();
+		$existing = static::where( 'option_name', $name )->fresh()->first();
 
 		if ( $existing ) {
 			$existing->option_value = $serialized;
@@ -56,7 +56,7 @@ class Option extends WpModel {
 	}
 
 	public static function remove( string $name ): bool {
-		$option = static::where( 'option_name', $name )->first();
+		$option = static::where( 'option_name', $name )->fresh()->first();
 		if ( ! $option ) {
 			return false;
 		}

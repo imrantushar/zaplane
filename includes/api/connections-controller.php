@@ -151,12 +151,12 @@ class ConnectionsController extends WP_REST_Controller {
 	}
 
 	public function permissions_check( $request ) {
-		return is_user_logged_in();
+		return current_user_can( 'manage_options' );
 	}
 
 	public function item_permissions_check( $request ) {
-		if ( ! is_user_logged_in() ) {
-			return new WP_Error( 'rest_forbidden', 'You must be logged in.', [ 'status' => 401 ] );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new WP_Error( 'rest_forbidden', 'Sorry, you are not allowed to manage connections.', [ 'status' => rest_authorization_required_code() ] );
 		}
 
 		$connection_id = (int) $request->get_param( 'id' );
@@ -372,35 +372,21 @@ class ConnectionsController extends WP_REST_Controller {
 		// reflected XSS. JSON_HEX_TAG makes the guarantee explicit instead.
 		$json = wp_json_encode( $data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
 
-		// Build a minimal but valid HTML page
-		$html = '<!DOCTYPE html>'
-			. '<html lang="en">'
-			. '<head>'
-			. '<meta charset="utf-8">'
-			. '<meta name="robots" content="noindex">'
-			. '<title>OAuth Callback</title>'
-			. '</head>'
-			. '<body>'
-			. '<p>' . esc_html( $message ) . '</p>'
-			. '<script>'
-			. '(function () {'
-			. '  var d = ' . $json . ';'
-			. '  if (window.opener && !window.opener.closed) {'
-			// Notify the parent tab
-			. '    window.opener.postMessage({ type: "zaplane_oauth_callback", data: d }, window.location.origin);'
-			. '    window.close();'
-			. '  } else {'
-			// No opener — redirect to the admin page with result params
-			. '    var url = "/wp-admin/admin.php?page=zaplane";'
-			. '    url += "&oauth_success=" + (d.success ? "1" : "0");'
-			. '    url += "&oauth_message=" + encodeURIComponent(d.message);'
-			. '    if (d.connection_id) { url += "&connection_id=" + d.connection_id; }'
-			. '    window.location.href = url;'
-			. '  }'
-			. '})();'
-			. '</script>'
-			. '</body>'
-			. '</html>';
+		$script = '(function () {'
+			. 'var d = ' . $json . ';'
+			. 'if (window.opener && !window.opener.closed) {'
+			// Hand the result to the tab that opened this one.
+			. 'window.opener.postMessage({ type: "zaplane_oauth_callback", data: d }, window.location.origin);'
+			. 'window.close();'
+			. '} else {'
+			// No opener: go back to Zaplane with the result in the query string.
+			. 'var url = ' . wp_json_encode( admin_url( 'admin.php?page=zaplane' ) ) . ';'
+			. 'url += "&oauth_success=" + (d.success ? "1" : "0");'
+			. 'url += "&oauth_message=" + encodeURIComponent(d.message);'
+			. 'if (d.connection_id) { url += "&connection_id=" + d.connection_id; }'
+			. 'window.location.href = url;'
+			. '}'
+			. '})();';
 
 		// Send raw HTML — do NOT use WP_REST_Response here
 		if ( ! headers_sent() ) {
@@ -409,8 +395,10 @@ class ConnectionsController extends WP_REST_Controller {
 			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		}
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo $html;
+		echo '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>OAuth Callback</title></head><body>';
+		echo '<p>' . esc_html( $message ) . '</p>';
+		wp_print_inline_script_tag( $script );
+		echo '</body></html>';
 		exit;
 	}
 
