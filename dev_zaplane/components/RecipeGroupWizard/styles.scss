@@ -1,20 +1,1297 @@
-.zaplane-wp-modal.zaplane-wp-modal--group-setup {
-  width: min(760px, calc(100vw - 32px));
+// Run Group Recipe setup: the steps on the left, the current step on the right,
+// and a footer that stays in reach however long a step gets.
 
-  // The footer sits on the frame's bottom edge. With the content's own bottom
-  // padding in place, the list would show through a strip underneath it.
+@keyframes zaplane-setup-forward {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes zaplane-setup-back {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes zaplane-setup-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes zaplane-setup-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zaplane-setup-shimmer {
+  from {
+    background-position: 100% 50%;
+  }
+  to {
+    background-position: 0 50%;
+  }
+}
+
+@keyframes zaplane-setup-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.zaplane-wp-modal.zaplane-wp-modal--group-setup {
+  width: min(1000px, calc(100vw - 48px));
+  max-width: none;
+  height: min(720px, calc(100vh - 64px));
+  max-height: none;
+
+  // The setup scrolls its own step and pins its own footer, so the modal's content
+  // box only passes the height down.
   .components-modal__content {
-    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
   }
 
-  // The buttons stay in reach however long the list of workflows gets.
-  .zaplane-group-setup__footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 1;
-    margin-top: 4px;
-    padding: 12px 0 20px;
-    border-top: 1px solid var(--zaplane-border-color);
+  .components-modal__children-container,
+  .zaplane-wp-modal__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+}
+
+// Nested under .zaplane-scope so these win over the scope's button and input resets.
+.zaplane-scope .zaplane-group-setup {
+  --zgs-line: var(--zaplane-border-color);
+  --zgs-muted: var(--zaplane-font-secondary-color);
+  --zgs-tint: color-mix(in srgb, var(--zaplane-primary) 7%, var(--zaplane-background));
+  --zgs-tint-strong: color-mix(in srgb, var(--zaplane-primary) 14%, var(--zaplane-background));
+  --zgs-ring: color-mix(in srgb, var(--zaplane-primary) 18%, transparent);
+  --zgs-hover-line: color-mix(in srgb, var(--zaplane-primary) 40%, var(--zaplane-border-color));
+
+  display: grid;
+  flex: 1;
+  grid-template-columns: 248px minmax(0, 1fr);
+  min-height: 0;
+  color: var(--zaplane-font-color);
+  font-size: 13px;
+  line-height: 1.5;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  // wp-admin spaces out paragraphs, headings and list items; the setup spaces its own.
+  p,
+  h3,
+  ol,
+  ul,
+  li,
+  label {
+    margin: 0;
+  }
+
+  ol,
+  ul {
+    padding: 0;
+    list-style: none;
+  }
+
+  button {
+    font: inherit;
+  }
+
+  // Rail
+
+  .zgs-rail {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 0;
+    padding: 20px 14px;
+    overflow-y: auto;
+    border-right: 1px solid var(--zgs-line);
+    background: var(--zaplane-secondary-color);
+  }
+
+  .zgs-rail__eyebrow {
+    margin: 0 0 8px 10px;
+    color: var(--zgs-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .zgs-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    li {
+      position: relative;
+    }
+
+    // The line from one step's dot down to the next one's.
+    li:not(:last-child)::after {
+      position: absolute;
+      top: 38px;
+      bottom: -10px;
+      left: 21px;
+      width: 2px;
+      border-radius: 2px;
+      background: var(--zgs-line);
+      content: "";
+      pointer-events: none;
+      transition: background-color 0.25s ease;
+    }
+
+    li.is-done:not(:last-child)::after {
+      background: var(--zaplane-primary);
+    }
+  }
+
+  .zgs-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    padding: 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--zaplane-font-color);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--zaplane-font-color) 5%, transparent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--zaplane-primary);
+      outline-offset: 1px;
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+
+    &[aria-current="step"] {
+      background: var(--zaplane-background);
+      box-shadow: 0 0 0 1px var(--zgs-line), 0 1px 3px rgba(16, 24, 40, 0.06);
+    }
+  }
+
+  .zgs-step__dot {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: 1.5px solid var(--zgs-line);
+    border-radius: 50%;
     background: var(--zaplane-background);
+    color: var(--zgs-muted);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .zgs-step[aria-current="step"] .zgs-step__dot {
+    border-color: var(--zaplane-primary);
+    background: var(--zaplane-primary);
+    box-shadow: 0 0 0 4px var(--zgs-ring);
+    color: #fff;
+  }
+
+  .zgs-step.is-done .zgs-step__dot {
+    border-color: var(--zaplane-primary);
+    background: var(--zgs-tint-strong);
+    color: var(--zaplane-primary);
+  }
+
+  .zgs-step__label {
+    display: block;
+    padding-top: 3px;
+    color: var(--zaplane-font-color);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 18px;
+  }
+
+  .zgs-step:disabled:not(.is-done):not([aria-current="step"]) .zgs-step__label {
+    color: var(--zgs-muted);
+  }
+
+  .zgs-step__hint {
+    display: block;
+    margin-top: 1px;
+    color: var(--zgs-muted);
+    font-size: 12px;
+    line-height: 17px;
+  }
+
+  .zgs-step.has-alert .zgs-step__hint {
+    color: var(--zaplane-danger);
+  }
+
+  .zgs-rail__summary {
+    padding: 14px;
+    border: 1px solid var(--zgs-line);
+    border-radius: 10px;
+    background: var(--zaplane-background);
+  }
+
+  .zgs-rail__caption {
+    color: var(--zgs-muted);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .zgs-rail__count {
+    margin: 2px 0;
+    color: var(--zaplane-font-color);
+    font-size: 20px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+    animation: zaplane-setup-rise 0.25s ease;
+  }
+
+  .zgs-rail__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--zgs-line);
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      color: var(--zaplane-font-color);
+      font-size: 12px;
+      line-height: 1.4;
+      animation: zaplane-setup-rise 0.2s ease;
+    }
+
+    svg {
+      flex: none;
+      margin-top: 2px;
+      color: var(--zaplane-success);
+    }
+  }
+
+  // Main column
+
+  .zgs-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    background: var(--zaplane-background);
+  }
+
+  .zgs-body {
+    flex: 1;
+    min-height: 0;
+    padding: 24px 28px 28px;
+    overflow-y: auto;
+  }
+
+  .zgs-step-panel {
+    animation: zaplane-setup-rise 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &.is-forward {
+      animation-name: zaplane-setup-forward;
+    }
+
+    &.is-back {
+      animation-name: zaplane-setup-back;
+    }
+  }
+
+  .zgs-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .zgs-stack--loose {
+    gap: 22px;
+  }
+
+  .zgs-intro {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 6px;
+  }
+
+  .zgs-intro__title {
+    color: var(--zaplane-font-color);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .zgs-intro__text {
+    max-width: 620px;
+    margin-top: 4px;
+    color: var(--zgs-muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .zgs-link {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    margin: -4px -8px;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--zaplane-primary);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--zgs-tint);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--zaplane-primary);
+      outline-offset: 1px;
+    }
+  }
+
+  .zgs-hint {
+    color: var(--zgs-muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  // Workflow cards
+
+  .zgs-card {
+    border: 1px solid var(--zgs-line);
+    border-radius: 12px;
+    background: var(--zaplane-background);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+
+    &:hover {
+      border-color: var(--zgs-hover-line);
+    }
+
+    &.is-on {
+      border-color: var(--zaplane-primary);
+      box-shadow: 0 0 0 3px var(--zgs-ring);
+    }
+  }
+
+  .zgs-card__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+
+    &:focus-visible {
+      outline: 2px solid var(--zaplane-primary);
+      outline-offset: -2px;
+    }
+  }
+
+  .zgs-card__text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .zgs-card__title {
+    display: block;
+    color: var(--zaplane-font-color);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+
+  .zgs-card__desc {
+    display: block;
+    color: var(--zgs-muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .zgs-pill {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    height: 22px;
+    margin-top: 1px;
+    padding: 0 9px;
+    border-radius: 999px;
+    background: var(--zaplane-secondary-color);
+    color: var(--zgs-muted);
+    font-size: 12px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    transition: background-color 0.18s ease, color 0.18s ease;
+  }
+
+  .zgs-card.is-on .zgs-pill {
+    background: var(--zgs-tint-strong);
+    color: var(--zaplane-primary);
+  }
+
+  // Step chains
+
+  .zgs-chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 6px;
+    transition: opacity 0.18s ease;
+  }
+
+  // Lined up with the card's title, past the switch.
+  .zgs-card > .zgs-chain {
+    margin-top: -4px;
+    padding: 0 18px 16px 76px;
+  }
+
+  .zgs-card:not(.is-on) > .zgs-chain {
+    opacity: 0.55;
+  }
+
+  .zgs-chain__step {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .zgs-chain__sep {
+    flex: none;
+    margin: 0 2px;
+    color: var(--zgs-muted);
+    opacity: 0.6;
+  }
+
+  .zgs-chain__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 220px;
+    height: 26px;
+    padding: 0 9px 0 7px;
+    border: 1px solid var(--zgs-line);
+    border-radius: 7px;
+    background: var(--zaplane-background);
+    color: var(--zaplane-font-color);
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+    transition: opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+
+    > span:not(.zgs-icon):not(.screen-reader-text) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .zgs-chain__step.is-trigger .zgs-chain__chip {
+    background: var(--zaplane-secondary-color);
+    font-weight: 500;
+  }
+
+  .zgs-chain__step.is-off .zgs-chain__chip {
+    border-style: dashed;
+    background: transparent;
+    opacity: 0.5;
+
+    > span:not(.zgs-icon) {
+      text-decoration: line-through;
+    }
+  }
+
+  .zgs-icon {
+    display: inline-block;
+    flex: none;
+    object-fit: contain;
+  }
+
+  .zgs-icon--empty {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: var(--zgs-line);
+  }
+
+  // Options open by growing their row from nothing to its own height.
+  .zgs-options {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.25s ease;
+
+    > div {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    &.is-open {
+      grid-template-rows: 1fr;
+    }
+  }
+
+  .zgs-options__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0 18px 12px 68px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--zgs-line);
+  }
+
+  .zgs-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 7px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--zaplane-font-color);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background: var(--zaplane-secondary-color);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--zaplane-primary);
+      outline-offset: -2px;
+    }
+  }
+
+  .zgs-option__label {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.45;
+  }
+
+  .zgs-option__desc {
+    display: block;
+  }
+
+  .zgs-option__meta {
+    flex: none;
+    color: var(--zgs-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.15s ease;
+  }
+
+  .zgs-option[aria-checked="true"] .zgs-option__meta {
+    color: var(--zaplane-primary);
+  }
+
+  // Banners
+
+  .zgs-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--zaplane-font-color);
+    font-size: 13px;
+    line-height: 1.5;
+    animation: zaplane-setup-rise 0.22s ease;
+
+    > svg {
+      flex: none;
+      margin-top: 2px;
+    }
+  }
+
+  .zgs-banner--info {
+    border-color: color-mix(in srgb, var(--zaplane-primary) 22%, transparent);
+    background: var(--zgs-tint);
+
+    > svg {
+      color: var(--zaplane-primary);
+    }
+  }
+
+  .zgs-banner--warning {
+    border-color: color-mix(in srgb, var(--zaplane-warning) 45%, transparent);
+    background: color-mix(in srgb, var(--zaplane-warning) 12%, var(--zaplane-background));
+
+    > svg {
+      color: color-mix(in srgb, var(--zaplane-warning) 75%, var(--zaplane-font-color));
+    }
+  }
+
+  .zgs-banner--danger {
+    border-color: color-mix(in srgb, var(--zaplane-danger) 35%, transparent);
+    background: color-mix(in srgb, var(--zaplane-danger) 8%, var(--zaplane-background));
+
+    > svg {
+      color: var(--zaplane-danger);
+    }
+  }
+
+  // Settings
+
+  .zgs-value {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    align-items: center;
+    gap: 8px 28px;
+    padding: 16px 18px;
+    border: 1px solid var(--zgs-line);
+    border-radius: 12px;
+    background: var(--zaplane-background);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+
+    &:hover {
+      border-color: var(--zgs-hover-line);
+    }
+
+    &.has-error {
+      border-color: var(--zaplane-danger);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--zaplane-danger) 14%, transparent);
+    }
+
+    .zgs-chips {
+      margin-top: 8px;
+    }
+  }
+
+  .zgs-value__label {
+    display: block;
+    color: var(--zaplane-font-color);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .zgs-value__desc {
+    margin-top: 2px;
+    color: var(--zgs-muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .zgs-value__control {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .zgs-value__error {
+    grid-column: 1 / -1;
+    color: var(--zaplane-danger);
+    font-size: 12px;
+    line-height: 1.4;
+    animation: zaplane-setup-rise 0.2s ease;
+  }
+
+  .zgs-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .zgs-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: var(--zaplane-secondary-color);
+    color: var(--zgs-muted);
+    font-size: 12px;
+    white-space: nowrap;
+
+    strong {
+      color: var(--zaplane-font-color);
+      font-weight: 600;
+    }
+  }
+
+  .zgs-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--zgs-line);
+    border-radius: 8px;
+    background: var(--zaplane-background);
+    color: var(--zgs-muted);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus-within {
+      border-color: var(--zaplane-primary);
+      box-shadow: 0 0 0 3px var(--zgs-ring);
+    }
+
+    // wp-admin gives text and number inputs their own border, padding and focus ring.
+    input {
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      height: 100%;
+      min-height: 0;
+      margin: 0;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0;
+      outline: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      color: var(--zaplane-font-color);
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
+      line-height: normal;
+    }
+  }
+
+  .zgs-value.has-error .zgs-input {
+    border-color: var(--zaplane-danger);
+  }
+
+  .zgs-value.has-error .zgs-input:focus-within {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--zaplane-danger) 14%, transparent);
+  }
+
+  .zgs-input__suffix {
+    flex: none;
+    color: var(--zgs-muted);
+    font-size: 13px;
+  }
+
+  // The track fills up to the thumb; --zgs-fill is set from the value.
+  .zgs-range {
+    width: 100%;
+    height: 6px;
+    margin: 4px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(
+      to right,
+      var(--zaplane-primary) 0 var(--zgs-fill, 0%),
+      var(--zgs-line) var(--zgs-fill, 0%) 100%
+    );
+    cursor: pointer;
+    appearance: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::-webkit-slider-thumb {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--zaplane-primary);
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(16, 24, 40, 0.2);
+      transition: transform 0.12s ease;
+      appearance: none;
+    }
+
+    &::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--zaplane-primary);
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(16, 24, 40, 0.2);
+    }
+
+    &:hover::-webkit-slider-thumb,
+    &:active::-webkit-slider-thumb {
+      transform: scale(1.15);
+    }
+  }
+
+  .zgs-range__scale {
+    display: flex;
+    justify-content: space-between;
+    color: var(--zgs-muted);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  // Connections
+
+  .zgs-connection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 18px;
+    border: 1px solid var(--zgs-line);
+    border-radius: 12px;
+    background: var(--zaplane-background);
+    transition: border-color 0.18s ease;
+
+    &.is-linked {
+      border-color: color-mix(in srgb, var(--zaplane-success) 45%, var(--zaplane-border-color));
+    }
+  }
+
+  .zgs-connection__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .zgs-connection__icon {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--zgs-line);
+    border-radius: 10px;
+    background: var(--zaplane-secondary-color);
+  }
+
+  .zgs-connection__badge {
+    position: absolute;
+    right: -5px;
+    bottom: -5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--zaplane-background);
+    border-radius: 50%;
+    background: var(--zaplane-success);
+    color: #fff;
+    animation: zaplane-setup-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .zgs-connection__text {
+    flex: 1;
+    min-width: 0;
+
+    .zgs-chips {
+      margin-top: 6px;
+    }
+  }
+
+  // Review
+
+  .zgs-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .zgs-field__label {
+    color: var(--zgs-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .zgs-summary {
+    overflow: hidden;
+    border: 1px solid var(--zgs-line);
+    border-radius: 12px;
+    background: var(--zaplane-background);
+
+    > * + * {
+      border-top: 1px solid var(--zgs-line);
+    }
+  }
+
+  .zgs-summary__row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+  }
+
+  .zgs-summary__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .zgs-summary__title {
+    color: var(--zaplane-font-color);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .zgs-toggle-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--zgs-line);
+    border-radius: 12px;
+    background: var(--zaplane-background);
+    color: var(--zaplane-font-color);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+
+    &:hover {
+      border-color: var(--zgs-hover-line);
+    }
+
+    &[aria-checked="true"] {
+      border-color: var(--zaplane-primary);
+      box-shadow: 0 0 0 3px var(--zgs-ring);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--zaplane-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  // Done
+
+  .zgs-done {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .zgs-done__hero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid color-mix(in srgb, var(--zaplane-success) 25%, transparent);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--zaplane-success) 8%, var(--zaplane-background));
+  }
+
+  .zgs-done__icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--zaplane-success);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--zaplane-success) 18%, transparent);
+    color: #fff;
+    animation: zaplane-setup-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .zgs-done__title {
+    color: var(--zaplane-font-color);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .zgs-done__text {
+    margin-top: 2px;
+    color: var(--zgs-muted);
+  }
+
+  .zgs-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    animation: zaplane-setup-rise 0.3s ease both;
+  }
+
+  .zgs-result__main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .zgs-result__error {
+    margin-top: 2px;
+    color: var(--zgs-muted);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .zgs-status {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    height: 22px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
+  }
+
+  .zgs-status--active {
+    background: color-mix(in srgb, var(--zaplane-success) 12%, var(--zaplane-background));
+    color: var(--zaplane-success);
+  }
+
+  .zgs-status--draft {
+    background: var(--zaplane-secondary-color);
+    color: var(--zgs-muted);
+  }
+
+  // Footer
+
+  .zgs-footer {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 28px;
+    border-top: 1px solid var(--zgs-line);
+    background: var(--zaplane-background);
+  }
+
+  // How far through the setup this is, drawn over the footer's top edge.
+  .zgs-progress {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: var(--zgs-progress, 0%);
+    height: 2px;
+    background: var(--zaplane-primary);
+    transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+
+    &.is-complete {
+      background: var(--zaplane-success);
+    }
+  }
+
+  .zgs-footer__status {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--zgs-muted);
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .zgs-footer__actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .zgs-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+
+    svg {
+      transition: transform 0.15s ease;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--zaplane-primary);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  .zgs-btn.zgs-btn--primary {
+    border-color: var(--zaplane-primary);
+    background: var(--zaplane-primary);
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      border-color: color-mix(in srgb, var(--zaplane-primary) 86%, #000);
+      background: color-mix(in srgb, var(--zaplane-primary) 86%, #000);
+    }
+  }
+
+  .zgs-btn.zgs-btn--ghost {
+    border-color: var(--zgs-line);
+    background: var(--zaplane-background);
+    color: var(--zaplane-font-color);
+
+    &:hover:not(:disabled) {
+      background: var(--zaplane-secondary-color);
+    }
+  }
+
+  .zgs-btn.zgs-btn--small {
+    gap: 5px;
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .zgs-btn:hover:not(:disabled) .zgs-btn__next {
+    transform: translateX(2px);
+  }
+
+  .zgs-btn:hover:not(:disabled) .zgs-btn__back {
+    transform: translateX(-2px);
+  }
+
+  .zgs-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid color-mix(in srgb, #fff 40%, transparent);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: zaplane-setup-spin 0.7s linear infinite;
+  }
+
+  .zgs-skeleton {
+    height: 96px;
+    border-radius: 12px;
+    background: linear-gradient(
+      90deg,
+      var(--zaplane-secondary-color) 25%,
+      color-mix(in srgb, var(--zaplane-secondary-color) 40%, var(--zaplane-background)) 37%,
+      var(--zaplane-secondary-color) 63%
+    );
+    background-size: 400% 100%;
+    animation: zaplane-setup-shimmer 1.4s ease infinite;
+  }
+
+  .zgs-skeleton--rail {
+    height: 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zaplane-group-setup *,
+  .zaplane-group-setup *::before,
+  .zaplane-group-setup *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+// Narrow screens drop the rail; the footer still says which step this is.
+@media (max-width: 782px) {
+  .zaplane-scope .zaplane-group-setup {
+    grid-template-columns: minmax(0, 1fr);
+
+    .zgs-rail {
+      display: none;
+    }
+
+    .zgs-body {
+      padding: 18px 16px 22px;
+    }
+
+    .zgs-footer {
+      padding: 12px 16px;
+    }
+
+    .zgs-value {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .zgs-card > .zgs-chain {
+      padding-left: 18px;
+    }
+
+    .zgs-options__list {
+      margin-left: 10px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .zaplane-wp-modal.zaplane-wp-modal--group-setup {
+    width: 100%;
+    height: 100%;
   }
 }

@@ -60,6 +60,7 @@ class RecipeGroupService {
 				'description' => $workflow['description'],
 				'default'     => $workflow['default'],
 				'icons'       => array_values( array_unique( $icons ) ),
+				'steps'       => RecipeGroupBuilder::steps( $workflow ),
 				'options'     => array_map(
 					static function ( $option ) {
 						unset( $option['nodes'] );

@@ -80,6 +80,81 @@ class RecipeGroupBuilder {
 	}
 
 	/**
+	 * A workflow's steps in the order a run reaches them, each with the option that
+	 * adds it, or null when the step is always there. Steps no line reaches, such as
+	 * an agent's sub-nodes, come last.
+	 *
+	 * @param array<string,mixed> $workflow One entry of workflows().
+	 * @return array<int,array{id:string,name:string,app:string,icon:string,trigger:bool,option:?string}>
+	 */
+	public static function steps( array $workflow ): array {
+		$nodes = [];
+		foreach ( (array) ( $workflow['graph']['nodes'] ?? [] ) as $node ) {
+			if ( is_array( $node ) && isset( $node['id'] ) ) {
+				$nodes[ (string) $node['id'] ] = $node;
+			}
+		}
+
+		$option_of = [];
+		foreach ( (array) ( $workflow['options'] ?? [] ) as $option ) {
+			foreach ( (array) ( $option['nodes'] ?? [] ) as $id ) {
+				$option_of[ (string) $id ] = (string) $option['key'];
+			}
+		}
+
+		$next = [];
+		foreach ( (array) ( $workflow['graph']['edges'] ?? [] ) as $edge ) {
+			if ( is_array( $edge ) && ! self::is_sub_node_line( $edge ) ) {
+				$next[ (string) ( $edge['source'] ?? '' ) ][] = (string) ( $edge['target'] ?? '' );
+			}
+		}
+
+		$order = [];
+		$queue = [];
+		foreach ( $nodes as $id => $node ) {
+			if ( 'trigger' === ( $node['type'] ?? '' ) ) {
+				$queue[] = (string) $id;
+			}
+		}
+
+		while ( $queue ) {
+			$id = array_shift( $queue );
+
+			if ( isset( $order[ $id ] ) ) {
+				continue;
+			}
+			$order[ $id ] = true;
+
+			foreach ( $next[ $id ] ?? [] as $target ) {
+				if ( isset( $nodes[ $target ] ) && ! isset( $order[ $target ] ) ) {
+					$queue[] = $target;
+				}
+			}
+		}
+
+		foreach ( array_keys( $nodes ) as $id ) {
+			$order[ (string) $id ] = true;
+		}
+
+		$steps = [];
+		foreach ( array_keys( $order ) as $id ) {
+			$id   = (string) $id;
+			$data = (array) ( $nodes[ $id ]['data'] ?? [] );
+
+			$steps[] = [
+				'id'      => $id,
+				'name'    => (string) ( $data['name'] ?? $data['label'] ?? $data['app'] ?? '' ),
+				'app'     => (string) ( $data['app'] ?? '' ),
+				'icon'    => (string) ( $data['icon'] ?? '' ),
+				'trigger' => 'trigger' === ( $nodes[ $id ]['type'] ?? '' ),
+				'option'  => $option_of[ $id ] ?? null,
+			];
+		}
+
+		return $steps;
+	}
+
+	/**
 	 * The values the group asks for, with every setting spelled out.
 	 *
 	 * @param array<string,mixed> $group

@@ -219,4 +219,30 @@ class RecipeGroupBuilderTest extends TestCase {
 			RecipeGroupBuilder::dangling_references( $graph )
 		);
 	}
+
+	public function test_steps_follow_the_lines_and_name_the_option_that_adds_each(): void {
+		$steps = RecipeGroupBuilder::steps( RecipeGroupBuilder::workflows( $this->group() )[0] );
+
+		$this->assertSame( [ '1', '2', '3', '4' ], array_column( $steps, 'id' ) );
+		$this->assertSame( [ true, false, false, false ], array_map( fn( $step ) => $step['trigger'], $steps ) );
+		$this->assertSame( [ null, null, 'follow_up', 'follow_up' ], array_map( fn( $step ) => $step['option'], $steps ) );
+	}
+
+	public function test_steps_are_in_run_order_whatever_order_the_graph_lists_them_in(): void {
+		$workflow = RecipeGroupBuilder::workflows(
+			[
+				'workflows' => [
+					[
+						'key'   => 'shuffled',
+						'graph' => [
+							'nodes' => [ $this->node( '3' ), $this->node( '1', 'trigger' ), $this->node( '2' ) ],
+							'edges' => [ $this->edge( '2', '3' ), $this->edge( '1', '2' ) ],
+						],
+					],
+				],
+			]
+		)[0];
+
+		$this->assertSame( [ '1', '2', '3' ], array_column( RecipeGroupBuilder::steps( $workflow ), 'id' ) );
+	}
 }

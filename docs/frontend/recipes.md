@@ -69,6 +69,10 @@ Every endpoint below is under `zaplane/v1` and needs `manage_options`.
       "description": "Reaches out to customers who haven't ordered for a while.",
       "default": true,
       "icons": ["woo.svg", "crm.svg", "delay"],
+      "steps": [
+        { "id": "1", "name": "Inactive Customer", "app": "woocommerce", "icon": "woo.svg", "trigger": true, "option": null },
+        { "id": "3", "name": "Wait 7 Days", "app": "delay", "icon": "delay", "trigger": false, "option": "coupon" }
+      ],
       "options": [
         { "key": "coupon", "label": "Follow up with a personal coupon a week later", "description": "", "default": true }
       ]
@@ -106,6 +110,8 @@ Every endpoint below is under `zaplane/v1` and needs `manage_options`.
 }
 ```
 
+- `steps` lists a workflow's steps in the order a run reaches them. `option` names the
+  option that adds a step, so the setup can show which steps an option leaves out.
 - A value matters only while a step that reads it will be created: its workflow is on,
   and its `option` is null or switched on. Only those values are checked when the
   workflows are created.
