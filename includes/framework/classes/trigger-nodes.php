@@ -228,7 +228,7 @@ class TriggerNodes {
 
 			// `items[].name` addresses every element of a list. There is no single
 			// place to write that, so a name like it cannot be mapped.
-			if ( '' === $name || str_contains( $name, '[' ) || ! is_scalar( $expression ) || '' === trim( (string) $expression ) ) {
+			if ( '' === $name || false !== strpos( $name, '[' ) || ! is_scalar( $expression ) || '' === trim( (string) $expression ) ) {
 				continue;
 			}
 

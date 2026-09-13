@@ -64,7 +64,7 @@ class Expression {
 			return null;
 		}
 
-		if ( ! is_string( $expr ) || ! str_contains( $expr, '{{' ) ) {
+		if ( ! is_string( $expr ) || false === strpos( $expr, '{{' ) ) {
 			return $expr;
 		}
 
@@ -271,7 +271,7 @@ class Expression {
 			return self::read_word( $code, $i );
 		}
 
-		return [ 'value', str_contains( $raw, '.' ) ? (float) $raw : (int) $raw ];
+		return [ 'value', false !== strpos( $raw, '.' ) ? (float) $raw : (int) $raw ];
 	}
 
 	/**

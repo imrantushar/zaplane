@@ -247,7 +247,7 @@ class TriggerAdvisor {
 	 */
 	private static function covers( array $mapped, string $path ): bool {
 		foreach ( $mapped as $key ) {
-			if ( $key === $path || str_starts_with( $path, $key . '.' ) || str_starts_with( $key, $path . '.' ) ) {
+			if ( $key === $path || 0 === strpos( $path, $key . '.' ) || 0 === strpos( $key, $path . '.' ) ) {
 				return true;
 			}
 		}
