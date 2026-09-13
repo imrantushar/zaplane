@@ -1,0 +1,20 @@
+.zaplane-wp-modal.zaplane-wp-modal--group-setup {
+  width: min(760px, calc(100vw - 32px));
+
+  // The footer sits on the frame's bottom edge. With the content's own bottom
+  // padding in place, the list would show through a strip underneath it.
+  .components-modal__content {
+    padding-bottom: 0;
+  }
+
+  // The buttons stay in reach however long the list of workflows gets.
+  .zaplane-group-setup__footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    margin-top: 4px;
+    padding: 12px 0 20px;
+    border-top: 1px solid var(--zaplane-border-color);
+    background: var(--zaplane-background);
+  }
+}

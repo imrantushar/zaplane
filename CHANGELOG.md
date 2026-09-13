@@ -32,8 +32,24 @@ All notable changes to Zaplane are documented here. This project adheres to
   to one from nearby. While you drag, the steps that can take the line are
   outlined, and letting go on empty canvas opens the step picker, already
   connected. Lines into a trigger, loops and duplicate lines are refused.
+- **Group recipes.** One recipe can set up several workflows at once. Run Group
+  Recipe opens a setup: switch each workflow, and some of their steps, on or off,
+  fill in a few values such as a coupon's discount, pick the connections they
+  need, and create them together in a new folder, as drafts or turned on. The
+  first is *WooCommerce Customer Lifecycle*: abandoned carts, a thank-you coupon,
+  a feedback request, a win-back email and a birthday coupon.
+- A folder set up from a group recipe says which one. Any folder can turn all of
+  its workflows on, or pause them, in one go.
+- The Recipes page can show only group recipes, or only single-workflow recipes.
 
 ### Fixed
+- Workflows made from the WooCommerce and GemCRM recipes that ship with Zaplane
+  couldn't go live: their Send Email steps were missing the Email Content
+  setting. Recipes already on a site are corrected on update.
+- Renaming a recipe that ships with Zaplane added a second copy on the next
+  update, and deleting one brought it back. Shipped recipes are now known by a
+  slug, and a deleted one stays deleted.
+- The Recipes page showed only the first 20 recipes.
 - Changing a live trigger's settings without adding or removing a step could keep
   it firing with the old settings for up to an hour. The trigger cache now keys on
   the saved graph, not only the version.
