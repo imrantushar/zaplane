@@ -15,6 +15,7 @@ use Zaplane\Database\Seeders\AiKnowledgeReplyRecipeSeeder;
 use Zaplane\Database\Seeders\AiSupportAgentRecipeSeeder;
 use Zaplane\Database\Seeders\AiVoiceSupportRecipeSeeder;
 use Zaplane\Database\Seeders\CustomerLifecycleGroupSeeder;
+use Zaplane\Database\Seeders\StoreengineEmailsGroupSeeder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -58,6 +59,7 @@ class Installer {
 		( new AiSupportAgentRecipeSeeder() )->run();
 		( new AiVoiceSupportRecipeSeeder() )->run();
 		( new CustomerLifecycleGroupSeeder() )->run();
+		( new StoreengineEmailsGroupSeeder() )->run();
 
 		$current_db_version = get_option( $this->db_version_option, '0.0.0' );
 		if ( version_compare( $current_db_version, $this->plugin_version, '<' ) ) {

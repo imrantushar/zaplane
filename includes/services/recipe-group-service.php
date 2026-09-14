@@ -191,13 +191,23 @@ class RecipeGroupService {
 			];
 		}
 
-		return [
+		$result = [
 			'folder'    => [
 				'id'    => (int) $folder->id,
 				'title' => (string) $folder->title,
 			],
 			'workflows' => $created,
 		];
+
+		/**
+		 * Fires once a group recipe's workflows are created, and switched on if asked.
+		 *
+		 * @param array  $result What was created: the folder, and each workflow's key, id, title, status and error.
+		 * @param Recipe $recipe The group recipe they came from.
+		 */
+		do_action( 'zaplane_recipe_group_installed', $result, $recipe );
+
+		return $result;
 	}
 
 	/**
