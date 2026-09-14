@@ -160,10 +160,14 @@ const Setting = () => {
   const { mode: activeMode, set: setActiveMode } = useThemeMode();
   const [form, setForm] = useState(data ? clone(data) : null);
   const query = useQuery();
-  // A teaser can link here with ?tab=modules, so land where it promised.
-  const requestedTab = query.get('tab');
+  // A teaser links here with ?tab=modules, and core's application-password
+  // screen returns with ?tab=mcp. Either can arrive on the admin URL rather
+  // than the router's, so read both.
+  const requestedTab =
+    query.get('tab') || new URLSearchParams(window.location.search).get('tab');
   const [activeTab, setActiveTab] = useState(requestedTab || 'appearance');
   const [modules, setModules] = useState([]);
+  const [modulesLoaded, setModulesLoaded] = useState(false);
   const [palette, setPalette] = useState({ fields: [], defaults: { light: {}, dark: {} } });
   const [paletteTab, setPaletteTab] = useState(activeMode);
   const savedRef = useRef(data);
@@ -172,7 +176,8 @@ const Setting = () => {
     dispatch(getSettings());
     API.get(`${namespace}modules`)
       .then(res => setModules(Array.isArray(res.data) ? res.data : []))
-      .catch(() => setModules([]));
+      .catch(() => setModules([]))
+      .finally(() => setModulesLoaded(true));
     API.get(`${namespace}palette`)
       .then(res => res.data?.fields && setPalette(res.data))
       .catch(() => {});
@@ -217,26 +222,27 @@ const Setting = () => {
   // Switching a module off takes its panel away; don't strand the user on a tab
   // that no longer exists (or one a stale ?tab= asked for).
   useEffect(() => {
-    if (tabs.length && !tabs.some(t => t.key === activeTab)) setActiveTab('modules');
-  }, [tabs.map(t => t.key).join(), activeTab]);
+    // Only once the panels are known — until then every module tab looks
+    // missing, and a ?tab= naming one would be thrown away on first render.
+    if (modulesLoaded && tabs.length && !tabs.some(t => t.key === activeTab)) setActiveTab('modules');
+  }, [modulesLoaded, tabs.map(t => t.key).join(), activeTab]);
 
   // Only surface the branded, enabled save button when there are unsaved edits.
   const isDirty = !!form && !!data && JSON.stringify(form) !== JSON.stringify(data);
   const canSave = isDirty && !saving;
 
-  const saveButton = (
+  // Nothing to save is not the same as a save that failed. A greyed-out button
+  // reads as the second, so tabs with nothing on them (AI access issues tokens
+  // through its own controls) show no button at all rather than a dead one.
+  const saveButton = canSave || saving ? (
     <button
       onClick={handleSave}
       disabled={!canSave}
-      className={`inline-flex items-center gap-2 rounded-[4px] px-4 py-2 text-[13px] font-semibold transition-colors ${
-        canSave
-          ? 'bg-[var(--zaplane-primary)] text-white hover:opacity-90 cursor-pointer'
-          : 'bg-[var(--zaplane-secondary-color)] text-[var(--zaplane-text-muted)] cursor-not-allowed'
-      }`}
+      className="inline-flex items-center gap-2 rounded-[4px] bg-[var(--zaplane-primary)] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
     >
       {saving ? __('Saving…', 'zaplane') : __('Save changes', 'zaplane')}
     </button>
-  );
+  ) : null;
 
   return (
     <PageLayout title={__('Settings', 'zaplane')} heading={__('Settings', 'zaplane')} actions={saveButton}>

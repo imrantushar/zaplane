@@ -75,7 +75,7 @@ const Notification = () => {
       </div>
       <Button 
         onClick={closeHandler} 
-        aria-label={__('Close notification', 'zaplaness')} 
+        aria-label={__('Close notification', 'zaplane')} 
         preset='transparent' 
         suffix="close"
         icon={

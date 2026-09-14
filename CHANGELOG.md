@@ -9,6 +9,41 @@ The dashboard is rebuilt, the workflow canvas is retyped, modules become opt-in
 and discoverable, and Zaplane gains an MCP server. Integration coverage grows from
 **998 to 1,070** triggers and actions across **93** apps and tools.
 
+### Security
+- **Merge tags are parsed now, not compiled and handed to `eval()`.** The tag
+  inside `{{ … }}` was rewritten into PHP — identifiers became array lookups —
+  and everything that was not an identifier went through untouched: operators,
+  parentheses, semicolons, `$`, braces, backticks. That is a filter with a hole
+  in it rather than a sandbox. Worse, `{{a.b(c.d)}}` compiled to
+  `$data["a"]["b"]($data["c"]["d"])` — a function call whose name was read out
+  of the run's own data. Every node's configuration is resolved against that
+  data before the node executes, and for a webhook-triggered workflow the data
+  is a JSON body posted by a stranger.
+
+  There is a small parser in its place. Paths, numbers, strings, `true`/`false`/
+  `null`, the arithmetic, comparison and logical operators, and parentheses for
+  grouping — the same language as before, minus the parts nobody asked for.
+  There is no production for a function call, which is why one can no longer be
+  written. Anything outside the grammar resolves to nothing, as an unresolvable
+  tag always has.
+- **An outbound request can no longer be aimed inside your network.** The
+  Webhook action, the HTTP Request action and every Custom App ask the
+  `zaplane_http_block_request` filter before connecting — and nothing answered
+  it, so the only check that ran was that the scheme was http or https. Since a
+  node's configuration is resolved at run time, a URL containing a merge tag is
+  chosen by whatever triggered the workflow, and the response comes back into
+  the run: a way to read whatever this server can reach and the caller cannot —
+  another site on the same host, an admin panel on a private address, the cloud
+  metadata service at 169.254.169.254.
+
+  Loopback, private, link-local, carrier-grade-NAT and reserved addresses are
+  refused by default, on every address a hostname resolves to rather than only
+  the first, and a host that resolves to nothing is refused rather than passed
+  on. The filter still has the last word, and a site with an internal service a
+  workflow legitimately calls can name it through
+  `zaplane_http_allowed_private_hosts` — matched as a whole hostname, so one
+  entry cannot admit a lookalike.
+
 ### Added — Integrations
 - **aBlocks** — a new app with a **Form Submitted** trigger for aBlocks
   form-builder forms and an optional per-form filter. Requires the companion
@@ -31,6 +66,202 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   advertises what the presenting token can call.
 - Tools for diagnosing runs (`list_runs`, `get_run`), reading and editing existing
   workflows, and listing connections.
+- **OAuth 2.1, so hosted AI clients can connect at all.** A connector run by
+  someone else — claude.ai, ChatGPT — is never handed a token, because there is
+  nowhere for a person to paste one; it expects to discover an authorization
+  server and ask for its own. Zaplane now is one: the two `/.well-known/`
+  discovery documents (RFC 9728 and RFC 8414), dynamic client registration
+  (RFC 7591), and the authorization-code flow with PKCE. The 401 from the MCP
+  endpoint carries the `resource_metadata` pointer that starts it off.
+  Connecting still ends at a consent screen only an administrator can approve,
+  and the token it issues acts as that administrator, appears in **Settings → AI
+  access** like any other, and can be revoked there. Access tokens last an hour
+  and are refreshed; a spent refresh token is retired with the access token it
+  replaced.
+- The discovery documents describe the site under **the host the request arrived
+  on**, when that host is this site under another name — only a `www.` apart. A
+  client checks that the resource it was told about has the same origin as the
+  address you typed, and abandons the whole flow when it does not; a site whose
+  `home_url()` is bare that answers a `www.` request with bare URLs is, to that
+  client, a different server. Any other Host is ignored, so nobody can make the
+  site advertise an authorization server of their choosing.
+- The AI access panel now says **how to connect**: the three steps a hosted
+  connector takes, the two for a client you run yourself, and a copyable command
+  for the latter. It also warns when the site's address is not reachable from the
+  internet — a development hostname cannot be resolved by claude.ai or ChatGPT,
+  whose servers look it up from outside, and all they can report is that they
+  could not sign in.
+- **Every credential acts as the account it was issued to, and is held to what
+  that account can do.** A token recorded a user and nothing applied it — no user
+  was set on the request, no capability was ever asked — so a token issued to
+  anybody at all reached exactly as far as an administrator's, and one issued to
+  an administrator who was later demoted or deleted kept working forever. The
+  endpoint now becomes the token's user and asks for `manage_options`, which is
+  what Zaplane asks of everyone on every one of its own screens. Asked on every
+  call rather than once at issue, so demotion takes effect.
+
+  This retires the queue that let somebody without `manage_options` ask an
+  administrator to allow their client. It was built on the premise that the
+  resulting token would act as the person who asked and so carry no more
+  authority than they had; it never did, and now that it does, such a token is
+  refused every time it is used. The consent screen says so plainly instead of
+  parking a request and producing a credential that does not work. The menu
+  bubble goes with it.
+- **Losing a registration now revokes what it held.** Registration is open and
+  unauthenticated — a hosted connector signs itself up unasked — so a burst of
+  it pushes older entries past the 50-client cap. Their tokens used to stay
+  behind: access still working, with nothing left to show where it came from,
+  which is the exact thing removing a client by hand was careful to avoid.
+- **A token's "last used" no longer lands on the wrong token, and no longer
+  writes on every call.** It was stamped by position in the stored list, and a
+  revoke between verifying and stamping shifts every later record down one. The
+  write was also a read-modify-write of the whole list on every authenticated
+  call, so two requests arriving together could lose each other's work —
+  including a token issued in between. Now keyed by id, and at most once a
+  minute.
+- **Tokens that can never be used again are cleared out** when the next one is
+  issued. Nothing pruned them before: an expired token was refused but kept
+  forever. One still holding a refresh token is left alone — it is waiting to be
+  renewed, not dead.
+- The header is offered as **two fields, name and value**, because that is how a
+  connector dialog asks for it — with a note that `Bearer` is part of the value.
+  Pasting the token on its own is the usual way this goes wrong, and it fails
+  with a plain 401 that says nothing about the cause.
+- A freshly issued token now comes with **the command to use it**, with the token
+  already in place rather than a placeholder, plus the raw header for anything
+  else. The instructions sat at the top of the panel while the token appeared at
+  the bottom, so at the moment you had it in hand there was nothing telling you
+  what to do with it. A token carrying `run` says so, in the box.
+- **The consent screen has a checkbox per scope, with `run` unticked.** It used
+  to be a single Approve button granting whatever the client asked for — and
+  clients ask for everything the server advertises, so the scope that sends mail
+  and takes payments was arriving without anyone deciding on it. Never grants
+  more than was requested, and ticking nothing falls back to read rather than to
+  everything.
+- **Registered clients are visible, and removable.** Apps that signed themselves
+  up were previously invisible and permanent: you could revoke a token but not
+  the registration behind it. The panel now lists them, says which are actually
+  connected, and removing one revokes its tokens too — a token outliving its
+  registration is access with no visible origin.
+- **Connecting a client is now installing one.** Pick Claude Desktop, Claude
+  Code, Cursor, Claude.ai, ChatGPT or Other and the panel writes the file that
+  client reads, names the path it reads it from — on macOS, Windows or Linux —
+  and offers it to copy or download. Per-client steps replaced one set of
+  generic ones that was true for every client and useful for none.
+
+  A desktop client that speaks stdio gets the bridge configuration rather than a
+  URL it cannot use, with the header passed through the environment because a
+  value with a space in it does not survive being split back apart, and every
+  Basic credential has one. Where a client cannot sign in through a browser the
+  panel says so and offers to **make the credential right there**, named after
+  that client, and it lands in the configuration — that being the step people
+  otherwise do by hand and get wrong. Claude.ai gets a link that opens its
+  add-connector dialog with the name and URL in place, and both hosted clients
+  say plainly when this site cannot be reached from the internet, because
+  nothing below will work until it can. Claude Code needs no credential at all —
+  it signs in through the browser on first use, which was true before and went
+  unsaid.
+- **A client can identify itself by URL instead of registering** (Client ID
+  Metadata Document). This is the option the connector dialogs mark
+  *Recommended*, and it failed until now because Zaplane did not support it —
+  every new user met an error on the default setting. It also leaves no row
+  behind, which is why it is recommended: dynamic registration accumulates one
+  per client on a busy site.
+
+  The whole risk is the fetch: a stranger chooses the URL and this server makes
+  the request. Private and reserved addresses are refused before connecting —
+  loopback, the LAN ranges, and the cloud-metadata address — redirects are not
+  followed, the read is capped at 5KB, only a 200 counts, the document must name
+  itself as the URL it was found at, and failures are never cached.
+- **An email the first time a client runs a workflow for real, and when one is
+  refused repeatedly.** Issuing a run-scoped token is a decision someone made
+  once, possibly without reading the third checkbox; the moment it is used is
+  when they would want to know. Five refusals in ten minutes from one token is
+  either a misconfiguration or something trying, and one notice per token per
+  hour keeps it from becoming noise. Only these two — a notice that arrives
+  constantly is one nobody reads, and the log holds everything else. Switchable
+  from the panel.
+- **Tokens can be given a lifetime.** OAuth tokens last an hour and rotate; one
+  pasted into a config lasted forever. Choose 30 days, 90, a year, or never when
+  issuing, and the expiry shows on the token.
+- **A `run` token can name the workflows it may start.** Holding `run` used to
+  mean holding it over every workflow on the site, which made it an
+  all-or-nothing decision — and clients ask for it by default. Tick Run when
+  issuing a token and a list appears; choose the ones that client is for.
+  Choosing none keeps the old meaning, so nothing already issued narrows
+  underneath anyone. A refused workflow says which ones the token covers, and
+  the refusal is recorded.
+- **AI client activity is recorded, and lives on the Logs screen** beside workflow
+  runs — which is where people already go to find out what happened. Every tool
+  call: which client, whose account, which tool, how it went, how long it took.
+  Refusals too, because repeated attempts at a scope a client was never given is
+  the shape of something going wrong and is invisible if only successes are kept.
+  Filter by outcome, page through it, clear it. Arguments are never recorded: a
+  call carries whatever the model was working with, and copying that into a table
+  nobody prunes turns an audit trail into a second, quieter database of
+  everything. The settings panel links to it rather than trying to show it.
+- **A self-check on the AI access panel, for when a client will not connect.** An
+  AI client can only report the symptom from outside — "could not reach", "could
+  not register" — which says nothing about the cause. **Run check** tests the same
+  things the client does, from the site: whether the module is on, whether the
+  endpoint refuses an unauthenticated call with a pointer to the sign-in service,
+  whether the two discovery documents are actually served, whether the address is
+  reachable from the internet at all, and whether application passwords are
+  available. Each failure says what to do about it. A disabled module reports once
+  rather than cascading into three unrelated-looking failures.
+- **WordPress application passwords work as a third way in.** Core already
+  authenticates them on REST requests, so a client that can send Basic auth needs
+  no Zaplane token at all, and revoking it is where a WordPress user already
+  looks — Users → Profile → Application Passwords. They never carry `run`: an
+  application password is the whole user, with no way to withhold one capability,
+  so the scope that sends mail and takes payments still has to be asked for
+  deliberately.
+- **The panel makes one for you, through WordPress's own screen.** Getting an
+  application password meant leaving Zaplane, finding Users → Profile, scrolling
+  past everything else on it, and remembering what to name the thing — so the
+  quickest way in was also the least discoverable. **Create credential** now
+  hands you to core's Authorize Application screen with the name already filled
+  in, and brings you back to the panel with the password shown once and the
+  Basic header assembled ready to paste. Nothing is duplicated to do it: core
+  asks, core hashes, core stores, core revokes, and the panel reads its list and
+  calls its delete. The credentials it made are stamped as Zaplane's, so the
+  panel lists only those and will not revoke one somebody created for something
+  else. They also still appear on the profile page, because they are the same
+  credentials.
+
+  Two things in that hand-off are Zaplane's to get right rather than core's. The
+  return address is **held to this site** — core sends to any domain on purpose,
+  saying so where it declines to use `wp_safe_redirect`, but this screen always
+  comes back to wp-admin and a newly minted password is what follows the
+  address. And **approving and declining now arrive back distinguishable**: core
+  says nothing about which one it took, so a cancelled attempt used to look
+  exactly like nothing having happened. The panel says what happened either way,
+  including when WordPress refuses because this account is not allowed one — and
+  it only offers the button when core would honour it, which is a question asked
+  **per user**, not per site, since a role can be withheld from it.
+- **Core's consent screen now says what the credential is for.** It asks for
+  "access to your account", which is accurate and tells you nothing — it is one
+  screen serving every application and cannot know what any of them intends.
+  Zaplane adds a line to its own request saying that an AI client will read and
+  build workflows and will not start one for real. Worded as what Zaplane will
+  do with the credential, never as what the credential is limited to: an
+  application password authenticates every REST route on the site, so capping
+  MCP at read and write caps Zaplane, not the password. The panel used to blur
+  that, next to the button that mints one, and now says it plainly in both
+  places. The note appears only on Zaplane's own request; every other
+  application's approval is untouched.
+- **The panel no longer blanks when you change something on it.** Every save
+  refetched the panel, and the panel hid itself while fetching — so ticking a
+  checkbox made the whole screen vanish and rebuild. A setting that makes the
+  screen disappear and come back reads as one that did not save. Only the first
+  read shows a loading state now; the toggle also moves at once and rolls back
+  with a message if the save fails, rather than waiting on a round trip to say
+  anything.
+- The MCP endpoint answers **405** to `GET` and `DELETE`, with `Allow: POST`.
+  Streamable HTTP reserves those verbs for an event stream and for ending a
+  session, neither of which this server offers; the 404 they produced before
+  reads as "no such endpoint", which is how opening the URL in a browser came to
+  look like a broken route.
 
 ### Added — Modules and discovery
 - **MCP is a module.** Optional features are now declared once in a registry that
@@ -164,6 +395,17 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   control that was unreadable on the dark ground.
 
 ### Fixed — Settings
+- Primary buttons inside the AI access panel rendered as white text on a white
+  card. `bg-[var(--…)]` computed transparent there — something in the admin beats
+  the generated class — so **Issue token** and the new approval button were
+  invisible rather than merely unstyled.
+- The **Run** scope pill had no background tint: Tailwind's `/opacity` syntax
+  needs a real colour to work on, and these are CSS variables. Uses `color-mix`,
+  like the teaser components already did.
+- **Save changes** is hidden when there is nothing to save, instead of showing a
+  greyed-out button. A dead button reads as a save that failed, particularly on
+  panels like AI access where nothing belongs to the settings form in the first
+  place.
 - The Appearance screen kept a hand-copied duplicate of both palettes in
   JavaScript, which had already drifted from the PHP: six tokens never appeared in
   the editor at all, and "Reset to default" wrote stale colours. Rows and defaults
@@ -183,7 +425,43 @@ and discoverable, and Zaplane gains an MCP server. Integration coverage grows fr
   throws under the bundle's strict mode, and a broad `catch` treated that as a
   failed request.
 
+### Added — MCP server
+- **`list_field_options`** resolves the values a config field can take on this
+  site — which course, which product, which form, which CRM list — through the
+  same lookup registry the workflow editor's own pickers use. **412 of the 1,070
+  triggers and actions have a required field like that**, and `describe_app`
+  cannot answer for them, so a client had no way to fill them in; 377 of those 412
+  are now answerable, the rest being lookups already broken in their own
+  integrations.
+- **A value the site does not have is now rejected instead of saved.** Dynamic
+  fields were skipped during validation because the options were unknown, so a
+  guessed id saved clean and the workflow then never matched anything.
+  `validate_graph` and `create_workflow` resolve the list and name both the tool
+  to call and the values that would work. A lookup that cannot run, or one that
+  comes back empty, stays a warning — a site with no courses yet must still be
+  able to author against them.
+
 ### Fixed — MCP server
+- **A JSON-RPC batch came back with an extra response.** The token was stashed on
+  the request with `set_param()`, which writes into the decoded JSON body — and
+  when that body is an array, as a batch is, the stash became an element of it. The
+  server answered a message the client never sent, echoing the token's id back as
+  that response's id. It is held on the controller instead.
+- **Hitting the rate limit reported `401 Sorry, you are not allowed to do that`.**
+  A client reads that as a rejected credential and stops retrying, or asks to
+  re-authorise. Throttling now answers `429` with `Retry-After` and says how long
+  to wait.
+- **The limit was half what it claimed.** WordPress calls a route's
+  `permission_callback` twice per HTTP request — once to authorise, then again from
+  `rest_send_allow_header()` — so the counter charged two per call and 120/min
+  behaved as 60/min. The check is memoized per request.
+- A `401` now carries `WWW-Authenticate: Bearer`, so a client can tell how it was
+  meant to authenticate instead of seeing an opaque refusal.
+- **Activating a workflow no longer succeeds when a step has no connection.** A
+  missing connection is advisory while the graph is a draft — the author links the
+  account afterwards — but going live with one means the workflow fires and
+  silently does nothing. Findings now carry a code so activation can block on that
+  one without matching message text.
 - The `Authorization` header is now also read from `HTTP_AUTHORIZATION` /
   `REDIRECT_HTTP_AUTHORIZATION`, so Apache under CGI no longer causes silent 401s.
 - Workflows created over MCP are attributed to the token's owner instead of being

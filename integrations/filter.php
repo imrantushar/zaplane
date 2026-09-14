@@ -4,6 +4,10 @@ namespace Zaplane\Integrations;
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Classes\Expression;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class Filter extends IntegrationBase {
 
 

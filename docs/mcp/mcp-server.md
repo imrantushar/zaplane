@@ -50,7 +50,8 @@ was last used.
 
 ## Tools
 
-**Discovery** — `search_capabilities`, `list_apps`, `describe_app`
+**Discovery** — `search_capabilities`, `list_apps`, `describe_app`,
+`list_field_options`
 
 **Authoring** — `validate_graph`, `create_workflow`, `update_workflow`,
 `set_workflow_status`, `create_workflow_from_recipe`
@@ -70,8 +71,26 @@ intended path is narrow-then-read:
 1. `search_capabilities` with a plain-language description → a ranked shortlist.
 2. `describe_app` on a slug from that list → every field, its type, whether it is
    required, and the allowed values for fixed selects.
-3. `validate_graph` on the draft → errors before anything is written.
-4. `create_workflow` → a draft on the canvas.
+3. `list_field_options` for any field carrying `dynamic` → the values this
+   particular site can offer.
+4. `validate_graph` on the draft → errors before anything is written.
+5. `create_workflow` → a draft on the canvas.
+
+Step 3 is not optional. **412 of the 1,070 triggers and actions have a required
+field whose options live on the site** — which course, which product, which form
+— and `describe_app` returns no list for them, because only the site knows.
+Guessing an id produces a workflow that saves and then never matches anything, so
+`validate_graph` and `create_workflow` now resolve those lists and refuse a value
+the site does not have:
+
+```
+Field "course_id" got "999999", which does not exist on this site.
+Call list_field_options for academy/user_enroll_course and use one of: any, 113, 111
+```
+
+A lookup that cannot run — its companion plugin is inactive — or one that comes
+back empty is a **warning**, never an error: a site with no courses yet still has
+to be able to author against them.
 
 A node only needs its intent:
 
@@ -115,21 +134,256 @@ able to start the workflow that is calling it. The MCP client sends
 `run_workflow` while still allowing reads.
 
 **Rate limit.** 120 calls per token per minute; over that the endpoint returns
-401 until the window rolls.
+429 with `Retry-After` until the window rolls.
+
+**POST only.** The endpoint answers 405 with `Allow: POST` to `GET` and `DELETE`.
+Streamable HTTP reserves those for a server-initiated event stream and for ending
+a session, and this server offers neither — so opening the URL in a browser shows
+a 405, not a working page and not a missing route.
 
 **Tool failures** come back as `isError` results with a readable message rather
 than JSON-RPC protocol errors, so the model can correct itself. Only an unknown
 method or unknown tool is a protocol error.
 
-## Authentication and remote clients
+## Authentication
 
-Authentication is a static bearer token. The MCP authorization spec describes
-OAuth 2.1 with dynamic client registration, which some hosted clients require;
-until that is implemented, connect through a bridge that can set a header, e.g.
+Three ways in, for three kinds of client.
+
+All three are described on the **Settings → AI access** panel itself, which also warns
+when the site's address cannot be reached from the internet — a hosted connector
+resolves it from its own servers, so a development hostname never arrives and all
+it can report is that it could not sign in.
+
+The AI access panel installs this site into a client, so the rest of this
+section is background rather than something to follow by hand. Pick the client
+and it writes the file that client reads — the stdio bridge configuration for a
+desktop app, an HTTP entry for one that speaks it, a terminal command where
+that is the interface — names the path it belongs at on macOS, Windows or
+Linux, and offers it to copy or download. Where the client cannot sign in
+through a browser it offers to make the credential there and then, named after
+that client, and puts it in the file.
+
+One detail is easy to get wrong by hand and is why the bridge configuration
+looks the way it does: the header goes through `env` as `${ZAPLANE_AUTH}`
+rather than straight into `args`. A value containing a space does not survive
+being split back apart, and every Basic credential has one.
+
+**A token you paste.** Issue one under **Settings → AI access** and give it to a
+client you run yourself — Claude Code, Cursor, a script. It is presented as
+`Authorization: Bearer <token>`, never expires, and is revoked from that same
+screen.
+
+A connector dialog usually asks for the header in two fields. The name is
+`Authorization` and the value is `Bearer <token>` — **the scheme word is part of
+the value**, and pasting the token alone is refused with a 401. In a dialog that
+also offers an authentication mode, choose the one meaning "no sign-in / uses an
+API key": a static token is not OAuth, and selecting an OAuth mode alongside it
+will send the connector looking for a sign-in flow it does not need.
+
+**A WordPress application password.** Press **Create credential** on the AI
+access panel. It hands the browser to core's own Authorize Application screen
+with the name filled in, and brings it back with the password shown once and the
+`Authorization: Basic base64(user:password)` header assembled ready to paste.
+Core authenticates it before Zaplane sees the request, so there is no Zaplane
+token to issue or lose.
+
+Zaplane keeps nothing of its own here — `Zaplane\Mcp\Connections` is a hundred
+lines over `WP_Application_Passwords`, and holds no credential, no table and no
+option. It stamps each one it creates with a fixed `app_id`, which is the only
+thing that makes the panel's list a list: it shows the credentials made through
+this screen and refuses to revoke one created for anything else. They are
+ordinary application passwords, so they also appear — and can be revoked — at
+Users → Profile → Application Passwords.
+
+Two details of that hand-off are Zaplane's to get right rather than core's.
+**The return address is held to this site.** Core sends to any domain on
+purpose — an application password is often for something running elsewhere, and
+it says so in a comment where it declines to use `wp_safe_redirect` — but this
+screen always comes back to wp-admin, and a newly minted password is what
+follows the address. **And the two return addresses are marked differently**,
+because core says nothing about which one it took: approving arrives with a
+credential, declining arrives with the address unchanged. Without a marker the
+panel cannot tell somebody who changed their mind from somebody who has just
+opened it, so a cancelled attempt looked exactly like nothing having happened.
+
+The button is offered only when core would actually honour it. Availability is
+asked per user (`wp_is_application_passwords_available_for_user`), not per site:
+a site can allow application passwords generally and still withhold them from a
+role, and the site-wide question would offer a button whose destination refuses.
+
+Zaplane caps it at `read` and `write`. That is a cap on Zaplane, not on the
+credential: an application password is the whole user and authenticates every
+REST route on the site, so `run` is never granted through one — that scope needs
+an issued token or an approved OAuth grant — but nothing stops the holder using
+core's own routes. Say so where somebody is deciding, which is why Zaplane adds
+a line to core's consent screen (`wp_authorize_application_password_form`,
+gated on its own `app_id`) describing what it will do with the credential rather
+than what the credential can do. Note also that a site can
+switch application passwords off entirely (`wp_is_application_passwords_available`),
+and some security plugins do.
+
+**OAuth, for clients you don't run.** A hosted connector — claude.ai, ChatGPT —
+has nowhere for you to paste a token, so it expects to find an authorization
+server and ask for one. Paste the endpoint URL into the connector and it will
+walk the rest itself:
+
+```
+https://example.com/wp-json/zaplane/v1/mcp
+```
+
+What happens behind that: the connector calls the endpoint, gets a 401 carrying
+`WWW-Authenticate: Bearer realm="Zaplane MCP", resource_metadata="…"`, follows
+that pointer to `/.well-known/oauth-protected-resource` (RFC 9728), reads
+`/.well-known/oauth-authorization-server` (RFC 8414) to find the endpoints,
+registers itself (RFC 7591), and sends you to a consent screen. **You must be
+signed in as an administrator to approve it.** The token it receives acts as the
+account that approved it.
+
+| | |
+|---|---|
+| Consent | `https://example.com/zaplane-oauth/authorize` |
+| Register | `POST /wp-json/zaplane/v1/oauth/register` |
+| Token | `POST /wp-json/zaplane/v1/oauth/token` |
+| Revoke | `POST /wp-json/zaplane/v1/oauth/revoke` |
+
+PKCE with `S256` is required — `plain` is not accepted. Authorization codes last
+a minute and are spent once, whether or not the exchange succeeds. Access tokens
+last an hour; the refresh token that comes with one is rotated on use, and the
+pair it replaces stops working immediately. Every client is public: there are no
+client secrets to store or leak.
+
+Approved connectors appear in **Settings → AI access** alongside hand-issued
+tokens, and revoking one there disconnects it.
+
+If the site's MCP module is off, all of this 404s — the site does not advertise
+an authorization server it isn't running.
+
+### Identifying by URL instead of registering
+
+A client may use an https URL as its `client_id`, serving a JSON document that
+describes itself. Zaplane fetches and validates that document instead of keeping
+a registration — which is what the connector dialogs recommend, since dynamic
+registration otherwise leaves a row for every client that ever connects.
+
+The document must name itself: its `client_id` must equal the URL it was fetched
+from, or it is refused. Beyond that: https with a path and no fragment, a 200
+answer, no redirects followed, at most 5KB read, and at least one usable
+`redirect_uri`. Private and reserved addresses are refused before the request is
+made — the URL is chosen by a stranger and this server makes the call, which is
+the one place this feature could become a way to reach things only the site can
+reach.
+
+### www, and why it used to fail
+
+A client compares the `resource` in the discovery document against the address
+you gave it, and requires the two to have the same origin. If it does not match
+it stops there — before registering — and reports that it could not register with
+your sign-in service.
+
+So the documents are built from the host the request arrived on, not from
+`home_url()`, whenever that host is this site under another name (a `www.` prefix
+either way). Paste `https://www.example.com/...` and the documents say
+`www.example.com`; paste the bare domain and they say the bare domain. Any other
+Host is ignored — reflecting one would let a stranger publish a document naming
+an authorization server of their own.
+
+The consent screen is the exception: it stays on the site's canonical host,
+because that is where the login cookie lives, where `wp_login_url()` points, and
+the only host `wp_safe_redirect()` will return to. A consent page on the alias
+would ask for a login and then be unable to find its way back.
+
+Nothing here replaces the token flow, and a client that can set a header does not
+need OAuth. If you would rather keep a static token with a hosted client, a
+bridge still works:
 
 ```bash
 npx mcp-remote https://example.com/wp-json/zaplane/v1/mcp --header "Authorization: Bearer <token>"
 ```
+
+## Who a credential acts as
+
+Every credential acts as the account it was issued to, and every call asks
+whether that account may still `manage_options` — the capability Zaplane asks of
+everyone on every one of its own screens.
+
+Asked on **every call**, not once when the credential was made. A credential
+outlives the standing of the person it was issued to, so demoting or deleting
+that account has to take effect, and does: the next call is refused with 403.
+
+This is why an application password and an issued token now behave the same way.
+Core authenticates the application password and sets the user; a bearer token
+authenticates nobody, so the recorded user is applied at the endpoint. Either
+way the same question follows, and the audit trail names somebody real.
+
+It used to be otherwise. A bearer token recorded a user and nothing applied it —
+no user was set, no capability was asked — so every token reached as far as an
+administrator's, whoever it had been issued to.
+
+That is also why somebody who cannot manage this site can no longer ask an
+administrator to let their client in. A credential issued to them would be
+refused on every call, so the consent screen says so rather than parking a
+request and producing one that does not work.
+
+## Registered clients
+
+Apps that register themselves appear under **Settings → AI access → Registered
+clients**, marked *connected* or *registered, never approved*. Registering grants
+nothing on its own; approving one does.
+
+Removing a client revokes the tokens issued through it, and it will have to
+register and be approved again. Worth knowing before you tidy: an already
+connected client keeps pointing at its registration, and deleting that breaks it
+with an "unknown client" error that gives no clue why.
+
+## Limiting what `run` can start
+
+`run` is the scope that sends mail and takes payments, and holding it means
+holding it over every workflow — unless the token says otherwise. When issuing
+one, tick **Run** and a list of workflows appears; the token may then start those
+and no others.
+
+Choosing none means every workflow, now and in future, which is what tokens
+issued before this have and what "any" still means. A refused call names the
+workflows the token does cover, and the refusal is recorded in the log.
+
+The restriction lives on the token, so revoking or reissuing is how you change
+it. The same form sets a lifetime — 30 days, 90, a year, or never. OAuth tokens
+expire and rotate on their own; one pasted into a config only stops when you say
+so.
+
+## What clients have been doing
+
+**Zaplane → Logs → AI access.** Every tool call is recorded: the client, the
+account it acted as, the tool, the outcome, and how long it took. Refusals are
+kept alongside successes — a client repeatedly reaching for a scope it was never
+granted is worth seeing, and it is invisible if only successes are logged.
+
+Arguments are deliberately not recorded. A call carries whatever the model was
+working with, and a table of that which nobody remembers to prune is a second
+copy of your data with none of the care. Who, what and how it went is what the
+log is for.
+
+The trail is capped at 2000 rows and trimmed as new ones arrive. Clearing it is
+a button on that screen.
+
+## When a client will not connect
+
+**Settings → AI access → Run check.** A client can only tell you it failed. This
+runs the same checks from the site, where the cause is visible:
+
+| Check | What a failure means |
+|---|---|
+| Module is on | Everything is refused before the credential is read, so any client reports a sign-in failure |
+| Endpoint refuses correctly | Anything but 401 means a security plugin, firewall or cache answered before WordPress did |
+| Refusal carries a discovery pointer | Without it a hosted connector concludes the server has no OAuth; something is stripping response headers |
+| Discovery documents are served | Some hosts serve `/.well-known/` from disk, shadowing them; static caches can too |
+| Address is reachable from the internet | A development hostname never arrives at claude.ai or ChatGPT, whose servers resolve it from outside |
+| Application passwords available | A security plugin has disabled them; use a token or OAuth instead |
+
+Two things that look like faults and are not: opening the endpoint URL in a
+browser returns **405**, because it is POST-only; and a `401` with a
+`WWW-Authenticate` header is the correct answer to an unauthenticated call, not a
+broken credential.
 
 ## Pre-existing tokens
 

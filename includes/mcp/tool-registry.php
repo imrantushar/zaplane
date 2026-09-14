@@ -3,6 +3,7 @@
 namespace Zaplane\Mcp;
 
 use Zaplane\Authoring\Catalog;
+use Zaplane\Authoring\GraphTester;
 use Zaplane\Authoring\GraphValidator;
 use Zaplane\Authoring\WorkflowAuthor;
 use Zaplane\Models\Connection;
@@ -67,9 +68,23 @@ class ToolRegistry {
 				],
 				'required'    => [],
 			],
+			'list_field_options' => [
+				'scope'       => TokenStore::SCOPE_READ,
+				'description' => 'Resolve the allowed values for a config field whose options live on this site — a course, a product, a form, a Slack channel, a CRM list. describe_app marks such a field with "dynamic" and gives it no options list, because only the site knows them. Roughly a third of all capabilities have a required field like this, and guessing an id produces a workflow that saves and then never matches anything, so call this for every dynamic field before writing the node.',
+				'properties'  => [
+					'app'    => $s( 'App or tool slug.' ),
+					'event'  => $s( 'The trigger or action key the field belongs to.' ),
+					'field'  => $s( 'The field key, e.g. course_id.' ),
+					'config' => [
+						'type'        => 'object',
+						'description' => 'The config decided so far. Some lists depend on an earlier choice — a form\'s fields need its form_id — so pass what you already have.',
+					],
+				],
+				'required'    => [ 'app', 'event', 'field' ],
+			],
 			'describe_app' => [
 				'scope'       => TokenStore::SCOPE_READ,
-				'description' => 'Full detail for one app: every trigger and action it exposes, each with the exact config fields, types, required flags and allowed option values. This is what you need to write a valid workflow node.',
+				'description' => 'Full detail for one app: every trigger and action it exposes, each with the exact config fields, types, required flags and allowed option values. This is what you need to write a valid workflow node. A field carrying "dynamic" has no fixed options — call list_field_options for it.',
 				'properties'  => [
 					'slug' => $s( 'App or tool slug, from list_apps or search_capabilities.' ),
 				],
@@ -88,6 +103,22 @@ class ToolRegistry {
 				],
 				'required'    => [ 'graph' ],
 			],
+			'test_workflow' => [
+				'scope'       => TokenStore::SCOPE_READ,
+				'description' => 'Dry-run a workflow: walk it in run order, resolve every {{...}} against sample data, and report what each field would actually contain — without executing anything. validate_graph proves the apps and fields are real; this proves the wiring carries data, catching the typo in {{2.post_title}} that otherwise only surfaces once the workflow is live and the mail has gone out. Pass workflow_id for a saved workflow or graph for an unsaved draft. Nothing is sent, charged or written.',
+				'properties'  => [
+					'workflow_id'  => $i( 'Saved workflow to test. Give this or graph, not both.' ),
+					'graph'        => [
+						'type'        => 'object',
+						'description' => 'An unsaved graph of { nodes: [...], edges: [...] }, to test before creating it.',
+					],
+					'trigger_data' => [
+						'type'        => 'object',
+						'description' => 'Realistic trigger output to resolve against, replacing the integration\'s declared sample. Use it to check the copy with a real name and course title.',
+					],
+				],
+				'required'    => [],
+			],
 			'create_workflow' => [
 				'scope'       => TokenStore::SCOPE_WRITE,
 				'description' => 'Create a workflow from a graph. Node ids, canvas positions, labels, icons, trigger hooks and straight-line edges are filled in for you, so each node only needs { type, data: { app, event, config } }. Node ids, if you supply them, must be numeric strings ("1", "2"). Created as a draft; apps needing a connection are left unlinked for the site owner to pick.',
@@ -103,7 +134,7 @@ class ToolRegistry {
 			],
 			'update_workflow' => [
 				'scope'       => TokenStore::SCOPE_WRITE,
-				'description' => 'Replace an existing workflow\'s graph. A draft is edited in place; a live workflow keeps its version history.',
+				'description' => 'Replace an existing workflow\'s graph. A draft is edited in place; a live workflow keeps its version history. Changing a live workflow needs the run scope.',
 				'properties'  => [
 					'workflow_id' => $i( 'Workflow to update.' ),
 					'graph'       => [
@@ -115,7 +146,7 @@ class ToolRegistry {
 			],
 			'set_workflow_status' => [
 				'scope'       => TokenStore::SCOPE_WRITE,
-				'description' => 'Set a workflow to active, paused or draft. Going active re-validates the graph first and refuses if it would not run.',
+				'description' => 'Set a workflow to active, paused or draft. Going active re-validates the graph first and refuses if it would not run. Going active needs the run scope.',
 				'properties'  => [
 					'workflow_id' => $i( 'Workflow to change.' ),
 					'status'      => $s( 'One of: active, paused, draft.' ),
@@ -284,13 +315,21 @@ class ToolRegistry {
 				return [ 'apps' => Catalog::list_apps( (string) ( $args['category'] ?? '' ) ) ];
 			case 'describe_app':
 				return self::describe_app( $args );
+			case 'list_field_options':
+				return self::list_field_options( $args );
 			case 'validate_graph':
 				return self::validate_graph( $args );
+			case 'test_workflow':
+				return self::test_workflow( $args );
 			case 'create_workflow':
 				return self::create_workflow( $args, $token );
 			case 'update_workflow':
+				self::require_run_for_live( (int) ( $args['workflow_id'] ?? 0 ), $token, false );
 				return self::update_workflow( $args );
 			case 'set_workflow_status':
+				if ( 'active' === (string) ( $args['status'] ?? '' ) ) {
+					self::require_run_for_live( (int) ( $args['workflow_id'] ?? 0 ), $token, true );
+				}
 				return WorkflowAuthor::set_status(
 					(int) ( $args['workflow_id'] ?? 0 ),
 					(string) ( $args['status'] ?? '' )
@@ -319,7 +358,35 @@ class ToolRegistry {
 				return self::run_workflow( $args );
 		}
 
-		throw new \InvalidArgumentException( 'Unknown tool: ' . $name );
+		throw new \InvalidArgumentException( 'Unknown tool: ' . esc_html( $name ) );
+	}
+
+	/**
+	 * Taking a workflow live, or changing one that is, is running it.
+	 *
+	 * A live workflow fires on its own triggers — a schedule, a form, an order —
+	 * with every side effect the `run` scope exists to guard. So `write` may shape
+	 * a draft, but going live or editing a live workflow needs `run` for that
+	 * workflow. A call carrying no token is the site's own and is not asked.
+	 *
+	 * @param array<string,mixed> $token The resolved token record.
+	 * @throws \InvalidArgumentException When the token may not.
+	 */
+	private static function require_run_for_live( int $workflow_id, array $token, bool $activating ): void {
+		if ( empty( $token ) ) {
+			return;
+		}
+
+		if ( ! $activating ) {
+			$workflow = $workflow_id ? Workflow::find( $workflow_id ) : null;
+			if ( ! $workflow || ! $workflow->isActive() ) {
+				return;
+			}
+		}
+
+		if ( ! TokenStore::has_scope( $token, TokenStore::SCOPE_RUN ) || ! TokenStore::may_run( $token, $workflow_id ) ) {
+			throw new \InvalidArgumentException( 'Taking a workflow live, or changing one that is live, needs a token with the "run" scope for that workflow.' );
+		}
 	}
 
 	/* ------------------------------ handlers ------------------------------ */
@@ -358,10 +425,73 @@ class ToolRegistry {
 		$app  = '' === $slug ? null : Catalog::describe_app( $slug );
 
 		if ( null === $app ) {
-			throw new \InvalidArgumentException( 'Unknown app "' . $slug . '". Use list_apps or search_capabilities to find valid slugs.' );
+			throw new \InvalidArgumentException( 'Unknown app "' . esc_html( $slug ) . '". Use list_apps or search_capabilities to find valid slugs.' );
 		}
 
 		return $app;
+	}
+
+	/**
+	 * @param array<string,mixed> $args
+	 * @return array<string,mixed>
+	 */
+	private static function list_field_options( array $args ): array {
+		$app   = trim( (string) ( $args['app'] ?? '' ) );
+		$event = trim( (string) ( $args['event'] ?? '' ) );
+		$key   = trim( (string) ( $args['field'] ?? '' ) );
+
+		if ( '' === $app || '' === $event || '' === $key ) {
+			throw new \InvalidArgumentException( 'app, event and field are all required.' );
+		}
+
+		$config = ( isset( $args['config'] ) && is_array( $args['config'] ) ) ? $args['config'] : [];
+		$result = Catalog::field_options( $app, $event, $key, $config );
+
+		if ( null === $result ) {
+			$capability = Catalog::find_capability( $app, $event );
+			if ( null === $capability ) {
+				throw new \InvalidArgumentException(
+					sprintf( '"%s" is not a trigger or action of app "%s".', esc_html( $event ), esc_html( $app ) )
+				);
+			}
+			throw new \InvalidArgumentException(
+				sprintf(
+					'Field "%s" is not in %s/%s. Fields: %s',
+					esc_html( $key ),
+					esc_html( $app ),
+					esc_html( $event ),
+					esc_html( implode( ', ', array_column( (array) $capability['schema'], 'key' ) ) )
+				)
+			);
+		}
+
+		if ( ! $result['resolved'] ) {
+			throw new \RuntimeException( esc_html( (string) $result['error'] ) );
+		}
+
+		if ( ! $result['dynamic'] ) {
+			return [
+				'app'     => $app,
+				'event'   => $event,
+				'field'   => $key,
+				'dynamic' => false,
+				'options' => $result['options'],
+				'hint'    => empty( $result['options'] )
+					? 'This field takes a free value; there is no list to choose from.'
+					: 'These options ship with the app, so describe_app already returned them.',
+			];
+		}
+
+		return [
+			'app'     => $app,
+			'event'   => $event,
+			'field'   => $key,
+			'dynamic' => true,
+			'options' => $result['options'],
+			'hint'    => $result['options']
+				? 'Use one of these "value"s verbatim in the node config.'
+				: 'Nothing to choose from — this site has none yet.',
+		];
 	}
 
 	/**
@@ -383,6 +513,53 @@ class ToolRegistry {
 			'warnings'         => $report['warnings'],
 			'normalized_graph' => $normalized,
 		];
+	}
+
+	/**
+	 * Dry-run a saved or unsaved graph. Resolves only — see GraphTester.
+	 *
+	 * @param array<string,mixed> $args
+	 * @return array<string,mixed>
+	 */
+	private static function test_workflow( array $args ): array {
+		$id    = (int) ( $args['workflow_id'] ?? 0 );
+		$graph = $args['graph'] ?? null;
+
+		if ( $id && is_array( $graph ) ) {
+			throw new \InvalidArgumentException( 'Give workflow_id or graph, not both.' );
+		}
+
+		$title = null;
+
+		if ( $id ) {
+			$workflow = Workflow::find( $id );
+			if ( ! $workflow ) {
+				throw new \InvalidArgumentException( 'Workflow ' . (int) $id . ' not found.' );
+			}
+
+			$version = $workflow->activeVersion();
+			$graph   = $version ? $version->getGraph() : null;
+			$title   = $workflow->title;
+
+			if ( ! is_array( $graph ) ) {
+				throw new \RuntimeException( 'Workflow ' . (int) $id . ' has no saved graph to test.' );
+			}
+		}
+
+		if ( ! is_array( $graph ) ) {
+			throw new \InvalidArgumentException( 'Pass workflow_id for a saved workflow, or graph for one you have not created yet.' );
+		}
+
+		$report = GraphTester::test( $graph, (array) ( $args['trigger_data'] ?? [] ) );
+
+		if ( $id ) {
+			$report = [
+				'workflow_id' => $id,
+				'title'       => $title,
+			] + $report;
+		}
+
+		return $report;
 	}
 
 	/**
@@ -430,7 +607,7 @@ class ToolRegistry {
 		$recipe    = $recipe_id ? Recipe::find( $recipe_id ) : null;
 
 		if ( ! $recipe ) {
-			throw new \InvalidArgumentException( 'Recipe ' . $recipe_id . ' not found.' );
+			throw new \InvalidArgumentException( 'Recipe ' . (int) $recipe_id . ' not found.' );
 		}
 
 		$blueprint = $recipe->getBlueprint();
@@ -486,7 +663,7 @@ class ToolRegistry {
 		$workflow = $id ? Workflow::find( $id ) : null;
 
 		if ( ! $workflow ) {
-			throw new \InvalidArgumentException( 'Workflow ' . $id . ' not found.' );
+			throw new \InvalidArgumentException( 'Workflow ' . (int) $id . ' not found.' );
 		}
 
 		$version = $workflow->activeVersion();
@@ -558,7 +735,7 @@ class ToolRegistry {
 		$run = $id ? Run::find( $id ) : null;
 
 		if ( ! $run ) {
-			throw new \InvalidArgumentException( 'Run ' . $id . ' not found.' );
+			throw new \InvalidArgumentException( 'Run ' . (int) $id . ' not found.' );
 		}
 
 		$steps = [];
@@ -655,8 +832,8 @@ class ToolRegistry {
 
 		$table = \Zaplane\Models\Knowledge::getTable();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( "SELECT business_key, COUNT(*) AS entries FROM {$table} GROUP BY business_key ORDER BY business_key ASC", ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT business_key, COUNT(*) AS entries FROM %i GROUP BY business_key ORDER BY business_key ASC', $table ), ARRAY_A );
 
 		return [ 'businesses' => is_array( $rows ) ? $rows : [] ];
 	}
@@ -691,7 +868,7 @@ class ToolRegistry {
 		$data = $res['data'] ?? [];
 
 		if ( empty( $data['success'] ) ) {
-			throw new \RuntimeException( (string) ( $data['error'] ?? 'Sync failed.' ) );
+			throw new \RuntimeException( esc_html( (string) ( $data['error'] ?? 'Sync failed.' ) ) );
 		}
 
 		return [
@@ -720,7 +897,7 @@ class ToolRegistry {
 		$run_id = zaplane_run_workflow( $id, $data );
 
 		if ( ! $run_id ) {
-			throw new \RuntimeException( 'Could not start workflow ' . $id . ' — it does not exist, or has no active version with a trigger.' );
+			throw new \RuntimeException( 'Could not start workflow ' . (int) $id . ' — it does not exist, or has no active version with a trigger.' );
 		}
 
 		return [

@@ -3,6 +3,10 @@ namespace Zaplane\Integrations\Wordpress;
 
 use Zaplane\Traits\ActionResponseTrait;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait RoleActionsTrait {
 
 	private static function resolve_role_key_from_config( array $config, bool $require_existing = true ): string {

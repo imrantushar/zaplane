@@ -1367,8 +1367,9 @@ class Dokan extends IntegrationBase {
 			return null;
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Dokan's own withdrawals table.
 		return $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d LIMIT 1", $withdraw_id )
+			$wpdb->prepare( 'SELECT * FROM %i WHERE id = %d LIMIT 1', $table, $withdraw_id )
 		);
 	}
 
@@ -1490,16 +1491,13 @@ class Dokan extends IntegrationBase {
 			}
 		}
 
-		$sql = "SELECT * FROM {$table}";
-		if ( ! empty( $where ) ) {
-			$sql .= ' WHERE ' . implode( ' AND ', $where );
-		}
-		$sql .= ' ORDER BY id DESC LIMIT %d OFFSET %d';
-		$params[] = $limit;
-		$params[] = $offset;
+		$where_sql = empty( $where ) ? '' : ' WHERE ' . implode( ' AND ', $where );
+		$params[]  = $limit;
+		$params[]  = $offset;
 
-		$query = $wpdb->prepare( $sql, $params );
-		$rows = $wpdb->get_results( $query );
+		// Each clause in $where is a fixed fragment with its own placeholder; the values are in $params.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- The spread $params holds one value per placeholder.
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i{$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d", $table, ...$params ) );
 		return is_array( $rows ) ? $rows : [];
 	}
 

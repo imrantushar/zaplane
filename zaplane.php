@@ -1,17 +1,17 @@
 <?php
 /**
- * Plugin Name:     Zaplane
- * Plugin URI:      https://zaplane.app/
- * Description:     WordPress Automation Plugin
- * Version:         1.2.0
- * Author:          kodezen
- * Author URI:      https://kodezen.com
- * License:         GPL-3.0+
- * Text Domain:     zaplane
- * Domain Path:     /languages
- *
- * Requires PHP: 7.4
- * Tested up to: 6.8
+ * Plugin Name:       Zaplane
+ * Plugin URI:        https://zaplane.app/
+ * Description:       WordPress Automation Plugin
+ * Version:           1.2.0
+ * Author:            kodezen
+ * Author URI:        https://kodezen.com
+ * License:           GPL-3.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
+ * Text Domain:       zaplane
+ * Domain Path:       /languages
+ * Requires at least: 6.8
+ * Requires PHP:      7.4
  */
 
 use Zaplane\Framework\Classes\ConnectionManager;
@@ -117,6 +117,21 @@ final class Zaplane {
 		// anything reads it (automation boot below, and later REST controllers).
 		\Zaplane\CustomApps\Loader::boot();
 		\Zaplane\CustomApps\Poller::boot();
+
+		// OAuth for the MCP endpoint. Both of these claim front-end URLs — the two
+		// /.well-known/ documents and the consent screen — so they hook parse_request
+		// rather than rest_api_init, and must be registered on every request.
+		// Where an outbound request from a workflow may go. Registered before
+		// anything can make one, and on every request: a workflow runs from cron
+		// and from a webhook, not only from wp-admin.
+		\Zaplane\HttpGuard::boot();
+
+		\Zaplane\Mcp\OAuth\Discovery::boot();
+		\Zaplane\Mcp\OAuth\Server::boot();
+
+		// A line on core's consent screen saying what the credential is for. Core
+		// serves every application from that one screen and cannot know.
+		\Zaplane\Mcp\Connections::boot();
 
 		// Initialize modules first
 		$modules = $this->container->get( 'modules' );

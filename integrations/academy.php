@@ -518,14 +518,14 @@ class Academy extends IntegrationBase {
 				if ( $user ) {
 					return $user->ID;
 				} else {
-					throw new \Exception( sprintf( 'User with email "%s" not found.', $user_input ) );
+					throw new \Exception( sprintf( 'User with email "%s" not found.', esc_html( $user_input ) ) );
 				}
 			} else {
 				$user_id = (int) $user_input;
 				if ( $user_id > 0 && get_userdata( $user_id ) ) {
 					return $user_id;
 				} else {
-					throw new \Exception( sprintf( 'User with ID "%d" not found.', $user_id ) );
+					throw new \Exception( sprintf( 'User with ID "%d" not found.', (int) $user_id ) );
 				}
 			}
 		}
@@ -801,9 +801,9 @@ class Academy extends IntegrationBase {
 			throw new \Exception(
 				sprintf(
 					'Unable to determine a valid action. Extracted: "%s". Allowed: %s. Node: %s',
-					$action,
-					implode( ', ', $allowed ),
-					wp_json_encode( $node )
+					esc_html( $action ),
+					esc_html( implode( ', ', $allowed ) ),
+					esc_html( (string) wp_json_encode( $node ) )
 				)
 			);
 		}
@@ -866,7 +866,7 @@ class Academy extends IntegrationBase {
 				break;
 
 			default:
-				throw new \Exception( sprintf( 'Unhandled action: "%s".', $action ) );
+				throw new \Exception( sprintf( 'Unhandled action: "%s".', esc_html( $action ) ) );
 		}//end switch
 
 		return [

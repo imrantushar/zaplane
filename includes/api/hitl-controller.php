@@ -19,8 +19,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * The endpoint is public (approvers aren't logged in) — security comes entirely
  * from the HMAC signature on the link, which covers the run/node identity,
- * expiry, and decision. On a valid click the paused run is resumed down the
- * chosen branch and a small confirmation page is shown.
+ * expiry, and decision. Opening the link only asks: mail scanners and link
+ * previews fetch every URL in a message, so a GET that decided would approve on
+ * the approver's behalf before anyone read it. The confirmation form posts the
+ * same signed fields back, and only that resumes the run.
  */
 class HitlController extends WP_REST_Controller {
 
@@ -34,7 +36,7 @@ class HitlController extends WP_REST_Controller {
 
 	public function register_routes(): void {
 		register_rest_route( $this->namespace, '/' . $this->rest_base . '/respond', [
-			'methods'             => WP_REST_Server::READABLE,
+			'methods'             => [ WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ],
 			'callback'            => [ $this, 'respond' ],
 			'permission_callback' => '__return_true',
 			'args'                => [
@@ -74,6 +76,10 @@ class HitlController extends WP_REST_Controller {
 			return self::page( __( 'This request has already been handled.', 'zaplane' ), true );
 		}
 
+		if ( 'POST' !== $request->get_method() ) {
+			self::confirm_page( compact( 'run', 'nr', 'nk', 'exp', 'decision', 'sig' ) );
+		}
+
 		$automation = $this->container ? $this->container->get( 'automation' ) : Automation::get_instance();
 		if ( $automation ) {
 			$automation->resume_delayed_run( $run, $nr, $nk, [
@@ -90,6 +96,42 @@ class HitlController extends WP_REST_Controller {
 			: __( 'You have rejected this request.', 'zaplane' );
 
 		return self::page( $message, true );
+	}
+
+	/**
+	 * Ask before deciding, with a form that posts the signed fields back.
+	 *
+	 * @param array<string,int|string> $fields The signed link's parameters.
+	 */
+	protected static function confirm_page( array $fields ): void {
+		$approve = 'approved' === $fields['decision'];
+		$inputs  = '';
+		foreach ( $fields as $name => $value ) {
+			$inputs .= '<input type="hidden" name="' . esc_attr( (string) $name ) . '" value="' . esc_attr( (string) $value ) . '">';
+		}
+
+		$html = '<div style="font-family:sans-serif;max-width:440px;margin:12vh auto;text-align:center;">'
+			. '<p style="font-size:16px;color:#1f2937;">' . esc_html( $approve ? __( 'Approve this request?', 'zaplane' ) : __( 'Reject this request?', 'zaplane' ) ) . '</p>'
+			. '<form method="post" action="' . esc_url( rest_url( HumanApproval::REST_ROUTE ) ) . '">'
+			. $inputs
+			. '<button type="submit" style="font-size:15px;padding:10px 22px;border-radius:6px;border:0;color:#fff;background:' . esc_attr( $approve ? '#16a34a' : '#dc2626' ) . ';">'
+			. esc_html( $approve ? __( 'Approve', 'zaplane' ) : __( 'Reject', 'zaplane' ) )
+			. '</button></form></div>';
+
+		wp_die(
+			wp_kses(
+				$html,
+				[
+					'div'    => [ 'style' => true ],
+					'p'      => [ 'style' => true ],
+					'form'   => [ 'method' => true, 'action' => true ],
+					'input'  => [ 'type' => true, 'name' => true, 'value' => true ],
+					'button' => [ 'type' => true, 'style' => true ],
+				]
+			),
+			esc_html__( 'Zaplane Approval', 'zaplane' ),
+			[ 'response' => 200 ]
+		);
 	}
 
 	/**

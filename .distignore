@@ -2,7 +2,12 @@
 # Files/dirs excluded from the distributable plugin zip.
 # NOTE: never exclude the whole `vendor/` dir — wp dist-archive drops
 # vendor/autoload.php when the vendor dir is ignored. Production deps are
-# already trimmed by `composer install --no-dev` in scripts/build-zip.sh.
+# trimmed by `composer install --no-dev` in the release build.
+#
+# The uncompiled source of assets/build/ ships on purpose: dev_zaplane/ (React),
+# assets/scss/ (Sass) and the build setup (package.json, webpack.config.js,
+# tailwind.config.js, postcss.config.js, jsconfig.json). WordPress.org requires
+# the source of every generated file to be available.
 # ─────────────────────────────────────────────────────────────
 
 # VCS & IDE
@@ -17,7 +22,7 @@
 .vscode
 .idea
 
-# Dev tooling & configs
+# Dev tooling (not needed to build or run)
 .distignore
 .eslintrc.js
 .eslintignore
@@ -26,15 +31,9 @@
 .phpunit.result.cache
 .fantasticonrc.js
 .npmrc
-webpack.config.js
-tailwind.config.js
-postcss.config.js
-jsconfig.json
 phpcs.xml
 phpunit.xml
-composer.json
 composer.lock
-package.json
 package-lock.json
 
 # Build tooling & logs (not needed at runtime)
@@ -54,12 +53,12 @@ docs
 
 # Dev-only code & tests
 tests
-dev_zaplane
 recipes-test
 node_modules
 includes/framework/console
 includes/commands
+includes/testing
 
-# Asset sources (compiled output ships in assets/build & assets/library)
-assets/scss
+# Icon font sources and the generator's preview page
 assets/icon-src
+assets/library/icons/fonts/*.html

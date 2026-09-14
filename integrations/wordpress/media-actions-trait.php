@@ -3,6 +3,10 @@ namespace Zaplane\Integrations\Wordpress;
 
 use Zaplane\Traits\ActionResponseTrait;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait MediaActionsTrait {
 
 	protected static function action_generate_attachment_metadata( array $config ): array {

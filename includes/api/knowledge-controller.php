@@ -147,12 +147,12 @@ class KnowledgeController extends WP_REST_Controller {
 		}
 
 		// Total count.
-		$count_sql = "SELECT COUNT(*) FROM {$table} WHERE {$where}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$count_sql = "SELECT COUNT(*) FROM %i WHERE {$where}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is fixed fragments whose placeholders $params fills.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-		$total = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+		$total = (int) $wpdb->get_var( $wpdb->prepare( $count_sql, array_merge( [ $table ], $params ) ) );
 
-		$list_sql        = "SELECT id, business_key, title, content, source, ref_id, updated_at FROM {$table} WHERE {$where} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$list_params     = array_merge( $params, [ $per_page, $offset ] );
+		$list_sql        = "SELECT id, business_key, title, content, source, ref_id, updated_at FROM %i WHERE {$where} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is fixed fragments whose placeholders $params fills.
+		$list_params     = array_merge( [ $table ], $params, [ $per_page, $offset ] );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$rows = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ), ARRAY_A );
 
@@ -168,8 +168,8 @@ class KnowledgeController extends WP_REST_Controller {
 	public function get_businesses() {
 		global $wpdb;
 		$table = Knowledge::getTable();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$keys = $wpdb->get_col( "SELECT business_key, COUNT(*) AS c FROM {$table} GROUP BY business_key ORDER BY business_key ASC" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$keys = $wpdb->get_col( $wpdb->prepare( 'SELECT business_key, COUNT(*) AS c FROM %i GROUP BY business_key ORDER BY business_key ASC', $table ) );
 
 		return rest_ensure_response( [ 'businesses' => array_values( array_filter( (array) $keys ) ) ] );
 	}
