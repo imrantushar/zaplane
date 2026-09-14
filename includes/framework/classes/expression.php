@@ -58,7 +58,7 @@ class Expression {
 			return null;
 		}
 
-		if ( ! is_string( $expr ) || ! str_contains( $expr, '{{' ) ) {
+		if ( ! is_string( $expr ) || false === strpos( $expr, '{{' ) ) {
 			return $expr;
 		}
 
@@ -117,7 +117,7 @@ class Expression {
 	 */
 	private static function compute( string $code, array $data ) {
 		try {
-			$tokens = self::tokenize( $code );
+			$tokens = self::tokenize( $code, $data );
 
 			if ( empty( $tokens ) ) {
 				return null;
@@ -137,11 +137,13 @@ class Expression {
 	/**
 	 * Split into values and operators.
 	 *
-	 * @param string $code The tag's contents.
+	 * @param string              $code The tag's contents.
+	 * @param array<string,mixed> $data Everything the run has gathered. The keys in it tell
+	 *                                  a hyphen in a name from a minus sign.
 	 * @return array<int,array{0:string,1:mixed}>
 	 * @throws \InvalidArgumentException On a character the grammar has no place for.
 	 */
-	private static function tokenize( string $code ): array {
+	private static function tokenize( string $code, array $data ): array {
 		$tokens = [];
 		$length = strlen( $code );
 		$i      = 0;
@@ -187,12 +189,12 @@ class Expression {
 			}
 
 			if ( ctype_digit( $char ) ) {
-				$tokens[] = self::read_number( $code, $i );
+				$tokens[] = self::read_number( $code, $i, $data );
 				continue;
 			}
 
 			if ( ctype_alpha( $char ) || '_' === $char ) {
-				$tokens[] = self::read_word( $code, $i );
+				$tokens[] = self::read_word( $code, $i, $data );
 				continue;
 			}
 
@@ -240,11 +242,12 @@ class Expression {
 	 * `{{1.first_name}}` is the commonest tag in the whole product: a step's
 	 * output addressed by its number. It starts with a digit and is not a number.
 	 *
-	 * @param string $code The tag's contents.
-	 * @param int    $i    Advanced past the token.
+	 * @param string              $code The tag's contents.
+	 * @param int                 $i    Advanced past the token.
+	 * @param array<string,mixed> $data Everything the run has gathered.
 	 * @return array{0:string,1:mixed}
 	 */
-	private static function read_number( string $code, int &$i ): array {
+	private static function read_number( string $code, int &$i, array $data ): array {
 		$start = $i;
 		$len   = strlen( $code );
 
@@ -262,25 +265,45 @@ class Expression {
 		// `1.first_name` starts as a digit but is a path, not a number.
 		if ( $i < $len && ( ctype_alpha( $code[ $i ] ) || '_' === $code[ $i ] || '.' === $code[ $i ] ) ) {
 			$i = $start;
-			return self::read_word( $code, $i );
+			return self::read_word( $code, $i, $data );
 		}
 
-		return [ 'value', str_contains( $raw, '.' ) ? (float) $raw : (int) $raw ];
+		return [ 'value', false !== strpos( $raw, '.' ) ? (float) $raw : (int) $raw ];
 	}
 
 	/**
 	 * A bare word: one of the three literals, or a dotted path into the data.
 	 *
-	 * @param string $code The tag's contents.
-	 * @param int    $i    Advanced past the word.
+	 * Form fields are often named with hyphens, like Contact Form 7's `your-email`.
+	 * A hyphen inside a word belongs to the path when the data has that path, and
+	 * is a minus sign otherwise, so `{{1.total-1.discount}}` still subtracts.
+	 *
+	 * @param string              $code The tag's contents.
+	 * @param int                 $i    Advanced past the word.
+	 * @param array<string,mixed> $data Everything the run has gathered.
 	 * @return array{0:string,1:mixed}
 	 */
-	private static function read_word( string $code, int &$i ): array {
+	private static function read_word( string $code, int &$i, array $data ): array {
 		$start = $i;
 		$len   = strlen( $code );
 
-		while ( $i < $len && ( ctype_alnum( $code[ $i ] ) || '_' === $code[ $i ] || '.' === $code[ $i ] ) ) {
+		while ( $i < $len && self::is_path_char( $code[ $i ] ) ) {
 			++$i;
+		}
+
+		// Try every hyphen and keep the longest word that is a path in the data. A name
+		// like `billing-first-name` has no `billing-first`, so a miss doesn't end the search.
+		$scan = $i;
+		while ( $scan + 1 < $len && '-' === $code[ $scan ] && '.' !== $code[ $scan - 1 ] && '.' !== $code[ $scan + 1 ] && self::is_path_char( $code[ $scan + 1 ] ) ) {
+			++$scan;
+
+			while ( $scan < $len && self::is_path_char( $code[ $scan ] ) ) {
+				++$scan;
+			}
+
+			if ( self::find( substr( $code, $start, $scan - $start ), $data )[0] ) {
+				$i = $scan;
+			}
 		}
 
 		$word = substr( $code, $start, $i - $start );
@@ -400,6 +423,18 @@ class Expression {
 	 * @return mixed Null when any segment is missing.
 	 */
 	private static function lookup( string $path, array $data ) {
+		return self::find( $path, $data )[1];
+	}
+
+	/**
+	 * Walk a dotted path into the run's data, telling a path that isn't there from
+	 * one whose value is null.
+	 *
+	 * @param string              $path A dotted path.
+	 * @param array<string,mixed> $data Everything the run has gathered.
+	 * @return array{0:bool,1:mixed} Whether every segment was there, and the value.
+	 */
+	private static function find( string $path, array $data ): array {
 		$value = $data;
 
 		foreach ( explode( '.', $path ) as $segment ) {
@@ -413,10 +448,18 @@ class Expression {
 				continue;
 			}
 
-			return null;
+			return [ false, null ];
 		}
 
-		return $value;
+		return [ true, $value ];
+	}
+
+	/**
+	 * A character a path can hold: a letter, a digit, `_`, or the `.` between
+	 * segments.
+	 */
+	private static function is_path_char( string $char ): bool {
+		return ctype_alnum( $char ) || '_' === $char || '.' === $char;
 	}
 
 	/**

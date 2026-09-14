@@ -3,6 +3,55 @@
 All notable changes to Zaplane are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **A workflow can start from more than one trigger.** Add another trigger under
+  the first one on the canvas. Whichever fires starts a run from itself and
+  follows only its own connections. Triggers are numbered on the canvas, the Logs
+  list shows which one started each run, and a trigger can be deleted as long as
+  another remains.
+- **`{{trigger.*}}`** reads the data of whichever trigger started the run, and
+  `{{workflow.trigger_app}}`, `{{workflow.trigger_event}}` and
+  `{{workflow.trigger_node_id}}` say which one it was, so a Router can branch on it.
+- **Match fields to another trigger.** A trigger can fill another trigger's field
+  names from its own data, so steps written against `{{1.email}}` still get a
+  value when a different trigger fires. Fields with the same name match in one click.
+- **Warnings for workflows with several triggers:** a trigger with no app, one that
+  leads nowhere, two identical triggers that would run twice, steps reading fields
+  another trigger doesn't supply, and a webhook with no secret that runs the same
+  steps as a site trigger. They show on the canvas and never block a save.
+- Each Catch Webhook trigger has its own URL, `/hook/<workflow>/<trigger>`. The old
+  `/hook/<workflow>` still works and goes to the first webhook trigger.
+- Test Trigger listens for that trigger only. Test Flow Once listens for all of
+  them and runs from whichever fires first.
+- MCP: `run_workflow` and `test_workflow` take `trigger_node_id`, and the dry run
+  walks one trigger at a time.
+- **Connecting steps is easier.** Drop a line anywhere on a step's card to connect
+  it, not only on the small dot. The dots have a bigger grab area and a line snaps
+  to one from nearby. While you drag, the steps that can take the line are
+  outlined, and letting go on empty canvas opens the step picker, already
+  connected. Lines into a trigger, loops and duplicate lines are refused.
+
+### Fixed
+- A step got nothing from a field whose name has a hyphen, such as a Contact Form 7
+  form's `your-email`, so a Create Contact step said a valid email was required.
+  A minus between two values still subtracts.
+- Submitting a form failed with an error when two triggers, in one workflow or in
+  several, listened for that form. Both runs started, but the visitor saw an error.
+- Changing a live trigger's settings without adding or removing a step could keep
+  it firing with the old settings for up to an hour. The trigger cache now keys on
+  the saved graph, not only the version.
+- A field using `{{wp.…}}` or `{{workflow.…}}` next to a step's output could read
+  the wrong step, because merging the two renumbered the step ids.
+- The Logs **Re-Try** button retried whichever node run shared the run's id. It now
+  runs the run again from the same trigger with the same data.
+- The schedule and inactive-customer triggers kept one "last fired" record per
+  workflow. Each trigger now keeps its own, so two of them don't hold each other back.
+- Test Trigger and Test Flow Once ran the event they caught twice, once for real
+  and once as the test, and a test left waiting held back that trigger's real
+  events. The caught event now runs only as the test.
+
 ## [1.2.0] - 2026-09-08
 
 The dashboard is rebuilt, the workflow canvas is retyped, modules become opt-in

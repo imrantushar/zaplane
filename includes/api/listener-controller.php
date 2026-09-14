@@ -5,6 +5,8 @@ namespace Zaplane\API;
 use WP_REST_Controller;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Classes\Query;
+use Zaplane\Framework\Classes\TriggerNodes;
 use Zaplane\Framework\Models\Option;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
@@ -98,20 +100,31 @@ class ListenerController extends WP_REST_Controller {
 	public function start_listener( $req ) {
 		$workflowId = (int) $req['workflow_id'];
 
-		$resolved = $this->resolve_trigger( $workflowId );
+		// With node_id the listener waits on that one trigger. Without it (the
+		// canvas's Test Flow Once) it waits on every trigger, and the first one to
+		// fire is the one that runs.
+		$nodeId = $req['node_id'] ?? null;
+
+		$resolved = $this->resolve_targets( $workflowId, null === $nodeId || '' === $nodeId ? null : (string) $nodeId );
 		if ( is_wp_error( $resolved ) ) {
 			return $resolved;
 		}
-		[ $version, $targetNode ] = $resolved;
+		[ $version, $targets ] = $resolved;
 
-		$hook       = $targetNode['data']['hook'];
+		$hooks    = array_values( array_unique( array_column( $targets, 'hook' ) ) );
+		$nodeKeys = array_values( array_unique( array_map( static fn( $target ) => (int) $target['node']['id'], $targets ) ) );
+		sort( $nodeKeys );
+
 		$optionName = $this->get_option_name( $workflowId );
 
 		$existingState = $this->get_state_fresh( $optionName );
 		if ( $existingState && 'listening' === $existingState['status'] ) {
 			$startedAt = strtotime( $existingState['started_at'] ?? '' );
-			if ( $startedAt && ( time() - $startedAt ) < self::LISTENER_TIMEOUT ) {
-				// Already listening — idempotent; just acknowledge.
+			$sameKeys  = array_map( 'intval', (array) ( $existingState['node_keys'] ?? [ $existingState['node_key'] ?? 0 ] ) );
+			sort( $sameKeys );
+
+			if ( $startedAt && ( time() - $startedAt ) < self::LISTENER_TIMEOUT && $sameKeys === $nodeKeys ) {
+				// Already listening for the same triggers — idempotent; just acknowledge.
 				return [
 					'status' => 'listening',
 					'code'   => 'LISTENING',
@@ -121,12 +134,15 @@ class ListenerController extends WP_REST_Controller {
 		}
 
 		$initialState = [
-			'status' => 'listening',
-			'started_at' => current_time( 'mysql' ),
-			'hook' => $hook,
-			'workflow_id' => $workflowId,
-			'node_key' => (int) $targetNode['id'],
-			'data' => null,
+			'status'       => 'listening',
+			'started_at'   => current_time( 'mysql' ),
+			'hooks'        => $hooks,
+			'node_keys'    => $nodeKeys,
+			// The single-trigger fields, kept for anything that still reads them.
+			'hook'         => $hooks[0],
+			'node_key'     => $nodeKeys[0],
+			'workflow_id'  => $workflowId,
+			'data'         => null,
 			'triggered_at' => null,
 		];
 		Option::set( $optionName, $initialState, 'no' );
@@ -134,7 +150,7 @@ class ListenerController extends WP_REST_Controller {
 		// wp_options LIKE scan on every request when nobody is listening.
 		update_option( 'zaplane_listeners_active', 1 );
 
-		$this->register_listener_hook( $workflowId, $hook, $targetNode, $version );
+		$this->register_listener_hook( $workflowId, $targets, $version );
 
 		return [
 			'status' => 'listening',
@@ -166,7 +182,7 @@ class ListenerController extends WP_REST_Controller {
 			$triggerData = $state['data'];
 			$this->cleanup( $optionName, $workflowId );
 
-			$resolved = $this->resolve_trigger( $workflowId );
+			$resolved = $this->resolve_fired( $workflowId, $state['node_key'] ?? null );
 			if ( is_wp_error( $resolved ) ) {
 				// Workflow changed since listening started — still surface the
 				// captured payload so the user sees the trigger data.
@@ -217,12 +233,68 @@ class ListenerController extends WP_REST_Controller {
 	}
 
 	/**
-	 * Resolve a workflow's active version and its trigger node, validating that
-	 * it's saved and has a hook. Shared by start_listener and poll_listener.
+	 * Resolve a workflow's active version and the triggers to listen on: the one
+	 * named, or every trigger with a hook. A Manual trigger hooks nothing, so
+	 * there is nothing to listen for on it.
 	 *
+	 * @return array{0:WorkflowVersion,1:array<int,array{hook:string,node:array}>}|WP_Error
+	 */
+	private function resolve_targets( int $workflowId, ?string $nodeId ) {
+		$version = $this->active_version( $workflowId );
+		if ( is_wp_error( $version ) ) {
+			return $version;
+		}
+
+		$graph    = $version->getGraph();
+		$triggers = null === $nodeId ? TriggerNodes::all( $graph ) : array_filter( [ TriggerNodes::find( $graph, $nodeId ) ] );
+
+		if ( empty( $triggers ) ) {
+			return new WP_Error( 'no_trigger', 'Please save the workflow and try testing again.', [ 'status' => 404 ] );
+		}
+
+		$targets = [];
+		foreach ( $triggers as $node ) {
+			foreach ( Query::hooks_for( $node ) as $hook ) {
+				$targets[] = [
+					'hook' => $hook,
+					'node' => $node,
+				];
+			}
+		}
+
+		if ( empty( $targets ) ) {
+			return new WP_Error( 'no_hook', 'Trigger hasn’t been added yet. Please set it to continue', [ 'status' => 400 ] );
+		}
+
+		return [ $version, $targets ];
+	}
+
+	/**
+	 * Resolve the workflow's active version and the trigger that fired.
+	 *
+	 * @param int|string|null $nodeKey
 	 * @return array{0:WorkflowVersion,1:array}|WP_Error
 	 */
-	private function resolve_trigger( int $workflowId ) {
+	private function resolve_fired( int $workflowId, $nodeKey ) {
+		$version = $this->active_version( $workflowId );
+		if ( is_wp_error( $version ) ) {
+			return $version;
+		}
+
+		$graph = $version->getGraph();
+		$node  = null === $nodeKey ? TriggerNodes::default_node( $graph ) : TriggerNodes::find( $graph, $nodeKey );
+
+		if ( ! $node ) {
+			return new WP_Error( 'no_trigger', 'Please save the workflow and try testing again.', [ 'status' => 404 ] );
+		}
+
+		return [ $version, $node ];
+	}
+
+	/**
+	 * @return WorkflowVersion|WP_Error
+	 */
+	private function active_version( int $workflowId ) {
 		$workflow = Workflow::find( $workflowId );
 		if ( ! $workflow ) {
 			return new WP_Error( 'not_found', 'Workflow not found', [ 'status' => 404 ] );
@@ -233,23 +305,7 @@ class ListenerController extends WP_REST_Controller {
 			return new WP_Error( 'no_version', 'No active workflow version', [ 'status' => 404 ] );
 		}
 
-		$targetNode = null;
-		foreach ( $version->getGraph()['nodes'] as $node ) {
-			if ( ( $node['type'] ?? '' ) === 'trigger' ) {
-				$targetNode = $node;
-				break;
-			}
-		}
-
-		if ( ! $targetNode ) {
-			return new WP_Error( 'no_trigger', 'Please save the workflow and try testing again.', [ 'status' => 404 ] );
-		}
-
-		if ( empty( $targetNode['data']['hook'] ) ) {
-			return new WP_Error( 'no_hook', 'Trigger hasn’t been added yet. Please set it to continue', [ 'status' => 400 ] );
-		}
-
-		return [ $version, $targetNode ];
+		return $version;
 	}
 
 	public function stop_listener( $req ) {
@@ -295,16 +351,22 @@ class ListenerController extends WP_REST_Controller {
 			'started_at' => $state['started_at'] ?? null,
 			'hook' => $state['hook'] ?? null,
 			'node_key' => $state['node_key'] ?? null,
+			'node_keys' => $state['node_keys'] ?? ( isset( $state['node_key'] ) ? [ $state['node_key'] ] : [] ),
 		];
 	}
 
-	private function register_listener_hook( int $workflowId, string $hook, array $node, WorkflowVersion $version ): void {
+	/**
+	 * @param array<int,array{hook:string,node:array}> $targets
+	 */
+	private function register_listener_hook( int $workflowId, array $targets, WorkflowVersion $version ): void {
 		$hookInfoOption = 'zaplane_listener_hook_' . $workflowId;
 		Option::set($hookInfoOption, [
-			'hook' => $hook,
-			'node' => $node,
+			'targets'      => $targets,
+			// The single-trigger fields, kept for anything that still reads them.
+			'hook'         => $targets[0]['hook'],
+			'node'         => $targets[0]['node'],
 			'version_hash' => $version->graph_hash,
-			'workflow_id' => $workflowId,
+			'workflow_id'  => $workflowId,
 		], 'no');
 	}
 
@@ -314,6 +376,10 @@ class ListenerController extends WP_REST_Controller {
 	}
 
 	private function execute_triggered_workflow( WorkflowVersion $version, array $triggerNode, array $payload ): array {
+		// What the trigger hands its steps: the captured payload plus any fields it
+		// matches to another trigger, the same as in a real run.
+		$output = TriggerNodes::apply_field_map( $triggerNode, $payload );
+
 		$run = Run::create([
 			'workflow_version_id' => $version->id,
 			'workflow_id' => $version->workflow_id,
@@ -341,7 +407,7 @@ class ListenerController extends WP_REST_Controller {
 			'parent_node_run_id' => null,
 			'status'             => 'completed',
 			'input_json'         => $payload,
-			'output_json'        => $payload,
+			'output_json'        => $output,
 			'started_at'         => current_time( 'mysql' ),
 			'finished_at'        => current_time( 'mysql' ),
 		]);
@@ -371,7 +437,7 @@ class ListenerController extends WP_REST_Controller {
 				$this->container->get( 'automation' )->spawn_node_run(
 					$run->id,
 					$targetKey,
-					$payload,
+					$output,
 					$nodeRun->id,
 					$targetNode ? [
 						'app'   => $targetNode['data']['app'] ?? null,
@@ -386,7 +452,7 @@ class ListenerController extends WP_REST_Controller {
 			'run_id' => $run->id,
 			'node_run_id' => $nodeRun->id,
 			'input' => $payload,
-			'output' => $payload,
+			'output' => $output,
 		];
 	}
 

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-13T16:55:12+00:00\n"
+"POT-Creation-Date: 2026-09-14T06:55:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: zaplane\n"
@@ -273,6 +273,70 @@ msgstr ""
 msgid "Application password"
 msgstr ""
 
+#. translators: %d: the trigger's number on the canvas
+#: includes/api/workflows-controller.php:834
+#: includes/authoring/trigger-advisor.php:219
+#: includes/authoring/trigger-advisor.php:366
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:182
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:62
+#, php-format,js-format
+msgid "Trigger %d"
+msgstr ""
+
+#: includes/api/workflows-controller.php:868
+msgid "Trigger (whichever fired)"
+msgstr ""
+
+#. translators: %s: trigger name, e.g. "Trigger 2"
+#: includes/authoring/trigger-advisor.php:70
+#, php-format
+msgid "%s has no app picked yet, so it never starts this workflow."
+msgstr ""
+
+#. translators: %s: trigger name, e.g. "Trigger 2 (WooCommerce · New order)"
+#: includes/authoring/trigger-advisor.php:80
+#, php-format
+msgid "%s is not connected to any step, so nothing happens when it fires."
+msgstr ""
+
+#. translators: %s: trigger name, e.g. "Trigger 2 (WooCommerce · New order)"
+#: includes/authoring/trigger-advisor.php:90
+#, php-format
+msgid "%s matches its fields to a trigger that is no longer in this workflow."
+msgstr ""
+
+#. translators: 1: trigger name, 2: the identical trigger's name
+#: includes/authoring/trigger-advisor.php:122
+#, php-format
+msgid "%1$s is the same as %2$s (same app, event and settings), so every event starts this workflow twice."
+msgstr ""
+
+#. translators: 1: step name, 2: trigger whose fields the step reads, 3: that trigger's id, 4: the other trigger
+#: includes/authoring/trigger-advisor.php:186
+#, php-format
+msgid "%1$s uses fields from %2$s ({{%3$s.…}}), but %4$s also leads here and does not match its fields to it. When %4$s fires, those fields are empty. Match its fields, or use {{trigger.…}} with fields both triggers have."
+msgstr ""
+
+#. translators: 1: step name, 2: the unmatched fields, e.g. {{1.first_name}}, 3: trigger whose fields the step reads, 4: the other trigger, 5: the other trigger's number, e.g. "Trigger 3"
+#: includes/authoring/trigger-advisor.php:208
+#, php-format
+msgid "%1$s reads %2$s from %3$s. The field match on %4$s leaves it out, so it is empty when %5$s fires."
+msgid_plural "%1$s reads %2$s from %3$s. The field match on %4$s leaves them out, so they are empty when %5$s fires."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: webhook trigger name, 2: another trigger's name
+#: includes/authoring/trigger-advisor.php:302
+#, php-format
+msgid "%1$s has no secret but runs the same steps as %2$s. Anyone who finds its URL can run those steps with data they choose. Add a secret."
+msgstr ""
+
+#. translators: 1: step id, 2: step name
+#: includes/authoring/trigger-advisor.php:383
+#, php-format
+msgid "Step %1$s (%2$s)"
+msgstr ""
+
 #: includes/config/menu.php:10
 msgid "Dashboard"
 msgstr ""
@@ -316,7 +380,7 @@ msgid "Folders"
 msgstr ""
 
 #: includes/config/menu.php:50
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:177
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:207
 msgid "Logs"
 msgstr ""
 
@@ -483,7 +547,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:456
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:528
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:634
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:250
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:251
 msgid "Cancel"
 msgstr ""
 
@@ -868,7 +932,7 @@ msgstr ""
 
 #: dev_zaplane/components/SearchableDrawerList/DrawerItemList/DrawerItemButton.js:27
 #: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:40
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:243
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:244
 msgid "App"
 msgstr ""
 
@@ -977,19 +1041,28 @@ msgid "Live Data"
 msgstr ""
 
 #: dev_zaplane/components/VariableEditor/VariablePopover.js:114
+#, js-format
+msgid "Only %s provides this field. It's empty when another trigger fires."
+msgstr ""
+
+#: dev_zaplane/components/VariableEditor/VariablePopover.js:116
+msgid "Not every trigger"
+msgstr ""
+
+#: dev_zaplane/components/VariableEditor/VariablePopover.js:123
 msgid "No fields available"
 msgstr ""
 
-#: dev_zaplane/components/VariableEditor/VariablePopover.js:121
+#: dev_zaplane/components/VariableEditor/VariablePopover.js:130
 msgid "Sample data - run a test to see real values"
 msgstr ""
 
-#: dev_zaplane/components/VariableEditor/VariablePopover.js:141
+#: dev_zaplane/components/VariableEditor/VariablePopover.js:150
 #: dev_zaplane/components/WorkflowTable/index.js:160
 msgid "Apps"
 msgstr ""
 
-#: dev_zaplane/components/VariableEditor/VariablePopover.js:146
+#: dev_zaplane/components/VariableEditor/VariablePopover.js:155
 msgid "Context"
 msgstr ""
 
@@ -1035,7 +1108,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:136
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:560
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:191
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:60
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:66
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:65
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:46
 msgid "Status"
@@ -1047,7 +1120,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/CustomAppList.js:109
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:320
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:147
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:78
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:84
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:75
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:60
 msgid "Action"
@@ -1081,7 +1154,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:159
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:18
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:210
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:80
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:86
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:62
 msgid "Details"
 msgstr ""
@@ -1096,7 +1169,7 @@ msgid "No workflows found"
 msgstr ""
 
 #: dev_zaplane/components/WorkflowTable/index.js:258
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:120
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:126
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:84
 msgid "Log Details"
 msgstr ""
@@ -1505,7 +1578,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/parts.js:143
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:490
 #: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:518
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:221
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:230
 msgid "Remove"
 msgstr ""
 
@@ -1562,6 +1635,7 @@ msgid "Webhook"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/TriggersEditor.js:26
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:60
 msgid "Trigger"
 msgstr ""
 
@@ -1622,6 +1696,7 @@ msgid "Output fields"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/TriggersEditor.js:165
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:409
 msgid "Add trigger"
 msgstr ""
 
@@ -1763,7 +1838,7 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/FolderCard.js:98
 #: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:146
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:250
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:280
 msgid "Update"
 msgstr ""
 
@@ -1916,7 +1991,7 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:413
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:637
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:257
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:258
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:218
 msgid "Save"
 msgstr ""
@@ -2123,7 +2198,7 @@ msgid "Edit workflow"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:179
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:66
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:72
 msgid "DURATION"
 msgstr ""
 
@@ -2648,64 +2723,64 @@ msgstr[1] ""
 msgid "connected app"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:111
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:127
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:112
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:128
 msgid "This field is required"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:138
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:139
 msgid "Enter a valid email address"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:150
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:151
 msgid "A connection is required"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:243
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:244
 msgid "Add Trigger"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:243
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:244
 msgid "Add Action"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:257
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:258
 msgid "Continue"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:264
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:265
 msgid "Search apps or tools..."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:295
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:296
 msgid "No configuration required for this action."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:74
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:75
 msgid "Save the workflow to generate its webhook URL."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:121
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:130
 msgid "name@example.com — or type \"@\" for dynamic data"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:159
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:168
 msgid "Type \"@\" here to add dynamic"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:177
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:186
 msgid "Select a file"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:178
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:187
 msgid "Use this file"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:214
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:223
 msgid "Change"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:231
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:240
 msgid "Upload or select a file"
 msgstr ""
 
@@ -2810,34 +2885,85 @@ msgstr ""
 msgid "Generate a value"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:104
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:105
 msgid "Test Trigger"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:106
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:107
 msgid "Stop Listening"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:109
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:110
 msgid "Listening for trigger…"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:109
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:110
 msgid "Go perform the action that fires this trigger (for example, submit the form). The captured data will appear below."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:117
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:118
 msgid "Test Action"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:111
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:112
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:114
+#, js-format
+msgid "Trigger %1$d · %2$s"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:136
+msgid "Match fields to another trigger"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:138
+msgid "Steps built for another trigger read its fields, such as {{1.email}}. When this trigger fires, those fields take the values you match here."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:143
+msgid "Trigger to match"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:147
+msgid "Don't match fields"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:159
+msgid "Loading fields…"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:164
+msgid "That trigger has no fields to match yet. Test it once to capture its data."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:172
+#, js-format
+msgid "%1$d of %2$d fields matched"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:179
+msgid "Match same names"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:200
+msgid "Not matched"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:104
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:105
+msgid "Delete trigger"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:104
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:105
 msgid "Reset trigger"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:111
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:112
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:104
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:105
 msgid "Delete step"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:132
+msgid "Drop to connect"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:228
@@ -2857,43 +2983,59 @@ msgstr ""
 msgid "Add %s"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowCanvas.js:145
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:383
+msgid "Add another trigger that starts this workflow"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowCanvas.js:234
 msgid "Vertical layout"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowCanvas.js:156
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowCanvas.js:245
 msgid "Horizontal layout"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:129
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:131
+msgid "Things to check in this workflow's triggers"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:139
+msgid "Check your triggers"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:140
+msgid "As of the last save."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:159
 msgid "Test Flow Once"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:137
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:167
 msgid "Stop"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:144
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:174
 msgid "Listening..."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:163
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:193
 msgid "Log History"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:187
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:217
 msgid "Refresh"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:197
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:227
 msgid "Replay"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:204
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:234
 msgid "Version History"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:303
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:333
 msgid "Flows"
 msgstr ""
 
@@ -2902,17 +3044,17 @@ msgstr ""
 msgid "Run ID"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:72
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:78
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:57
 msgid "Node Run"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:89
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:95
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:71
 msgid "Re-Try"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:108
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:114
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:98
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:80
 msgid "No history found"
@@ -3019,8 +3161,11 @@ msgid "Updated workflow Successfully"
 msgstr ""
 
 #: dev_zaplane/redux/Slices/workFlowSlice/actions/workflowExctions.js:26
-#: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowRuns.js:47
 msgid "Run fetched successfully"
+msgstr ""
+
+#: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowRuns.js:50
+msgid "Run started again."
 msgstr ""
 
 #: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowVersion.js:60

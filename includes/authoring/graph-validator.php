@@ -75,6 +75,10 @@ class GraphValidator {
 		$this->validate_edges( $edges, $ids );
 		$this->validate_reachability( $nodes, $edges, $ids );
 
+		foreach ( TriggerAdvisor::warnings( $graph ) as $warning ) {
+			$this->warn( $warning['where'], $warning['message'], $warning['code'] );
+		}
+
 		return $this->result();
 	}
 
@@ -404,13 +408,10 @@ class GraphValidator {
 			}
 		}
 
+		// A workflow can start from several triggers: whichever one fires starts a
+		// run from itself. It needs at least one.
 		if ( empty( $triggers ) ) {
-			$this->error( '', 'Graph has no trigger node. Every workflow starts with exactly one.' );
-			return;
-		}
-
-		if ( count( $triggers ) > 1 ) {
-			$this->error( '', 'Graph has ' . count( $triggers ) . ' trigger nodes (' . implode( ', ', $triggers ) . '); only one is allowed.' );
+			$this->error( '', 'Graph has no trigger node. Every workflow starts from at least one.' );
 		}
 	}
 

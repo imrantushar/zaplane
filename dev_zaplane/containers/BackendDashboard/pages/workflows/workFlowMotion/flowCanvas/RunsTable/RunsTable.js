@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import LogDetails from "@ZAPComponents/LogDetails";
 import { getDuration } from "@ZAPUtils/helper";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { statusStyle } from "../../../helper";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
@@ -56,6 +56,12 @@ const RunsTable = ({
     cell: row => <span>{__(row.id, "zaplane")}</span>,
     // columnWidth: "180px",
     textAlign: "center"
+  }, {
+    name: __('Trigger', 'zaplane'),
+    cell: row => row.trigger ? <span className="truncate" title={row.trigger.label || ""}>
+          {sprintf(__("Trigger %d", "zaplane"), row.trigger.number)}
+          {row.trigger.label ? <span className="text-[var(--zaplane-font-secondary-color)]">{` · ${row.trigger.label}`}</span> : null}
+        </span> : <span className="text-[var(--zaplane-font-secondary-color)]">—</span>
   }, {
     name: __('Status', 'zaplane'),
     cell: row => <span textTransform="capitalize" style={statusStyle(row.status)} className="px-2 py-0.5 rounded-md text-[xs]">

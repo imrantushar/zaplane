@@ -17,13 +17,17 @@ import {
 // work flow listnner
 export const workflowNodeListiner = createAsyncThunk(
 	'zaplane/workflowNodeListiner',
-	async (id, thunkAPI) => {
+	async (arg, thunkAPI) => {
+		// A workflow id listens on every trigger (the canvas's Test Flow Once);
+		// { id, nodeId } listens on that one trigger.
+		const { id, nodeId } = arg !== null && typeof arg === 'object' ? arg : { id: arg };
 		try {
 			// "start" only registers the listener — no success toast here (it fired
 			// an empty one on every start). Success is shown when the trigger is
 			// actually captured, in the poll thunk below.
 			const res = await API.get(
-				namespace + `node-listener/${id}`
+				namespace + `node-listener/${id}`,
+				{ params: nodeId != null ? { node_id: nodeId } : {} }
 			);
 			return res.data;
 		} catch (e) {

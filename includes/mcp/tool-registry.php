@@ -116,12 +116,13 @@ class ToolRegistry {
 						'type'        => 'object',
 						'description' => 'Realistic trigger output to resolve against, replacing the integration\'s declared sample. Use it to check the copy with a real name and course title.',
 					],
+					'trigger_node_id' => $s( 'For a workflow with several triggers, the one to start the dry run from. Test each trigger: a step reading {{1.…}} is empty when another trigger fires, unless that trigger matches its fields to trigger 1, while {{trigger.…}} reads whichever trigger fired. Defaults to the Manual trigger, else the first.' ),
 				],
 				'required'    => [],
 			],
 			'create_workflow' => [
 				'scope'       => TokenStore::SCOPE_WRITE,
-				'description' => 'Create a workflow from a graph. Node ids, canvas positions, labels, icons, trigger hooks and straight-line edges are filled in for you, so each node only needs { type, data: { app, event, config } }. Node ids, if you supply them, must be numeric strings ("1", "2"). Created as a draft; apps needing a connection are left unlinked for the site owner to pick.',
+				'description' => 'Create a workflow from a graph. Node ids, canvas positions, labels, icons, trigger hooks and straight-line edges are filled in for you, so each node only needs { type, data: { app, event, config } }. Node ids, if you supply them, must be numeric strings ("1", "2"). Created as a draft; apps needing a connection are left unlinked for the site owner to pick. A workflow can start from several triggers, and any one firing starts a run from it. With more than one, pass the edges yourself: the automatic straight line would wire one trigger into the next. Steps shared by several triggers should read {{trigger.…}}, which is whichever trigger fired.',
 				'properties'  => [
 					'title'     => $s( 'Name for the new workflow.' ),
 					'graph'     => [
@@ -259,6 +260,7 @@ class ToolRegistry {
 						'type'        => 'object',
 						'description' => 'Optional trigger data passed to the workflow.',
 					],
+					'trigger_node_id' => $s( 'For a workflow with several triggers, the trigger to start from. Defaults to its Manual trigger, else its first trigger.' ),
 				],
 				'required'    => [ 'workflow_id' ],
 			],
@@ -550,7 +552,11 @@ class ToolRegistry {
 			throw new \InvalidArgumentException( 'Pass workflow_id for a saved workflow, or graph for one you have not created yet.' );
 		}
 
-		$report = GraphTester::test( $graph, (array) ( $args['trigger_data'] ?? [] ) );
+		$report = GraphTester::test(
+			$graph,
+			(array) ( $args['trigger_data'] ?? [] ),
+			isset( $args['trigger_node_id'] ) && '' !== (string) $args['trigger_node_id'] ? (string) $args['trigger_node_id'] : null
+		);
 
 		if ( $id ) {
 			$report = [
@@ -894,7 +900,8 @@ class ToolRegistry {
 		}
 
 		$data   = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
-		$run_id = zaplane_run_workflow( $id, $data );
+		$trigger = isset( $args['trigger_node_id'] ) && '' !== (string) $args['trigger_node_id'] ? (string) $args['trigger_node_id'] : null;
+		$run_id  = zaplane_run_workflow( $id, $data, $trigger );
 
 		if ( ! $run_id ) {
 			throw new \RuntimeException( 'Could not start workflow ' . (int) $id . ' — it does not exist, or has no active version with a trigger.' );

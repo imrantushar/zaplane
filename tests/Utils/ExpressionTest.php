@@ -157,4 +157,55 @@ class ExpressionTest extends TestCase {
 		// becomes text, and nothing is an empty string rather than the word null.
 		$this->assertSame( 'Hello , welcome.', Expression::evaluate( 'Hello {{nowhere}}, welcome.', [] ) );
 	}
+
+	/**
+	 * Form fields are often named with hyphens. Contact Form 7's `your-email` read as
+	 * `your` minus `email`, so every step that used it got nothing.
+	 *
+	 * @test
+	 */
+	public function a_field_name_with_a_hyphen_is_one_key(): void {
+		$form = [ 'form' => [ 'form_data' => [ 'your-name' => 'Rimon', 'your-email' => 'rimon@example.com' ] ] ];
+		$data = [ '2' => $form, 'trigger' => $form, 'your-email' => 'top@example.com' ];
+
+		$this->assertSame( 'rimon@example.com', Expression::evaluate( '{{2.form.form_data.your-email}}', $data ) );
+		$this->assertSame( 'rimon@example.com', Expression::evaluate( '{{ trigger.form.form_data.your-email }}', $data ) );
+		$this->assertSame( 'top@example.com', Expression::evaluate( '{{your-email}}', $data ) );
+		$this->assertSame(
+			'Hi Rimon, we will write to rimon@example.com.',
+			Expression::evaluate( 'Hi {{2.form.form_data.your-name}}, we will write to {{2.form.form_data.your-email}}.', $data )
+		);
+		$this->assertTrue( Expression::evaluate( '{{2.form.form_data.your-email == "rimon@example.com"}}', $data ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function a_key_with_several_hyphens_is_one_key(): void {
+		$this->assertSame( 'Ada', Expression::evaluate( '{{1.billing-first-name}}', [ '1' => [ 'billing-first-name' => 'Ada' ] ] ) );
+	}
+
+	/**
+	 * A hyphen is part of a name only when the data has that name. Between two
+	 * values it is still a minus sign.
+	 *
+	 * @test
+	 */
+	public function a_minus_between_two_values_still_subtracts(): void {
+		$data = [ '1' => [ 'total' => 10, 'discount' => 3 ], 'n' => 5 ];
+
+		$this->assertSame( 7, Expression::evaluate( '{{1.total-1.discount}}', $data ) );
+		$this->assertSame( 4, Expression::evaluate( '{{n-1}}', $data ) );
+		$this->assertSame( 4, Expression::evaluate( '{{n - 1}}', $data ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function a_hyphenated_field_the_run_does_not_have_is_nothing(): void {
+		$data = [ '2' => [ 'form' => [ 'form_data' => [ 'your-email' => 'rimon@example.com' ] ] ] ];
+
+		$this->assertNull( Expression::evaluate( '{{2.form.form_data.your-phone}}', $data ) );
+		$this->assertSame( 'Call .', Expression::evaluate( 'Call {{2.form.form_data.your-phone}}.', $data ) );
+	}
 }
