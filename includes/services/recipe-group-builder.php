@@ -216,7 +216,7 @@ class RecipeGroupBuilder {
 		}
 
 		if ( ! in_array( true, $workflows, true ) ) {
-			throw new \InvalidArgumentException( __( 'Pick at least one workflow to set up.', 'zaplane' ) );
+			throw new \InvalidArgumentException( esc_html__( 'Pick at least one workflow to set up.', 'zaplane' ) );
 		}
 
 		$usage        = self::value_usage( $group );
@@ -555,7 +555,7 @@ class RecipeGroupBuilder {
 
 			if ( $value['required'] && '' === $text ) {
 				/* translators: %s: name of a setup value, e.g. "Sender name". */
-				throw new \InvalidArgumentException( sprintf( __( '%s is required.', 'zaplane' ), $value['label'] ) );
+				throw new \InvalidArgumentException( sprintf( esc_html__( '%s is required.', 'zaplane' ), esc_html( $value['label'] ) ) );
 			}
 
 			return $text;
@@ -563,7 +563,7 @@ class RecipeGroupBuilder {
 
 		if ( is_bool( $given ) || ! is_numeric( $given ) ) {
 			/* translators: %s: name of a setup value, e.g. "Coupon discount". */
-			throw new \InvalidArgumentException( sprintf( __( '%s must be a number.', 'zaplane' ), $value['label'] ) );
+			throw new \InvalidArgumentException( sprintf( esc_html__( '%s must be a number.', 'zaplane' ), esc_html( $value['label'] ) ) );
 		}
 
 		$number = $given + 0;
@@ -582,7 +582,7 @@ class RecipeGroupBuilder {
 				$message = sprintf( __( '%1$s must be at most %2$s.', 'zaplane' ), $value['label'], $max );
 			}
 
-			throw new \InvalidArgumentException( $message );
+			throw new \InvalidArgumentException( esc_html( $message ) );
 		}
 
 		return (string) $number;

@@ -284,7 +284,7 @@ class RecipeGroupService {
 			$connection = Connection::find( $id );
 
 			if ( ! $connection || (string) $connection->app !== (string) $app ) {
-				throw new \InvalidArgumentException( __( 'A connection picked in the setup no longer exists. Pick one again.', 'zaplane' ) );
+				throw new \InvalidArgumentException( esc_html__( 'A connection picked in the setup no longer exists. Pick one again.', 'zaplane' ) );
 			}
 
 			$connections[ (string) $app ] = $id;

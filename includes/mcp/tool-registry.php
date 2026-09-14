@@ -617,7 +617,7 @@ class ToolRegistry {
 		}
 
 		if ( $recipe->isGroup() ) {
-			throw new \InvalidArgumentException( 'Recipe ' . $recipe_id . ' is a group recipe, which sets up several workflows. Set it up from Recipes in the Zaplane dashboard.' );
+			throw new \InvalidArgumentException( 'Recipe ' . (int) $recipe_id . ' is a group recipe, which sets up several workflows. Set it up from Recipes in the Zaplane dashboard.' );
 		}
 
 		$blueprint = $recipe->getBlueprint();
