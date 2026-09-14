@@ -60,7 +60,7 @@ class GraphTester {
 
 		$start = TriggerNodes::resolve( $graph, $trigger_node_id );
 		if ( null !== $trigger_node_id && null === $start ) {
-			throw new \InvalidArgumentException( 'trigger_node_id ' . $trigger_node_id . ' is not a trigger in this graph.' );
+			throw new \InvalidArgumentException( 'trigger_node_id ' . esc_html( (string) $trigger_node_id ) . ' is not a trigger in this graph.' );
 		}
 
 		// The triggers other than the starting one don't fire in this walk.
