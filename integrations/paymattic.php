@@ -651,7 +651,8 @@ class Paymattic extends IntegrationBase {
 		}
 
 		$table = $wpdb->prefix . 'wpf_submissions';
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $submission_id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Paymattic's own submissions table.
+		$row   = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, $submission_id ), ARRAY_A );
 		if ( ! is_array( $row ) ) {
 			return [];
 		}
@@ -894,7 +895,8 @@ class Paymattic extends IntegrationBase {
 		}
 
 		$table = $wpdb->prefix . 'wpf_submissions';
-		$rows  = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY id DESC LIMIT " . (int) $limit, ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Paymattic's own submissions table.
+		$rows  = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i ORDER BY id DESC LIMIT %d', $table, (int) $limit ), ARRAY_A );
 		$rows  = is_array( $rows ) ? $rows : [];
 		return self::normalize_value( $rows );
 	}

@@ -375,7 +375,7 @@ class Aiagent extends IntegrationBase {
 				return 'url is required.';
 			}
 			$method = strtoupper( (string) ( $args['method'] ?? 'GET' ) );
-			$resp   = wp_remote_request( $url, [
+			$resp   = \Zaplane\HttpGuard::request( $url, [
 				'method'  => in_array( $method, [ 'GET', 'POST', 'PUT', 'DELETE' ], true ) ? $method : 'GET',
 				'body'    => $args['body'] ?? null,
 				'timeout' => 30,

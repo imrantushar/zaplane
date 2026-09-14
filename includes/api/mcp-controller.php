@@ -437,13 +437,6 @@ class McpController extends WP_REST_Controller {
 	private static function assume( array $token ): bool {
 		$user_id = (int) ( $token['user_id'] ?? 0 );
 
-		// A token issued before scoping existed has no user recorded. It is
-		// honoured for compatibility, but it cannot be anybody, so there is no
-		// capability to check and nothing to become.
-		if ( ! empty( $token['legacy'] ) && 0 === $user_id ) {
-			return true;
-		}
-
 		if ( $user_id > 0 && get_current_user_id() !== $user_id ) {
 			wp_set_current_user( $user_id );
 		}

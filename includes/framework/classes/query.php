@@ -93,13 +93,17 @@ class Query {
 		$workflows = $wpdb->prefix . 'zaplane_workflows';
 		$versions  = $wpdb->prefix . 'zaplane_workflow_versions';
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table names only; no user input.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table names only; no user input.
 		$rows = $wpdb->get_results(
-			"SELECT w.id AS wid, v.id AS vid, v.graph_hash AS vh
-			 FROM {$workflows} w
-			 INNER JOIN {$versions} v ON v.workflow_id = w.id AND v.is_active = 1
-			 WHERE w.status = 'active'
-			 ORDER BY w.id",
+			$wpdb->prepare(
+				"SELECT w.id AS wid, v.id AS vid, v.graph_hash AS vh
+				 FROM %i w
+				 INNER JOIN %i v ON v.workflow_id = w.id AND v.is_active = 1
+				 WHERE w.status = 'active'
+				 ORDER BY w.id",
+				$workflows,
+				$versions
+			),
 			ARRAY_A
 		);
 
@@ -122,12 +126,16 @@ class Query {
 		$workflows = $wpdb->prefix . 'zaplane_workflows';
 		$versions  = $wpdb->prefix . 'zaplane_workflow_versions';
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table names only; no user input. Cached by the caller.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table names only; no user input. Cached by the caller.
 		$rows = $wpdb->get_results(
-			"SELECT w.id AS workflow_id, v.id AS version_id, v.graph_json AS graph_json
-			 FROM {$workflows} w
-			 INNER JOIN {$versions} v ON v.workflow_id = w.id AND v.is_active = 1
-			 WHERE w.status = 'active'",
+			$wpdb->prepare(
+				"SELECT w.id AS workflow_id, v.id AS version_id, v.graph_json AS graph_json
+				 FROM %i w
+				 INNER JOIN %i v ON v.workflow_id = w.id AND v.is_active = 1
+				 WHERE w.status = 'active'",
+				$workflows,
+				$versions
+			),
 			ARRAY_A
 		);
 

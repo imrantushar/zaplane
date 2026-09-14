@@ -621,7 +621,7 @@ class Telegram extends IntegrationBase {
 		];
 
 		if ( empty( $media_url ) ) {
-			throw new \Exception( 'Telegram: ' . ( $label_map[ $field ] ?? $field . ' URL' ) . ' is required' );
+			throw new \Exception( 'Telegram: ' . esc_html( $label_map[ $field ] ?? $field . ' URL' ) . ' is required' );
 		}
 
 		$payload = [

@@ -126,7 +126,7 @@ class Discovery {
 	}
 
 	public static function maybe_serve(): void {
-		$path = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH );
+		$path = (string) wp_parse_url( esc_url_raw( wp_unslash( (string) ( $_SERVER['REQUEST_URI'] ?? '' ) ) ), PHP_URL_PATH );
 		$path = trim( $path, '/' );
 
 		if ( 0 !== strpos( $path, '.well-known/' ) ) {

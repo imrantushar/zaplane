@@ -30,7 +30,7 @@ class Option extends WpModel {
 	}
 
 	public static function get( string $name, $default = null ) {
-		$option = static::where( 'option_name', $name )->first();
+		$option = static::where( 'option_name', $name )->fresh()->first();
 		if ( ! $option ) {
 			return $default;
 		}
@@ -58,7 +58,7 @@ class Option extends WpModel {
 	}
 
 	public static function remove( string $name ): bool {
-		$option = static::where( 'option_name', $name )->first();
+		$option = static::where( 'option_name', $name )->fresh()->first();
 		if ( ! $option ) {
 			return false;
 		}

@@ -607,7 +607,7 @@ class Zoom extends IntegrationBase {
 
 		if ( ! self::is_valid_datetime( $start_time ) ) {
 			throw new \Exception(
-				'Zoom: Start Time must be ISO 8601 format (e.g. 2026-06-10T10:00:00). You provided: "' . $start_time . '".'
+				'Zoom: Start Time must be ISO 8601 format (e.g. 2026-06-10T10:00:00). You provided: "' . esc_html( $start_time ) . '".'
 			);
 		}
 
@@ -747,7 +747,7 @@ class Zoom extends IntegrationBase {
 		}
 
 		if ( ! is_email( $email ) ) {
-			throw new \Exception( 'Zoom: "' . $email . '" is not a valid email address.' );
+			throw new \Exception( 'Zoom: "' . esc_html( $email ) . '" is not a valid email address.' );
 		}
 
 		if ( empty( $first_name ) ) {
@@ -922,7 +922,7 @@ class Zoom extends IntegrationBase {
 
 		if ( $http_code < 200 || $http_code >= 300 ) {
 			throw new \Exception(
-				sprintf( 'Zoom API returned HTTP %d: %s', $http_code, esc_html( wp_strip_all_tags( $raw_body ) ) )
+				sprintf( 'Zoom API returned HTTP %d: %s', (int) $http_code, esc_html( wp_strip_all_tags( $raw_body ) ) )
 			);
 		}
 

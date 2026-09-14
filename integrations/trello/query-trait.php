@@ -1,6 +1,10 @@
 <?php
 namespace Zaplane\Integrations\Trello;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait QueryTrait {
 
 	public static function query_board( array $query ): array {

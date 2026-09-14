@@ -18,7 +18,12 @@ class Assets {
 		// stylesheet (and a filemtime stat) on every public page view.
 	}
 
-	public function enqueue_icons(): void {
+	public function enqueue_icons( $hook ): void {
+		// Only Zaplane's own screens use the icon font; the admin menu icon is an SVG.
+		if ( false === strpos( (string) $hook, '_page_' . ZAPLANE_PLUGIN_SLUG ) ) {
+			return;
+		}
+
 		wp_enqueue_style(
 			'zaplane-icons',
 			ZAPLANE_ASSETS_URI . 'library/icons/zaplane-icons.css',

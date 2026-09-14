@@ -13,16 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * comparison. Condition and Filter nodes keep their operator separately and
  * compare in PHP, so nothing here ever needs to be more than one value.
  *
- * This used to compile the tag to PHP and hand it to eval(). Identifiers were
- * rewritten into array lookups, and everything that was not an identifier —
- * operators, parentheses, semicolons, `$`, braces, backticks — went through
- * untouched, which is a filter with a hole in it rather than a sandbox. Worse,
- * `{{a.b(c.d)}}` compiled to `$data["a"]["b"]($data["c"]["d"])`: a call whose
- * function name came out of the run's own data. Every node's configuration is
- * resolved against that data, and for a webhook trigger the data is a JSON body
- * posted by a stranger.
- *
- * So it is parsed now, not compiled. The grammar below is the whole language:
+ * Tags are parsed, never compiled to PHP. Every node's configuration is resolved
+ * against the run's data, and for a webhook trigger that data is a JSON body
+ * posted by a stranger, so the language has to be closed. The grammar below is
+ * the whole language:
  * values, the usual operators, and parentheses for grouping. There is no
  * production for a function call, which is why one cannot be written.
  */

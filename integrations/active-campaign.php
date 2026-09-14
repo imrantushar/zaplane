@@ -794,7 +794,7 @@ class ActiveCampaign extends IntegrationBase {
 
 		if ( $status >= 400 ) {
 			$message = self::extract_api_error( $response_body );
-			throw new \Exception( 'ActiveCampaign API error: ' . $message );
+			throw new \Exception( 'ActiveCampaign API error: ' . esc_html( $message ) );
 		}
 
 		return [ $response_body, $status ];

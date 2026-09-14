@@ -41,6 +41,7 @@ class Storeengine extends IntegrationBase {
 			if ( ! $active ) {
 				$item['disabled']        = true;
 				$item['disabled_reason'] = sprintf(
+					/* translators: %s: StoreEngine addon name. */
 					__( 'Requires the StoreEngine %s addon to be active.', 'zaplane' ),
 					$label
 				);

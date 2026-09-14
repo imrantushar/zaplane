@@ -9,10 +9,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Where an outbound request from a workflow is allowed to go.
  *
- * Three places make a request with an address someone configured — the Webhook
- * action, the HTTP Request action, and every Custom App — and all three ask the
- * `zaplane_http_block_request` filter first. Nothing answered it, so the only
- * check any of them actually performed was that the scheme was http or https.
+ * Every step that fetches an address someone configured, or that a run supplied,
+ * goes through request() below — HTTP Request, Send Webhook, Custom Apps, the
+ * AI Agent's HTTP tool, AI image and audio downloads, CSV from a URL, the MCP
+ * client and Human Approval's Slack message — and it asks the
+ * `zaplane_http_block_request` filter about every address, redirects included.
  *
  * That address is rarely a constant. A node's configuration is resolved against
  * the run's data before it executes, so a URL containing a merge tag is chosen
@@ -142,6 +143,14 @@ class HttpGuard {
 			return true;
 		}
 
+		// An IPv4 address carried inside an IPv6 one reaches that IPv4 address, so it
+		// is judged as one. Before PHP 8.3 the range filter below passes
+		// ::ffff:127.0.0.1 as a public address.
+		$embedded = self::embedded_ipv4( $address );
+		if ( null !== $embedded ) {
+			return self::is_reachable_only_from_here( $embedded );
+		}
+
 		if ( ! filter_var( $address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
 			return true;
 		}
@@ -156,5 +165,101 @@ class HttpGuard {
 		}
 
 		return false;
+	}
+
+	/**
+	 * The IPv4 address inside a mapped (::ffff:0:0/96), compatible (::/96), NAT64
+	 * (64:ff9b::/96) or 6to4 (2002::/16) IPv6 address, or null for any other.
+	 *
+	 * @param string $address One resolved address.
+	 */
+	private static function embedded_ipv4( string $address ): ?string {
+		if ( ! filter_var( $address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) ) {
+			return null;
+		}
+
+		$bin = inet_pton( $address );
+		if ( false === $bin || 16 !== strlen( $bin ) ) {
+			return null;
+		}
+
+		$prefix = substr( $bin, 0, 12 );
+		$v4     = null;
+
+		if ( str_repeat( "\0", 10 ) . "\xff\xff" === $prefix || str_repeat( "\0", 12 ) === $prefix || "\x00\x64\xff\x9b" . str_repeat( "\0", 8 ) === $prefix ) {
+			$v4 = substr( $bin, 12, 4 );
+		} elseif ( "\x20\x02" === substr( $bin, 0, 2 ) ) {
+			$v4 = substr( $bin, 2, 4 );
+		}
+
+		if ( null === $v4 ) {
+			return null;
+		}
+
+		$ip = inet_ntop( $v4 );
+
+		return false === $ip ? null : $ip;
+	}
+
+	/**
+	 * Make a request, checking every address it goes to.
+	 *
+	 * The check has to run again on each redirect: a public address answering with
+	 * a Location of 127.0.0.1 or the metadata service would otherwise be followed
+	 * straight past it. So WordPress is told not to follow redirects, and they are
+	 * followed here instead, every hop asked the same question.
+	 *
+	 * Takes and returns what wp_remote_request() does; `redirection` sets the limit.
+	 *
+	 * @param string              $url  Absolute http(s) URL.
+	 * @param array<string,mixed> $args wp_remote_request() arguments.
+	 * @return array<string,mixed>|\WP_Error
+	 */
+	public static function request( string $url, array $args = [] ) {
+		$hops                = isset( $args['redirection'] ) ? max( 0, (int) $args['redirection'] ) : 5;
+		$args['redirection'] = 0;
+
+		for ( $hop = 0; $hop <= $hops; $hop++ ) {
+			$parsed = wp_parse_url( $url );
+			$parsed = is_array( $parsed ) ? $parsed : null;
+			$scheme = strtolower( (string) ( $parsed['scheme'] ?? '' ) );
+
+			if ( ! in_array( $scheme, [ 'http', 'https' ], true ) ) {
+				return new \WP_Error( 'zaplane_http_blocked', sprintf( 'Request refused: the scheme "%s" is not allowed (http and https only).', $scheme ) );
+			}
+
+			if ( apply_filters( 'zaplane_http_block_request', false, $url, $parsed ) ) {
+				return new \WP_Error( 'zaplane_http_blocked', 'Request refused: that address is not one a workflow may reach.' );
+			}
+
+			$response = wp_remote_request( $url, $args );
+			if ( is_wp_error( $response ) ) {
+				return $response;
+			}
+
+			$code     = (int) wp_remote_retrieve_response_code( $response );
+			$location = wp_remote_retrieve_header( $response, 'location' );
+			if ( is_array( $location ) ) {
+				$location = (string) end( $location );
+			}
+
+			if ( $code < 300 || $code >= 400 || '' === (string) $location ) {
+				return $response;
+			}
+
+			if ( $hop === $hops ) {
+				return 0 === $hops ? $response : new \WP_Error( 'zaplane_http_too_many_redirects', 'Request refused: too many redirects.' );
+			}
+
+			$url = \WP_Http::make_absolute_url( (string) $location, $url );
+
+			// Browsers turn a 303, and a 301 or 302 answering a POST, into a GET.
+			if ( 303 === $code || ( in_array( $code, [ 301, 302 ], true ) && 'POST' === strtoupper( (string) ( $args['method'] ?? 'GET' ) ) ) ) {
+				$args['method'] = 'GET';
+				unset( $args['body'] );
+			}
+		}//end for
+
+		return new \WP_Error( 'zaplane_http_too_many_redirects', 'Request refused: too many redirects.' );
 	}
 }

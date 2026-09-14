@@ -36,6 +36,11 @@ class HttpGuardTest extends TestCase {
 			'http://0.0.0.0/',
 			'http://[::1]/',
 			'http://[fe80::1]/',
+			// IPv4 carried inside IPv6: mapped, NAT64 and 6to4.
+			'http://[::ffff:127.0.0.1]/',
+			'http://[::ffff:a9fe:a9fe]/',
+			'http://[64:ff9b::a9fe:a9fe]/',
+			'http://[2002:7f00:1::]/',
 		] as $url ) {
 			$this->assertTrue( $this->blocked( $url ), $url . ' should be refused' );
 		}

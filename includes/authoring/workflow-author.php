@@ -106,7 +106,7 @@ class WorkflowAuthor {
 		$report = GraphValidator::check( $graph );
 
 		if ( ! $report['valid'] ) {
-			throw new \InvalidArgumentException( self::format_errors( $report['errors'] ) );
+			throw new \InvalidArgumentException( esc_html( self::format_errors( $report['errors'] ) ) );
 		}
 
 		$status = (string) ( $opts['status'] ?? 'draft' );
@@ -162,14 +162,14 @@ class WorkflowAuthor {
 	public static function save( int $workflow_id, array $graph ): array {
 		$workflow = Workflow::find( $workflow_id );
 		if ( ! $workflow ) {
-			throw new \InvalidArgumentException( 'Workflow ' . $workflow_id . ' not found.' );
+			throw new \InvalidArgumentException( 'Workflow ' . (int) $workflow_id . ' not found.' );
 		}
 
 		$graph  = self::normalize( $graph );
 		$report = GraphValidator::check( $graph );
 
 		if ( ! $report['valid'] ) {
-			throw new \InvalidArgumentException( self::format_errors( $report['errors'] ) );
+			throw new \InvalidArgumentException( esc_html( self::format_errors( $report['errors'] ) ) );
 		}
 
 		$hash    = hash( 'sha256', (string) wp_json_encode( $graph ) );
@@ -243,19 +243,19 @@ class WorkflowAuthor {
 
 		$workflow = Workflow::find( $workflow_id );
 		if ( ! $workflow ) {
-			throw new \InvalidArgumentException( 'Workflow ' . $workflow_id . ' not found.' );
+			throw new \InvalidArgumentException( 'Workflow ' . (int) $workflow_id . ' not found.' );
 		}
 
 		if ( 'active' === $status ) {
 			$version = $workflow->activeVersion();
 			if ( ! $version ) {
-				throw new \InvalidArgumentException( 'Workflow ' . $workflow_id . ' has no active version to run.' );
+				throw new \InvalidArgumentException( 'Workflow ' . (int) $workflow_id . ' has no active version to run.' );
 			}
 
 			$report = GraphValidator::check( $version->getGraph() );
 			if ( ! $report['valid'] ) {
 				throw new \InvalidArgumentException(
-					'Workflow ' . $workflow_id . ' cannot go live: ' . self::format_errors( $report['errors'] )
+					'Workflow ' . (int) $workflow_id . ' cannot go live: ' . esc_html( self::format_errors( $report['errors'] ) )
 				);
 			}
 
@@ -272,7 +272,7 @@ class WorkflowAuthor {
 
 			if ( $blocking ) {
 				throw new \InvalidArgumentException(
-					'Workflow ' . $workflow_id . ' cannot go live: ' . self::format_errors( $blocking )
+					'Workflow ' . (int) $workflow_id . ' cannot go live: ' . esc_html( self::format_errors( $blocking ) )
 				);
 			}
 		}

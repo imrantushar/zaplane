@@ -1,17 +1,17 @@
 <?php
 /**
- * Plugin Name:     Zaplane
- * Plugin URI:      https://zaplane.app/
- * Description:     WordPress Automation Plugin
- * Version:         1.2.0
- * Author:          kodezen
- * Author URI:      https://kodezen.com
- * License:         GPL-3.0+
- * Text Domain:     zaplane
- * Domain Path:     /languages
- *
- * Requires PHP: 7.4
- * Tested up to: 6.8
+ * Plugin Name:       Zaplane
+ * Plugin URI:        https://zaplane.app/
+ * Description:       WordPress Automation Plugin
+ * Version:           1.2.0
+ * Author:            kodezen
+ * Author URI:        https://kodezen.com
+ * License:           GPL-3.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
+ * Text Domain:       zaplane
+ * Domain Path:       /languages
+ * Requires at least: 6.8
+ * Requires PHP:      7.4
  */
 
 use Zaplane\Framework\Classes\ConnectionManager;

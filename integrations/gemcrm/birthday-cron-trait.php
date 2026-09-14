@@ -61,13 +61,14 @@ trait BirthdayCronTrait {
 		$table      = $prefix . 'gemcrm_contacts';
 
 		do {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$ids = $wpdb->get_col(
 				$wpdb->prepare(
-					"SELECT id FROM {$table}
+					"SELECT id FROM %i
 					WHERE dob IS NOT NULL
 					AND DATE_FORMAT( dob, %s ) = %s
 					LIMIT %d OFFSET %d",
+					$table,
 					'%m-%d',
 					$today_md,
 					$batch_size,
@@ -150,7 +151,8 @@ trait BirthdayCronTrait {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$value = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT m_value FROM {$table} WHERE contact_id = %d AND m_key = %s LIMIT 1",
+				"SELECT m_value FROM %i WHERE contact_id = %d AND m_key = %s LIMIT 1",
+				$table,
 				$contact_id,
 				'_zaplane_birthday_triggered'
 			)

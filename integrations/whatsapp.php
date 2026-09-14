@@ -612,7 +612,7 @@ class Whatsapp extends IntegrationBase {
 		];
 
 		if ( empty( $link ) ) {
-			throw new \Exception( 'WhatsApp: ' . ( $label_map[ $type ] ?? $type . ' URL' ) . ' is required' );
+			throw new \Exception( 'WhatsApp: ' . esc_html( $label_map[ $type ] ?? $type . ' URL' ) . ' is required' );
 		}
 
 		$media = [ 'link' => $link ];

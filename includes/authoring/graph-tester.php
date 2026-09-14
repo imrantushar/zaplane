@@ -532,10 +532,10 @@ class GraphTester {
 	/**
 	 * Evaluate one expression without letting the engine's diagnostics escape.
 	 *
-	 * Expression::compute() runs through eval() and returns null when a path is
-	 * missing, but PHP still emits "Undefined array key" on the way out. Those
-	 * are precisely the cases this class exists to report, so it reports them
-	 * as findings rather than letting raw warnings into the response.
+	 * Expression::evaluate() returns null when a path is missing, and a warning
+	 * raised on the way would otherwise reach the response. Missing paths are
+	 * precisely the cases this class exists to report, so it reports them as
+	 * findings rather than letting raw warnings through.
 	 *
 	 * @param array<string,mixed> $context
 	 * @return mixed
