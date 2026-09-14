@@ -127,18 +127,20 @@ class TokenStoreTest extends TestCase {
 	}
 
 	/**
+	 * A token from before scoping was stored in plain text, held every scope and
+	 * belonged to nobody. It is refused, and deleted the first time it is shown.
+	 *
 	 * @test
 	 */
-	public function a_pre_scoping_token_keeps_working_with_every_scope(): void {
+	public function a_pre_scoping_token_is_refused_and_removed(): void {
 		update_option( 'zaplane_mcp_token', 'legacy-secret-value' );
 
-		$resolved = TokenStore::resolve( 'legacy-secret-value' );
-
-		$this->assertNotNull( $resolved );
-		$this->assertSame( TokenStore::ALL_SCOPES, $resolved['scopes'] );
-		$this->assertTrue( $resolved['legacy'] );
-
 		$this->assertNull( TokenStore::resolve( 'not-the-legacy-value' ) );
+		$this->assertSame( 'legacy-secret-value', get_option( 'zaplane_mcp_token', '' ), 'A wrong guess must not delete it' );
+
+		$this->assertNull( TokenStore::resolve( 'legacy-secret-value' ) );
+		$this->assertSame( '', (string) get_option( 'zaplane_mcp_token', '' ) );
+		$this->assertFalse( TokenStore::has_any() );
 	}
 
 	/**

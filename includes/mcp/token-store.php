@@ -124,6 +124,15 @@ class TokenStore {
 	}
 
 	/**
+	 * How many tokens one registered client holds.
+	 *
+	 * @param string $client_id The registered client.
+	 */
+	public static function count_for_client( string $client_id ): int {
+		return count( array_filter( self::records(), fn( $r ) => (string) ( $r['client_id'] ?? '' ) === $client_id ) );
+	}
+
+	/**
 	 * Revoke every token issued to one registered client, and say how many.
 	 *
 	 * Removing a client without this would leave its tokens working while the
@@ -198,17 +207,12 @@ class TokenStore {
 			return null;
 		}
 
-		// A token issued before scoping existed. Honoured so an already-connected
-		// client keeps working, with every scope, until it is rotated.
+		// A token from before scoping was stored in plain text, carried every scope
+		// and belonged to nobody, so no capability could be asked of it. It is not
+		// accepted any more, and the first time it is presented it is deleted.
 		$legacy = (string) get_option( self::LEGACY_OPTION, '' );
 		if ( '' !== $legacy && hash_equals( $legacy, $presented ) ) {
-			return [
-				'id'      => 'legacy',
-				'name'    => 'Legacy token',
-				'scopes'  => self::ALL_SCOPES,
-				'user_id' => 0,
-				'legacy'  => true,
-			];
+			delete_option( self::LEGACY_OPTION );
 		}
 
 		return null;
@@ -275,9 +279,9 @@ class TokenStore {
 		return in_array( $scope, (array) ( $record['scopes'] ?? [] ), true );
 	}
 
-	/** True once at least one token exists (legacy included). */
+	/** True once at least one token exists. */
 	public static function has_any(): bool {
-		return ! empty( self::records() ) || '' !== (string) get_option( self::LEGACY_OPTION, '' );
+		return ! empty( self::records() );
 	}
 
 	/**

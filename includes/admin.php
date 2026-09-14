@@ -5,7 +5,6 @@ use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Core\ModuleInterface;
 use Zaplane\Admin\Menu;
 use Zaplane\Admin\Assets;
-use Zaplane\Admin\Updater;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -16,7 +15,6 @@ class Admin implements ModuleInterface {
 	protected Container $container;
 	protected ?Menu $menu = null;
 	protected ?Assets $assets = null;
-	protected ?Updater $updater = null;
 	protected static ?self $instance = null;
 
 	public static function init( Container $container ): self {
@@ -47,10 +45,6 @@ class Admin implements ModuleInterface {
 		if ( ! $this->assets ) {
 			$this->assets = new Assets();
 			$this->assets->register();
-		}
-		if ( ! $this->updater ) {
-			$this->updater = new Updater();
-			$this->updater->register();
 		}
 	}
 }

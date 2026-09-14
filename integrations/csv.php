@@ -214,21 +214,21 @@ class Csv extends IntegrationBase {
 			$items = [];
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen -- In-memory stream, not filesystem.
-		$fh = fopen( 'php://temp', 'r+' );
+		$file = new \SplTempFileObject();
 
 		$first = reset( $items );
 		if ( $header && is_array( $first ) ) {
-			fputcsv( $fh, array_keys( $first ), $delimiter, '"', '\\' );
+			$file->fputcsv( array_keys( $first ), $delimiter, '"', '\\' );
 		}
 		foreach ( $items as $item ) {
 			$row = is_array( $item ) ? array_values( $item ) : [ $item ];
-			fputcsv( $fh, $row, $delimiter, '"', '\\' );
+			$file->fputcsv( $row, $delimiter, '"', '\\' );
 		}
 
-		rewind( $fh );
-		$csv = stream_get_contents( $fh );
-		fclose( $fh ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose -- In-memory stream, not filesystem.
+		$csv = '';
+		foreach ( $file as $line ) {
+			$csv .= $line;
+		}
 
 		if ( 'file' !== ( $config['destination'] ?? 'text' ) ) {
 			return [ 'csv' => $csv ];
@@ -294,20 +294,19 @@ class Csv extends IntegrationBase {
 			return [];
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen -- In-memory stream, not filesystem.
-		$fh = fopen( 'php://temp', 'r+' );
-		fwrite( $fh, $text ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fwrite -- In-memory stream, not filesystem.
-		rewind( $fh );
+		$file = new \SplTempFileObject();
+		$file->fwrite( $text );
+		$file->rewind();
+		$file->setFlags( \SplFileObject::READ_CSV );
+		$file->setCsvControl( $delimiter, '"', '\\' );
 
 		$rows = [];
-		// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Standard fgetcsv iteration pattern.
-		while ( ( $row = fgetcsv( $fh, 0, $delimiter, '"', '\\' ) ) !== false ) {
-			if ( [ null ] === $row || ( 1 === count( $row ) && '' === (string) $row[0] ) ) {
+		foreach ( $file as $row ) {
+			if ( ! is_array( $row ) || [ null ] === $row || ( 1 === count( $row ) && '' === (string) $row[0] ) ) {
 				continue;
 			}
 			$rows[] = array_map( 'strval', $row );
 		}
-		fclose( $fh ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose -- In-memory stream, not filesystem.
 
 		return $rows;
 	}
@@ -348,7 +347,7 @@ class Csv extends IntegrationBase {
 
 		// Remote URL.
 		if ( preg_match( '#^https?://#i', $location ) ) {
-			$response = wp_remote_get( $location, [ 'timeout' => 20 ] );
+			$response = \Zaplane\HttpGuard::request( $location, [ 'timeout' => 20 ] );
 			if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
 				return (string) wp_remote_retrieve_body( $response );
 			}

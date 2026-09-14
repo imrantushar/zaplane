@@ -60,7 +60,7 @@ class GraphTester {
 
 		$start = TriggerNodes::resolve( $graph, $trigger_node_id );
 		if ( null !== $trigger_node_id && null === $start ) {
-			throw new \InvalidArgumentException( 'trigger_node_id ' . $trigger_node_id . ' is not a trigger in this graph.' );
+			throw new \InvalidArgumentException( 'trigger_node_id ' . esc_html( (string) $trigger_node_id ) . ' is not a trigger in this graph.' );
 		}
 
 		// The triggers other than the starting one don't fire in this walk.
@@ -532,10 +532,10 @@ class GraphTester {
 	/**
 	 * Evaluate one expression without letting the engine's diagnostics escape.
 	 *
-	 * Expression::compute() runs through eval() and returns null when a path is
-	 * missing, but PHP still emits "Undefined array key" on the way out. Those
-	 * are precisely the cases this class exists to report, so it reports them
-	 * as findings rather than letting raw warnings into the response.
+	 * Expression::evaluate() returns null when a path is missing, and a warning
+	 * raised on the way would otherwise reach the response. Missing paths are
+	 * precisely the cases this class exists to report, so it reports them as
+	 * findings rather than letting raw warnings through.
 	 *
 	 * @param array<string,mixed> $context
 	 * @return mixed

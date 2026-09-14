@@ -107,8 +107,8 @@ class KnowledgeEmbeddings {
 	private static function invalidate_all_vectors(): void {
 		global $wpdb;
 		$table = \Zaplane\Models\Knowledge::getTable();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query( "UPDATE {$table} SET embedding = NULL WHERE embedding IS NOT NULL" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query( $wpdb->prepare( 'UPDATE %i SET embedding = NULL WHERE embedding IS NOT NULL', $table ) );
 	}
 
 	/** @return array<string,mixed> */

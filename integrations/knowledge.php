@@ -316,7 +316,8 @@ class Knowledge extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$total = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table} WHERE business_key = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"SELECT COUNT(*) FROM %i WHERE business_key = %s",
+				$table,
 				$key
 			)
 		);
@@ -335,7 +336,8 @@ class Knowledge extends IntegrationBase {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT id, title, content, embedding FROM {$table} WHERE business_key = %s ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+					"SELECT id, title, content, embedding FROM %i WHERE business_key = %s ORDER BY id DESC LIMIT %d",
+					$table,
 					$key,
 					$scan
 				),
@@ -689,7 +691,8 @@ class Knowledge extends IntegrationBase {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			return (int) $wpdb->query(
 				$wpdb->prepare(
-					"DELETE FROM {$table} WHERE business_key = %s AND source = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+					"DELETE FROM %i WHERE business_key = %s AND source = %s",
+					$table,
 					$key,
 					$source
 				)
@@ -697,12 +700,12 @@ class Knowledge extends IntegrationBase {
 		}
 
 		$placeholders = implode( ',', array_fill( 0, count( $keep_refs ), '%s' ) );
-		$params       = array_merge( [ $key, $source ], $keep_refs );
+		$params       = array_merge( [ $table, $key, $source ], $keep_refs );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->query(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- placeholder count is dynamic; $params supplies exactly count($keep_refs)+2 values to match.
-				"DELETE FROM {$table} WHERE business_key = %s AND source = %s AND ref_id NOT IN ({$placeholders})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name and placeholder count generated internally.
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- placeholder count is dynamic; $params supplies exactly count($keep_refs)+3 values to match.
+				"DELETE FROM %i WHERE business_key = %s AND source = %s AND ref_id NOT IN ({$placeholders})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholder count generated internally.
 				$params
 			)
 		);
@@ -790,7 +793,8 @@ class Knowledge extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$deleted = $wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM {$table} WHERE business_key = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"DELETE FROM %i WHERE business_key = %s",
+				$table,
 				$key
 			)
 		);
@@ -835,7 +839,8 @@ class Knowledge extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, title, content FROM {$table} WHERE business_key = %s AND ( embedding IS NULL OR embedding = '' ) ORDER BY id ASC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"SELECT id, title, content FROM %i WHERE business_key = %s AND ( embedding IS NULL OR embedding = '' ) ORDER BY id ASC LIMIT %d",
+				$table,
 				$key,
 				$limit
 			),
@@ -869,7 +874,8 @@ class Knowledge extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$remaining = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table} WHERE business_key = %s AND ( embedding IS NULL OR embedding = '' )", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"SELECT COUNT(*) FROM %i WHERE business_key = %s AND ( embedding IS NULL OR embedding = '' )",
+				$table,
 				$key
 			)
 		);
@@ -917,7 +923,8 @@ class Knowledge extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, title, content, embedding FROM {$table} WHERE business_key = %s AND MATCH(title, content) AGAINST (%s IN BOOLEAN MODE) LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"SELECT id, title, content, embedding FROM %i WHERE business_key = %s AND MATCH(title, content) AGAINST (%s IN BOOLEAN MODE) LIMIT %d",
+				$table,
 				$key,
 				$boolean,
 				$limit

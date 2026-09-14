@@ -152,26 +152,41 @@ class ClientStoreTest extends TestCase {
 	}
 
 	/**
-	 * Registration is open and unauthenticated, so a burst of it can push older
-	 * entries past the cap. Their tokens have to go with them: one outliving its
-	 * registration is access with nothing left to show where it came from, and
-	 * the client holding it would keep working while the panel showed nobody.
+	 * Registration is open and unauthenticated, so a burst of it must not be a way
+	 * to disconnect anyone. Only registrations nobody approved make room: a client
+	 * holding a token stays, and so does its token.
 	 *
 	 * @test
 	 */
-	public function evicting_a_registration_revokes_what_it_holds(): void {
-		$victim = ClientStore::register( [ 'client_name' => 'First in', 'redirect_uris' => [ 'https://example.com/cb' ] ] );
+	public function a_flood_of_registrations_cannot_evict_a_client_holding_a_token(): void {
+		$keeper = ClientStore::register( [ 'client_name' => 'First in', 'redirect_uris' => [ 'https://example.com/cb' ] ] );
 
-		\Zaplane\Mcp\TokenStore::issue( 'Its token', \Zaplane\Mcp\TokenStore::DEFAULT_SCOPES, 0, [ 'client_id' => $victim['client_id'] ] );
+		\Zaplane\Mcp\TokenStore::issue( 'Its token', \Zaplane\Mcp\TokenStore::DEFAULT_SCOPES, 0, [ 'client_id' => $keeper['client_id'] ] );
 
-		$this->assertCount( 1, \Zaplane\Mcp\TokenStore::all() );
-
-		// Fill past the cap, so the first one registered falls out.
-		for ( $i = 0; $i < 50; $i++ ) {
+		for ( $i = 0; $i < 60; $i++ ) {
 			ClientStore::register( [ 'client_name' => 'Filler ' . $i, 'redirect_uris' => [ 'https://example.com/cb-' . $i ] ] );
 		}
 
-		$this->assertArrayNotHasKey( $victim['client_id'], ClientStore::all(), 'The oldest registration should have been evicted' );
-		$this->assertSame( [], \Zaplane\Mcp\TokenStore::all(), 'Its token must not outlive it' );
+		$this->assertArrayHasKey( $keeper['client_id'], ClientStore::all(), 'A connected client must survive a flood' );
+		$this->assertCount( 1, \Zaplane\Mcp\TokenStore::all(), 'Its token must survive too' );
+		$this->assertCount( 50, ClientStore::all() );
 	}
+
+	/**
+	 * When every registration holds a token there is nothing to evict, so a new
+	 * one is refused rather than let in at somebody else's expense.
+	 *
+	 * @test
+	 */
+	public function a_store_full_of_connected_clients_refuses_another(): void {
+		for ( $i = 0; $i < 50; $i++ ) {
+			$client = ClientStore::register( [ 'client_name' => 'Connected ' . $i, 'redirect_uris' => [ 'https://example.com/cb-' . $i ] ] );
+			\Zaplane\Mcp\TokenStore::issue( 'Token ' . $i, \Zaplane\Mcp\TokenStore::DEFAULT_SCOPES, 0, [ 'client_id' => $client['client_id'] ] );
+		}
+
+		$this->expectException( \OverflowException::class );
+
+		ClientStore::register( [ 'client_name' => 'One too many', 'redirect_uris' => [ 'https://example.com/late' ] ] );
+	}
+
 }

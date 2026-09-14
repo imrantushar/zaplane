@@ -3,6 +3,10 @@ namespace Zaplane\Integrations\Wordpress;
 
 use Zaplane\Traits\ActionResponseTrait;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait PostActionsTrait {
 
 	protected static function action_create_post( array $config ): array {

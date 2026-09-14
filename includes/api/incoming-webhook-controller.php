@@ -235,8 +235,12 @@ class IncomingWebhookController extends WP_REST_Controller {
 	 * so it must not go through WP's REST JSON envelope.
 	 */
 	private function send_raw( string $body, string $content_type = 'text/plain' ): void {
+		// Echoed verbatim, so it is never offered to the browser as markup.
+		$content_type = 'application/json' === $content_type ? 'application/json' : 'text/plain';
+
 		if ( ! headers_sent() ) {
 			header( 'Content-Type: ' . $content_type . '; charset=utf-8' );
+			header( 'X-Content-Type-Options: nosniff' );
 			header( 'Cache-Control: no-store' );
 			status_header( 200 );
 		}
@@ -256,6 +260,12 @@ class IncomingWebhookController extends WP_REST_Controller {
 
 		if ( ! $workflow ) {
 			return new WP_Error( 'not_found', 'Workflow not found.', [ 'status' => 404 ] );
+		}
+
+		// A paused or draft workflow still has an active version, so that alone does
+		// not say its owner wants anyone able to start it from outside.
+		if ( ! $workflow->isActive() ) {
+			return new WP_Error( 'inactive', 'Workflow is not active.', [ 'status' => 403 ] );
 		}
 
 		$version = method_exists( $workflow, 'activeVersion' ) ? $workflow->activeVersion() : null;

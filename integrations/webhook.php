@@ -65,7 +65,7 @@ class Webhook extends IntegrationBase {
 				'label' => 'Webhook URL',
 				'type'  => 'copy',
 				'value' => 'zaplane/v1/hook/{workflow_id}/{node_id}',
-				'help'  => 'Send a GET or POST request (JSON body and/or query params) to this URL to start the workflow from this trigger. Available after the workflow is saved.',
+				'help'  => 'Send a GET or POST request (JSON body and/or query params) to this URL to start the workflow from this trigger. Accepted while the workflow is active.',
 			],
 			[
 				'key'      => 'secret',
@@ -297,7 +297,7 @@ class Webhook extends IntegrationBase {
 			}
 		}
 
-		$response = wp_remote_request( $url, [
+		$response = \Zaplane\HttpGuard::request( $url, [
 			'method'  => $method,
 			'headers' => $headers,
 			'body'    => $body,

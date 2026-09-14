@@ -158,7 +158,8 @@ class Memory extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT role, content FROM {$table} WHERE conversation_key = %s ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"SELECT role, content FROM %i WHERE conversation_key = %s ORDER BY id DESC LIMIT %d",
+				$table,
 				$key,
 				$limit
 			),
@@ -208,7 +209,8 @@ class Memory extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$deleted = $wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM {$table} WHERE conversation_key = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"DELETE FROM %i WHERE conversation_key = %s",
+				$table,
 				$key
 			)
 		);

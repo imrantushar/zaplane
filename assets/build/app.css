@@ -1,3 +1,17 @@
+/*!
+ * Zaplane - generated file, do not edit.
+ *
+ * Built from the Sass that dev_zaplane/app.js imports: assets/scss/backend.scss and the .scss files beside the components in dev_zaplane/.
+ * The complete uncompiled source ships inside this plugin: dev_zaplane/ is the
+ * React source and assets/scss/ the Sass; package.json, webpack.config.js,
+ * tailwind.config.js and postcss.config.js are the build setup.
+ *
+ * To rebuild, run in the plugin directory:
+ *   npm install --legacy-peer-deps
+ *   npm run build
+ *
+ * License: GPL-3.0-or-later
+ */
 .zaplane-topbar-logo{background:#e2e0ff;padding:6px;border-radius:50%}
 @keyframes zaplane-modal-overlay-in{from{opacity:0}to{opacity:1}}@keyframes zaplane-modal-frame-in{from{opacity:0;transform:translateY(12px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}.components-modal__screen-overlay:has(.zaplane-wp-modal){animation:zaplane-modal-overlay-in .2s ease}.zaplane-wp-modal{width:600px;min-height:220px;position:relative;animation:zaplane-modal-frame-in .22s cubic-bezier(0.16, 1, 0.3, 1) forwards;background:var(--zaplane-background) !important;color:var(--zaplane-font-color);border:1px solid var(--zaplane-border-color)}.zaplane-wp-modal .components-modal__header{background:var(--zaplane-background);border-bottom:1px solid var(--zaplane-border-color)}.zaplane-wp-modal .components-modal__header-heading{color:var(--zaplane-font-color)}.zaplane-wp-modal .components-modal__header .components-button{width:35px;height:35px;min-width:35px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid var(--zaplane-border-color);background:var(--zaplane-secondary-color);color:var(--zaplane-font-color)}.zaplane-wp-modal .components-modal__header .components-button svg{width:18px;height:18px;fill:currentColor}.zaplane-wp-modal .components-modal__header .components-button:hover:not(:disabled,[aria-disabled=true]){background:var(--zaplane-border-color);color:var(--zaplane-primary)}
 .zaplane-pagination{width:100%;display:flex;justify-content:center;align-items:center;gap:5px}.zaplane-pagination .zaplane-pagination-list{display:flex;align-items:center;gap:10px;padding:4px;margin:0}.zaplane-pagination .zaplane-pagination-list__item{min-width:30px;height:30px;padding:0 6px;border-radius:4px;display:flex;justify-content:center;align-items:center;cursor:pointer;margin:0;font-weight:500;font-size:14px;line-height:1;color:var(--zaplane-font-color);border:1px solid var(--zaplane-border-color)}.zaplane-pagination .zaplane-pagination-list__item:hover{background:var(--zaplane-secondary-color)}.zaplane-pagination .zaplane-pagination-list__item-dots{letter-spacing:4px;font-weight:500;padding-left:4px;color:none;pointer-events:none}.zaplane-pagination .zaplane-pagination-list__item-dots:hover{background:none;color:none;border-radius:unset}.zaplane-pagination .zaplane-pagination-list__item-active{background:var(--zaplane-primary);color:#fff;cursor:default}.zaplane-pagination .zaplane-pagination-list__item-active:hover{background:var(--zaplane-primary);color:#fff}

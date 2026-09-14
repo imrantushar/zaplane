@@ -66,17 +66,22 @@ class ClientStore {
 		$clients[ $client['client_id'] ] = $client;
 
 		// Registration is open — a hosted connector signs itself up, unasked and
-		// unauthenticated — so a burst of them can push older entries past the
-		// cap. Oldest out first, and their tokens go with them: a token that
-		// outlives its registration is access with nothing left to show where it
-		// came from, and the client holding it would keep working while the panel
-		// showed nobody.
+		// unauthenticated — so the cap is what keeps the option from growing. Only a
+		// registration nobody approved makes room: a client holding a token is a
+		// connection an administrator chose, and evicting it would let anyone able
+		// to send fifty requests disconnect every one of them.
 		if ( count( $clients ) > self::MAX_CLIENTS ) {
-			$evicted = array_slice( $clients, 0, count( $clients ) - self::MAX_CLIENTS, true );
-			$clients = array_slice( $clients, -self::MAX_CLIENTS, null, true );
+			foreach ( array_keys( $clients ) as $known ) {
+				if ( count( $clients ) <= self::MAX_CLIENTS ) {
+					break;
+				}
+				if ( $known !== $client['client_id'] && 0 === \Zaplane\Mcp\TokenStore::count_for_client( (string) $known ) ) {
+					unset( $clients[ $known ] );
+				}
+			}
 
-			foreach ( array_keys( $evicted ) as $gone ) {
-				\Zaplane\Mcp\TokenStore::revoke_for_client( (string) $gone );
+			if ( count( $clients ) > self::MAX_CLIENTS ) {
+				throw new \OverflowException( 'This site already has as many connected MCP clients as it allows. Remove one in Zaplane settings first.' );
 			}
 		}
 
@@ -183,7 +188,12 @@ class ClientStore {
 		}
 
 		// A private-use scheme (com.example.app:/cb) is how a native client is
-		// reached; it has no host to check.
+		// reached; it has no host to check. A scheme a browser would run, or read
+		// locally, is never one.
+		if ( in_array( $scheme, [ 'javascript', 'data', 'file', 'vbscript', 'blob', 'about', 'ftp', 'ws', 'wss' ], true ) ) {
+			return false;
+		}
+
 		return (bool) preg_match( '/^[a-z][a-z0-9+.\-]*$/', $scheme );
 	}
 }

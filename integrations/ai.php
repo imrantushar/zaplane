@@ -929,7 +929,7 @@ class Ai extends IntegrationBase {
 	 * @return array{mime_type:string,data:string}|null
 	 */
 	private static function fetch_inline_image( string $url ): ?array {
-		$resp = wp_remote_get( $url, [ 'timeout' => 30 ] );
+		$resp = \Zaplane\HttpGuard::request( $url, [ 'timeout' => 30 ] );
 		if ( is_wp_error( $resp ) || (int) wp_remote_retrieve_response_code( $resp ) >= 400 ) {
 			return null;
 		}
@@ -1022,7 +1022,7 @@ class Ai extends IntegrationBase {
 			return self::error( 'An audio URL is required.', $input );
 		}
 
-		$resp = wp_remote_get( $audio_url, [ 'timeout' => 60 ] );
+		$resp = \Zaplane\HttpGuard::request( $audio_url, [ 'timeout' => 60 ] );
 		if ( is_wp_error( $resp ) || (int) wp_remote_retrieve_response_code( $resp ) >= 400 ) {
 			return self::error( 'Could not download the audio file.', $input );
 		}

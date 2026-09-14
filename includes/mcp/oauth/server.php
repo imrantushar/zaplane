@@ -38,6 +38,9 @@ class Server {
 	/** Access tokens are short; the refresh token is what keeps a connector attached. */
 	public const TOKEN_TTL = HOUR_IN_SECONDS;
 
+	/** Anonymous client registrations one address may make in an hour. */
+	private const REGISTRATIONS_PER_HOUR = 20;
+
 	/** Query parameters the authorization request is made of. */
 	private const AUTHORIZE_PARAMS = [
 		'response_type',
@@ -128,10 +131,21 @@ class Server {
 			$metadata = (array) $request->get_body_params();
 		}
 
+		// Registration is anonymous, so it is metered per address.
+		$address  = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		$meter    = 'zaplane_mcp_reg_' . md5( $address );
+		$attempts = (int) get_transient( $meter );
+		if ( $attempts >= self::REGISTRATIONS_PER_HOUR ) {
+			return new \WP_Error( 'slow_down', 'Too many client registrations from this address. Try again later.', [ 'status' => 429 ] );
+		}
+		set_transient( $meter, $attempts + 1, HOUR_IN_SECONDS );
+
 		try {
 			$client = ClientStore::register( $metadata );
 		} catch ( \InvalidArgumentException $e ) {
 			return new \WP_Error( 'invalid_redirect_uri', $e->getMessage(), [ 'status' => 400 ] );
+		} catch ( \OverflowException $e ) {
+			return new \WP_Error( 'temporarily_unavailable', $e->getMessage(), [ 'status' => 429 ] );
 		}
 
 		return [
@@ -176,7 +190,9 @@ class Server {
 
 		// Anything wrong with the client or its redirect is shown here rather than
 		// bounced onward: redirecting to an address we have not verified is how a
-		// bad redirect_uri turns into a delivery mechanism.
+		// bad redirect_uri turns into a delivery mechanism. A malformed request is shown
+		// here too: registration is open, so a registered redirect proves nothing about
+		// who asked, and nothing goes to one before an administrator has answered.
 		if ( ! $client ) {
 			self::fail_page( __( 'Unknown client. Register the connector again.', 'zaplane' ) );
 		}
@@ -186,15 +202,15 @@ class Server {
 		}
 
 		if ( 'code' !== self::query( 'response_type' ) ) {
-			self::bounce( $redirect_uri, $state, 'unsupported_response_type', 'Only the authorization code flow is supported.' );
+			self::fail_page( __( 'This connector asked for a sign-in flow Zaplane does not support.', 'zaplane' ) );
 		}
 
 		if ( '' === $challenge || 'S256' !== $method ) {
-			self::bounce( $redirect_uri, $state, 'invalid_request', 'PKCE with code_challenge_method=S256 is required.' );
+			self::fail_page( __( 'This connector did not use PKCE (S256), which Zaplane requires.', 'zaplane' ) );
 		}
 
 		if ( ! self::resource_ours( self::query( 'resource' ) ) ) {
-			self::bounce( $redirect_uri, $state, 'invalid_target', 'That resource is not served by this site.' );
+			self::fail_page( __( 'This connector asked for access to a different site.', 'zaplane' ) );
 		}
 
 		$requested = preg_split( '/[\s,+]+/', self::query( 'scope' ), -1, PREG_SPLIT_NO_EMPTY );
@@ -219,7 +235,7 @@ class Server {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading the verb, not form data; the branch it opens checks a nonce first.
-		if ( 'POST' === strtoupper( (string) ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) ) {
+		if ( 'POST' === strtoupper( sanitize_text_field( wp_unslash( (string) ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) ) ) ) ) {
 			check_admin_referer( 'zaplane_mcp_consent' );
 
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- check_admin_referer() above.
@@ -230,7 +246,7 @@ class Server {
 			self::grant( $client, $redirect_uri, $state, $challenge, self::ticked( $scopes ) );
 		}
 
-		self::consent_page( $client, $scopes );
+		self::consent_page( $client, $scopes, $redirect_uri );
 	}
 
 	/**
@@ -438,8 +454,9 @@ class Server {
 	/**
 	 * @param array<string,mixed> $client
 	 * @param array<int,string>   $scopes
+	 * @param string              $redirect_uri Where the browser goes after the answer.
 	 */
-	private static function consent_page( array $client, array $scopes ): void {
+	private static function consent_page( array $client, array $scopes, string $redirect_uri ): void {
 		$labels = [
 			TokenStore::SCOPE_READ  => __( 'Read your apps, workflows, runs and connections', 'zaplane' ),
 			TokenStore::SCOPE_WRITE => __( 'Create and edit workflows', 'zaplane' ),
@@ -463,6 +480,13 @@ class Server {
 			esc_html__( '%s is asking to:', 'zaplane' ),
 			'<strong>' . esc_html( (string) $client['client_name'] ) . '</strong>'
 		) . '</p>'
+			. '<p class="muted">' . esc_html(
+				sprintf(
+					/* translators: %s: the host the browser returns to after answering. */
+					__( 'After you answer, you will be sent back to %s.', 'zaplane' ),
+					self::redirect_label( $redirect_uri )
+				)
+			) . '</p>'
 			. '<form method="post" action="' . esc_url( self::current_url() ) . '">'
 			. '<ul class="scopes">' . $rows . '</ul>'
 			. wp_nonce_field( 'zaplane_mcp_consent', '_wpnonce', true, false )
@@ -508,6 +532,13 @@ class Server {
 		return empty( $granted ) ? [ TokenStore::SCOPE_READ ] : $granted;
 	}
 
+	/** The part of a redirect URI a person can check: its host, or an app's scheme. */
+	private static function redirect_label( string $uri ): string {
+		$host = (string) wp_parse_url( $uri, PHP_URL_HOST );
+
+		return '' !== $host ? $host : (string) wp_parse_url( $uri, PHP_URL_SCHEME ) . ':';
+	}
+
 	private static function fail_page( string $message ): void {
 		status_header( 400 );
 		self::page( __( 'Cannot connect', 'zaplane' ), '<p>' . esc_html( $message ) . '</p>' );
@@ -518,20 +549,30 @@ class Server {
 			header( 'Content-Type: text/html; charset=utf-8' );
 			header( 'X-Robots-Tag: noindex' );
 			header( 'Cache-Control: no-store' );
+			// A consent screen inside somebody else's frame can be clicked through
+			// without the person approving ever seeing what they approve.
+			header( 'X-Frame-Options: DENY' );
+			header( "Content-Security-Policy: frame-ancestors 'none'" );
 		}
 
-		echo '<!DOCTYPE html><html ' . get_language_attributes() . '><head><meta charset="utf-8">' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			. '<meta name="viewport" content="width=device-width,initial-scale=1">'
-			. '<title>' . esc_html( $title ) . '</title><style>'
-			. 'body{font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f5f7;color:#141a24;margin:0;padding:48px 20px}'
+		wp_register_style( 'zaplane-oauth', false, [], ZAPLANE_VERSION );
+		wp_add_inline_style(
+			'zaplane-oauth',
+			'body{font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f5f7;color:#141a24;margin:0;padding:48px 20px}'
 			. '.card{max-width:460px;margin:0 auto;background:#fff;border:1px solid #dcdfe4;border-radius:12px;padding:28px}'
 			. 'h1{font-size:19px;line-height:1.35;margin:0 0 14px}ul{padding-left:18px;margin:0 0 22px}li{margin-bottom:7px}'
 			. 'ul.scopes{list-style:none;padding:0}ul.scopes li{margin-bottom:10px}ul.scopes label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}'
 			. 'button{font:inherit;padding:9px 18px;border-radius:6px;border:1px solid #dcdfe4;background:#fff;cursor:pointer}'
 			. 'button.primary{background:#006BFF;border-color:#006BFF;color:#fff;font-weight:600}'
 			. '.muted{color:#6b7280;font-size:13px;margin:20px 0 0}'
-			. '</style></head><body><div class="card"><h1>' . esc_html( $title ) . '</h1>'
-			. $body // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Composed from escaped parts above.
+		);
+
+		echo '<!DOCTYPE html><html ';
+		language_attributes();
+		echo '><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . esc_html( $title ) . '</title>';
+		wp_print_styles( 'zaplane-oauth' );
+		echo '</head><body><div class="card"><h1>' . esc_html( $title ) . '</h1>'
+			. $body // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Composed from escaped parts by the callers.
 			. '</div></body></html>';
 		exit;
 	}

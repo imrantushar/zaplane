@@ -213,7 +213,7 @@ class Gmail extends IntegrationBase {
 			'client_id'     => [
 				'type'        => 'text',
 				'label'       => 'Client ID',
-				'placeholder' => 'xxxx.apps.googleusercontent.com',
+				'placeholder' => 'Your OAuth 2.0 client ID',
 				'required'    => true,
 				'help'        => 'From Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs.',
 			],

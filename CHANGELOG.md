@@ -50,6 +50,11 @@ All notable changes to Zaplane are documented here. This project adheres to
   update, and deleting one brought it back. Shipped recipes are now known by a
   slug, and a deleted one stays deleted.
 - The Recipes page showed only the first 20 recipes.
+- A step got nothing from a field whose name has a hyphen, such as a Contact Form 7
+  form's `your-email`, so a Create Contact step said a valid email was required.
+  A minus between two values still subtracts.
+- Submitting a form failed with an error when two triggers, in one workflow or in
+  several, listened for that form. Both runs started, but the visitor saw an error.
 - Changing a live trigger's settings without adding or removing a step could keep
   it firing with the old settings for up to an hour. The trigger cache now keys on
   the saved graph, not only the version.
