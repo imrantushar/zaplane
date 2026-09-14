@@ -51,3 +51,22 @@ export const CATEGORY_LABELS = {
   tool: 'Tool',
   ai: 'AI',
 };
+
+// Ports (output branches) declared by the node's action in the manifest, e.g.
+// router → path_1..fallback, condition → true/false, iterator → loop/done.
+export const getNodePorts = (data) => {
+  const integ = integrations?.apps?.[data?.app] || integrations?.tools?.[data?.app];
+  const outputs = integ?.actions?.[data?.event]?.outputs || [];
+  // "main" is the implicit single output — not a branch.
+  const branches = outputs.filter((p) => p && p !== "main");
+
+  // Router: one path per configured route (+ fallback), derived from the
+  // dynamic `routes` repeater. A fresh router still shows one path to build on.
+  if (data?.app === "router") {
+    const routes = Array.isArray(data?.config?.routes) ? data.config.routes : [];
+    const active = Array.from({ length: Math.max(1, routes.length) }, (_, i) => `path_${i + 1}`);
+    return [...active, "fallback"];
+  }
+
+  return branches;
+};

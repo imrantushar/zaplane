@@ -19876,8 +19876,8 @@
                             "key": "webhook_url",
                             "label": "Webhook URL",
                             "type": "copy",
-                            "value": "zaplane/v1/hook/{workflow_id}",
-                            "help": "Send a GET or POST request (JSON body and/or query params) to this URL to trigger the workflow. Accepted while the workflow is active."
+                            "value": "zaplane/v1/hook/{workflow_id}/{node_id}",
+                            "help": "Send a GET or POST request (JSON body and/or query params) to this URL to start the workflow from this trigger. Accepted while the workflow is active."
                         },
                         {
                             "key": "secret",

@@ -57,7 +57,8 @@ const TestRun = ({
   const handleListen = async () => {
     if (apiRequestRunning || !workflowId) return;
     dispatch(startApiCountdown(120));
-    const res = await dispatch(workflowNodeListiner(workflowId));
+    // Listen for this trigger only; the workflow may have others.
+    const res = await dispatch(workflowNodeListiner({ id: workflowId, nodeId: node?.id }));
     // If registering the listener failed, the rejected reducer already cleared
     // the running flag — don't start polling.
     if (res?.meta?.requestStatus !== "fulfilled") return;

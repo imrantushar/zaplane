@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import TopBar from "@ZAPComponents/TopBar";
-import { FiDownload } from "react-icons/fi";
+import { FiAlertTriangle, FiDownload } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
 import { LuFullscreen, LuMinimize, LuSquarePlay } from "react-icons/lu";
 import { LucideHistory } from "lucide-react";
@@ -29,6 +29,7 @@ import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportIm
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
+import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { BsThreeDotsVertical } from "react-icons/bs";
 export default function FlowTopBar({
   workFlow,
@@ -49,6 +50,10 @@ export default function FlowTopBar({
     apiRequestRunning
   } = useSelector(state => state.workflows);
   const [refreshing, setRefreshing] = useState(false);
+  // What looks wrong with the workflow's triggers, reported on load and on save.
+  const [warningsOpen, setWarningsOpen] = useState(false);
+  // They describe the workflow as last saved, and are checked again on every save.
+  const warnings = Array.isArray(workFlow?.warnings) ? workFlow.warnings : [];
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -117,6 +122,31 @@ export default function FlowTopBar({
     border: "1px solid var(--zaplane-primary)",
   };
   const rightActions = <div className="flex items-center gap-3">
+    {warnings.length > 0 && (
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setWarningsOpen(open => !open)}
+          aria-expanded={warningsOpen}
+          title={__("Things to check in this workflow's triggers", "zaplane")}
+          className="flex items-center gap-1.5 h-9 px-3 rounded-[4px] border border-[var(--zaplane-border-color)] bg-transparent text-[13px] font-medium text-amber-600 hover:bg-[var(--zaplane-secondary-color)] transition-all"
+        >
+          <FiAlertTriangle size={15} />
+          {warnings.length}
+        </button>
+        <WPPopover isOpen={warningsOpen} onClose={() => setWarningsOpen(false)} prefix="zaplane-trigger-warnings" focusOnMount={false}>
+          <div className="flex flex-col gap-2 max-w-[380px] p-1">
+            <p className="zaplane-label font-semibold m-0">{__("Check your triggers", "zaplane")}</p>
+            <p className="text-xs text-[var(--zaplane-font-secondary-color)] m-0">{__("As of the last save.", "zaplane")}</p>
+            {warnings.map((warning, index) => (
+              <p key={`${warning.code}-${warning.node_id}-${index}`} className="text-[13px] leading-snug text-[var(--zaplane-font-color)] m-0">
+                {warning.message}
+              </p>
+            ))}
+          </div>
+        </WPPopover>
+      </div>
+    )}
     {!apiRequestRunning ? (
       <button
         onClick={() => {

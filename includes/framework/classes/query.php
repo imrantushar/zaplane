@@ -44,8 +44,8 @@ class Query {
 	 * Building it walks every active workflow's active version graph (an N+1 that
 	 * used to run on every request). Instead we cache it keyed by a cheap
 	 * fingerprint of the active set — a single indexed JOIN returning
-	 * (workflow_id, active_version_id) pairs. Any save (new version id), version
-	 * activation, status change or delete shifts those pairs, so the cache
+	 * (workflow_id, active_version_id, graph_hash) rows. Any save, version
+	 * activation, status change or delete shifts those rows, so the cache
 	 * self-invalidates without depending on every mutation firing a hook.
 	 *
 	 * @return array<string,array<int,array<string,mixed>>>
@@ -82,9 +82,11 @@ class Query {
 	}
 
 	/**
-	 * Cheap fingerprint of the active-workflow set: the (workflow_id,
-	 * active_version_id) pairs. Versions are immutable (a save creates a new
-	 * version row), so these pairs fully determine the trigger map's content.
+	 * Cheap fingerprint of the active-workflow set: each active workflow's active
+	 * version id and graph hash. The hash has to be part of it. Saving a live
+	 * workflow without adding or removing a step edits its active version in
+	 * place, so a trigger changed that way (a new event, a different form) keeps
+	 * the same version id and would otherwise go on firing with its old settings.
 	 */
 	private static function active_signature(): string {
 		global $wpdb;
@@ -94,7 +96,7 @@ class Query {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table names only; no user input.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT w.id AS wid, v.id AS vid
+				"SELECT w.id AS wid, v.id AS vid, v.graph_hash AS vh
 				 FROM %i w
 				 INNER JOIN %i v ON v.workflow_id = w.id AND v.is_active = 1
 				 WHERE w.status = 'active'
@@ -165,6 +167,17 @@ class Query {
 		}//end foreach
 
 		return $map;
+	}
+
+	/**
+	 * Every WP hook a trigger node listens on, for code outside this class (the
+	 * Test Trigger listener) that needs the same answer the trigger map uses.
+	 *
+	 * @param array<string,mixed> $node
+	 * @return string[]
+	 */
+	public static function hooks_for( array $node ): array {
+		return self::resolve_hooks( $node );
 	}
 
 	/**
