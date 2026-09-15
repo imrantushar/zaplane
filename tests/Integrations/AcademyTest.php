@@ -4,53 +4,7 @@ namespace Zaplane\Tests\Integrations;
 
 use Zaplane\Integrations\Academy;
 
-/**
- * Test suite for the Academy LMS integration.
- *
- * ── How this file is structured ──────────────────────────────────────────────
- *
- * 1. CONTRACT (inherited)
- *    IntegrationTestCase auto-runs:
- *      - all_tested_triggers_are_registered   — every key in getTriggerTests()
- *                                               must exist in get_triggers()
- *      - triggers_fire_and_return_payload      — bulk: each trigger returns array|false
- *      - actions_execute_and_return_valid_format — bulk: each action returns {port,data}
- *
- * 2. TRIGGER TESTS  (hand-written, one per trigger × happy + sad path)
- *    Each trigger has:
- *      - A happy-path test: valid args → assert key fields in the returned array.
- *      - A sad-path test:   invalid/missing args → assert false.
- *      - Any edge-case tests specific to that trigger's logic.
- *
- * 3. ACTION TESTS
- *    Academy has no actions — execute_node() is a passthrough.
- *    We verify the contract and passthrough behaviour only.
- *
- * ── Reading guide for team members ───────────────────────────────────────────
- *
- *  makeTriggerNode($event, $config)
- *      Builds the $node array that resolve_trigger() receives.
- *      $config maps to $node['data']['config'] — this is how "selected course"
- *      / "selected quiz" / "target percentage" etc. get passed in.
- *
- *  makeAttempt(array $overrides)
- *      Builds the stdClass object that Academy fires for quiz events.
- *      Fields: quiz_id, user_id, earned_marks, total_marks, attempt_status.
- *
- *  getTriggerTests()
- *      Provides minimal valid args for each trigger to satisfy the bulk runner.
- *      The bulk runner only checks array|false — detailed checks are in the
- *      hand-written tests below.
- *
- * ── Triggers covered ─────────────────────────────────────────────────────────
- *
- *   user_enroll_course         — fired when a user enrolls
- *   course_complete            — fired when a user finishes a course
- *   lesson_complete            — fired when a user finishes a lesson
- *   academy_quiz_course_attempt — fired when a quiz attempt is submitted
- *   quiz_target                — fired when a quiz attempt meets a % target
- * ─────────────────────────────────────────────────────────────────────────────
- */
+/** Regression coverage for Academy's actual hook signatures. */
 class AcademyTest extends IntegrationTestCase {
 
 	// -------------------------------------------------------------------------
@@ -100,13 +54,13 @@ class AcademyTest extends IntegrationTestCase {
 	protected function getTriggerTests(): array {
 		return [
 			// course_id / enroll_id are passed as positional args.
-			'user_enroll_course'          => [ 1, 99 ],
+			'user_enroll_course'          => [ 1, 99, 1 ],
 
 			// course_complete: course_id, user_id
 			'course_complete'             => [ 1, 1 ],
 
 			// lesson_complete: lesson_id, user_id
-			'lesson_complete'             => [ 5, 1 ],
+			'lesson_complete'             => [ 'lesson', 1, 5, 1 ],
 
 			// quiz attempt object with attempt_ended status
 			'academy_quiz_course_attempt' => [ $this->makeAttempt() ],
@@ -123,7 +77,7 @@ class AcademyTest extends IntegrationTestCase {
 	public function test_trigger_user_enroll_course_returns_course_and_enroll_ids(): void {
 		$result = Academy::resolve_trigger(
 			$this->makeTriggerNode( 'user_enroll_course' ),
-			[ 42, 7 ]   // course_id=42, enroll_id=7
+			[ 42, 7, 1 ]   // course_id=42, enroll_id=7
 		);
 
 		$this->assertIsArray( $result );
@@ -156,7 +110,7 @@ class AcademyTest extends IntegrationTestCase {
 		// Node configured for course 99, but enrollment is for course 42.
 		$result = Academy::resolve_trigger(
 			$this->makeTriggerNode( 'user_enroll_course', [ 'course_id' => '99' ] ),
-			[ 42, 7 ]
+			[ 42, 7, 1 ]
 		);
 		$this->assertFalse( $result );
 	}
@@ -167,7 +121,7 @@ class AcademyTest extends IntegrationTestCase {
 	public function test_trigger_user_enroll_course_passes_any_course_when_config_is_any(): void {
 		$result = Academy::resolve_trigger(
 			$this->makeTriggerNode( 'user_enroll_course', [ 'course_id' => 'any' ] ),
-			[ 42, 7 ]
+			[ 42, 7, 1 ]
 		);
 		$this->assertIsArray( $result );
 		$this->assertEquals( 42, $result['course_id'] );
@@ -232,7 +186,7 @@ class AcademyTest extends IntegrationTestCase {
 	public function test_trigger_lesson_complete_returns_lesson_and_user_ids(): void {
 		$result = Academy::resolve_trigger(
 			$this->makeTriggerNode( 'lesson_complete' ),
-			[ 5, 1 ]   // lesson_id=5, user_id=1
+			[ 'lesson', 1, 5, 1 ]   // lesson_id=5, user_id=1
 		);
 
 		$this->assertIsArray( $result );
@@ -252,7 +206,7 @@ class AcademyTest extends IntegrationTestCase {
 	public function test_trigger_lesson_complete_returns_false_without_user_id(): void {
 		$result = Academy::resolve_trigger(
 			$this->makeTriggerNode( 'lesson_complete' ),
-			[ 5, 0 ]
+			[ 'lesson', 1, 5, 0 ]
 		);
 		$this->assertFalse( $result );
 	}
@@ -261,7 +215,7 @@ class AcademyTest extends IntegrationTestCase {
 		// Node configured for lesson 99, but completion is for lesson 5.
 		$result = Academy::resolve_trigger(
 			$this->makeTriggerNode( 'lesson_complete', [ 'lesson_id' => '99' ] ),
-			[ 5, 1 ]
+			[ 'lesson', 1, 5, 1 ]
 		);
 		$this->assertFalse( $result );
 	}
@@ -269,7 +223,7 @@ class AcademyTest extends IntegrationTestCase {
 	public function test_trigger_lesson_complete_passes_when_lesson_matches_config(): void {
 		$result = Academy::resolve_trigger(
 			$this->makeTriggerNode( 'lesson_complete', [ 'lesson_id' => '5' ] ),
-			[ 5, 1 ]
+			[ 'lesson', 1, 5, 1 ]
 		);
 		$this->assertIsArray( $result );
 		$this->assertEquals( 5, $result['lesson_id'] );
@@ -425,10 +379,10 @@ class AcademyTest extends IntegrationTestCase {
 	// =========================================================================
 
 	/**
-	 * Academy has no actions — execute_node() is a passthrough that returns
-	 * the input data unchanged on the 'main' port.
+	 * Unknown actions must not silently pass data through.
 	 */
-	public function test_execute_node_is_passthrough(): void {
+	public function test_execute_node_rejects_unknown_action(): void {
+		$this->expectException( \InvalidArgumentException::class );
 		$input  = [ 'course_id' => 1, 'user_id' => 2 ];
 		$result = Academy::execute_node(
 			$this->makeActionNode( '__any__', [] ),
@@ -469,13 +423,13 @@ class AcademyTest extends IntegrationTestCase {
 
 	public function test_trigger_config_schema_for_quiz_attempt(): void {
 		$schema = Academy::get_trigger_config_schema( 'academy_quiz_course_attempt' );
-		$this->assertCount( 1, $schema );
+		$this->assertCount( 2, $schema );
 		$this->assertEquals( 'quiz_id', $schema[0]['key'] );
 	}
 
 	public function test_trigger_config_schema_for_quiz_target_has_two_fields(): void {
 		$schema = Academy::get_trigger_config_schema( 'quiz_target' );
-		$this->assertCount( 2, $schema );
+		$this->assertCount( 3, $schema );
 
 		$keys = array_column( $schema, 'key' );
 		$this->assertContains( 'quiz_id',           $keys );
@@ -484,7 +438,7 @@ class AcademyTest extends IntegrationTestCase {
 
 	public function test_trigger_config_schema_for_lesson_trigger(): void {
 		$schema = Academy::get_trigger_config_schema( 'lesson_complete' );
-		$this->assertCount( 1, $schema );
+		$this->assertCount( 2, $schema );
 		$this->assertEquals( 'lesson_id', $schema[0]['key'] );
 	}
 
@@ -492,8 +446,10 @@ class AcademyTest extends IntegrationTestCase {
 		$this->assertSame( [], Academy::get_trigger_config_schema( '__unknown__' ) );
 	}
 
-	public function test_get_actions_returns_empty_array(): void {
-		$this->assertSame( [], Academy::get_actions() );
+	public function test_get_actions_preserves_existing_actions(): void {
+		foreach ( [ 'enroll-course', 'unenroll-course', 'complete-lesson', 'complete-course' ] as $action ) {
+			$this->assertArrayHasKey( $action, Academy::get_actions() );
+		}
 	}
 
 	public function test_get_dynamic_queries_has_all_keys(): void {
