@@ -4,7 +4,7 @@ namespace Zaplane\Tests\Utils;
 
 use Zaplane\Authoring\Catalog;
 use Zaplane\Authoring\GraphValidator;
-use Zaplane\Database\Seeders\CustomerLifecycleGroupSeeder;
+use Zaplane\Recipes\RecipeCompiler;
 use Zaplane\Services\RecipeGroupBuilder;
 use Zaplane\Tests\TestCase;
 
@@ -13,6 +13,15 @@ class CustomerLifecycleGroupTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Catalog::flush();
+	}
+
+	/**
+	 * The group, as the recipe file registers it.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private static function group(): array {
+		return RecipeCompiler::blueprint( require ZAPLANE_ROOT_DIR_PATH . 'includes/recipes/shipped/woocommerce-customer-lifecycle.php' );
 	}
 
 	/**
@@ -52,7 +61,7 @@ class CustomerLifecycleGroupTest extends TestCase {
 	}
 
 	public function test_every_setup_builds_workflows_whose_steps_all_resolve(): void {
-		$group = CustomerLifecycleGroupSeeder::definition();
+		$group = self::group();
 		$built = 0;
 
 		foreach ( $this->everySetup( $group ) as $given ) {
@@ -79,7 +88,7 @@ class CustomerLifecycleGroupTest extends TestCase {
 	}
 
 	public function test_every_workflow_passes_the_validator_with_its_options_on_and_off(): void {
-		$group = CustomerLifecycleGroupSeeder::definition();
+		$group = self::group();
 
 		foreach ( [ true, false ] as $on ) {
 			$given = [
@@ -105,7 +114,7 @@ class CustomerLifecycleGroupTest extends TestCase {
 	}
 
 	public function test_the_setup_values_reach_the_trigger_the_coupon_and_the_email(): void {
-		$group   = CustomerLifecycleGroupSeeder::definition();
+		$group   = self::group();
 		$answers = RecipeGroupBuilder::answers(
 			$group,
 			[

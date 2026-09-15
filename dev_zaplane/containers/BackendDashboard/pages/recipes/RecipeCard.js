@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { route_path } from '@ZAPUtils/helper';
 import WPModal from '@ZAPComponents/Modal/WPModal';
-import { deleteRecipe, recipeToWorkflow, updateRecipe } from '@ZAPRedux/Slices/recipeSlice/recipeSlice';
+import { deleteRecipe, updateRecipe } from '@ZAPRedux/Slices/recipeSlice/recipeSlice';
 import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import { IoIosPlay } from 'react-icons/io';
 import { FiLayers } from 'react-icons/fi';
@@ -17,43 +15,20 @@ const RecipeCard = ({
   recipe
 }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [isConvertOpen, setIsConvertOpen] = useState(false);
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
-  const [titleOverride, setTitleOverride] = useState(recipe?.title || '');
   const [title, setTitle] = useState(recipe?.title || '');
-  const [loading, setLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const isGroup = recipe?.type === 'group';
   const workflowCount = recipe?.workflows?.length || 0;
   useEffect(() => {
-    setTitleOverride(recipe?.title || '');
     setTitle(recipe?.title || '');
   }, [recipe]);
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this recipe?")) {
       dispatch(deleteRecipe(recipe.id));
     }
-  };
-  const handleConvert = async () => {
-    setLoading(true);
-    try {
-      const response = await dispatch(recipeToWorkflow({
-        recipeId: recipe.id,
-        payload: {
-          title: titleOverride?.trim() || undefined
-        }
-      })).unwrap();
-      if (response?.workflow_id) {
-        navigate(`${route_path}admin.php?page=zaplane-workflows&action=edit&id=${response.workflow_id}`);
-      }
-      setIsConvertOpen(false);
-    } catch (err) {
-      console.error(err);
-    }
-    setLoading(false);
   };
   const handleRename = async () => {
     if (!title.trim()) return;
@@ -123,7 +98,7 @@ const RecipeCard = ({
       <div className="mt-5">
         <ZAPTooltip content={isGroup ? __('Choose which workflows to set up', 'zaplane') : __('Use Recipe', 'zaplane')}>
           <button
-            onClick={() => (isGroup ? setIsSetupOpen(true) : setIsConvertOpen(true))}
+            onClick={() => setIsSetupOpen(true)}
             className="flex w-full items-center justify-center gap-2 px-4 py-2.5 rounded bg-[var(--zaplane-primary)] text-white text-[13px] font-semibold hover:opacity-90 active:opacity-80 transition-all"
           >
             <IoIosPlay size={14} />
@@ -133,23 +108,8 @@ const RecipeCard = ({
       </div>
     </div>
 
-    {isGroup && <RecipeGroupWizard recipe={recipe} isOpen={isSetupOpen} onClose={() => setIsSetupOpen(false)} />}
-
-    {/* Convert Modal */}
-    <WPModal title={__('Use Recipe', 'zaplane')} isOpen={isConvertOpen} onRequestClose={() => setIsConvertOpen(false)} size="small">
-      <div align="stretch" className="flex flex-col gap-4">
-        <ZAPInput
-          label={__('Workflow title (optional)', 'zaplane')}
-          value={titleOverride} onChange={e => setTitleOverride(e.target.value)} />
-
-
-        <div className="flex gap-3">
-          <button style={primaryBtn} onClick={handleConvert} disabled={loading}>
-            {__('Create Workflow', 'zaplane')}
-          </button>
-        </div>
-      </div>
-    </WPModal>
+    {/* Every recipe opens a setup built from what it asks for. */}
+    <RecipeGroupWizard recipe={recipe} isOpen={isSetupOpen} onClose={() => setIsSetupOpen(false)} />
 
     {/* Rename Modal  */}
     <WPModal title={__("Rename Recipe", "zaplane")} isOpen={isRenameOpen} onRequestClose={() => setIsRenameOpen(false)} size="small">

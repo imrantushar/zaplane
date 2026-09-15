@@ -16,7 +16,9 @@ const DoneStep = ({ result, onOpenWorkflow }) => {
             {sprintf(_n("Created %d workflow", "Created %d workflows", workflows.length, "zaplane"), workflows.length)}
           </p>
           <p className="zgs-done__text">
-            {sprintf(__("In the folder “%s”.", "zaplane"), result.folder.title)}
+            {result.folder
+              ? sprintf(__("In the folder “%s”.", "zaplane"), result.folder.title)
+              : __("It's with your other workflows.", "zaplane")}
             {notOn > 0 && ` ${sprintf(_n("%d couldn't be turned on yet.", "%d couldn't be turned on yet.", notOn, "zaplane"), notOn)}`}
           </p>
         </div>

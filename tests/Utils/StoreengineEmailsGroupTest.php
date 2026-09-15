@@ -4,8 +4,9 @@ namespace Zaplane\Tests\Utils;
 
 use Zaplane\Authoring\Catalog;
 use Zaplane\Authoring\GraphValidator;
-use Zaplane\Database\Seeders\StoreengineEmailsGroupSeeder;
+use Zaplane\Recipes\RecipeCompiler;
 use Zaplane\Services\RecipeGroupBuilder;
+use Zaplane\Services\StoreengineEmailHandover;
 use Zaplane\Tests\TestCase;
 
 class StoreengineEmailsGroupTest extends TestCase {
@@ -19,6 +20,15 @@ class StoreengineEmailsGroupTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Catalog::flush();
+	}
+
+	/**
+	 * The group, as the recipe file registers it.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private static function group(): array {
+		return RecipeCompiler::blueprint( require ZAPLANE_ROOT_DIR_PATH . 'includes/recipes/shipped/storeengine-store-emails.php' );
 	}
 
 	/**
@@ -53,7 +63,7 @@ class StoreengineEmailsGroupTest extends TestCase {
 	}
 
 	public function test_each_workflow_builds_with_its_options_on_or_off_and_every_step_resolves(): void {
-		$group = StoreengineEmailsGroupSeeder::definition();
+		$group = self::group();
 		$built = [];
 
 		foreach ( $this->setupsOfEachWorkflow( $group ) as $key => $given ) {
@@ -80,7 +90,7 @@ class StoreengineEmailsGroupTest extends TestCase {
 	}
 
 	public function test_every_workflow_passes_the_validator_with_its_options_on_and_off(): void {
-		$group = StoreengineEmailsGroupSeeder::definition();
+		$group = self::group();
 
 		foreach ( [ true, false ] as $on ) {
 			$given = [
@@ -105,7 +115,7 @@ class StoreengineEmailsGroupTest extends TestCase {
 	}
 
 	public function test_the_setup_values_reach_the_store_alert_the_wait_and_the_coupon(): void {
-		$group = StoreengineEmailsGroupSeeder::definition();
+		$group = self::group();
 		$none  = array_fill_keys( array_column( RecipeGroupBuilder::workflows( $group ), 'key' ), false );
 
 		$answers = RecipeGroupBuilder::answers(
@@ -138,7 +148,7 @@ class StoreengineEmailsGroupTest extends TestCase {
 	}
 
 	public function test_a_store_alert_needs_an_address(): void {
-		$group = StoreengineEmailsGroupSeeder::definition();
+		$group = self::group();
 
 		$this->expectException( \InvalidArgumentException::class );
 
@@ -152,7 +162,7 @@ class StoreengineEmailsGroupTest extends TestCase {
 	}
 
 	public function test_the_refund_email_reads_whichever_refund_trigger_fired(): void {
-		$group   = StoreengineEmailsGroupSeeder::definition();
+		$group   = self::group();
 		$none    = array_fill_keys( array_column( RecipeGroupBuilder::workflows( $group ), 'key' ), false );
 		$answers = RecipeGroupBuilder::answers(
 			$group,
@@ -171,8 +181,8 @@ class StoreengineEmailsGroupTest extends TestCase {
 	}
 
 	public function test_each_workflow_that_takes_over_an_email_names_one_storeengine_sends(): void {
-		$keys     = array_column( RecipeGroupBuilder::workflows( StoreengineEmailsGroupSeeder::definition() ), 'key' );
-		$handover = StoreengineEmailsGroupSeeder::HANDOVER;
+		$keys     = array_column( RecipeGroupBuilder::workflows( self::group() ), 'key' );
+		$handover = StoreengineEmailHandover::EMAILS;
 
 		foreach ( $handover as $workflow => $email ) {
 			$this->assertContains( $workflow, $keys );
@@ -184,7 +194,7 @@ class StoreengineEmailsGroupTest extends TestCase {
 	}
 
 	public function test_no_step_is_read_by_its_number(): void {
-		$group = StoreengineEmailsGroupSeeder::definition();
+		$group = self::group();
 
 		foreach ( $this->setupsOfEachWorkflow( $group ) as $key => $given ) {
 			$graph = RecipeGroupBuilder::build( $group, RecipeGroupBuilder::answers( $group, $given ) )[0]['graph'];
@@ -198,7 +208,7 @@ class StoreengineEmailsGroupTest extends TestCase {
 	 * its own fields, so every {{code}} has to come right after a coupon step.
 	 */
 	public function test_each_bare_field_is_read_right_after_the_step_that_gives_it(): void {
-		$group = StoreengineEmailsGroupSeeder::definition();
+		$group = self::group();
 		$reads = 0;
 
 		foreach ( $this->setupsOfEachWorkflow( $group ) as $key => $given ) {
