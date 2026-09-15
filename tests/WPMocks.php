@@ -494,6 +494,12 @@ namespace {
 
 	// ── Transients ────────────────────────────────────────────────────────────
 
+	if ( ! function_exists( '_doing_it_wrong' ) ) {
+		function _doing_it_wrong( $function_name, $message, $version ): void {
+			$GLOBALS['zaplane_test_doing_it_wrong'][] = (string) $message;
+		}
+	}
+
 	if ( ! function_exists( 'get_transient' ) ) {
 		function get_transient( string $key ) {
 			return WPMocks::getTransient( $key );

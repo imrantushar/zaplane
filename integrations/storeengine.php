@@ -234,6 +234,10 @@ class Storeengine extends IntegrationBase {
 				'label' => 'Subscription Renewal Failed',
 				'hook'  => 'storeengine/subscription/failed_to_create_renewal_order',
 			],
+			'subscription_renewal_payment_failed' => [
+				'label' => 'Subscription Renewal Payment Failed',
+				'hook'  => 'storeengine/subscription/renewal_payment_failed',
+			],
 			'subscription_trial_ended' => [
 				'label' => 'Subscription Trial Ended',
 				'hook'  => 'storeengine/subscription/trial_ended',
@@ -349,7 +353,135 @@ class Storeengine extends IntegrationBase {
 				)
 				: '',
 			'items'          => $items,
-		], $extra );
+		], self::order_email_fields( $order_obj, $items ), $extra );
+	}
+
+	/**
+	 * An order's details as an email shows them: a first name to greet, the date it
+	 * was placed, the total with its currency symbol, the items on one line, how it
+	 * was paid, and links to view it, pay for it, and open it in the admin.
+	 *
+	 * @param object                         $order_obj
+	 * @param array<int,array<string,mixed>> $items
+	 * @return array<string,string>
+	 */
+	private static function order_email_fields( $order_obj, array $items ): array {
+		$summary = [];
+		foreach ( $items as $item ) {
+			if ( isset( $item['name'] ) && '' !== (string) $item['name'] ) {
+				$summary[] = $item['name'] . ' × ' . ( '' !== (string) ( $item['quantity'] ?? '' ) ? $item['quantity'] : 1 );
+			}
+		}
+
+		$date = method_exists( $order_obj, 'get_order_placed_date' ) ? $order_obj->get_order_placed_date() : null;
+		if ( ! $date && method_exists( $order_obj, 'get_date_created_gmt' ) ) {
+			$date = $order_obj->get_date_created_gmt();
+		}
+
+		return [
+			'first_name'           => method_exists( $order_obj, 'get_billing_first_name' ) ? (string) $order_obj->get_billing_first_name() : '',
+			'order_date'           => is_object( $date ) && method_exists( $date, 'date' ) ? (string) $date->date( (string) get_option( 'date_format' ) ?: 'F j, Y' ) : '',
+			'total_formatted'      => self::formatted_price( $order_obj->get_total(), (string) $order_obj->get_currency() ),
+			'items_summary'        => implode( ', ', $summary ),
+			'payment_method_title' => method_exists( $order_obj, 'get_payment_method_title' ) ? (string) $order_obj->get_payment_method_title() : '',
+			'order_url'            => method_exists( $order_obj, 'get_view_order_url' ) ? (string) $order_obj->get_view_order_url() : '',
+			'payment_url'          => method_exists( $order_obj, 'get_checkout_payment_url' ) ? (string) $order_obj->get_checkout_payment_url() : '',
+			'edit_order_url'       => method_exists( $order_obj, 'get_edit_order_url' ) ? (string) $order_obj->get_edit_order_url() : '',
+		];
+	}
+
+	/**
+	 * A price as the store writes it, such as $49.00, in plain text.
+	 *
+	 * @param mixed $amount
+	 */
+	private static function formatted_price( $amount, string $currency = '' ): string {
+		if ( ! is_scalar( $amount ) || '' === (string) $amount ) {
+			return '';
+		}
+
+		if ( ! method_exists( '\StoreEngine\Utils\Formatting', 'price' ) ) {
+			return trim( $amount . ' ' . $currency );
+		}
+
+		$price = \StoreEngine\Utils\Formatting::price(
+			$amount,
+			[
+				'currency' => $currency,
+				'in_span'  => false,
+			]
+		);
+
+		return html_entity_decode( wp_strip_all_tags( $price ), ENT_QUOTES, 'UTF-8' );
+	}
+
+	/**
+	 * A status as StoreEngine names it, such as "On Hold" for on_hold.
+	 *
+	 * @param mixed  $status As the hook passed it; anything but a status gets no label.
+	 * @param string $kind   order, or shipping for a shipment's status.
+	 */
+	private static function status_label( $status, string $kind = 'order' ): string {
+		if ( ! is_scalar( $status ) || '' === (string) $status ) {
+			return '';
+		}
+
+		$status = (string) $status;
+
+		if ( 'shipping' === $kind && method_exists( '\StoreEngine\Utils\Constants', 'get_shipping_status_label' ) ) {
+			return (string) \StoreEngine\Utils\Constants::get_shipping_status_label( $status );
+		}
+
+		if ( 'order' === $kind && method_exists( '\StoreEngine\Classes\OrderStatus\OrderStatus', 'get_order_status_name' ) ) {
+			return (string) \StoreEngine\Classes\OrderStatus\OrderStatus::get_order_status_name( $status );
+		}
+
+		return ucwords( str_replace( [ '_', '-' ], ' ', $status ) );
+	}
+
+	/**
+	 * How much a refund gave back, and the reason given for it.
+	 *
+	 * @param mixed $refund_id
+	 * @return array<string,string>
+	 */
+	private static function refund_details( $refund_id ): array {
+		$details = [
+			'refund_amount'           => '',
+			'refund_amount_formatted' => '',
+			'refund_reason'           => '',
+		];
+
+		if ( ! is_numeric( $refund_id ) || ! $refund_id || ! class_exists( '\StoreEngine\Classes\Refund' ) ) {
+			return $details;
+		}
+
+		try {
+			$refund = new \StoreEngine\Classes\Refund( (int) $refund_id );
+		} catch ( \Throwable $e ) {
+			return $details;
+		}
+
+		// StoreEngine keeps a refund as a negative total; an email says how much went back.
+		$amount = $refund->get_amount();
+		$amount = is_numeric( $amount ) ? (string) abs( (float) $amount ) : '';
+
+		return [
+			'refund_amount'           => $amount,
+			'refund_amount_formatted' => self::formatted_price( $amount, (string) $refund->get_currency() ),
+			'refund_reason'           => (string) $refund->get_reason(),
+		];
+	}
+
+	/**
+	 * Whether an order renews a subscription. A failed renewal has a trigger of its own.
+	 */
+	private static function is_renewal_order( int $order_id ): bool {
+		$collection = '\StoreEngine\Addons\Subscription\Classes\SubscriptionCollection';
+
+		return $order_id > 0
+			&& method_exists( $collection, 'order_contains_subscription' )
+			&& (bool) $collection::order_contains_subscription( $order_id, [ 'renewal' ] );
 	}
 
 	private static function resolve_product_payload( $product, array $extra = [] ) {
@@ -400,7 +532,13 @@ class Storeengine extends IntegrationBase {
 			'currency'        => method_exists( $sub, 'get_currency' ) ? $sub->get_currency() : '',
 			'customer_id'     => method_exists( $sub, 'get_customer_id' ) ? $sub->get_customer_id() : '',
 			'customer_email'  => method_exists( $sub, 'get_billing_email' ) ? $sub->get_billing_email() : '',
+			'first_name'      => method_exists( $sub, 'get_billing_first_name' ) ? (string) $sub->get_billing_first_name() : '',
+			'customer_name'   => method_exists( $sub, 'get_billing_first_name' ) && method_exists( $sub, 'get_billing_last_name' )
+				? trim( $sub->get_billing_first_name() . ' ' . $sub->get_billing_last_name() )
+				: '',
 		];
+
+		$data['total_formatted'] = self::formatted_price( $data['total'], (string) $data['currency'] );
 
 		if ( method_exists( $sub, 'get_next_payment_date' ) ) {
 			$next = $sub->get_next_payment_date();
@@ -452,8 +590,12 @@ class Storeengine extends IntegrationBase {
 				$old      = $args[1] ?? '';
 				$new      = $args[2] ?? '';
 				return self::resolve_order_payload( $order_id, [
-					'old_status' => $old,
-					'new_status' => $new,
+					'old_status'       => $old,
+					'new_status'       => $new,
+					'old_status_label' => self::status_label( $old ),
+					'new_status_label' => self::status_label( $new ),
+					// Checkout moves an order through statuses the customer needn't hear about.
+					'during_checkout'  => defined( 'STOREENGINE_DOING_CHECKOUT' ) && STOREENGINE_DOING_CHECKOUT,
 				] );
 
 			case 'order_status_on_hold':
@@ -469,8 +611,13 @@ class Storeengine extends IntegrationBase {
 				$transition = $args[2] ?? [];
 				$extra      = [];
 				if ( is_array( $transition ) ) {
-					$extra['old_status'] = $transition['from'] ?? '';
-					$extra['new_status'] = $transition['to'] ?? '';
+					$extra['old_status']       = $transition['from'] ?? '';
+					$extra['new_status']       = $transition['to'] ?? '';
+					$extra['old_status_label'] = self::status_label( $extra['old_status'] );
+					$extra['new_status_label'] = self::status_label( $extra['new_status'] );
+				}
+				if ( 'order_status_failed' === $node['event'] ) {
+					$extra['is_renewal'] = self::is_renewal_order( is_numeric( $order_id ) ? (int) $order_id : 0 );
 				}
 				return self::resolve_order_payload( $order_id, $extra );
 
@@ -493,16 +640,16 @@ class Storeengine extends IntegrationBase {
 			case 'order_fully_refunded':
 				$order_id  = $args[0] ?? 0;
 				$refund_id = $args[1] ?? 0;
-				return self::resolve_order_payload( $order_id, [ 'refund_id' => $refund_id ] );
+				return self::resolve_order_payload( $order_id, array_merge( [ 'refund_id' => $refund_id ], self::refund_details( $refund_id ) ) );
 
 			case 'order_partially_refunded':
 				$order_id        = $args[0] ?? 0;
 				$refund_id       = $args[1] ?? 0;
 				$remaining_amount = $args[2] ?? 0;
-				return self::resolve_order_payload( $order_id, [
+				return self::resolve_order_payload( $order_id, array_merge( [
 					'refund_id'        => $refund_id,
 					'remaining_amount' => $remaining_amount,
-				] );
+				], self::refund_details( $refund_id ) ) );
 
 			case 'payment_refunded':
 				$order_id        = $args[0] ?? 0;
@@ -523,11 +670,17 @@ class Storeengine extends IntegrationBase {
 				$order_id      = $args[0] ?? 0;
 				$order_item_id = $args[1] ?? 0;
 				$product_id    = $args[2] ?? 0;
+				$shipment      = is_array( $args[3] ?? null ) ? $args[3] : [];
 				$new_status    = $args[4] ?? '';
 				return self::resolve_order_payload( $order_id, [
-					'order_item_id'  => $order_item_id,
-					'product_id'     => $product_id,
-					'shipment_status' => $new_status,
+					'order_item_id'         => $order_item_id,
+					'product_id'            => $product_id,
+					'shipment_status'       => $new_status,
+					'shipment_status_label' => self::status_label( $new_status, 'shipping' ),
+					'item_name'             => is_numeric( $product_id ) && $product_id ? html_entity_decode( get_the_title( (int) $product_id ), ENT_QUOTES, 'UTF-8' ) : '',
+					'courier'               => (string) ( $shipment['courier'] ?? '' ),
+					'tracking_number'       => (string) ( $shipment['tracking_number'] ?? '' ),
+					'tracking_url'          => (string) ( $shipment['tracking_url'] ?? '' ),
 				] );
 
 			case 'order_fully_delivered':
@@ -687,6 +840,16 @@ class Storeengine extends IntegrationBase {
 				$sub = $args[1] ?? null;
 				return self::resolve_subscription_payload( $sub );
 
+			case 'subscription_renewal_payment_failed':
+				$sub           = $args[0] ?? null;
+				$renewal_order = $args[1] ?? null;
+				$has_order     = is_object( $renewal_order ) && method_exists( $renewal_order, 'get_id' );
+				return self::resolve_subscription_payload( $sub, [
+					'renewal_order_id' => $has_order ? (int) $renewal_order->get_id() : '',
+					// Paying for the renewal order puts the subscription back on track.
+					'payment_url'      => $has_order && method_exists( $renewal_order, 'get_checkout_payment_url' ) ? $renewal_order->get_checkout_payment_url() : '',
+				] );
+
 			case 'subscription_trial_ended':
 				$subscription_id = $args[0] ?? 0;
 				return self::resolve_subscription_payload( $subscription_id );
@@ -774,15 +937,76 @@ class Storeengine extends IntegrationBase {
 					'total' => '49.00'
 				],
 			],
+			'first_name'           => 'John',
+			'order_date'           => 'September 14, 2026',
+			'total_formatted'      => '$49.00',
+			'items_summary'        => 'Pro Plan × 1',
+			'payment_method_title' => 'Card',
+			'order_url'            => 'https://example.com/dashboard/orders/101/',
+			'payment_url'          => 'https://example.com/checkout/order-pay/101/?pay_for_order=true&key=se_order_5f2b1c',
+			'edit_order_url'       => 'https://example.com/wp-admin/admin.php?page=storeengine-orders&id=101&action=edit',
+		];
+
+		$status_sample = [
+			'old_status'       => 'processing',
+			'new_status'       => 'completed',
+			'old_status_label' => 'Processing',
+			'new_status_label' => 'Completed',
+		];
+
+		$refund_sample = [
+			'refund_id'               => 55,
+			'refund_amount'           => '49.00',
+			'refund_amount_formatted' => '$49.00',
+			'refund_reason'           => 'Arrived damaged',
+		];
+
+		$subscription_sample = [
+			'subscription_id'   => 9,
+			'status'            => 'active',
+			'total'             => '49.00',
+			'currency'          => 'USD',
+			'customer_id'       => 5,
+			'customer_email'    => 'john@example.com',
+			'first_name'        => 'John',
+			'customer_name'     => 'John Doe',
+			'next_payment_date' => '2026-10-14 00:00:00',
+			'total_formatted'   => '$49.00',
 		];
 
 		$samples = [
 			'order_paid'                  => array_merge( $order_sample, [ 'transaction_id' => 'txn_123' ] ),
-			'order_status_update'         => array_merge( $order_sample, [
-				'old_status' => 'processing',
-				'new_status' => 'completed'
+			'order_status_update'         => array_merge( $order_sample, $status_sample, [ 'during_checkout' => false ] ),
+			'order_status_failed'         => array_merge( $order_sample, [
+				'order_status'     => 'payment_failed',
+				'old_status'       => 'pending_payment',
+				'new_status'       => 'payment_failed',
+				'old_status_label' => 'Pending Payment',
+				'new_status_label' => 'Payment Failed',
+				'is_renewal'       => false,
 			] ),
-			'order_fully_refunded'        => array_merge( $order_sample, [ 'refund_id' => 55 ] ),
+			'order_fully_refunded'        => array_merge( $order_sample, $refund_sample ),
+			'order_partially_refunded'    => array_merge( $order_sample, $refund_sample, [
+				'refund_amount'           => '10.00',
+				'refund_amount_formatted' => '$10.00',
+				'remaining_amount'        => '39.00',
+			] ),
+			'order_item_shipped'          => array_merge( $order_sample, [
+				'order_item_id'         => 31,
+				'product_id'            => 12,
+				'shipment_status'       => 'shipped',
+				'shipment_status_label' => 'Shipped',
+				'item_name'             => 'Pro Plan',
+				'courier'               => 'Express Courier',
+				'tracking_number'       => 'EC123456789',
+				'tracking_url'          => 'https://example.com/track/EC123456789',
+			] ),
+			'order_customer_note_added'   => array_merge( $order_sample, [ 'note' => 'Your order ships tomorrow.' ] ),
+			'subscription_renewal_payment_failed' => array_merge( $subscription_sample, [
+				'status'           => 'on_hold',
+				'renewal_order_id' => 120,
+				'payment_url'      => 'https://example.com/checkout/order-pay/120/?pay_for_order=true&key=se_order_9d41aa',
+			] ),
 			'customer_created'            => [
 				'customer_id' => 5,
 				'email' => 'john@example.com',
@@ -851,10 +1075,7 @@ class Storeengine extends IntegrationBase {
 		// Category fallback so every trigger exposes fields in the "@" picker even
 		// before a capture, matching the shape resolve_trigger actually emits.
 		if ( 0 === strpos( $trigger, 'order_status_' ) ) {
-			return array_merge( $order_sample, [
-				'old_status' => 'processing',
-				'new_status' => 'completed'
-			] );
+			return array_merge( $order_sample, $status_sample );
 		}
 		if ( 0 === strpos( $trigger, 'order' ) || 0 === strpos( $trigger, 'checkout' )
 			|| in_array( $trigger, [ 'product_purchased', 'add_to_cart', 'payment_refunded' ], true ) ) {
@@ -870,14 +1091,10 @@ class Storeengine extends IntegrationBase {
 			];
 		}
 		if ( 0 === strpos( $trigger, 'subscription' ) ) {
-			return [
-				'subscription_id' => 9,
-				'status'          => 'active',
-				'old_status'      => 'pending',
-				'new_status'      => 'active',
-				'customer_id'     => 5,
-				'total'           => '49.00',
-			];
+			return array_merge( $subscription_sample, [
+				'old_status' => 'pending',
+				'new_status' => 'active',
+			] );
 		}
 		if ( 0 === strpos( $trigger, 'customer' ) ) {
 			return [
@@ -1258,6 +1475,13 @@ class Storeengine extends IntegrationBase {
 						'label' => 'Usage Limit (total)',
 						'type' => 'expression',
 						'required' => false
+					],
+					[
+						'key'      => 'random_suffix',
+						'label'    => 'Add a random ending to the code',
+						'type'     => 'boolean',
+						'required' => false,
+						'help'     => 'Makes a code built from an order or customer number impossible to guess.',
 					],
 				];
 
@@ -1822,6 +2046,10 @@ class Storeengine extends IntegrationBase {
 
 		if ( '' === $code || ! class_exists( '\StoreEngine\Utils\Helper' ) ) {
 			return self::action_error( 'A coupon code is required.' );
+		}
+
+		if ( filter_var( $config['random_suffix'] ?? false, FILTER_VALIDATE_BOOLEAN ) ) {
+			$code .= '-' . strtoupper( wp_generate_password( 6, false ) );
 		}
 
 		$post_type = \StoreEngine\Utils\Helper::COUPON_POST_TYPE;
