@@ -141,11 +141,8 @@ trait InactiveCustomerCronTrait {
 			return;
 		}
 
-		$existing   = \GemCrm\Database\Models\Contact::index( [
-			'email' => $email,
-			'per_page' => 1
-		], null );
-		$contact_id = (int) ( $existing['records'][0]['id'] ?? 0 );
+		$existing   = self::find_gemcrm_contact_by_email( $email );
+		$contact_id = (int) ( $existing['id'] ?? 0 );
 		if ( ! $contact_id ) {
 			return;
 		}
@@ -250,11 +247,7 @@ trait InactiveCustomerCronTrait {
 			return 0;
 		}
 
-		$existing = \GemCrm\Database\Models\Contact::index( [
-			'email' => $email,
-			'per_page' => 1
-		], null );
-		$contact  = $existing['records'][0] ?? null;
+		$contact  = self::find_gemcrm_contact_by_email( $email );
 
 		if ( $contact ) {
 			return (int) ( $contact['id'] ?? 0 );
@@ -291,5 +284,25 @@ trait InactiveCustomerCronTrait {
 				\GemCrm\Database\Models\ListModel::attach_single( $contact_id, $list_id );
 			}
 		}
+	}
+
+	/**
+	 * The GemCRM contact with this email address, or null. Contact::index()
+	 * was used for this, but its sanitizer drops the unknown 'email' key, so
+	 * it returned the newest contact — tags went on the wrong person and the
+	 * customer was matched to someone else's contact id.
+	 */
+	private static function find_gemcrm_contact_by_email( string $email ): ?array {
+		if ( '' === $email || ! class_exists( \GemCrm\Database\Utils\QueryBuilder::class ) ) {
+			return null;
+		}
+
+		$contact = \GemCrm\Database\Utils\QueryBuilder::ins()
+			->select( [ 'id', 'email', 'status' ] )
+			->from( 'gemcrm_contacts' )
+			->where( 'email', '=', $email )
+			->first();
+
+		return empty( $contact ) ? null : $contact;
 	}
 }
