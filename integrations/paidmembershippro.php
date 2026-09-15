@@ -241,7 +241,7 @@ class Paidmembershippro extends IntegrationBase {
 			'user_email'   => 'jane@example.com',
 			'display_name' => 'Jane Doe',
 			'nickname'     => 'janedoe',
-			'avatar_url'   => 'https://www.gravatar.com/avatar/0123456789abcdef?s=96&d=mm&r=g',
+			'avatar_url'   => 'https://example.com/avatar.png',
 			'user_roles'   => [ 'subscriber' ],
 			'role'         => 'subscriber',
 		];

@@ -4,7 +4,7 @@ Tags: automation, workflow, woocommerce, marketing automation, crm
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -24,7 +24,7 @@ Build workflows visually on a drag-and-drop canvas — no code required — and 
 * **Powerful flow control** — delays, conditions, filters, iterators (loops), custom variables and raw HTTP/webhook requests.
 * **Reliable background processing** — long-running and scheduled steps are powered by Action Scheduler.
 * **Ready-made recipes** — start from pre-built templates for common automations.
-* **Optional AI steps** — write replies, run a tool-calling agent or search your own knowledge base, with your own OpenAI, Anthropic or Google Gemini key, or the AI provider configured in WordPress.
+* **Optional AI steps** — write replies, run a tool-calling agent or search your own knowledge base, through the AI Client built into WordPress 7.0 and later, on the provider you set up once for your whole site. On older WordPress versions, or for what the AI Client cannot do yet (audio transcription and knowledge-base embeddings), you can use your own OpenAI, Anthropic or Google Gemini key instead.
 * **Optional MCP server** — off by default. When you turn it on, an AI client you approve can read your workflows and build new ones through scoped, revocable access.
 
 = Ready-made recipe templates =
@@ -152,6 +152,14 @@ Zaplane contacts no external service when you install, activate or browse it, an
 * Terms of service: https://policies.google.com/terms and https://developers.google.com/terms
 * Privacy policy: https://policies.google.com/privacy (see also https://developers.google.com/terms/api-services-user-data-policy)
 
+= AI provider configured in WordPress =
+* Used for: AI and AI Agent steps, and Generate Image, when their connection uses the WordPress AI provider (the default).
+* Sends: Zaplane hands the prompt, conversation history, knowledge context, tool definitions and results, and any image you reference to the AI Client in WordPress core, which sends them to the provider the site owner configured in WordPress. Zaplane stores no key for it and contacts no AI service itself.
+* When: when one of those steps runs.
+* Terms of service and privacy policy: those of the provider configured in WordPress, for example the Anthropic, OpenAI or Google Gemini terms listed below.
+
+The Anthropic, OpenAI, Google Gemini and OpenAI-compatible entries below apply only when you choose that provider on a connection and enter your own key.
+
 = Google Gemini API =
 * Used for: AI steps with the Gemini provider and, if you turn it on, Business Knowledge semantic search, using your Gemini API key (generativelanguage.googleapis.com).
 * Sends: prompts, conversation history, knowledge context and images you reference; for semantic search, knowledge entry titles and content and search queries.
@@ -174,10 +182,10 @@ Zaplane contacts no external service when you install, activate or browse it, an
 * Privacy policy: https://openai.com/policies/privacy-policy/
 
 = OpenAI-compatible providers =
-* Used for: AI and AI Agent steps when you choose the OpenAI-compatible provider and enter a base URL (for example Azure OpenAI, OpenRouter, or a model you host yourself).
+* Used for: AI and AI Agent steps when you choose the OpenAI-compatible provider and enter a base URL (for example Azure OpenAI, OpenRouter at openrouter.ai, or a model you host yourself with Ollama, which stays on your own server).
 * Sends: the same data as the OpenAI provider, to the base URL you entered.
-* When: when you test the connection and when an AI step runs.
-* Terms of service and privacy policy: those of the provider you choose.
+* When: when you test the connection, when the builder loads the models the endpoint lists, and when an AI or AI Agent step runs.
+* Terms of service and privacy policy: those of the provider you choose. For OpenRouter: https://openrouter.ai/terms and https://openrouter.ai/privacy. For Azure OpenAI: https://www.microsoft.com/licensing/terms/ and https://www.microsoft.com/privacy/privacystatement
 
 = Zoom =
 * Used for: the Zoom app (create meetings and webinars, add registrants) through your own Zoom app (api.zoom.us, with OAuth at zoom.us).
@@ -208,7 +216,7 @@ Zaplane contacts no external service when you install, activate or browse it, an
 * Privacy policy: https://www.brevo.com/legal/privacypolicy/
 
 = ActiveCampaign =
-* Used for: the ActiveCampaign app (contacts, lists, tags, automations) at the account API URL and key you enter.
+* Used for: the ActiveCampaign app (contacts, lists, tags, automations) at the account API URL and key you enter (your account's own address, such as youraccount.api-us1.com or youraccount.activehosted.com).
 * Sends: contact email addresses, names and phone numbers, and list, tag and automation IDs.
 * When: when you test the connection and when an ActiveCampaign step runs.
 * Terms of service: https://www.activecampaign.com/legal/terms-of-service
@@ -287,6 +295,31 @@ The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `compo
 
 == Changelog ==
 
+= 1.3.0 =
+**Workflows**
+* A workflow can start from more than one trigger. Whichever fires starts the run, and `{{trigger.*}}` reads its data.
+* Connecting steps is easier: drop a line anywhere on a step's card, and letting go on empty canvas opens the step picker.
+
+**Recipes**
+* Group recipes set up several workflows at once in a new folder, starting with WooCommerce Customer Lifecycle and StoreEngine Store Emails.
+* Every recipe opens a setup for its optional steps, settings and connections. Plugins can register recipes as simple arrays.
+
+**AI**
+* The AI, AI Agent and Generate Image steps use the WordPress AI Client by default on WordPress 7.0 and later, including the agent's tool calling. Your own provider key is still an option.
+
+**AI access (MCP server)**
+* claude.ai and ChatGPT can connect through OAuth, with administrator approval. WordPress application passwords also work.
+* Tool calls are logged, tokens can expire, and run tokens can be limited to chosen workflows.
+
+**Security and compatibility**
+* Merge tags are no longer evaluated as PHP, and outbound requests are checked on every redirect.
+* MCP tokens now act as their own user and require administrator rights.
+* Updates come only from WordPress.org. WordPress 6.8 or later is required.
+
+**Fixes**
+* GemCRM Send Email now reaches only the chosen contact or list.
+* Fixed shipped recipes' Send Email steps, duplicate recipes after a rename, fields with hyphens, forms watched by two triggers, and Logs Re-Try.
+
 = 1.2.0 =
 **New integrations**
 * aBlocks — a Form Submitted trigger for aBlocks form-builder forms.
@@ -351,6 +384,9 @@ The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `compo
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+Adds multiple triggers per workflow, group recipes, WordPress AI Client support and OAuth sign-in for AI clients, and fixes security issues. Requires WordPress 6.8 or later. MCP tokens issued to users without administrator rights stop working.
 
 = 1.2.0 =
 Adds aBlocks and FluentCart integrations, an optional MCP server and a rebuilt dark theme. Optional modules are off on new sites. The Dokan "Withdraw Request Pending" and FluentCart "Order Paid Done" triggers were removed; re-select the trigger in any workflow using them.

@@ -88,8 +88,6 @@ class McpController extends WP_REST_Controller {
 			]
 		);
 
-		$admin = fn() => current_user_can( 'manage_options' );
-
 		// Endpoint URL, whether the feature is on, and the issued tokens
 		// (never their secrets).
 		register_rest_route(
@@ -99,7 +97,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'info' ],
-					'permission_callback' => $admin,
+					'permission_callback' => [ $this, 'can_manage' ],
 				],
 			]
 		);
@@ -111,7 +109,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'connection_authorize_url' ],
-					'permission_callback' => $admin,
+					'permission_callback' => [ $this, 'can_manage' ],
 				],
 			]
 		);
@@ -123,7 +121,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_connection' ],
-					'permission_callback' => $admin,
+					'permission_callback' => [ $this, 'can_manage' ],
 				],
 			]
 		);
@@ -135,7 +133,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_token' ],
-					'permission_callback' => $admin,
+					'permission_callback' => [ $this, 'can_manage' ],
 				],
 			]
 		);
@@ -147,7 +145,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'list_clients' ],
-					'permission_callback' => $admin,
+					'permission_callback' => [ $this, 'can_manage' ],
 				],
 			]
 		);
@@ -159,7 +157,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_client' ],
-					'permission_callback' => $admin,
+					'permission_callback' => [ $this, 'can_manage' ],
 				],
 			]
 		);
@@ -171,7 +169,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'set_alerts' ],
-					'permission_callback' => $admin,
+					'permission_callback' => [ $this, 'can_manage' ],
 				],
 			]
 		);
@@ -183,12 +181,12 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'list_audit' ],
-					'permission_callback' => $admin,
+					'permission_callback' => [ $this, 'can_manage' ],
 				],
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'clear_audit' ],
-					'permission_callback' => $admin,
+					'permission_callback' => [ $this, 'can_manage' ],
 				],
 			]
 		);
@@ -200,7 +198,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'diagnostics' ],
-					'permission_callback' => $admin,
+					'permission_callback' => [ $this, 'can_manage' ],
 				],
 			]
 		);
@@ -241,8 +239,6 @@ class McpController extends WP_REST_Controller {
 	 * @see \Zaplane\Mcp\OAuth\Server
 	 */
 	private function register_oauth_routes(): void {
-		$public = '__return_true';
-
 		register_rest_route(
 			$this->namespace,
 			'/oauth/register',
@@ -250,7 +246,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ OAuthServer::class, 'register' ],
-					'permission_callback' => $public,
+					'permission_callback' => '__return_true',
 				],
 			]
 		);
@@ -262,7 +258,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ OAuthServer::class, 'token' ],
-					'permission_callback' => $public,
+					'permission_callback' => '__return_true',
 				],
 			]
 		);
@@ -274,7 +270,7 @@ class McpController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ OAuthServer::class, 'revoke' ],
-					'permission_callback' => $public,
+					'permission_callback' => '__return_true',
 				],
 			]
 		);
@@ -343,6 +339,14 @@ class McpController extends WP_REST_Controller {
 
 	public static function enabled(): bool {
 		return Settings::feature_enabled( 'mcp_server' );
+	}
+
+	/**
+	 * Permission check for the admin-only routes: the MCP settings screen reads
+	 * and changes them.
+	 */
+	public function can_manage(): bool {
+		return current_user_can( 'manage_options' );
 	}
 
 	/**
