@@ -2,7 +2,6 @@
 
 namespace Zaplane\Tests\Utils;
 
-use Zaplane\Database\Seeders\StoreengineEmailsGroupSeeder;
 use Zaplane\Models\Recipe;
 use Zaplane\Services\StoreengineEmailHandover;
 use Zaplane\Tests\TestCase;
@@ -132,7 +131,7 @@ class StoreengineEmailHandoverTest extends TestCase {
 					[ 'key' => 'new_order_alert', 'id' => 23, 'status' => 'draft', 'error' => 'It needs a connection.' ],
 				],
 			],
-			$this->recipe( StoreengineEmailsGroupSeeder::SLUG )
+			$this->recipe( StoreengineEmailHandover::RECIPE )
 		);
 
 		$this->assertSame(

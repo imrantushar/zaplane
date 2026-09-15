@@ -10,6 +10,7 @@ use Zaplane\Framework\Classes\Container;
 use Zaplane\Models\Recipe;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
+use Zaplane\Recipes\Registry;
 use Zaplane\Services\BlueprintService;
 use Zaplane\Services\RecipeGroupService;
 
@@ -115,7 +116,7 @@ class RecipeController extends WP_REST_Controller {
 			],
 		] );
 
-		// A group recipe's setup: GET describes what it asks, POST creates the workflows.
+		// A recipe's setup: GET describes what it asks, POST creates the workflows.
 		register_rest_route( $this->namespace, '/recipes/(?P<id>\d+)/setup', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -135,6 +136,9 @@ class RecipeController extends WP_REST_Controller {
 	}
 
 	public function get_items( $request ) {
+		// A recipe a plugin registered, or one that changed, shows up without an update.
+		Registry::instance()->sync();
+
 		$page    = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
 		$perPage = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 		$type    = (string) ( $request->get_param( 'type' ) ?? '' );
@@ -160,6 +164,8 @@ class RecipeController extends WP_REST_Controller {
 	}
 
 	public function get_item( $request ) {
+		Registry::instance()->sync();
+
 		$recipe = Recipe::find( (int) $request['id'] );
 		if ( ! $recipe ) {
 			return new WP_Error( 'not_found', 'Recipe not found.', [ 'status' => 404 ] );
@@ -287,6 +293,24 @@ class RecipeController extends WP_REST_Controller {
 
 		$titleOverride = sanitize_text_field( $request->get_param( 'title' ) ?? '' );
 
+		// A registered recipe is set up with its defaults, as its setup would.
+		if ( isset( $blueprint['workflows'] ) ) {
+			try {
+				$created = ( new RecipeGroupService() )->install( $recipe, [ 'title' => $titleOverride ] )['workflows'][0];
+			} catch ( \InvalidArgumentException $e ) {
+				return new WP_Error( 'invalid_setup', $e->getMessage(), [ 'status' => 400 ] );
+			} catch ( \Throwable $e ) {
+				return new WP_Error( 'import_failed', $e->getMessage(), [ 'status' => 422 ] );
+			}
+
+			return rest_ensure_response( [
+				'workflow_id'           => $created['id'],
+				'title'                 => $created['title'],
+				'status'                => $created['status'],
+				'connections_to_relink' => [],
+			] );
+		}
+
 		try {
 			$workflow = ( new BlueprintService() )->import( $blueprint, $titleOverride );
 		} catch ( \Throwable $e ) {
@@ -302,7 +326,7 @@ class RecipeController extends WP_REST_Controller {
 	}
 
 	public function get_setup( $request ) {
-		$recipe = $this->group_recipe( (int) $request['id'] );
+		$recipe = $this->recipe( (int) $request['id'] );
 		if ( is_wp_error( $recipe ) ) {
 			return $recipe;
 		}
@@ -311,7 +335,7 @@ class RecipeController extends WP_REST_Controller {
 	}
 
 	public function run_setup( $request ) {
-		$recipe = $this->group_recipe( (int) $request['id'] );
+		$recipe = $this->recipe( (int) $request['id'] );
 		if ( is_wp_error( $recipe ) ) {
 			return $recipe;
 		}
@@ -330,15 +354,11 @@ class RecipeController extends WP_REST_Controller {
 	/**
 	 * @return Recipe|WP_Error
 	 */
-	private function group_recipe( int $id ) {
+	private function recipe( int $id ) {
 		$recipe = Recipe::find( $id );
 
 		if ( ! $recipe ) {
 			return new WP_Error( 'not_found', __( 'Recipe not found.', 'zaplane' ), [ 'status' => 404 ] );
-		}
-
-		if ( ! $recipe->isGroup() ) {
-			return new WP_Error( 'not_a_group', __( 'This recipe creates a single workflow, so it has no setup.', 'zaplane' ), [ 'status' => 400 ] );
 		}
 
 		return $recipe;

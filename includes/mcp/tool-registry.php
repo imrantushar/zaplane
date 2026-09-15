@@ -11,7 +11,9 @@ use Zaplane\Models\NodeRun;
 use Zaplane\Models\Recipe;
 use Zaplane\Models\Run;
 use Zaplane\Models\Workflow;
+use Zaplane\Recipes\Registry;
 use Zaplane\Services\BlueprintService;
+use Zaplane\Services\RecipeGroupService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -625,10 +627,21 @@ class ToolRegistry {
 			throw new \RuntimeException( 'Recipe blueprint is empty.' );
 		}
 
-		$workflow = ( new BlueprintService() )->import(
-			$blueprint,
-			sanitize_text_field( (string) ( $args['title'] ?? '' ) )
-		);
+		$title = sanitize_text_field( (string) ( $args['title'] ?? '' ) );
+
+		// A registered recipe is set up as the dashboard does it, with its defaults.
+		if ( isset( $blueprint['workflows'] ) ) {
+			$created = ( new RecipeGroupService() )->install( $recipe, [ 'title' => $title ] )['workflows'][0];
+
+			return [
+				'workflow_id'           => (int) $created['id'],
+				'title'                 => (string) $created['title'],
+				'status'                => (string) $created['status'],
+				'connections_to_relink' => [],
+			];
+		}
+
+		$workflow = ( new BlueprintService() )->import( $blueprint, $title );
 
 		return [
 			'workflow_id'           => (int) $workflow->id,
@@ -692,6 +705,8 @@ class ToolRegistry {
 	 * @return array<string,mixed>
 	 */
 	private static function list_recipes(): array {
+		Registry::instance()->sync();
+
 		$out = [];
 
 		foreach ( Recipe::orderBy( 'id', 'asc' )->limit( self::MAX_LIMIT )->get() as $recipe ) {

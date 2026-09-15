@@ -16,8 +16,10 @@ import { Banner, activeSteps, valueError } from "./parts";
 import "./styles.scss";
 
 /**
- * Sets up a group recipe: pick its workflows and their optional steps, fill in
- * its settings and connections, and create the workflows in a new folder.
+ * Sets up a recipe: pick its workflows and their optional steps, fill in its
+ * settings and connections, and create them. A group recipe's workflows go in a
+ * new folder. A recipe of one workflow skips what it has nothing to ask, and
+ * names the workflow instead of a folder.
  */
 const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -88,6 +90,8 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
   const titleOf = key => setup?.workflows?.find(workflow => workflow.key === key)?.title || key;
   const chosen = (setup?.workflows || []).filter(workflow => workflows[workflow.key]);
   const totalSteps = chosen.reduce((sum, workflow) => sum + activeSteps(workflow, options).length, 0);
+  const single = setup?.type === "workflow";
+  const hasOptions = (setup?.workflows || []).some(workflow => (workflow.options || []).length > 0);
 
   // A value matters only while a step that reads it will be created.
   const reads = use => workflows[use.workflow] && (use.option === null || !!options[use.workflow]?.[use.option]);
@@ -102,11 +106,23 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
   const usedByApp = app => app.workflows.filter(key => workflows[key]).map(titleOf);
 
   const steps = [
-    {
-      key: "workflows",
-      label: __("Workflows", "zaplane"),
-      hint: setup ? sprintf(__("%1$d of %2$d on", "zaplane"), chosen.length, setup.workflows.length) : "",
-    },
+    ...(!single
+      ? [
+          {
+            key: "workflows",
+            label: __("Workflows", "zaplane"),
+            hint: setup ? sprintf(__("%1$d of %2$d on", "zaplane"), chosen.length, setup.workflows.length) : "",
+          },
+        ]
+      : hasOptions
+        ? [
+            {
+              key: "workflows",
+              label: __("Steps", "zaplane"),
+              hint: sprintf(_n("%d step", "%d steps", totalSteps, "zaplane"), totalSteps),
+            },
+          ]
+        : []),
     ...(valuesInUse.length
       ? [
           {
@@ -132,7 +148,11 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
           },
         ]
       : []),
-    { key: "review", label: __("Review", "zaplane"), hint: __("Name the folder and create", "zaplane") },
+    {
+      key: "review",
+      label: __("Review", "zaplane"),
+      hint: single ? __("Name the workflow and create", "zaplane") : __("Name the folder and create", "zaplane"),
+    },
   ];
   const index = Math.min(step, steps.length - 1);
   const current = steps[index].key;
@@ -161,7 +181,7 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
         options,
         values,
         connections,
-        folder_title: folderTitle.trim(),
+        ...(single ? { title: folderTitle.trim() } : { folder_title: folderTitle.trim() }),
         activate,
       });
       setResult(res?.data);
@@ -170,7 +190,9 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
         showNotification({
           isShow: true,
           type: "error",
-          message: e?.response?.data?.message || __("The workflows could not be created.", "zaplane"),
+          message:
+            e?.response?.data?.message ||
+            (single ? __("The workflow could not be created.", "zaplane") : __("The workflows could not be created.", "zaplane")),
         })
       );
     }
@@ -187,6 +209,7 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
       return (
         <WorkflowsStep
           setup={setup}
+          single={single}
           workflows={workflows}
           options={options}
           inactiveApps={inactiveApps}
@@ -225,6 +248,7 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
     return (
       <ReviewStep
         setup={setup}
+        single={single}
         chosen={chosen}
         options={options}
         valuesInUse={valuesInUse}
@@ -270,7 +294,7 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
 
   return (
     <WPModal
-      title={setup?.title || recipe?.title || __("Group recipe", "zaplane")}
+      title={setup?.title || recipe?.title || __("Recipe", "zaplane")}
       isOpen={isOpen}
       onRequestClose={onClose}
       shouldCloseOnClickOutside={false}
@@ -308,7 +332,9 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
 
               <span className="zgs-footer__status">
                 {result
-                  ? sprintf(__("In the folder “%s”", "zaplane"), result.folder.title)
+                  ? result.folder
+                    ? sprintf(__("In the folder “%s”", "zaplane"), result.folder.title)
+                    : __("Created as a workflow", "zaplane")
                   : sprintf(__("Step %1$d of %2$d · %3$s", "zaplane"), index + 1, steps.length, steps[index].label)}
               </span>
 
@@ -321,9 +347,15 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
                     <button
                       type="button"
                       className="zgs-btn zgs-btn--primary"
-                      onClick={() => go(`page=zaplane-folders&action=edit&id=${result.folder.id}`)}
+                      onClick={() =>
+                        go(
+                          result.folder
+                            ? `page=zaplane-folders&action=edit&id=${result.folder.id}`
+                            : `page=zaplane-workflows&action=edit&id=${result.workflows[0]?.id}`
+                        )
+                      }
                     >
-                      {__("Open folder", "zaplane")}
+                      {result.folder ? __("Open folder", "zaplane") : __("Open workflow", "zaplane")}
                       <FiArrowRight className="zgs-btn__next" size={15} aria-hidden="true" />
                     </button>
                   </>
@@ -344,7 +376,9 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
                             {__("Creating…", "zaplane")}
                           </>
                         ) : (
-                          sprintf(_n("Create %d workflow", "Create %d workflows", chosen.length, "zaplane"), chosen.length)
+                          single
+                            ? __("Create workflow", "zaplane")
+                            : sprintf(_n("Create %d workflow", "Create %d workflows", chosen.length, "zaplane"), chosen.length)
                         )}
                       </button>
                     ) : (

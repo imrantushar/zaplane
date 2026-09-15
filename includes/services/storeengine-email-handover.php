@@ -2,7 +2,6 @@
 
 namespace Zaplane\Services;
 
-use Zaplane\Database\Seeders\StoreengineEmailsGroupSeeder;
 use Zaplane\Models\Recipe;
 use Zaplane\Models\Workflow;
 
@@ -25,6 +24,30 @@ class StoreengineEmailHandover {
 
 	/** Workflow id => the StoreEngine email it took over, as "setting key.recipient". */
 	const OPTION = 'zaplane_storeengine_email_handover';
+
+	/** The slug of the group recipe, in includes/recipes/shipped/. */
+	const RECIPE = 'storeengine-store-emails';
+
+	/**
+	 * The StoreEngine email each of the recipe's workflows takes over, as
+	 * "setting key.recipient". A workflow that isn't here sends an email
+	 * StoreEngine doesn't have.
+	 */
+	const EMAILS = [
+		'order_confirmation'          => 'order_confirmation.customer',
+		'new_order_alert'             => 'order_confirmation.admin',
+		'order_status'                => 'order_status.customer',
+		'order_note'                  => 'order_note.customer',
+		'order_refund'                => 'order_refund.customer',
+		'payment_failed'              => 'order_payment_failed.customer',
+		'payment_failed_alert'        => 'order_payment_failed.admin',
+		'item_shipped'                => 'order_item_shipped.customer',
+		'order_delivered'             => 'order_delivered.customer',
+		'order_cancelled'             => 'order_cancelled.customer',
+		'subscription_renewed'        => 'subscription_renewed.customer',
+		'subscription_cancelled'      => 'subscription_cancelled.customer',
+		'subscription_renewal_failed' => 'subscription_renewal_failed.customer',
+	];
 
 	/**
 	 * Setting key => the recipients whose copy a live workflow sends, once worked out.
@@ -67,14 +90,14 @@ class StoreengineEmailHandover {
 	 * @param mixed $recipe The group recipe it came from.
 	 */
 	public static function record( $result, $recipe ): void {
-		if ( ! is_array( $result ) || ! $recipe instanceof Recipe || StoreengineEmailsGroupSeeder::SLUG !== (string) $recipe->slug ) {
+		if ( ! is_array( $result ) || ! $recipe instanceof Recipe || self::RECIPE !== (string) $recipe->slug ) {
 			return;
 		}
 
 		$index = self::index();
 
 		foreach ( (array) ( $result['workflows'] ?? [] ) as $workflow ) {
-			$email = StoreengineEmailsGroupSeeder::HANDOVER[ (string) ( $workflow['key'] ?? '' ) ] ?? '';
+			$email = self::EMAILS[ (string) ( $workflow['key'] ?? '' ) ] ?? '';
 
 			if ( '' !== $email && ! empty( $workflow['id'] ) ) {
 				$index[ (int) $workflow['id'] ] = $email;

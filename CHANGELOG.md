@@ -38,6 +38,15 @@ All notable changes to Zaplane are documented here. This project adheres to
   need, and create them together in a new folder, as drafts or turned on. The
   first is *WooCommerce Customer Lifecycle*: abandoned carts, a thank-you coupon,
   a feedback request, a win-back email and a birthday coupon.
+- **Register a recipe with an array.** Name each step by its app and event, such
+  as `gemcrm.send_email`, and give its settings. Zaplane lays the steps out,
+  connects them and fills in their labels, icons and trigger hooks. Use
+  `zaplane_register_recipe()` or the `zaplane_register_recipes` action; see
+  `docs/recipes/registering-recipes.md`. Recipes a plugin registers show up the
+  next time Recipes is opened.
+- **Every recipe gets a setup.** Use Recipe opens the same setup as a group recipe,
+  showing only what that recipe needs: its optional steps, its settings, its
+  connections, and a name for the workflow.
 - A folder set up from a group recipe says which one. Any folder can turn all of
   its workflows on, or pause them, in one go.
 - The Recipes page can show only group recipes, or only single-workflow recipes.
@@ -59,6 +68,10 @@ All notable changes to Zaplane are documented here. This project adheres to
   formatted total.
 - StoreEngine's Create Coupon step can add a random ending to the code, so a code
   built from an order number can't be guessed.
+- The recipes that ship with Zaplane no longer refer to steps by number. Their
+  emails and steps read the trigger as `{{trigger.first_name}}`, and a field of
+  an earlier step by its name, such as `{{coupon.code}}` in the email after a
+  Create Coupon step. Workflows already made from a recipe keep working as they are.
 
 ### Fixed
 - Workflows made from the WooCommerce and GemCRM recipes that ship with Zaplane

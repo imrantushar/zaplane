@@ -17,8 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Sets up a group recipe: describes what its setup asks, and creates the
- * workflows its answers pick, in a folder of their own.
+ * Sets up a recipe: describes what its setup asks, and creates the workflows its
+ * answers pick. A group recipe's workflows go in a folder of their own; a recipe
+ * of one workflow goes through the same setup, and creates just that workflow.
  *
  * What to create is worked out by RecipeGroupBuilder; this class reads the site
  * (apps, plugins, connections, folders) and writes the result.
@@ -33,7 +34,7 @@ class RecipeGroupService {
 	 * @return array<string,mixed>
 	 */
 	public function setup( Recipe $recipe ): array {
-		$group = $recipe->getBlueprint();
+		$group = self::group_of( $recipe );
 		$usage = RecipeGroupBuilder::value_usage( $group );
 
 		$workflows = [];
@@ -79,41 +80,55 @@ class RecipeGroupService {
 
 		return [
 			'id'           => (int) $recipe->id,
+			'type'         => $recipe->isGroup() ? Recipe::TYPE_GROUP : Recipe::TYPE_WORKFLOW,
 			'title'        => (string) $recipe->title,
 			'description'  => (string) ( $recipe->description ?? '' ),
 			'folder_title' => (string) ( $group['folder'] ?? $recipe->title ),
 			'workflows'    => $workflows,
 			'values'       => $values,
 			'apps'         => $this->apps( $apps ),
-			'folders'      => $this->earlier_setups( $recipe ),
+			'folders'      => $recipe->isGroup() ? $this->earlier_setups( $recipe ) : [],
 		];
 	}
 
 	/**
-	 * Creates the workflows the answers pick, as drafts in a new folder. With
-	 * `activate`, each is then switched on if it passes the checks a workflow has
-	 * to pass to go live; one that doesn't stays a draft, and says why.
+	 * Creates the workflows the answers pick, as drafts: a group's in a new folder,
+	 * and a recipe of one workflow's on its own, named `title`. With `activate`,
+	 * each is then switched on if it passes the checks a workflow has to pass to go
+	 * live; one that doesn't stays a draft, and says why.
 	 *
-	 * @param array<string,mixed> $given { workflows, options, values, connections: {app: connection id}, folder_title, activate }
-	 * @return array{folder: array{id:int,title:string}, workflows: array<int,array<string,mixed>>}
+	 * @param array<string,mixed> $given { workflows, options, values, connections: {app: connection id}, folder_title, title, activate }
+	 * @return array{folder: array{id:int,title:string}|null, workflows: array<int,array<string,mixed>>}
 	 * @throws \InvalidArgumentException When the answers are not valid.
 	 */
 	public function install( Recipe $recipe, array $given ): array {
-		$group       = $recipe->getBlueprint();
+		$group  = self::group_of( $recipe );
+		$single = ! $recipe->isGroup();
+
+		if ( $single ) {
+			// There is nothing to pick: the recipe is its workflow.
+			$given['workflows'] = array_fill_keys( array_column( RecipeGroupBuilder::workflows( $group ), 'key' ), true );
+		}
+
 		$answers     = RecipeGroupBuilder::answers( $group, $given );
 		$built       = RecipeGroupBuilder::build( $group, $answers );
 		$connections = $this->connections( $given['connections'] ?? [] );
 
-		$title = sanitize_text_field( is_scalar( $given['folder_title'] ?? null ) ? (string) $given['folder_title'] : '' );
+		$title = '';
+		foreach ( $single ? [ 'title', 'folder_title' ] : [ 'folder_title' ] as $field ) {
+			if ( '' === $title && is_scalar( $given[ $field ] ?? null ) ) {
+				$title = sanitize_text_field( (string) $given[ $field ] );
+			}
+		}
 		if ( '' === $title ) {
-			$title = (string) ( $group['folder'] ?? $recipe->title );
+			$title = $single ? (string) $recipe->title : (string) ( $group['folder'] ?? $recipe->title );
 		}
 
 		$user_id = get_current_user_id();
 
 		list( $folder, $workflows ) = DB::transaction(
-			function () use ( $recipe, $built, $answers, $connections, $title, $user_id ) {
-				$folder = Folder::create(
+			function () use ( $recipe, $built, $answers, $connections, $title, $user_id, $single ) {
+				$folder = $single ? null : Folder::create(
 					[
 						'title'      => $this->unused_folder_title( $title ),
 						'created_by' => $user_id,
@@ -126,16 +141,19 @@ class RecipeGroupService {
 				foreach ( $built as $item ) {
 					$graph = $this->with_connections( $item['graph'], $connections );
 
-					$workflow = Workflow::create(
-						[
-							'user_id'           => $user_id,
-							'folder_id'         => (int) $folder->id,
-							'title'             => $item['title'],
-							'status'            => 'draft',
-							'layout'            => $item['layout'],
-							'integration_icons' => $this->icons( $graph ),
-						]
-					);
+					$attributes = [
+						'user_id'           => $user_id,
+						'title'             => $single ? $title : $item['title'],
+						'status'            => 'draft',
+						'layout'            => $item['layout'],
+						'integration_icons' => $this->icons( $graph ),
+					];
+
+					if ( $folder ) {
+						$attributes['folder_id'] = (int) $folder->id;
+					}
+
+					$workflow = Workflow::create( $attributes );
 
 					WorkflowVersion::create(
 						[
@@ -150,18 +168,20 @@ class RecipeGroupService {
 					$workflows[ $item['key'] ] = $workflow;
 				}//end foreach
 
-				$folder->setup = [
-					'recipe_title' => (string) $recipe->title,
-					'answers'      => $answers,
-					'connections'  => $connections,
-					'workflows'    => array_map(
-						static function ( $workflow ) {
-							return (int) $workflow->id;
-						},
-						$workflows
-					),
-				];
-				$folder->save();
+				if ( $folder ) {
+					$folder->setup = [
+						'recipe_title' => (string) $recipe->title,
+						'answers'      => $answers,
+						'connections'  => $connections,
+						'workflows'    => array_map(
+							static function ( $workflow ) {
+								return (int) $workflow->id;
+							},
+							$workflows
+						),
+					];
+					$folder->save();
+				}
 
 				return [ $folder, $workflows ];
 			}
@@ -192,12 +212,16 @@ class RecipeGroupService {
 		}
 
 		$result = [
-			'folder'    => [
+			'folder'    => $folder ? [
 				'id'    => (int) $folder->id,
 				'title' => (string) $folder->title,
-			],
+			] : null,
 			'workflows' => $created,
 		];
+
+		if ( $single ) {
+			return $result;
+		}
 
 		/**
 		 * Fires once a group recipe's workflows are created, and switched on if asked.
@@ -208,6 +232,52 @@ class RecipeGroupService {
 		do_action( 'zaplane_recipe_group_installed', $result, $recipe );
 
 		return $result;
+	}
+
+	/**
+	 * A recipe's blueprint in the shape a group recipe has.
+	 *
+	 * A registered recipe is stored that way already, one workflow or several. A
+	 * recipe saved from a workflow holds that workflow's versions instead, and
+	 * becomes a group of one from its active version, without the connections of
+	 * the site it was saved on.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public static function group_of( Recipe $recipe ): array {
+		$blueprint = $recipe->getBlueprint();
+
+		if ( isset( $blueprint['workflows'] ) ) {
+			return $blueprint;
+		}
+
+		$graph = [];
+		foreach ( (array) ( $blueprint['versions'] ?? [] ) as $version ) {
+			$version_graph = $version['graph_json'] ?? [];
+			$version_graph = is_string( $version_graph ) ? json_decode( $version_graph, true ) : $version_graph;
+
+			if ( is_array( $version_graph ) && ( ! $graph || ! empty( $version['is_active'] ) ) ) {
+				$graph = $version_graph;
+			}
+		}
+
+		foreach ( (array) ( $graph['nodes'] ?? [] ) as $index => $node ) {
+			unset( $graph['nodes'][ $index ]['data']['connection_id'] );
+		}
+
+		return [
+			'folder'    => (string) $recipe->title,
+			'values'    => [],
+			'workflows' => [
+				[
+					'key'     => 'workflow',
+					'title'   => (string) $recipe->title,
+					'layout'  => (string) ( $blueprint['layout'] ?? 'LR' ),
+					'graph'   => $graph,
+					'options' => [],
+				],
+			],
+		];
 	}
 
 	/**
