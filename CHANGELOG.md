@@ -41,6 +41,24 @@ All notable changes to Zaplane are documented here. This project adheres to
 - A folder set up from a group recipe says which one. Any folder can turn all of
   its workflows on, or pause them, in one go.
 - The Recipes page can show only group recipes, or only single-workflow recipes.
+- **StoreEngine Store Emails**, a group recipe that sends a StoreEngine store's
+  emails from workflows: order confirmation, status, note, refund, shipping,
+  delivery and cancellation emails, failed payment and failed renewal recovery,
+  renewal and cancelled subscription emails, alerts to the store for new orders
+  and failed payments, and a review request after delivery. Each email is a
+  workflow you can add to, and some come with a follow-up coupon or an order
+  note. While one of these workflows is on, StoreEngine's own copy of its email
+  is switched off; pause the workflow and StoreEngine sends it again. This needs
+  a StoreEngine version with the `storeengine/email/setting` filter.
+- StoreEngine: a **Subscription Renewal Payment Failed** trigger, with a link to
+  pay again. Order triggers also give `first_name`, `order_date`,
+  `total_formatted`, `items_summary`, `payment_method_title`, `order_url`,
+  `payment_url` and `edit_order_url`. Status triggers give status labels, Order
+  Item Shipped gives the item name, courier and tracking, refund triggers give
+  the amount and reason, and subscription triggers give the customer's name and
+  formatted total.
+- StoreEngine's Create Coupon step can add a random ending to the code, so a code
+  built from an order number can't be guessed.
 
 ### Fixed
 - Workflows made from the WooCommerce and GemCRM recipes that ship with Zaplane

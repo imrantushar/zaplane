@@ -38,6 +38,10 @@ final class Zaplane {
 
 		$this->container = $this->boot_container();
 
+		// StoreEngine builds its emails on plugins_loaded, before this plugin's own
+		// callback runs, and each email reads its settings as it is built.
+		\Zaplane\Services\StoreengineEmailHandover::boot();
+
 		register_activation_hook( __FILE__, [ $this, 'activate_plugin' ] );
 		register_deactivation_hook( __FILE__, [ $this, 'deactivate_plugin' ] );
 

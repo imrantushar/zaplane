@@ -1673,6 +1673,16 @@
                         "main"
                     ]
                 },
+                "subscription_renewal_payment_failed": {
+                    "label": "Subscription Renewal Payment Failed",
+                    "hook": "storeengine/subscription/renewal_payment_failed",
+                    "requires_addon": "subscription",
+                    "key": "subscription_renewal_payment_failed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "subscription_trial_ended": {
                     "label": "Subscription Trial Ended",
                     "hook": "storeengine/subscription/trial_ended",
@@ -2160,6 +2170,13 @@
                             "label": "Usage Limit (total)",
                             "type": "expression",
                             "required": false
+                        },
+                        {
+                            "key": "random_suffix",
+                            "label": "Add a random ending to the code",
+                            "type": "boolean",
+                            "required": false,
+                            "help": "Makes a code built from an order or customer number impossible to guess."
                         }
                     ],
                     "outputs": [
