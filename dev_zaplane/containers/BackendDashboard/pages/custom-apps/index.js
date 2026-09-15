@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from 'react-redux';
+import { FiUpload } from 'react-icons/fi';
 import PageLayout from '@ZAPComponents/PageLayout';
 import ZAPLoading from '@ZAPComponents/Loading';
 import { showNotification } from '@ZAPRedux/Slices/notificationSlice/notificationSlice';
@@ -152,7 +153,13 @@ const CustomApps = () => {
 			actions={
 				<div className="flex gap-2">
 					<input ref={fileInput} type="file" accept="application/json" className="hidden" onChange={onImportFile} />
-					<button type="button" style={outlineBtn} onClick={() => fileInput.current?.click()}>
+					<button
+						type="button"
+						className="flex items-center gap-2"
+						style={outlineBtn}
+						onClick={() => fileInput.current?.click()}
+					>
+						<FiUpload />
 						{__('Import', 'zaplane')}
 					</button>
 					<button type="button" style={primaryBtn} onClick={openNew}>
