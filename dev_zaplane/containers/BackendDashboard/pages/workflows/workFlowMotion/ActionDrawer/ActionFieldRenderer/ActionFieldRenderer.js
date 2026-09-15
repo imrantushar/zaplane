@@ -6,7 +6,7 @@ import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
 import ZAPCheckbox from "@ZAPComponents/ZAPCheckbox";
 import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
-import RepeaterField from "../../actionDrawer/RepeaterField/RepeaterField";
+import RepeaterField from "../RepeaterField/RepeaterField";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
