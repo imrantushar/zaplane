@@ -1,6 +1,6 @@
 {
     "version": "1.3.0",
-    "generated_at": "2026-09-08 12:56:18",
+    "generated_at": "2026-09-15 17:54:56",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -3071,7 +3071,7 @@
                             "type": "expression",
                             "required": false,
                             "placeholder": "https://example.com/photo.jpg",
-                            "help": "Attach an image for the model to analyze. Supported on OpenAI, Anthropic, and Gemini vision models."
+                            "help": "Attach an image for the model to analyze. Supported on WordPress AI, OpenAI, Anthropic, and Gemini vision models."
                         },
                         {
                             "key": "system_prompt",
@@ -3148,7 +3148,7 @@
                             "type": "expression",
                             "required": false,
                             "placeholder": "gpt-image-1",
-                            "help": "OpenAI image model (e.g. gpt-image-1 or dall-e-3). Requires an OpenAI connection."
+                            "help": "OpenAI image model (e.g. gpt-image-1 or dall-e-3). Used with an OpenAI connection; a WordPress AI connection uses the image model configured in WordPress."
                         },
                         {
                             "key": "size",
@@ -29738,6 +29738,38 @@
                     ]
                 }
             }
+        },
+        "gemcrm-email-inbox": {
+            "slug": "gemcrm-email-inbox",
+            "name": "GemCRM Email Inbox",
+            "icon": "crm.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "triggers": {
+                "email_received": {
+                    "label": "Email Received",
+                    "hook": "gemcrm/email_inbox/received",
+                    "key": "email_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_received_unmatched": {
+                    "label": "Email Received (Unmatched)",
+                    "hook": "gemcrm/email_inbox/received_unmatched",
+                    "key": "email_received_unmatched",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
         }
     },
     "tools": {
