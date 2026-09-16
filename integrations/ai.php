@@ -94,7 +94,7 @@ class Ai extends IntegrationBase {
 				'placeholder' => 'http://localhost:11434/v1',
 				// Only for OpenAI-compatible endpoints (Azure/OpenRouter/Ollama/etc).
 				'depends_on'  => [ 'provider' => [ 'openai_compatible' ] ],
-				'help'        => 'The OpenAI-compatible base URL, e.g. http://localhost:11434/v1 (Ollama) or https://openrouter.ai/api/v1. The /chat/completions path is appended automatically.',
+				'help'        => 'The OpenAI-compatible base URL, e.g. http://localhost:11434/v1 for Ollama. The /chat/completions path is appended automatically.',
 			],
 		];
 	}
@@ -364,7 +364,7 @@ class Ai extends IntegrationBase {
 				'type'        => 'expression',
 				'required'    => false,
 				'placeholder' => 'https://example.com/photo.jpg',
-				'help'        => 'Attach an image for the model to analyze. Supported on OpenAI, Anthropic, and Gemini vision models.',
+				'help'        => 'Attach an image for the model to analyze. Supported on WordPress AI, OpenAI, Anthropic, and Gemini vision models.',
 			],
 			[
 				'key'         => 'system_prompt',
@@ -438,7 +438,7 @@ class Ai extends IntegrationBase {
 				'type'        => 'expression',
 				'required'    => false,
 				'placeholder' => 'gpt-image-1',
-				'help'        => 'OpenAI image model (e.g. gpt-image-1 or dall-e-3). Requires an OpenAI connection.',
+				'help'        => 'OpenAI image model (e.g. gpt-image-1 or dall-e-3). Used with an OpenAI connection; a WordPress AI connection uses the image model configured in WordPress.',
 			],
 			[
 				'key'     => 'size',
@@ -501,6 +501,9 @@ class Ai extends IntegrationBase {
 		$api_key  = $credentials['api_key'] ?? '';
 
 		if ( 'generate_image' === $event ) {
+			if ( 'wordpress' === $provider ) {
+				return self::action_generate_image_wordpress( $config, $input );
+			}
 			return self::action_generate_image( $api_key, $config, $input );
 		}
 		if ( 'transcribe' === $event ) {
@@ -533,7 +536,7 @@ class Ai extends IntegrationBase {
 		$messages = self::build_messages( $config['history'] ?? '', $user_msg );
 
 		if ( 'wordpress' === $provider ) {
-			$result = self::call_wordpress( $system, $messages, $max_tokens, $temperature );
+			$result = self::call_wordpress( $system, $messages, $max_tokens, $temperature, $image_url );
 		} elseif ( 'openai' === $provider ) {
 			$result = self::call_openai( $api_key, $model, $system, $messages, $max_tokens, $temperature, $json, self::OPENAI_URL, $image_url );
 		} elseif ( 'openai_compatible' === $provider ) {
@@ -635,7 +638,7 @@ class Ai extends IntegrationBase {
 		return true;
 	}
 
-	private static function call_wordpress( string $system, array $messages, int $max_tokens, ?float $temperature ): array {
+	private static function call_wordpress( string $system, array $messages, int $max_tokens, ?float $temperature, string $image_url = '' ): array {
 		if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
 			return [ 'error' => 'WordPress Core AI is unavailable (requires WordPress 7.0+).' ];
 		}
@@ -669,6 +672,15 @@ class Ai extends IntegrationBase {
 			}
 			if ( null !== $temperature ) {
 				$builder->using_temperature( $temperature );
+			}
+			if ( '' !== $image_url ) {
+				// Fetched here, through the same guard as every other provider, so
+				// the AI Client never reaches for the URL itself.
+				$inline = self::fetch_inline_image( $image_url );
+				if ( null === $inline ) {
+					return [ 'error' => 'Could not download the image.' ];
+				}
+				$builder->with_file( 'data:' . $inline['mime_type'] . ';base64,' . $inline['data'] );
 			}
 
 			$text = $builder->generate_text();
@@ -1003,6 +1015,53 @@ class Ai extends IntegrationBase {
 					'image_url' => $url,
 					'image_b64' => $b64,
 					'model'     => $model,
+				]
+			),
+		];
+	}
+
+	/**
+	 * Generate an image through the AI Client in WordPress core, on the image
+	 * model the site owner configured in WordPress.
+	 *
+	 * @param array<string,mixed> $config
+	 */
+	private static function action_generate_image_wordpress( array $config, array $input ): array {
+		if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
+			return self::error( 'WordPress AI is unavailable (requires WordPress 7.0+).', $input );
+		}
+		$prompt = trim( (string) ( $config['prompt'] ?? '' ) );
+		if ( '' === $prompt ) {
+			return self::error( 'A prompt is required.', $input );
+		}
+
+		$orientations = [
+			'1024x1792' => 'portrait',
+			'1792x1024' => 'landscape',
+		];
+		$size         = (string) ( $config['size'] ?? '1024x1024' );
+		$orientation  = \WordPress\AiClient\Files\Enums\MediaOrientationEnum::from( $orientations[ $size ] ?? 'square' );
+
+		$file = wp_ai_client_prompt( $prompt )->as_output_media_orientation( $orientation )->generate_image();
+		if ( is_wp_error( $file ) ) {
+			return self::error( 'WordPress AI image: ' . $file->get_error_message(), $input );
+		}
+
+		$url = (string) $file->getUrl();
+		$b64 = (string) $file->getBase64Data();
+		if ( '' === $url && '' === $b64 ) {
+			return self::error( 'No image was returned.', $input );
+		}
+
+		return [
+			'port' => 'main',
+			'data' => array_merge(
+				$input,
+				[
+					'success'   => true,
+					'image_url' => $url,
+					'image_b64' => $b64,
+					'model'     => 'wordpress-default',
 				]
 			),
 		];

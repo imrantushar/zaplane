@@ -3,7 +3,7 @@
  * Plugin Name:       Zaplane
  * Plugin URI:        https://zaplane.app/
  * Description:       WordPress Automation Plugin
- * Version:           1.2.0
+ * Version:           1.3.0
  * Author:            kodezen
  * Author URI:        https://kodezen.com
  * License:           GPL-3.0-or-later
@@ -61,7 +61,7 @@ final class Zaplane {
 	}
 
 	public function define_constants(): void {
-		define( 'ZAPLANE_VERSION', '1.2.0' );
+		define( 'ZAPLANE_VERSION', '1.3.0' );
 		define( 'ZAPLANE_ALLOW_LOGS', true );
 		define( 'ZAPLANE_PLUGIN_SLUG', 'zaplane' );
 		define( 'ZAPLANE_PLUGIN_FILE', __FILE__ );
@@ -151,7 +151,13 @@ final class Zaplane {
 		// activation hook doesn't fire). Previously the seeders ran unconditionally
 		// on every page load, REST call and cron tick — five SELECTs of pure waste.
 		if ( version_compare( (string) get_option( 'zaplane_db_version', '0.0.0' ), ZAPLANE_VERSION, '<' ) ) {
-			\Zaplane\Installer::init()->run();
+			// On `init`, not here: seeding recipes resolves REST URLs, and WordPress
+			// creates the rewrite object rest_url() needs only after plugins load.
+			if ( did_action( 'init' ) ) {
+				\Zaplane\Installer::init()->run();
+			} else {
+				add_action( 'init', [ \Zaplane\Installer::init(), 'run' ], 1 );
+			}
 		}
 
 		do_action( 'zaplane_init' );

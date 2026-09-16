@@ -23,7 +23,7 @@ import DrawerModeList from "@ZAPComponents/SearchableDrawerList/DrawerItemList/D
 import DrawerItemList from "@ZAPComponents/SearchableDrawerList/DrawerItemList";
 import ActionFieldRenderer from "../ActionDrawer/ActionFieldRenderer/ActionFieldRenderer";
 import TestRun from "../ActionDrawer/TestRun/TestRun";
-import TriggerFieldMap from "./TriggerFieldMap/TriggerFieldMap";
+import TriggerFieldMap from "../ActionDrawer/TriggerFieldMap/TriggerFieldMap";
 import DrawerSearchList from "@ZAPComponents/SearchableDrawerList/DrawerSearchList/DrawerSearchList";
 
 // Pragmatic email check for UI validation (not RFC-exhaustive): non-empty local

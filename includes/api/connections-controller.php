@@ -108,6 +108,9 @@ class ConnectionsController extends WP_REST_Controller {
 			]
 		);
 
+		// Public by necessity: the provider redirects the admin's browser here
+		// without a REST nonce. oauth_callback() refuses anything whose `state`
+		// does not match the one issued to that admin when they clicked Connect.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/oauth/callback',
