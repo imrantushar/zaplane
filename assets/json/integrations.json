@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-08 12:56:18",
+    "generated_at": "2026-09-17 06:12:57",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -10655,40 +10655,20 @@
             "webhook_route": "",
             "webhook_setup": [],
             "triggers": {
-                "woofunnels_loaded": {
-                    "label": "WooFunnels Loaded",
-                    "hook": "woofunnels_loaded",
-                    "key": "woofunnels_loaded",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "core_modules_loaded": {
-                    "label": "Core Modules Loaded",
-                    "hook": "wffn_core_modules_loaded",
-                    "key": "core_modules_loaded",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "loaded": {
-                    "label": "FunnelKit Loaded",
-                    "hook": "wffn_loaded",
-                    "key": "loaded",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
                 "funnel_created": {
                     "label": "Funnel Created",
                     "hook": "wffn_funnel_created",
                     "key": "funnel_created",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_updated": {
+                    "label": "Funnel Updated",
+                    "hook": "wffn_funnel_update",
+                    "key": "funnel_updated",
                     "schema": [
                         {
                             "key": "funnel_id",
@@ -10739,47 +10719,7 @@
                     "label": "Funnel Imported",
                     "hook": "wffn_funnel_imported",
                     "key": "funnel_imported",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "funnel_updated": {
-                    "label": "Funnel Updated",
-                    "hook": "wffn_funnel_update",
-                    "key": "funnel_updated",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -10789,22 +10729,7 @@
                     "label": "Step Duplicated",
                     "hook": "wffn_step_duplicated",
                     "key": "step_duplicated",
-                    "schema": [
-                        {
-                            "key": "step_id",
-                            "label": "Step",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "steps",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -10814,22 +10739,7 @@
                     "label": "Step Viewed",
                     "hook": "wffn_event_step_viewed",
                     "key": "step_viewed",
-                    "schema": [
-                        {
-                            "key": "step_id",
-                            "label": "Step",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "steps",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -10839,22 +10749,7 @@
                     "label": "Step Converted",
                     "hook": "wffn_event_step_converted",
                     "key": "step_converted",
-                    "schema": [
-                        {
-                            "key": "step_id",
-                            "label": "Step",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "steps",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -10864,22 +10759,7 @@
                     "label": "Funnel Ended",
                     "hook": "wffn_funnel_ended_event",
                     "key": "funnel_ended",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -10889,56 +10769,6 @@
                     "label": "Thank You Funnel Ended",
                     "hook": "wffn_ty_funnel_ended_event",
                     "key": "ty_funnel_ended",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "import_completed": {
-                    "label": "Import Completed",
-                    "hook": "wffn_import_completed",
-                    "key": "import_completed",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "importing_completed": {
-                    "label": "Background Import Completed",
-                    "hook": "wffn_importing_completed",
-                    "key": "importing_completed",
                     "schema": [],
                     "outputs": [
                         "main",
@@ -10949,22 +10779,7 @@
                     "label": "Template Import Remote",
                     "hook": "wffn_template_import_remote",
                     "key": "template_import_remote",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -11004,16 +10819,6 @@
                     "label": "WooFunnels Footer",
                     "hook": "woofunnels_wp_footer",
                     "key": "wp_footer",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "checkout_loaded": {
-                    "label": "Checkout Module Loaded",
-                    "hook": "wfacp_loaded",
-                    "key": "checkout_loaded",
                     "schema": [],
                     "outputs": [
                         "main",
@@ -11273,7 +11078,14 @@
                 "current_filter": {
                     "label": "Get Current Filter",
                     "key": "current_filter",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
