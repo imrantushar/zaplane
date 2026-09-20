@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import LogDetails from "@ZAPComponents/LogDetails";
 import { getDuration } from "@ZAPUtils/helper";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { statusStyle } from "../../../helper";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
@@ -57,6 +57,12 @@ const RunsTable = ({
     // columnWidth: "180px",
     textAlign: "center"
   }, {
+    name: __('Trigger', 'zaplane'),
+    cell: row => row.trigger ? <span className="truncate" title={row.trigger.label || ""}>
+          {sprintf(__("Trigger %d", "zaplane"), row.trigger.number)}
+          {row.trigger.label ? <span className="text-[var(--zaplane-font-secondary-color)]">{` · ${row.trigger.label}`}</span> : null}
+        </span> : <span className="text-[var(--zaplane-font-secondary-color)]">—</span>
+  }, {
     name: __('Status', 'zaplane'),
     cell: row => <span textTransform="capitalize" style={statusStyle(row.status)} className="px-2 py-0.5 rounded-md text-[xs]">
           {__(row.status, "zaplane")}
@@ -82,12 +88,12 @@ const RunsTable = ({
           setActiveRunId(row.id);
           setDrawerOpen(true);
           dispatch(nodeLogsRunDetails(row.id));
-        }} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border">
+        }} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)]">
               <HistoryIcon height="20px" width="20px" />
             </div>
           </ZAPTooltip>
           <ZAPTooltip content={__("Re-Try", 'zaplane')}>
-            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border">
+            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)]">
               <ReExcutionIcon height="20px" width="20px" />
             </div>
           </ZAPTooltip>

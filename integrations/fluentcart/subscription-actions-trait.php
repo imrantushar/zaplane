@@ -48,4 +48,24 @@ trait SubscriptionActionsTrait {
 			)
 		);
 	}
+
+	private static function action_get_current_subscription( array $config, array $input ): array {
+		$order_id = self::resolve_entity_id_for_action( $config, $input, 'order_id', [ 'order' ] );
+		if ( $order_id <= 0 ) {
+			return self::error_response( 'Order ID is required', $input );
+		}
+
+		$order = self::find_model_by_id( self::order_model_class(), $order_id );
+		if ( ! $order ) {
+			return self::error_response( 'Order not found', $input );
+		}
+
+		return self::main_response(
+			array_merge( $input, [ 'order_id' => $order_id, 'subscription' => self::normalize_payload_value( self::get_model_relation( $order, 'subscription' ) ) ] )
+		);
+	}
+
+	private static function action_get_subscription_transactions( array $config, array $input ): array {
+		return self::relation_list_response( $config, $input, 'subscription_id', [ 'subscription' ], self::subscription_model_class(), 'transactions', 'items' );
+	}
 }

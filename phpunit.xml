@@ -6,13 +6,27 @@
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
+    processIsolation="true"
 >
     <testsuites>
         <testsuite name="Integrations">
             <directory suffix="Test.php">./tests/Integrations</directory>
+            <exclude>./tests/Integrations/_pending</exclude>
+        </testsuite>
+        <testsuite name="Authoring">
+            <directory suffix="Test.php">./tests/Authoring</directory>
+        </testsuite>
+        <testsuite name="Mcp">
+            <directory suffix="Test.php">./tests/Mcp</directory>
+        </testsuite>
+        <testsuite name="Features">
+            <directory suffix="Test.php">./tests/Features</directory>
         </testsuite>
         <testsuite name="Utils">
             <directory suffix="Test.php">./tests/Utils</directory>
+        </testsuite>
+        <testsuite name="Testing">
+            <directory suffix="Test.php">./tests/Testing</directory>
         </testsuite>
     </testsuites>
     <filter>

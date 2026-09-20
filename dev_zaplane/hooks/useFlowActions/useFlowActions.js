@@ -1,7 +1,7 @@
 import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { getLayoutedElements } from "./utils/dagreLayout";
 import { useCallback } from "react";
-import { createActionNode, getBranchNodes } from "./utils/helper";
+import { createActionNode, getBranchNodes, nextNodeIds } from "./utils/helper";
 
 export const useFlowActions = ({
     nodes,
@@ -37,6 +37,47 @@ export const useFlowActions = ({
                 },
             },
         }));
+    };
+
+    const resetTrigger = (nodeId) => {
+        setNodes((nds) =>
+            nds.map((n) =>
+                n.id === nodeId
+                    ? { ...n, data: { icon: "plus", app: "Select an app", action: "trigger", config: {} } }
+                    : n
+            )
+        );
+    };
+
+    // Add another trigger. It joins the steps the trigger it was added from leads
+    // to, so either one starts the same flow, and the trigger picker opens for it.
+    const addTrigger = (fromNodeId) => {
+        const triggers = nodes.filter((n) => n.data?.action === "trigger");
+        const from = nodes.find((n) => n.id === fromNodeId) || triggers[triggers.length - 1];
+        if (!from) return;
+
+        const [id] = nextNodeIds(nodes, 1);
+        const position = canvasLayout === "LR"
+            ? { x: from.position.x, y: Math.max(...triggers.map((n) => n.position.y)) + 140 }
+            : { x: Math.max(...triggers.map((n) => n.position.x)) + 300, y: from.position.y };
+
+        const node = {
+            id,
+            type: "custom",
+            position,
+            data: { icon: "plus", app: "Select an app", action: "trigger", config: {} },
+        };
+
+        const joined = edges
+            .filter((e) => e.source === from.id && !e.sourceHandle)
+            .map((e) => ({ id: `e${id}-${e.target}`, source: id, target: e.target, type: "custom" }));
+
+        setNodes((nds) => [...nds, node]);
+        if (joined.length) {
+            setEdges((eds) => [...eds, ...joined]);
+        }
+
+        openDrawerForNode(node);
     };
 
     const deleteNode = (nodeId) => {
@@ -82,8 +123,12 @@ export const useFlowActions = ({
         setDrawerOpen(true);
     };
 
-    const openDrawerFromAdd = (node) => {
-        setDrawerContext({ source: "add", node, edge: null });
+    // `port` (optional) targets a specific branch/sub-handle:
+    //   { id, type: "source" } → new node is a child of this node's output port
+    //   { id, type: "target" } → new node feeds INTO this node's input handle
+    //                            (AI Agent tool/memory/model sub-nodes)
+    const openDrawerFromAdd = (node, port = null) => {
+        setDrawerContext({ source: "add", node, edge: null, port });
         setDrawerOpen(true);
     };
 
@@ -115,6 +160,8 @@ export const useFlowActions = ({
     return {
         updateNodeData,
         deleteNode,
+        resetTrigger,
+        addTrigger,
         handleAddAction,
         onAddNode,
         openDrawerForNode,

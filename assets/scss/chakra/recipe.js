@@ -2,7 +2,7 @@ import { round } from "lodash"
 
 export const primaryBtn = {
     background: "var(--zaplane-primary)",
-    color: "#fff",
+    color: "var(--zaplane-white)",
     fontWeight: "500",
     fontSize: '14px',
     cursor: "pointer",
@@ -41,7 +41,7 @@ export const outlineBtn = {
 
 export const removeBtn = {
     background: "var(--zaplane-danger)",
-    color: "#fff",
+    color: "var(--zaplane-white)",
     cursor: "pointer",
 }
 

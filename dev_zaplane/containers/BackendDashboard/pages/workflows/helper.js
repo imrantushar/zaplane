@@ -1,9 +1,9 @@
 import { Background } from "@xyflow/react";
 
 export const statusOptions = [
-    { value: "active", label: "Active" },
-    { value: "paused", label: "Paused" },
-    { value: "draft", label: "Draft" },
+    { value: "active", label: "Active", color: "#16A34A" },
+    { value: "paused", label: "Paused", color: "#D97706" },
+    { value: "draft",  label: "Draft",  color: "#6B7280" },
 ];
 export const statusStyle = (status) => {
   switch (status) {

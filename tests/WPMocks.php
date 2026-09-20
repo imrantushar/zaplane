@@ -3,34 +3,132 @@
 namespace Zaplane\Tests {
 	class WPMocks {
 
-		private static array $options    = [];
-		private static array $transients = [];
-		private static array $posts      = [];
-		private static array $users      = [];
-		private static array $comments   = [];
-		private static array $terms      = [];
-		private static array $taxonomies = [];
-		private static array $postTypes  = [];
-		private static array $roles      = [];
-		private static int   $lastInsertId  = 100;
-		private static array $httpResponses = [];
+		private static array $options          = [];
+		private static array $transients       = [];
+		private static array $posts            = [];
+		private static array $postMeta         = [];
+		private static array $userMeta         = [];
+		private static array $filters          = [];
+		private static array $users            = [];
+		private static array $comments         = [];
+		private static array $terms            = [];
+		private static array $taxonomies       = [];
+		private static array $postTypes        = [];
+		private static array $roles            = [];
+		private static int   $lastInsertId     = 100;
+		private static array $httpResponses    = [];
+		private static array $wcOrders           = [];
+		private static array $scheduledActions   = [];
+		private static array $enqueuedNodeRuns   = [];
 
-		public static function reset(): void {
-			self::$options      = [];
-			self::$transients   = [];
-			self::$posts        = [];
-			self::$users        = [];
-			self::$comments     = [];
-			self::$terms        = [];
-			self::$taxonomies   = [];
-			self::$postTypes    = [];
-			self::$roles        = [];
-			self::$lastInsertId = 100;
-			self::$httpResponses = [];
+		public static function addFilter( string $tag, callable $callback, int $priority ): void {
+			self::$filters[ $tag ][ $priority ][] = $callback;
 		}
 
-		public static function setHttpResponse( array $body, int $status = 200 ): void {
-			self::$httpResponses[] = [ 'body' => wp_json_encode( $body ), 'status' => $status ];
+		public static function removeFilter( string $tag, $callback, int $priority ): void {
+			foreach ( self::$filters[ $tag ][ $priority ] ?? [] as $i => $registered ) {
+				if ( $registered === $callback ) {
+					unset( self::$filters[ $tag ][ $priority ][ $i ] );
+				}
+			}
+		}
+
+		public static function hasFilter( string $tag ): bool {
+			foreach ( self::$filters[ $tag ] ?? [] as $callbacks ) {
+				if ( ! empty( $callbacks ) ) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/** @return mixed */
+		public static function applyFilters( string $tag, $value, array $args ) {
+			if ( empty( self::$filters[ $tag ] ) ) {
+				return $value;
+			}
+
+			$byPriority = self::$filters[ $tag ];
+			ksort( $byPriority );
+
+			foreach ( $byPriority as $callbacks ) {
+				foreach ( $callbacks as $callback ) {
+					$value = $callback( $value, ...$args );
+				}
+			}
+
+			return $value;
+		}
+
+		/** @return mixed */
+		public static function getUserMeta( int $userId, string $key, bool $single ) {
+			$value = self::$userMeta[ $userId ][ $key ] ?? null;
+
+			if ( null === $value ) {
+				return $single ? '' : [];
+			}
+
+			return $single ? $value : [ $value ];
+		}
+
+		public static function setUserMeta( int $userId, string $key, $value ): void {
+			self::$userMeta[ $userId ][ $key ] = $value;
+		}
+
+		public static function deleteUserMeta( int $userId, string $key ): void {
+			unset( self::$userMeta[ $userId ][ $key ] );
+		}
+
+		public static function reset(): void {
+			self::$options          = [];
+			self::$transients       = [];
+			self::$posts            = [];
+			self::$postMeta         = [];
+			self::$userMeta         = [];
+			self::$filters          = [];
+			self::$users            = [];
+			self::$comments         = [];
+			self::$terms            = [];
+			self::$taxonomies       = [];
+			self::$postTypes        = [];
+			self::$roles            = [];
+			self::$lastInsertId     = 100;
+			self::$httpResponses    = [];
+			self::$wcOrders         = [];
+			self::$scheduledActions = [];
+			self::$enqueuedNodeRuns = [];
+		}
+
+		public static function recordEnqueuedNodeRun( array $args ): void {
+			self::$enqueuedNodeRuns[] = $args;
+		}
+
+		public static function getEnqueuedNodeRuns(): array {
+			return self::$enqueuedNodeRuns;
+		}
+
+		public static function setWcOrders( array $orders ): void {
+			self::$wcOrders = $orders;
+		}
+
+		public static function getWcOrders(): array {
+			return self::$wcOrders;
+		}
+
+		public static function scheduleAction( string $hook, int $timestamp ): void {
+			self::$scheduledActions[ $hook ] = $timestamp;
+		}
+
+		public static function getScheduledAction( string $hook ) {
+			return self::$scheduledActions[ $hook ] ?? false;
+		}
+
+		public static function setHttpResponse( array $body, int $status = 200, array $headers = [] ): void {
+			self::$httpResponses[] = [
+				'body'    => wp_json_encode( $body ),
+				'status'  => $status,
+				'headers' => array_change_key_case( $headers ),
+			];
 		}
 
 		public static function nextHttpResponse(): ?array {
@@ -41,6 +139,22 @@ namespace Zaplane\Tests {
 
 		public static function setPost( int $id, array $data ): void {
 			self::$posts[ $id ] = array_merge( self::getDefaultPost( $id ), $data );
+		}
+
+		public static function setPostMeta( int $id, string $key, $value ): void {
+			self::$postMeta[ $id ][ $key ] = $value;
+		}
+
+		public static function getPostMeta( int $id, string $key, bool $single ) {
+			if ( '' === $key ) {
+				return $single ? '' : self::$postMeta[ $id ] ?? [];
+			}
+			if ( ! isset( self::$postMeta[ $id ][ $key ] ) ) {
+				return $single ? '' : [];
+			}
+			$value = self::$postMeta[ $id ][ $key ];
+
+			return $single ? $value : [ $value ];
 		}
 
 		public static function getPost( int $id ): ?object {
@@ -132,6 +246,9 @@ namespace Zaplane\Tests {
 				'user_activation_key' => '',
 				'user_status'         => 0,
 				'display_name'        => 'User ' . $id,
+				'first_name'          => 'Test',
+				'last_name'           => 'User',
+				'nickname'            => 'user' . $id,
 			];
 		}
 
@@ -320,9 +437,28 @@ namespace Zaplane\Tests {
 }
 
 namespace {
+	if ( ! function_exists( 'wp_rand' ) ) {
+		function wp_rand( $min = 0, $max = 0 ) {
+			return random_int( (int) $min, (int) ( $max ? $max : 2147483647 ) );
+		}
+	}
+
 	use Zaplane\Tests\WPMocks;
 
 	$mock_dir = __DIR__ . '/mocks/';
+
+	// Some mock files (e.g. wpuserfrontend.php) provide richer fixtures
+	// (get_userdata with display_name "John Doe", WP_Post class) that must
+	// win over the more bare-bones definitions in alphabetically earlier
+	// mock files such as buddyboss.php. Load these priority files first so
+	// their function_exists-guarded definitions register first.
+	$priority_mocks = [ 'wpuserfrontend.php' ];
+	foreach ( $priority_mocks as $priority_file ) {
+		$path = $mock_dir . $priority_file;
+		if ( file_exists( $path ) ) {
+			require_once $path;
+		}
+	}
 
 	foreach (glob($mock_dir . '*.php') as $file) {
 		require_once $file;
@@ -357,6 +493,12 @@ namespace {
 	}
 
 	// ── Transients ────────────────────────────────────────────────────────────
+
+	if ( ! function_exists( '_doing_it_wrong' ) ) {
+		function _doing_it_wrong( $function_name, $message, $version ): void {
+			$GLOBALS['zaplane_test_doing_it_wrong'][] = (string) $message;
+		}
+	}
 
 	if ( ! function_exists( 'get_transient' ) ) {
 		function get_transient( string $key ) {
@@ -429,6 +571,38 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'esc_url' ) ) {
+		function esc_url( $url ) {
+			return htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
+		}
+	}
+
+	if ( ! function_exists( '_n' ) ) {
+		function _n( string $single, string $plural, int $number, string $domain = 'default' ): string {
+			return 1 === $number ? $single : $plural;
+		}
+	}
+
+	if ( ! function_exists( 'rest_get_authenticated_app_password' ) ) {
+		function rest_get_authenticated_app_password() {
+			return $GLOBALS['zaplane_test_app_password_uuid'] ?? null;
+		}
+	}
+
+	if ( ! function_exists( 'is_ssl' ) ) {
+		function is_ssl(): bool {
+			return ! empty( $_SERVER['HTTPS'] ) && 'off' !== $_SERVER['HTTPS'];
+		}
+	}
+
+	if ( ! function_exists( 'esc_url_raw' ) ) {
+		function esc_url_raw( $url ) {
+			// WP strips whitespace and control characters; no HTML escaping, since
+			// the result is meant for headers and requests rather than markup.
+			return trim( (string) preg_replace( '/[\x00-\x1F\x7F]/', '', (string) $url ) );
+		}
+	}
+
 	if ( ! function_exists( 'wp_strip_all_tags' ) ) {
 		function wp_strip_all_tags( string $text, bool $remove_breaks = false ): string {
 			$text = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
@@ -484,9 +658,29 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'add_filter' ) ) {
+		function add_filter( string $tag, $callback, int $priority = 10, int $accepted_args = 1 ): bool {
+			WPMocks::addFilter( $tag, $callback, $priority );
+			return true;
+		}
+	}
+
+	if ( ! function_exists( 'remove_filter' ) ) {
+		function remove_filter( string $tag, $callback, int $priority = 10 ): bool {
+			WPMocks::removeFilter( $tag, $callback, $priority );
+			return true;
+		}
+	}
+
+	if ( ! function_exists( 'has_filter' ) ) {
+		function has_filter( string $tag, $callback = false ) {
+			return WPMocks::hasFilter( $tag );
+		}
+	}
+
 	if ( ! function_exists( 'apply_filters' ) ) {
 		function apply_filters( string $tag, $value, ...$args ) {
-			return $value;
+			return WPMocks::applyFilters( $tag, $value, $args );
 		}
 	}
 
@@ -525,6 +719,7 @@ namespace {
 	// ── WP_User ───────────────────────────────────────────────────────────────
 
 	if ( ! class_exists( 'WP_User' ) ) {
+		#[\AllowDynamicProperties]
 		class WP_User {
 			public int    $ID    = 0;
 			public array  $roles = [];
@@ -535,6 +730,10 @@ namespace {
 				if ( $id ) {
 					$this->ID = $id;
 					$data = WPMocks::getUser( $id );
+					if ( ! $data ) {
+						WPMocks::setUser( $id, [] );
+						$data = WPMocks::getUser( $id );
+					}
 					if ( $data ) {
 						foreach ( get_object_vars( $data ) as $k => $v ) {
 							$this->$k = $v;
@@ -668,8 +867,24 @@ namespace {
 				$this->json_params = $params;
 			}
 
+			/**
+			 * Mirror WP: when nothing was set explicitly, a JSON content-type
+			 * means the raw body is decoded on read. Returning only what
+			 * set_json_params() stored let tests pass a JSON body and silently
+			 * see an empty array.
+			 */
 			public function get_json_params(): array {
-				return $this->json_params;
+				if ( ! empty( $this->json_params ) ) {
+					return $this->json_params;
+				}
+
+				if ( '' === $this->body || false === strpos( (string) $this->get_header( 'content-type' ), 'json' ) ) {
+					return [];
+				}
+
+				$decoded = json_decode( $this->body, true );
+
+				return is_array( $decoded ) ? $decoded : [];
 			}
 		}
 	}
@@ -707,7 +922,40 @@ namespace {
 			if ( $next === null ) {
 				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
 			}
-			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'] ];
+			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'], 'headers' => $next['headers'] ?? [] ];
+		}
+	}
+
+	if ( ! function_exists( 'wp_safe_remote_get' ) ) {
+		function wp_safe_remote_get( string $url, array $args = [] ) {
+			// The real one refuses private and reserved hosts before connecting.
+			if ( ! wp_http_validate_url( $url ) ) {
+				return new \WP_Error( 'http_request_failed', 'A valid URL was not provided.' );
+			}
+			return wp_remote_get( $url, $args );
+		}
+	}
+
+	if ( ! function_exists( 'wp_http_validate_url' ) ) {
+		function wp_http_validate_url( $url ) {
+			$parts = wp_parse_url( (string) $url );
+			$host  = strtolower( (string) ( $parts['host'] ?? '' ) );
+
+			if ( ! in_array( strtolower( (string) ( $parts['scheme'] ?? '' ) ), [ 'http', 'https' ], true ) ) {
+				return false;
+			}
+
+			// Enough of core's rule to test against: loopback, link-local and the
+			// private ranges are refused.
+			$blocked = [ 'localhost', '::1' ];
+			if ( in_array( $host, $blocked, true ) ) {
+				return false;
+			}
+			if ( preg_match( '/^(127\.|10\.|0\.|169\.254\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)/', $host ) ) {
+				return false;
+			}
+
+			return $url;
 		}
 	}
 
@@ -717,7 +965,7 @@ namespace {
 			if ( $next === null ) {
 				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
 			}
-			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'] ];
+			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'], 'headers' => $next['headers'] ?? [] ];
 		}
 	}
 
@@ -730,6 +978,48 @@ namespace {
 	if ( ! function_exists( 'wp_remote_retrieve_response_code' ) ) {
 		function wp_remote_retrieve_response_code( $response ) {
 			return is_array( $response ) ? ( $response['response']['code'] ?? 200 ) : 0;
+		}
+	}
+
+	if ( ! function_exists( 'wp_remote_retrieve_header' ) ) {
+		function wp_remote_retrieve_header( $response, string $name ) {
+			$headers = is_array( $response ) ? ( $response['headers'] ?? [] ) : [];
+			return $headers[ strtolower( $name ) ] ?? '';
+		}
+	}
+
+	if ( ! function_exists( 'wp_remote_retrieve_headers' ) ) {
+		function wp_remote_retrieve_headers( $response ) {
+			return is_array( $response ) ? ( $response['headers'] ?? [] ) : [];
+		}
+	}
+
+	if ( ! function_exists( 'wp_parse_url' ) ) {
+		function wp_parse_url( $url, $component = -1 ) {
+			return $component === -1 ? parse_url( $url ) : parse_url( $url, $component );
+		}
+	}
+
+	if ( ! function_exists( 'is_plugin_active' ) ) {
+		function is_plugin_active( $plugin ) {
+			// Default to "active" so query_forms helpers don't short-circuit
+			// in tests. Override per-test by setting
+			// $GLOBALS['zaplane_is_plugin_active'] to an array keyed by plugin
+			// (or a boolean to apply to all plugins).
+			if ( isset( $GLOBALS['zaplane_is_plugin_active'] ) ) {
+				$override = $GLOBALS['zaplane_is_plugin_active'];
+				if ( is_array( $override ) ) {
+					if ( array_key_exists( $plugin, $override ) ) {
+						return (bool) $override[ $plugin ];
+					}
+					if ( array_key_exists( '*', $override ) ) {
+						return (bool) $override['*'];
+					}
+				} else {
+					return (bool) $override;
+				}
+			}
+			return true;
 		}
 	}
 
@@ -761,6 +1051,16 @@ namespace {
 
 	if ( ! function_exists( 'get_posts' ) ) {
 		function get_posts( $args = [] ): array {
+			// Tests may override via $GLOBALS['zaplane_get_posts']. Value may be:
+			//   - a plain array (returned for every call)
+			//   - a callable( array $args ): array
+			if ( isset( $GLOBALS['zaplane_get_posts'] ) ) {
+				$override = $GLOBALS['zaplane_get_posts'];
+				if ( is_callable( $override ) ) {
+					return (array) $override( $args );
+				}
+				return (array) $override;
+			}
 			return [];
 		}
 	}
@@ -888,12 +1188,13 @@ namespace {
 
 	if ( ! function_exists( 'get_post_meta' ) ) {
 		function get_post_meta( $post_id, $key = '', $single = false ) {
-			return $single ? '' : [];
+			return WPMocks::getPostMeta( (int) $post_id, (string) $key, (bool) $single );
 		}
 	}
 
 	if ( ! function_exists( 'update_post_meta' ) ) {
 		function update_post_meta( $post_id, $meta_key, $meta_value, $prev_value = '' ) {
+			WPMocks::setPostMeta( (int) $post_id, (string) $meta_key, $meta_value );
 			return true;
 		}
 	}
@@ -1181,18 +1482,20 @@ namespace {
 
 	if ( ! function_exists( 'get_user_meta' ) ) {
 		function get_user_meta( $user_id, $key = '', $single = false ) {
-			return $single ? '' : [];
+			return WPMocks::getUserMeta( (int) $user_id, (string) $key, (bool) $single );
 		}
 	}
 
 	if ( ! function_exists( 'update_user_meta' ) ) {
 		function update_user_meta( $user_id, $meta_key, $meta_value, $prev_value = '' ) {
+			WPMocks::setUserMeta( (int) $user_id, (string) $meta_key, $meta_value );
 			return true;
 		}
 	}
 
 	if ( ! function_exists( 'delete_user_meta' ) ) {
 		function delete_user_meta( $user_id, $meta_key, $meta_value = '' ) {
+			WPMocks::deleteUserMeta( (int) $user_id, (string) $meta_key );
 			return true;
 		}
 	}
@@ -1209,9 +1512,19 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'wp_set_current_user' ) ) {
+		function wp_set_current_user( $id, $name = '' ) {
+			$GLOBALS['zaplane_test_current_user'] = (int) $id;
+
+			return (object) [ 'ID' => (int) $id ];
+		}
+	}
+
 	if ( ! function_exists( 'current_user_can' ) ) {
 		function current_user_can( string $capability ): bool {
-			return false;
+			// Default false, as most tests expect. A test that needs a capable
+			// user sets the global rather than every test gaining one.
+			return in_array( $capability, (array) ( $GLOBALS['zaplane_test_caps'] ?? [] ), true );
 		}
 	}
 
@@ -1258,6 +1571,12 @@ namespace {
 	if ( ! function_exists( 'wp_mail' ) ) {
 		function wp_mail( $to, $subject, $message, $headers = '', $attachments = [] ): bool {
 			return true;
+		}
+	}
+
+	if ( ! function_exists( 'wp_salt' ) ) {
+		function wp_salt( string $scheme = 'auth' ): string {
+			return 'test-salt-' . $scheme;
 		}
 	}
 
@@ -1421,6 +1740,38 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'wp_generate_password' ) ) {
+		function wp_generate_password( int $length = 12, bool $special_chars = true, bool $extra_special_chars = false ): string {
+			$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+			if ( $special_chars ) {
+				$chars .= '!@#$%^&*()';
+			}
+			$out = '';
+			for ( $i = 0; $i < $length; $i++ ) {
+				$out .= $chars[ random_int( 0, strlen( $chars ) - 1 ) ];
+			}
+			return $out;
+		}
+	}
+
+	if ( ! function_exists( 'untrailingslashit' ) ) {
+		function untrailingslashit( string $value ): string {
+			return rtrim( $value, '/\\' );
+		}
+	}
+
+	if ( ! function_exists( 'trailingslashit' ) ) {
+		function trailingslashit( string $value ): string {
+			return untrailingslashit( $value ) . '/';
+		}
+	}
+
+	if ( ! function_exists( 'wp_unslash' ) ) {
+		function wp_unslash( $value ) {
+			return is_string( $value ) ? stripslashes( $value ) : $value;
+		}
+	}
+
 	if ( ! function_exists( 'absint' ) ) {
 		function absint( $maybeint ) {
 			return abs( (int) $maybeint );
@@ -1459,6 +1810,126 @@ namespace {
 
 	if ( ! function_exists( 'get_current_blog_id' ) ) {
 		function get_current_blog_id(): int {
+			return 1;
+		}
+	}
+
+	// ── URL helpers ───────────────────────────────────────────────────────────
+
+	if ( ! function_exists( 'home_url' ) ) {
+		function home_url( $path = '', $scheme = null ): string {
+			return 'http://example.com' . ( $path ? '/' . ltrim( (string) $path, '/' ) : '' );
+		}
+	}
+
+	if ( ! function_exists( 'add_query_arg' ) ) {
+		/**
+		 * Core does not encode the values it appends — build_query() passes
+		 * $urlencode = false — so callers that need encoding do it themselves.
+		 * A mock that encoded here would make correct code look double-encoded.
+		 */
+		function add_query_arg( $key, $value = '', $url = '' ): string {
+			if ( is_array( $key ) ) {
+				$url   = (string) $value;
+				$pairs = $key;
+			} else {
+				$url   = (string) $url;
+				$pairs = [ (string) $key => (string) $value ];
+			}
+
+			$parts = [];
+			foreach ( $pairs as $k => $v ) {
+				$parts[] = $k . '=' . $v;
+			}
+
+			$sep = strpos( $url, '?' ) !== false ? '&' : '?';
+			return $url . $sep . implode( '&', $parts );
+		}
+	}
+
+	if ( ! function_exists( 'remove_query_arg' ) ) {
+		function remove_query_arg( $key, $url = '' ): string {
+			$url   = (string) $url;
+			$parts = explode( '?', $url, 2 );
+
+			if ( ! isset( $parts[1] ) ) {
+				return $url;
+			}
+
+			parse_str( $parts[1], $query );
+
+			foreach ( (array) $key as $one ) {
+				unset( $query[ $one ] );
+			}
+
+			return $query ? $parts[0] . '?' . http_build_query( $query ) : $parts[0];
+		}
+	}
+
+	if ( ! function_exists( '__' ) ) {
+		function __( $text, $domain = 'default' ) {
+			return $text;
+		}
+	}
+
+	if ( ! function_exists( 'esc_html__' ) ) {
+		function esc_html__( $text, $domain = 'default' ) {
+			return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+		}
+	}
+
+	if ( ! function_exists( 'wp_validate_redirect' ) ) {
+		function wp_validate_redirect( $location, $fallback_url = '' ) {
+			$host = wp_parse_url( (string) $location, PHP_URL_HOST );
+
+			if ( null === $host ) {
+				return $location;
+			}
+
+			return 'example.com' === $host ? $location : $fallback_url;
+		}
+	}
+
+	if ( ! function_exists( 'wp_is_application_passwords_available_for_user' ) ) {
+		function wp_is_application_passwords_available_for_user( $user ): bool {
+			return true;
+		}
+	}
+
+	if ( ! function_exists( 'admin_url' ) ) {
+		function admin_url( $path = '', $scheme = 'admin' ): string {
+			return 'http://example.com/wp-admin/' . ltrim( (string) $path, '/' );
+		}
+	}
+
+	// ── WooCommerce stubs ─────────────────────────────────────────────────────
+
+	if ( ! function_exists( 'wc_get_orders' ) ) {
+		function wc_get_orders( $args = [] ): array {
+			return \Zaplane\Tests\WPMocks::getWcOrders();
+		}
+	}
+
+	// ── Action Scheduler stubs ────────────────────────────────────────────────
+
+	if ( ! function_exists( 'as_next_scheduled_action' ) ) {
+		function as_next_scheduled_action( string $hook, array $args = [], string $group = '' ) {
+			return \Zaplane\Tests\WPMocks::getScheduledAction( $hook );
+		}
+	}
+
+	if ( ! function_exists( 'as_schedule_recurring_action' ) ) {
+		function as_schedule_recurring_action( int $timestamp, int $interval, string $hook, array $args = [], string $group = '' ): int {
+			\Zaplane\Tests\WPMocks::scheduleAction( $hook, $timestamp );
+			return 1;
+		}
+	}
+
+	if ( ! function_exists( 'as_enqueue_async_action' ) ) {
+		function as_enqueue_async_action( string $hook, array $args = [], string $group = '' ): int {
+			if ( $hook === 'zaplane_execute_node_run' ) {
+				\Zaplane\Tests\WPMocks::recordEnqueuedNodeRun( $args );
+			}
 			return 1;
 		}
 	}

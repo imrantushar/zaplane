@@ -39,8 +39,8 @@ const OptionMenu = props => {
       const y = rect.top + window.pageYOffset;
       const buttonHeight = relativeTo.current.offsetHeight;
       menuItemRef.current.style.position = 'absolute';
-      menuItemRef.current.style.left = `${x - 155}px`;
-      menuItemRef.current.style.top = `${y + buttonHeight - 25}px`;
+      menuItemRef.current.style.left = `${x - 160}px`;
+      menuItemRef.current.style.top = `${y + buttonHeight + 2}px`;
       document.body.appendChild(menuItemRef.current);
     } else if (menuItemRef.current && menuItemRef.current.parentNode === document.body) {
       document.body.removeChild(menuItemRef.current);

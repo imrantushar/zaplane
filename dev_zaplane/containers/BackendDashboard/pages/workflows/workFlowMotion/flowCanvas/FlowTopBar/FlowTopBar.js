@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import TopBar from "@ZAPComponents/TopBar";
-import { FiDownload } from "react-icons/fi";
+import { FiAlertTriangle, FiDownload } from "react-icons/fi";
 import { TfiReload } from "react-icons/tfi";
 import { LuFullscreen, LuMinimize, LuSquarePlay } from "react-icons/lu";
 import { LucideHistory } from "lucide-react";
@@ -29,6 +29,7 @@ import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportIm
 import { IoIosArrowForward } from "react-icons/io";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
+import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import { BsThreeDotsVertical } from "react-icons/bs";
 export default function FlowTopBar({
   workFlow,
@@ -49,6 +50,10 @@ export default function FlowTopBar({
     apiRequestRunning
   } = useSelector(state => state.workflows);
   const [refreshing, setRefreshing] = useState(false);
+  // What looks wrong with the workflow's triggers, reported on load and on save.
+  const [warningsOpen, setWarningsOpen] = useState(false);
+  // They describe the workflow as last saved, and are checked again on every save.
+  const warnings = Array.isArray(workFlow?.warnings) ? workFlow.warnings : [];
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -110,7 +115,38 @@ export default function FlowTopBar({
     }
   };
   const currentTitle = values?.title ?? workFlow?.workflow?.title ?? "Untitled Flow";
+  const toolbarButtonStyle = {
+    border: "1px solid var(--zaplane-border-color)",
+  };
+  const activeToolbarButtonStyle = {
+    border: "1px solid var(--zaplane-primary)",
+  };
   const rightActions = <div className="flex items-center gap-3">
+    {warnings.length > 0 && (
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setWarningsOpen(open => !open)}
+          aria-expanded={warningsOpen}
+          title={__("Things to check in this workflow's triggers", "zaplane")}
+          className="flex items-center gap-1.5 h-9 px-3 rounded-[4px] border border-[var(--zaplane-border-color)] bg-transparent text-[13px] font-medium text-amber-600 hover:bg-[var(--zaplane-secondary-color)] transition-all"
+        >
+          <FiAlertTriangle size={15} />
+          {warnings.length}
+        </button>
+        <WPPopover isOpen={warningsOpen} onClose={() => setWarningsOpen(false)} prefix="zaplane-trigger-warnings" focusOnMount={false}>
+          <div className="flex flex-col gap-2 max-w-[380px] p-1">
+            <p className="zaplane-label font-semibold m-0">{__("Check your triggers", "zaplane")}</p>
+            <p className="text-xs text-[var(--zaplane-font-secondary-color)] m-0">{__("As of the last save.", "zaplane")}</p>
+            {warnings.map((warning, index) => (
+              <p key={`${warning.code}-${warning.node_id}-${index}`} className="text-[13px] leading-snug text-[var(--zaplane-font-color)] m-0">
+                {warning.message}
+              </p>
+            ))}
+          </div>
+        </WPPopover>
+      </div>
+    )}
     {!apiRequestRunning ? (
       <button
         onClick={() => {
@@ -125,7 +161,7 @@ export default function FlowTopBar({
     ) : (
       <button
         onClick={() => dispatch(workflowNodeListinerStop(id))}
-        className="flex items-center gap-2 h-9 px-4 bg-red-50 text-red-600 font-medium rounded-[4px] hover:bg-red-100 transition-all"
+        className="flex items-center gap-2 h-9 px-4 bg-red-50 text-[var(--zaplane-danger)] font-medium rounded-[4px] hover:bg-red-100 transition-all"
       >
         <LiaStopCircleSolid className="text-xl" />
         <span>{__("Stop", "zaplane")}</span>
@@ -134,7 +170,7 @@ export default function FlowTopBar({
 
     {apiRequestRunning && (
       <div className="flex items-center gap-2">
-        <span className="text-[13px] font-medium text-gray-500">
+        <span className="text-[13px] font-medium text-[var(--zaplane-font-secondary-color)]">
           {__("Listening...", "zaplane")}
         </span>
         <span className="text-[13px] font-bold text-[var(--zaplane-primary)]">
@@ -147,6 +183,7 @@ export default function FlowTopBar({
       <button
         onClick={toggleFullscreen}
         style={outlineBtn}
+        className="mt-[4px]"
       >
         {isFullscreen ? <LuMinimize size={18} /> : <LuFullscreen size={18} />}
       </button>
@@ -161,9 +198,10 @@ export default function FlowTopBar({
       trigger={
         <button
           onClick={() => setActiveDrawer("logs")}
+          style={activeDrawer === "logs" ? activeToolbarButtonStyle : toolbarButtonStyle}
           className={`h-9 px-4 border rounded-[4px] text-sm font-medium transition-all ${activeDrawer === 'logs'
             ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
-            : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+            : 'border-[var(--zaplane-border-color)] text-[var(--zaplane-font-secondary-color)] hover:bg-[var(--zaplane-secondary-color)] hover:border-[var(--zaplane-border-color)]'
             }`}
         >
           {__("Logs", "zaplane")}
@@ -173,7 +211,7 @@ export default function FlowTopBar({
       <div className="flex gap-[5px] mb-[12px]">
         <button
           onClick={() => dispatch(getRunWorkFlow({ id }))}
-          className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-[#454F59] border-0 bg-transparent hover:bg-gray-100 rounded"
+          className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-[var(--zaplane-font-color)] border-0 bg-transparent hover:bg-[var(--zaplane-secondary-color)] rounded"
         >
           <TfiReload className={refreshing ? "animate-spin" : ""} />
           {__("Refresh", "zaplane")}
@@ -183,7 +221,7 @@ export default function FlowTopBar({
           onClick={() =>
             dispatch(workFLowExction({ workflow_hash: workFlow?.version?.hash }))
           }
-          className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-[#454F59] border-0 bg-transparent hover:bg-gray-100 rounded"
+          className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-[var(--zaplane-font-color)] border-0 bg-transparent hover:bg-[var(--zaplane-secondary-color)] rounded"
         >
           <LuSquarePlay />
           {__("Replay", "zaplane")}
@@ -202,9 +240,10 @@ export default function FlowTopBar({
         <ZAPTooltip content={'History'}>
           <button
             onClick={() => setActiveDrawer("history")}
+            style={activeDrawer === "history" ? activeToolbarButtonStyle : toolbarButtonStyle}
             className={`flex items-center justify-center w-9 h-9 border rounded-[4px] transition-all ${activeDrawer === 'history'
               ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
-              : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+              : 'border-[var(--zaplane-border-color)] text-[var(--zaplane-font-secondary-color)] hover:bg-[var(--zaplane-secondary-color)] hover:border-[var(--zaplane-border-color)]'
               }`}
           >
             <LucideHistory size={18} />
@@ -223,13 +262,20 @@ export default function FlowTopBar({
       isClearable={false}
       isSearchable={false}
       placeholder="Select status"
-      className="zaplane-selete"
+      className="zaplane-select"
+      classNamePrefix="zaplane-select"
+      formatOptionLabel={(opt) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: opt.color, flexShrink: 0, display: 'inline-block' }} />
+          {opt.label}
+        </div>
+      )}
     />
 
     <button
       disabled={!isFlowDirty}
       onClick={handleSubmit}
-      className="h-9 px-6 bg-[var(--zaplane-primary)] hover:opacity-90 active:scale-[0.98] text-white font-semibold rounded-[4px] transition-all shadow-sm shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="h-9 px-6 bg-[var(--zaplane-primary)] hover:opacity-90 active:scale-[0.98] text-white font-semibold rounded-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {__("Update", "zaplane")}
     </button>
@@ -271,7 +317,7 @@ export default function FlowTopBar({
         />
       </div>
 
-      <IoIosArrowForward className="text-gray-400 text-xs" />
+      <IoIosArrowForward className="text-[var(--zaplane-text-muted)] text-xs" />
 
       <ZAPLabel
         as="h2"
@@ -288,7 +334,7 @@ export default function FlowTopBar({
         className="hover:text-[var(--zaplane-primary)] transition-colors"
       />
 
-      <IoIosArrowForward className="text-gray-400 text-xs" />
+      <IoIosArrowForward className="text-[var(--zaplane-text-muted)] text-xs" />
 
       {isEditingTitle ? (
         <input
@@ -305,7 +351,7 @@ export default function FlowTopBar({
       ) : (
         <span
           onClick={() => setIsEditingTitle(true)}
-          className="m-0 text-[14px] font-semibold text-[var(--zaplane-font-color)] truncate cursor-pointer max-w-[240px] hover:bg-gray-50 px-2 py-1 rounded transition-colors"
+          className="m-0 text-[14px] font-semibold text-[var(--zaplane-font-color)] truncate cursor-pointer max-w-[240px] hover:bg-[var(--zaplane-secondary-color)] px-2 py-1 rounded transition-colors"
         >
           {currentTitle}
         </span>

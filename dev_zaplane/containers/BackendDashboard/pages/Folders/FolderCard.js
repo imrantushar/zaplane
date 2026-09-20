@@ -8,7 +8,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import WPModal from "@ZAPComponents/Modal/WPModal";
-import { outlineBtn, primaryBtn } from '../../../../../assets/scss/chakra/recipe';
+import { primaryBtn } from '../../../../../assets/scss/chakra/recipe';
 import { updateFolder, deleteFolder } from '@ZAPRedux/Slices/folderSlice/folderSlice';
 import ZAPInput from '@ZAPComponents/ZAPInput';
 const FolderCard = ({
@@ -87,19 +87,16 @@ const FolderCard = ({
 
       <WPModal title={__("Rename Folder", "zaplane")} isOpen={isRenameOpen} onRequestClose={() => setIsRenameOpen(false)} size="large">
     
-        <div justify="flex-end" gap={3} className="flex">
-          <div className='flex flex-col gap-6'>
-            <ZAPInput
-              placeholder={__("Enter folder name", "zaplane")}
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-            />
-            <button style={outlineBtn} onClick={() => setIsRenameOpen(false)}>
-            {__("Cancel", "zaplane")}
-          </button>
-          <button style={primaryBtn} onClick={handleRename} disabled={!title.trim()}>
-            {__("Update", "zaplane")}
-          </button>
+        <div className="flex flex-col gap-6">
+          <ZAPInput
+            placeholder={__("Enter folder name", "zaplane")}
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+          />
+          <div className="flex gap-3">
+            <button style={primaryBtn} onClick={handleRename} disabled={!title.trim()}>
+              {__("Update", "zaplane")}
+            </button>
           </div>
         </div>
       </WPModal>

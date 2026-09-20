@@ -1,32 +1,64 @@
+# ─────────────────────────────────────────────────────────────
+# Files/dirs excluded from the distributable plugin zip.
+# NOTE: never exclude the whole `vendor/` dir — wp dist-archive drops
+# vendor/autoload.php when the vendor dir is ignored. Production deps are
+# trimmed by `composer install --no-dev` in the release build.
+#
+# The uncompiled source of assets/build/ ships on purpose: dev_zaplane/ (React),
+# assets/scss/ (Sass) and the build setup (package.json, webpack.config.js,
+# tailwind.config.js, postcss.config.js, jsconfig.json). WordPress.org requires
+# the source of every generated file to be available.
+# ─────────────────────────────────────────────────────────────
+
 # VCS & IDE
 .git
 .github
 .gitignore
+.gitattributes
 .DS_Store
 .claude
+.codex
+.editorconfig
+.vscode
+.idea
 
-# Dev tooling
+# Dev tooling (not needed to build or run)
+.distignore
 .eslintrc.js
 .eslintignore
 .prettierrc.js
 .prettierignore
 .phpunit.result.cache
-.gitignore
 .fantasticonrc.js
-webpack.config.js
+.npmrc
 phpcs.xml
-composer.json
-composer.lock
-package.json
-package-lock.json
-jsconfig.json
 phpunit.xml
-node_modules
-CLAUDE.md
+composer.lock
+package-lock.json
 
-# Dev-only code
-tests
+# Build tooling & logs (not needed at runtime)
+build.sh
+build_output.log
+scripts
+build-tools
+build.config.json
+.build-cache
+
+# Docs (dev-facing; README.txt ships the user-facing changelog)
+CLAUDE.md
+CHANGELOG.md
+TESTING.md
+front-end-dev-doc
 docs
-dev_zaplane
+
+# Dev-only code & tests
+tests
+recipes-test
+node_modules
 includes/framework/console
 includes/commands
+includes/testing
+
+# Icon font sources and the generator's preview page
+assets/icon-src
+assets/library/icons/fonts/*.html

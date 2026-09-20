@@ -5,7 +5,9 @@ namespace Zaplane\Framework\Core;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\ConnectionManager;
 use Zaplane\Framework\Classes\Expression;
+use Zaplane\Framework\Classes\GlobalContext;
 use Zaplane\Framework\Classes\Query;
+use Zaplane\Framework\Classes\TriggerNodes;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
 use Zaplane\Framework\Models\Option;
@@ -22,6 +24,14 @@ class Automation {
 	protected static ?self $instance = null;
 	protected Container $container;
 	protected array $registered_hooks = [];
+
+	/**
+	 * Events a Test Trigger listener caught in this request, so the run router
+	 * leaves them to the test. Keyed by claim_key().
+	 *
+	 * @var array<string,bool>
+	 */
+	protected array $claimed = [];
 
 	public static function init( Container $container ): self {
 		if ( ! self::$instance ) {
@@ -49,6 +59,7 @@ class Automation {
 	}
 
 	public function reload_triggers() {
+		Query::flush_trigger_map();
 		foreach ( $this->registered_hooks as $event => $cb ) {
 			if ( is_array( $cb ) ) {
 				remove_action( $event, $cb, 10 );
@@ -70,7 +81,16 @@ class Automation {
 	}
 
 	public function dispatch_active_listeners(): void {
-		$listeners = Option::where( 'option_name', 'LIKE', 'zaplane_listener_state_%' )->get();
+		// Listeners only exist transiently while a user is in "Test Trigger" mode.
+		// The autoloaded flag lets the common case (nobody listening) skip the
+		// wp_options LIKE scan entirely on every request. It's set when a listener
+		// starts (ListenerController) and self-heals to 0 below once none remain.
+		if ( ! get_option( 'zaplane_listeners_active' ) ) {
+			return;
+		}
+
+		$listeners     = Option::where( 'option_name', 'LIKE', 'zaplane_listener_state_%' )->get();
+		$any_listening = false;
 
 		foreach ( $listeners as $listener ) {
 			$state = $listener->getValue();
@@ -79,15 +99,18 @@ class Automation {
 				continue;
 			}
 
-			$hook = $state['hook'] ?? '';
-			if ( ! $hook ) {
-				continue;
-			}
+			$any_listening = true;
 
-			if ( ! isset( $this->registered_hooks[ 'listener_' . $hook ] ) ) {
-				add_action( $hook, [ $this, 'listener_hook_handler' ], 1, 99 );
-				$this->registered_hooks[ 'listener_' . $hook ] = true;
+			foreach ( self::listened_hooks( $state ) as $hook ) {
+				if ( ! isset( $this->registered_hooks[ 'listener_' . $hook ] ) ) {
+					add_action( $hook, [ $this, 'listener_hook_handler' ], 1, 99 );
+					$this->registered_hooks[ 'listener_' . $hook ] = true;
+				}
 			}
+		}
+
+		if ( ! $any_listening ) {
+			update_option( 'zaplane_listeners_active', 0 );
 		}
 	}
 
@@ -104,36 +127,93 @@ class Automation {
 				continue;
 			}
 
-			if ( ( $state['hook'] ?? '' ) !== $currentHook ) {
+			if ( ! in_array( $currentHook, self::listened_hooks( $state ), true ) ) {
 				continue;
 			}
 
-			$workflowId = $state['workflow_id'] ?? 0;
+			$workflowId     = $state['workflow_id'] ?? 0;
 			$hookInfoOption = 'zaplane_listener_hook_' . $workflowId;
-			$hookInfo = Option::get( $hookInfoOption );
+			$hookInfo       = Option::get( $hookInfoOption );
 
 			if ( ! $hookInfo || ! is_array( $hookInfo ) ) {
 				continue;
 			}
 
-			$node = $hookInfo['node'];
+			foreach ( self::listener_targets( $hookInfo ) as $target ) {
+				if ( ( $target['hook'] ?? '' ) !== $currentHook || ! is_array( $target['node'] ?? null ) ) {
+					continue;
+				}
 
-			$integration = $this->container->get( 'integrations' )->get( strtolower( $node['data']['app'] ) );
-			if ( ! $integration ) {
-				continue;
-			}
+				$node        = $target['node'];
+				$integration = $this->container->get( 'integrations' )->get( strtolower( (string) ( $node['data']['app'] ?? '' ) ) );
+				if ( ! $integration ) {
+					continue;
+				}
 
-			$payload = $integration::resolve_trigger( $node['data'], $args );
-			if ( ! $payload ) {
-				continue;
-			}
+				$payload = $integration::resolve_trigger( $node['data'], $args );
+				if ( ! $payload ) {
+					continue;
+				}
 
-			$state['status'] = 'triggered';
-			$state['data'] = $payload;
-			$state['triggered_at'] = current_time( 'mysql' );
+				$state['status'] = 'triggered';
+				$state['data']   = $payload;
+				// Which trigger fired, when the listener was waiting on several.
+				$state['node_key']     = (int) $node['id'];
+				$state['triggered_at'] = current_time( 'mysql' );
 
-			Option::set( $listener->option_name, $state, 'no' );
+				Option::set( $listener->option_name, $state, 'no' );
+
+				// The editor's poll runs this event as a test. The run router handles
+				// the same event right after this, and must not start a real run too.
+				$this->claimed[ self::claim_key( $workflowId, $node['id'] ) ] = true;
+				break;
+			}//end foreach
 		}//end foreach
+	}
+
+	/**
+	 * The hooks a Test Trigger listener waits on. A listener started before one
+	 * could wait on several triggers stored a single `hook`.
+	 *
+	 * @param array<string,mixed> $state
+	 * @return array<int,string>
+	 */
+	private static function listened_hooks( array $state ): array {
+		$hooks = isset( $state['hooks'] ) && is_array( $state['hooks'] ) ? $state['hooks'] : [ $state['hook'] ?? '' ];
+
+		return array_values( array_filter( $hooks, static fn( $hook ) => is_string( $hook ) && '' !== $hook ) );
+	}
+
+	/**
+	 * The trigger nodes a listener waits on, one entry per hook.
+	 *
+	 * @param array<string,mixed> $hookInfo
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function listener_targets( array $hookInfo ): array {
+		if ( isset( $hookInfo['targets'] ) && is_array( $hookInfo['targets'] ) ) {
+			return $hookInfo['targets'];
+		}
+
+		return isset( $hookInfo['node'] )
+			? [
+				[
+					'hook' => $hookInfo['hook'] ?? '',
+					'node' => $hookInfo['node'],
+				],
+			]
+			: [];
+	}
+
+	/**
+	 * Names an event that a Test Trigger listener caught, for one trigger of one
+	 * workflow.
+	 *
+	 * @param int|string $workflow_id
+	 * @param int|string $node_id
+	 */
+	private static function claim_key( $workflow_id, $node_id ): string {
+		return (int) $workflow_id . ':' . (int) $node_id;
 	}
 
 	public function trigger_router() {
@@ -141,12 +221,23 @@ class Automation {
 
 		$args = func_get_args();
 		foreach ( Query::get_active_workflows_for_event( $event ) as $trigger ) {
-			$listenerState = Option::get( 'zaplane_listener_state_' . $trigger['workflow_id'] );
-			if ( is_array( $listenerState ) && ( $listenerState['status'] ?? '' ) === 'listening' ) {
+			// A Test Trigger listener caught this very event for this trigger. Every
+			// other event runs for real, this trigger's next one included, so a
+			// listener that nobody polls can't hold a trigger back.
+			$claim = self::claim_key( $trigger['workflow_id'], $trigger['id'] );
+			if ( isset( $this->claimed[ $claim ] ) ) {
+				unset( $this->claimed[ $claim ] );
 				continue;
 			}
 
 			$integration = $this->container->get( 'integrations' )->get( strtolower( $trigger['app'] ) );
+			// A workflow can outlive its integration (plugin removed, custom app
+			// deleted). Without this the whole hook fataled, taking down every
+			// other workflow listening on the same event.
+			if ( ! $integration ) {
+				continue;
+			}
+
 			$payload = $integration::resolve_trigger( $trigger['graph_node']['data'], $args );
 			if ( ! $payload ) {
 				continue;
@@ -156,20 +247,136 @@ class Automation {
 		}
 	}
 
-	private function start_trigger_run( array $trigger, array $payload ) {
+	protected function start_trigger_run( array $trigger, array $payload ): int {
 		$nodeKey = (int) $trigger['id'];
 
 		$run = Run::create([
 			'workflow_version_id' => $trigger['workflow_version_id'],
-			'workflow_id' => $trigger['workflow_id'],
-			'trigger_data' => $payload,
-			'status' => 'running',
-			'start_node_key' => $nodeKey,
-			'target_node_key' => null,
-			'started_at' => current_time( 'mysql' ),
+			'workflow_id'         => $trigger['workflow_id'],
+			// Capture the current WordPress user synchronously at hook-fire time.
+			// Action Scheduler runs nodes async (no logged-in user), so we store the
+			// user ID here and re-hydrate it in GlobalContext::build_wp() at execution time.
+			'trigger_data'        => array_merge( $payload, [ '__wp_user_id' => get_current_user_id() ] ),
+			'status'              => 'running',
+			'start_node_key'      => $nodeKey,
+			'target_node_key'     => null,
+			'started_at'          => current_time( 'mysql' ),
 		]);
 
+		// NodeRun gets the clean payload — __wp_user_id must not appear in node outputs.
 		$this->spawn_node_run( $run->id, $nodeKey, $payload, null, $this->extract_node_meta( $trigger['graph_node'] ) );
+
+		// Remember this payload as the shared sample for the trigger (app+event
+		// +config) so other workflows using the exact same trigger can map its
+		// fields without re-capturing.
+		$gnode = $trigger['graph_node']['data'] ?? [];
+		self::store_trigger_sample( $gnode['app'] ?? '', $gnode['event'] ?? '', $payload, is_array( $gnode['config'] ?? null ) ? $gnode['config'] : [] );
+
+		return $run->id;
+	}
+
+	/**
+	 * Persist the most recent payload for a trigger, keyed by app+event (NOT by
+	 * workflow), so any workflow that uses the same trigger can reuse it as
+	 * sample data for field mapping without capturing again.
+	 *
+	 * $config is the trigger node's saved config (e.g. the selected form_id for
+	 * a form-builder trigger). Triggers whose payload shape depends on which
+	 * specific entity is selected (different forms have different fields) must
+	 * not share a sample across different selections — folding $config into the
+	 * key keeps "Form A" and "Form B" from bleeding into each other's picker.
+	 */
+	public static function store_trigger_sample( string $app, string $event, array $payload, array $config = [] ): void {
+		$app   = sanitize_key( $app );
+		$event = sanitize_key( $event );
+		if ( '' === $app || '' === $event || empty( $payload ) ) {
+			return;
+		}
+		Option::set( self::trigger_sample_option_name( $app, $event, $config ), $payload, 'no' );
+	}
+
+	/**
+	 * Read the shared sample payload previously captured for a trigger
+	 * (app+event+config). Returns [] when nothing has been captured for it yet.
+	 */
+	public static function get_trigger_sample( string $app, string $event, array $config = [] ): array {
+		$app   = sanitize_key( $app );
+		$event = sanitize_key( $event );
+		if ( '' === $app || '' === $event ) {
+			return [];
+		}
+		$value = Option::get( self::trigger_sample_option_name( $app, $event, $config ) );
+		return is_array( $value ) ? $value : [];
+	}
+
+	/**
+	 * Triggers with no config selector keep the plain app__event key (no change
+	 * for the common case). A non-empty config appends a short hash of it so
+	 * different selections (e.g. different forms) get distinct cache entries.
+	 */
+	private static function trigger_sample_option_name( string $app, string $event, array $config ): string {
+		$name = 'zaplane_trigger_sample_' . $app . '__' . $event;
+		if ( ! empty( $config ) ) {
+			ksort( $config );
+			$name .= '__' . substr( md5( (string) wp_json_encode( $config ) ), 0, 12 );
+		}
+		return $name;
+	}
+
+	public static function get_instance(): ?self {
+		return self::$instance;
+	}
+
+	/**
+	 * Directly start runs for every active workflow that listens on $event,
+	 * using an already-resolved $payload. Bypasses the WP hook system so it
+	 * works reliably even when called from async contexts (Action Scheduler).
+	 */
+	public function trigger_event( string $event, array $payload ): void {
+		foreach ( Query::get_active_workflows_for_event( $event ) as $trigger ) {
+			$this->start_trigger_run( $trigger, $payload );
+		}
+	}
+
+	/**
+	 * Programmatically start a workflow run with custom trigger data, bypassing
+	 * the normal WordPress hook system. The workflow must have an active version.
+	 *
+	 * A workflow can have several triggers. $trigger_node_id names the one the run
+	 * starts from. Without it the run starts from the workflow's Manual trigger,
+	 * or from its first trigger when it has no Manual one.
+	 *
+	 * Returns the Run ID on success, or false if the workflow, its active version
+	 * or the trigger could not be found.
+	 *
+	 * @param int|string|null $trigger_node_id
+	 */
+	public function run_workflow( int $workflow_id, array $data = [], $trigger_node_id = null ) {
+		$workflow = \Zaplane\Models\Workflow::find( $workflow_id );
+		if ( ! $workflow ) {
+			return false;
+		}
+
+		$version = $workflow->activeVersion();
+		if ( ! $version ) {
+			return false;
+		}
+
+		$triggerNode = TriggerNodes::resolve( $version->getGraph(), $trigger_node_id );
+
+		if ( ! $triggerNode ) {
+			return false;
+		}
+
+		$trigger = [
+			'workflow_version_id' => $version->id,
+			'workflow_id'         => $workflow->id,
+			'id'                  => $triggerNode['id'],
+			'app'                 => $triggerNode['data']['app'] ?? '',
+			'graph_node'          => $triggerNode,
+		];
+
+		return $this->start_trigger_run( $trigger, $data );
 	}
 
 	public function spawn_node_run( int $run_id, int $node_key, array $input, ?int $parent, ?array $node_meta = null ) {
@@ -247,15 +454,45 @@ class Automation {
 
 		$app = strtolower( $node['data']['app'] ?? '' );
 
-		$context = $this->buildNodeContext( $run->id );
+		$context     = $this->buildNodeContext( $run->id, $run, $node, $graph );
 		$resolveData = $input + $context;
+
+		// `trigger` is the data of whichever trigger started this run. It wins over
+		// a field of the same name in the step's input, or it couldn't be relied on.
+		if ( array_key_exists( 'trigger', $context ) ) {
+			$resolveData['trigger'] = $context['trigger'];
+		}
 
 		$node['_run_id'] = $run->id;
 		$node['_node_run_id'] = $nodeRun->id;
 
+		// AI Agent sub-nodes: nodes wired into the agent's tool/memory/model
+		// handles are configuration providers, not flow steps. Collect them here
+		// so the agent can use them; they never execute on their own (nothing in
+		// the main flow connects into them).
+		if ( 'ai-agent' === $app ) {
+			$subs = $this->collect_sub_nodes( $graph, $nodeRun->node_key );
+
+			// Resolve {{...}} in each sub-node's config against the run context, the
+			// same way the agent's own config is resolved — otherwise e.g. a Memory
+			// node's dynamic conversation_key would stay a literal and never match.
+			foreach ( [ 'ai_model', 'ai_memory' ] as $handle ) {
+				if ( ! empty( $subs[ $handle ]['data']['config'] ) && is_array( $subs[ $handle ]['data']['config'] ) ) {
+					$subs[ $handle ]['data']['config'] = $this->resolveConfigValues( $subs[ $handle ]['data']['config'], $resolveData );
+				}
+			}
+			foreach ( $subs['ai_tool'] as $k => $tool_node ) {
+				if ( ! empty( $tool_node['data']['config'] ) && is_array( $tool_node['data']['config'] ) ) {
+					$subs['ai_tool'][ $k ]['data']['config'] = $this->resolveConfigValues( $tool_node['data']['config'], $resolveData );
+				}
+			}
+
+			$node['_sub_nodes'] = $subs;
+		}
+
 		try {
 			if ( 'trigger' === $node['type'] ) {
-				$output = $input;
+				$output = TriggerNodes::apply_field_map( $node, $input );
 			} elseif ( in_array( $app, [ 'condition', 'filter' ], true ) ) {
 				$integration = $this->container->get( 'integrations' )->get( $app );
 				if ( ! $integration ) {
@@ -289,10 +526,16 @@ class Automation {
 
 				$remaining = $output['remaining'] ?? [];
 				if ( ! empty( $remaining ) ) {
-					$iteratorInput = array_merge( $input, [
-						'_is_iterating' => true,
-						'_remaining'    => $remaining
-					] );
+					// `iterator_state` lets a looping tool carry counters (index/total)
+					// forward across passes without threading them by hand.
+					$iteratorInput = array_merge(
+						$input,
+						[
+							'_is_iterating' => true,
+							'_remaining'    => $remaining,
+						],
+						is_array( $output['iterator_state'] ?? null ) ? $output['iterator_state'] : []
+					);
 
 					$this->spawn_node_run(
 						$run->id,
@@ -372,7 +615,7 @@ class Automation {
 				$nodeRun->id,
 				$targetNode ? $this->extract_node_meta( $targetNode ) : null
 			);
-		}
+		}//end foreach
 	}
 
 	private function finalize_run( int $run_id ) {
@@ -407,7 +650,7 @@ class Automation {
 
 
 
-	private function buildNodeContext( int $run_id ): array {
+	private function buildNodeContext( int $run_id, ?Run $run = null, array $node = [], array $graph = [] ): array {
 		$nodeRuns = NodeRun::where( 'run_id', $run_id )
 			->where( 'status', 'completed' )
 			->orderBy( 'id', 'asc' )
@@ -418,10 +661,68 @@ class Automation {
 		foreach ( $nodeRuns as $nr ) {
 			$output = $nr->getOutput();
 
+			if ( is_array( $output ) && isset( $output['port'], $output['data'] ) ) {
+				$output = $output['data'];
+			}
+
 			$context[ (string) $nr->node_key ] = is_array( $output ) ? $output : [ 'value' => $output ];
 		}
 
+		if ( $run && null !== $run->start_node_key && $graph ) {
+			$context = TriggerNodes::with_aliases( $context, $graph, (string) $run->start_node_key );
+		}
+
+		// Only inject global context groups that this node's config actually references.
+		// e.g. if config has {{wp.user_email}} we build the 'wp' group; if not, we skip it.
+		// A union, not array_merge(): node outputs are keyed by numeric id, and
+		// array_merge() renumbers numeric keys, which pointed {{1.…}} at the wrong step.
+		$prefixes = GlobalContext::detect_prefixes( $node['data']['config'] ?? [] );
+		if ( $prefixes ) {
+			$context = $context + GlobalContext::build( $prefixes, $run );
+		}
+
 		return $context;
+	}
+
+	/**
+	 * Gather the sub-nodes wired into a node's AI-agent handles (ai_tool,
+	 * ai_memory, ai_model). Returns tool providers as a list and memory/model as
+	 * single nodes. These are inspected by the agent — never executed as steps.
+	 *
+	 * @return array{ai_tool:array<int,array<string,mixed>>,ai_memory:?array<string,mixed>,ai_model:?array<string,mixed>}
+	 */
+	private function collect_sub_nodes( array $graph, int $node_key ): array {
+		$subs = [
+			'ai_tool' => [],
+			'ai_memory' => null,
+			'ai_model' => null
+		];
+
+		$nodeMap = [];
+		foreach ( $graph['nodes'] ?? [] as $n ) {
+			$nodeMap[ (int) $n['id'] ] = $n;
+		}
+
+		foreach ( $graph['edges'] ?? [] as $edge ) {
+			if ( (int) ( $edge['target'] ?? 0 ) !== $node_key ) {
+				continue;
+			}
+			$handle = $edge['targetHandle'] ?? '';
+			if ( ! array_key_exists( $handle, $subs ) ) {
+				continue;
+			}
+			$src = $nodeMap[ (int) ( $edge['source'] ?? 0 ) ] ?? null;
+			if ( ! $src ) {
+				continue;
+			}
+			if ( 'ai_tool' === $handle ) {
+				$subs['ai_tool'][] = $src;
+			} else {
+				$subs[ $handle ] = $src;
+			}
+		}
+
+		return $subs;
 	}
 
 	private function inject_credentials( array $node ): array {

@@ -132,7 +132,39 @@ class Run extends Model {
 			$nodeRuns = $run->nodeRuns();
 			foreach ( $nodeRuns as $nodeRun ) {
 				$key = $nodeRun->node_key;
-				if ( ! isset( $nodeOutputs[ $key ] ) ) {
+				if ( ! isset( $nodeOutputs[ $key ] ) && $nodeRun->isCompleted() ) {
+					$nodeOutputs[ $key ] = $nodeRun;
+				}
+			}
+		}
+
+		return $nodeOutputs;
+	}
+
+	/**
+	 * Latest completed node outputs across ALL runs of a workflow — test or real.
+	 *
+	 * Fallback for the "@" variable picker so a real run (an actual form
+	 * submission, or a manual "Run") surfaces its captured data even when the user
+	 * never used the "Test" flow. Full runs have no target_node_key, so unlike the
+	 * test variant we don't filter on it.
+	 *
+	 * @return array<int,NodeRun>
+	 */
+	public static function latestNodeRunsByWorkflow( int $workflowId, array $nodeIds = [] ): array {
+		$runs = static::where( 'workflow_id', $workflowId )
+			->orderBy( 'id', 'desc' )
+			->get();
+
+		$nodeOutputs = [];
+
+		foreach ( $runs as $run ) {
+			foreach ( $run->nodeRuns() as $nodeRun ) {
+				$key = (int) $nodeRun->node_key;
+				if ( ! empty( $nodeIds ) && ! in_array( $key, $nodeIds, true ) ) {
+					continue;
+				}
+				if ( ! isset( $nodeOutputs[ $key ] ) && $nodeRun->isCompleted() ) {
 					$nodeOutputs[ $key ] = $nodeRun;
 				}
 			}

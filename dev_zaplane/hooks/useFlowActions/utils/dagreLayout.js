@@ -1,7 +1,11 @@
 import dagre from "dagre";
 
-const NODE_WIDTH = 160;
-const NODE_HEIGHT = 48;
+// Must track the rendered node card size (CustomNode.js: minWidth 220px,
+// minHeight 64px) — if these are smaller than the real card, dagre computes
+// gaps assuming a narrower box than what actually renders, so the visible
+// space between cards (and the edge/arrow drawn in it) collapses.
+const NODE_WIDTH = 240;
+const NODE_HEIGHT = 64;
 
 export const getLayoutedElements = (nodes, edges, direction = "TB") => {
   const dagreGraph = new dagre.graphlib.Graph();

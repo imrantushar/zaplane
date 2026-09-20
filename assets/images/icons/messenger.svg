@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+<path fill="url(#zaplane-messenger-gradient)" d="M12 0C5.373 0 0 5.093 0 11.375c0 3.573 1.734 6.766 4.446 8.845V24l4.06-2.23c1.083.3 2.233.463 3.494.463 6.627 0 12-5.093 12-11.375C24 5.093 18.627 0 12 0Z"/>
+<path fill="#fff" d="M13.11 14.09 10.05 10.82 4.07 14.09 10.9 6.75 14.03 10.02 20.01 6.75Z"/>
+<defs>
+<linearGradient id="zaplane-messenger-gradient" x1="12" y1="0" x2="12" y2="23.99" gradientUnits="userSpaceOnUse">
+<stop stop-color="#00B2FF"/>
+<stop offset="0.5" stop-color="#B900E2"/>
+<stop offset="1" stop-color="#F70A8D"/>
+</linearGradient>
+</defs>
+</svg>

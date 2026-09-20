@@ -8,18 +8,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 trait DynamicQueriesTrait {
 	public static function get_dynamic_queries(): array {
 		return [
-			'orders'               => [ self::class, 'orders_query' ],
-			'customers'            => [ self::class, 'customers_query' ],
-			'subscriptions'        => [ self::class, 'subscriptions_query' ],
-			'products'             => [ self::class, 'products_query' ],
-			'order_statuses'       => [ self::class, 'order_statuses_query' ],
-			'payment_statuses'     => [ self::class, 'payment_statuses_query' ],
-			'customer_statuses'    => [ self::class, 'customer_statuses_query' ],
-			'subscription_statuses'=> [ self::class, 'subscription_statuses_query' ],
-			'post_statuses'        => [ self::class, 'post_statuses_query' ],
-			'fulfillment_types'    => [ self::class, 'fulfillment_types_query' ],
-			'stock_statuses'       => [ self::class, 'stock_statuses_query' ],
-			'payment_types'        => [ self::class, 'payment_types_query' ],
+			'orders'                => [ self::class, 'orders_query' ],
+			'customers'             => [ self::class, 'customers_query' ],
+			'subscriptions'         => [ self::class, 'subscriptions_query' ],
+			'products'              => [ self::class, 'products_query' ],
+			'coupons'               => [ self::class, 'coupons_query' ],
+			'categories'            => [ self::class, 'categories_query' ],
+			'brands'                => [ self::class, 'brands_query' ],
+			'shipping_classes'      => [ self::class, 'shipping_classes_query' ],
+			'order_statuses'        => [ self::class, 'order_statuses_query' ],
+			'payment_statuses'      => [ self::class, 'payment_statuses_query' ],
+			'customer_statuses'     => [ self::class, 'customer_statuses_query' ],
+			'subscription_statuses' => [ self::class, 'subscription_statuses_query' ],
+			'post_statuses'         => [ self::class, 'post_statuses_query' ],
+			'fulfillment_types'     => [ self::class, 'fulfillment_types_query' ],
+			'stock_statuses'        => [ self::class, 'stock_statuses_query' ],
+			'payment_types'         => [ self::class, 'payment_types_query' ],
 		];
 	}
 
@@ -173,6 +177,88 @@ trait DynamicQueriesTrait {
 			$options[] = [
 				'name'  => (string) $product_id,
 				'label' => $title . ' (#' . $product_id . ')',
+			];
+		}
+
+		return $options;
+	}
+
+	public static function coupons_query( $q ): array {
+		$q = is_array( $q ) ? $q : [];
+
+		$options = [
+			[
+				'name'  => 'any',
+				'label' => 'Any Coupon',
+			],
+		];
+
+		$rows = self::list_coupons(
+			max( 1, (int) ( $q['limit'] ?? 50 ) ),
+			1,
+			trim( (string) ( $q['search'] ?? '' ) )
+		);
+
+		foreach ( $rows as $row ) {
+			$coupon_id = self::parse_positive_int( $row['id'] ?? 0 );
+			if ( $coupon_id <= 0 ) {
+				continue;
+			}
+
+			$code = (string) ( $row['code'] ?? ( 'Coupon #' . $coupon_id ) );
+
+			$options[] = [
+				'name'  => (string) $coupon_id,
+				'label' => $code,
+			];
+		}
+
+		return $options;
+	}
+
+	public static function categories_query( $q ): array {
+		return self::taxonomy_term_query( self::PRODUCT_CATEGORY_TAXONOMY, 'Any Category' );
+	}
+
+	public static function brands_query( $q ): array {
+		return self::taxonomy_term_query( self::PRODUCT_BRAND_TAXONOMY, 'Any Brand' );
+	}
+
+	public static function shipping_classes_query( $q ): array {
+		return self::taxonomy_term_query( self::PRODUCT_SHIPPING_CLASS_TAXONOMY, 'Any Shipping Class' );
+	}
+
+	private static function taxonomy_term_query( string $taxonomy, string $any_label ): array {
+		$options = [
+			[
+				'id'    => 'any',
+				'label' => $any_label,
+			],
+		];
+
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return $options;
+		}
+
+		$terms = get_terms(
+			[
+				'taxonomy'   => $taxonomy,
+				'hide_empty' => false,
+			]
+		);
+
+		if ( is_wp_error( $terms ) || ! is_array( $terms ) ) {
+			return $options;
+		}
+
+		foreach ( $terms as $term ) {
+			if ( ! is_object( $term ) || ! isset( $term->term_id ) ) {
+				continue;
+			}
+
+			$options[] = [
+				'id'    => (string) $term->term_id,
+				'label' => (string) ( $term->name ?? ( 'Term #' . $term->term_id ) ),
 			];
 		}
 

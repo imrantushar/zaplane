@@ -24,11 +24,20 @@ class MetaboxTest extends IntegrationTestCase
 			],
 		];
 
-		$result = Metabox::resolve_trigger( $node, [ $object ] );
+		$GLOBALS['zaplane_post_meta'] = [
+			'your_name' => [ 'John Doe' ],
+			'_hidden'   => [ 'should_skip' ],
+		];
 
-		$this->assertTrue( $result['success'] );
-		$this->assertEquals( 'form_1', $result['data']['id'] );
-		$this->assertEquals( 'John Doe', $result['data']['your_name'] );
-		$this->assertEquals( 123, $result['data']['post_id'] );
+		try {
+			$result = Metabox::resolve_trigger( $node, [ $object ] );
+
+			$this->assertTrue( $result['success'] );
+			$this->assertEquals( 'form_1', $result['data']['id'] );
+			$this->assertEquals( 'John Doe', $result['data']['your_name'] );
+			$this->assertEquals( 123, $result['data']['post_id'] );
+		} finally {
+			unset( $GLOBALS['zaplane_post_meta'] );
+		}
 	}
 }

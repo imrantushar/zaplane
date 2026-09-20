@@ -6,11 +6,15 @@ use WP_REST_Controller;
 use WP_REST_Server;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Classes\GlobalContext;
+use Zaplane\Framework\Classes\TriggerNodes;
+use Zaplane\Authoring\TriggerAdvisor;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Utils\VariableExtractor;
+use Zaplane\Framework\Core\IntegrationLoader;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -114,6 +118,14 @@ class WorkflowsController extends WP_REST_Controller {
 			],
 		]);
 
+		register_rest_route($namespace, '/' . $rest_base . '/(?P<id>\d+)/trigger', [
+			[
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => [ $this, 'trigger_workflow' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		]);
+
 		register_rest_route($namespace, '/condition-variables', [
 			[
 				'methods' => WP_REST_Server::CREATABLE,
@@ -121,10 +133,58 @@ class WorkflowsController extends WP_REST_Controller {
 				'permission_callback' => [ $this, 'permissions_check' ],
 			],
 		]);
+
+		// The fields each trigger provides, for matching one trigger's fields to
+		// another's in a workflow that has several.
+		register_rest_route($namespace, '/trigger-fields', [
+			[
+				'methods' => WP_REST_Server::CREATABLE,
+				'callback' => [ $this, 'get_trigger_fields' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		]);
 	}
 
 	public function permissions_check() {
 		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * Run a workflow on demand (the "Run"/Manual trigger). Starts a run from the
+	 * workflow's trigger node with any posted data, via the automation engine.
+	 */
+	public function trigger_workflow( $request ) {
+		$workflow_id = (int) $request['id'];
+
+		$workflow = Workflow::find( $workflow_id );
+		if ( ! $workflow ) {
+			return new WP_Error( 'not_found', 'Workflow not found.', [ 'status' => 404 ] );
+		}
+
+		$body = $request->get_json_params();
+		$data = isset( $body['data'] ) && is_array( $body['data'] ) ? $body['data'] : [];
+		// For a workflow with several triggers, the one to start from. Without it
+		// the run starts from the Manual trigger, or else the first trigger.
+		$node = isset( $body['node_id'] ) && '' !== (string) $body['node_id'] ? (string) $body['node_id'] : null;
+
+		$automation = $this->container ? $this->container->get( 'automation' ) : \Zaplane\Framework\Core\Automation::get_instance();
+		if ( ! $automation ) {
+			return new WP_Error( 'unavailable', 'Automation engine is not available.', [ 'status' => 500 ] );
+		}
+
+		$run_id = $automation->run_workflow( $workflow_id, $data, $node );
+		if ( ! $run_id ) {
+			return new WP_Error(
+				'no_trigger',
+				'This workflow has no active version or trigger node to run.',
+				[ 'status' => 422 ]
+			);
+		}
+
+		return rest_ensure_response( [
+			'triggered' => true,
+			'run_id' => (int) $run_id
+		] );
 	}
 
 	public function get_workflow_items( $request ) {
@@ -202,7 +262,27 @@ class WorkflowsController extends WP_REST_Controller {
 		return rest_ensure_response( [ 'id' => $workflow->id ] );
 	}
 
+	/**
+	 * Save the canvas graph, and report what looks wrong with its triggers so the
+	 * editor can show it. The warnings never block the save.
+	 */
 	public function update_item( $request ) {
+		$response = $this->save_graph( $request );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$graph = $request->get_json_params();
+		$data  = (array) $response->get_data();
+
+		$data['warnings'] = TriggerAdvisor::warnings( is_array( $graph ) ? $graph : [] );
+		$response->set_data( $data );
+
+		return $response;
+	}
+
+	private function save_graph( $request ) {
 		$workflowId = (int) $request['id'];
 		$graph      = $request->get_json_params();
 		$layout     = sanitize_text_field( $request['layout'] ?? 'LR' );
@@ -221,11 +301,11 @@ class WorkflowsController extends WP_REST_Controller {
 
 		$icons = $graph['integration_icons'] ?? null;
 		// if ( is_array( $icons ) ) {
-		// 	$workflow->integration_icons = array_slice( array_values( array_unique( $icons ) ), 0, 3 );
+		// $workflow->integration_icons = array_slice( array_values( array_unique( $icons ) ), 0, 3 );
 		// }
 		if ( is_array( $icons ) ) {
-        $workflow->integration_icons = array_values(array_unique($icons));
-         }
+			$workflow->integration_icons = array_values( array_unique( $icons ) );
+		}
 
 		$workflow->save();
 
@@ -398,6 +478,7 @@ class WorkflowsController extends WP_REST_Controller {
 			] : null,
 			'graph' => $graph,
 			'test_outputs' => $testOutputs,
+			'warnings' => TriggerAdvisor::warnings( $graph ),
 		]);
 	}
 
@@ -501,6 +582,8 @@ class WorkflowsController extends WP_REST_Controller {
 			]);
 		}
 
+		$graph = $version->getGraph();
+
 		$page = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
 		$perPage = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 
@@ -516,6 +599,7 @@ class WorkflowsController extends WP_REST_Controller {
 				'finished_at' => $r->finished_at,
 				'last_error' => $r->last_error,
 				'node_runs_count' => NodeRun::where( 'run_id', $r->id )->count(),
+				'trigger' => self::run_trigger( $graph, $r->start_node_key ),
 			])
 			->toArray();
 
@@ -550,7 +634,11 @@ class WorkflowsController extends WP_REST_Controller {
 
 		$previousNodeIds = $this->findPreviousNodes( $targetNodeKey, $edges );
 
+		// Prefer captured output from a dedicated "Test" run, but fall back to the
+		// latest real run (e.g. an actual form submission or a manual "Run") so the
+		// "@" picker shows real fields the user has already produced.
 		$nodeOutputs = Run::latestTestNodeRunsByWorkflow( $workflowId, $previousNodeIds );
+		$realOutputs = Run::latestNodeRunsByWorkflow( $workflowId, $previousNodeIds );
 
 		$data = [];
 		foreach ( $previousNodeIds as $nodeId ) {
@@ -559,12 +647,18 @@ class WorkflowsController extends WP_REST_Controller {
 				continue;
 			}
 
-			$nodeType = $node['type'] ?? '';
-			if ( ! in_array( $nodeType, [ 'action', 'condition', 'filter' ], true ) ) {
+			// The target node's own output is not a variable source for itself.
+			if ( (int) $nodeId === $targetNodeKey ) {
 				continue;
 			}
 
-			$nodeRun = $nodeOutputs[ $nodeId ] ?? null;
+			// The "type" the builder sends is the app slug for tools (csv, delay…)
+			// and 'trigger'/'action' otherwise, so a fixed whitelist would drop every
+			// tool node. Resolve by integration slug instead; trigger-vs-action comes
+			// from the graph type / data.action.
+			$nodeType = $node['type'] ?? '';
+
+			$nodeRun = $nodeOutputs[ $nodeId ] ?? $realOutputs[ $nodeId ] ?? null;
 
 			if ( $nodeRun ) {
 				$output = $nodeRun->getOutput();
@@ -574,26 +668,231 @@ class WorkflowsController extends WP_REST_Controller {
 				}
 
 				$data[] = [
-					'node_id' => $nodeId,
-					'node_name' => $node['data']['name'] ?? '',
+					'node_id'    => $nodeId,
+					'node_name'  => $node['data']['name'] ?? '',
 					'node_event' => $node['data']['event'] ?? '',
-					'variables' => VariableExtractor::extract( $output ),
+					'variables'  => VariableExtractor::extract( $output ),
+					'is_sample'  => false,
 				];
 			} else {
+				// No test run — fall back to the integration's declared sample so
+				// fields still show in the "@" picker. Nodes store their integration
+				// under data.app (data.integration is a legacy fallback).
+				$integration = $node['data']['app'] ?? $node['data']['integration'] ?? '';
+				$event       = $node['data']['event'] ?? '';
+				$instance    = ( '' !== $integration && 'Select an app' !== $integration )
+					? IntegrationLoader::get( $integration )
+					: null;
+
+				$sample = [];
+
+				if ( 'trigger' === $nodeType ) {
+					// 1) Reuse the most recent real capture of this trigger from ANY
+					// workflow, so a new workflow inherits its fields.
+					$triggerConfig = is_array( $node['data']['config'] ?? null ) ? $node['data']['config'] : [];
+					$sample        = \Zaplane\Framework\Core\Automation::get_trigger_sample( $integration, $event, $triggerConfig );
+
+					// 2) Fall back to the integration's declared trigger sample.
+					if ( empty( $sample ) && $instance ) {
+						$sample = get_class( $instance )::get_trigger_sample_output( $event );
+					}
+				} elseif ( $instance ) {
+					// Actions/tools expose their fields via the action sample.
+					$sample = get_class( $instance )::get_action_sample_output( $event );
+				}
+
+				// Skip nodes that expose nothing (placeholder / Sticky Note).
+				if ( empty( $sample ) ) {
+					continue;
+				}
+
 				$data[] = [
-					'node_id' => $nodeId,
-					'node_name' => $node['data']['name'] ?? '',
-					'node_event' => $node['data']['event'] ?? '',
-					'variables' => [],
+					'node_id'    => $nodeId,
+					'node_name'  => $node['data']['name'] ?? '',
+					'node_event' => $event,
+					'variables'  => VariableExtractor::extract( $sample ),
+					'is_sample'  => true,
 				];
 			}//end if
 		}//end foreach
 
+		$workflow = Workflow::find( $workflowId );
+		$context  = GlobalContext::all_for_picker( $workflow ?: null );
+
+		// A step that more than one trigger leads to can read {{trigger.…}}, the
+		// data of whichever trigger fired. Offer it as its own group.
+		$triggerGroup = self::merged_trigger_group( is_array( $graph ) ? $graph : [], $nodeMap, $data );
+		if ( $triggerGroup ) {
+			$context = [ 'trigger' => $triggerGroup ] + $context;
+		}
+
+		return rest_ensure_response([
+			'status'  => 'success',
+			'code'    => 'SUCCESS',
+			'data'    => $data,
+			'context' => $context,
+		]);
+	}
+
+	/**
+	 * The fields each requested trigger provides: what its last test captured,
+	 * else what a real run produced, else the sample shared by workflows using the
+	 * same trigger, else the integration's declared sample. The graph comes from
+	 * the canvas, so a trigger that hasn't been saved yet still resolves.
+	 */
+	public function get_trigger_fields( $request ) {
+		$workflowId = (int) ( $request['workflow_id'] ?? 0 );
+		$graph      = is_array( $request['graph'] ?? null ) ? $request['graph'] : [];
+		$nodeIds    = array_values( array_filter( array_map( 'strval', (array) ( $request['node_ids'] ?? [] ) ), 'ctype_digit' ) );
+		$keys       = array_map( 'intval', $nodeIds );
+
+		$testOutputs = $workflowId && $keys ? Run::latestTestNodeRunsByWorkflow( $workflowId, $keys ) : [];
+		$realOutputs = $workflowId && $keys ? Run::latestNodeRunsByWorkflow( $workflowId, $keys ) : [];
+
+		$fields = [];
+		foreach ( $nodeIds as $nodeId ) {
+			$node = TriggerNodes::find( $graph, $nodeId );
+			if ( ! $node ) {
+				continue;
+			}
+
+			$fields[ $nodeId ] = $this->trigger_variables( $node, $testOutputs[ (int) $nodeId ] ?? $realOutputs[ (int) $nodeId ] ?? null );
+		}
+
 		return rest_ensure_response([
 			'status' => 'success',
-			'code' => 'SUCCESS',
-			'data' => $data,
+			'data'   => (object) $fields,
 		]);
+	}
+
+	/**
+	 * @param array<string,mixed> $node
+	 * @param NodeRun|null        $nodeRun The trigger's latest captured run, if any.
+	 * @return array<string,mixed>
+	 */
+	private function trigger_variables( array $node, $nodeRun ): array {
+		if ( $nodeRun ) {
+			$output = $nodeRun->getOutput();
+
+			return [
+				'node_id'   => (string) $node['id'],
+				'variables' => VariableExtractor::extract( is_array( $output ) ? $output : [ 'value' => $output ] ),
+				'is_sample' => false,
+			];
+		}
+
+		$sample = [];
+
+		if ( TriggerNodes::is_configured( $node ) ) {
+			$app    = (string) $node['data']['app'];
+			$event  = (string) $node['data']['event'];
+			$config = is_array( $node['data']['config'] ?? null ) ? $node['data']['config'] : [];
+			$sample = \Zaplane\Framework\Core\Automation::get_trigger_sample( $app, $event, $config );
+
+			$instance = IntegrationLoader::get( $app );
+			if ( empty( $sample ) && $instance ) {
+				$sample = get_class( $instance )::get_trigger_sample_output( $event );
+			}
+		}
+
+		return [
+			'node_id'   => (string) $node['id'],
+			'variables' => VariableExtractor::extract( is_array( $sample ) ? $sample : [] ),
+			'is_sample' => true,
+		];
+	}
+
+	/**
+	 * One "Trigger" group for the picker, merging the fields of every trigger that
+	 * leads to the step. Only offered with more than one such trigger; a single
+	 * trigger's own group already says everything. A field that some of those
+	 * triggers don't provide carries `only_from`, naming the ones that do. Fields
+	 * a trigger matches to another count as provided by it.
+	 *
+	 * @param array<string,mixed>            $graph
+	 * @param array<int,array<string,mixed>> $nodeMap
+	 * @param array<int,array<string,mixed>> $data    The picker's per-node entries.
+	 * @return array<string,mixed>|null
+	 */
+	private static function merged_trigger_group( array $graph, array $nodeMap, array $data ): ?array {
+		$triggers = array_values(
+			array_filter( $data, static fn( $entry ) => 'trigger' === ( $nodeMap[ (int) $entry['node_id'] ]['type'] ?? '' ) )
+		);
+
+		if ( count( $triggers ) < 2 ) {
+			return null;
+		}
+
+		$fields  = [];
+		$sources = [];
+
+		foreach ( $triggers as $entry ) {
+			$node  = $nodeMap[ (int) $entry['node_id'] ];
+			$id    = (string) $node['id'];
+			$label = TriggerNodes::label( $node );
+			/* translators: %d: the trigger's number on the canvas */
+			$name = sprintf( __( 'Trigger %d', 'zaplane' ), TriggerNodes::number( $graph, $id ) ) . ( '' === $label ? '' : ' (' . $label . ')' );
+			$keys = [];
+
+			foreach ( (array) ( $entry['variables'] ?? [] ) as $variable ) {
+				$key = (string) ( $variable['key'] ?? '' );
+				if ( '' === $key ) {
+					continue;
+				}
+
+				$fields[ $key ] = $fields[ $key ] ?? $variable;
+				$keys[ $key ]   = true;
+			}
+
+			foreach ( array_keys( (array) ( $node['data']['field_map']['fields'] ?? [] ) ) as $mapped ) {
+				$keys[ (string) $mapped ] = true;
+			}
+
+			foreach ( array_keys( $keys ) as $key ) {
+				$sources[ (string) $key ][ $id ] = $name;
+			}
+		}//end foreach
+
+		$variables = [];
+		foreach ( $fields as $key => $variable ) {
+			$from = array_values( $sources[ (string) $key ] ?? [] );
+
+			if ( count( $from ) < count( $triggers ) ) {
+				$variable['only_from'] = $from;
+			}
+
+			$variables[] = $variable;
+		}
+
+		return [
+			'label'     => __( 'Trigger (whichever fired)', 'zaplane' ),
+			'prefix'    => 'trigger',
+			'variables' => $variables,
+		];
+	}
+
+	/**
+	 * Which trigger started a run, for the Logs list.
+	 *
+	 * @param array<string,mixed> $graph
+	 * @param int|null            $startNodeKey
+	 * @return array<string,mixed>|null
+	 */
+	private static function run_trigger( array $graph, $startNodeKey ): ?array {
+		$node = null === $startNodeKey ? null : TriggerNodes::find( $graph, $startNodeKey );
+
+		if ( ! $node ) {
+			return null;
+		}
+
+		return [
+			'node_id' => (string) $node['id'],
+			'number'  => TriggerNodes::number( $graph, $node['id'] ),
+			'app'     => $node['data']['app'] ?? null,
+			'event'   => $node['data']['event'] ?? null,
+			'icon'    => $node['data']['icon'] ?? null,
+			'label'   => TriggerNodes::label( $node ),
+		];
 	}
 
 	private function findPreviousNodes( int $targetNodeId, array $edges ): array {

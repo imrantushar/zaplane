@@ -3,6 +3,10 @@ namespace Zaplane\Integrations\Wordpress;
 
 use Zaplane\Traits\ActionResponseTrait;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait QueryTrait {
 
 
@@ -35,7 +39,12 @@ trait QueryTrait {
 			'posts_per_page' => -1,
 		] );
 
-		$result = [ [ 'name' => 'any', 'label' => 'Any' ] ];
+		$result = [
+			[
+				'name' => 'any',
+				'label' => 'Any'
+			]
+		];
 
 		foreach ( $posts as $post ) {
 			$label = ( $post->post_type === 'attachment' )
@@ -161,6 +170,65 @@ trait QueryTrait {
 				'label' => $cat->name,
 				'slug' => $cat->slug,
 			];
+		}
+		return $items;
+	}
+
+	public static function query_tags( $q ) {
+		$args = [
+			'taxonomy' => 'post_tag',
+			'hide_empty' => false
+		];
+		if ( ! empty( $q['search'] ) ) {
+			$args['search'] = $q['search'];
+		}
+		if ( ! empty( $q['limit'] ) ) {
+			$args['number'] = (int) $q['limit'];
+		}
+
+		$terms = get_terms( $args );
+		$items = [];
+		if ( is_array( $terms ) ) {
+			foreach ( $terms as $t ) {
+				$items[] = [
+					'id'    => $t->term_id,
+					'name'  => $t->name,
+					'label' => $t->name,
+					'slug'  => $t->slug,
+				];
+			}
+		}
+		return $items;
+	}
+
+	public static function query_taxonomy_terms( $q ) {
+		$taxonomy = ! empty( $q['taxonomy'] ) ? sanitize_key( $q['taxonomy'] ) : '';
+		if ( '' === $taxonomy || ! taxonomy_exists( $taxonomy ) ) {
+			return [];
+		}
+
+		$args = [
+			'taxonomy' => $taxonomy,
+			'hide_empty' => false
+		];
+		if ( ! empty( $q['search'] ) ) {
+			$args['search'] = $q['search'];
+		}
+		if ( ! empty( $q['limit'] ) ) {
+			$args['number'] = (int) $q['limit'];
+		}
+
+		$terms = get_terms( $args );
+		$items = [];
+		if ( is_array( $terms ) ) {
+			foreach ( $terms as $t ) {
+				$items[] = [
+					'id'    => $t->term_id,
+					'name'  => $t->name,
+					'label' => $t->name,
+					'slug'  => $t->slug,
+				];
+			}
 		}
 		return $items;
 	}

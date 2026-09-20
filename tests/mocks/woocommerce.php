@@ -31,28 +31,32 @@ namespace {
 				self::$next_attribute_id = 10;
 				self::$orders = [
 					501 => [
-						'id'            => 501,
-						'status'        => 'processing',
-						'total'         => 49.99,
-						'currency'      => 'USD',
-						'customer_id'   => 701,
-						'billing_email' => 'customer701@example.com',
-						'notes'         => [],
-						'meta'          => [],
-						'billing'       => [],
-						'shipping'      => [],
+						'id'                  => 501,
+						'status'              => 'processing',
+						'total'               => 49.99,
+						'currency'            => 'USD',
+						'customer_id'         => 701,
+						'billing_email'       => 'customer701@example.com',
+						'billing_first_name'  => 'John',
+						'billing_last_name'   => 'Doe',
+						'notes'               => [],
+						'meta'                => [],
+						'billing'             => [],
+						'shipping'            => [],
 					],
 					502 => [
-						'id'            => 502,
-						'status'        => 'completed',
-						'total'         => 19.99,
-						'currency'      => 'USD',
-						'customer_id'   => 701,
-						'billing_email' => 'customer701@example.com',
-						'notes'         => [],
-						'meta'          => [],
-						'billing'       => [],
-						'shipping'      => [],
+						'id'                  => 502,
+						'status'              => 'completed',
+						'total'               => 19.99,
+						'currency'            => 'USD',
+						'customer_id'         => 701,
+						'billing_email'       => 'customer701@example.com',
+						'billing_first_name'  => 'John',
+						'billing_last_name'   => 'Doe',
+						'notes'               => [],
+						'meta'                => [],
+						'billing'             => [],
+						'shipping'            => [],
 					],
 				];
 				self::$products = [
@@ -326,14 +330,25 @@ namespace {
 			public function get_currency(): string { return (string) ( $this->data['currency'] ?? 'USD' ); }
 			public function get_customer_id(): int { return (int) ( $this->data['customer_id'] ?? 0 ); }
 			public function get_billing_email(): string { return (string) ( $this->data['billing_email'] ?? '' ); }
+			public function get_billing_first_name(): string { return (string) ( $this->data['billing_first_name'] ?? '' ); }
+			public function get_billing_last_name(): string { return (string) ( $this->data['billing_last_name'] ?? '' ); }
+			public function get_order_key(): string { return (string) ( $this->data['order_key'] ?? 'wc_order_' . $this->get_id() ); }
 			public function set_currency( string $currency ): void { $this->data['currency'] = $currency; }
 			public function set_status( string $status ): void { $this->data['status'] = $status; }
 			public function set_customer_id( int $customer_id ): void { $this->data['customer_id'] = $customer_id; }
 			public function set_total( float $total ): void { $this->data['total'] = $total; }
 			public function set_address( array $address, string $type = 'billing' ): void {
 				$this->data[ $type ] = $address;
-				if ( 'billing' === $type && isset( $address['email'] ) ) {
-					$this->data['billing_email'] = $address['email'];
+				if ( 'billing' === $type ) {
+					if ( isset( $address['email'] ) ) {
+						$this->data['billing_email'] = $address['email'];
+					}
+					if ( isset( $address['first_name'] ) ) {
+						$this->data['billing_first_name'] = $address['first_name'];
+					}
+					if ( isset( $address['last_name'] ) ) {
+						$this->data['billing_last_name'] = $address['last_name'];
+					}
 				}
 			}
 			public function update_meta_data( string $key, $value ): void { $this->data['meta'][ $key ] = $value; }

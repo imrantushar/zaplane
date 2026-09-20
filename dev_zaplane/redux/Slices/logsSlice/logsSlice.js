@@ -21,7 +21,7 @@ export const getSingleRunDetails = createAsyncThunk(
 				namespace + `runs/${parseInt(runId)}`
 			);
 
-			handleSliceSuccess(thunkAPI, __('Run details fetched successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI, __('Run details fetched successfully', 'zaplane'));
 
 			return res.data;
 			// {
@@ -37,20 +37,24 @@ export const getSingleRunDetails = createAsyncThunk(
 );
 export const getRunsList = createAsyncThunk(
 	'zaplane/getRunsList',
-	async ({ page = 1, per_page = 20 } = {}, thunkAPI) => {
+	async ({ page = 1, per_page = 20, status } = {}, thunkAPI) => {
 		try {
+			const params = { page, per_page };
+			if (status && status !== 'all') {
+				params.status = status;
+			}
 			const res = await API.get(
 				namespace + `runs`,{
-					params: { page, per_page },
+					params,
 				}
 			);
-			const { runs = [], pagination = {} } = res.data;
+			const { runs = [], ...pagination } = res.data;
 			return {
 				data: runs,
-				currentPage: pagination.page || 1,
-				itemPerPage: pagination.per_page || 20,
-				totalItems: pagination.total || 0,
-				totalPages: pagination.total_pages || 0,
+				currentPage: pagination?.page || 1,
+				itemPerPage: pagination?.per_page || 20,
+				totalItems: pagination?.total || 0,
+				totalPages: pagination?.total_pages || 0,
 			}; 
 		} catch (e) {
 			return handleSliceError(thunkAPI, e);
@@ -68,7 +72,7 @@ export const retryNodeRun = createAsyncThunk(
 
       thunkAPI.dispatch(
         showNotification({
-          message: __('Node retried and queued successfully', 'workflow'),
+          message: __('Node retried and queued successfully', 'zaplane'),
           isShow: true,
           type: 'success',
         })
@@ -84,6 +88,48 @@ export const retryNodeRun = createAsyncThunk(
   }
 );
 
+
+export const clearRuns = createAsyncThunk(
+  'zaplane/clearRuns',
+  async (_, thunkAPI) => {
+    try {
+      const res = await API.delete(namespace + `runs`);
+
+      thunkAPI.dispatch(
+        showNotification({
+          message: __('Logs cleared successfully', 'zaplane'),
+          isShow: true,
+          type: 'success',
+        })
+      );
+
+      return res?.data;
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
+);
+
+export const deleteRun = createAsyncThunk(
+  'zaplane/deleteRun',
+  async (id, thunkAPI) => {
+    try {
+      const res = await API.delete(namespace + `runs/${parseInt(id)}`);
+
+      thunkAPI.dispatch(
+        showNotification({
+          message: __('Log deleted successfully', 'zaplane'),
+          isShow: true,
+          type: 'success',
+        })
+      );
+
+      return res?.data;
+    } catch (e) {
+      return handleSliceError(thunkAPI, e);
+    }
+  }
+);
 
 const logSlice = createSlice({
 	name: 'logs',

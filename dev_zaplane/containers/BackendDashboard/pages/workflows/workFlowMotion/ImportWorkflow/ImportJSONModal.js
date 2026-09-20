@@ -30,7 +30,7 @@ export default function ImportJSONModal({
   };
 
   return <WPModal title={__("Import JSON File", "zaplane")} isOpen={isOpen} onRequestClose={onClose} size="medium">
-      <div className="flex flex-col items-center p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 text-center">
+      <div className="flex flex-col items-center p-6 border-2 border-dashed border-[var(--zaplane-border-color)] rounded-lg bg-[var(--zaplane-secondary-color)] text-center">
         <input 
           type="file" 
           accept="application/json" 
@@ -40,17 +40,14 @@ export default function ImportJSONModal({
         />
         <button 
           onClick={() => fileInputRef.current?.click()} 
-          className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+          className="flex items-center justify-center px-4 py-2 border border-[var(--zaplane-border-color)] rounded-md shadow-sm text-sm font-medium text-[var(--zaplane-font-color)] bg-[var(--zaplane-background)] hover:bg-[var(--zaplane-secondary-color)] focus:outline-none"
         >
           <HiUpload className="mr-2" /> {__("Select JSON File", "zaplane")}
         </button>
-        {file && <p className="mt-2 text-sm text-gray-600">{file.name}</p>}
+        {file && <p className="mt-2 text-sm text-[var(--zaplane-font-secondary-color)]">{file.name}</p>}
       </div>
-      <div className="flex justify-end gap-[12px] mt-[24px]">
-        <button variant={'outline'} onClick={onClose} className="mt-[16px]">
-          {__("cancel", "zaplane")}
-        </button>
-        <button style={primaryBtn} onClick={handleImport} className="mt-[16px] px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 ml-3">
+      <div className="flex gap-[12px] mt-[24px]">
+        <button style={primaryBtn} onClick={handleImport} className="mt-[16px] px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
           {__("Import", "zaplane")}
         </button>
       </div>

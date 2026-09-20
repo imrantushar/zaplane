@@ -26,9 +26,14 @@ class EasyDigitalDownload extends IntegrationBase {
 		return 'easydigitaldownload';
 	}
 
+	public static function get_name(): string {
+		return 'Easy Digital Downloads';
+	}
+
 	public static function get_icon(): string {
 		return 'easydigitaldownload.svg';
 	}
+
 	public static function get_triggers(): array {
 		return [
 			'purchase_product' => [
@@ -84,8 +89,16 @@ class EasyDigitalDownload extends IntegrationBase {
 	public static function resolve_trigger( array $node, array $args ) {
 		switch ( $node['event'] ) {
 			case 'purchase_product':
-				return self::payload_with_id('payment_id', $args[0] ?? 0, [
-					'customer_id' => self::extract_id( $args[2] ?? null ),
+				// edd_complete_purchase fires with a single arg: ( $payment_id ).
+				// customer_id is not available from the hook args, so we look it
+				// up from the payment record itself.
+				$payment_id = self::extract_id( $args[0] ?? 0 );
+				if ( ! $payment_id ) {
+					return false;
+				}
+
+				return self::payload_with_id('payment_id', $payment_id, [
+					'customer_id' => self::get_customer_id_for_payment( $payment_id ),
 				]);
 
 			case 'payment_status_changed':
@@ -111,11 +124,13 @@ class EasyDigitalDownload extends IntegrationBase {
 				return self::payload_with_id( 'customer_id', $args[0] ?? 0 );
 
 			case 'discount_created':
-				return self::payload_with_id('discount_id', $args[1] ?? ( $args[0] ?? 0 ), [
+				// edd_post_insert_discount fires as: ( $discount_details, $discount_id )
+				return self::payload_with_id('discount_id', $args[1] ?? 0, [
 					'data' => $args[0] ?? [],
 				]);
 
 			case 'discount_updated':
+				// edd_post_update_discount fires as: ( $discount_details, $discount_id )
 				return self::payload_with_id('discount_id', $args[1] ?? 0, [
 					'data' => $args[0] ?? [],
 				]);
@@ -158,6 +173,138 @@ class EasyDigitalDownload extends IntegrationBase {
 		return false;
 	}
 
+	/**
+	 * Sample output for each trigger so the "@" field picker has fields to
+	 * offer before a real capture exists. Keys mirror exactly what
+	 * resolve_trigger() emits for the same event.
+	 */
+	public static function get_trigger_sample_output( string $event ): array {
+		// Recurring shapes shared across several triggers.
+		$payment_base = [
+			'payment_id'  => 101,
+			'customer_id' => 5,
+		];
+
+		$customer_data = [
+			'user_id'        => 9,
+			'name'           => 'John Doe',
+			'email'          => 'john@example.com',
+			'date_created'   => '2026-07-09 12:00:00',
+			'purchase_count' => 3,
+			'purchase_value' => '147.00',
+			'status'         => 'active',
+		];
+
+		$customer_base = [
+			'customer_id' => 5,
+		];
+
+		$discount_data = [
+			'name'        => 'Summer Sale',
+			'code'        => 'SUMMER25',
+			'type'        => 'percent',
+			'amount'      => '25.00',
+			'status'      => 'active',
+			'start_date'  => '2026-07-01 00:00:00',
+			'end_date'    => '2026-07-31 23:59:59',
+			'use_count'   => 4,
+			'max_uses'    => 100,
+		];
+
+		$discount_base = [
+			'discount_id' => 12,
+		];
+
+		$download_post = [
+			'ID'          => 21,
+			'post_title'  => 'Pro Plan',
+			'post_status' => 'publish',
+			'post_type'   => 'download',
+			'post_author' => 1,
+			'post_date'   => '2026-07-09 12:00:00',
+		];
+
+		$download_base = [
+			'download_id' => 21,
+		];
+
+		$samples = [
+			'purchase_product'       => $payment_base,
+			'payment_status_changed' => array_merge( $payment_base, [
+				'new_status' => 'complete',
+				'old_status' => 'pending',
+			] ),
+			'customer_created'       => array_merge( $customer_base, [
+				'data' => $customer_data,
+			] ),
+			'customer_updated'       => array_merge( $customer_base, [
+				'updated' => true,
+				'data'    => $customer_data,
+			] ),
+			'customer_deleted'       => $customer_base,
+			'discount_created'       => array_merge( $discount_base, [
+				'data' => $discount_data,
+			] ),
+			'discount_updated'       => array_merge( $discount_base, [
+				'data' => $discount_data,
+			] ),
+			'discount_deleted'       => $discount_base,
+			'download_created'       => array_merge( $download_base, [
+				'data' => $download_post,
+			] ),
+			'download_updated'       => array_merge( $download_base, [
+				'post' => $download_post,
+			] ),
+			'download_deleted'       => array_merge( $download_base, [
+				'post' => $download_post,
+			] ),
+			'download_purchased'     => [
+				'download_id'   => 21,
+				'order_id'      => 101,
+				'download_type' => 'default',
+				'cart_details'  => [
+					[
+						'name'        => 'Pro Plan',
+						'id'          => 21,
+						'item_number' => [
+							'id'      => 21,
+							'options' => [ 'price_id' => 1 ],
+						],
+						'item_price'  => '49.00',
+						'quantity'    => 1,
+						'price'       => '49.00',
+					],
+				],
+				'cart_index'    => 0,
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		// Prefix fallbacks so any future trigger still exposes a sensible shape
+		// in the "@" picker even before a capture.
+		if ( 0 === strpos( $event, 'payment_' ) || 0 === strpos( $event, 'purchase_' ) ) {
+			return array_merge( $payment_base, [
+				'new_status' => 'complete',
+				'old_status' => 'pending',
+			] );
+		}
+		if ( 0 === strpos( $event, 'customer_' ) ) {
+			return array_merge( $customer_base, [ 'data' => $customer_data ] );
+		}
+		if ( 0 === strpos( $event, 'discount_' ) ) {
+			return array_merge( $discount_base, [ 'data' => $discount_data ] );
+		}
+		if ( 0 === strpos( $event, 'download_' ) ) {
+			return array_merge( $download_base, [ 'post' => $download_post ] );
+		}
+
+		// Final non-empty catch-all: no trigger ever returns [].
+		return $payment_base;
+	}
+
 
 	public static function get_actions(): array {
 		return [
@@ -177,7 +324,7 @@ class EasyDigitalDownload extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Customer Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				[
@@ -189,6 +336,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'user_id',
 					'label' => 'User ID',
 					'type' => 'select',
+					'required' => true,
 					'dynamic' => [
 						'integration' => 'easydigitaldownload',
 						'query' => 'users',
@@ -199,14 +347,17 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'customer_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Active',
 							'value' => 'edd_customer_active'
 						],
 						[
-							'label' => 'Inactive',
-							'value' => 'edd_customer_inactive'
+							// EDD customer statuses are only "active" / "disabled" —
+							// there is no "inactive" status in EDD core.
+							'label' => 'Disabled',
+							'value' => 'edd_customer_disabled'
 						],
 					]
 				],
@@ -234,6 +385,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'type',
 					'label' => 'Type',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Percent',
@@ -249,6 +401,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'discount_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Active',
@@ -287,6 +440,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'payment_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Pending',
@@ -321,8 +475,9 @@ class EasyDigitalDownload extends IntegrationBase {
 							'value' => 'edd_payment_abandoned'
 						],
 						[
+							// EDD's real order status key is "onhold" (no underscore).
 							'label' => 'On Hold',
-							'value' => 'edd_payment_on_hold'
+							'value' => 'edd_payment_onhold'
 						],
 					]
 				],
@@ -367,6 +522,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'download_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Draft',
@@ -410,6 +566,7 @@ class EasyDigitalDownload extends IntegrationBase {
 					'key' => 'download_status',
 					'label' => 'Status',
 					'type' => 'select',
+					'required' => true,
 					'options' => [
 						[
 							'label' => 'Draft',
@@ -455,11 +612,6 @@ class EasyDigitalDownload extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
-	/**
-	 * =====================================================
-	 * DYNAMIC DATA QUERIES (API)
-	 * =====================================================
-	 */
 	public static function get_dynamic_queries(): array {
 		return [
 			'downloads' => [ self::class, 'query_downloads' ],

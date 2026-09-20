@@ -7,6 +7,7 @@ import BackendDashboard from './containers/BackendDashboard';
 import AdminMenu from '@ZAPContainers/BackendDashboard/AdminMenu';
 import { store } from '@ZAPRedux/store';
 import { WorkFlowHook } from '@ZAPContainers/BackendDashboard/pages/workflows/WorkFlowHook';
+import { initThemeMode } from '@ZAPUtils/theme';
 
 import '../assets/scss/backend.scss';
 
@@ -15,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	const container = document.getElementById('zaplane-app');
 	if (container) {
 		container.classList.add('zaplane-scope');
+		// Stamp the active theme mode before the first paint (no flash).
+		initThemeMode();
 
 		const root = createRoot(container);
 		const menuPage = document.getElementById('toplevel_page_zaplane');

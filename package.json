@@ -1,10 +1,12 @@
 {
   "name": "zaplane",
-  "version": "1.0.0",
-  "description": "A Simple WordPress Quiz Plugin",
-  "main": "index.js",
+  "version": "1.2.0",
+  "description": "No-code workflow automation for WordPress.",
   "scripts": {
     "build": "wp-scripts build",
+    "dist": "node build-tools/build.mjs",
+    "dist:zip": "node build-tools/build.mjs --only=zip",
+    "dist:dev": "node build-tools/build.mjs --dev",
     "check-engines": "wp-scripts check-engines",
     "check-licenses": "wp-scripts check-licenses",
     "format": "wp-scripts format",
@@ -20,21 +22,15 @@
     "test:unit": "wp-scripts test-unit-js",
     "generate-icons": "fantasticon --normalize"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/imrantushar/quizpress.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/imrantushar/quizpress/issues"
-  },
-  "homepage": "https://github.com/imrantushar/quizpress#readme",
+  "author": "Kodezen",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://zaplane.app/",
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@headlessui/react": "^2.2.10",
+    "@kodezen/editor": "1.2.0",
     "@reduxjs/toolkit": "^2.9.0",
     "@wordpress/components": "^30.0.0",
     "@wordpress/hooks": "^4.27.0",
@@ -71,10 +67,12 @@
   "devDependencies": {
     "@wordpress/eslint-plugin": "^22.13.0",
     "ajv": "^8.18.0",
+    "archiver": "^8.0.0",
     "autoprefixer": "^10.5.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "clean-webpack-plugin": "^4.0.0",
     "fantasticon": "^3.0.0",
+    "ignore": "^7.0.8",
     "postcss": "^8.5.10",
     "redux-logger": "^3.0.6",
     "sass-loader": "^13.3.2",

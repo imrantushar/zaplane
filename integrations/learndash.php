@@ -477,6 +477,206 @@ class Learndash extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+
+		$user_id = 15;
+		$now     = current_time( 'mysql' );
+
+		$user = [
+			'first_name'   => 'Jane',
+			'last_name'    => 'Doe',
+			'user_login'   => 'janedoe',
+			'user_email'   => 'jane.doe@example.com',
+			'nickname'     => 'janedoe',
+			'display_name' => 'Jane Doe',
+			'avatar_url'   => 'https://www.gravatar.com/avatar/a1b2c3d4',
+			'user_roles'   => [ 'subscriber' ],
+		];
+
+		$course = [
+			'course_id'    => 101,
+			'course_title' => 'Introduction to Widgets',
+			'course_url'   => 'https://example.com/courses/introduction-to-widgets/',
+		];
+
+		$lesson = [
+			'lesson_id'    => 201,
+			'lesson_title' => 'Getting Started',
+			'lesson_url'   => 'https://example.com/lessons/getting-started/',
+		];
+
+		$topic = [
+			'topic_id'    => 301,
+			'topic_title' => 'Your First Widget',
+			'topic_url'   => 'https://example.com/topics/your-first-widget/',
+		];
+
+		$quiz = [
+			'quiz_id'    => 401,
+			'quiz_title' => 'Widget Basics Quiz',
+			'quiz_url'   => 'https://example.com/quizzes/widget-basics-quiz/',
+		];
+
+		$group = [
+			'group_id'    => 501,
+			'group_title' => 'Spring Cohort',
+			'group_url'   => 'https://example.com/groups/spring-cohort/',
+		];
+
+		// Full user fields as emitted by resolve_course_payload / group / assignment payloads.
+		$user_fields = [
+			'user_id'      => $user_id,
+			'first_name'   => $user['first_name'],
+			'last_name'    => $user['last_name'],
+			'user_login'   => $user['user_login'],
+			'user_email'   => $user['user_email'],
+			'nickname'     => $user['nickname'],
+			'display_name' => $user['display_name'],
+			'avatar_url'   => $user['avatar_url'],
+			'user_roles'   => $user['user_roles'],
+			'completed_at' => $now,
+		];
+
+		// resolve_course_payload() shape: course + full user fields.
+		$course_payload = array_merge( $course, $user_fields );
+
+		$samples = [
+			'user_enroll_course' => [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => $course_payload,
+			],
+			'course_complete' => [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => $course_payload,
+			],
+			'lesson_complete' => [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => [
+					'lesson_id'    => $lesson['lesson_id'],
+					'lesson_title' => $lesson['lesson_title'],
+					'lesson_url'   => $lesson['lesson_url'],
+					'user_id'      => $user_id,
+				],
+			],
+			'topic_complete' => [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => array_merge( $course, $lesson, $topic, [
+					'user_id'      => $user_id,
+					'user_email'   => $user['user_email'],
+					'display_name' => $user['display_name'],
+				] ),
+			],
+			'quiz_attempt' => [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => array_merge( $course, $lesson, $quiz, [
+					'score'        => 85,
+					'pass'         => true,
+					'total_points' => 100,
+					'points'       => 85,
+					'percentage'   => 85,
+					'user_id'      => $user_id,
+					'user_email'   => $user['user_email'],
+					'display_name' => $user['display_name'],
+				] ),
+			],
+			'added_group' => [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => array_merge( $group, $user_fields ),
+			],
+			'removed_group' => [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => array_merge( $group, $user_fields ),
+			],
+			'lesson_assignment' => [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => array_merge( $course, $lesson, [
+					'assignment_id' => 601,
+					'file_name'     => 'assignment.pdf',
+					'file_link'     => 'https://example.com/wp-content/uploads/assignments/assignment.pdf',
+					'file_path'     => '/var/www/wp-content/uploads/assignments/assignment.pdf',
+				], $user_fields ),
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		// Keyword based category fallbacks.
+		if ( strpos( $event, 'group' ) !== false ) {
+			return [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => array_merge( $group, $user_fields ),
+			];
+		}
+
+		if ( strpos( $event, 'quiz' ) !== false ) {
+			return [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => array_merge( $course, $lesson, $quiz, [
+					'score'        => 85,
+					'pass'         => true,
+					'total_points' => 100,
+					'points'       => 85,
+					'percentage'   => 85,
+					'user_id'      => $user_id,
+					'user_email'   => $user['user_email'],
+					'display_name' => $user['display_name'],
+				] ),
+			];
+		}
+
+		if ( strpos( $event, 'topic' ) !== false ) {
+			return [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => array_merge( $course, $lesson, $topic, [
+					'user_id'      => $user_id,
+					'user_email'   => $user['user_email'],
+					'display_name' => $user['display_name'],
+				] ),
+			];
+		}
+
+		if ( strpos( $event, 'lesson' ) !== false ) {
+			return [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => [
+					'lesson_id'    => $lesson['lesson_id'],
+					'lesson_title' => $lesson['lesson_title'],
+					'lesson_url'   => $lesson['lesson_url'],
+					'user_id'      => $user_id,
+				],
+			];
+		}
+
+		if ( strpos( $event, 'course' ) !== false ) {
+			return [
+				'success'   => true,
+				'timestamp' => $now,
+				'data'      => $course_payload,
+			];
+		}
+
+		// Non-empty catch-all so no trigger returns [].
+		return [
+			'success'   => true,
+			'timestamp' => $now,
+			'data'      => $course_payload,
+		];
+	}
+
 	public static function get_dynamic_queries(): array {
 		return [
 			'course_query' => [ self::class, 'course_query_types' ],

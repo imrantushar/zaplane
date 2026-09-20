@@ -69,7 +69,7 @@ class BlueprintService {
 			}
 
 			$exportedVersions[] = $versionData;
-		}
+		}//end foreach
 
 		$connectionIds = array_values( array_unique( $connectionIds ) );
 		$connections   = [];
@@ -129,7 +129,7 @@ class BlueprintService {
 				'last_error'      => $run->last_error,
 				'node_runs'       => $nodeRuns,
 			];
-		}
+		}//end foreach
 
 		return $exportedRuns;
 	}
@@ -164,10 +164,24 @@ class BlueprintService {
 			'layout'  => sanitize_text_field( $data['layout'] ?? 'LR' ),
 		] );
 
+		$icons = [];
+
 		foreach ( $data['versions'] as $versionData ) {
-			$graph = $versionData['graph_json'] ?? [ 'nodes' => [], 'edges' => [] ];
+			$graph = $versionData['graph_json'] ?? [
+				'nodes' => [],
+				'edges' => []
+			];
 			$graph = $this->strip_connection_ids( $graph );
 			$hash  = hash( 'sha256', wp_json_encode( $graph ) );
+
+			// Collect integration icons from the graph nodes (each node carries
+			// data.icon) so the imported workflow's integration_icons is populated.
+			foreach ( $graph['nodes'] ?? [] as $node ) {
+				$icon = $node['data']['icon'] ?? null;
+				if ( $icon ) {
+					$icons[] = $icon;
+				}
+			}
 
 			$version = WorkflowVersion::create( [
 				'workflow_id'    => $workflow->id,
@@ -180,7 +194,10 @@ class BlueprintService {
 			if ( ! empty( $versionData['runs'] ) && is_array( $versionData['runs'] ) ) {
 				$this->import_runs( $versionData['runs'], $workflow->id, $version->id );
 			}
-		}
+		}//end foreach
+
+		$workflow->integration_icons = array_values( array_unique( $icons ) );
+		$workflow->save();
 
 		// Ensure at least one version is active.
 		$hasActive = WorkflowVersion::where( 'workflow_id', $workflow->id )->where( 'is_active', 1 )->first();
@@ -256,7 +273,7 @@ class BlueprintService {
 			if ( $originalParent ) {
 				$newNodes[ $nodeRun->id ] = (int) $originalParent;
 			}
-		}
+		}//end foreach
 
 		foreach ( $newNodes as $newId => $originalParentId ) {
 			if ( isset( $idMap[ $originalParentId ] ) ) {

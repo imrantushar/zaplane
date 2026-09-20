@@ -171,7 +171,7 @@ trait Helper {
 					]
 				);
 
-			case 'import_completed':
+			case 'import_complete':
 				$module_id = self::resolve_funnel_id_from_value( $args[0] ?? null );
 				$funnel_id = $module_id;
 				if ( $funnel_id <= 0 ) {
@@ -214,7 +214,7 @@ trait Helper {
 						'funnel'    => $funnel_id > 0 ? self::resolve_funnel_payload( $funnel_id ) : null,
 					]
 				);
-		}
+		}//end switch
 
 		return false;
 	}
@@ -839,7 +839,7 @@ trait Helper {
 			}
 
 			return $base;
-		}
+		}//end if
 
 		return null;
 	}
@@ -891,8 +891,8 @@ trait Helper {
 						];
 					}
 				}
-			}
-		}
+			}//end if
+		}//end if
 
 		return $options;
 	}
@@ -972,10 +972,10 @@ trait Helper {
 							'name'  => (string) $step_id,
 							'label' => $label,
 						];
-					}
-				}
-			}
-		}
+					}//end foreach
+				}//end foreach
+			}//end if
+		}//end if
 
 		return $options;
 	}
@@ -1003,4 +1003,3 @@ trait Helper {
 		];
 	}
 }
-

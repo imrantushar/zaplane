@@ -75,10 +75,22 @@ class Telegram extends IntegrationBase {
 					'label'    => 'Parse Mode',
 					'required' => false,
 					'options'  => [
-						[ 'value' => '', 'label' => 'None' ],
-						[ 'value' => 'HTML', 'label' => 'HTML' ],
-						[ 'value' => 'Markdown', 'label' => 'Markdown' ],
-						[ 'value' => 'MarkdownV2', 'label' => 'MarkdownV2' ],
+						[
+							'value' => '',
+							'label' => 'None'
+						],
+						[
+							'value' => 'HTML',
+							'label' => 'HTML'
+						],
+						[
+							'value' => 'Markdown',
+							'label' => 'Markdown'
+						],
+						[
+							'value' => 'MarkdownV2',
+							'label' => 'MarkdownV2'
+						],
 					],
 					'help'     => 'Formatting mode for the message text.',
 				],
@@ -88,12 +100,18 @@ class Telegram extends IntegrationBase {
 					'label'    => 'Silent Message',
 					'required' => false,
 					'options'  => [
-						[ 'value' => 'false', 'label' => 'No (with notification)' ],
-						[ 'value' => 'true', 'label' => 'Yes (silent)' ],
+						[
+							'value' => 'false',
+							'label' => 'No (with notification)'
+						],
+						[
+							'value' => 'true',
+							'label' => 'Yes (silent)'
+						],
 					],
 				],
 			];
-		}
+		}//end if
 
 		if ( 'send_photo' === $action ) {
 			return [
@@ -216,12 +234,18 @@ class Telegram extends IntegrationBase {
 					'label'    => 'Silent Pin',
 					'required' => false,
 					'options'  => [
-						[ 'value' => 'false', 'label' => 'No (with notification)' ],
-						[ 'value' => 'true', 'label' => 'Yes (silent)' ],
+						[
+							'value' => 'false',
+							'label' => 'No (with notification)'
+						],
+						[
+							'value' => 'true',
+							'label' => 'Yes (silent)'
+						],
 					],
 				],
 			];
-		}
+		}//end if
 
 		if ( 'send_poll' === $action ) {
 			return [
@@ -248,18 +272,29 @@ class Telegram extends IntegrationBase {
 					'label'    => 'Anonymous Poll',
 					'required' => false,
 					'options'  => [
-						[ 'value' => 'true', 'label' => 'Yes (anonymous)' ],
-						[ 'value' => 'false', 'label' => 'No (show voters)' ],
+						[
+							'value' => 'true',
+							'label' => 'Yes (anonymous)'
+						],
+						[
+							'value' => 'false',
+							'label' => 'No (show voters)'
+						],
 					],
 				],
 			];
-		}
+		}//end if
 
 		return [];
 	}
 
-	public static function resolve_trigger( array $node, array $args ): array {
+	public static function resolve_trigger( array $node, array $args ) {
 		$update = $args[0] ?? [];
+
+		if ( ! is_array( $update ) || empty( $update ) ) {
+			return false;
+		}
+
 		$from   = $update['from'] ?? [];
 		$chat   = $update['chat'] ?? [];
 		$text   = $update['text'] ?? '';
@@ -270,7 +305,7 @@ class Telegram extends IntegrationBase {
 			'telegram_chat_id'        => $chat['id'] ?? '',
 			'telegram_chat_type'      => $chat['type'] ?? '',
 			'telegram_from_id'        => $from['id'] ?? '',
-			'telegram_from_first_name'=> $from['first_name'] ?? '',
+			'telegram_from_first_name' => $from['first_name'] ?? '',
 			'telegram_from_last_name' => $from['last_name'] ?? '',
 			'telegram_from_username'  => $from['username'] ?? '',
 			'telegram_date'           => $update['date'] ?? '',
@@ -285,6 +320,44 @@ class Telegram extends IntegrationBase {
 
 			$base['telegram_command']      = $command;
 			$base['telegram_command_args'] = $cmd_args;
+		}
+
+		return $base;
+	}
+
+	public static function get_trigger_sample_output( string $event ): array {
+		$base = [
+			'telegram_message_id'      => 1042,
+			'telegram_text'            => 'Hello from Zaplane!',
+			'telegram_chat_id'         => 987654321,
+			'telegram_chat_type'       => 'private',
+			'telegram_from_id'         => 123456789,
+			'telegram_from_first_name' => 'Jane',
+			'telegram_from_last_name'  => 'Doe',
+			'telegram_from_username'   => 'janedoe',
+			'telegram_date'            => 1782633600,
+		];
+
+		$command = array_merge(
+			$base,
+			[
+				'telegram_text'         => '/start welcome',
+				'telegram_command'      => '/start',
+				'telegram_command_args' => 'welcome',
+			]
+		);
+
+		$samples = [
+			'message_received' => $base,
+			'command_received' => $command,
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'command' ) ) {
+			return $command;
 		}
 
 		return $base;
@@ -339,6 +412,86 @@ class Telegram extends IntegrationBase {
 		return [
 			'port' => 'main',
 			'data' => $input,
+		];
+	}
+
+	/**
+	 * Telegram pushes updates to a callback URL you register with setWebhook.
+	 * Without this the incoming-webhook endpoint rejected every delivery with
+	 * "does not support incoming webhooks", so telegram_webhook_message /
+	 * telegram_webhook_command could never fire at all.
+	 */
+	public static function supports_webhook(): bool {
+		return true;
+	}
+
+	public static function get_webhook_setup_fields(): array {
+		return [
+			[
+				'key'      => 'secret_token',
+				'label'    => 'Secret Token',
+				'type'     => 'password',
+				'generate' => true,
+				'help'     => 'Pass the same value as secret_token when you call setWebhook. Telegram then sends it back on every request, which is how this endpoint tells real deliveries from forged ones.',
+			],
+		];
+	}
+
+	/**
+	 * Telegram echoes the secret_token given to setWebhook in the
+	 * X-Telegram-Bot-Api-Secret-Token header. Unset means the site owner hasn't
+	 * configured one yet — allowed so first-time setup isn't a chicken-and-egg,
+	 * but the setup panel flags it.
+	 */
+	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
+		$secret = self::get_webhook_setting( 'secret_token' );
+
+		if ( '' === $secret ) {
+			return true;
+		}
+
+		$provided = (string) $request->get_header( 'x_telegram_bot_api_secret_token' );
+
+		return '' !== $provided && hash_equals( $secret, $provided );
+	}
+
+	/**
+	 * Unwrap Telegram's Update envelope down to the message object that
+	 * resolve_trigger() expects, and route commands separately from plain text.
+	 */
+	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
+		$update = $request->get_json_params();
+
+		if ( ! is_array( $update ) ) {
+			$decoded = json_decode( (string) $request->get_body(), true );
+			$update  = is_array( $decoded ) ? $decoded : [];
+		}
+
+		$message = null;
+		foreach ( [ 'message', 'edited_message', 'channel_post', 'edited_channel_post' ] as $key ) {
+			if ( isset( $update[ $key ] ) && is_array( $update[ $key ] ) ) {
+				$message = $update[ $key ];
+				break;
+			}
+		}
+
+		// Ignore everything that isn't a text message — callback queries, polls,
+		// join/leave notices, edits with no text.
+		if ( null === $message || '' === (string) ( $message['text'] ?? '' ) ) {
+			return null;
+		}
+
+		// Never react to another bot's messages (or our own) — that loops.
+		if ( ! empty( $message['from']['is_bot'] ) ) {
+			return null;
+		}
+
+		$text  = (string) $message['text'];
+		$event = 0 === strpos( $text, '/' ) ? 'command_received' : 'message_received';
+
+		return [
+			'event'   => $event,
+			'payload' => $message,
 		];
 	}
 
@@ -468,7 +621,7 @@ class Telegram extends IntegrationBase {
 		];
 
 		if ( empty( $media_url ) ) {
-			throw new \Exception( 'Telegram: ' . ( $label_map[ $field ] ?? $field . ' URL' ) . ' is required' );
+			throw new \Exception( 'Telegram: ' . esc_html( $label_map[ $field ] ?? $field . ' URL' ) . ' is required' );
 		}
 
 		$payload = [

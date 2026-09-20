@@ -36,18 +36,6 @@ class Wpfunnels extends IntegrationBase {
 
 	public static function get_triggers(): array {
 		return [
-			'loaded' => [
-				'label' => 'WPFunnels Loaded',
-				'hook'  => 'wpfunnels/loaded',
-			],
-			'init' => [
-				'label' => 'WPFunnels Initialized',
-				'hook'  => 'wpfunnels/init',
-			],
-			'pro_init' => [
-				'label' => 'WPFunnels Pro Initialized',
-				'hook'  => 'wpfunnels/pro_init',
-			],
 			'import_complete' => [
 				'label' => 'Import Complete',
 				'hook'  => 'wpfunnels/wpfnl_import_complete',
@@ -147,12 +135,12 @@ class Wpfunnels extends IntegrationBase {
 						'query'       => 'steps',
 						'select'      => [ 'name', 'label' ],
 					],
+					'required' => true,
 				],
 			];
 		}
 
 		$funnel_triggers = [
-			'after_funnel_creation',
 			'setup_wizard_complete',
 		];
 
@@ -167,6 +155,7 @@ class Wpfunnels extends IntegrationBase {
 						'query'       => 'funnels',
 						'select'      => [ 'name', 'label' ],
 					],
+					'required' => true,
 				],
 			];
 		}
@@ -255,23 +244,43 @@ class Wpfunnels extends IntegrationBase {
 			case 'do_action':
 				return [
 					$hook_field,
-					[ 'key' => 'arg_1', 'label' => 'Argument 1', 'type' => 'text' ],
-					[ 'key' => 'arg_2', 'label' => 'Argument 2', 'type' => 'text' ],
+					[
+						'key' => 'arg_1',
+						'label' => 'Argument 1',
+						'type' => 'text'
+					],
+					[
+						'key' => 'arg_2',
+						'label' => 'Argument 2',
+						'type' => 'text'
+					],
 				];
 
 			case 'apply_filters':
 				return [
 					$hook_field,
-					[ 'key' => 'value', 'label' => 'Value', 'type' => 'text' ],
-					[ 'key' => 'arg_1', 'label' => 'Argument 1', 'type' => 'text' ],
-					[ 'key' => 'arg_2', 'label' => 'Argument 2', 'type' => 'text' ],
+					[
+						'key' => 'value',
+						'label' => 'Value',
+						'type' => 'text'
+					],
+					[
+						'key' => 'arg_1',
+						'label' => 'Argument 1',
+						'type' => 'text'
+					],
+					[
+						'key' => 'arg_2',
+						'label' => 'Argument 2',
+						'type' => 'text'
+					],
 				];
 
 			case 'remove_action':
 			case 'has_action':
 			case 'current_filter':
 				return [ $hook_field ];
-		}
+		}//end switch
 
 		return [];
 	}
@@ -297,5 +306,177 @@ class Wpfunnels extends IntegrationBase {
 			'steps'   => [ self::class, 'query_steps' ],
 		];
 	}
-}
 
+	public static function get_trigger_sample_output( string $trigger ): array {
+		// Shared base samples mirroring resolve_funnel_payload() / resolve_step_payload()
+		// / resolve_order_summary_from_value() shapes in the Wpfunnels Helper trait.
+		$funnel = [
+			'funnel_id'     => 10,
+			'funnel_title'  => 'Sample Funnel',
+			'funnel_status' => 'publish',
+			'funnel_url'    => home_url( '/sample-funnel/' ),
+			'total_steps'   => 3,
+			'steps'         => [],
+			'created_at'    => '2024-01-01 10:00:00',
+			'updated_at'    => '2024-01-02 12:00:00',
+		];
+
+		$step = [
+			'step_id'      => 21,
+			'funnel_id'    => 10,
+			'step_type'    => 'landing',
+			'step_title'   => 'Sample Step',
+			'step_status'  => 'publish',
+			'step_url'     => home_url( '/sample-funnel/landing/' ),
+			'next_step_id' => 22,
+			'created_at'   => '2024-01-01 10:00:00',
+			'updated_at'   => '2024-01-02 12:00:00',
+		];
+
+		$order = [
+			'id'            => 123,
+			'status'        => 'completed',
+			'total'         => 49.99,
+			'currency'      => 'USD',
+			'customer_id'   => 1,
+			'billing_email' => 'customer@example.com',
+		];
+
+		$offer_product = [
+			'id'      => 55,
+			'step_id' => 21,
+			'name'    => 'Sample Offer Product',
+		];
+
+		$base = [
+			'event'      => $trigger,
+			'event_time' => current_time( 'mysql' ),
+			'args'       => [],
+		];
+
+		// Explicit extras matching each resolve_wpfunnels_trigger() branch.
+		$explicit = [
+			'after_funnel_creation' => [
+				'funnel_id' => 10,
+				'funnel'    => $funnel,
+			],
+			'after_step_creation' => [
+				'step_id'   => 21,
+				'step'      => $step,
+				'funnel_id' => 10,
+				'funnel'    => $funnel,
+			],
+			'after_step_duplicate' => [
+				'funnel_id' => 10,
+				'step_id'   => 21,
+				'funnel'    => $funnel,
+				'step'      => $step,
+			],
+			'funnel_journey_starts' => [
+				'step_id'   => 21,
+				'funnel_id' => 10,
+				'step'      => $step,
+				'funnel'    => $funnel,
+			],
+			'funnel_journey_end' => [
+				'step_id'   => 21,
+				'funnel_id' => 10,
+				'step'      => $step,
+				'funnel'    => $funnel,
+			],
+			'funnel_order_placed' => [
+				'order_id'  => 123,
+				'order'     => $order,
+				'funnel_id' => 10,
+				'step_id'   => 21,
+				'funnel'    => $funnel,
+				'step'      => $step,
+			],
+			'order_bump_accepted' => [
+				'step_id'    => 21,
+				'product_id' => 55,
+				'funnel_id'  => 10,
+				'step'       => $step,
+				'funnel'     => $funnel,
+			],
+			'order_bump_rejected' => [
+				'step_id'    => 21,
+				'product_id' => 55,
+				'funnel_id'  => 10,
+				'step'       => $step,
+				'funnel'     => $funnel,
+			],
+			'offer_accepted' => [
+				'order_id'      => 123,
+				'order'         => $order,
+				'offer_product' => $offer_product,
+				'step_id'       => 21,
+				'funnel_id'     => 10,
+				'step'          => $step,
+				'funnel'        => $funnel,
+			],
+			'offer_rejected' => [
+				'order_id'      => 123,
+				'order'         => $order,
+				'offer_product' => $offer_product,
+				'step_id'       => 21,
+				'funnel_id'     => 10,
+				'step'          => $step,
+				'funnel'        => $funnel,
+			],
+			'child_order_created' => [
+				'parent_order'   => $order,
+				'child_order'    => array_merge( $order, [
+					'id' => 124,
+					'status' => 'processing',
+					'total' => 19.99
+				] ),
+				'transaction_id' => 'txn_abc123',
+			],
+			'subscription_created' => [
+				'subscription'  => [
+					'id' => 900,
+					'status' => 'active'
+				],
+				'offer_product' => $offer_product,
+				'order_id'      => 123,
+				'order'         => $order,
+				'step_id'       => 21,
+				'funnel_id'     => 10,
+				'step'          => $step,
+				'funnel'        => $funnel,
+			],
+			'setup_wizard_complete' => [
+				'funnel_id' => 10,
+				'action'    => 'complete',
+				'goal'      => 'sell_products',
+				'funnel'    => $funnel,
+			],
+		];
+
+		$extra = $explicit[ $trigger ] ?? [];
+
+		// Category fallbacks by event-name prefix for the generic/template triggers
+		// (import_complete, template_*) and any future trigger.
+		if ( empty( $extra ) ) {
+			if ( 0 === strpos( $trigger, 'funnel_' ) || 0 === strpos( $trigger, 'step_' ) || 0 === strpos( $trigger, 'after_' ) ) {
+				$extra = [
+					'funnel_id' => 10,
+					'step_id'   => 21,
+					'funnel'    => $funnel,
+					'step'      => $step,
+				];
+			} elseif ( 0 === strpos( $trigger, 'order_' ) || 0 === strpos( $trigger, 'optin_' ) ) {
+				$extra = [
+					'order_id'   => 123,
+					'contact_id' => 1,
+					'email'      => 'customer@example.com',
+					'total'      => 49.99,
+					'order'      => $order,
+				];
+			}
+		}
+
+		return array_merge( $base, $extra );
+	}
+}

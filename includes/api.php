@@ -39,28 +39,32 @@ class API implements ModuleInterface {
 		( new \Zaplane\API\ImportExportController( $this->container ) )->register_routes();
 		( new \Zaplane\API\FolderController( $this->container ) )->register_routes();
 		( new \Zaplane\API\RecipeController( $this->container ) )->register_routes();
+		( new \Zaplane\API\EmailTemplateController( $this->container ) )->register_routes();
+		( new \Zaplane\API\CustomAppsController( $this->container ) )->register_routes();
+		( new \Zaplane\API\HitlController( $this->container ) )->register_routes();
+		( new \Zaplane\API\KnowledgeController( $this->container ) )->register_routes();
+		( new \Zaplane\API\McpController( $this->container ) )->register_routes();
+		( new \Zaplane\API\SettingsController( $this->container ) )->register_routes();
 
-		register_rest_route('zaplane/v1', '/runs/(?P<id>\d+)', [
-			'methods'  => 'GET',
-			'permission_callback' => '__return_true',
-			'callback' => function ( $req ) {
-				return DB::table( 'run_logs' )
-					->where( 'run_id', (int) $req['id'] )
-					->fresh()
-					->get()
-					->toArray();
-			}
-		]);
 
 		register_rest_route('zaplane/v1', '/dynamic', [
 			'methods' => 'POST',
-			'permission_callback' => '__return_true',
+			'permission_callback' => function () {
+				return current_user_can( 'manage_options' );
+			},
 			'callback' => function ( $req ) {
 
 				$integrationLoader = $this->container->get( 'integrations' );
 				$integration = $integrationLoader->get( $req['integration'] );
 
 				if ( ! $integration ) {
+					return [];
+				}
+
+				// Not part of IntegrationBase — an integration only declares it when
+				// it has dynamic selects. Calling it blind fataled the whole route
+				// for every integration that doesn't.
+				if ( ! method_exists( $integration, 'get_dynamic_queries' ) ) {
 					return [];
 				}
 

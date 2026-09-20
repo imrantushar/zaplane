@@ -6,10 +6,14 @@ use WP_REST_Controller;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\Expression;
+use Zaplane\Framework\Classes\GlobalContext;
+use Zaplane\Framework\Classes\TriggerNodes;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
+use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
+use Zaplane\Framework\Database\ORM\DB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -44,12 +48,29 @@ class RunController extends WP_REST_Controller {
 					'maximum' => 100,
 					'sanitize_callback' => 'absint',
 				],
+				'status' => [
+					'type' => 'string',
+					'required' => false,
+					'sanitize_callback' => 'sanitize_text_field',
+				],
 			],
+		]);
+
+		register_rest_route($ns, '/runs', [
+			'methods' => 'DELETE',
+			'callback' => [ $this, 'clear_runs' ],
+			'permission_callback' => [ $this, 'permissions' ]
 		]);
 
 		register_rest_route($ns, '/runs/(?P<id>\d+)', [
 			'methods' => 'GET',
 			'callback' => [ $this, 'get_run' ],
+			'permission_callback' => [ $this, 'permissions' ]
+		]);
+
+		register_rest_route($ns, '/runs/(?P<id>\d+)', [
+			'methods' => 'DELETE',
+			'callback' => [ $this, 'delete_run' ],
 			'permission_callback' => [ $this, 'permissions' ]
 		]);
 
@@ -88,27 +109,99 @@ class RunController extends WP_REST_Controller {
 			'callback' => [ $this, 'execute_single_node' ],
 			'permission_callback' => [ $this, 'permissions' ]
 		]);
+
 	}
 
 	public function permissions() {
 		return current_user_can( 'manage_options' );
 	}
 
+	public function clear_runs( $request ) {
+		// Logs are runs + their node-runs (no separate logs table). Delete
+		// node-runs first, then the runs. An always-true WHERE satisfies the
+		// ORM's "cannot delete without where clause" guard while removing all rows.
+		try {
+			NodeRun::query()->where( 'id', '>', 0 )->delete();
+			Run::query()->where( 'id', '>', 0 )->delete();
+		} catch ( \Throwable $e ) {
+			return new WP_Error( 'clear_failed', $e->getMessage(), [ 'status' => 500 ] );
+		}
+
+		return rest_ensure_response( [ 'deleted' => true ] );
+	}
+
 	public function list_runs( $request ) {
 		$page    = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
 		$perPage = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 
-		$total = Run::query()->count();
-		$runs  = Run::query()->orderBy( 'id', 'desc' )->forPage( $page, $perPage )->get();
+		// Optional status filter (e.g. "completed", "failed", "running"). Only a
+		// known status is honoured so an arbitrary value can't slip into the query.
+		$status          = $request->get_param( 'status' );
+		$allowedStatuses = [ 'completed', 'failed', 'running', 'cancelled', 'pending', 'waiting' ];
+		$status          = in_array( $status, $allowedStatuses, true ) ? $status : null;
 
-		$data = $runs->map(function ( $run ) {
-			$node       = null;
-			$version    = $run->workflowVersion();
-			$node_count = NodeRun::where( 'run_id', $run->id )->count();
+		$countQuery = Run::query();
+		$listQuery  = Run::query()->orderBy( 'id', 'desc' );
+		if ( $status ) {
+			$countQuery->where( 'status', $status );
+			$listQuery->where( 'status', $status );
+		}
 
-			if ( $version ) {
+		$total = $countQuery->count();
+		$runs  = $listQuery->forPage( $page, $perPage )->get();
+
+		// Batch everything the row loop needs so it issues zero per-row queries.
+		// Previously each run did its own workflowVersion() find + node-run count()
+		// — ~2 queries and a graph_json decode per row (up to 100).
+		$run_ids     = [];
+		$version_ids = [];
+		foreach ( $runs as $run ) {
+			$run_ids[] = (int) $run->id;
+			if ( $run->workflow_version_id ) {
+				$version_ids[ (int) $run->workflow_version_id ] = true;
+			}
+		}
+		$version_ids = array_keys( $version_ids );
+
+		// One query for the page's distinct versions; decode each graph once
+		// (many runs on a page share the same version).
+		$graph_by_version    = [];
+		$workflow_by_version = []; // version_id => workflow_id, so each run can link back to its workflow.
+		if ( $version_ids ) {
+			foreach ( WorkflowVersion::query()->whereIn( 'id', $version_ids )->get() as $version ) {
+				$graph_by_version[ (int) $version->id ]    = $version->getGraph();
+				$workflow_by_version[ (int) $version->id ] = (int) $version->workflow_id;
+			}
+		}
+
+		// One query for the page's workflow titles (many runs share a workflow).
+		$title_by_workflow = [];
+		$workflow_ids      = array_values( array_unique( array_filter( $workflow_by_version ) ) );
+		if ( $workflow_ids ) {
+			foreach ( Workflow::query()->whereIn( 'id', $workflow_ids )->get() as $wf ) {
+				$title_by_workflow[ (int) $wf->id ] = $wf->title ?: $wf->name;
+			}
+		}
+
+		// One grouped query for all node-run counts on the page.
+		$count_by_run = [];
+		if ( $run_ids ) {
+			$rows = DB::table( 'node_runs' )
+				->selectRaw( 'run_id, COUNT(*) as c' )
+				->whereIn( 'run_id', $run_ids )
+				->groupBy( 'run_id' )
+				->get();
+			foreach ( $rows as $row ) {
+				$count_by_run[ (int) $row['run_id'] ] = (int) $row['c'];
+			}
+		}
+
+		$data = $runs->map(function ( $run ) use ( $graph_by_version, $count_by_run, $workflow_by_version, $title_by_workflow ) {
+			$node  = null;
+			$graph = $graph_by_version[ (int) $run->workflow_version_id ] ?? null;
+
+			if ( is_array( $graph ) ) {
 				$nodeKey = $run->start_node_key ?? $run->target_node_key;
-				$graph   = $version->getGraph();
 				foreach ( $graph['nodes'] ?? [] as $n ) {
 					if ( (int) $n['id'] === (int) $nodeKey ) {
 						$node = $n;
@@ -117,13 +210,17 @@ class RunController extends WP_REST_Controller {
 				}
 			}
 
+			$workflow_id = $workflow_by_version[ (int) $run->workflow_version_id ] ?? null;
+
 			return [
-				'id'          => $run->id,
-				'status'      => $run->status,
-				'started_at'  => $run->started_at,
-				'finished_at' => $run->finished_at,
-				'node_count'  => $node_count,
-				'node'        => $node ? [
+				'id'             => $run->id,
+				'status'         => $run->status,
+				'started_at'     => $run->started_at,
+				'finished_at'    => $run->finished_at,
+				'node_count'     => $count_by_run[ (int) $run->id ] ?? 0,
+				'workflow_id'    => $workflow_id,
+				'workflow_title' => $workflow_id ? ( $title_by_workflow[ $workflow_id ] ?? null ) : null,
+				'node'           => $node ? [
 					'app'   => $node['data']['app'] ?? null,
 					'event' => $node['data']['event'] ?? null,
 				] : null,
@@ -137,6 +234,29 @@ class RunController extends WP_REST_Controller {
 			'per_page' => $perPage,
 			'pages'    => $perPage > 0 ? (int) ceil( $total / $perPage ) : 1,
 		]);
+	}
+
+	public function delete_run( $req ) {
+		$id  = (int) $req['id'];
+		$run = Run::find( $id );
+
+		if ( ! $run ) {
+			return new WP_Error( 'not_found', 'Run not found', [ 'status' => 404 ] );
+		}
+
+		// Delete the run and its node-runs. The where() satisfies the ORM's
+		// "cannot delete without where clause" guard.
+		try {
+			NodeRun::where( 'run_id', $id )->delete();
+			$run->delete();
+		} catch ( \Throwable $e ) {
+			return new WP_Error( 'delete_failed', $e->getMessage(), [ 'status' => 500 ] );
+		}
+
+		return rest_ensure_response( [
+			'deleted' => true,
+			'id' => $id
+		] );
 	}
 
 	public function get_run( $req ) {
@@ -271,14 +391,10 @@ class RunController extends WP_REST_Controller {
 		}
 
 		$graph = $version->getGraph();
-		$trigger = null;
-
-		foreach ( $graph['nodes'] as $node ) {
-			if ( 'trigger' === $node['type'] ) {
-				$trigger = $node;
-				break;
-			}
-		}
+		// For a workflow with several triggers, the one to start from. Without it
+		// the run starts from the Manual trigger, or else the first trigger.
+		$nodeId  = isset( $req['node_id'] ) && '' !== (string) $req['node_id'] ? (string) $req['node_id'] : null;
+		$trigger = TriggerNodes::resolve( $graph, $nodeId );
 
 		if ( ! $trigger ) {
 			return new WP_Error( 'no_trigger', 'No trigger node found', [ 'status' => 400 ] );
@@ -311,7 +427,9 @@ class RunController extends WP_REST_Controller {
 		$workflowVersionId = (int) ( $req['workflow_version_id'] ?? 0 );
 		$input             = $req['input'] ?? [];
 
-		if ( $targetNode && is_array( $input ) ) {
+		// For action nodes, merge input into config so expression fields receive values.
+		// Trigger nodes skip this — their input is the raw hook args, not config.
+		if ( $targetNode && is_array( $input ) && 'trigger' !== ( $targetNode['type'] ?? '' ) ) {
 			$targetNode['data']['config'] = array_merge( $targetNode['data']['config'] ?? [], $input );
 		}
 
@@ -364,16 +482,56 @@ class RunController extends WP_REST_Controller {
 			}
 		}
 
-		$testContext = [];
+		$testContext   = [];
+		$latestTrigger = null;
+		$latestRunId   = 0;
+		$versionGraph  = $version->getGraph();
+		$upstream      = TriggerNodes::upstream_ids( $versionGraph, (string) $targetNode['id'] );
+
 		foreach ( Run::latestTestNodeRunsByWorkflow( $version->workflow_id ) as $nodeKey => $prevNodeRun ) {
 			$out = $prevNodeRun->getOutput();
 			$testContext[ (string) $nodeKey ] = is_array( $out ) ? $out : [ 'value' => $out ];
+
+			// Of the triggers leading here, the one tested most recently stands in
+			// for "whichever fired", so {{trigger.…}} resolves in a test as well.
+			if ( in_array( (string) $nodeKey, $upstream, true ) && (int) $prevNodeRun->id > $latestRunId ) {
+				$latestTrigger = (string) $nodeKey;
+				$latestRunId   = (int) $prevNodeRun->id;
+			}
 		}
+
+		if ( null !== $latestTrigger ) {
+			$testContext = TriggerNodes::with_aliases( $testContext, $versionGraph, $latestTrigger );
+		}
+
+		// Only inject global context groups that this node's config actually references.
+		// Test execution: $run = null so GlobalContext falls back to wp_get_current_user() (admin).
+		// A union, not array_merge(): outputs are keyed by numeric node id, and
+		// array_merge() renumbers numeric keys.
+		$prefixes = GlobalContext::detect_prefixes( $targetNode['data']['config'] ?? [] );
+		if ( $prefixes ) {
+			$testContext = $testContext + GlobalContext::build( $prefixes );
+		}
+
 		$effectiveInput = $input + $testContext;
+
+		if ( array_key_exists( 'trigger', $testContext ) ) {
+			$effectiveInput['trigger'] = $testContext['trigger'];
+		}
 
 		try {
 			if ( 'trigger' === $targetNode['type'] ) {
-				$output = $input;
+				$app         = strtolower( $targetNode['data']['app'] ?? '' );
+				$integration = $this->container->get( 'integrations' )->get( $app );
+
+				if ( ! $integration ) {
+					throw new \Exception( 'Integration not found: ' . ( $targetNode['data']['app'] ?? 'unknown' ) );
+				}
+
+				// $input is the simulated hook args (positional array from the frontend).
+				// resolve_trigger() returns the structured payload or false when filtered.
+				$resolved = $integration::resolve_trigger( $targetNode['data'], array_values( $input ) );
+				$output   = ( false !== $resolved ) ? TriggerNodes::apply_field_map( $targetNode, (array) $resolved ) : [];
 			} else {
 				$integration = $this->container->get( 'integrations' )->get( strtolower( $targetNode['data']['app'] ) );
 
@@ -383,8 +541,14 @@ class RunController extends WP_REST_Controller {
 
 				$targetNode = $this->resolveNodeConfig( $targetNode, $effectiveInput );
 
-				$output = $integration::execute_node( $targetNode, $effectiveInput );
-			}
+				// Resolve {{...}} against the full accumulated test context above, but
+				// hand execute_node only the node's own input — the same bag it gets
+				// at runtime (Automation passes the parent's output, not every node's
+				// output). Passing $effectiveInput here leaks the entire workflow's
+				// captured context into pass-through nodes like Set Variable, so their
+				// output looked identical (a static blob) on every test run.
+				$output = $integration::execute_node( $targetNode, $input );
+			}//end if
 
 			$run->markAsCompleted();
 			$nodeRun->setOutput( $output );

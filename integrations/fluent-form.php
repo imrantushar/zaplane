@@ -86,21 +86,6 @@ class FluentForm extends IntegrationBase {
 		return false;
 	}
 
-	public static function get_actions(): array {
-		return [];
-	}
-
-	public static function get_action_config_schema( string $action ): array {
-		return [];
-	}
-
-	public static function execute_node( array $node, array $input ): array {
-		return [
-			'port' => 'main',
-			'data' => $input
-		];
-	}
-
 	public static function get_dynamic_queries(): array {
 		return [
 			'form' => [ self::class, 'query_forms' ],
@@ -134,8 +119,7 @@ class FluentForm extends IntegrationBase {
 		return $options;
 	}
 
-	public static function get_output_ports(): array
-	{
+	public static function get_output_ports(): array {
 		return [
 			'main' => 'Main output',
 		];

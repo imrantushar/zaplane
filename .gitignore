@@ -1,5 +1,6 @@
 /vendor/
 .claude/
+.codex
 .DS_Store
 CLAUDE.md
 node_modules/
@@ -10,3 +11,4 @@ assets/js/*.txt
 **/*.map
 assets/css/backend-dist.css
 assets/css/frontend-dist.css
+.build-cache/

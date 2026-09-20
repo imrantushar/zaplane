@@ -12,8 +12,8 @@
     line-height: 20px;
     font-weight: 500;
     text-decoration: none;
-    background: #fff;
-    color: #444;
+    background: var(--zaplane-background);
+    color: var(--zaplane-btn-text);
     cursor: pointer;
     text-align: center;
     padding: 15px;
@@ -33,7 +33,7 @@
         height: 100%;
         left: -100%;
         top: 0;
-        background: rgba(0, 0, 0, 0.1);
+        background: var(--zaplane-overlay-dark);
         transition: all 0.25s cubic-bezier(0.66, 0.36, 0.17, 0.91);
     }
     &:hover::after {
@@ -66,36 +66,36 @@
     }
     &--bg-red,
     &--preset-red {
-        background: #f94d4d;
-        color: #fff;
+        background: var(--zaplane-red);
+        color: var(--zaplane-white);
         &:hover, &:focus {
-            background: #f94d4d;
-            color: #fff;
+            background: var(--zaplane-red);
+            color: var(--zaplane-white);
         }
     }
     &--preset-error {
-        background: #f94d4d !important;
-        color: #fff !important;
+        background: var(--zaplane-red) !important;
+        color: var(--zaplane-white) !important;
     }
     &--bg-light-red,
     &--preset-light-red {
-        background: rgba(249, 77, 77, 0.2);
-        color: #f94d4d;
+        background: var(--zaplane-red-light);
+        color: var(--zaplane-red);
         .zaplane-icon:before {
-            color: #f94d4d;
-        }        
+            color: var(--zaplane-red);
+        }
         &:hover, &:focus {
-            background: rgba(249, 77, 77, 0.2);
-            color: #f94d4d;
+            background: var(--zaplane-red-light);
+            color: var(--zaplane-red);
         }
     }
     &--bg-purple,
     &--preset-purple {
         background: var(--zaplane-primary-color);
-        color: #fff;
+        color: var(--zaplane-white);
         &:hover, &:focus {
             background: var(--zaplane-primary-color);
-            color: #fff;
+            color: var(--zaplane-white);
         }
     }
     &--bg-light-purple,
@@ -125,11 +125,11 @@
         }
     }
     &--preset-white {
-        background: #fff;
-        color: #000000;
+        background: var(--zaplane-background);
+        color: var(--zaplane-black);
         &:hover, &:focus {
-            background: #fff;
-            color: #000000;
+            background: var(--zaplane-background);
+            color: var(--zaplane-black);
         }
     }
     &--preset-transparent {
@@ -150,7 +150,7 @@
         border: 1px solid var(--zaplane-primary-color);
         color: var(--zaplane-primary-color);
         &:hover, &:focus {
-            background: #F5F5F5;
+            background: var(--zaplane-secondary);
             color: var(--zaplane-primary-color);
         }
     }
@@ -161,9 +161,9 @@
         }
     }
     &--border-red {
-        border: 1px solid #f94d4d;
+        border: 1px solid var(--zaplane-red);
         &:hover, &:focus {
-            border: 1px solid #f94d4d;
+            border: 1px solid var(--zaplane-red);
         }
     }
     &--border-black {
@@ -195,7 +195,7 @@
         font-size: 14px;
 	}
     &--disabled {
-        background: #E5E5E6 !important;
+        background: var(--zaplane-disabled-bg) !important;
         color: var(--zaplane-text-disable) !important;
         cursor: not-allowed !important;
         .zaplane-icon {

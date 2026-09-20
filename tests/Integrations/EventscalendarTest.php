@@ -3,181 +3,177 @@
 namespace Zaplane\Tests\Integrations;
 
 use Zaplane\Integrations\Eventscalendar;
-use Zaplane\Tests\WPMocks;
 
+/**
+ * Every trigger here is an Event Tickets hook, and three of the four read their
+ * arguments out of the wrong positions. These lock the real signatures in.
+ *
+ * @see https://docs.theeventscalendar.com/ — Event Tickets fires:
+ *   event_tickets_checkin( $attendee_id, $qr )
+ *   event_tickets_rsvp_attendee_created( $attendee_id, $post_id, $order, $product_id, $status )
+ *   event_tickets_rsvp_tickets_generated_for_product( $product_id, $order_id )
+ *   tribe_tickets_attendee_repository_create_attendee_for_ticket_after_create(
+ *       $attendee, $attendee_data, $ticket, $repository )
+ */
 class EventscalendarTest extends IntegrationTestCase {
 
-    protected function getIntegrationClass(): string {
-        return Eventscalendar::class;
-    }
+	protected function getIntegrationClass(): string {
+		return Eventscalendar::class;
+	}
 
-    protected function setupMockData(): void {
-        parent::setupMockData();
+	protected function setUp(): void {
+		parent::setUp();
 
-        WPMocks::setPost( 101, [
-            'post_title' => 'John Doe',
-            'post_type'  => 'tribe_rsvp_attendees',
-        ] );
+		// resolve_trigger short-circuits unless Event Tickets is present.
+		if ( ! class_exists( 'Tribe__Tickets__Main' ) ) {
+			eval( 'class Tribe__Tickets__Main {}' ); // phpcs:ignore Squiz.PHP.Eval.Discouraged -- Stand-in for the absent plugin.
+		}
 
-        WPMocks::setPost( 201, [
-            'post_title' => 'Test Event',
-            'post_type'  => 'tribe_events',
-        ] );
+		// The shared get_post/get_post_meta stubs read these fixtures; strict mode
+		// makes an unseeded id return null instead of a generic post.
+		$GLOBALS['zaplane_wp_posts']        = [];
+		$GLOBALS['zaplane_wp_posts_strict'] = true;
+		$GLOBALS['zaplane_post_meta']       = [];
+	}
 
-        WPMocks::setUser( 1, [
-            'user_login'   => 'johndoe',
-            'user_email'   => 'john@example.com',
-            'display_name' => 'John Doe',
-        ] );
-    }
+	protected function tearDown(): void {
+		unset(
+			$GLOBALS['zaplane_wp_posts'],
+			$GLOBALS['zaplane_wp_posts_strict'],
+			$GLOBALS['zaplane_post_meta']
+		);
+		parent::tearDown();
+	}
 
-    protected function getTriggerTests(): array {
-        return [
-            'attendEvent'          => [ 101, 201, 0 ],
-            'attendeeRegistered'   => [ 101, 201, 300, 401 ],
-            'newAttendee'          => [ 401, 300, [ 101 ] ],
-            'attendeeRegisteredWc' => [ 101, (object) [], (object) [], [] ],
-        ];
-    }
+	private function seedPost( int $id, string $title ): void {
+		$GLOBALS['zaplane_wp_posts'][ $id ] = new \WP_Post( [ 'ID' => $id, 'post_title' => $title ] );
+	}
 
-    // ========== attendEvent ==========
+	private function seedMeta( int $id, array $meta ): void {
+		foreach ( $meta as $key => $value ) {
+			$GLOBALS['zaplane_post_meta'][ $id ][ $key ] = [ $value ];
+		}
+	}
 
-    public function test_attend_event_returns_payload(): void {
-        $result = Eventscalendar::resolve_trigger(
-            $this->makeTriggerNode( 'attendEvent' ),
-            [ 101, 201, 0 ]
-        );
+	public function test_requires_event_tickets_not_just_the_events_calendar(): void {
+		$required = Eventscalendar::get_required_plugins();
 
-        $this->assertIsArray( $result );
-        $this->assertEquals( 101, $result['attendee_id'] );
-        $this->assertEquals( 'John Doe', $result['attendee_name'] );
-        $this->assertEquals( 201, $result['event_id'] );  // from $args[1]
-        $this->assertEquals( 'Test Event', $result['event_title'] );
-        $this->assertArrayHasKey( 'user_id', $result );
-        $this->assertArrayHasKey( 'user_email', $result );
-        $this->assertArrayHasKey( 'checked_in_at', $result );
-    }
+		$this->assertContains(
+			'event-tickets/event-tickets.php',
+			$required,
+			'All four triggers are Event Tickets hooks; The Events Calendar alone fires none of them.'
+		);
+	}
 
-    public function test_attend_event_returns_false_without_attendee_id(): void {
-        $result = Eventscalendar::resolve_trigger(
-            $this->makeTriggerNode( 'attendEvent' ),
-            [ 0, 201, 0 ]
-        );
+	/**
+	 * $args[1] is the QR flag, not the event id. Reading it as one meant a QR
+	 * check-in resolved the event to `true` and returned an empty title/url.
+	 */
+	public function test_checkin_reads_the_event_from_meta_not_the_qr_flag(): void {
+		$this->seedPost( 720, 'Sarah Johnson' );
+		$this->seedPost( 410, 'Annual Tech Conference 2026' );
+		$this->seedMeta( 720, [
+			'_tribe_rsvp_event'           => 410,
+			'_tribe_tickets_meta_user_id' => 2,
+		] );
 
-        $this->assertFalse( $result );
-    }
+		$node = $this->makeTriggerNode( 'attendEvent' );
 
-    public function test_attend_event_returns_false_with_invalid_attendee(): void {
-        $result = Eventscalendar::resolve_trigger(
-            $this->makeTriggerNode( 'attendEvent' ),
-            [ 9999, 201, 0 ]
-        );
+		// Second arg is the QR object, exactly as Event Tickets passes it.
+		$result = Eventscalendar::resolve_trigger( $node, [ 720, true ] );
 
-        $this->assertFalse( $result );
-    }
+		$this->assertSame( 720, $result['attendee_id'] );
+		$this->assertSame( 410, $result['event_id'] );
+		$this->assertSame( 'Annual Tech Conference 2026', $result['event_title'] );
+		$this->assertTrue( $result['via_qr'] );
+	}
 
-    public function test_attend_event_uses_args_event_id_over_meta(): void {
-        $result = Eventscalendar::resolve_trigger(
-            $this->makeTriggerNode( 'attendEvent' ),
-            [ 101, 999, 0 ]
-        );
+	public function test_checkin_still_resolves_for_a_manual_check_in(): void {
+		$this->seedPost( 721, 'Manual Attendee' );
+		$this->seedPost( 411, 'Workshop' );
+		$this->seedMeta( 721, [ '_tribe_wooticket_event' => 411 ] );
 
-        $this->assertIsArray( $result );
-        $this->assertEquals( 999, $result['event_id'] );
-    }
+		$result = Eventscalendar::resolve_trigger( $this->makeTriggerNode( 'attendEvent' ), [ 721, null ] );
 
-    // ========== attendeeRegistered ==========
+		$this->assertSame( 411, $result['event_id'] );
+		$this->assertFalse( $result['via_qr'] );
+	}
 
-    public function test_attendee_registered_returns_payload(): void {
-        $result = Eventscalendar::resolve_trigger(
-            $this->makeTriggerNode( 'attendeeRegistered' ),
-            [ 101, 201, 300, 401 ]
-        );
+	public function test_checkin_rejects_an_unknown_attendee(): void {
+		$this->assertFalse( Eventscalendar::resolve_trigger( $this->makeTriggerNode( 'attendEvent' ), [ 0 ] ) );
+		$this->assertFalse( Eventscalendar::resolve_trigger( $this->makeTriggerNode( 'attendEvent' ), [ 999999 ] ) );
+	}
 
-        $this->assertIsArray( $result );
-        $this->assertEquals( 101, $result['attendee_id'] );
-        $this->assertEquals( 201, $result['post_id'] );
-        $this->assertEquals( 300, $result['order_id'] );
-        $this->assertEquals( 401, $result['product_id'] );
-    }
+	/**
+	 * $args[2] is the order OBJECT for RSVP, so it has to be narrowed to an id
+	 * rather than handed through as one.
+	 */
+	public function test_rsvp_attendee_created_narrows_the_order_object_to_an_id(): void {
+		$order = (object) [ 'ID' => 9001 ];
 
-    public function test_attendee_registered_returns_empty_values_with_no_args(): void {
-        $result = Eventscalendar::resolve_trigger(
-            $this->makeTriggerNode( 'attendeeRegistered' ),
-            []
-        );
+		$result = Eventscalendar::resolve_trigger(
+			$this->makeTriggerNode( 'attendeeRegistered' ),
+			[ 720, 410, $order, 512, 'yes' ]
+		);
 
-        $this->assertIsArray( $result );
-        $this->assertEquals( '', $result['attendee_id'] );
-        $this->assertEquals( '', $result['post_id'] );
-        $this->assertEquals( '', $result['order_id'] );
-        $this->assertEquals( '', $result['product_id'] );
-    }
+		$this->assertSame( 720, $result['attendee_id'] );
+		$this->assertSame( 410, $result['post_id'] );
+		$this->assertSame( 9001, $result['order_id'] );
+		$this->assertSame( 512, $result['product_id'] );
+		$this->assertSame( 'yes', $result['status'] );
+	}
 
-    // ========== newAttendee ==========
+	/**
+	 * The hook passes only two arguments — the attendee list has to be looked
+	 * up, not read from a third that never arrives.
+	 */
+	public function test_tickets_generated_does_not_read_a_third_argument(): void {
+		$result = Eventscalendar::resolve_trigger( $this->makeTriggerNode( 'newAttendee' ), [ 512, 9001 ] );
 
-    public function test_new_attendee_returns_payload(): void {
-        $result = Eventscalendar::resolve_trigger(
-            $this->makeTriggerNode( 'newAttendee' ),
-            [ 401, 300, [ 101, 102 ] ]
-        );
+		$this->assertSame( 512, $result['product_id'] );
+		$this->assertSame( 9001, $result['order_id'] );
+		$this->assertIsArray( $result['attendees'] );
+	}
 
-        $this->assertIsArray( $result );
-        $this->assertEquals( 401, $result['product_id'] );
-        $this->assertEquals( 300, $result['order_id'] );
-        $this->assertEquals( [ 101, 102 ], $result['attendees'] );
-    }
+	/**
+	 * The old mapping read these as ( attendee_id, ticket, order, attendee_data )
+	 * — every field shifted one position and the wrong type.
+	 */
+	public function test_wc_attendee_created_reads_each_argument_in_its_real_position(): void {
+		$attendee      = (object) [ 'ID' => 720 ];
+		$attendee_data = [ 'order_id' => 9001, 'full_name' => 'Sarah Johnson', 'email' => 'sarah@example.com' ];
+		$ticket        = (object) [ 'ID' => 512, 'name' => 'General Admission', 'price' => 49.00 ];
+		$repository    = (object) [ 'irrelevant' => true ];
 
-    public function test_new_attendee_returns_empty_attendees_with_no_args(): void {
-        $result = Eventscalendar::resolve_trigger(
-            $this->makeTriggerNode( 'newAttendee' ),
-            []
-        );
+		$result = Eventscalendar::resolve_trigger(
+			$this->makeTriggerNode( 'attendeeRegisteredWc' ),
+			[ $attendee, $attendee_data, $ticket, $repository ]
+		);
 
-        $this->assertIsArray( $result );
-        $this->assertEquals( [], $result['attendees'] );
-    }
+		$this->assertSame( 720, $result['attendee_id'] );
+		$this->assertSame( 512, $result['ticket']['ticket_id'] );
+		$this->assertSame( 'General Admission', $result['ticket']['name'] );
+		$this->assertSame( 9001, $result['order']['order_id'] );
+		$this->assertSame( 'Sarah Johnson', $result['attendee_data']['full_name'] );
+	}
 
-    // ========== attendeeRegisteredWc ==========
+	/**
+	 * Guards against the payload drifting away from what the "@" variable picker
+	 * offers before any test run has happened.
+	 */
+	public function test_wc_payload_keys_match_the_sample_output(): void {
+		$result = Eventscalendar::resolve_trigger(
+			$this->makeTriggerNode( 'attendeeRegisteredWc' ),
+			[ (object) [ 'ID' => 720 ], [ 'order_id' => 9001 ], (object) [ 'ID' => 512 ], null ]
+		);
 
-    public function test_attendee_registered_wc_returns_payload(): void {
-        $ticket = (object) [ 'ID' => 401 ];
-        $order  = (object) [ 'ID' => 300 ];
-        $data   = [ 'meta_key' => 'meta_value' ];
+		$this->assertSame(
+			array_keys( Eventscalendar::get_trigger_sample_output( 'attendeeRegisteredWc' ) ),
+			array_keys( $result )
+		);
+	}
 
-        $result = Eventscalendar::resolve_trigger(
-            $this->makeTriggerNode( 'attendeeRegisteredWc' ),
-            [ 101, $ticket, $order, $data ]
-        );
-
-        $this->assertIsArray( $result );
-        $this->assertEquals( 101, $result['attendee_id'] );
-        $this->assertEquals( $ticket, $result['ticket'] );
-        $this->assertEquals( $order, $result['order'] );
-        $this->assertEquals( $data, $result['attendee_data'] );
-    }
-
-    public function test_attendee_registered_wc_returns_empty_values_with_no_args(): void {
-        $result = Eventscalendar::resolve_trigger(
-            $this->makeTriggerNode( 'attendeeRegisteredWc' ),
-            []
-        );
-
-        $this->assertIsArray( $result );
-        $this->assertEquals( '', $result['attendee_id'] );
-        $this->assertEquals( [], $result['attendee_data'] );
-    }
-
-    // ========== execute_node ==========
-
-    public function test_execute_node_returns_main_port(): void {
-        $result = Eventscalendar::execute_node(
-            $this->makeActionNode( 'attendEvent' ),
-            [ 'attendee_id' => 101 ]
-        );
-
-        $this->assertIsArray( $result );
-        $this->assertEquals( 'main', $result['port'] );
-        $this->assertEquals( [ 'attendee_id' => 101 ], $result['data'] );
-    }
+	public function test_unknown_event_returns_false(): void {
+		$this->assertFalse( Eventscalendar::resolve_trigger( [ 'event' => 'nope' ], [ 1 ] ) );
+	}
 }

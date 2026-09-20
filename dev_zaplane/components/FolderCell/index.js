@@ -6,10 +6,11 @@ import { getFolders, createFolder, addWorkflowToFolder, removeWorkflowFromFolder
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { getWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
-import { outlineBtn, primaryBtn } from "../../../assets/scss/chakra/recipe";
+import { primaryBtn } from "../../../assets/scss/chakra/recipe";
 const FolderCell = ({
   row,
-  isFolder = false
+  isFolder = false,
+  menuPlacement = "bottom"
 }) => {
   const dispatch = useDispatch();
   const {
@@ -99,7 +100,7 @@ const FolderCell = ({
   }];
   if (assigning) {
     return (
-      <div className="flex items-center justify-center h-[36px] w-[100px] border border-[#E5E7EB] bg-white rounded-full">
+      <div className="flex items-center justify-center h-[36px] w-[100px] border border-[var(--zaplane-border-color)] bg-[var(--zaplane-background)] rounded-full">
         <svg className="animate-spin h-4 w-4 text-[#006BFF]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -108,9 +109,9 @@ const FolderCell = ({
     );
   }
   return <>
-    {selectedFolder ? <ZAPMenu items={menuItems} trigger={<div onClick={e => e.stopPropagation()} className="flex flex-row items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white group hover:border-[#D1D5DB] transition-all cursor-pointer max-w-[160px]">
-      <LuFolderOpen size={14} className="text-[#6B7280] shrink-0" />
-      <span className="text-[13px] font-semibold text-[#111827] truncate flex-[1]">
+    {selectedFolder ? <ZAPMenu items={menuItems} menuPlacement={menuPlacement} trigger={<div onClick={e => e.stopPropagation()} className="flex flex-row items-center gap-2 px-4 h-[36px] rounded-full border border-[var(--zaplane-border-color)] bg-[var(--zaplane-background)] group hover:border-[var(--zaplane-border-color)] transition-all cursor-pointer max-w-[160px]">
+      <LuFolderOpen size={14} className="text-[var(--zaplane-font-secondary-color)] shrink-0" />
+      <span className="text-[13px] font-semibold text-[var(--zaplane-font-color)] truncate flex-[1]">
         {selectedFolder.title}
       </span>
       <div
@@ -118,17 +119,17 @@ const FolderCell = ({
           e.stopPropagation();
           handleRemove();
         }}
-        className="flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-50 hover:bg-gray-100 shrink-0 transition-colors"
+        className="flex items-center justify-center w-[18px] h-[18px] rounded-full bg-[var(--zaplane-secondary-color)] hover:bg-[var(--zaplane-secondary-color)] shrink-0 transition-colors"
         title={__("Remove from folder", "zaplane")}
       >
-        <LuMinus size={11} className="text-[#6B7280]" />
+        <LuMinus size={11} className="text-[var(--zaplane-font-secondary-color)]" />
       </div>
-    </div>} /> : <ZAPMenu items={menuItems} trigger={<button
+    </div>} /> : <ZAPMenu items={menuItems} menuPlacement={menuPlacement} trigger={<button
       onClick={e => e.stopPropagation()}
-      className="flex items-center gap-2 px-4 h-[36px] rounded-full border border-[#E5E7EB] bg-white text-[13px] font-semibold text-[#374151] hover:bg-[#F9FAFB] hover:border-[#D1D5DB] transition-all"
+      className="flex items-center gap-2 px-4 h-[36px] rounded-full border border-[var(--zaplane-border-color)] bg-[var(--zaplane-background)] text-[13px] font-semibold text-[var(--zaplane-font-color)] hover:bg-[var(--zaplane-secondary-color)] hover:border-[var(--zaplane-border-color)] transition-all"
       aria-label={__("Add to folder", "zaplane")}
     >
-      <LuFolderOpen size={14} className="text-[#6B7280]" />
+      <LuFolderOpen size={14} className="text-[var(--zaplane-font-secondary-color)]" />
       {__("Add", "zaplane")}
     </button>} />}
 
@@ -149,13 +150,7 @@ const FolderCell = ({
           }
         }} autoFocus className="zaplane-input mb-5" />
 
-        <div className="flex flex-row items-center justify-end gap-3">
-          <button style={outlineBtn} onClick={() => {
-            setModalOpen(false);
-            setFolderName("");
-          }}>
-            {__("Cancel", "zaplane")}
-          </button>
+        <div className="flex flex-row items-center gap-3">
           <button style={primaryBtn} disabled={!folderName.trim()} onClick={handleCreateFolder}>
             {__("Create", "zaplane")}
           </button>

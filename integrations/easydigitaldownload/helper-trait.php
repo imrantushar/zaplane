@@ -1,5 +1,10 @@
 <?php
+
 namespace Zaplane\Integrations\Easydigitaldownload;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 trait HelperTrait {
 
@@ -80,6 +85,30 @@ trait HelperTrait {
 		}
 
 		return array_merge( [ $key => $id ], $extra );
+	}
+
+	/**
+	 * Looks up the customer_id for a given payment/order, since
+	 * edd_complete_purchase only fires with the payment ID and does not
+	 * pass the customer along.
+	 */
+	protected static function get_customer_id_for_payment( int $payment_id ): int {
+		if ( ! $payment_id ) {
+			return 0;
+		}
+
+		if ( function_exists( 'edd_get_payment' ) ) {
+			$payment = edd_get_payment( $payment_id );
+			if ( $payment && isset( $payment->customer_id ) ) {
+				return (int) $payment->customer_id;
+			}
+		}
+
+		if ( function_exists( 'edd_get_payment_customer_id' ) ) {
+			return (int) edd_get_payment_customer_id( $payment_id );
+		}
+
+		return 0;
 	}
 
 	protected static function build_payment_status_payload( $payment_id, string $new_status, string $old_status = '' ) {
@@ -246,7 +275,7 @@ trait HelperTrait {
 				}
 				$email = $customer->email ?? '';
 				$name = trim( (string) ( $customer->name ?? '' ) );
-					$label = '' !== $name ? $name : $email;
+				$label = '' !== $name ? $name : $email;
 				if ( '' === $label ) {
 					$label = 'Customer #' . $id;
 				}
@@ -320,7 +349,7 @@ trait HelperTrait {
 			if ( ! $id ) {
 				continue;
 			}
-				$label = ! empty( $user->display_name ) ? $user->display_name : ( $user->user_email ?? '' );
+			$label = ! empty( $user->display_name ) ? $user->display_name : ( $user->user_email ?? '' );
 			if ( '' === $label ) {
 				$label = 'User #' . $id;
 			}

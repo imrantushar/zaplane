@@ -231,6 +231,137 @@ class Paidmembershippro extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+
+		$user_data = [
+			'user_id'      => '42',
+			'first_name'   => 'Jane',
+			'last_name'    => 'Doe',
+			'user_login'   => 'janedoe',
+			'user_email'   => 'jane@example.com',
+			'display_name' => 'Jane Doe',
+			'nickname'     => 'janedoe',
+			'avatar_url'   => 'https://www.gravatar.com/avatar/0123456789abcdef?s=96&d=mm&r=g',
+			'user_roles'   => [ 'subscriber' ],
+			'role'         => 'subscriber',
+		];
+
+		$level_data = [
+			'id'                => '2',
+			'name'              => 'Gold',
+			'description'       => 'Gold membership level',
+			'confirmation'      => '',
+			'initial_payment'   => '99.00',
+			'billing_amount'    => '29.00',
+			'cycle_number'      => '1',
+			'cycle_period'      => 'Month',
+			'billing_limit'     => '0',
+			'trial_amount'      => '0.00',
+			'trial_limit'       => '0',
+			'allow_signups'     => '1',
+			'expiration_number' => '1',
+			'expiration_period' => 'Year',
+		];
+
+		$level_object = [
+			'id'                => 2,
+			'name'              => 'Gold',
+			'description'       => 'Gold membership level',
+			'initial_payment'   => '99.00',
+			'billing_amount'    => '29.00',
+			'cycle_number'      => 1,
+			'cycle_period'      => 'Month',
+			'billing_limit'     => 0,
+			'trial_amount'      => '0.00',
+			'trial_limit'       => 0,
+			'expiration_number' => 1,
+			'expiration_period' => 'Year',
+			'startdate'         => '2026-07-09 10:15:00',
+			'enddate'           => '2027-07-09 10:15:00',
+		];
+
+		$samples = [
+			'admin_assigns_membership' => [
+				'success' => true,
+				'data'    => array_merge(
+					$user_data,
+					$level_data,
+					[ 'membership_id' => 2 ]
+				),
+			],
+			'user_cancels_membership' => [
+				'success' => true,
+				'data'    => array_merge(
+					$user_data,
+					$level_data,
+					[ 'membership_id' => 2 ]
+				),
+			],
+			'user_purchases_membership' => [
+				'success' => true,
+				'data'    => array_merge(
+					$user_data,
+					[
+						'membership_id' => 2,
+						'membership'    => $level_object,
+					]
+				),
+			],
+			'user_membership_expires' => [
+				'success' => true,
+				'data'    => array_merge(
+					$user_data,
+					$level_data,
+					[ 'membership_id' => 2 ]
+				),
+			],
+			'membership_level_changed' => [
+				'success' => true,
+				'data'    => array_merge(
+					$user_data,
+					[
+						'old_level_data' => [ $level_object ],
+						'new_level_data' => [
+							array_merge( $level_object, [
+								'id' => 3,
+								'name' => 'Platinum'
+							] ),
+						],
+					]
+				),
+			],
+			'user_renews_expired_membership' => [
+				'success' => true,
+				'data'    => array_merge(
+					$user_data,
+					$level_data,
+					[ 'membership_id' => 2 ]
+				),
+			],
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'purchase' ) ) {
+			return $samples['user_purchases_membership'];
+		}
+
+		if ( false !== strpos( $event, 'level_changed' ) ) {
+			return $samples['membership_level_changed'];
+		}
+
+		return [
+			'success' => true,
+			'data'    => array_merge(
+				$user_data,
+				$level_data,
+				[ 'membership_id' => 2 ]
+			),
+		];
+	}
+
 	public static function get_actions(): array {
 		return [
 			'get_all_membership_levels' => [
@@ -591,16 +722,16 @@ class Paidmembershippro extends IntegrationBase {
 	}
 
 	private static function get_level_data( int $level_id ): array {
-        global $wpdb;
+		global $wpdb;
 
-        $level = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT * FROM {$wpdb->pmpro_membership_levels} WHERE id = %d LIMIT 1",
-                $level_id
-            ),
-            ARRAY_A
-        );
+		$level = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->pmpro_membership_levels} WHERE id = %d LIMIT 1",
+				$level_id
+			),
+			ARRAY_A
+		);
 
-        return $level ?: [ 'level_id' => $level_id ];
-    }
+		return $level ?: [ 'level_id' => $level_id ];
+	}
 }

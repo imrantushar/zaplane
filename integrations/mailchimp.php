@@ -1,4 +1,5 @@
 <?php
+
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
@@ -9,7 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Mailchimp extends IntegrationBase {
-
 
 	private const API_VERSION = '3.0';
 
@@ -22,7 +22,7 @@ class Mailchimp extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'mailchimp';
+		return 'mailchimp.svg';
 	}
 
 	public static function get_triggers(): array {
@@ -81,7 +81,7 @@ class Mailchimp extends IntegrationBase {
 			[
 				'key'         => 'email',
 				'label'       => 'Email Address',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'name@example.com or {{email}}',
 				'required'    => true,
 			],
@@ -206,6 +206,140 @@ class Mailchimp extends IntegrationBase {
 		return $payload;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$merges = [
+			'EMAIL' => 'jane@example.com',
+			'FNAME' => 'Jane',
+			'LNAME' => 'Doe',
+		];
+
+		$subscriber_data = [
+			'id'         => 'abc123def456',
+			'list_id'    => 'a6b5da1054',
+			'email'      => 'jane@example.com',
+			'email_type' => 'html',
+			'ip_opt'     => '203.0.113.10',
+			'ip_signup'  => '203.0.113.10',
+			'merges'     => $merges,
+		];
+
+		$base = [
+			'type'                  => 'subscribe',
+			'fired_at'              => '2026-07-09 10:15:00',
+			'data'                  => $subscriber_data,
+			'mailchimp_event'       => 'subscribe',
+			'mailchimp_event_name'  => 'subscribed',
+			'mailchimp_member_id'   => 'abc123def456',
+			'mailchimp_list_id'     => 'a6b5da1054',
+			'mailchimp_email'       => 'jane@example.com',
+			'mailchimp_old_email'   => '',
+			'mailchimp_new_email'   => 'jane@example.com',
+			'mailchimp_email_type'  => 'html',
+			'mailchimp_reason'      => '',
+			'mailchimp_action'      => '',
+			'mailchimp_campaign_id' => '',
+			'mailchimp_merges'      => $merges,
+		];
+
+		$samples = [
+			'subscribed'      => $base,
+			'unsubscribed'    => array_merge(
+				$base,
+				[
+					'type'                 => 'unsubscribe',
+					'mailchimp_event'      => 'unsubscribe',
+					'mailchimp_event_name' => 'unsubscribed',
+					'mailchimp_reason'     => 'manual',
+					'mailchimp_action'     => 'unsub',
+					'data'                 => array_merge(
+						$subscriber_data,
+						[
+							'action' => 'unsub',
+							'reason' => 'manual',
+						]
+					),
+				]
+			),
+			'profile_updated' => array_merge(
+				$base,
+				[
+					'type'                 => 'profile',
+					'mailchimp_event'      => 'profile',
+					'mailchimp_event_name' => 'profile_updated',
+				]
+			),
+			'cleaned'         => array_merge(
+				$base,
+				[
+					'type'                 => 'cleaned',
+					'mailchimp_event'      => 'cleaned',
+					'mailchimp_event_name' => 'cleaned',
+					'mailchimp_reason'     => 'hard',
+					'data'                 => [
+						'list_id' => 'a6b5da1054',
+						'email'   => 'jane@example.com',
+						'reason'  => 'hard',
+					],
+				]
+			),
+			'email_changed'   => array_merge(
+				$base,
+				[
+					'type'                 => 'upemail',
+					'mailchimp_event'      => 'upemail',
+					'mailchimp_event_name' => 'email_changed',
+					'mailchimp_member_id'  => 'newid789',
+					'mailchimp_old_email'  => 'jane@example.com',
+					'mailchimp_new_email'  => 'jane.new@example.com',
+					'mailchimp_email'      => '',
+					'mailchimp_merges'     => [],
+					'data'                 => [
+						'list_id'   => 'a6b5da1054',
+						'new_id'    => 'newid789',
+						'new_email' => 'jane.new@example.com',
+						'old_email' => 'jane@example.com',
+					],
+				]
+			),
+			'campaign_sent'   => array_merge(
+				$base,
+				[
+					'type'                  => 'campaign',
+					'mailchimp_event'       => 'campaign',
+					'mailchimp_event_name'  => 'campaign_sent',
+					'mailchimp_member_id'   => '',
+					'mailchimp_email'       => '',
+					'mailchimp_new_email'   => '',
+					'mailchimp_email_type'  => '',
+					'mailchimp_merges'      => [],
+					'mailchimp_campaign_id' => 'campaign_abc123',
+					'data'                  => [
+						'id'          => 'campaign_abc123',
+						'campaign_id' => 'campaign_abc123',
+						'subject'     => 'Our July Newsletter',
+						'status'      => 'sent',
+						'reason'      => 'completed',
+						'list_id'     => 'a6b5da1054',
+					],
+				]
+			),
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'campaign' ) ) {
+			return $samples['campaign_sent'];
+		}
+
+		if ( false !== strpos( $event, 'email' ) ) {
+			return $samples['email_changed'];
+		}
+
+		return $base;
+	}
+
 	public static function query_lists( $q ): array {
 		$q = is_array( $q ) ? $q : [];
 		$api_key = self::resolve_dynamic_api_key( $q );
@@ -246,12 +380,17 @@ class Mailchimp extends IntegrationBase {
 		return array_slice( $items, 0, $limit );
 	}
 
+	/**
+	 * Every action here authenticates with a Mailchimp API key, so this must be
+	 * true: the dashboard hides the Connections entry AND the node's connection
+	 * picker unless it is, which left every action running with no credentials.
+	 */
 	public static function requires_connection(): bool {
-		return false;
+		return true;
 	}
 
 	public static function get_auth_type(): string {
-		return 'none';
+		return 'api_key';
 	}
 
 	public static function get_auth_fields( $auth_type = null ): array {
@@ -299,8 +438,31 @@ class Mailchimp extends IntegrationBase {
 		return true;
 	}
 
+	public static function get_webhook_setup_fields(): array {
+		return [
+			[
+				'key'      => 'shared_secret',
+				'label'    => 'Shared Secret',
+				'type'     => 'password',
+				'generate' => true,
+				'help'     => 'Optional. When set, append ?secret=<value> to the callback URL you paste into Mailchimp; requests without it are rejected.',
+			],
+		];
+	}
+
+	/**
+	 * Mailchimp validates a webhook by GETting the callback URL once and
+	 * requiring a 200 before it will save it. It sends none of Meta's
+	 * hub.* parameters, so the inherited challenge handler rejected it with a
+	 * 403 and the webhook could never be created. An empty body is fine —
+	 * Mailchimp only looks at the status code.
+	 */
+	public static function verify_webhook_challenge( \WP_REST_Request $request ): ?string {
+		return '';
+	}
+
 	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
-		$secret = trim( (string) get_option( 'zaplane_mailchimp_webhook_secret', '' ) );
+		$secret = self::get_webhook_setting( 'shared_secret', 'zaplane_mailchimp_webhook_secret' );
 
 		if ( '' === $secret ) {
 			return true;
@@ -626,10 +788,10 @@ class Mailchimp extends IntegrationBase {
 		);
 
 		if ( $allow_empty ) {
-			array_unshift( $options, array(
+			array_unshift($options, array(
 				'value' => '',
 				'label' => 'Leave Unchanged'
-			) );
+			));
 		}
 
 		return $options;

@@ -41,7 +41,39 @@ trait QueryTrait {
 
 			$name     = trim( "{$first} {$last}" );
 			$label    = $name !== '' ? "{$name} ({$email})" : $email;
-			$result[] = [ 'value' => $id, 'label' => $label ];
+			$result[] = [
+				'value' => $id,
+				'label' => $label
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Returns Zaplane's own email templates for the "Use saved template"
+	 * dropdown. Newest first; search narrows by title. These are designed with
+	 * the drag-and-drop builder on the Zaplane Email Templates page.
+	 */
+	public static function query_email_templates( $q = null ): array {
+		if ( ! class_exists( \Zaplane\Models\EmailTemplate::class ) ) {
+			return [];
+		}
+
+		$query = \Zaplane\Models\EmailTemplate::orderBy( 'updated_at', 'desc' );
+
+		if ( ! empty( $q['search'] ?? '' ) ) {
+			$query = $query->where( 'title', 'like', '%' . $q['search'] . '%' );
+		}
+
+		$result = [];
+
+		foreach ( $query->forPage( 1, 50 )->get() as $template ) {
+			$title    = (string) $template->title;
+			$result[] = [
+				'value' => (int) $template->id,
+				'label' => '' !== $title ? $title : sprintf( '#%d', $template->id ),
+			];
 		}
 
 		return $result;
@@ -72,7 +104,10 @@ trait QueryTrait {
 			$name = $item['title'] ?? '';
 
 			if ( $id ) {
-				$result[] = [ 'value' => $id, 'label' => $name ];
+				$result[] = [
+					'value' => $id,
+					'label' => $name
+				];
 			}
 		}
 
@@ -104,7 +139,45 @@ trait QueryTrait {
 			$name = $item['title'] ?? '';
 
 			if ( $id ) {
-				$result[] = [ 'value' => $id, 'label' => $name ];
+				$result[] = [
+					'value' => $id,
+					'label' => $name
+				];
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Returns the latest 10 email sequences by default; search narrows results.
+	 */
+	public static function query_sequences( $q = null ): array {
+		if ( ! class_exists( \GemCrmPro\Database\Models\EmailSequence::class ) ) {
+			return [];
+		}
+
+		$params = [
+			'per_page' => 10,
+			'page'     => 1,
+		];
+
+		if ( ! empty( $q['search'] ?? '' ) ) {
+			$params['search'] = $q['search'];
+		}
+
+		$items  = \GemCrmPro\Database\Models\EmailSequence::index( $params, null );
+		$result = [];
+
+		foreach ( (array) ( $items['records'] ?? $items ) as $item ) {
+			$id   = $item['id'] ?? null;
+			$name = $item['title'] ?? $item['name'] ?? '';
+
+			if ( $id ) {
+				$result[] = [
+					'value' => $id,
+					'label' => $name
+				];
 			}
 		}
 
@@ -136,7 +209,10 @@ trait QueryTrait {
 			$name = $item['title'] ?? $item['name'] ?? '';
 
 			if ( $id ) {
-				$result[] = [ 'value' => $id, 'label' => $name ];
+				$result[] = [
+					'value' => $id,
+					'label' => $name
+				];
 			}
 		}
 

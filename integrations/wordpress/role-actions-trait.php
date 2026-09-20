@@ -3,6 +3,10 @@ namespace Zaplane\Integrations\Wordpress;
 
 use Zaplane\Traits\ActionResponseTrait;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait RoleActionsTrait {
 
 	private static function resolve_role_key_from_config( array $config, bool $require_existing = true ): string {
@@ -19,8 +23,21 @@ trait RoleActionsTrait {
 	}
 
 	private static function resolve_user( array $config ) {
-		$user = get_userdata( (int) ( $config['user_id'] ?? 0 ) );
-		return $user ? $user : null;
+		$user_id = (int) ( $config['user_id'] ?? 0 );
+		if ( ! $user_id ) {
+			return null;
+		}
+		$user = get_userdata( $user_id );
+		if ( ! $user ) {
+			return null;
+		}
+		// Role-mutation actions call $user->add_role()/remove_role()/set_role().
+		// Some test environments mock get_userdata as a bare stdClass that lacks
+		// these methods — fall back to a real WP_User instance in that case.
+		if ( ! method_exists( $user, 'add_role' ) && class_exists( '\WP_User' ) ) {
+			$user = new \WP_User( $user_id );
+		}
+		return $user;
 	}
 
 	private static function require_role_from_config( array $config, string &$error = '' ) {

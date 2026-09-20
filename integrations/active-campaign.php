@@ -1,4 +1,5 @@
 <?php
+
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\ConnectionManager;
@@ -9,7 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class ActiveCampaign extends IntegrationBase {
-
 
 	private const LIST_STATUSES = [
 		'subscribed'   => '1',
@@ -32,15 +32,15 @@ class ActiveCampaign extends IntegrationBase {
 		return [
 			'form_submitted' => [
 				'label' => 'Form Submitted',
-				'hook'  => 'wp_loaded',
+				'hook'  => 'activecampaign_webhook_form_submitted',
 			],
 			'contact_subscribed' => [
 				'label' => 'Contact Subscribed',
-				'hook'  => 'wp_loaded',
+				'hook'  => 'activecampaign_webhook_contact_subscribed',
 			],
 			'contact_unsubscribed' => [
 				'label' => 'Contact Unsubscribed',
-				'hook'  => 'wp_loaded',
+				'hook'  => 'activecampaign_webhook_contact_unsubscribed',
 			],
 		];
 	}
@@ -61,6 +61,7 @@ class ActiveCampaign extends IntegrationBase {
 				'key'      => 'form_id',
 				'label'    => 'Form',
 				'type'     => 'select',
+				'required' => true,
 				'dynamic'  => [
 					'integration' => 'activecampaign',
 					'query'       => 'forms',
@@ -71,8 +72,9 @@ class ActiveCampaign extends IntegrationBase {
 			[
 				'key'         => 'email',
 				'label'       => 'Contact Email',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'name@example.com',
+				'required' => true,
 				'help'        => 'Optional. Only continue when the submitted contact email matches this value.',
 			],
 		];
@@ -95,7 +97,7 @@ class ActiveCampaign extends IntegrationBase {
 			[
 				'key'         => 'email',
 				'label'       => 'Email Address',
-				'type'        => 'text',
+				'type'        => 'email',
 				'placeholder' => 'name@example.com or {{email}}',
 				'required'    => true,
 			],
@@ -197,7 +199,7 @@ class ActiveCampaign extends IntegrationBase {
 						],
 					]
 				);
-		}//end switch
+		} //end switch
 
 		return [];
 	}
@@ -211,15 +213,125 @@ class ActiveCampaign extends IntegrationBase {
 		];
 	}
 
+	/**
+	 * ActiveCampaign delivers events to a callback URL registered under
+	 * Settings → Developer → Webhooks.
+	 *
+	 * These triggers previously hung off `wp_loaded` and scraped $_POST when the
+	 * request happened to be aimed at the ActiveCampaign plugin's legacy
+	 * form_process.php. That fired a handler on every single request (admin,
+	 * REST and cron included) and only ever matched if the site still used that
+	 * endpoint — sites posting straight to <account>.activehosted.com never
+	 * triggered at all.
+	 */
 	public static function supports_webhook(): bool {
-		return false;
+		return true;
+	}
+
+	public static function get_webhook_setup_fields(): array {
+		return [
+			[
+				'key'      => 'shared_secret',
+				'label'    => 'Shared Secret',
+				'type'     => 'password',
+				'generate' => true,
+				'help'     => 'Optional. When set, append ?secret=<value> to the callback URL you register in ActiveCampaign; requests without it are rejected.',
+			],
+		];
+	}
+
+	public static function verify_webhook_signature( \WP_REST_Request $request ): bool {
+		$secret = self::get_webhook_setting( 'shared_secret' );
+
+		if ( '' === $secret ) {
+			return true;
+		}
+
+		$provided = trim( (string) ( $request->get_param( 'secret' ) ?: $request->get_header( 'x-zaplane-secret' ) ) );
+
+		return '' !== $provided && hash_equals( $secret, $provided );
+	}
+
+	/**
+	 * Normalise an ActiveCampaign webhook (form-encoded, contact[...] nesting)
+	 * into the payload shape resolve_trigger() already consumes.
+	 */
+	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
+		$body = $request->get_body_params();
+
+		if ( empty( $body ) ) {
+			$raw = (string) $request->get_body();
+			if ( '' !== $raw ) {
+				parse_str( $raw, $body );
+			}
+		}
+
+		if ( empty( $body ) ) {
+			$json = $request->get_json_params();
+			$body = is_array( $json ) ? $json : [];
+		}
+
+		if ( ! is_array( $body ) || empty( $body ) ) {
+			return null;
+		}
+
+		$type = strtolower( trim( (string) ( $body['type'] ?? '' ) ) );
+
+		$map = [
+			'subscribe'   => 'contact_subscribed',
+			'unsubscribe' => 'contact_unsubscribed',
+			'forward'     => 'form_submitted',
+		];
+
+		// A `subscribe` carrying a form id is a form submission as well; emit the
+		// more specific event so both trigger types stay usable.
+		$form_id = trim( (string) ( $body['form'] ?? '' ) );
+		$event   = $map[ $type ] ?? null;
+
+		if ( 'subscribe' === $type && '' !== $form_id ) {
+			$event = 'form_submitted';
+		}
+
+		if ( null === $event ) {
+			return null;
+		}
+
+		$contact = is_array( $body['contact'] ?? null ) ? $body['contact'] : [];
+		$lists   = [];
+
+		foreach ( (array) ( $body['list'] ?? [] ) as $list_id ) {
+			$list_id = trim( (string) $list_id );
+			if ( '' !== $list_id ) {
+				$lists[] = [ 'id' => $list_id ];
+			}
+		}
+
+		if ( empty( $lists ) && ! empty( $body['list'] ) && is_scalar( $body['list'] ) ) {
+			$lists[] = [ 'id' => trim( (string) $body['list'] ) ];
+		}
+
+		return [
+			'event'   => $event,
+			'payload' => [
+				'form'    => [ 'id' => $form_id ],
+				'action'  => 'unsubscribe' === $type ? 'unsub' : 'sub',
+				'type'    => $type,
+				'contact' => [
+					'id'         => (string) ( $contact['id'] ?? '' ),
+					'email'      => sanitize_email( (string) ( $contact['email'] ?? '' ) ),
+					'first_name' => (string) ( $contact['first_name'] ?? '' ),
+					'last_name'  => (string) ( $contact['last_name'] ?? '' ),
+					'phone'      => (string) ( $contact['phone'] ?? '' ),
+					'fields'     => is_array( $contact['fields'] ?? null ) ? $contact['fields'] : [],
+				],
+				'lists'   => $lists,
+				'message' => (string) ( $body['message'] ?? '' ),
+			],
+		];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
 		$payload = self::normalize_trigger_payload( $args[0] ?? null );
-		if ( null === $payload ) {
-			$payload = self::capture_form_process_payload();
-		}
 
 		if ( ! is_array( $payload ) || empty( $payload ) ) {
 			return false;
@@ -267,6 +379,57 @@ class ActiveCampaign extends IntegrationBase {
 		];
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$contact = [
+			'id'         => '318',
+			'email'      => 'jane.doe@example.com',
+			'first_name' => 'Jane',
+			'last_name'  => 'Doe',
+			'phone'      => '+12025550143',
+			'fields'     => [ '1' => 'VIP' ],
+		];
+
+		$lists = [
+			[ 'id' => '12' ],
+			[ 'id' => '15' ],
+		];
+
+		$build = static function ( string $event, string $action ) use ( $contact, $lists ): array {
+			return [
+				'event'   => $event,
+				'form_id' => '7',
+				'action'  => $action,
+				'contact' => $contact,
+				'lists'   => $lists,
+				'message' => '',
+				'raw'     => [
+					'form'    => [ 'id' => '7' ],
+					'action'  => $action,
+					'sync'    => 1,
+					'contact' => $contact,
+					'lists'   => $lists,
+					'message' => '',
+				],
+			];
+		};
+
+		$samples = [
+			'form_submitted'       => $build( 'form_submitted', 'sub' ),
+			'contact_subscribed'   => $build( 'contact_subscribed', 'sub' ),
+			'contact_unsubscribed' => $build( 'contact_unsubscribed', 'unsub' ),
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( false !== strpos( $event, 'unsub' ) ) {
+			return $build( $event, 'unsub' );
+		}
+
+		return $build( '' !== $event ? $event : 'form_submitted', 'sub' );
+	}
+
 	public static function execute_node( array $node, array $input ): array {
 		$action      = self::resolve_event( $node );
 		$credentials = self::resolve_node_credentials( $node );
@@ -282,17 +445,23 @@ class ActiveCampaign extends IntegrationBase {
 				return self::run_remove_tag_from_contact( $node, $input, $credentials );
 			case 'add_contact_to_automation':
 				return self::run_add_contact_to_automation( $node, $input, $credentials );
-		}//end switch
+		} //end switch
 
 		throw new \Exception( 'ActiveCampaign action type is missing or unsupported' );
 	}
 
+	/**
+	 * Actions here need an API URL + key, so this must be true: the dashboard
+	 * hides both the Connections entry and the node's connection picker unless
+	 * it is, which left every action falling back to the ActiveCampaign
+	 * plugin's own option and throwing when that plugin wasn't installed.
+	 */
 	public static function requires_connection(): bool {
-		return false;
+		return true;
 	}
 
 	public static function get_auth_type(): string {
-		return 'none';
+		return 'api_key';
 	}
 
 	public static function get_auth_fields( ?string $auth_type = null ): array {
@@ -315,7 +484,7 @@ class ActiveCampaign extends IntegrationBase {
 
 	public static function test_connection( array $credentials ): array {
 		try {
-			[ $body, $status ] = self::activecampaign_request( 'GET', 'users/me', self::normalize_credentials( $credentials ) );
+			[$body, $status] = self::activecampaign_request( 'GET', 'users/me', self::normalize_credentials( $credentials ) );
 		} catch ( \Throwable $e ) {
 			return [
 				'success' => false,
@@ -336,7 +505,7 @@ class ActiveCampaign extends IntegrationBase {
 	}
 
 	public static function query_lists( $q ): array {
-		return self::query_collection( $q, 'lists', 'lists', static function ( array $item ): ?array {
+		return self::query_collection($q, 'lists', 'lists', static function ( array $item ): ?array {
 			$id = (string) ( $item['id'] ?? '' );
 			if ( '' === $id ) {
 				return null;
@@ -346,11 +515,11 @@ class ActiveCampaign extends IntegrationBase {
 				'id'   => $id,
 				'name' => (string) ( $item['name'] ?? $id ),
 			];
-		} );
+		});
 	}
 
 	public static function query_tags( $q ): array {
-		return self::query_collection( $q, 'tags', 'tags', static function ( array $item ): ?array {
+		return self::query_collection($q, 'tags', 'tags', static function ( array $item ): ?array {
 			$id = (string) ( $item['id'] ?? '' );
 			if ( '' === $id ) {
 				return null;
@@ -360,11 +529,11 @@ class ActiveCampaign extends IntegrationBase {
 				'id'   => $id,
 				'name' => (string) ( $item['tag'] ?? $item['name'] ?? $id ),
 			];
-		} );
+		});
 	}
 
 	public static function query_automations( $q ): array {
-		return self::query_collection( $q, 'automations', 'automations', static function ( array $item ): ?array {
+		return self::query_collection($q, 'automations', 'automations', static function ( array $item ): ?array {
 			$id = (string) ( $item['id'] ?? '' );
 			if ( '' === $id ) {
 				return null;
@@ -374,11 +543,11 @@ class ActiveCampaign extends IntegrationBase {
 				'id'   => $id,
 				'name' => (string) ( $item['name'] ?? $id ),
 			];
-		} );
+		});
 	}
 
 	public static function query_forms( $q ): array {
-		return self::query_collection( $q, 'forms', 'forms', static function ( array $item ): ?array {
+		return self::query_collection($q, 'forms', 'forms', static function ( array $item ): ?array {
 			$id = (string) ( $item['id'] ?? '' );
 			if ( '' === $id ) {
 				return null;
@@ -388,7 +557,7 @@ class ActiveCampaign extends IntegrationBase {
 				'id'   => $id,
 				'name' => (string) ( $item['name'] ?? $id ),
 			];
-		} );
+		});
 	}
 
 	private static function run_upsert_contact( array $node, array $input, array $credentials ): array {
@@ -416,7 +585,7 @@ class ActiveCampaign extends IntegrationBase {
 			throw new \Exception( 'ActiveCampaign list ID is required' );
 		}
 
-		[ $response ] = self::activecampaign_request(
+		[$response] = self::activecampaign_request(
 			'POST',
 			'contactLists',
 			$credentials,
@@ -453,7 +622,7 @@ class ActiveCampaign extends IntegrationBase {
 			throw new \Exception( 'ActiveCampaign tag ID is required' );
 		}
 
-		[ $response ] = self::activecampaign_request(
+		[$response] = self::activecampaign_request(
 			'POST',
 			'contactTags',
 			$credentials,
@@ -525,7 +694,7 @@ class ActiveCampaign extends IntegrationBase {
 			throw new \Exception( 'ActiveCampaign automation ID is required' );
 		}
 
-		[ $response ] = self::activecampaign_request(
+		[$response] = self::activecampaign_request(
 			'POST',
 			'contactAutomations',
 			$credentials,
@@ -575,7 +744,7 @@ class ActiveCampaign extends IntegrationBase {
 			$contact['phone'] = $phone;
 		}
 
-		[ $response ] = self::activecampaign_request(
+		[$response] = self::activecampaign_request(
 			'POST',
 			'contact/sync',
 			$credentials,
@@ -591,7 +760,7 @@ class ActiveCampaign extends IntegrationBase {
 	}
 
 	private static function find_contact_tag_id( string $contact_id, string $tag_id, array $credentials ): string {
-		[ $response ] = self::activecampaign_request( 'GET', 'contacts/' . rawurlencode( $contact_id ) . '/contactTags', $credentials );
+		[$response] = self::activecampaign_request( 'GET', 'contacts/' . rawurlencode( $contact_id ) . '/contactTags', $credentials );
 		$items = $response['contactTags'] ?? [];
 
 		foreach ( $items as $item ) {
@@ -621,11 +790,11 @@ class ActiveCampaign extends IntegrationBase {
 			$args['body'] = wp_json_encode( $body );
 		}
 
-		[ $response_body, $status ] = self::http_request( $method, $url, $args );
+		[$response_body, $status] = self::http_request( $method, $url, $args );
 
 		if ( $status >= 400 ) {
 			$message = self::extract_api_error( $response_body );
-			throw new \Exception( 'ActiveCampaign API error: ' . $message );
+			throw new \Exception( 'ActiveCampaign API error: ' . esc_html( $message ) );
 		}
 
 		return [ $response_body, $status ];
@@ -642,7 +811,7 @@ class ActiveCampaign extends IntegrationBase {
 		$limit  = self::normalize_dynamic_limit( is_array( $q ) ? $q : [] );
 
 		try {
-			[ $response ] = self::activecampaign_request( 'GET', $path, $credentials );
+			[$response] = self::activecampaign_request( 'GET', $path, $credentials );
 		} catch ( \Throwable $e ) {
 			return [];
 		}
@@ -677,10 +846,10 @@ class ActiveCampaign extends IntegrationBase {
 			$api_key = trim( (string) ( $credentials['api_key'] ?? '' ) );
 
 			if ( '' !== $api_url && '' !== $api_key ) {
-				return self::normalize_credentials( [
+				return self::normalize_credentials([
 					'api_url' => $api_url,
 					'api_key' => $api_key,
-				] );
+				]);
 			}
 		}
 
@@ -692,10 +861,10 @@ class ActiveCampaign extends IntegrationBase {
 			throw new \Exception( 'ActiveCampaign credentials not found. Save them in the ActiveCampaign plugin settings or create a Zaplane connection.' );
 		}
 
-		return self::normalize_credentials( [
+		return self::normalize_credentials([
 			'api_url' => $api_url,
 			'api_key' => $api_key,
-		] );
+		]);
 	}
 
 	private static function normalize_credentials( array $credentials ): array {
@@ -728,10 +897,10 @@ class ActiveCampaign extends IntegrationBase {
 		}
 
 		if ( '' !== $api_url && '' !== $api_key ) {
-			return self::normalize_credentials( [
+			return self::normalize_credentials([
 				'api_url' => $api_url,
 				'api_key' => $api_key,
-			] );
+			]);
 		}
 
 		$connection_id = $q['connection_id'] ?? null;
@@ -813,90 +982,9 @@ class ActiveCampaign extends IntegrationBase {
 		return is_array( $payload ) && ! empty( $payload ) ? $payload : null;
 	}
 
-	private static function capture_form_process_payload(): ?array {
-		if ( 'POST' !== strtoupper( (string) ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ) {
-			return null;
-		}
 
-		$request_uri  = (string) ( $_SERVER['REQUEST_URI'] ?? '' );
-		$request_path = (string) parse_url( $request_uri, PHP_URL_PATH );
-		if ( '' === $request_path || ! preg_match( '#/activecampaign-subscription-forms/form_process\.php$#', $request_path ) ) {
-			return null;
-		}
 
-		$form_id = trim( (string) ( $_POST['f'] ?? '' ) );
-		$email   = sanitize_email( (string) ( $_POST['email'] ?? '' ) );
-		$lists   = self::normalize_request_lists( $_POST['nlbox'] ?? [] );
 
-		if ( '' === $form_id || '' === $email || empty( $lists ) ) {
-			return null;
-		}
-
-		$action     = self::normalize_request_action();
-		$names      = self::resolve_request_names();
-		$phone      = trim( (string) ( $_POST['phone'] ?? '' ) );
-		$fields     = isset( $_POST['field'] ) && is_array( $_POST['field'] ) ? $_POST['field'] : [];
-		$sync_value = isset( $_GET['sync'] ) ? (int) $_GET['sync'] : 0;
-
-		return [
-			'form'    => [
-				'id' => $form_id,
-			],
-			'action'  => $action,
-			'sync'    => $sync_value,
-			'contact' => [
-				'id'         => '',
-				'email'      => $email,
-				'first_name' => $names['first_name'],
-				'last_name'  => $names['last_name'],
-				'phone'      => $phone,
-				'fields'     => $fields,
-			],
-			'lists'   => $lists,
-			'message' => '',
-		];
-	}
-
-	private static function normalize_request_lists( $lists ): array {
-		if ( ! is_array( $lists ) ) {
-			return [];
-		}
-
-		$normalized = [];
-		foreach ( $lists as $list_id ) {
-			$list_id = trim( (string) $list_id );
-			if ( '' === $list_id ) {
-				continue;
-			}
-			$normalized[] = [ 'id' => $list_id ];
-		}
-
-		return $normalized;
-	}
-
-	private static function normalize_request_action(): string {
-		$action = (string) ( $_POST['act_radio'] ?? $_POST['act'] ?? 'sub' );
-		return 'unsub' === $action ? 'unsub' : 'sub';
-	}
-
-	private static function resolve_request_names(): array {
-		$full_name = trim( (string) ( $_POST['fullname'] ?? '' ) );
-		if ( '' !== $full_name ) {
-			$parts      = preg_split( '/\s+/', $full_name );
-			$first_name = (string) array_shift( $parts );
-			$last_name  = implode( ' ', $parts );
-
-			return [
-				'first_name' => $first_name,
-				'last_name'  => $last_name,
-			];
-		}
-
-		return [
-			'first_name' => trim( (string) ( $_POST['firstname'] ?? $_POST['first_name'] ?? '' ) ),
-			'last_name'  => trim( (string) ( $_POST['lastname'] ?? $_POST['last_name'] ?? '' ) ),
-		];
-	}
 
 	private static function matches_trigger_event( string $event, array $payload ): bool {
 		$action = (string) ( $payload['action'] ?? '' );

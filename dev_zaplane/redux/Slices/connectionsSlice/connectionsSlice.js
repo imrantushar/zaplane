@@ -45,11 +45,12 @@ export const fetchAuthFields = createAsyncThunk(
 // Initialize OAuth flow
 export const initOAuth = createAsyncThunk(
   'connections/initOAuth',
-  async ({ app, name, credentials }, thunkAPI) => {
+  async ({ app, name, icon, credentials }, thunkAPI) => {
     try {
       const res = await API.post(namespace + 'connections/oauth/init', {
         app,
         name,
+        icon,
         credentials,
       });
       return res.data;
@@ -74,7 +75,7 @@ export const createTokenConnection = createAsyncThunk(
 
       handleSliceSuccess(
         thunkAPI,
-        res.data?.test_result?.message || __('Connection created', 'workflow')
+        res.data?.test_result?.message || __('Connection created', 'zaplane')
       );
 
       return res.data;
@@ -93,7 +94,7 @@ export const testConnection = createAsyncThunk(
 
       handleSliceSuccess(
         thunkAPI,
-        res.data?.message || __('Connection successful', 'workflow')
+        res.data?.message || __('Connection successful', 'zaplane')
       );
 
       return {
@@ -115,7 +116,7 @@ export const deleteConnection = createAsyncThunk(
       thunkAPI.dispatch(
         showNotification({
           type: 'success',
-          message: __('Connection deleted', 'workflow'),
+          message: __('Connection deleted', 'zaplane'),
         })
       );
       return connectionId;
@@ -149,7 +150,7 @@ export const updateConnection = createAsyncThunk(
 
       handleSliceSuccess(
         thunkAPI,
-        __('Connection updated successfully', 'workflow')
+        __('Connection updated successfully', 'zaplane')
       );
 
       return res.data;

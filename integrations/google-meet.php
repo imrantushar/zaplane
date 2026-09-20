@@ -95,7 +95,7 @@ class GoogleMeet extends IntegrationBase {
 				],
 				[
 					'key'         => 'attendees',
-					'type'        => 'text',
+					'type'        => 'email',
 					'label'       => 'Attendees',
 					'placeholder' => 'alice@example.com,bob@example.com',
 					'required'    => false,
@@ -107,13 +107,19 @@ class GoogleMeet extends IntegrationBase {
 					'label'    => 'Send Invites to Attendees',
 					'required' => false,
 					'options'  => [
-						[ 'value' => 'true',  'label' => 'Yes' ],
-						[ 'value' => 'false', 'label' => 'No' ],
+						[
+							'value' => 'true',
+							'label' => 'Yes'
+						],
+						[
+							'value' => 'false',
+							'label' => 'No'
+						],
 					],
 				],
 				$calendar_field,
 			];
-		}
+		}//end if
 
 		if ( 'update_meeting' === $action ) {
 			return [
@@ -171,7 +177,7 @@ class GoogleMeet extends IntegrationBase {
 				],
 				$calendar_field,
 			];
-		}
+		}//end if
 
 		if ( 'cancel_meeting' === $action ) {
 			return [
@@ -189,13 +195,19 @@ class GoogleMeet extends IntegrationBase {
 					'label'    => 'Notify Attendees',
 					'required' => false,
 					'options'  => [
-						[ 'value' => 'true',  'label' => 'Yes — send cancellation emails' ],
-						[ 'value' => 'false', 'label' => 'No' ],
+						[
+							'value' => 'true',
+							'label' => 'Yes — send cancellation emails'
+						],
+						[
+							'value' => 'false',
+							'label' => 'No'
+						],
 					],
 				],
 				$calendar_field,
 			];
-		}
+		}//end if
 
 		if ( 'create_space' === $action ) {
 			return [
@@ -205,15 +217,27 @@ class GoogleMeet extends IntegrationBase {
 					'label'    => 'Access Type',
 					'required' => false,
 					'options'  => [
-						[ 'value' => '',             'label' => 'Default' ],
-						[ 'value' => 'OPEN',         'label' => 'Open — anyone with the link' ],
-						[ 'value' => 'TRUSTED',      'label' => 'Trusted — organisation members' ],
-						[ 'value' => 'RESTRICTED',   'label' => 'Restricted — invited members only' ],
+						[
+							'value' => '',
+							'label' => 'Default'
+						],
+						[
+							'value' => 'OPEN',
+							'label' => 'Open — anyone with the link'
+						],
+						[
+							'value' => 'TRUSTED',
+							'label' => 'Trusted — organisation members'
+						],
+						[
+							'value' => 'RESTRICTED',
+							'label' => 'Restricted — invited members only'
+						],
 					],
 					'help' => 'Who can join this Meet space.',
 				],
 			];
-		}
+		}//end if
 
 		if ( 'end_conference' === $action ) {
 			return [
@@ -288,7 +312,7 @@ class GoogleMeet extends IntegrationBase {
 			'client_id'     => [
 				'type'        => 'text',
 				'label'       => 'Client ID',
-				'placeholder' => 'xxxx.apps.googleusercontent.com',
+				'placeholder' => 'Your OAuth 2.0 client ID',
 				'required'    => true,
 				'help'        => 'From Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs.',
 			],
@@ -362,6 +386,28 @@ class GoogleMeet extends IntegrationBase {
 			'expires_in'    => $body['expires_in'] ?? 3600,
 			'token_type'    => $body['token_type'] ?? 'Bearer',
 			'scope'         => $body['scope'] ?? '',
+		];
+	}
+
+	public static function refresh_oauth_token( array $credentials ): array {
+		$response = wp_remote_post( 'https://oauth2.googleapis.com/token', [
+			'body' => [
+				'refresh_token' => $credentials['refresh_token'] ?? '',
+				'client_id'     => $credentials['client_id'] ?? '',
+				'client_secret' => $credentials['client_secret'] ?? '',
+				'grant_type'    => 'refresh_token',
+			],
+		] );
+
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( isset( $body['error'] ) ) {
+			throw new \Exception( esc_html( (string) ( $body['error_description'] ?? $body['error'] ) ) );
+		}
+
+		return [
+			'access_token' => $body['access_token'],
+			'expires_in'   => $body['expires_in'] ?? 3600,
 		];
 	}
 
@@ -449,8 +495,6 @@ class GoogleMeet extends IntegrationBase {
 		return $result;
 	}
 
-	// ── Private action helpers ────────────────────────────────────────────────
-
 	private static function action_create_meeting( array $node, array $input, string $token ): array {
 		$config   = $node['data']['config'] ?? [];
 		$summary  = $config['summary'] ?? '';
@@ -475,17 +519,23 @@ class GoogleMeet extends IntegrationBase {
 
 		$body = [
 			'summary' => $summary,
-			'start'   => [ 'dateTime' => $start_dt, 'timeZone' => $timezone ],
-			'end'     => [ 'dateTime' => $end_dt,   'timeZone' => $timezone ],
+			'start'   => [
+				'dateTime' => $start_dt,
+				'timeZone' => $timezone
+			],
+			'end'     => [
+				'dateTime' => $end_dt,
+				'timeZone' => $timezone
+			],
 			'conferenceData' => [
 				'createRequest' => [
 					'requestId'             => sprintf(
 						'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-						mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
-						mt_rand( 0, 0xffff ),
-						mt_rand( 0, 0x0fff ) | 0x4000,
-						mt_rand( 0, 0x3fff ) | 0x8000,
-						mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
+						wp_rand( 0, 0xffff ), wp_rand( 0, 0xffff ),
+						wp_rand( 0, 0xffff ),
+						wp_rand( 0, 0x0fff ) | 0x4000,
+						wp_rand( 0, 0x3fff ) | 0x8000,
+						wp_rand( 0, 0xffff ), wp_rand( 0, 0xffff ), wp_rand( 0, 0xffff )
 					),
 					'conferenceSolutionKey' => [ 'type' => 'hangoutsMeet' ],
 				],
@@ -558,11 +608,17 @@ class GoogleMeet extends IntegrationBase {
 		}
 
 		if ( ! empty( $config['start_datetime'] ) ) {
-			$body['start'] = [ 'dateTime' => $config['start_datetime'], 'timeZone' => $timezone ];
+			$body['start'] = [
+				'dateTime' => $config['start_datetime'],
+				'timeZone' => $timezone
+			];
 		}
 
 		if ( ! empty( $config['end_datetime'] ) ) {
-			$body['end'] = [ 'dateTime' => $config['end_datetime'], 'timeZone' => $timezone ];
+			$body['end'] = [
+				'dateTime' => $config['end_datetime'],
+				'timeZone' => $timezone
+			];
 		}
 
 		if ( ! empty( $config['attendees'] ) ) {
@@ -664,13 +720,6 @@ class GoogleMeet extends IntegrationBase {
 		];
 	}
 
-	// ── Internal utility ─────────────────────────────────────────────────────
-
-	/**
-	 * Make an authenticated request to a Google API endpoint.
-	 *
-	 * @throws \Exception on WP_Error or API error response.
-	 */
 	private static function google_request( string $token, string $method, string $url, array $body = [] ): array {
 		$args = [
 			'headers' => [

@@ -298,10 +298,6 @@ abstract class AbstractRequestHandler {
 
 
 	protected function maybe_decode( $value, string $type ) {
-		if ( in_array( $type, [ 'serialize', 'unserialize', 'php' ], true ) ) {
-			return maybe_unserialize( $value );
-		}
-
 		if ( in_array( $type, [ 'json', 'array', 'object' ], true ) ) {
 			if ( is_string( $value ) && ( str_starts_with( $value, '[' ) || str_starts_with( $value, '{' ) ) ) {
 				return json_decode( $value, 'array' === $type );

@@ -9,9 +9,19 @@ import CustomTableMessage from "@ZAPComponents/Oops/CustomTableMessage";
 import './styles.scss';
 import RecipesSkeleton from "@ZAPComponents/ZaplaneLoader/RecipesSkeletion";
 import PageLayout from "@ZAPComponents/PageLayout";
+import Search from "@ZAPComponents/Search";
+
+const TYPES = [
+  { value: "all", label: __("All", "zaplane") },
+  { value: "group", label: __("Group recipes", "zaplane") },
+  { value: "workflow", label: __("Single workflows", "zaplane") },
+];
+
 const RecipesPage = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [type, setType] = useState("all");
   const {
     recipes,
     loadingRecipes
@@ -19,11 +29,41 @@ const RecipesPage = () => {
   useEffect(() => {
     dispatch(getRecipes());
   }, [dispatch]);
-  return <PageLayout title="Recipes" isLoading={loadingRecipes} skeleton={RecipesSkeleton}>
-        {recipes?.length ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-start">
-            {recipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} />)}
+
+  const allRecipes = recipes || [];
+  const hasGroups = allRecipes.some(r => r.type === "group");
+  const ofType = type === "all" ? allRecipes : allRecipes.filter(r => (r.type || "workflow") === type);
+  // Group recipes first: one sets up several of the others at once.
+  const filteredRecipes = (searchTerm
+    ? ofType.filter(r => (r.name || r.title || "").toLowerCase().includes(searchTerm.toLowerCase()))
+    : ofType
+  ).slice().sort((a, b) => (b.type === "group") - (a.type === "group"));
+
+  return <PageLayout
+      title="Recipes"
+      isLoading={loadingRecipes}
+      skeleton={RecipesSkeleton}
+      actions={<Search placeholder={__("Search recipes...", "zaplane")} onSearchHandler={setSearchTerm} />}
+    >
+        {hasGroups && <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label={__("Recipe type", "zaplane")}>
+            {TYPES.map(option => <button
+                key={option.value}
+                type="button"
+                aria-pressed={type === option.value}
+                onClick={() => setType(option.value)}
+                className="rounded-full border px-3 py-1 text-[13px] font-medium transition-colors"
+                style={type === option.value
+                  ? { backgroundColor: "var(--zaplane-primary)", borderColor: "var(--zaplane-primary)", color: "#fff" }
+                  : { backgroundColor: "var(--zaplane-background)", borderColor: "var(--zaplane-border-color)", color: "var(--zaplane-font-color)" }}
+              >
+                {option.label}
+              </button>)}
+          </div>}
+
+        {filteredRecipes?.length ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} />)}
           </div> : <div>
-              <CustomTableMessage title={__('No Data Available!!!', 'zaplane')} subText={'Please, create data to see the available list here.'} />
+              <CustomTableMessage title={__('No recipes found', 'zaplane')} subText={searchTerm ? __('No recipes match your search.', 'zaplane') : __('Recipes you save will appear here.', 'zaplane')} />
             </div>}
 
         <CreateWorkflowModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

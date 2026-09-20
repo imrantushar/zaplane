@@ -50,14 +50,14 @@ const WhatsNew = () => {
           <path d="M8 6v8" />
         </g>
       </svg>
-      {__("What's New")}
+      {__("What's New", "zaplane")}
     </button>
   } title={__("What's New", "zaplane")} size="sm">
     <div>
       {whatsNewContent.map((entry, i) => (
-        <div key={i} className="border-b border-gray-100 last:border-b-0 pb-4 mb-4">
+        <div key={i} className="border-b border-[var(--zaplane-border-color)] last:border-b-0 pb-4 mb-4">
           <div className="flex items-center gap-[8px] mb-[10px]">
-            <span style={{textTransform:'uppercase', letterSpacing:'0.06em'}} className="text-[11px] m-0 font-[500] text-gray-400">{entry.age}</span>
+            <span style={{textTransform:'uppercase', letterSpacing:'0.06em'}} className="text-[11px] m-0 font-[500] text-[var(--zaplane-text-muted)]">{entry.age}</span>
             <div className="w-[4px] h-[4px] bg-gray-300 rounded-full" />
             <span style={{color:'var(--zaplane-primary)'}} className="text-[11px] font-[600] px-[8px] py-[2px] rounded-full">{entry.version}</span>
           </div>
@@ -66,17 +66,17 @@ const WhatsNew = () => {
 
           {entry.sections.map((section, si) => (
             <div key={si}>
-              <div style={{textTransform:'uppercase', letterSpacing:'0.08em'}} className="flex items-center mt-[16px] mb-[8px] text-[11px] font-[600] text-gray-400 gap-[6px]">
+              <div style={{textTransform:'uppercase', letterSpacing:'0.08em'}} className="flex items-center mt-[16px] mb-[8px] text-[11px] font-[600] text-[var(--zaplane-text-muted)] gap-[6px]">
                 {section.label}
-                <span className="flex-1 h-[1px] bg-gray-100 block" />
+                <span className="flex-1 h-[1px] bg-[var(--zaplane-secondary-color)] block" />
               </div>
               <ul style={{listStyleType:'none'}} className="p-0 m-0 flex flex-col gap-[7px]">
                 {section.items.map((item, ii) => (
-                  <li key={ii} style={{lineHeight:'1.55', paddingLeft:'14px', position:'relative'}} className="text-[13.5px] text-gray-600 before:content-[''] before:absolute before:left-0 before:top-[8px] before:w-[5px] before:h-[5px] before:rounded-full before:bg-purple-300">
+                  <li key={ii} style={{lineHeight:'1.55', paddingLeft:'14px', position:'relative'}} className="text-[13.5px] text-[var(--zaplane-font-secondary-color)] before:content-[''] before:absolute before:left-0 before:top-[8px] before:w-[5px] before:h-[5px] before:rounded-full before:bg-purple-300">
                     <SectionTag type={section.tag} />
-                    {item.bold && <strong className="text-gray-700">{item.bold} </strong>}
+                    {item.bold && <strong className="text-[var(--zaplane-font-color)]">{item.bold} </strong>}
                     {item.text}
-                    {item.note && <em style={{fontStyle:'normal'}} className="text-[12.5px] text-gray-400"> {item.note}</em>}
+                    {item.note && <em style={{fontStyle:'normal'}} className="text-[12.5px] text-[var(--zaplane-text-muted)]"> {item.note}</em>}
                   </li>
                 ))}
               </ul>

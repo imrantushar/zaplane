@@ -277,6 +277,111 @@ class Memberpress extends IntegrationBase {
 		return [];
 	}
 
+	/**
+	 * Sample trigger output for the "@" variable picker.
+	 *
+	 * Keys mirror what resolve_trigger() returns for each event. Explicit
+	 * per-trigger samples take precedence; anything else falls through to a
+	 * category fallback chosen by the event-name prefix (subscription_* /
+	 * transaction_* / membership_* / member_* etc.), reusing shared base
+	 * arrays so every trigger returns a non-empty sample.
+	 */
+	public static function get_trigger_sample_output( string $trigger ): array {
+		$created_at = '2024-01-01 12:00:00';
+
+		$member = [
+			'user_id' => 1,
+			'user' => [
+				'id' => 1,
+				'email' => 'member@example.com',
+				'username' => 'johnmember',
+				'first_name' => 'John',
+				'last_name' => 'Member',
+				'display_name' => 'John Member',
+			],
+		];
+
+		$subscription = [
+			'subscription_id' => 1,
+			'user_id' => 1,
+			'membership_id' => 10,
+			'product_id' => 10,
+			'subscription' => [
+				'id' => 1,
+				'user_id' => 1,
+				'product_id' => 10,
+				'price' => 49.00,
+				'period' => 1,
+				'period_type' => 'months',
+				'status' => 'active',
+				'gateway' => 'stripe',
+				'created_at' => $created_at,
+			],
+		];
+
+		$transaction = [
+			'transaction_id' => 1,
+			'user_id' => 1,
+			'membership_id' => 10,
+			'product_id' => 10,
+			'subscription_id' => 1,
+			'transaction' => [
+				'id' => 1,
+				'user_id' => 1,
+				'product_id' => 10,
+				'subscription_id' => 1,
+				'amount' => 49.00,
+				'total' => 49.00,
+				'status' => 'complete',
+				'gateway' => 'stripe',
+				'created_at' => $created_at,
+				'expires_at' => '2024-02-01 12:00:00',
+			],
+		];
+
+		$membership = [
+			'membership_id' => 10,
+			'product_id' => 10,
+			'membership' => [
+				'id' => 10,
+				'title' => 'Gold Membership',
+				'price' => 49.00,
+			],
+		];
+
+		$base = static function ( string $type ) use ( $trigger, $created_at ) {
+			return [
+				'event' => str_replace( '_', '-', $trigger ),
+				'evt_id' => 1,
+				'evt_id_type' => $type,
+				'created_at' => $created_at,
+				'args' => [],
+			];
+		};
+
+		// Explicit per-trigger samples take precedence over the category fallbacks.
+		$explicit = [];
+		if ( isset( $explicit[ $trigger ] ) ) {
+			return $explicit[ $trigger ];
+		}
+
+		// Category fallbacks by event-name prefix.
+		if ( 0 === strpos( $trigger, 'subscription_' ) || 0 === strpos( $trigger, 'account_' ) ) {
+			return array_merge( $base( 'subscriptions' ), $subscription );
+		}
+
+		if ( false !== strpos( $trigger, 'transaction' ) || 0 === strpos( $trigger, 'offline_payment_' ) ) {
+			return array_merge( $base( 'transactions' ), $transaction );
+		}
+
+		if ( 0 === strpos( $trigger, 'membership_' ) ) {
+			return array_merge( $base( '' ), $membership );
+		}
+
+		// member_*, login, user_*, and any remaining triggers.
+		return array_merge( $base( 'users' ), $member );
+	}
+
 	public static function get_actions(): array {
 		return [
 			'create_member' => [ 'label' => 'Create Member' ],
@@ -299,18 +404,20 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'email',
 					'label' => 'Email',
-					'type' => 'text',
+					'type' => 'email',
 					'required' => true
 				],
 				[
 					'key' => 'username',
 					'label' => 'Username',
-					'type' => 'text'
+					'type' => 'text',
+					'required' => true
 				],
 				[
 					'key' => 'password',
 					'label' => 'Password',
-					'type' => 'text'
+					'type' => 'text',
+					'required' => true
 				],
 				[
 					'key' => 'first_name',
@@ -459,7 +566,8 @@ class Memberpress extends IntegrationBase {
 				[
 					'key' => 'price',
 					'label' => 'Price',
-					'type' => 'number'
+					'type' => 'number',
+					'required' => true
 				],
 				[
 					'key' => 'period',
@@ -769,11 +877,6 @@ class Memberpress extends IntegrationBase {
 		return $schemas[ $action ] ?? [];
 	}
 
-	/**
-	 * =====================================================
-	 * DYNAMIC DATA QUERIES (API)
-	 * =====================================================
-	 */
 	public static function get_dynamic_queries(): array {
 		return [
 			'memberships' => [ self::class, 'query_memberships' ],

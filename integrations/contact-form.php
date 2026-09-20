@@ -193,6 +193,27 @@ class ContactForm extends IntegrationBase {
 		return false;
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		if ( in_array( $event, [ 'form_created', 'form_updated' ], true ) ) {
+			return [
+				'success' => true,
+				'form'    => [
+					'form_id'    => 42,
+					'form_title' => 'Contact form 1',
+					'status'     => 'publish',
+					'locale'     => 'en_US',
+					'title'      => '2026-07-09 12:00:00',
+					'user_id'    => 1,
+					'action'     => 'form_created' === $event ? 'created' : 'updated',
+				],
+			];
+		}
+
+		// form_submitted fields are user-defined per form — the "@" picker fills
+		// them from a captured real submission, so no static sample here.
+		return [];
+	}
+
 	public static function get_dynamic_queries(): array {
 		return [
 			'form_query' => [ self::class, 'form_query_types' ],

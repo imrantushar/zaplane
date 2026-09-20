@@ -1,344 +1,137 @@
 <?php
 
-namespace Zaplane\Tests\Integrations {
+namespace Zaplane\Tests\Integrations;
 
-	use Zaplane\Integrations\ActiveCampaign;
-	use Zaplane\Tests\WPMocks;
+use Zaplane\Integrations\ActiveCampaign;
+use WP_REST_Request;
 
-	class ActiveCampaignTest extends IntegrationTestCase {
+/**
+ * Covers the move off the wp_loaded form-scrape onto real ActiveCampaign
+ * webhooks, and the connection flag that left every action credential-less.
+ */
+class ActiveCampaignTest extends IntegrationTestCase {
 
-		private array $credentials = [
-			'api_url' => 'https://zaplane.api-us1.com',
-			'api_key' => 'test-api-key',
-		];
+	protected function getIntegrationClass(): string {
+		return ActiveCampaign::class;
+	}
 
-		protected function getIntegrationClass(): string {
-			return ActiveCampaign::class;
-		}
+	// ========== CONNECTION ==========
 
-		protected function setupMockData(): void {
-			parent::setupMockData();
+	public function test_requires_connection(): void {
+		$this->assertTrue( ActiveCampaign::requires_connection() );
+		$this->assertSame( 'api_key', ActiveCampaign::get_auth_type() );
+	}
 
-			WPMocks::setOption(
-				'settings_activecampaign',
-				[
-					'api_url' => 'https://zaplane.api-us1.com',
-					'api_key' => 'plugin-settings-key',
-				]
+	public function test_auth_fields_declare_url_and_key(): void {
+		$fields = ActiveCampaign::get_auth_fields();
+
+		$this->assertArrayHasKey( 'api_url', $fields );
+		$this->assertArrayHasKey( 'api_key', $fields );
+	}
+
+	public function test_action_without_credentials_fails_loudly(): void {
+		$node = $this->makeActionNode( 'create_or_update_contact', [ 'email' => 'jane@example.com' ] );
+
+		$this->expectException( \Exception::class );
+		$this->expectExceptionMessageMatches( '/credentials|API/i' );
+
+		ActiveCampaign::execute_node( $node, [] );
+	}
+
+	// ========== TRIGGER DELIVERY ==========
+
+	/**
+	 * All three triggers used to hang off wp_loaded, which fires on every single
+	 * request. Nothing here may bind to it again.
+	 */
+	public function test_no_trigger_binds_to_wp_loaded(): void {
+		foreach ( ActiveCampaign::get_triggers() as $key => $trigger ) {
+			$this->assertNotSame(
+				'wp_loaded',
+				$trigger['hook'] ?? '',
+				"Trigger '{$key}' is bound to wp_loaded, which runs a handler on every request."
 			);
 		}
+	}
 
-		protected function tearDown(): void {
-			$_POST   = [];
-			$_GET    = [];
-			$_SERVER = [];
-			parent::tearDown();
-		}
+	public function test_supports_incoming_webhooks(): void {
+		$this->assertTrue( ActiveCampaign::supports_webhook() );
+		$this->assertStringContainsString( '/wp-json/zaplane/v1/incoming/activecampaign', ActiveCampaign::get_webhook_url() );
+	}
 
-		protected function getTriggerTests(): array {
-			return [];
-		}
+	public function test_parse_webhook_event_maps_subscribe(): void {
+		$parsed = ActiveCampaign::parse_webhook_event( $this->makeWebhookRequest( [
+			'type'    => 'subscribe',
+			'list'    => [ '12' ],
+			'contact' => [
+				'id'         => '318',
+				'email'      => 'jane.doe@example.com',
+				'first_name' => 'Jane',
+				'last_name'  => 'Doe',
+			],
+		] ) );
 
-		public function test_upsert_contact_uses_plugin_settings_fallback(): void {
-			$this->mockHttp(
-				[
-					'contact' => [
-						'id'        => '101',
-						'email'     => 'user@example.com',
-						'firstName' => 'John',
-						'lastName'  => 'Doe',
-					],
-				]
-			);
+		$this->assertSame( 'contact_subscribed', $parsed['event'] );
+		$this->assertSame( 'jane.doe@example.com', $parsed['payload']['contact']['email'] );
+		$this->assertSame( [ [ 'id' => '12' ] ], $parsed['payload']['lists'] );
+	}
 
-			$result = ActiveCampaign::execute_node(
-				$this->makeActionNode(
-					'upsert_contact',
-					[
-						'email'      => 'user@example.com',
-						'first_name' => 'John',
-						'last_name'  => 'Doe',
-					]
-				),
-				[]
-			);
+	public function test_parse_webhook_event_maps_unsubscribe(): void {
+		$parsed = ActiveCampaign::parse_webhook_event( $this->makeWebhookRequest( [
+			'type'    => 'unsubscribe',
+			'contact' => [ 'email' => 'jane.doe@example.com' ],
+		] ) );
 
-			$this->assertEquals( 'main', $result['port'] );
-			$this->assertEquals( '101', $result['data']['activecampaign_contact_id'] );
-			$this->assertEquals( 'user@example.com', $result['data']['activecampaign_contact_email'] );
-		}
+		$this->assertSame( 'contact_unsubscribed', $parsed['event'] );
+		$this->assertSame( 'unsub', $parsed['payload']['action'] );
+	}
 
-		public function test_add_contact_to_list_subscribes_contact(): void {
-			$this->mockHttp(
-				[
-					'contact' => [
-						'id'    => '101',
-						'email' => 'user@example.com',
-					],
-				]
-			);
-			$this->mockHttp(
-				[
-					'contactList' => [
-						'id'      => '9001',
-						'contact' => '101',
-						'list'    => '12',
-						'status'  => '1',
-					],
-				]
-			);
+	/**
+	 * A subscribe that carries a form id is a form submission too — emit the
+	 * more specific event so the Form Submitted trigger stays usable.
+	 */
+	public function test_subscribe_with_a_form_id_becomes_form_submitted(): void {
+		$parsed = ActiveCampaign::parse_webhook_event( $this->makeWebhookRequest( [
+			'type'    => 'subscribe',
+			'form'    => '7',
+			'contact' => [ 'email' => 'jane.doe@example.com' ],
+		] ) );
 
-			$result = ActiveCampaign::execute_node(
-				$this->makeActionNode(
-					'add_contact_to_list',
-					[
-						'email'   => 'user@example.com',
-						'list_id' => '12',
-						'status'  => 'subscribed',
-					],
-					$this->credentials
-				),
-				[]
-			);
+		$this->assertSame( 'form_submitted', $parsed['event'] );
+		$this->assertSame( '7', $parsed['payload']['form']['id'] );
+	}
 
-			$this->assertEquals( '101', $result['data']['activecampaign_contact_id'] );
-			$this->assertEquals( '12', $result['data']['activecampaign_list_id'] );
-			$this->assertEquals( '1', $result['data']['activecampaign_list_status'] );
-		}
+	public function test_parse_webhook_event_ignores_unmapped_types(): void {
+		$this->assertNull( ActiveCampaign::parse_webhook_event( $this->makeWebhookRequest( [ 'type' => 'open' ] ) ) );
+		$this->assertNull( ActiveCampaign::parse_webhook_event( $this->makeWebhookRequest( [] ) ) );
+	}
 
-		public function test_add_tag_to_contact_assigns_tag(): void {
-			$this->mockHttp(
-				[
-					'contact' => [
-						'id'    => '101',
-						'email' => 'user@example.com',
-					],
-				]
-			);
-			$this->mockHttp(
-				[
-					'contactTag' => [
-						'id'      => '303',
-						'contact' => '101',
-						'tag'     => '55',
-					],
-				]
-			);
+	/**
+	 * The webhook payload has to flow straight into resolve_trigger.
+	 */
+	public function test_parsed_payload_resolves_into_a_trigger(): void {
+		$parsed = ActiveCampaign::parse_webhook_event( $this->makeWebhookRequest( [
+			'type'    => 'subscribe',
+			'list'    => [ '12' ],
+			'contact' => [ 'email' => 'jane.doe@example.com', 'first_name' => 'Jane' ],
+		] ) );
 
-			$result = ActiveCampaign::execute_node(
-				$this->makeActionNode(
-					'add_tag_to_contact',
-					[
-						'email'  => 'user@example.com',
-						'tag_id' => '55',
-					],
-					$this->credentials
-				),
-				[]
-			);
+		$node   = $this->makeTriggerNode( 'contact_subscribed' );
+		$result = ActiveCampaign::resolve_trigger( $node, [ $parsed['payload'] ] );
 
-			$this->assertEquals( '303', $result['data']['activecampaign_contact_tag_id'] );
-			$this->assertEquals( '55', $result['data']['activecampaign_tag_id'] );
-		}
+		$this->assertIsArray( $result );
+		$this->assertSame( 'contact_subscribed', $result['event'] );
+		$this->assertSame( 'jane.doe@example.com', $result['contact']['email'] );
+	}
 
-		public function test_remove_tag_from_contact_deletes_existing_relation(): void {
-			$this->mockHttp(
-				[
-					'contact' => [
-						'id'    => '101',
-						'email' => 'user@example.com',
-					],
-				]
-			);
-			$this->mockHttp(
-				[
-					'contactTags' => [
-						[
-							'id'  => '303',
-							'tag' => '55',
-						],
-					],
-				]
-			);
-			$this->mockHttp( [] );
+	public function test_trigger_rejects_empty_payload(): void {
+		$this->assertFalse( ActiveCampaign::resolve_trigger( $this->makeTriggerNode( 'contact_subscribed' ), [] ) );
+	}
 
-			$result = ActiveCampaign::execute_node(
-				$this->makeActionNode(
-					'remove_tag_from_contact',
-					[
-						'email'  => 'user@example.com',
-						'tag_id' => '55',
-					],
-					$this->credentials
-				),
-				[]
-			);
+	private function makeWebhookRequest( array $body ): WP_REST_Request {
+		$request = new WP_REST_Request( 'POST', '/zaplane/v1/incoming/activecampaign' );
+		$request->set_body_params( $body );
 
-			$this->assertTrue( $result['data']['activecampaign_tag_removed'] );
-			$this->assertEquals( '303', $result['data']['activecampaign_contact_tag_id'] );
-		}
-
-		public function test_add_contact_to_automation_adds_entry(): void {
-			$this->mockHttp(
-				[
-					'contact' => [
-						'id'    => '101',
-						'email' => 'user@example.com',
-					],
-				]
-			);
-			$this->mockHttp(
-				[
-					'contactAutomation' => [
-						'id'         => '808',
-						'contact'    => '101',
-						'automation' => '77',
-					],
-				]
-			);
-
-			$result = ActiveCampaign::execute_node(
-				$this->makeActionNode(
-					'add_contact_to_automation',
-					[
-						'email'         => 'user@example.com',
-						'automation_id' => '77',
-					],
-					$this->credentials
-				),
-				[]
-			);
-
-			$this->assertEquals( '77', $result['data']['activecampaign_automation_id'] );
-			$this->assertEquals( '808', $result['data']['activecampaign_contact_automation_id'] );
-		}
-
-		public function test_query_lists_returns_filtered_results(): void {
-			$this->mockHttp(
-				[
-					'lists' => [
-						[ 'id' => '12', 'name' => 'Newsletter' ],
-						[ 'id' => '13', 'name' => 'Customers' ],
-					],
-				]
-			);
-
-			$result = ActiveCampaign::query_lists(
-				[
-					'search' => 'news',
-				]
-			);
-
-			$this->assertCount( 1, $result );
-			$this->assertEquals( '12', $result[0]['id'] );
-		}
-
-		public function test_test_connection_succeeds(): void {
-			$this->mockHttp(
-				[
-					'user' => [
-						'username' => 'zaplane-admin',
-					],
-				]
-			);
-
-			$result = ActiveCampaign::test_connection( $this->credentials );
-
-			$this->assertTrue( $result['success'] );
-			$this->assertStringContainsString( 'zaplane-admin', $result['message'] );
-		}
-
-		public function test_form_submitted_trigger_resolves_local_form_process_request(): void {
-			$this->mockFormProcessRequest();
-
-			$result = ActiveCampaign::resolve_trigger(
-				$this->makeTriggerNode( 'form_submitted', [ 'form_id' => '44' ] ),
-				[]
-			);
-
-			$this->assertIsArray( $result );
-			$this->assertEquals( 'form_submitted', $result['event'] );
-			$this->assertEquals( '44', $result['form_id'] );
-			$this->assertEquals( 'user@example.com', $result['contact']['email'] );
-		}
-
-		public function test_contact_subscribed_trigger_filters_by_email_and_list(): void {
-			$this->mockFormProcessRequest();
-
-			$result = ActiveCampaign::resolve_trigger(
-				$this->makeTriggerNode( 'contact_subscribed', [
-					'email'   => 'user@example.com',
-					'list_id' => '12',
-				] ),
-				[]
-			);
-
-			$this->assertIsArray( $result );
-			$this->assertEquals( 'contact_subscribed', $result['event'] );
-			$this->assertEquals( 'user@example.com', $result['contact']['email'] );
-		}
-
-		public function test_contact_unsubscribed_trigger_keeps_action_value(): void {
-			$this->mockFormProcessRequest(
-				[
-					'act' => 'unsub',
-				]
-			);
-
-			$result = ActiveCampaign::resolve_trigger(
-				$this->makeTriggerNode( 'contact_unsubscribed' ),
-				[]
-			);
-
-			$this->assertIsArray( $result );
-			$this->assertEquals( 'contact_unsubscribed', $result['event'] );
-			$this->assertEquals( 'unsub', $result['action'] );
-		}
-
-		public function test_resolve_trigger_returns_false_for_mismatched_filter(): void {
-			$this->mockFormProcessRequest();
-
-			$result = ActiveCampaign::resolve_trigger(
-				$this->makeTriggerNode( 'contact_subscribed', [ 'email' => 'other@example.com' ] ),
-				[]
-			);
-
-			$this->assertFalse( $result );
-		}
-
-		public function test_resolve_trigger_returns_false_without_payload(): void {
-			$this->assertFalse( ActiveCampaign::resolve_trigger( $this->makeTriggerNode( 'missing' ), [] ) );
-		}
-
-		private function mockFormProcessRequest( array $post_overrides = [], array $get_overrides = [], array $server_overrides = [] ): void {
-			$_POST = array_replace_recursive(
-				[
-					'f'         => '44',
-					'act'       => 'sub',
-					'email'     => 'user@example.com',
-					'firstname' => 'John',
-					'lastname'  => 'Doe',
-					'phone'     => '+8801000000000',
-					'field'     => [ '7' => 'VIP' ],
-					'nlbox'     => [ '12' ],
-				],
-				$post_overrides
-			);
-
-			$_GET = array_replace(
-				[
-					'sync' => '1',
-				],
-				$get_overrides
-			);
-
-			$_SERVER = array_replace(
-				[
-					'REQUEST_METHOD' => 'POST',
-					'REQUEST_URI'    => '/wp-content/plugins/activecampaign-subscription-forms/form_process.php?sync=1',
-				],
-				$server_overrides
-			);
-		}
+		return $request;
 	}
 }

@@ -2,33 +2,29 @@
 
 namespace Zaplane\Integrations;
 
-if (! defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-class Ninjaform extends IntegrationBase
-{
+class Ninjaform extends IntegrationBase {
 
 
-	public static function get_slug(): string
-	{
+
+	public static function get_slug(): string {
 		return 'ninjaform';
 	}
 
-	public static function get_name(): string
-	{
+	public static function get_name(): string {
 		return 'Ninja Form';
 	}
 
-	public static function get_icon(): string
-	{
+	public static function get_icon(): string {
 		return 'ninjaform.svg';
 	}
 
-	public static function get_triggers(): array
-	{
+	public static function get_triggers(): array {
 		return [
 			'process_ninja_form' => [
 				'label' => 'Form Submit',
@@ -38,9 +34,8 @@ class Ninjaform extends IntegrationBase
 		];
 	}
 
-	public static function get_trigger_config_schema(string $trigger): array
-	{
-		if ('process_ninja_form' !== $trigger) {
+	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( 'process_ninja_form' !== $trigger ) {
 			return [];
 		}
 
@@ -52,21 +47,20 @@ class Ninjaform extends IntegrationBase
 				'dynamic' => [
 					'integration' => 'ninjaform',
 					'query'       => 'forms',
-					'select'      => ['name', 'label'],
+					'select'      => [ 'name', 'label' ],
 				],
 				'required' => true,
 			],
 		];
 	}
 
-	private static function resolve_form_payload($form): array
-	{
-		if (! $form) {
+	private static function resolve_form_payload( $form ): array {
+		if ( ! $form ) {
 			return [];
 		}
 
-		$id    = method_exists($form, 'get_id') ? (int) $form->get_id() : 0;
-		$title = method_exists($form, 'get_setting') ? (string) $form->get_setting('title') : '';
+		$id    = method_exists( $form, 'get_id' ) ? (int) $form->get_id() : 0;
+		$title = method_exists( $form, 'get_setting' ) ? (string) $form->get_setting( 'title' ) : '';
 
 		return [
 			'id'    => $id,
@@ -74,85 +68,60 @@ class Ninjaform extends IntegrationBase
 		];
 	}
 
-	public static function resolve_trigger(array $node, array $args)
-	{
+	public static function resolve_trigger( array $node, array $args ) {
 
-		switch ($node['event']) {
+		switch ( $node['event'] ) {
 			case 'process_ninja_form':
 				$formData = $args[0] ?? null;
-				if (empty($formData) || ! is_array($formData)) {
+				if ( empty( $formData ) || ! is_array( $formData ) ) {
 					return false;
 				}
 
 				$currentFormId = $formData['form_id']
 					?? $formData['id']
-					?? ($formData['form']['id'] ?? null)
+					?? ( $formData['form']['id'] ?? null )
 					?? null;
 
-				if (empty($currentFormId)) {
+				if ( empty( $currentFormId ) ) {
 					return false;
 				}
 
 				$config       = $node['data']['config'] ?? [];
 				$requiredForm = $config['form_id'] ?? 'any';
 
-				if ('any' !== $requiredForm && (int) $requiredForm !== (int) $currentFormId) {
+				if ( 'any' !== $requiredForm && (int) $requiredForm !== (int) $currentFormId ) {
 					return false;
 				}
 
 				$form = null;
-				$nf = function_exists('Ninja_Forms') ? Ninja_Forms() : null;
-				if ($nf) {
-					$form = $nf->form((int) $currentFormId);
+				$nf = function_exists( 'Ninja_Forms' ) ? Ninja_Forms() : null;
+				if ( $nf ) {
+					$form = $nf->form( (int) $currentFormId );
 				}
 
 				$entryId =
 					$formData['sub_id']
-					?? ($formData['extra']['sub_id'] ?? null)
-					?? ($formData['submission']['id'] ?? null)
+					?? ( $formData['extra']['sub_id'] ?? null )
+					?? ( $formData['submission']['id'] ?? null )
 					?? null;
 
 				return [
 					'success'   => true,
 					'entry_id'  => $entryId,
 					'form_data' => $formData,
-					'form'      => $form ? self::resolve_form_payload($form) : null,
+					'form'      => $form ? self::resolve_form_payload( $form ) : null,
 				];
 		} //end switch
 		return false;
 	}
 
-	public static function get_actions(): array
-	{
-		return [];
-	}
-
-	public static function get_action_config_schema(string $action): array
-	{
-
-		$schemas = [];
-
-		return $schemas[$action] ?? [];
-	}
-
-	public static function execute_node(array $node, array $input): array
-	{
+	public static function get_dynamic_queries(): array {
 		return [
-			'port' => 'main',
-			'data' => $input
+			'forms' => [ self::class, 'query_forms' ],
 		];
 	}
 
-	public static function get_dynamic_queries(): array
-	{
-		return [
-			'forms' => [self::class, 'query_forms'],
-		];
-	}
-
-	public static function query_forms()
-	{
-
+	public static function query_forms() {
 		$options = [
 			[
 				'label' => 'Any Form',
@@ -160,14 +129,14 @@ class Ninjaform extends IntegrationBase
 			],
 		];
 
-		$nf = function_exists('Ninja_Forms') ? Ninja_Forms() : null;
-		if ($nf) {
+		$nf = function_exists( 'Ninja_Forms' ) ? Ninja_Forms() : null;
+		if ( $nf ) {
 			$forms = $nf->form()->get_forms();
 
-			if (! empty($forms)) {
-				foreach ($forms as $form) {
+			if ( ! empty( $forms ) ) {
+				foreach ( $forms as $form ) {
 					$options[] = [
-						'label' => $form->get_setting('title'),
+						'label' => $form->get_setting( 'title' ),
 						'name' => $form->get_id(),
 					];
 				}
@@ -177,8 +146,7 @@ class Ninjaform extends IntegrationBase
 		return $options;
 	}
 
-	public static function get_output_ports(): array
-	{
+	public static function get_output_ports(): array {
 		return [
 			'main' => 'Main output',
 		];

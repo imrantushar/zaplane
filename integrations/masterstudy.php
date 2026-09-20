@@ -46,6 +46,83 @@ class Masterstudy extends IntegrationBase {
 		];
 	}
 
+	public static function get_trigger_sample_output( string $event ): array {
+		$user = [
+			'user_id'      => 1,
+			'first_name'   => 'Jane',
+			'last_name'    => 'Doe',
+			'user_login'   => 'janedoe',
+			'user_email'   => 'jane.doe@example.com',
+			'nickname'     => 'jane',
+			'display_name' => 'Jane Doe',
+			'avatar_url'   => 'https://example.com/wp-content/uploads/avatars/jane.png',
+			'user_roles'   => [ 'subscriber' ],
+			'completed_at' => '2026-07-09 14:32:05',
+		];
+
+		$course = [
+			'course_id'          => 101,
+			'course_title'       => 'Introduction to WordPress',
+			'course_description' => 'A beginner friendly course covering WordPress fundamentals.',
+			'course_url'         => 'https://example.com/courses/introduction-to-wordpress/',
+		];
+
+		$lesson = [
+			'lesson_id'          => 201,
+			'lesson_title'       => 'Setting Up Your First Site',
+			'lesson_description' => 'Learn how to install and configure WordPress.',
+			'lesson_url'         => 'https://example.com/lessons/setting-up-your-first-site/',
+		];
+
+		$quiz = [
+			'quiz_id'          => 301,
+			'quiz_title'       => 'WordPress Basics Quiz',
+			'quiz_description' => 'Test your knowledge of WordPress fundamentals.',
+			'quiz_url'         => 'https://example.com/quizzes/wordpress-basics-quiz/',
+		];
+
+		$wrap = static function ( array $extra ) use ( $user ) {
+			return [
+				'success'   => true,
+				'timestamp' => '2026-07-09 14:32:05',
+				'data'      => array_merge( $user, $extra ),
+			];
+		};
+
+		$samples = [
+			'user_enroll_course' => $wrap( $course ),
+			'course_complete'    => $wrap( $course ),
+			'lesson_complete'    => $wrap( $lesson ),
+			'quiz_passed'        => $wrap( array_merge( $quiz, [
+				'score' => 85,
+				'status' => 'passed'
+			] ) ),
+			'quiz_failed'        => $wrap( array_merge( $quiz, [
+				'score' => 40,
+				'status' => 'failed'
+			] ) ),
+		];
+
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		if ( 0 === strpos( $event, 'course' ) ) {
+			return $wrap( $course );
+		}
+		if ( 0 === strpos( $event, 'lesson' ) ) {
+			return $wrap( $lesson );
+		}
+		if ( 0 === strpos( $event, 'quiz' ) ) {
+			return $wrap( array_merge( $quiz, [
+				'score' => 85,
+				'status' => 'passed'
+			] ) );
+		}
+
+		return $wrap( $course );
+	}
+
 	public static function get_trigger_config_schema( string $trigger ): array {
 		if ( in_array( $trigger, [ 'user_enroll_course', 'course_complete' ], true ) ) {
 			return [

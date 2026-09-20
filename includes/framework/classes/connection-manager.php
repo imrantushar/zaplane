@@ -238,7 +238,7 @@ class ConnectionManager {
 		$class = get_class( $integration );
 
 		try {
-			$new_tokens = $class::refresh_oauth_token( $refresh_token );
+			$new_tokens = $class::refresh_oauth_token( $credentials );
 			$credentials = array_merge( $credentials, $new_tokens );
 
 			$connection->setCredentials( $credentials );

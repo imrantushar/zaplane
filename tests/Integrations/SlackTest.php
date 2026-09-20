@@ -208,22 +208,117 @@ class SlackTest extends IntegrationTestCase {
 
 	// ========== TRIGGERS ==========
 
-	public function test_trigger_resolve_returns_message_payload(): void {
+	/**
+	 * The webhook hands resolve_trigger the Slack event object, so the payload
+	 * must come back with the event's own keys — the ones
+	 * get_trigger_sample_output() advertises and workflows map against.
+	 */
+	public function test_trigger_resolve_returns_the_slack_event_payload(): void {
+		$event = [
+			'type'    => 'message',
+			'channel' => 'C012AB3CD',
+			'user'    => 'U012AB3CD',
+			'text'    => 'Hello from Slack',
+			'ts'      => '1720535405.001200',
+			'team_id' => 'T012AB3CD',
+		];
+
 		$node   = $this->makeTriggerNode( 'message_received' );
-		$result = Slack::resolve_trigger( $node, [ 'Hello from Slack' ] );
+		$result = Slack::resolve_trigger( $node, [ $event ] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'message', $result );
-		$this->assertEquals( 'Hello from Slack', $result['message'] );
+		$this->assertEquals( 'Hello from Slack', $result['text'] );
+		$this->assertEquals( 'U012AB3CD', $result['user'] );
+		$this->assertEquals( 'C012AB3CD', $result['channel'] );
+	}
+
+	public function test_trigger_resolve_payload_keys_match_sample_output(): void {
+		foreach ( [ 'message_received', 'app_mention', 'reaction_added' ] as $event ) {
+			$sample = Slack::get_trigger_sample_output( $event );
+			$node   = $this->makeTriggerNode( $event );
+			$result = Slack::resolve_trigger( $node, [ $sample ] );
+
+			$this->assertIsArray( $result, $event );
+			$this->assertSame(
+				array_keys( $sample ),
+				array_keys( $result ),
+				"Slack `{$event}` resolve_trigger output drifted from its sample output."
+			);
+		}
 	}
 
 	public function test_trigger_resolve_handles_empty_args(): void {
-		$node   = $this->makeTriggerNode( 'app_mention' );
-		$result = Slack::resolve_trigger( $node, [] );
+		$node = $this->makeTriggerNode( 'app_mention' );
 
-		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'message', $result );
-		$this->assertEquals( '', $result['message'] );
+		$this->assertFalse( Slack::resolve_trigger( $node, [] ) );
+	}
+
+	/**
+	 * A workflow that both listens for messages and posts one would otherwise
+	 * re-trigger itself on its own output.
+	 */
+	public function test_trigger_resolve_ignores_bot_messages(): void {
+		$node = $this->makeTriggerNode( 'message_received' );
+
+		$this->assertFalse( Slack::resolve_trigger( $node, [ [
+			'type'   => 'message',
+			'text'   => 'posted by us',
+			'bot_id' => 'B012AB3CD',
+		] ] ) );
+
+		$this->assertFalse( Slack::resolve_trigger( $node, [ [
+			'type'    => 'message',
+			'text'    => 'posted by us',
+			'subtype' => 'bot_message',
+		] ] ) );
+	}
+
+	public function test_trigger_resolve_applies_channel_filter(): void {
+		$event = [
+			'type'    => 'message',
+			'channel' => 'C012AB3CD',
+			'text'    => 'hi',
+		];
+
+		$match = $this->makeTriggerNode( 'message_received', [ 'channel' => 'C012AB3CD' ] );
+		$this->assertIsArray( Slack::resolve_trigger( $match, [ $event ] ) );
+
+		$other = $this->makeTriggerNode( 'message_received', [ 'channel' => 'CSOMEWHERE' ] );
+		$this->assertFalse( Slack::resolve_trigger( $other, [ $event ] ) );
+
+		// The router hands over graph_node['data'] itself, not the whole node, so
+		// the config has to resolve from that shape too.
+		$flat = [ 'app' => 'slack', 'event' => 'message_received', 'config' => [ 'channel' => 'CSOMEWHERE' ] ];
+		$this->assertFalse( Slack::resolve_trigger( $flat, [ $event ] ) );
+	}
+
+	/**
+	 * Slack refuses to enable Event Subscriptions unless the Request URL echoes
+	 * back the challenge it POSTs.
+	 */
+	public function test_url_verification_handshake_returns_the_challenge(): void {
+		$request = new \WP_REST_Request( 'POST', '/zaplane/v1/incoming/slack' );
+		$request->set_body( (string) wp_json_encode( [
+			'type'      => 'url_verification',
+			'challenge' => '3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P',
+		] ) );
+		$request->set_header( 'content-type', 'application/json' );
+
+		$handshake = Slack::handle_webhook_handshake( $request );
+
+		$this->assertIsArray( $handshake );
+		$this->assertSame( '3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P', $handshake['body'] );
+	}
+
+	public function test_normal_event_is_not_treated_as_a_handshake(): void {
+		$request = new \WP_REST_Request( 'POST', '/zaplane/v1/incoming/slack' );
+		$request->set_body( (string) wp_json_encode( [
+			'type'  => 'event_callback',
+			'event' => [ 'type' => 'message', 'text' => 'hi' ],
+		] ) );
+		$request->set_header( 'content-type', 'application/json' );
+
+		$this->assertNull( Slack::handle_webhook_handshake( $request ) );
 	}
 
 	// ========== test_connection ==========

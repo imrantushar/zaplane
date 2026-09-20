@@ -1,16 +1,17 @@
 <?php
 /**
- * Plugin Name:     Zaplane
- * Plugin URI:      http://zaplane.pro
- * Description:     WordPress Automation Plugin
- * Version:         0.0.1
- * Author:          kodezen
- * Author URI:      http://kodezen.com
- * License:         GPL-3.0+
- * Text Domain:     zaplane
- *
- * Requires PHP: 7.4
- * Tested up to: 6.8
+ * Plugin Name:       Zaplane
+ * Plugin URI:        https://zaplane.app/
+ * Description:       WordPress Automation Plugin
+ * Version:           1.2.0
+ * Author:            kodezen
+ * Author URI:        https://kodezen.com
+ * License:           GPL-3.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
+ * Text Domain:       zaplane
+ * Domain Path:       /languages
+ * Requires at least: 6.8
+ * Requires PHP:      7.4
  */
 
 use Zaplane\Framework\Classes\ConnectionManager;
@@ -19,6 +20,7 @@ use Zaplane\Framework\Classes\OAuthHandler;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Core\ModuleManager;
+use Zaplane\Integrations\Gemcrm;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,6 +37,10 @@ final class Zaplane {
 		$this->load_cli();
 
 		$this->container = $this->boot_container();
+
+		// StoreEngine builds its emails on plugins_loaded, before this plugin's own
+		// callback runs, and each email reads its settings as it is built.
+		\Zaplane\Services\StoreengineEmailHandover::boot();
 
 		register_activation_hook( __FILE__, [ $this, 'activate_plugin' ] );
 		register_deactivation_hook( __FILE__, [ $this, 'deactivate_plugin' ] );
@@ -55,7 +61,7 @@ final class Zaplane {
 	}
 
 	public function define_constants(): void {
-		define( 'ZAPLANE_VERSION', '0.0.1' );
+		define( 'ZAPLANE_VERSION', '1.2.0' );
 		define( 'ZAPLANE_ALLOW_LOGS', true );
 		define( 'ZAPLANE_PLUGIN_SLUG', 'zaplane' );
 		define( 'ZAPLANE_PLUGIN_FILE', __FILE__ );
@@ -64,7 +70,7 @@ final class Zaplane {
 		define( 'ZAPLANE_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 		define( 'ZAPLANE_INCLUDES_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/' );
 		define( 'ZAPLANE_FRAMEWORK_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'includes/framework/' );
-		define( 'ZAPLANE_INTEGRATION_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'integration/' );
+		define( 'ZAPLANE_INTEGRATION_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'integrations/' );
 		define( 'ZAPLANE_ASSETS_DIR_PATH', ZAPLANE_ROOT_DIR_PATH . 'assets/' );
 		define( 'ZAPLANE_ASSETS_URI', ZAPLANE_PLUGIN_ROOT_URI . 'assets/' );
 	}
@@ -108,6 +114,29 @@ final class Zaplane {
 	}
 
 	public function init_plugin(): void {
+		// Feature-toggle gating (hides disabled feature pages from menu + SPA).
+		\Zaplane\Settings::boot();
+
+		// Register user-defined Custom Apps into the integration registry before
+		// anything reads it (automation boot below, and later REST controllers).
+		\Zaplane\CustomApps\Loader::boot();
+		\Zaplane\CustomApps\Poller::boot();
+
+		// OAuth for the MCP endpoint. Both of these claim front-end URLs — the two
+		// /.well-known/ documents and the consent screen — so they hook parse_request
+		// rather than rest_api_init, and must be registered on every request.
+		// Where an outbound request from a workflow may go. Registered before
+		// anything can make one, and on every request: a workflow runs from cron
+		// and from a webhook, not only from wp-admin.
+		\Zaplane\HttpGuard::boot();
+
+		\Zaplane\Mcp\OAuth\Discovery::boot();
+		\Zaplane\Mcp\OAuth\Server::boot();
+
+		// A line on core's consent screen saying what the credential is for. Core
+		// serves every application from that one screen and cannot know.
+		\Zaplane\Mcp\Connections::boot();
+
 		// Initialize modules first
 		$modules = $this->container->get( 'modules' );
 		$modules->boot();
@@ -115,10 +144,24 @@ final class Zaplane {
 		$automation = $this->container->get( 'automation' );
 		$automation->boot();
 
+		( new \Zaplane\Scheduler\Scheduler() )->boot();
+
+		// Run migrations + recipe seeding once per version, not on every request.
+		// Activation covers fresh installs; this covers plugin updates (where the
+		// activation hook doesn't fire). Previously the seeders ran unconditionally
+		// on every page load, REST call and cron tick — five SELECTs of pure waste.
+		if ( version_compare( (string) get_option( 'zaplane_db_version', '0.0.0' ), ZAPLANE_VERSION, '<' ) ) {
+			\Zaplane\Installer::init()->run();
+		}
+
 		do_action( 'zaplane_init' );
 	}
 
-	public function deactivate_plugin(): void {}
+	public function deactivate_plugin(): void {
+		Gemcrm::unschedule_birthday_cron();
+		\Zaplane\Integrations\Woocommerce::unschedule_inactive_customer_cron();
+		\Zaplane\CustomApps\Poller::unschedule();
+	}
 }
 
 // Bootstrap plugin

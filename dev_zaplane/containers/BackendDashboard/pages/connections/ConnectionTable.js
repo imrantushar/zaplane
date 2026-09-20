@@ -1,6 +1,7 @@
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import Search from "@ZAPComponents/Search";
 import ListTable from "@ZAPComponents/ListTable";
 import OptionMenu from "@ZAPComponents/OptionMenu";
 import StatusOptions from "@ZAPComponents/StatusOptions";
@@ -25,7 +26,11 @@ const ConnectionTable = () => {
     totalItems
   } = useSelector(state => state.connections);
   const [selection, setSelection] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(allConnection.length === 0);
+  const filteredConnections = searchTerm
+    ? allConnection.filter(c => c.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+    : allConnection;
   const handleRefresh = async (page = 1, per_page = 10) => {
     setLoading(true);
     await dispatch(fetchConnections({
@@ -75,7 +80,7 @@ const ConnectionTable = () => {
                 </span>,
     cell: row => {
       return <div className="flex items-center gap-3">
-                    <ZAPIconGroup icons={[row?.icon]} />
+                    <ZAPIconGroup icons={[row?.icon || row?.app]} />
                     <span textOverflow="ellipsis" className="zaplane-label font-[400]">
                         {row.name}
                     </span>
@@ -171,7 +176,7 @@ const ConnectionTable = () => {
     textAlign: "center"
   }];
   return <>
-            <ListTable columns={columns} data={allConnection} isRowSelectable={true} showSubHeader={false} showColumnFilter={false} showPagination={totalItems >= 10} noDataText={__("No connections found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="connection-table" currentPageNumber={currentPage} perPage={perPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} getSelectRowValue={rows => {
+            <ListTable columns={columns} data={filteredConnections} isRowSelectable={true} showSubHeader={true} subHeaderComponent={<Search placeholder={__("Search connections...", "zaplane")} onSearchHandler={setSearchTerm} />} showColumnFilter={false} showPagination={totalItems >= 10} noDataText={__("No connections found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="connection-table" currentPageNumber={currentPage} perPage={perPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} getSelectRowValue={rows => {
       setSelection(rows || []);
     }} />
             <ZAPActionBar selection={selection} onDelete={handleDeleteSelected} onClose={() => setSelection([])} />

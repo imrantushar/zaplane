@@ -13,9 +13,15 @@ class Beaverbuilder extends IntegrationBase {
 	public static function get_slug(): string {
 		return 'beaverbuilder';
 	}
+
+	public static function get_name(): string {
+		return 'Beaver Builder';
+	}
+
 	public static function get_icon(): string {
 		return 'beaverbuilder.svg';
 	}
+
 	public static function get_triggers(): array {
 		return [
 			'contact_form_submission' => [
@@ -61,12 +67,5 @@ class Beaverbuilder extends IntegrationBase {
 		}//end switch
 
 		return false;
-	}
-
-	public static function execute_node( array $node, array $input ): array {
-		return [
-			'port' => 'main',
-			'data' => $input
-		];
 	}
 }

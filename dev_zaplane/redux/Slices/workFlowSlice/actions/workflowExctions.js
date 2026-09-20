@@ -23,7 +23,7 @@ export const workFLowExction = createAsyncThunk(
 				payload
 			);
 
-			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'zaplane'));
 			return res.data;
 
 		} catch (e) {

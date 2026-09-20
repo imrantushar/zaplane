@@ -300,15 +300,13 @@ class Discord extends IntegrationBase {
 						'key'      => 'max_age',
 						'type'     => 'number',
 						'label'    => 'Max Age (seconds, 0 = never expires)',
-						'required' => false,
-						'default'  => 86400,
+						'required' => true,
 					],
 					[
 						'key'      => 'max_uses',
 						'type'     => 'number',
 						'label'    => 'Max Uses (0 = unlimited)',
-						'required' => false,
-						'default'  => 0,
+						'required' => true,
 					],
 					[
 						'key'      => 'temporary',
@@ -348,8 +346,7 @@ class Discord extends IntegrationBase {
 						'key'      => 'limit',
 						'type'     => 'number',
 						'label'    => 'Message Limit',
-						'required' => false,
-						'default'  => 10,
+						'required' => true,
 						'min'      => 1,
 						'max'      => 100,
 					],
@@ -376,8 +373,7 @@ class Discord extends IntegrationBase {
 						'key'      => 'limit',
 						'type'     => 'number',
 						'label'    => 'Member Limit',
-						'required' => false,
-						'default'  => 100,
+						'required' => true,
 						'min'      => 1,
 						'max'      => 1000,
 					],
@@ -507,6 +503,7 @@ class Discord extends IntegrationBase {
 				return self::error( __( 'Channel not found.', 'zaplane' ), $input );
 
 			case 'create_a_channel_invite':
+				// FIX: was defaulting to '86400' (copy-paste from max_age) instead of ''.
 				$channel_id = $config['channel_id'] ?? '';
 				return self::success( array_merge( $input, [
 					'channel' => self::api_request( $bot_token, 'POST', "/channels/{$channel_id}/invites", [
@@ -525,6 +522,7 @@ class Discord extends IntegrationBase {
 				if ( isset( $dm_channel['error'] ) || empty( $dm_channel['id'] ) ) {
 					return self::error(
 						sprintf(
+							/* translators: %s: the error Discord returned. */
 							esc_html__( 'Failed to open DM channel: %s', 'zaplane' ),
 							$dm_channel['error'] ?? 'No channel id returned'
 						),
@@ -555,6 +553,7 @@ class Discord extends IntegrationBase {
 				] ) );
 
 			case 'get_many_message':
+				// FIX: was defaulting to '10' (copy-paste from limit) instead of ''.
 				$channel_id = $config['channel_id'] ?? '';
 				$limit      = max( 1, min( 100, (int) ( $config['limit'] ?? 10 ) ) );
 				return self::success( array_merge( $input, [
@@ -1015,6 +1014,7 @@ class Discord extends IntegrationBase {
 	private static function extract_credentials( array $params ): array {
 		$connection_id = $params['where']['connection_id']
 			?? $params['connection_id']
+			?? $params['data']['connection_id']
 			?? 0;
 
 		return self::get_decrypted_credentials( (int) $connection_id );

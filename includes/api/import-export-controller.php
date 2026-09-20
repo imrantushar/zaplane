@@ -137,7 +137,7 @@ class ImportExportController extends WP_REST_Controller {
 			}
 
 			$exportedVersions[] = $versionData;
-		}
+		}//end foreach
 
 		$connectionIds = array_values( array_unique( $connectionIds ) );
 		$connections   = [];
@@ -197,7 +197,7 @@ class ImportExportController extends WP_REST_Controller {
 				'last_error'      => $run->last_error,
 				'node_runs'       => $nodeRuns,
 			];
-		}
+		}//end foreach
 
 		return $exportedRuns;
 	}
@@ -226,11 +226,21 @@ class ImportExportController extends WP_REST_Controller {
 			return new WP_Error( 'upload_error', $message, [ 'status' => 400 ] );
 		}
 
-		$ext = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
-		if ( 'json' !== $ext ) {
+		if ( empty( $file['tmp_name'] ) || ! is_uploaded_file( $file['tmp_name'] ) ) {
+			return new WP_Error( 'upload_error', 'No uploaded file was found.', [ 'status' => 400 ] );
+		}
+
+		// An export of every workflow with its run history runs to a few megabytes.
+		if ( (int) ( $file['size'] ?? 0 ) > 20 * MB_IN_BYTES ) {
+			return new WP_Error( 'file_too_large', 'The file is larger than 20 MB.', [ 'status' => 400 ] );
+		}
+
+		$filetype = wp_check_filetype( (string) $file['name'], [ 'json' => 'application/json' ] );
+		if ( 'json' !== $filetype['ext'] ) {
 			return new WP_Error( 'invalid_file_type', 'Only .json files are accepted.', [ 'status' => 400 ] );
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- PHP's own upload temp file, removed when the request ends.
 		$content = file_get_contents( $file['tmp_name'] );
 		if ( false === $content ) {
 			return new WP_Error( 'file_read_error', 'Could not read the uploaded file.', [ 'status' => 400 ] );
@@ -310,7 +320,10 @@ class ImportExportController extends WP_REST_Controller {
 		$importedVersions = [];
 
 		foreach ( $data['versions'] as $versionData ) {
-			$graph = $versionData['graph_json'] ?? [ 'nodes' => [], 'edges' => [] ];
+			$graph = $versionData['graph_json'] ?? [
+				'nodes' => [],
+				'edges' => []
+			];
 
 			$graph = $this->strip_connection_ids( $graph );
 
@@ -333,7 +346,7 @@ class ImportExportController extends WP_REST_Controller {
 				'new_id'        => $version->id,
 				'is_active'     => (bool) $version->is_active,
 			];
-		}
+		}//end foreach
 
 		$hasActive = WorkflowVersion::where( 'workflow_id', $workflow->id )->where( 'is_active', 1 )->first();
 		if ( ! $hasActive ) {
@@ -419,7 +432,7 @@ class ImportExportController extends WP_REST_Controller {
 			if ( $originalParent ) {
 				$newNodes[ $nodeRun->id ] = (int) $originalParent;
 			}
-		}
+		}//end foreach
 
 		foreach ( $newNodes as $newId => $originalParentId ) {
 			if ( isset( $idMap[ $originalParentId ] ) ) {

@@ -1,5 +1,5 @@
 .zaplane-app {
-    background: #F6F7F8;
+    background: var(--zaplane-secondary-color);
     display: flex;
     flex-direction: column;
     left: 0;
@@ -73,8 +73,8 @@
 
     .zaplane-select {
         &__control {
-            border: 1px solid #CBD1D7;
-            background: #FFF;
+            border: 1px solid var(--zaplane-border-color);
+            background: var(--zaplane-background);
             border-radius: 4px;
             box-shadow: none;
 
@@ -88,23 +88,24 @@
         }
 
         &__control:hover {
-            border: 1px solid #CBD1D7;
+            border: 1px solid var(--zaplane-border-color);
         }
 
         &__menu {
-            background: #fff;
+            background: var(--zaplane-background);
             min-width: 100%;
-            box-shadow: 0 0 1px 0 rgba(20, 26, 36, 0.30), 0 8px 16px 0 rgba(20, 26, 36, 0.10);
+            box-shadow: var(--zaplane-shadow-menu);
         }
 
         &__option {
             color: var(--zaplane-font-color);
             cursor: pointer;
             white-space: nowrap;
+            background: transparent;
 
             &:hover,
             &:active {
-                background: var(--zaplane-primary) !important;
+                background: var(--zaplane-secondary-color) !important;
                 -webkit-tap-highlight-color: none !important;
             }
 
@@ -113,14 +114,19 @@
             border-radius: 4px;
         }
 
+        // Keyboard/mouse-hovered row: a neutral highlight, not the brand color —
+        // a solid primary fill here reads like a button, not a passive hover state.
         &__option--is-focused {
-            background: var(--zaplane-primary) !important;
-            color: #fff !important;
+            background: var(--zaplane-secondary-color) !important;
+            color: var(--zaplane-font-color) !important;
         }
 
+        // The actually-selected value: a soft tint instead of a solid fill, so it
+        // doesn't visually compete with real primary buttons (e.g. "Create New").
         &__option--is-selected {
-            background: var(--zaplane-primary) !important;
-            color: #fff !important;
+            background: var(--zaplane-second-primary) !important;
+            color: var(--zaplane-primary) !important;
+            font-weight: 600;
         }
 
         &__multi-value {
@@ -128,15 +134,15 @@
         }
 
         &__multi-value__label {
-            color: #fff !important;
+            color: var(--zaplane-white) !important;
         }
 
         &__multi-value__remove {
-            color: #E2483D;
+            color: var(--zaplane-danger);
         }
 
         &__single-value {
-            color: #141A24;
+            color: var(--zaplane-font-color);
         }
     }
 
@@ -239,7 +245,6 @@
         padding: 0 8px;
         border-radius: 4px;
         margin: 0;
-        background: transparent !important;
         color: var(--zaplane-font-color) !important;
 
         &:hover,
@@ -343,13 +348,13 @@
     transform: translate(-50%, -50%);
     width: 8px;
     height: 8px;
-    background-color: white;
+    background-color: var(--zaplane-white);
     border-radius: 50%;
 }
 
 .zaplane-radio-input:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    box-shadow: 0 0 0 3px var(--zaplane-focus-ring);
 }
 
 .zaplane-radio-input:hover {

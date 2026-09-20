@@ -3,6 +3,10 @@ namespace Zaplane\Integrations\Wordpress;
 
 use Zaplane\Traits\ActionResponseTrait;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait PostActionsTrait {
 
 	protected static function action_create_post( array $config ): array {
@@ -63,6 +67,9 @@ trait PostActionsTrait {
 		$new_title   = $config['new_title'] ?? '';
 		$status      = $config['status'] ?? 'draft';
 		$post        = get_post( $post_id );
+		if ( ! $post ) {
+			return static::error( 'Post not found.' );
+		}
 		$final_title = '' !== $new_title ? $new_title : $post->post_title . ' (copy)';
 		$new_post_id = wp_insert_post([
 			'post_type'    => $post->post_type,

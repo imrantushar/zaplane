@@ -10,6 +10,7 @@ use Zaplane\Framework\Classes\Container;
 use Zaplane\Models\Folder;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\Run;
+use Zaplane\Authoring\WorkflowAuthor;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -116,10 +117,65 @@ class FolderController extends WP_REST_Controller {
 				'permission_callback' => [ $this, 'permissions_check' ],
 			],
 		] );
+
+		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>\d+)/status', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'set_status' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+				'args'                => [
+					'status' => [
+						'type'     => 'string',
+						'required' => true,
+						'enum'     => [ 'active', 'paused' ],
+					],
+				],
+			],
+		] );
 	}
 
 	public function permissions_check(): bool {
 		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * Switches on every workflow in the folder, or pauses the ones that are on.
+	 *
+	 * A workflow only goes live if it passes the checks any workflow has to pass
+	 * to go live. One that doesn't keeps its status, and says why.
+	 */
+	public function set_status( $request ) {
+		$folder = Folder::find( (int) $request['id'] );
+		if ( ! $folder ) {
+			return new WP_Error( 'not_found', 'Folder not found.', [ 'status' => 404 ] );
+		}
+
+		$status  = (string) $request->get_param( 'status' );
+		$results = [];
+
+		foreach ( $folder->workflows() as $workflow ) {
+			$result = [
+				'id'     => (int) $workflow->id,
+				'title'  => (string) $workflow->title,
+				'status' => (string) $workflow->status,
+				'error'  => null,
+			];
+
+			// Pausing stops what is running; a draft stays a draft.
+			$changes = 'active' === $status ? 'active' !== $workflow->status : 'active' === $workflow->status;
+
+			if ( $changes ) {
+				try {
+					$result['status'] = (string) WorkflowAuthor::set_status( (int) $workflow->id, $status )['status'];
+				} catch ( \InvalidArgumentException $e ) {
+					$result['error'] = $e->getMessage();
+				}
+			}
+
+			$results[] = $result;
+		}
+
+		return rest_ensure_response( [ 'workflows' => $results ] );
 	}
 
 	public function get_items( $request ) {
@@ -207,7 +263,10 @@ class FolderController extends WP_REST_Controller {
 		$workflow->folder_id = null;
 		$workflow->save();
 
-		return rest_ensure_response( [ 'removed' => true, 'workflow_id' => $workflow->id ] );
+		return rest_ensure_response( [
+			'removed' => true,
+			'workflow_id' => $workflow->id
+		] );
 	}
 
 	public function get_folder_workflows( $request ) {
@@ -272,6 +331,9 @@ class FolderController extends WP_REST_Controller {
 
 		$folder->delete();
 
-		return rest_ensure_response( [ 'deleted' => true, 'id' => (int) $request['id'] ] );
+		return rest_ensure_response( [
+			'deleted' => true,
+			'id' => (int) $request['id']
+		] );
 	}
 }

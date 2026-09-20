@@ -1,6 +1,10 @@
 <?php
 namespace Zaplane\Integrations\Memberpress;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait ActionsTrait {
 
 	private static function action_success_with_input( array $input, array $extra = [] ): array {

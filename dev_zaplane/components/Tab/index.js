@@ -13,16 +13,16 @@ const ZAPTab = ({ value, tabs, onChange }) => {
 
     return (
         <TabGroup selectedIndex={selectedIndex >= 0 ? selectedIndex : 0} onChange={handleTabChange}>
-            <TabList className="flex space-x-1 mb-4 border-b border-gray-200">
-                {tabs.map((tab) => (
+            <TabList className="flex mb-4 border-b border-[var(--zaplane-border-color)]">
+                {tabs.map((tab, index) => (
                     <Tab as={Fragment} key={tab.value}>
                         {({ selected }) => (
                             <button
                                 className={`
-                                    py-2 px-4 text-sm font-medium focus:outline-none 
-                                    ${selected 
-                                        ? 'border-b-2 border-blue-600 text-blue-600' 
-                                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent'}
+                                    py-2.5 ${index === 0 ? 'pr-[12px]' : 'px-[12px]'} text-sm font-medium border-b-2 transition-colors focus:outline-none
+                                    ${selected
+                                        ? 'border-[var(--zaplane-primary)] text-[var(--zaplane-font-color)]'
+                                        : 'border-transparent text-[var(--zaplane-font-secondary-color)] hover:text-[var(--zaplane-font-color)]'}
                                 `}
                             >
                                 {tab.label}

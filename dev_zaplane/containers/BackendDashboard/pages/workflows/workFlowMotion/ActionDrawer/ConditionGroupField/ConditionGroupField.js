@@ -4,10 +4,12 @@ import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import { __ } from "@wordpress/i18n";
 import { buildEmptyRule } from "./helper";
 import VariableEditor from "@ZAPComponents/VariableEditor";
+import { primaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
 export default function ConditionGroupField({
   value,
   field,
-  variables
+  variables,
+  variableContext
 }) {
   const ruleFields = field?.fields;
   const EMPTY_RULE = buildEmptyRule(ruleFields);
@@ -22,11 +24,11 @@ export default function ConditionGroupField({
       return <div className="flex flex-col gap-4">
                         {groups.map((group, gIndex) => <div key={gIndex}>
                                 {groups.length > 1 && gIndex !== 0 && <div className="flex items-center mb-3">
-                                        <div className="flex-[1] h-[1px] bg-gray-300" />
+                                        <div className="flex-[1] h-[1px] bg-[var(--zaplane-border-color)]" />
                                         <span className="mx-3 text-[sm]">
                                             {__("OR", "zaplane")}
                                         </span>
-                                        <div className="flex-[1] h-[1px] bg-gray-300" />
+                                        <div className="flex-[1] h-[1px] bg-[var(--zaplane-border-color)]" />
                                     </div>}
 
                                 <FieldArray name={`${field.key}.${gIndex}`}>
@@ -43,7 +45,7 @@ export default function ConditionGroupField({
                   }
                   return <VariableEditor containerStyle={{
                     width: '30%'
-                  }} label={f.label} placeholder={__('Type "@" here to...', "zaplane")} value={rule[f.key]} variables={variables} field={{
+                  }} multiline={false} label={f.label} placeholder={__('Type "@" here to...', "zaplane")} value={rule[f.key]} variables={variables} variableContext={variableContext} isRequired field={{
                     key: `${field.key}.${gIndex}.${rIndex}.${f.key}`
                   }} setFieldValue={(key, val) => {
                     ruleHelpers.replace(rIndex, {
@@ -54,9 +56,9 @@ export default function ConditionGroupField({
                 })}
 
                                                     <div className="flex items-center gap-2 mt-[27px] min-h-[30px]">
-                                                        <button type="button" style={{height:'34px', background:'var(--zaplane-secondary)', color:'var(--zaplane-font-color)'}} onClick={() => ruleHelpers.push({
+                                                        <button type="button" style={primaryBtn} onClick={() => ruleHelpers.push({
                     ...EMPTY_RULE
-                  })} className="bg-var(--zaplane-secondary) text-var(--zaplane-font-color)">
+                  })}>
                                                             {__("Add", "zaplane")}
                                                         </button>
 
@@ -75,9 +77,9 @@ export default function ConditionGroupField({
                                 </FieldArray>
                             </div>)}
 
-                        <button size="sm" width="140px" onClick={() => groupHelpers.push([{
+                        <button type="button" style={primaryBtn} onClick={() => groupHelpers.push([{
           ...EMPTY_RULE
-        }])} className="bg-var(--zaplane-secondary) text-var(--zaplane-font-color) font-[500]">
+        }])}>
                             {__("OR Group", "zaplane")}
                         </button>
                     </div>;

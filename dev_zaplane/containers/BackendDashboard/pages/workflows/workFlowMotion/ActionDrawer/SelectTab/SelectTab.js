@@ -1,7 +1,7 @@
-
 import { __ } from "@wordpress/i18n";
 import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ConnectionSelector from "./ConnectionSelector/ConnectionSelector";
+import WebhookSetup from "./WebhookSetup/WebhookSetup";
 
 const SelectTab = ({
   isTrigger,
@@ -28,6 +28,7 @@ const SelectTab = ({
         }}
         placeholder={__("Select Action Type", "zaplane")}
         isClearable
+        isRequired
         containerStyle={{ marginBottom: "8px" }}
       />
       {selectedIntegration?.requires_connection === true && (
@@ -35,6 +36,17 @@ const SelectTab = ({
           appSlug={appSlug}
           values={values}
           setFieldValue={setFieldValue}
+          selectedIntegration={selectedIntegration}
+        />
+      )}
+      {/*
+        Webhook-delivered triggers can only fire once the provider is pointed at
+        this site's callback URL and the handshake secret matches. Both belong
+        next to the trigger being configured — there is nowhere else to set them.
+      */}
+      {isTrigger && (
+        <WebhookSetup
+          appSlug={appSlug}
           selectedIntegration={selectedIntegration}
         />
       )}

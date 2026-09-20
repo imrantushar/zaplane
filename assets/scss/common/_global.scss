@@ -1,21 +1,56 @@
 :root {
-    --zaplane-font: "Roboto", sans-serif;
+    --zaplane-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
     --zaplane-primary: #006BFF;
-    --zaplane-second-primary: #DAEAFF;
+    --zaplane-second-primary: #E3E7FF;
     --zaplane-secondary: #f5f5f5;
     --zaplane-secondary-color: #F6F7F8;
-    --zaplane-border-color: #CBD1D7;
+    --zaplane-border-color: #DFE1E5;
     --zaplane-body-background: #F6F7F8;
     --zaplane-background: #FFFFFF;
-    --zaplane-font-color: #141A24;
-    --zaplane-font-secondary-color: #737373;
+    --zaplane-font-color: #131D2B;
+    --zaplane-font-secondary-color: #575E6C;
     --zaplane-text-muted: #738496;
-    --zaplane-danger: #e44a3f;
+    --zaplane-danger: #E2483D;
     --zaplane-warning: #FDB022;
+    --zaplane-success: #00AD6B;
     --zaplane-placeholder: #A2ADB9;
+    // Aliases for a few legacy references in component styles. Resolved lazily,
+    // so they follow the active (light/dark) values of the vars they point at.
+    --zaplane-primary-color: var(--zaplane-primary);
+    --zaplane-gray-color: var(--zaplane-font-secondary-color);
     --zaplane-shadow: 0 0 1px 0 rgba(212, 212, 216, 0.30) inset, 0 8px 16px 0 rgba(24, 24, 27, 0.10);
     --zaplane-shadow-2: 0 0 1px 0 rgba(20, 26, 36, 0.20), 0 1px 2px 0 rgba(20, 26, 36, 0.10);
+    --zaplane-shadow-menu: 0 0 1px 0 rgba(20, 26, 36, 0.30), 0 8px 16px 0 rgba(20, 26, 36, 0.10);
     --zaplane-gray: #F6F7F8;
+
+    // Base/neutral tokens (previously hardcoded #fff/#000 throughout components)
+    --zaplane-white: #fff;
+    --zaplane-black: #000;
+    --zaplane-icon-check: #f8f8f8;
+    --zaplane-btn-text: #444;
+    --zaplane-disabled-bg: #E5E5E6;
+    --zaplane-overlay-dark: rgba(0, 0, 0, 0.1);
+    --zaplane-overlay-light: rgba(0, 0, 0, 0.08);
+    --zaplane-focus-ring: rgba(49, 130, 206, 0.1);
+
+    // Extra semantic accents (not covered by primary/danger/success/warning)
+    --zaplane-info: #7B68EE;
+    --zaplane-info-light: rgba(123, 104, 238, 0.2);
+    --zaplane-red: #f94d4d;
+    --zaplane-red-light: rgba(249, 77, 77, 0.2);
+
+    // Notification component tokens
+    --zaplane-notification-shadow: 0px 12px 72px -8px rgba(16, 24, 40, 0.25);
+    --zaplane-notification-error: #FF4D4D;
+    --zaplane-notification-error-light: #FFEDED;
+
+    // Status pill tokens
+    --zaplane-status-success: #16A34A;
+    --zaplane-status-success-bg: rgba(22, 163, 74, 0.1);
+    --zaplane-status-failed: #DC2626;
+    --zaplane-status-failed-bg: rgba(220, 38, 38, 0.1);
+    --zaplane-status-pending: #EAB308;
+    --zaplane-status-pending-bg: rgba(234, 179, 8, 0.1);
 }
 
 // .wp-admin{
@@ -24,8 +59,13 @@
 // #wpbody-content{
 //     padding: 0
 // }
+// #wpfooter is absolutely positioned against #wpcontent (WP core sets
+// #wpcontent to position:relative), so it sits outside #wpbody-content's own
+// box and shows WP core's light background through unless #wpcontent itself
+// is themed too.
 #wpcontent{
-    padding: 0
+    padding: 0;
+    background: var(--zaplane-body-background);
 }
 .react-flow{
     position: fixed !important;
@@ -64,8 +104,8 @@
     font-size: 14px;
     .zaplane-select {
         &__control {
-            border: 1px solid #CBD1D7;
-            background: #FFF;
+            border: 1px solid var(--zaplane-border-color);
+            background: var(--zaplane-background);
             border-radius: 4px;
             box-shadow: none;
             .zaplane-select__input-container {
@@ -77,21 +117,22 @@
             }
         }
           &__control:hover{
-        border:1px solid #CBD1D7;
+        border:1px solid var(--zaplane-border-color);
        }
 
         &__menu {
-            background: #fff;
+            background: var(--zaplane-background);
             min-width: 100%;
-            box-shadow: 0 0 1px 0 rgba(20, 26, 36, 0.30), 0 8px 16px 0 rgba(20, 26, 36, 0.10);
+            box-shadow: var(--zaplane-shadow-menu);
         }
 
         &__option {
             color: var(--zaplane-font-color);
             cursor: pointer;
             white-space: nowrap;
+            background: transparent;
             &:hover, &:active {
-                background: var(--zaplane-primary) !important;
+                background: var(--zaplane-secondary-color) !important;
                 -webkit-tap-highlight-color: none !important;
             }
             width: calc(100% - 16px);
@@ -99,14 +140,19 @@
             border-radius: 4px;
         }
 
+        // Keyboard/mouse-hovered row: a neutral highlight, not the brand color —
+        // a solid primary fill here reads like a button, not a passive hover state.
         &__option--is-focused {
-            background: var(--zaplane-primary) !important;
-            color: #fff !important;
+            background: var(--zaplane-secondary-color) !important;
+            color: var(--zaplane-font-color) !important;
         }
 
+        // The actually-selected value: a soft tint instead of a solid fill, so it
+        // doesn't visually compete with real primary buttons (e.g. "Create New").
         &__option--is-selected {
-            background: var(--zaplane-primary) !important;
-            color: #fff !important;
+            background: var(--zaplane-second-primary) !important;
+            color: var(--zaplane-primary) !important;
+            font-weight: 600;
         }
         
         &__multi-value {
@@ -114,15 +160,34 @@
         }
 
         &__multi-value__label {
-            color: #fff !important;
+            color: var(--zaplane-white) !important;
         }
 
         &__multi-value__remove {
-            color: #E2483D;
+            color: var(--zaplane-danger);
         }
 
         &__single-value {
-            color: #141A24;
+            color: var(--zaplane-font-secondary-color);
+        }
+
+        // Typed text + placeholder + indicators must theme too (react-select
+        // renders these with hardcoded near-black inline colors otherwise).
+        &__input-container {
+            color: var(--zaplane-font-color) !important;
+        }
+
+        &__input input {
+            background: transparent !important;
+            color: var(--zaplane-font-color) !important;
+        }
+
+        &__placeholder {
+            color: var(--zaplane-placeholder);
+        }
+
+        &__indicator {
+            color: var(--zaplane-text-muted);
         }
     }
 
@@ -185,17 +250,65 @@
     transform: translate(-50%, -50%);
     width: 8px;
     height: 8px;
-    background-color: white;
+    background-color: var(--zaplane-white);
     border-radius: 50%;
 }
 
 .zaplane-radio-input:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    box-shadow: 0 0 0 3px var(--zaplane-focus-ring);
 }
 
 .zaplane-radio-input:hover {
     border-color: var(--zaplane-primary-color);
+}
+
+// Custom checkbox (boolean / checkbox field types)
+// Selectors use the "input.zaplane-checkbox" form (rather than just ".zaplane-checkbox")
+// to match/beat the specificity of WP admin core's own
+// `input[type=checkbox]:checked::before` dashicon-based rule (forms.css), which would
+// otherwise win the cascade and clobber this checkmark's size/position/content.
+input.zaplane-checkbox {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--zaplane-border-color);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+input.zaplane-checkbox:checked {
+    border-color: var(--zaplane-primary);
+    background-color: var(--zaplane-primary);
+}
+
+input.zaplane-checkbox:checked::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 5px !important;
+    top: 2px !important;
+    width: 4px !important;
+    height: 9px !important;
+    border-right: 2px solid var(--zaplane-white) !important;
+    border-bottom: 2px solid var(--zaplane-white) !important;
+    transform: rotate(45deg) !important;
+    float: none !important;
+    display: block !important;
+    margin: 0 !important;
+    font: normal 0/0 serif !important;
+}
+
+input.zaplane-checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--zaplane-focus-ring);
+}
+
+input.zaplane-checkbox:hover {
+    border-color: var(--zaplane-primary);
 }
 
 .zaplane-radio-label {
@@ -218,7 +331,73 @@
 }
 // Custom radio button
 
+// Field text should render at normal weight in the standard font color
+// (these controls otherwise inherit a bold weight).
+.zaplane-input,
+.zaplane-textarea {
+    font-weight: 400;
+    color: var(--zaplane-font-secondary-color);
+}
 
+// ── Themed form controls (dark-mode-aware) ────────────────────────────────
+// Any input/select/textarea inside a Zaplane surface — the main app AND portaled
+// modals/drawers (which re-apply `.zaplane-scope`) — must use themed colors so
+// they don't fall back to WordPress admin core's hardcoded white. No
+// `!important` needed: this selector (0,2,1) already outweighs WP core's
+// element+attribute form rules (0,1,1) — and `!important` here would leak into
+// embedded third-party editors (e.g. the email builder) whose own class-based
+// input styles could then never win.
+.zaplane-scope {
+    .zaplane-input,
+    .zaplane-textarea,
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    input[type="number"],
+    input[type="search"],
+    input[type="password"],
+    input[type="tel"],
+    textarea,
+    select {
+        background-color: var(--zaplane-background);
+        color: var(--zaplane-font-color);
+        border-color: var(--zaplane-border-color);
+
+        &::placeholder {
+            color: var(--zaplane-placeholder);
+        }
+    }
+
+    // Styled checkbox/radio: themed fill for the unchecked state only. This ties
+    // in specificity with the plain `input.zaplane-checkbox:checked` rule above
+    // and comes later in the cascade, so without `:not(:checked)` it would win
+    // the tie and permanently mask the checked-state primary fill.
+    input.zaplane-checkbox:not(:checked),
+    .zaplane-radio-input:not(:checked) {
+        background-color: var(--zaplane-background);
+    }
+
+    // Native (unstyled) checkboxes/radios — e.g. the table select-all box.
+    // `:not(:checked)` here too: these are `!important`, so without it they'd
+    // unconditionally win over WP core's (non-`!important`) `:checked` fill/
+    // border rules and permanently mask the checked-state appearance.
+    input[type="checkbox"]:not(.zaplane-checkbox):not(:checked),
+    input[type="radio"]:not(.zaplane-radio-input):not(:checked) {
+        background: var(--zaplane-background) !important;
+        border-color: var(--zaplane-border-color) !important;
+    }
+
+    // react-select's editable input shares a grid cell with the selected value.
+    // The generic themed-input rule above forces an opaque background on every
+    // [type=text] input — which would paint over and CLIP the value's first
+    // character. Keep the select's own input transparent (declared later, so it
+    // wins the equal-specificity tie against that rule).
+    .zaplane-select__input-container input,
+    input.zaplane-select__input {
+        background: transparent !important;
+        color: var(--zaplane-font-color) !important;
+    }
+}
 
 @media (max-width: 768px) {
     .zaplane-ticket-table td > p{

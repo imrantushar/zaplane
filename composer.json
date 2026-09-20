@@ -1,29 +1,46 @@
 {
     "name": "zaplane/zaplane",
     "description": "Automate your WordPress site management with Zaplane.",
+    "license": "GPL-3.0-or-later",
     "require": {
-        "storeengine/wordpress-sdk": "^1.2",
-        "woocommerce/action-scheduler": "^3.8"
+        "woocommerce/action-scheduler": "^4.1"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/imrantushar/storeengine-sdk-for-wordpress.git"
-        }
-    ],
     "require-dev": {
-        "squizlabs/php_codesniffer": "3.6.2",
-        "dealerdirect/phpcodesniffer-composer-installer": "0.7.1",
+        "squizlabs/php_codesniffer": "^3.9",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "phpcompatibility/php-compatibility": "9.3.5",
-        "wp-coding-standards/wpcs": "2.3.0",
-        "phpunit/phpunit": "^9.5",
+        "wp-coding-standards/wpcs": "^3.1",
+        "phpunit/phpunit": "^9.6",
         "yoast/phpunit-polyfills": "^1.0",
-        "phpcompatibility/phpcompatibility-wp": "*"
+        "phpcompatibility/phpcompatibility-wp": "*",
+        "mockery/mockery": "^1.5"
     },
     "scripts": {
         "format": "phpcbf",
         "lint": "phpcs",
-        "test": "vendor/bin/phpunit"
+        "build": "@build:production",
+        "build:production": "bash scripts/build-zip.sh",
+        "build:zip": "bash scripts/build-zip.sh",
+        "build:assets": "npm run build",
+        "test": "vendor/bin/phpunit",
+        "test:integrations": "vendor/bin/phpunit --testsuite=Integrations",
+        "test:utils": "vendor/bin/phpunit --testsuite=Utils",
+        "test:testing": "vendor/bin/phpunit --testsuite=Testing",
+        "test:smoke": "vendor/bin/phpunit --filter=ParityTest",
+        "test:release": [
+            "@composer test:utils",
+            "@composer test:testing",
+            "@composer test:integrations"
+        ],
+        "test:all": [
+            "@composer test:smoke",
+            "@composer test:release"
+        ]
+    },
+    "scripts-descriptions": {
+        "build": "Build a production release zip (alias of build:production). Optionally bump version: composer build 1.2.3",
+        "build:production": "Full production build: compile assets, install no-dev composer deps, create the dist zip, then restore dev deps.",
+        "build:assets": "Compile the production JS/CSS bundles (npm run build) only."
     },
     "config": {
         "platform": {

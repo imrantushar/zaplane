@@ -6,16 +6,20 @@ export default function Search({
   placeholder = 'Search...',
   defaultValue = '',
   onSearchHandler = () => {},
-  custom = ''
+  custom = '',
+  // Instant by default — searches that filter an in-memory list shouldn't lag.
+  // Pass a delay (ms) only when each change triggers a network request.
+  debounce = 0  
 }) {
   const [searchText, setSearchText] = useState(defaultValue);
   const classNames = ['zaplane-search-component', custom && `${custom}`].filter(Boolean).join(' ');
-  const debouncedAPICall = useCallback(reactDebounce(keyword => {
-    onSearchHandler(keyword);
-  }, 1000), [onSearchHandler]);
+  const emitSearch = useCallback(
+    debounce > 0 ? reactDebounce(keyword => onSearchHandler(keyword), debounce) : keyword => onSearchHandler(keyword),
+    [onSearchHandler, debounce]
+  );
   const searchHandler = searchValue => {
     setSearchText(searchValue);
-    debouncedAPICall(searchValue);
+    emitSearch(searchValue);
   };
   const handleClear = () => {
     if (searchText) {

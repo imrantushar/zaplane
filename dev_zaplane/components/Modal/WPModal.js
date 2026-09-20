@@ -11,7 +11,7 @@ export default function WPModal( {
 	isOpen = false,
 	onRequestClose,
 	isFullScreen = false,
-	shouldCloseOnClickOutside = false,
+	shouldCloseOnClickOutside = true,
 	size = 'medium',
 } ) {
 	return (
@@ -27,7 +27,7 @@ export default function WPModal( {
 						suffix && ' zaplane-wp-modal--' + suffix
 					}` }
 				>
-					<div className="zaplane-wp-modal__content">
+					<div className="zaplane-wp-modal__content zaplane-scope">
 						{ children }
 					</div>
 				</Modal>

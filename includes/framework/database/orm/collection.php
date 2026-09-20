@@ -692,25 +692,14 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 		return $this->when( ! $value, $callback, $default );
 	}
 
-	public function dd(): void {
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_dump -- Intentional debug helper.
-		var_dump( $this->toArray() );
-		die( 1 );
-	}
-
-	public function dump(): self {
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_dump -- Intentional debug helper.
-		var_dump( $this->toArray() );
-
-		return $this;
-	}
 
 
 	public function offsetExists( $offset ): bool {
 		return isset( $this->items[ $offset ] );
 	}
 
-	public function offsetGet( $offset ): mixed {
+	#[\ReturnTypeWillChange]
+	public function offsetGet( $offset ) {
 		return $this->items[ $offset ];
 	}
 
