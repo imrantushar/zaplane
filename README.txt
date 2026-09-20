@@ -12,52 +12,32 @@ Visual, no-code automation for WordPress. Connect triggers and actions across Wo
 
 == Description ==
 
-**Zaplane** is a no-code automation builder that runs inside your WordPress site. Connect a **trigger** (something that happens, like a WooCommerce order being completed or a form being submitted) to one or more **actions** (send an email, add a contact to your CRM, post a Slack message, and more), with delays, conditions, filters and loops in between.
+**Zaplane** is a no-code automation builder that runs inside your WordPress site. Connect a **trigger** (a WooCommerce order completing, a form being submitted) to one or more **actions** (send an email, add a contact to your CRM, post a Slack message), with delays, conditions, filters and loops in between.
 
 Build workflows visually on a drag-and-drop canvas — no code required — and let them run reliably in the background.
 
 = Why Zaplane? =
 
-* **No-code visual builder** — design automations on a flow canvas by connecting trigger and action nodes.
-* **Runs on your site** — workflows, run history and connection credentials are kept in your own WordPress database, with no per-task pricing. Data goes to a third-party service only when a workflow or connection you set up uses that service (see External services).
+* **No-code visual builder** — design automations by connecting trigger and action nodes on a flow canvas.
+* **Runs on your site** — workflows, run history and credentials stay in your own WordPress database, with no per-task pricing. Data reaches a third-party service only when a workflow or connection you set up uses it (see External services).
 * **80+ integrations** — connect the WordPress plugins and external apps you already use.
-* **Powerful flow control** — delays, conditions, filters, iterators (loops), custom variables and raw HTTP/webhook requests.
-* **Reliable background processing** — long-running and scheduled steps are powered by Action Scheduler.
-* **Ready-made recipes** — start from pre-built templates for common automations.
-* **Optional AI steps** — write replies, run a tool-calling agent or search your own knowledge base, through the AI Client built into WordPress 7.0 and later, on the provider you set up once for your whole site. On older WordPress versions, or for what the AI Client cannot do yet (audio transcription and knowledge-base embeddings), you can use your own OpenAI, Anthropic or Google Gemini key instead.
-* **Optional MCP server** — off by default. When you turn it on, an AI client you approve can read your workflows and build new ones through scoped, revocable access.
-
-= Ready-made recipe templates =
-
-* Abandoned cart recovery
-* Customer birthday / anniversary messages
-* Inactive customer win-back
-* Post-purchase upsell
-* Order-complete feedback request
-* Product recommendation follow-ups
-
-= Flow-control building blocks =
-
-* **Delay** — wait minutes, hours or days before the next step.
-* **Condition** — branch the workflow based on data.
-* **Filter** — stop a workflow unless criteria are met.
-* **Iterator** — loop over a list of items.
-* **Variable** — store and reuse values across steps.
-* **HTTP request** — call any external API or webhook.
+* **Flow control** — delay, condition, filter, iterator (loop), variable and raw HTTP/webhook steps.
+* **Reliable background processing** — long-running and scheduled steps run on Action Scheduler.
+* **Ready-made recipes** — templates for abandoned carts, birthday messages, win-backs, upsells and feedback requests.
+* **Optional AI steps** — write replies, run a tool-calling agent or search your own knowledge base, through the AI Client built into WordPress 7.0 and later, or your own OpenAI, Anthropic or Gemini key.
+* **Optional MCP server** — off by default. Turn it on and an AI client you approve can read your workflows and build new ones, through scoped and revocable access.
 
 = Integrations =
 
-Zaplane connects with a wide range of WordPress plugins and external services, including:
-
-* **eCommerce:** WooCommerce, WooCommerce Bookings, Easy Digital Downloads, SureCart, FluentCart, Dokan, FunnelKit, WPFunnels, StoreEngine, Paymattic, Abandoned Cart
+* **eCommerce:** WooCommerce, Easy Digital Downloads, SureCart, FluentCart, StoreEngine, Dokan, FunnelKit, WPFunnels
 * **CRM & marketing:** FluentCRM, Groundhogg, GemCRM, Mailchimp, Brevo, ActiveCampaign
-* **Forms:** Fluent Forms, Gravity Forms, WPForms, Contact Form 7, Formidable, Ninja Forms, weForms, MetForm, SureForms, Jotform, Typeform, Fillout, Bit Form, ARForm, Avada Forms
-* **LMS & membership:** LearnDash, Tutor LMS, LifterLMS, MasterStudy, Academy, MemberPress, Paid Memberships Pro, SureMembers, Ultimate Member, Profile Builder, BuddyBoss, GamiPress
-* **Messaging & email:** Slack, Discord, Telegram, WhatsApp, Gmail, FluentSMTP, SureMail, Zoom, Google Meet
-* **Page builders & blocks:** Elementor, Divi, Beaver Builder, Kadence Blocks, Essential Blocks, Spectra, CoBlocks
-* **Content & data:** Advanced Custom Fields, JetEngine, Meta Box, The Events Calendar, WP User Frontend, generic HTTP / Webhooks
+* **Forms:** Fluent Forms, Gravity Forms, WPForms, Contact Form 7, Formidable, Ninja Forms, SureForms, Jotform, Typeform
+* **LMS & membership:** LearnDash, Tutor LMS, LifterLMS, MasterStudy, Academy, MemberPress, Paid Memberships Pro, BuddyBoss
+* **Messaging & email:** Slack, Discord, Telegram, WhatsApp, Messenger, Gmail, Zoom, Google Meet
+* **Page builders:** Elementor, Divi, Beaver Builder, Kadence Blocks, Essential Blocks, Spectra
+* **Content & data:** Advanced Custom Fields, JetEngine, Meta Box, The Events Calendar, Trello, HTTP / Webhooks
 
-Each external service needs your own account with that provider. See **External services** below for what Zaplane sends to each one, and when.
+Each service needs your own account with that provider. See **External services** for what Zaplane sends to each one, and when.
 
 == Installation ==
 
@@ -267,34 +247,26 @@ Only one part of Zaplane is compiled: the admin interface, which is a React app.
 
 = Where the development files are =
 
-* `dev_zaplane/` — the React source of the admin interface. `app.js` is the entry point and `app.scss` its base stylesheet.
-* `dev_zaplane/components/` — shared UI components, some with a `styles.scss` beside them.
-* `dev_zaplane/containers/BackendDashboard/` — the admin screens (`pages/`), including the workflow canvas, and the admin menu.
-* `dev_zaplane/redux/` — the Redux store and its slices.
-* `dev_zaplane/hooks/` and `dev_zaplane/utils/` — custom React hooks and helper functions.
-* `dev_zaplane/webpack/` — a small loader the build uses to point the email editor's placeholder images at files in `assets/images/`.
+* `dev_zaplane/` — the React source: `app.js` is the entry point, `app.scss` its base stylesheet, with `components/` (shared UI), `containers/BackendDashboard/` (the admin screens and workflow canvas), `redux/` (store and slices), `hooks/`, `utils/` and `webpack/` (a loader that points the email editor's placeholder images at `assets/images/`).
 * `assets/scss/` — the Sass for the admin interface; `backend.scss` is its entry.
-* `package.json`, `webpack.config.js`, `tailwind.config.js`, `postcss.config.js` and `jsconfig.json` — the JavaScript dependencies, build scripts and build configuration. The build runs on `@wordpress/scripts`, with Tailwind CSS and Autoprefixer through PostCSS.
+* `package.json`, `webpack.config.js`, `tailwind.config.js`, `postcss.config.js` and `jsconfig.json` — the dependencies, build scripts and configuration. The build runs on `@wordpress/scripts`, with Tailwind CSS and Autoprefixer through PostCSS.
 
 = Generated files =
 
 * `assets/build/app.js` — built from `dev_zaplane/app.js` and every module it imports.
-* `assets/build/app.css` and `assets/build/app-rtl.css` — built from the Sass above; the right-to-left file is generated from the same source.
+* `assets/build/app.css` and `assets/build/app-rtl.css` — built from the Sass above; the right-to-left file comes from the same source.
 * `assets/build/app.asset.php` — written by the build: the script's WordPress dependencies and its version.
 
-Every generated `.js` and `.css` file starts with a comment that names its source and the commands that rebuild it.
+Every generated `.js` and `.css` file starts with a comment naming its source and the commands that rebuild it.
 
 = Building the admin interface =
 
-You need Node.js 18.12 or newer and npm 8.19 or newer.
+You need Node.js 18.12 or newer and npm 8.19 or newer. In the plugin's folder, `wp-content/plugins/zaplane`:
 
-1. Open a terminal in the plugin's folder, `wp-content/plugins/zaplane`.
-2. Install the dependencies: `npm install --legacy-peer-deps`
-3. Build the production files: `npm run build`
+1. Install the dependencies: `npm install --legacy-peer-deps`
+2. Build the production files: `npm run build`
 
-The build writes minified files to `assets/build/`. While you work on the source, run `npm run start` instead: it rebuilds on every save, unminified and with source maps. Run `npm run build` again before using the plugin on a live site.
-
-`--legacy-peer-deps` is needed because one dependency, react-json-view, declares support only for older React versions, although it works with the version Zaplane uses.
+The build writes minified files to `assets/build/`. While working on the source, `npm run start` rebuilds on every save, unminified and with source maps; run `npm run build` again before using the plugin on a live site. `--legacy-peer-deps` is needed because one dependency, react-json-view, declares support only for older React versions, although it works with the version Zaplane uses.
 
 The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `composer install --no-dev` reinstalls it.
 
