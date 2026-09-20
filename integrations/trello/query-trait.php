@@ -16,7 +16,7 @@ trait QueryTrait {
 			return $options;
 		}
 		$response = wp_remote_get(
-			self::API_BASE_URL . '/members/me/boards?' . http_build_query(
+			'https://api.trello.com/1/members/me/boards?' . http_build_query(
 				[
 					'key'    => $api_key,
 					'token'  => $token,
@@ -52,7 +52,7 @@ trait QueryTrait {
 			return $options;
 		}
 		$response = wp_remote_get(
-			self::API_BASE_URL . '/boards/' . rawurlencode( $board_id ) . '/lists?' . http_build_query(
+			'https://api.trello.com/1/boards/' . rawurlencode( $board_id ) . '/lists?' . http_build_query(
 				[
 					'key'    => $api_key,
 					'token'  => $token,
@@ -88,7 +88,7 @@ trait QueryTrait {
 			return $options;
 		}
 		$response = wp_remote_get(
-			self::API_BASE_URL . '/boards/' . rawurlencode( $board_id ) . '/labels?' . http_build_query(
+			'https://api.trello.com/1/boards/' . rawurlencode( $board_id ) . '/labels?' . http_build_query(
 				[
 					'key'    => $api_key,
 					'token'  => $token,
@@ -123,7 +123,7 @@ trait QueryTrait {
 			return $options;
 		}
 		$response = wp_remote_get(
-			self::API_BASE_URL . '/boards/' . rawurlencode( $board_id ) . '/cards?' . http_build_query(
+			'https://api.trello.com/1/boards/' . rawurlencode( $board_id ) . '/cards?' . http_build_query(
 				[
 					'key'    => $api_key,
 					'token'  => $token,
@@ -159,7 +159,7 @@ trait QueryTrait {
 			return $options;
 		}
 		$response = wp_remote_get(
-			self::API_BASE_URL . '/cards/' . rawurlencode( $card_id ) . '/checklists?' . http_build_query(
+			'https://api.trello.com/1/cards/' . rawurlencode( $card_id ) . '/checklists?' . http_build_query(
 				[
 					'key'    => $api_key,
 					'token'  => $token,
@@ -194,7 +194,7 @@ trait QueryTrait {
 			return $options;
 		}
 		$response = wp_remote_get(
-			self::API_BASE_URL . '/checklists/' . rawurlencode( $checklist_id ) . '/checkItems?' . http_build_query(
+			'https://api.trello.com/1/checklists/' . rawurlencode( $checklist_id ) . '/checkItems?' . http_build_query(
 				[
 					'key'    => $api_key,
 					'token'  => $token,
@@ -230,7 +230,7 @@ trait QueryTrait {
 			return $options;
 		}
 		$response = wp_remote_get(
-			self::API_BASE_URL . '/cards/' . rawurlencode( $card_id ) . '/attachments?' . http_build_query(
+			'https://api.trello.com/1/cards/' . rawurlencode( $card_id ) . '/attachments?' . http_build_query(
 				[
 					'key'    => $api_key,
 					'token'  => $token,
@@ -266,7 +266,7 @@ trait QueryTrait {
 			return $options;
 		}
 		$response = wp_remote_get(
-			self::API_BASE_URL . '/boards/' . rawurlencode( $board_id ) . '/members?' . http_build_query(
+			'https://api.trello.com/1/boards/' . rawurlencode( $board_id ) . '/members?' . http_build_query(
 				[
 					'key'    => $api_key,
 					'token'  => $token,
@@ -303,7 +303,7 @@ trait QueryTrait {
 			return $options;
 		}
 		$response = wp_remote_get(
-			self::API_BASE_URL . '/members/me/organizations?' . http_build_query(
+			'https://api.trello.com/1/members/me/organizations?' . http_build_query(
 				[
 					'key'    => $api_key,
 					'token'  => $token,

@@ -17,6 +17,21 @@ class Paidmembershippro extends IntegrationBase {
 		return 'paidmembershippro';
 	}
 
+	/**
+	 * The membership-levels table, as an identifier for a `%i` placeholder.
+	 *
+	 * Paid Memberships Pro registers `$wpdb->pmpro_membership_levels`, which is
+	 * unset until that plugin loads, so fall back to the prefixed name. Either
+	 * way the value is a fixed table name, never anything a request supplies.
+	 */
+	private static function levels_table(): string {
+		global $wpdb;
+
+		return isset( $wpdb->pmpro_membership_levels )
+			? (string) $wpdb->pmpro_membership_levels
+			: $wpdb->prefix . 'pmpro_membership_levels';
+	}
+
 	public static function get_name(): string {
 		return 'Paid Memberships Pro';
 	}
@@ -446,7 +461,8 @@ class Paidmembershippro extends IntegrationBase {
 
 			case 'get_all_membership_levels':
 				$levels = $wpdb->get_results(
-					"SELECT * FROM {$wpdb->pmpro_membership_levels} ORDER BY id ASC"
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reading another plugin's table; it has no API for this and nothing to cache against.
+					$wpdb->prepare( 'SELECT * FROM %i ORDER BY id ASC', self::levels_table() )
 				);
 
 				if ( $wpdb->last_error ) {
@@ -466,10 +482,8 @@ class Paidmembershippro extends IntegrationBase {
 				}
 
 				$level = $wpdb->get_row(
-					$wpdb->prepare(
-						"SELECT * FROM {$wpdb->pmpro_membership_levels} WHERE id = %d LIMIT 1",
-						$level_id
-					)
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reading another plugin's table.
+					$wpdb->prepare( 'SELECT * FROM %i WHERE id = %d LIMIT 1', self::levels_table(), $level_id )
 				);
 
 				if ( empty( $level ) ) {
@@ -508,10 +522,8 @@ class Paidmembershippro extends IntegrationBase {
 				}
 
 				$level = $wpdb->get_row(
-					$wpdb->prepare(
-						"SELECT * FROM {$wpdb->pmpro_membership_levels} WHERE id = %d LIMIT 1",
-						$membership_id
-					)
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reading another plugin's table.
+					$wpdb->prepare( 'SELECT * FROM %i WHERE id = %d LIMIT 1', self::levels_table(), $membership_id )
 				);
 
 				if ( empty( $level ) ) {
@@ -606,24 +618,31 @@ class Paidmembershippro extends IntegrationBase {
 					? absint( $config['membership_id'] )
 					: null;
 
-				$base_sql = "
-					SELECT   mu.user_id,
-					         mu.membership_id,
-					         ml.name AS membership_name
-					FROM     {$wpdb->prefix}pmpro_memberships_users AS mu
-					LEFT JOIN {$wpdb->prefix}pmpro_membership_levels AS ml
-					       ON mu.membership_id = ml.id
-					WHERE    mu.status = 'active'
-				";
+				$members_table = $wpdb->prefix . 'pmpro_memberships_users';
 
 				if ( $membership_id ) {
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reading another plugin's tables.
 					$rows = $wpdb->get_results(
-                        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-						$wpdb->prepare( $base_sql . ' AND mu.membership_id = %d', $membership_id )
+						$wpdb->prepare(
+							'SELECT mu.user_id, mu.membership_id, ml.name AS membership_name'
+							. ' FROM %i AS mu LEFT JOIN %i AS ml ON mu.membership_id = ml.id'
+							. " WHERE mu.status = 'active' AND mu.membership_id = %d",
+							$members_table,
+							self::levels_table(),
+							$membership_id
+						)
 					);
 				} else {
-					// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-					$rows = $wpdb->get_results( $base_sql );
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reading another plugin's tables.
+					$rows = $wpdb->get_results(
+						$wpdb->prepare(
+							'SELECT mu.user_id, mu.membership_id, ml.name AS membership_name'
+							. ' FROM %i AS mu LEFT JOIN %i AS ml ON mu.membership_id = ml.id'
+							. " WHERE mu.status = 'active'",
+							$members_table,
+							self::levels_table()
+						)
+					);
 				}
 
 				if ( empty( $rows ) ) {
@@ -680,7 +699,8 @@ class Paidmembershippro extends IntegrationBase {
 		global $wpdb;
 
 		$levels = $wpdb->get_results(
-			"SELECT id, name FROM {$wpdb->pmpro_membership_levels} ORDER BY id ASC"
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reading another plugin's table.
+			$wpdb->prepare( 'SELECT id, name FROM %i ORDER BY id ASC', self::levels_table() )
 		);
 
 		$options = [
@@ -724,11 +744,9 @@ class Paidmembershippro extends IntegrationBase {
 	private static function get_level_data( int $level_id ): array {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reading another plugin's table.
 		$level = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->pmpro_membership_levels} WHERE id = %d LIMIT 1",
-				$level_id
-			),
+			$wpdb->prepare( 'SELECT * FROM %i WHERE id = %d LIMIT 1', self::levels_table(), $level_id ),
 			ARRAY_A
 		);
 

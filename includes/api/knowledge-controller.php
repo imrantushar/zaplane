@@ -131,30 +131,90 @@ class KnowledgeController extends WP_REST_Controller {
 		$per_page = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?: 20 ) ) );
 		$offset   = ( $page - 1 ) * $per_page;
 
-		$table  = Knowledge::getTable();
-		$where  = '1=1';
-		$params = [];
+		$table = Knowledge::getTable();
+		$like  = '%' . $wpdb->esc_like( $search ) . '%';
 
-		if ( '' !== $business ) {
-			$where   .= ' AND business_key = %s';
-			$params[] = $business;
+		// The filters are optional, so there are four shapes this listing can
+		// take. They are written out rather than concatenated, so each statement
+		// handed to prepare() is a literal with its placeholders in it — nothing
+		// about the query is assembled from anything that arrived with the
+		// request, and $business and $search only ever arrive as values.
+		if ( '' !== $business && '' !== $search ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$total = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM %i WHERE business_key = %s AND (title LIKE %s OR content LIKE %s)',
+					$table,
+					$business,
+					$like,
+					$like
+				)
+			);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Literal statement, prepared here.
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, business_key, title, content, source, ref_id, updated_at FROM %i WHERE business_key = %s AND (title LIKE %s OR content LIKE %s) ORDER BY id DESC LIMIT %d OFFSET %d',
+					$table,
+					$business,
+					$like,
+					$like,
+					$per_page,
+					$offset
+				),
+				ARRAY_A
+			);
+		} elseif ( '' !== $business ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$total = (int) $wpdb->get_var(
+				$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE business_key = %s', $table, $business )
+			);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Literal statement, prepared here.
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, business_key, title, content, source, ref_id, updated_at FROM %i WHERE business_key = %s ORDER BY id DESC LIMIT %d OFFSET %d',
+					$table,
+					$business,
+					$per_page,
+					$offset
+				),
+				ARRAY_A
+			);
+		} elseif ( '' !== $search ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$total = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM %i WHERE title LIKE %s OR content LIKE %s',
+					$table,
+					$like,
+					$like
+				)
+			);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Literal statement, prepared here.
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, business_key, title, content, source, ref_id, updated_at FROM %i WHERE (title LIKE %s OR content LIKE %s) ORDER BY id DESC LIMIT %d OFFSET %d',
+					$table,
+					$like,
+					$like,
+					$per_page,
+					$offset
+				),
+				ARRAY_A
+			);
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$total = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Literal statement, prepared here.
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, business_key, title, content, source, ref_id, updated_at FROM %i ORDER BY id DESC LIMIT %d OFFSET %d',
+					$table,
+					$per_page,
+					$offset
+				),
+				ARRAY_A
+			);
 		}
-		if ( '' !== $search ) {
-			$where   .= ' AND (title LIKE %s OR content LIKE %s)';
-			$like     = '%' . $wpdb->esc_like( $search ) . '%';
-			$params[] = $like;
-			$params[] = $like;
-		}
-
-		// Total count.
-		$count_sql = "SELECT COUNT(*) FROM %i WHERE {$where}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is fixed fragments whose placeholders $params fills.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-		$total = (int) $wpdb->get_var( $wpdb->prepare( $count_sql, array_merge( [ $table ], $params ) ) );
-
-		$list_sql        = "SELECT id, business_key, title, content, source, ref_id, updated_at FROM %i WHERE {$where} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is fixed fragments whose placeholders $params fills.
-		$list_params     = array_merge( [ $table ], $params, [ $per_page, $offset ] );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-		$rows = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ), ARRAY_A );
 
 		return rest_ensure_response( [
 			'items'    => is_array( $rows ) ? $rows : [],

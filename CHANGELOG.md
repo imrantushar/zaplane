@@ -5,6 +5,44 @@ All notable changes to Zaplane are documented here. This project adheres to
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-09-20
+
+### Removed
+- **Switch Theme action.** Changing the active theme is the site owner's decision,
+  taken in the Appearance screens. The Theme Switch *trigger* stays: a workflow can
+  still react to a switch the owner makes.
+- **Authenticate User action.** It called `wp_signon()` with credentials stored in
+  the workflow, which set auth cookies on whatever request happened to be running
+  the run — a visitor's page view could end up signed in as that account.
+
+### Security
+- Create, Update and Delete User accept only the fields their own form offers,
+  filtered and sanitized per field, and only a role the site actually defines.
+  Delete refuses the last remaining administrator and the account the run is using.
+- The incoming-webhook and Catch Webhook routes verify the provider's signature or
+  the trigger's shared secret in their `permission_callback`, so an unsigned
+  request never reaches the code that dispatches a workflow.
+- The ORM refuses any table, column, operator, sort direction, join type or
+  aggregate that is not a plain identifier or a known keyword (`Identifier`), and
+  prepares every value in the same call that runs the statement.
+- Schema changes and the remaining direct reads pass table names as `%i`
+  identifiers to `$wpdb->prepare()`.
+- The admin colour palette is validated before it becomes CSS, the integrations
+  catalogue is escaped before it is inlined in a `<script>`, the MCP consent page
+  goes through `wp_kses()`, and the webhook handshake echo is constrained and
+  escaped.
+
+### Changed
+- LifterLMS, GamiPress and Paid Memberships Pro option lists are read through
+  `get_posts()`/`prepare()` rather than the posts table directly.
+- README documents the Telegram API address and the links the MCP screen offers to
+  claude.ai and ChatGPT.
+
+### Fixed
+- `select()`, `addSelect()` and `groupBy()` accept an array of columns again;
+  passing one nested the array and produced `SELECT \`Array\``, which broke
+  `pluck()` and `value()`.
+
 ## [1.3.0] - 2026-09-15
 
 ### Added

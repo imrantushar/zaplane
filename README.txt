@@ -4,7 +4,7 @@ Tags: automation, workflow, woocommerce, marketing automation, crm
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -132,7 +132,7 @@ Zaplane contacts no external service when you install, activate or browse it, an
 * Privacy policy: https://discord.com/privacy
 
 = Telegram =
-* Used for: the Telegram app (send messages, media, locations and polls) through a bot token you provide.
+* Used for: the Telegram app (send messages, media, locations and polls) through a bot token you provide (api.telegram.org).
 * Sends: the chat ID, message text and media URLs you configure.
 * When: when you test the connection and when a Telegram step runs.
 * Terms of service: https://telegram.org/tos/bot-developers
@@ -256,6 +256,11 @@ HTTP Request, Send Webhook, Custom Apps, the MCP Client, the AI Agent's HTTP too
 = MCP client metadata =
 When the optional MCP server is on and an AI client identifies itself with a client ID that is a URL, Zaplane fetches that client's public metadata document from the URL to show you who is asking. Nothing about your site is sent.
 
+= Links to AI clients =
+The MCP settings screen offers shortcuts that open claude.ai or chatgpt.com in your browser with the connector name and this site's MCP address already filled in, so you do not have to type them. These are ordinary links you choose to follow: Zaplane sends nothing to either service itself, and the addresses only ever appear in a page you opened yourself.
+* Terms of service: https://www.anthropic.com/legal/consumer-terms and https://openai.com/policies/row-terms-of-use/
+* Privacy policy: https://www.anthropic.com/legal/privacy and https://openai.com/policies/row-privacy-policy/
+
 == Source Code and Build Process ==
 
 Only one part of Zaplane is compiled: the admin interface, which is a React app. Everything else, including all of the plugin's PHP in `includes/` and `integrations/`, runs exactly as it ships. The complete, uncompiled source of the admin interface is included in this plugin, together with everything needed to build it.
@@ -294,6 +299,19 @@ The build writes minified files to `assets/build/`. While you work on the source
 The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `composer install --no-dev` reinstalls it.
 
 == Changelog ==
+
+= 1.3.1 =
+**Security and privacy**
+* Removed the Switch Theme and Authenticate User actions. Which theme a site runs, and signing in, are the site owner's own decisions.
+* Create, Update and Delete User now accept only the fields their form offers and a role the site defines, and refuse to delete the last administrator or the account the run is using.
+* Incoming webhook and Catch Webhook URLs check the provider's signature, or the trigger's shared secret, before the request reaches the workflow.
+* The workflow query builder now refuses any table, column, operator or sort direction that is not a plain name, and every value it sends is a placeholder filled in by WordPress.
+* The admin palette, the integrations catalogue and the MCP consent screen are escaped on the way out.
+* Documented the Telegram API address and the links to claude.ai and ChatGPT under External services.
+
+**Fixed**
+* Lists of courses, quizzes, ranks and achievements are read through WordPress instead of the posts table directly.
+* Fixed selecting a specific set of columns — a "get this field for every row" query returned nothing.
 
 = 1.3.0 =
 **Workflows**
@@ -384,6 +402,9 @@ The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `compo
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.3.1 =
+Security hardening throughout, and two actions removed: Switch Theme and Authenticate User.
 
 = 1.3.0 =
 Adds multiple triggers per workflow, group recipes, WordPress AI Client support and OAuth sign-in for AI clients, and fixes security issues. Requires WordPress 6.8 or later. MCP tokens issued to users without administrator rights stop working.

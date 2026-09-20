@@ -6,11 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\MetaGraph;
 
 class Messenger extends IntegrationBase {
-
-	private const API_BASE_URL        = 'https://graph.facebook.com';
-	private const DEFAULT_API_VERSION = 'v19.0';
 
 	public static function get_slug(): string {
 		return 'messenger';
@@ -180,14 +178,14 @@ class Messenger extends IntegrationBase {
 				'type'        => 'text',
 				'label'       => 'API Version',
 				'required'    => false,
-				'placeholder' => 'v19.0',
+				'placeholder' => MetaGraph::DEFAULT_VERSION,
+				'help'        => 'Graph API version to call. Leave blank to use ' . MetaGraph::DEFAULT_VERSION . '.',
 			],
 		];
 	}
 
 	public static function test_connection( array $credentials ): array {
-		$token       = $credentials['page_access_token'] ?? '';
-		$api_version = $credentials['api_version'] ?? self::DEFAULT_API_VERSION;
+		$token = $credentials['page_access_token'] ?? '';
 
 		if ( '' === $token ) {
 			return [
@@ -198,7 +196,7 @@ class Messenger extends IntegrationBase {
 		}
 
 		$response = wp_remote_get(
-			self::API_BASE_URL . '/' . $api_version . '/me?access_token=' . rawurlencode( $token ),
+			MetaGraph::url( 'me', $credentials['api_version'] ?? null ) . '?access_token=' . rawurlencode( $token ),
 			[ 'timeout' => 20 ]
 		);
 
@@ -275,8 +273,7 @@ class Messenger extends IntegrationBase {
 	}
 
 	private static function action_send_text( array $node, array $input, array $credentials ): array {
-		$token       = $credentials['page_access_token'];
-		$api_version = $credentials['api_version'] ?? self::DEFAULT_API_VERSION;
+		$token = $credentials['page_access_token'];
 
 		$recipient = $node['data']['config']['recipient_id'] ?? '';
 		$text      = $node['data']['config']['text'] ?? '';
@@ -294,7 +291,7 @@ class Messenger extends IntegrationBase {
 			'message'        => [ 'text' => $text ],
 		];
 
-		$url = self::API_BASE_URL . '/' . $api_version . '/me/messages?access_token=' . rawurlencode( $token );
+		$url = MetaGraph::url( 'me/messages', $credentials['api_version'] ?? null ) . '?access_token=' . rawurlencode( $token );
 
 		$response = wp_remote_post( $url, [
 			'headers' => [ 'Content-Type' => 'application/json' ],

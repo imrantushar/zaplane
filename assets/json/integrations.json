@@ -1,6 +1,6 @@
 {
     "version": "1.3.0",
-    "generated_at": "2026-09-15 17:54:56",
+    "generated_at": "2026-09-20 12:51:56",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -25667,38 +25667,6 @@
                         "error"
                     ]
                 },
-                "authenticate_user": {
-                    "label": "Authenticate User",
-                    "key": "authenticate_user",
-                    "schema": [
-                        {
-                            "key": "user_login",
-                            "label": "Username or Email",
-                            "type": "email",
-                            "required": true
-                        },
-                        {
-                            "key": "user_password",
-                            "label": "Password",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "remember",
-                            "label": "Remember",
-                            "type": "boolean"
-                        },
-                        {
-                            "key": "secure_cookie",
-                            "label": "Secure Cookie",
-                            "type": "boolean"
-                        }
-                    ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
                 "logout_user": {
                     "label": "Logout User",
                     "key": "logout_user",
@@ -28458,30 +28426,6 @@
                             "dynamic": {
                                 "integration": "wordpress",
                                 "query": "active_plugins",
-                                "select": [
-                                    "file",
-                                    "name"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "switch_theme": {
-                    "label": "Theme Switch",
-                    "key": "switch_theme",
-                    "schema": [
-                        {
-                            "key": "theme",
-                            "label": "Theme Switch",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "deactivate_theme",
                                 "select": [
                                     "file",
                                     "name"

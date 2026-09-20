@@ -3,7 +3,7 @@
  * Plugin Name:       Zaplane
  * Plugin URI:        https://zaplane.app/
  * Description:       WordPress Automation Plugin
- * Version:           1.3.0
+ * Version:           1.3.1
  * Author:            kodezen
  * Author URI:        https://kodezen.com
  * License:           GPL-3.0-or-later
@@ -61,7 +61,7 @@ final class Zaplane {
 	}
 
 	public function define_constants(): void {
-		define( 'ZAPLANE_VERSION', '1.3.0' );
+		define( 'ZAPLANE_VERSION', '1.3.1' );
 		define( 'ZAPLANE_ALLOW_LOGS', true );
 		define( 'ZAPLANE_PLUGIN_SLUG', 'zaplane' );
 		define( 'ZAPLANE_PLUGIN_FILE', __FILE__ );
