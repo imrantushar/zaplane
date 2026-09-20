@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-08 12:56:18",
+    "generated_at": "2026-09-20 13:43:00",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -12898,15 +12898,7 @@
                     "label": "Subscriber Added",
                     "hook": "mailchimp_webhook_subscribed",
                     "key": "subscribed",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -12915,15 +12907,7 @@
                     "label": "Subscriber Unsubscribed",
                     "hook": "mailchimp_webhook_unsubscribed",
                     "key": "unsubscribed",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -12932,15 +12916,7 @@
                     "label": "Subscriber Profile Updated",
                     "hook": "mailchimp_webhook_profile_updated",
                     "key": "profile_updated",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -12949,15 +12925,7 @@
                     "label": "Email Cleaned",
                     "hook": "mailchimp_webhook_cleaned",
                     "key": "cleaned",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -12966,15 +12934,7 @@
                     "label": "Subscriber Email Changed",
                     "hook": "mailchimp_webhook_email_changed",
                     "key": "email_changed",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -12983,15 +12943,7 @@
                     "label": "Campaign Sent",
                     "hook": "mailchimp_webhook_campaign_sent",
                     "key": "campaign_sent",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
