@@ -185,6 +185,47 @@ class Messenger extends MetaChannel {
 		return [ 'ok' => true ];
 	}
 
+	/**
+	 * Messenger Ice Breakers: shown to people opening a new conversation with
+	 * the Page. Tapping one arrives as a postback whose title is the question.
+	 *
+	 * @param array<int,string> $questions
+	 * @return array{ok:bool,error:string}
+	 */
+	public static function set_starters( array $questions ): array {
+		$credentials = self::credentials();
+		$token       = (string) ( $credentials['page_access_token'] ?? '' );
+		if ( '' === $token ) {
+			return [
+				'ok'    => false,
+				'error' => __( 'Choose a Messenger connection first.', 'zaplane' ),
+			];
+		}
+		$headers = [ 'Authorization' => 'Bearer ' . $token ];
+		$version = $credentials['api_version'] ?? null;
+
+		$result = empty( $questions )
+			? self::graph_request( 'DELETE', 'me/messenger_profile', [ 'fields' => [ 'ice_breakers' ] ], $headers, $version )
+			: self::graph_post( 'me/messenger_profile', [
+				'ice_breakers' => [
+					[
+						'locale'          => 'default',
+						'call_to_actions' => array_map( static function ( $question, $i ) {
+							return [
+								'question' => (string) $question,
+								'payload'  => 'ZAPLANE_STARTER_' . $i,
+							];
+						}, array_values( $questions ), array_keys( array_values( $questions ) ) ),
+					],
+				],
+			], $headers, $version );
+
+		return [
+			'ok'    => $result['ok'],
+			'error' => $result['error'],
+		];
+	}
+
 	public static function send( Conversation $conversation, ?Identity $identity, Message $message ): array {
 		if ( ! $identity ) {
 			return [

@@ -124,6 +124,8 @@ class InboxModule implements ModuleInterface {
 			'color'    => (string) $widget['color'],
 			'position' => (string) $widget['position'],
 			'askEmail' => (bool) $widget['ask_email'],
+			// Buttons under the greeting, before the visitor has typed anything.
+			'questions' => array_values( (array) ( Settings::get()['answers']['common_questions'] ?? [] ) ),
 			'aiName'   => $ai_on ? $agent : '',
 			/* translators: %s: assistant name. */
 			'aiLabel'  => $ai_on ? sprintf( __( '%s · AI assistant', 'zaplane' ), $agent ) : '',

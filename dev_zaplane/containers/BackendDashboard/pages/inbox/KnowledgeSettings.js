@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
-import { FiExternalLink, FiSearch, FiX, FiPlus, FiBookOpen } from "react-icons/fi";
+import { FiExternalLink, FiSearch, FiX, FiPlus, FiBookOpen, FiCheck, FiAlertCircle } from "react-icons/fi";
+import { channelOf } from "./channels";
 import ZAPToggle from "@ZAPComponents/ZAPToggle";
 import { inboxApi } from "./api";
 
@@ -32,8 +33,118 @@ const Stat = ({ value, label, tone }) => (
   </div>
 );
 
+const MAX_COMMON = 4;
+const COMMON_LENGTH = 80;
+
+/**
+ * Up to four questions customers can tap instead of typing: buttons in the
+ * website chat, Ice Breakers on Messenger, conversation starters on WhatsApp.
+ */
+const CommonQuestions = ({ questions, onChange, faqs, widgetOn, channels, formChannels, status }) => {
+  const list = questions || [];
+  const set = (i, v) => onChange(list.map((q, j) => (j === i ? v.slice(0, COMMON_LENGTH) : q)));
+  const remove = (i) => onChange(list.filter((_, j) => j !== i));
+  const unused = (faqs || []).filter((f) => !list.includes(f) && f.length <= COMMON_LENGTH);
+
+  const where = [
+    { slug: "web", label: __("Website chat", "zaplane"), on: widgetOn, state: widgetOn ? "ok" : "off" },
+    ...Object.entries(channels || {}).map(([slug, ch]) => {
+      const on = !!formChannels?.[slug]?.enabled;
+      const st = status?.[slug];
+      return { slug, label: ch.label, on, state: !on ? "off" : !st ? "pending" : st.ok ? "ok" : "error", error: st?.error };
+    }),
+  ];
+
+  return (
+    <div className="zaplane-inbox-common">
+      <div className="zaplane-inbox-gaps-head">
+        <span>
+          <span className="zaplane-inbox-field-label">{__("Common questions", "zaplane")}</span>
+          <em className="zaplane-inbox-hint">
+            {" "}
+            {__("Shown before the customer types. Tapping one asks it, so a matching FAQ answers instantly.", "zaplane")}
+          </em>
+        </span>
+        {list.length < MAX_COMMON && unused.length > 0 && (
+          <select
+            className="zaplane-inbox-select zaplane-inbox-pick"
+            value=""
+            onChange={(e) => e.target.value && onChange([...list, e.target.value])}
+            aria-label={__("Add a question from your FAQs", "zaplane")}
+          >
+            <option value="">{__("+ Add from FAQs", "zaplane")}</option>
+            {unused.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+
+      <ol className="zaplane-inbox-common-list">
+        {list.map((q, i) => (
+          <li key={i}>
+            <span className="zaplane-inbox-common-n">{i + 1}</span>
+            <input className="zaplane-inbox-input" value={q} onChange={(e) => set(i, e.target.value)} maxLength={COMMON_LENGTH} />
+            <span className="zaplane-inbox-hint">{COMMON_LENGTH - q.length}</span>
+            <button type="button" className="zaplane-inbox-icon-btn is-ghost" onClick={() => remove(i)} aria-label={__("Remove", "zaplane")} title={__("Remove", "zaplane")}>
+              <FiX />
+            </button>
+          </li>
+        ))}
+        {list.length < MAX_COMMON && (
+          <li>
+            <span className="zaplane-inbox-common-n">{list.length + 1}</span>
+            <button type="button" className="zaplane-inbox-small is-ghost" onClick={() => onChange([...list, ""])}>
+              <FiPlus />
+              {__("Write your own", "zaplane")}
+            </button>
+          </li>
+        )}
+      </ol>
+
+      {list.filter((q) => q.trim()).length > 0 && (
+        <div className="zaplane-inbox-where">
+          {where.map((w) => {
+            const { Icon, color } = channelOf(w.slug);
+            return (
+              <span key={w.slug} className={"zaplane-inbox-where-item is-" + w.state} title={w.error || ""}>
+                <Icon style={{ color }} />
+                {w.label}
+                {w.state === "ok" && <FiCheck />}
+                {w.state === "error" && <FiAlertCircle />}
+                <em>
+                  {w.state === "off"
+                    ? __("not on", "zaplane")
+                    : w.state === "pending"
+                      ? __("updates when you save", "zaplane")
+                      : w.state === "error"
+                        ? __("couldn't update", "zaplane")
+                        : ""}
+                </em>
+              </span>
+            );
+          })}
+        </div>
+      )}
+      {where.some((w) => w.state === "error") && (
+        <div className="zaplane-inbox-callout is-warning">
+          {where
+            .filter((w) => w.state === "error")
+            .map((w) => w.label + ": " + w.error)
+            .join(" · ")}
+        </div>
+      )}
+      <em className="zaplane-inbox-hint">
+        {__("Messenger and WhatsApp show them to people starting a new chat with you, in their apps.", "zaplane")}
+      </em>
+    </div>
+  );
+};
+
 /** Business Knowledge: what the Inbox answers from, and whether it answers on its own. */
-const KnowledgeSettings = ({ form, setAi, setAnswers, knowledgeKeys, answersData, aiOn }) => {
+const KnowledgeSettings = ({ form, setAi, setAnswers, knowledgeKeys, answersData, aiOn, channels }) => {
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState(null);
   const [testing, setTesting] = useState(false);
@@ -145,6 +256,16 @@ const KnowledgeSettings = ({ form, setAi, setAnswers, knowledgeKeys, answersData
         </span>
         <ZAPToggle checked={!!answers.feedback} onChange={(v) => setAnswers("feedback", v)} size="sm" />
       </div>
+
+      <CommonQuestions
+        questions={answers.common_questions}
+        onChange={(v) => setAnswers("common_questions", v)}
+        faqs={answersData?.faqs}
+        widgetOn={!!form.widget?.enabled}
+        channels={channels}
+        formChannels={form.channels}
+        status={answersData?.common}
+      />
 
       <div className="zaplane-inbox-stats" aria-label={__("This week", "zaplane")}>
         <Stat value={stats.answered || 0} label={__("Answered this week", "zaplane")} tone="success" />

@@ -175,7 +175,7 @@ const Settings = ({ onSaved }) => {
           allowed_origins: form.widget.allowed_origins.split(/\s+/).filter(Boolean),
         },
         ai: form.ai,
-        answers: form.answers,
+        answers: { ...(form.answers || {}), common_questions: (form.answers?.common_questions || []).map((q) => q.trim()).filter(Boolean) },
         channels: form.channels,
       });
       // Webhook secrets are stored with the integration, not the inbox.
@@ -321,6 +321,7 @@ const Settings = ({ onSaved }) => {
           knowledgeKeys={knowledgeKeys}
           answersData={data?.answers}
           aiOn={!!aiReady}
+          channels={data?.channels}
         />
 
         <section className="zaplane-inbox-card" id="zaplane-inbox-ai" data-section="ai">

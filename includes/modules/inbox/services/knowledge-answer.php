@@ -82,6 +82,19 @@ class KnowledgeAnswer {
 			return;
 		}
 
+		// Already answered (this job's queued copy ran, or someone replied
+		// first). A workflow notification isn't an answer.
+		$answered = Message::where( 'conversation_id', $conversation_id )
+			->where( 'id', '>', $message_id )
+			->where( 'direction', 'out' )
+			->where( 'is_note', 0 )
+			->where( 'sender_type', '!=', 'workflow' )
+			->fresh()
+			->first();
+		if ( $answered ) {
+			return;
+		}
+
 		if ( self::applies( $conversation ) || self::pending( $conversation ) ) {
 			if ( self::feedback( $conversation, $message ) || ( self::applies( $conversation ) && self::answer( $conversation, $message ) ) ) {
 				return;

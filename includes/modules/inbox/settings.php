@@ -49,6 +49,9 @@ class Settings {
 				'enabled'    => false,
 				'strictness' => 'balanced',
 				'feedback'   => true,
+				// Up to four questions offered before the customer types: buttons
+				// in the website chat, Messenger Ice Breakers, WhatsApp starters.
+				'common_questions' => [],
 			],
 			'ai'     => [
 				'enabled'       => false,
@@ -160,6 +163,9 @@ class Settings {
 			if ( isset( $a['strictness'] ) && in_array( $a['strictness'], [ 'strict', 'balanced', 'broad' ], true ) ) {
 				$current['answers']['strictness'] = $a['strictness'];
 			}
+			if ( isset( $a['common_questions'] ) && is_array( $a['common_questions'] ) ) {
+				$current['answers']['common_questions'] = self::clean_questions( $a['common_questions'] );
+			}
 		}
 
 		if ( isset( $input['ai'] ) && is_array( $input['ai'] ) ) {
@@ -195,6 +201,25 @@ class Settings {
 
 		update_option( self::OPTION, $current, false );
 		return $current;
+	}
+
+	/** Messenger and WhatsApp allow four starters of up to 80 characters. */
+	public const MAX_COMMON = 4;
+	public const COMMON_LENGTH = 80;
+
+	/**
+	 * @param array<int,mixed> $questions
+	 * @return array<int,string>
+	 */
+	private static function clean_questions( array $questions ): array {
+		$out = [];
+		foreach ( $questions as $q ) {
+			$q = trim( sanitize_text_field( (string) $q ) );
+			if ( '' !== $q ) {
+				$out[] = mb_substr( $q, 0, self::COMMON_LENGTH );
+			}
+		}
+		return array_slice( array_values( array_unique( $out ) ), 0, self::MAX_COMMON );
 	}
 
 	/**

@@ -2501,6 +2501,86 @@ $settings-sticky: 124px;
 	}
 }
 
+.zaplane-inbox-common {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 14px 16px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 10px;
+}
+
+.zaplane-inbox-pick {
+	width: auto;
+	max-width: 260px;
+}
+
+.zaplane-inbox-common-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+
+	li {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin: 0;
+	}
+}
+
+.zaplane-inbox-common-n {
+	display: grid;
+	flex: none;
+	place-items: center;
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	background: var(--zaplane-second-primary);
+	color: var(--zaplane-primary);
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.zaplane-inbox-where {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.zaplane-inbox-where-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 3px 10px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 999px;
+	font-size: 12px;
+
+	em {
+		color: var(--zaplane-font-secondary-color);
+		font-style: normal;
+	}
+
+	&.is-ok > svg:last-of-type {
+		color: #0b8a5f;
+	}
+
+	&.is-error {
+		border-color: color-mix(in srgb, #d98b00 40%, var(--zaplane-border-color));
+
+		> svg:last-of-type {
+			color: #b87400;
+		}
+	}
+
+	&.is-off {
+		opacity: 0.6;
+	}
+}
+
 @media (max-width: 782px) {
 	.zaplane-inbox-stats {
 		grid-template-columns: repeat(2, minmax(0, 1fr));

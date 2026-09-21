@@ -95,6 +95,21 @@ abstract class MetaChannel implements ChannelInterface {
 	}
 
 	/**
+	 * Show up to four questions a customer can tap to start a conversation
+	 * (Messenger Ice Breakers, WhatsApp conversation starters). An empty
+	 * list removes them.
+	 *
+	 * @param array<int,string> $questions
+	 * @return array{ok:bool,error:string}
+	 */
+	public static function set_starters( array $questions ): array {
+		return [
+			'ok'    => false,
+			'error' => __( 'This channel has no conversation starters.', 'zaplane' ),
+		];
+	}
+
+	/**
 	 * POST to the Graph API.
 	 *
 	 * @param array<string,mixed> $body
@@ -102,7 +117,17 @@ abstract class MetaChannel implements ChannelInterface {
 	 * @return array{ok:bool,data:array<string,mixed>,error:string}
 	 */
 	protected static function graph_post( string $path, array $body, array $headers, ?string $version ): array {
-		$response = wp_remote_post( MetaGraph::url( $path, $version ), [
+		return self::graph_request( 'POST', $path, $body, $headers, $version );
+	}
+
+	/**
+	 * @param array<string,mixed> $body
+	 * @param array<string,string> $headers
+	 * @return array{ok:bool,data:array<string,mixed>,error:string}
+	 */
+	protected static function graph_request( string $method, string $path, array $body, array $headers, ?string $version ): array {
+		$response = wp_remote_request( MetaGraph::url( $path, $version ), [
+			'method'  => $method,
 			'headers' => array_merge( [ 'Content-Type' => 'application/json' ], $headers ),
 			'body'    => wp_json_encode( $body ),
 			'timeout' => 20,

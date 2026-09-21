@@ -14,6 +14,7 @@ use Zaplane\Modules\Inbox\Models\Contact;
 use Zaplane\Modules\Inbox\Models\Conversation;
 use Zaplane\Modules\Inbox\Models\Message;
 use Zaplane\Modules\Inbox\Models\Tag;
+use Zaplane\Modules\Inbox\Services\CommonQuestions;
 use Zaplane\Modules\Inbox\Services\Conversations;
 use Zaplane\Modules\Inbox\Services\KnowledgeAnswer;
 use Zaplane\Modules\Inbox\Services\MessageActions;
@@ -582,6 +583,8 @@ class AdminController {
 	public function save_settings( WP_REST_Request $request ) {
 		$params = $request->get_json_params() ?: [];
 		InboxSettings::save( is_array( $params ) ? $params : [] );
+		// Messenger / WhatsApp keep their own copy of the common questions.
+		CommonQuestions::sync();
 		return rest_ensure_response( $this->settings_payload() );
 	}
 
@@ -642,6 +645,8 @@ class AdminController {
 				'stats'      => KnowledgeAnswer::stats(),
 				'gaps'       => array_slice( KnowledgeAnswer::gaps(), 0, 20 ),
 				'embeddings' => \Zaplane\Services\KnowledgeEmbeddings::enabled(),
+				'common'     => CommonQuestions::status(),
+				'faqs'       => self::faq_questions( (string) InboxSettings::get()['ai']['business_key'] ),
 			],
 			'team'           => $team,
 			'site_origin'    => untrailingslashit( home_url() ),
@@ -657,6 +662,24 @@ class AdminController {
 	 *
 	 * @return array<int,array{key:string,count:int}>
 	 */
+	/**
+	 * FAQ questions in a knowledge key, to pick common questions from.
+	 *
+	 * @return array<int,string>
+	 */
+	private static function faq_questions( string $business_key ): array {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$titles = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT title FROM %i WHERE business_key = %s AND source = 'faq' AND title <> '' ORDER BY id ASC LIMIT 100",
+				\Zaplane\Models\Knowledge::getTable(),
+				$business_key
+			)
+		);
+		return array_values( array_map( 'strval', (array) $titles ) );
+	}
+
 	private static function knowledge_keys(): array {
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching

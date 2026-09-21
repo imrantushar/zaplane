@@ -172,6 +172,36 @@ class Whatsapp extends MetaChannel {
 		return [ 'ok' => true ];
 	}
 
+	/**
+	 * WhatsApp conversation starters ("ice breakers"): shown when a customer
+	 * opens a chat with the business number for the first time. Tapping one
+	 * sends it as an ordinary text message.
+	 *
+	 * @param array<int,string> $questions
+	 * @return array{ok:bool,error:string}
+	 */
+	public static function set_starters( array $questions ): array {
+		$credentials = self::credentials();
+		if ( empty( $credentials['access_token'] ) || empty( $credentials['phone_number_id'] ) ) {
+			return [
+				'ok'    => false,
+				'error' => __( 'Choose a WhatsApp connection first.', 'zaplane' ),
+			];
+		}
+
+		$result = self::graph_post(
+			(string) $credentials['phone_number_id'] . '/conversational_automation',
+			[ 'prompts' => array_values( $questions ) ],
+			[ 'Authorization' => 'Bearer ' . (string) $credentials['access_token'] ],
+			$credentials['api_version'] ?? null
+		);
+
+		return [
+			'ok'    => $result['ok'],
+			'error' => $result['error'],
+		];
+	}
+
 	public static function send( Conversation $conversation, ?Identity $identity, Message $message ): array {
 		if ( ! $identity ) {
 			return [

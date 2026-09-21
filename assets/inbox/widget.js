@@ -207,7 +207,24 @@
 
 	var greeting = el( 'div', 'zpi-msg zpi-them' );
 	greeting.appendChild( el( 'div', 'zpi-bubble', cfg.greeting || '' ) );
-	if ( cfg.greeting ) {
+
+	// Common questions: tap one instead of typing. Gone once the chat starts.
+	var starters = null;
+	if ( cfg.questions && cfg.questions.length ) {
+		starters = el( 'div', 'zpi-starters' );
+		cfg.questions.forEach( function ( question ) {
+			var btn = el( 'button', 'zpi-starter', question );
+			btn.type = 'button';
+			btn.addEventListener( 'click', function () {
+				text.value = question;
+				form.requestSubmit ? form.requestSubmit() : form.dispatchEvent( new Event( 'submit', { cancelable: true } ) );
+			} );
+			starters.appendChild( btn );
+		} );
+		greeting.appendChild( starters );
+	}
+
+	if ( cfg.greeting || starters ) {
 		list.appendChild( greeting );
 	}
 
@@ -279,6 +296,9 @@
 	function addMessage( m ) {
 		if ( ! m || m.id <= state.lastId ) {
 			return;
+		}
+		if ( starters && starters.parentNode ) {
+			starters.parentNode.removeChild( starters );
 		}
 		state.lastId = m.id;
 
