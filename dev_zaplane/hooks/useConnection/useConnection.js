@@ -6,6 +6,7 @@ import {
     fetchAuthFields,
     initOAuth,
     createTokenConnection,
+    updateConnection,
     resetAuthFields,
 } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 import { integrations } from "@ZAPUtils/helper";
@@ -17,6 +18,7 @@ const INITIAL_STATE = {
     selectedAuthType: null,
     credentials: {},
     search: "",
+    editingConnectionId: null,
 };
 
 const useConnection = () => {
@@ -24,7 +26,7 @@ const useConnection = () => {
     const { authFields, loading } = useSelector((state) => state.connections || []);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [loadingOAuth, setLoadingOAuth] = useState(false);
-    const [{ drawerStep, selectedApp, selectedAuthType, credentials, search }, setDrawerState] =
+    const [{ drawerStep, selectedApp, selectedAuthType, credentials, search, editingConnectionId }, setDrawerState] =
         useState(INITIAL_STATE);
 
 
@@ -102,6 +104,29 @@ const useConnection = () => {
         (item) => {
             resetDrawer();
             patchState({ drawerStep: "configure", selectedApp: item });
+        },
+        [resetDrawer, patchState]
+    );
+
+    // Re-enter credentials for an existing connection (e.g. a rotated/expired
+    // token) instead of deleting and recreating it. We never prefill the
+    // secret fields — the API never returns decrypted credentials — so the
+    // user re-enters the full credential set, same as on create.
+    const startEdit = useCallback(
+        (connection) => {
+            resetDrawer();
+            const app = integrations.apps?.[connection.app];
+            setIsDrawerOpen(true);
+            patchState({
+                drawerStep: "configure",
+                selectedApp: {
+                    id: connection.app,
+                    name: app?.name || connection.name,
+                    icon: connection.icon || app?.icon || null,
+                },
+                selectedAuthType: connection.auth_type,
+                editingConnectionId: connection.id,
+            });
         },
         [resetDrawer, patchState]
     );
@@ -187,8 +212,19 @@ const useConnection = () => {
             } finally {
                 setLoadingOAuth(false);
             }
+        } else if (editingConnectionId) {
+            const result = await dispatch(
+                updateConnection({
+                    id: editingConnectionId,
+                    payload: { credentials },
+                })
+            );
+            if (result.type === "connections/updateConnection/fulfilled") {
+                dispatch(fetchConnections());
+                closeDrawer();
+            }
         } else {
-            await dispatch(
+            const result = await dispatch(
                 createTokenConnection({
                     app: selectedApp.id,
                     name: selectedApp.name,
@@ -197,10 +233,12 @@ const useConnection = () => {
                     credentials,
                 })
             );
-            dispatch(fetchConnections());
-            closeDrawer();
+            if (result.type === "connections/createTokenConnection/fulfilled") {
+                dispatch(fetchConnections());
+                closeDrawer();
+            }
         }
-    }, [selectedApp, selectedAuthType, credentials, dispatch, openOAuthPopup, closeDrawer, loadingOAuth]);
+    }, [selectedApp, selectedAuthType, credentials, editingConnectionId, dispatch, openOAuthPopup, closeDrawer, loadingOAuth]);
 
 
     const authTypes = authFields?.available_auth_types || {};
@@ -208,7 +246,9 @@ const useConnection = () => {
     const drawerTitle =
         drawerStep === "select"
             ? "Select an app"
-            : selectedApp?.name ?? "Configure connection";
+            : editingConnectionId
+                ? `Update ${selectedApp?.name ?? ""} credentials`
+                : selectedApp?.name ?? "Configure connection";
 
     return {
         isDrawerOpen,
@@ -222,9 +262,11 @@ const useConnection = () => {
         appList,
         drawerTitle,
         loading,
+        editingConnectionId,
         openDrawer,
         closeDrawer,
         selectApp,
+        startEdit,
         goBack,
         selectAuthType,
         updateCredential,

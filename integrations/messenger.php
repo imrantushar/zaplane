@@ -195,8 +195,12 @@ class Messenger extends IntegrationBase {
 			];
 		}
 
+		// Only request `id` — the default response also includes `name`, which
+		// Meta gates behind pages_read_engagement / Page Public Content Access.
+		// Sending messages only needs pages_messaging, so requesting `name` here
+		// would fail otherwise-valid messaging tokens for an unrelated permission.
 		$response = wp_remote_get(
-			MetaGraph::url( 'me', $credentials['api_version'] ?? null ) . '?access_token=' . rawurlencode( $token ),
+			MetaGraph::url( 'me', $credentials['api_version'] ?? null ) . '?fields=id&access_token=' . rawurlencode( $token ),
 			[ 'timeout' => 20 ]
 		);
 
@@ -219,7 +223,7 @@ class Messenger extends IntegrationBase {
 
 		return [
 			'success' => true,
-			'message' => 'Connected as: ' . ( $body['name'] ?? 'Facebook Page' ),
+			'message' => 'Connected' . ( ! empty( $body['id'] ) ? ' (Page ID: ' . $body['id'] . ')' : '' ),
 			'details' => [ 'page_id' => $body['id'] ?? '' ],
 		];
 	}

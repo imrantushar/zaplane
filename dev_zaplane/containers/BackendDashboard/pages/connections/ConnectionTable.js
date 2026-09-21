@@ -5,7 +5,7 @@ import Search from "@ZAPComponents/Search";
 import ListTable from "@ZAPComponents/ListTable";
 import OptionMenu from "@ZAPComponents/OptionMenu";
 import StatusOptions from "@ZAPComponents/StatusOptions";
-import { FiTrash2, FiRefreshCw, FiEye } from "react-icons/fi";
+import { FiTrash2, FiRefreshCw, FiEye, FiEdit2 } from "react-icons/fi";
 import { deleteConnection, testConnection, fetchSingleConnection, updateConnection, fetchConnections } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 import { formatDateTime } from "@ZAPUtils/helper";
@@ -14,7 +14,7 @@ import { TableArrow } from "@ZAPUtils/icons";
 import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
 import ZAPIconGroup from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
-const ConnectionTable = () => {
+const ConnectionTable = ({ onEdit }) => {
   const dispatch = useDispatch();
   const [detailsOpen, setDetailsOpen] = useState(false);
   const {
@@ -160,7 +160,12 @@ const ConnectionTable = () => {
       icon: <FiEye />,
       type: "button",
       onClick: () => openDetails(row)
-    }, {
+    }, ...(row.auth_type !== "oauth2" ? [{
+      label: __("Edit credentials", "zaplane"),
+      icon: <FiEdit2 />,
+      type: "button",
+      onClick: () => onEdit?.(row)
+    }] : []), {
       label: __("Delete", "zaplane"),
       icon: <FiTrash2 />,
       type: "button",

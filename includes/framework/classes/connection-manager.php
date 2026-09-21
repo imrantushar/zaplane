@@ -129,21 +129,43 @@ class ConnectionManager {
 		return $connection->save();
 	}
 
-	public function update_credentials( int $id, array $credentials ): bool {
+	public function update_credentials( int $id, array $credentials ): array {
 		$connection = Connection::find( $id );
 
 		if ( ! $connection ) {
-			return false;
+			throw ConnectionException::notFound( esc_html( (string) $id ) );
+		}
+
+		$test_result = null;
+		if ( 'oauth2' !== $connection->auth_type && IntegrationLoader::has( $connection->app ) ) {
+			$integration = IntegrationLoader::get( $connection->app );
+			$class       = get_class( $integration );
+			$test_result = $class::test_connection( $credentials );
+			if ( ! ( $test_result['success'] ?? false ) ) {
+				throw ConnectionException::invalidCredentials(
+					esc_html( $connection->app ),
+					esc_html( $test_result['message'] ?? 'Connection test failed' )
+				);
+			}
 		}
 
 		try {
 			$encrypted = Encryption::encrypt( $credentials );
 		} catch ( EncryptionException $e ) {
-			return false;
+			throw ConnectionException::createFailed( esc_html( $connection->app ), esc_html( $e->getMessage() ) );
 		}
 
 		$connection->encrypted_credentials = $encrypted;
-		return $connection->save();
+		$saved = $connection->save();
+
+		if ( null !== $test_result ) {
+			$connection->markAsTested( true );
+		}
+
+		return [
+			'saved'       => $saved,
+			'test_result' => $test_result,
+		];
 	}
 
 	public function delete( int $id ): bool {
