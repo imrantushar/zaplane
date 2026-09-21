@@ -3,7 +3,7 @@
 namespace Zaplane\Services;
 
 use Zaplane\Framework\Classes\AiHttp;
-use Zaplane\Framework\Classes\Encryption;
+use Zaplane\Models\Connection;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -18,41 +18,54 @@ if ( ! defined( 'ABSPATH' ) ) {
  * null and the caller falls back to keyword scoring, so knowledge always works.
  * The `zaplane_embeddings_vector` filter lets you plug a local/self-hosted model
  * (and lets tests inject deterministic vectors) without any API key.
+ *
+ * Credentials are never stored here directly — a `connection_id` points at a
+ * saved AI Connection (the same ones the AI / AI Agent nodes use), so a key
+ * entered once is reusable everywhere and stays in one encrypted place.
  */
 class KnowledgeEmbeddings {
 
 	public const OPTION = 'zaplane_embeddings_config';
 
+	/** Providers with a real embeddings endpoint. Anthropic and WordPress Core
+	 * AI have no embeddings API as of this writing, so they're excluded even
+	 * though they're valid chat providers on an AI Connection. */
+	public const SUPPORTED_PROVIDERS = [ 'openai', 'gemini', 'openai_compatible' ];
+
 	private const OPENAI_URL = 'https://api.openai.com/v1/embeddings';
 	private const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/%s:embedContent';
 
 	/**
-	 * Effective config, merged over defaults and filterable. The API key is
-	 * decrypted from storage here so callers always see plaintext in `api_key`.
+	 * Effective config, resolved against the linked Connection so callers always
+	 * see plaintext credentials in `api_key`/`base_url`.
 	 *
-	 * @return array{enabled:bool,provider:string,api_key:string,model:string}
+	 * @return array{enabled:bool,connection_id:int,provider:string,api_key:string,base_url:string,model:string}
 	 */
 	public static function config(): array {
 		$raw = self::raw_option();
 
-		$api_key = '';
-		if ( ! empty( $raw['api_key_enc'] ) && Encryption::is_available() ) {
-			try {
-				$api_key = (string) ( Encryption::decrypt( (string) $raw['api_key_enc'] )['k'] ?? '' );
-			} catch ( \Throwable $e ) {
-				$api_key = '';
+		$connection_id = (int) ( $raw['connection_id'] ?? 0 );
+		$provider      = '';
+		$api_key       = '';
+		$base_url      = '';
+
+		if ( $connection_id > 0 ) {
+			$connection = Connection::find( $connection_id );
+			if ( $connection && 'ai' === $connection->app ) {
+				$creds    = $connection->getCredentials();
+				$provider = strtolower( (string) ( $creds['provider'] ?? '' ) );
+				$api_key  = (string) ( $creds['api_key'] ?? '' );
+				$base_url = (string) ( $creds['base_url'] ?? '' );
 			}
-		} elseif ( ! empty( $raw['api_key'] ) ) {
-			// Legacy plaintext (pre-encryption) — still honored; migrated to
-			// encrypted form on the next save().
-			$api_key = (string) $raw['api_key'];
 		}
 
 		$cfg = [
-			'enabled'  => ! empty( $raw['enabled'] ),
-			'provider' => (string) ( $raw['provider'] ?? 'openai' ),
-			'api_key'  => $api_key,
-			'model'    => (string) ( $raw['model'] ?? '' ),
+			'enabled'       => ! empty( $raw['enabled'] ),
+			'connection_id' => $connection_id,
+			'provider'      => $provider,
+			'api_key'       => $api_key,
+			'base_url'      => $base_url,
+			'model'         => (string) ( $raw['model'] ?? '' ),
 		];
 
 		/**
@@ -64,43 +77,54 @@ class KnowledgeEmbeddings {
 	}
 
 	/**
-	 * Persist config with the API key encrypted at rest. A blank api_key keeps
-	 * (and opportunistically migrates) the stored key.
+	 * Persist config. The connection itself carries the credentials — this only
+	 * stores which connection and model to use.
 	 *
-	 * @param array{enabled?:bool,provider?:string,model?:string,api_key?:string} $cfg
+	 * @param array{enabled?:bool,connection_id?:int,model?:string} $cfg
 	 */
 	public static function save( array $cfg ): void {
 		$existing = self::raw_option();
 
 		$store = [
-			'enabled'  => ! empty( $cfg['enabled'] ),
-			'provider' => sanitize_key( (string) ( $cfg['provider'] ?? 'openai' ) ),
-			'model'    => sanitize_text_field( (string) ( $cfg['model'] ?? '' ) ),
+			'enabled'       => ! empty( $cfg['enabled'] ),
+			'connection_id' => (int) ( $cfg['connection_id'] ?? 0 ),
+			'model'         => sanitize_text_field( (string) ( $cfg['model'] ?? '' ) ),
 		];
 
-		$new_key = isset( $cfg['api_key'] ) ? (string) $cfg['api_key'] : '';
-
-		if ( '' !== $new_key ) {
-			self::stash_key( $new_key, $store );
-		} elseif ( ! empty( $existing['api_key_enc'] ) ) {
-			// Keep the already-encrypted key.
-			$store['api_key_enc'] = (string) $existing['api_key_enc'];
-		} elseif ( ! empty( $existing['api_key'] ) ) {
-			// Migrate a legacy plaintext key to encrypted form.
-			self::stash_key( (string) $existing['api_key'], $store );
-		}
-
-		// Changing provider/model invalidates every stored vector (different
-		// dimensionality/space). Drop them so backfill re-embeds with the new
-		// model instead of leaving stale vectors that retrieval would skip.
-		$model_changed = ( (string) ( $existing['provider'] ?? '' ) !== $store['provider'] )
-			|| ( (string) ( $existing['model'] ?? '' ) !== $store['model'] );
+		// Changing the connection or model can change the embedding space
+		// (different provider/model = different dimensionality). Compare the
+		// resolved tag before/after and drop stale vectors so backfill re-embeds
+		// instead of retrieval silently skipping incompatible ones.
+		$old_tag = self::tag( self::resolve( (int) ( $existing['connection_id'] ?? 0 ), (string) ( $existing['model'] ?? '' ) ) );
 
 		update_option( self::OPTION, $store, false );
 
-		if ( $model_changed ) {
+		$new_tag = self::tag( self::config() );
+
+		if ( $old_tag !== $new_tag ) {
 			self::invalidate_all_vectors();
 		}
+	}
+
+	/**
+	 * Resolve a connection_id/model pair into the same shape config() returns,
+	 * without touching the stored option. Used by save() to compare the old tag.
+	 *
+	 * @return array{provider:string,model:string}
+	 */
+	private static function resolve( int $connection_id, string $model ): array {
+		$provider = '';
+		if ( $connection_id > 0 ) {
+			$connection = Connection::find( $connection_id );
+			if ( $connection && 'ai' === $connection->app ) {
+				$creds    = $connection->getCredentials();
+				$provider = strtolower( (string) ( $creds['provider'] ?? '' ) );
+			}
+		}
+		return [
+			'provider' => $provider,
+			'model'    => $model,
+		];
 	}
 
 	/** Null out every stored embedding so they get re-embedded with the current model. */
@@ -117,31 +141,22 @@ class KnowledgeEmbeddings {
 		return is_array( $o ) ? $o : [];
 	}
 
-	/**
-	 * Store a key encrypted when possible, plaintext only as a last resort (no
-	 * OpenSSL). Mutates $store in place.
-	 *
-	 * @param array<string,mixed> $store
-	 */
-	private static function stash_key( string $key, array &$store ): void {
-		if ( '' === $key ) {
-			return;
-		}
-		if ( Encryption::is_available() ) {
-			$store['api_key_enc'] = Encryption::encrypt( [ 'k' => $key ] );
-		} else {
-			$store['api_key'] = $key;
-		}
-	}
-
 	/** Whether semantic retrieval can run right now. */
 	public static function enabled(): bool {
+		if ( has_filter( 'zaplane_embeddings_vector' ) ) {
+			return true; // a custom/local vector provider works with no connection at all
+		}
 		$cfg = self::config();
 		if ( empty( $cfg['enabled'] ) ) {
 			return false;
 		}
-		// A key, or a custom vector provider wired via the filter.
-		return '' !== (string) $cfg['api_key'] || has_filter( 'zaplane_embeddings_vector' );
+		if ( ! in_array( (string) $cfg['provider'], self::SUPPORTED_PROVIDERS, true ) ) {
+			return false;
+		}
+		if ( 'openai_compatible' === $cfg['provider'] && '' === (string) $cfg['base_url'] ) {
+			return false;
+		}
+		return '' !== (string) $cfg['api_key'];
 	}
 
 	/** Default model per provider when none is set. */
@@ -179,13 +194,25 @@ class KnowledgeEmbeddings {
 			return array_map( 'floatval', $injected );
 		}
 
-		if ( empty( $cfg['enabled'] ) || '' === (string) $cfg['api_key'] ) {
+		if ( ! self::enabled() ) {
 			return null;
 		}
 
-		return 'gemini' === strtolower( (string) $cfg['provider'] )
-			? self::embed_gemini( $text, $cfg )
-			: self::embed_openai( $text, $cfg );
+		return self::dispatch_embed( $text, $cfg );
+	}
+
+	/** @param array{provider:string,api_key:string,base_url:string,model:string} $cfg */
+	private static function dispatch_embed( string $text, array $cfg ): ?array {
+		switch ( strtolower( (string) $cfg['provider'] ) ) {
+			case 'gemini':
+				return self::embed_gemini( $text, $cfg );
+			case 'openai_compatible':
+				return self::embed_openai_compatible( $text, $cfg );
+			case 'openai':
+				return self::embed_openai( $text, $cfg );
+			default:
+				return null;
+		}
 	}
 
 	/**
@@ -206,10 +233,11 @@ class KnowledgeEmbeddings {
 			return array_map( static fn( $t ) => self::embed( (string) $t ), $texts );
 		}
 
-		$cfg = self::config();
-		if ( empty( $cfg['enabled'] ) || '' === (string) $cfg['api_key'] ) {
+		if ( ! self::enabled() ) {
 			return array_fill( 0, count( $texts ), null );
 		}
+
+		$cfg = self::config();
 
 		// Gemini's single endpoint has no array input here — loop it (still one
 		// place, still resilient via AiHttp).
@@ -217,20 +245,25 @@ class KnowledgeEmbeddings {
 			return array_map( static fn( $t ) => self::embed_gemini( trim( (string) $t ), $cfg ), $texts );
 		}
 
-		return self::embed_batch_openai( $texts, $cfg );
+		if ( 'openai_compatible' === strtolower( (string) $cfg['provider'] ) ) {
+			return self::embed_batch_openai( $texts, $cfg, rtrim( (string) $cfg['base_url'], '/' ) . '/embeddings' );
+		}
+
+		return self::embed_batch_openai( $texts, $cfg, self::OPENAI_URL );
 	}
 
 	/**
-	 * @param array<int,string>                                    $texts
-	 * @param array{provider:string,api_key:string,model:string}   $cfg
+	 * @param array<int,string>                                            $texts
+	 * @param array{provider:string,api_key:string,base_url:string,model:string} $cfg
 	 * @return array<int,array<int,float>|null>
 	 */
-	private static function embed_batch_openai( array $texts, array $cfg ): array {
+	private static function embed_batch_openai( array $texts, array $cfg, string $url ): array {
 		$out = array_fill( 0, count( $texts ), null );
 
-		// OpenAI accepts an array `input`; results come back with an `index`.
+		// OpenAI (and OpenAI-compatible) accept an array `input`; results come
+		// back with an `index`.
 		$res = AiHttp::request(
-			self::OPENAI_URL,
+			$url,
 			[
 				'Authorization' => 'Bearer ' . $cfg['api_key'],
 				'Content-Type'  => 'application/json',
@@ -394,6 +427,39 @@ class KnowledgeEmbeddings {
 	private static function embed_openai( string $text, array $cfg ): ?array {
 		$res = AiHttp::request(
 			self::OPENAI_URL,
+			[
+				'Authorization' => 'Bearer ' . $cfg['api_key'],
+				'Content-Type'  => 'application/json',
+			],
+			[
+				'model' => self::model( $cfg ),
+				'input' => $text,
+			]
+		);
+
+		if ( null !== $res['error'] ) {
+			return null;
+		}
+		$vec = $res['data']['data'][0]['embedding'] ?? null;
+		return is_array( $vec ) && ! empty( $vec ) ? array_map( 'floatval', $vec ) : null;
+	}
+
+	/**
+	 * An OpenAI-compatible endpoint's /embeddings — same request/response shape
+	 * as OpenAI itself, just against $cfg['base_url'] (Ollama, OpenRouter, Azure,
+	 * LM Studio, or any self-hosted server implementing the same API).
+	 *
+	 * @param array{provider:string,api_key:string,base_url:string,model:string} $cfg
+	 * @return array<int,float>|null
+	 */
+	private static function embed_openai_compatible( string $text, array $cfg ): ?array {
+		$base_url = trim( (string) ( $cfg['base_url'] ?? '' ) );
+		if ( '' === $base_url ) {
+			return null;
+		}
+
+		$res = AiHttp::request(
+			rtrim( $base_url, '/' ) . '/embeddings',
 			[
 				'Authorization' => 'Bearer ' . $cfg['api_key'],
 				'Content-Type'  => 'application/json',

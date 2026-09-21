@@ -17,6 +17,8 @@ const emptyForm = { id: 0, business_key: "", title: "", content: "" };
 const KnowledgePage = () => {
   const [businesses, setBusinesses] = useState([]);
   const [business, setBusiness] = useState("");
+  const [sources, setSources] = useState([]);
+  const [source, setSource] = useState("");
   const [search, setSearch] = useState("");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +31,7 @@ const KnowledgePage = () => {
   const [statuses, setStatuses] = useState([]);
   const [embed, setEmbed] = useState(null); // null = closed; semantic-search settings
   const [embedStatus, setEmbedStatus] = useState({ enabled: false, has_key: false });
+  const [embedConnections, setEmbedConnections] = useState([]);
 
   const loadEmbedStatus = useCallback(async () => {
     try {
@@ -59,11 +62,20 @@ const KnowledgePage = () => {
     }
   }, []);
 
+  const loadSources = useCallback(async () => {
+    try {
+      const res = await API.get(namespace + "knowledge/sources");
+      setSources(res?.data?.sources || []);
+    } catch (e) {
+      setSources([]);
+    }
+  }, []);
+
   const loadItems = useCallback(async () => {
     setLoading(true);
     try {
       const res = await API.get(namespace + "knowledge", {
-        params: { business_key: business, search, per_page: 100 },
+        params: { business_key: business, source, search, per_page: 100 },
       });
       setItems(res?.data?.items || []);
     } catch (e) {
@@ -71,13 +83,14 @@ const KnowledgePage = () => {
     } finally {
       setLoading(false);
     }
-  }, [business, search]);
+  }, [business, source, search]);
 
   useEffect(() => {
     loadBusinesses();
+    loadSources();
     loadPostTypes();
     loadEmbedStatus();
-  }, [loadBusinesses, loadPostTypes, loadEmbedStatus]);
+  }, [loadBusinesses, loadSources, loadPostTypes, loadEmbedStatus]);
 
   useEffect(() => {
     loadItems();
@@ -111,6 +124,7 @@ const KnowledgePage = () => {
       }
       closeForm();
       await loadBusinesses();
+      await loadSources();
       await loadItems();
     } catch (e) {
       window.alert(__("Failed to save entry.", "zaplane"));
@@ -151,6 +165,7 @@ const KnowledgePage = () => {
       if (!business) setBusiness(faq.business_key.trim());
       closeFaq();
       await loadBusinesses();
+      await loadSources();
       await loadItems();
     } catch (e) {
       window.alert(__("Failed to save FAQs.", "zaplane"));
@@ -203,6 +218,7 @@ const KnowledgePage = () => {
       if (!business) setBusiness(target);
       closeSync();
       await loadBusinesses();
+      await loadSources();
       await loadItems();
     } catch (e) {
       window.alert(e?.response?.data?.message || __("Sync failed.", "zaplane"));
@@ -212,35 +228,45 @@ const KnowledgePage = () => {
   };
 
   const openEmbed = async () => {
-    let cfg = { enabled: false, provider: "openai", model: "", has_key: false };
+    let cfg = { enabled: false, connection_id: 0, provider: "", model: "", has_key: false };
     try {
-      const res = await API.get(namespace + "knowledge/embeddings");
-      cfg = { ...cfg, ...(res?.data || {}) };
+      const [cfgRes, connRes] = await Promise.all([
+        API.get(namespace + "knowledge/embeddings"),
+        API.get(namespace + "knowledge/embeddings/connections"),
+      ]);
+      cfg = { ...cfg, ...(cfgRes?.data || {}) };
+      setEmbedConnections(connRes?.data?.connections || []);
     } catch (e) {
-      // fall back to defaults
+      setEmbedConnections([]);
     }
     setEmbed({
       enabled: !!cfg.enabled,
-      provider: cfg.provider || "openai",
+      connection_id: cfg.connection_id || 0,
+      provider: cfg.provider || "",
       model: cfg.model || "",
       has_key: !!cfg.has_key,
-      api_key: "",
     });
   };
   const closeEmbed = () => setEmbed(null);
 
+  // Persists the drawer's current picks to the server. Shared by Save (which
+  // then closes the drawer) and Backfill (which must run against saved config,
+  // not whatever's still sitting unsaved in local state).
+  const persistEmbedConfig = async () => {
+    await API.post(namespace + "knowledge/embeddings", {
+      enabled: embed.enabled,
+      connection_id: embed.connection_id,
+      model: embed.model,
+    });
+    await loadEmbedStatus();
+  };
+
   const saveEmbed = async () => {
     setSaving(true);
     try {
-      await API.post(namespace + "knowledge/embeddings", {
-        enabled: embed.enabled,
-        provider: embed.provider,
-        model: embed.model,
-        api_key: embed.api_key, // blank keeps the stored key
-      });
+      await persistEmbedConfig();
       window.alert(__("Semantic search settings saved.", "zaplane"));
       closeEmbed();
-      await loadEmbedStatus();
     } catch (e) {
       window.alert(e?.response?.data?.message || __("Failed to save settings.", "zaplane"));
     } finally {
@@ -253,6 +279,11 @@ const KnowledgePage = () => {
     if (!target || !target.trim()) return;
     setSyncing(true);
     try {
+      // The backend reads the *saved* embeddings config, not this drawer's
+      // in-progress state — save first so a connection/toggle picked but not
+      // yet saved doesn't produce a confusing "not configured" error.
+      await persistEmbedConfig();
+
       let total = 0;
       let guard = 0;
       // Loop until every entry is embedded (each call processes a batch).
@@ -288,6 +319,17 @@ const KnowledgePage = () => {
     label: p.label + " (" + p.count + ")",
     value: p.slug,
   }));
+
+  // "faq"/"manual" get a friendly label; anything else is a synced post type
+  // (or the legacy "storeengine" source) — show the matching post type's
+  // label when we have one, otherwise the raw slug.
+  const sourceLabel = (src) => {
+    if ("faq" === src) return __("FAQ", "zaplane");
+    if ("manual" === src) return __("Manual", "zaplane");
+    const pt = postTypes.find((p) => p.slug === src);
+    return pt ? pt.label : src;
+  };
+  const sourceOptions = sources.map((s) => ({ label: sourceLabel(s), value: s }));
   const statusOptions = statuses.map((s) => ({ label: s.label, value: s.value }));
   const selectedPostType = sync ? postTypes.find((p) => p.slug === sync.post_type) : null;
   const taxonomyOptions = (selectedPostType?.taxonomies || []).map((t) => ({
@@ -299,6 +341,11 @@ const KnowledgePage = () => {
     {
       name: <span>{__("Business", "zaplane")}</span>,
       cell: (row) => <ZAPLabel label={row.business_key} type="simple" />,
+      textAlign: "start",
+    },
+    {
+      name: <span>{__("Source", "zaplane")}</span>,
+      cell: (row) => <ZAPLabel label={sourceLabel(row.source)} type="simple" />,
       textAlign: "start",
     },
     {
@@ -382,13 +429,22 @@ const KnowledgePage = () => {
                 isClearable
               />
             </div>
+            <div className="min-w-[180px]">
+              <ZAPSelect
+                options={sourceOptions}
+                value={source}
+                onChange={(opt) => setSource(opt?.value || "")}
+                placeholder={__("All sources", "zaplane")}
+                isClearable
+              />
+            </div>
             <Search placeholder={__("Search knowledge...", "zaplane")} onSearchHandler={setSearch} debounce={500} />
           </div>
         }
         showColumnFilter={false}
         showPagination={false}
         noDataText={
-          search || business
+          search || business || source
             ? __("Nothing matches your filter.", "zaplane")
             : __("Add products, prices, and FAQs so the AI can answer from your business data.", "zaplane")
         }
@@ -653,23 +709,22 @@ const KnowledgePage = () => {
               <span className="zaplane-label">{__("Enable semantic (vector) search", "zaplane")}</span>
             </label>
             <div>
-              <label className="zaplane-label">{__("Embeddings Provider", "zaplane")}</label>
+              <label className="zaplane-label">{__("AI Connection", "zaplane")}</label>
               <ZAPSelect
-                options={[
-                  { label: "OpenAI", value: "openai" },
-                  { label: "Google Gemini", value: "gemini" },
-                ]}
-                value={embed.provider}
-                onChange={(opt) => setEmbed({ ...embed, provider: opt?.value || "openai" })}
+                options={embedConnections.map((c) => ({
+                  label: `${c.name} (${c.provider})`,
+                  value: c.id,
+                }))}
+                value={embed.connection_id || null}
+                onChange={(opt) => setEmbed({ ...embed, connection_id: opt?.value || 0 })}
+                placeholder={__("Select a connection…", "zaplane")}
               />
+              {!embedConnections.length && (
+                <p className="text-sm mt-1" style={{ color: "var(--zaplane-font-secondary-color)" }}>
+                  {__("No eligible connections yet. Create an OpenAI, Gemini, or OpenAI-compatible connection under Connections first (Anthropic and WordPress Core AI don't support embeddings).", "zaplane")}
+                </p>
+              )}
             </div>
-            <ZAPInput
-              type="password"
-              label={__("API Key", "zaplane")}
-              placeholder={embed.has_key ? __("•••••••• (stored — leave blank to keep)", "zaplane") : "sk-..."}
-              value={embed.api_key}
-              onChange={(e) => setEmbed({ ...embed, api_key: e.target.value })}
-            />
             <ZAPInput
               label={__("Model (optional)", "zaplane")}
               placeholder={embed.provider === "gemini" ? "text-embedding-004" : "text-embedding-3-small"}
@@ -688,7 +743,7 @@ const KnowledgePage = () => {
                 type="button"
                 style={outlineBtn}
                 onClick={runBackfill}
-                disabled={syncing || !embed.enabled || (!embed.has_key && !embed.api_key)}
+                disabled={syncing || !embed.enabled || !embed.connection_id}
               >
                 {syncing ? __("Working...", "zaplane") : __("Backfill now", "zaplane")}
               </button>
