@@ -3,6 +3,7 @@
 namespace Zaplane\Modules\Inbox\Services;
 
 use Zaplane\Framework\Classes\ConnectionManager;
+use Zaplane\Modules\Inbox\Commerce\Commerce;
 use Zaplane\Modules\Inbox\Models\Contact;
 use Zaplane\Modules\Inbox\Models\Conversation;
 use Zaplane\Modules\Inbox\Models\Message;
@@ -96,12 +97,12 @@ class AiResponder {
 				'config' => [
 					'system_prompt' => self::system_prompt( $conversation, $ai ),
 					'task'          => $task,
-					'max_steps'     => (int) $ai['max_steps'],
+					'max_steps'     => (int) $ai['max_steps'] + ( self::selling( $ai ) ? 2 : 0 ),
 					'business_key'  => (string) $ai['business_key'],
 				],
 			],
 			'_connection_credentials' => $credentials,
-			'_sub_nodes'              => [ 'ai_tool' => self::tools( $conversation ) ],
+			'_sub_nodes'              => [ 'ai_tool' => self::tools( $conversation, $ai ) ],
 			'_history'                => $history,
 		];
 
@@ -113,6 +114,10 @@ class AiResponder {
 		 * @param Conversation        $conversation
 		 */
 		$node = (array) apply_filters( 'zaplane/inbox/ai_node', $node, $conversation );
+
+		// Decided before the run: a product card the tools send counts as an
+		// assistant message and would otherwise swallow the introduction.
+		$first = self::is_first_reply( (int) $conversation->id );
 
 		$result = \Zaplane\Integrations\Aiagent::execute_node( $node, [] );
 		$data   = (array) ( $result['data'] ?? [] );
@@ -146,7 +151,7 @@ class AiResponder {
 			return;
 		}
 
-		if ( self::is_first_reply( (int) $fresh->id ) ) {
+		if ( $first ) {
 			$reply = self::intro_line( $ai ) . ' ' . $reply;
 		}
 
@@ -331,6 +336,15 @@ class AiResponder {
 			'Do not greet or introduce yourself; the greeting is added for you. Do not call yourself an assistant or a bot.',
 		];
 
+		if ( self::selling( $ai ) ) {
+			$lines[] = 'You can help customers buy. Use tool_search_products to find products (it returns ids, prices and stock), and tool_send_product to show one as a card. Only mention prices and stock that the tool returned.';
+			if ( ! empty( $ai['can_order'] ) ) {
+				$lines[] = 'You can place cash-on-delivery orders with tool_create_order. Before calling it you must have the product ids and quantities, the customer\'s name, phone number and full delivery address, and you must first write back the complete order (items, quantities, total if known, address, phone) and receive a clear yes from the customer in their latest message. Never place an order without that confirmation. After it succeeds, give the customer the order number.';
+			} else {
+				$lines[] = 'You cannot place orders. When the customer wants to order, collect their name, phone number and delivery address, then call tool_forward_to_human so a teammate can confirm the order.';
+			}
+		}
+
 		if ( ! empty( $known ) ) {
 			$lines[] = 'Details the customer already gave (do not ask for them again): ' . implode( '; ', $known ) . '.';
 		}
@@ -349,18 +363,40 @@ class AiResponder {
 	 *
 	 * @return array<int,array<string,mixed>>
 	 */
-	private static function tools( Conversation $conversation ): array {
-		return [
-			[
+	private static function tools( Conversation $conversation, array $ai ): array {
+		$tool = static function ( string $event, string $description ) use ( $conversation ) {
+			return [
 				'data' => [
 					'app'         => 'inbox',
-					'event'       => 'forward_to_human',
-					'name'        => 'forward_to_human',
-					'description' => 'Hand this conversation to a human teammate. Give a short reason.',
-					'config'      => [ 'conversation_id' => (int) $conversation->id ],
-					'locked'      => [ 'conversation_id' ],
+					'event'       => $event,
+					'name'        => $event,
+					'description' => $description,
+					'config'      => [
+						'conversation_id' => (int) $conversation->id,
+						'_by_ai'          => true,
+					],
+					'locked'      => [ 'conversation_id', '_by_ai' ],
 				],
-			],
-		];
+			];
+		};
+
+		$tools = [ $tool( 'forward_to_human', 'Hand this conversation to a human teammate. Give a short reason.' ) ];
+
+		if ( self::selling( $ai ) ) {
+			$tools[] = $tool( 'search_products', 'Search the shop. Returns matching products with id, name, price, stock and link.' );
+			$tools[] = $tool( 'send_product', 'Show the customer one product as a card with its picture, price and link. Pass the product id from search results.' );
+			if ( ! empty( $ai['can_order'] ) ) {
+				$tools[] = $tool( 'create_order', 'Place a cash-on-delivery order, only after the customer confirmed the full order summary. items is "productId:quantity" pairs separated by commas.' );
+			}
+		}
+
+		return $tools;
+	}
+
+	/**
+	 * @param array<string,mixed> $ai
+	 */
+	private static function selling( array $ai ): bool {
+		return ! empty( $ai['sell'] ) && null !== Commerce::store();
 	}
 }

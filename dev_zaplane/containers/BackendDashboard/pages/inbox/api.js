@@ -17,7 +17,16 @@ export const inboxApi = {
   canned: () => API.get(base + "canned-replies").then((r) => r.data),
   saveCanned: (data) => API.post(base + "canned-replies", data).then((r) => r.data),
   deleteCanned: (id) => API.delete(base + "canned-replies/" + id).then((r) => r.data),
+  products: (search) => API.get(base + "products", { params: { search } }).then((r) => r.data),
+  sendProduct: (id, productId, message) =>
+    API.post(base + "conversations/" + id + "/product", { product_id: productId, message }).then((r) => r.data),
+  placeOrder: (id, data) => API.post(base + "conversations/" + id + "/order", data).then((r) => r.data),
+  webhookConfig: (slug, values) =>
+    API.post(namespace + "incoming/" + slug + "/config", values).then((r) => r.data),
 };
+
+/** Only http(s) links are ever rendered. */
+export const safeUrl = (url) => (/^https?:\/\//i.test(url || "") ? url : "");
 
 /** "3m", "2h", "Mon", "Sep 4" — short enough for a list row. */
 export function shortTime(iso) {

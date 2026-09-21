@@ -18,7 +18,7 @@ const InboxPage = () => {
   const [list, setList] = useState({ items: [], counts: {}, loading: true });
   const [activeId, setActiveId] = useState(0);
   const [thread, setThread] = useState({ conversation: null, messages: [], other: [] });
-  const [meta, setMeta] = useState({ team: [], canned: [], aiReady: false, widgetOn: false });
+  const [meta, setMeta] = useState({ team: [], canned: [], aiReady: false, widgetOn: false, store: null, channelsOn: false });
   const [sending, setSending] = useState(false);
   const lastIdRef = useRef(0);
 
@@ -29,6 +29,8 @@ const InboxPage = () => {
       canned: canned || [],
       aiReady: !!(s.settings?.ai?.enabled && s.settings?.ai?.connection_id),
       widgetOn: !!s.settings?.widget?.enabled,
+      channelsOn: Object.values(s.settings?.channels || {}).some((c) => c.enabled),
+      store: s.store || null,
     });
   }, []);
 
@@ -95,6 +97,25 @@ const InboxPage = () => {
     }
   };
 
+  const appendMessage = (res) => {
+    lastIdRef.current = Math.max(lastIdRef.current, res.message.id);
+    setThread((t) => ({ ...t, conversation: res.conversation, messages: [...t.messages, res.message] }));
+    loadList();
+  };
+
+  const sendProduct = async (productId, message) => {
+    appendMessage(await inboxApi.sendProduct(activeId, productId, message));
+  };
+
+  const placeOrder = async (data) => {
+    const res = await inboxApi.placeOrder(activeId, data);
+    setThread((t) => ({ ...t, conversation: res.conversation }));
+    // The system note and any confirmation arrive with the next poll.
+    pollThread();
+    loadList();
+    return res;
+  };
+
   const update = async (data) => {
     const res = await inboxApi.update(activeId, data);
     setThread((t) => ({ ...t, conversation: res.conversation }));
@@ -118,7 +139,7 @@ const InboxPage = () => {
         <Settings onSaved={loadMeta} />
       ) : (
         <>
-          {!meta.widgetOn && (
+          {!meta.widgetOn && !meta.channelsOn && (
             <div className="zaplane-inbox-setup">
               <span>{__("Your website chat widget is off, so visitors can't reach this inbox yet.", "zaplane")}</span>
               <button type="button" className="zaplane-inbox-link" onClick={() => setView("settings")}>
@@ -142,9 +163,19 @@ const InboxPage = () => {
               canned={meta.canned}
               sending={sending}
               onSend={send}
+              onSendProduct={sendProduct}
+              hasStore={!!meta.store}
               onToggleAi={(on) => update({ handler: on ? "bot" : "human" })}
             />
-            <Details conversation={thread.conversation} other={thread.other} team={meta.team} aiReady={meta.aiReady} onUpdate={update} />
+            <Details
+              conversation={thread.conversation}
+              other={thread.other}
+              team={meta.team}
+              aiReady={meta.aiReady}
+              onUpdate={update}
+              store={meta.store}
+              onPlaceOrder={placeOrder}
+            />
           </div>
         </>
       )}

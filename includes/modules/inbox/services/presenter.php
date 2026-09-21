@@ -80,6 +80,7 @@ class Presenter {
 			'updated_at'           => self::time( $conversation->updated_at ),
 			'contact'              => self::contact( $contact ),
 			'tags'                 => $tags[ (int) $conversation->id ] ?? Conversations::tags( (int) $conversation->id ),
+			'orders'               => array_values( (array) ( ( is_array( $conversation->meta ) ? $conversation->meta : [] )['orders'] ?? [] ) ),
 		];
 	}
 

@@ -247,12 +247,83 @@ class Ingest {
 	}
 
 	/**
+	 * Record a reply the business sent outside Zaplane — from the channel's own
+	 * app, say — so the thread stays complete. It counts as a person taking
+	 * over: the assistant stops, exactly as for a reply from the inbox.
+	 *
+	 * @param array<int,mixed> $attachments
+	 */
+	public static function external_reply( string $channel, string $account_id, string $customer_id, string $message_id, string $body, array $attachments = [] ): ?Message {
+		if ( '' !== $message_id && Message::where( 'channel', $channel )->where( 'external_id', $message_id )->fresh()->first() ) {
+			return null;
+		}
+
+		$identity = Identity::where( 'channel', $channel )
+			->where( 'account_id', $account_id )
+			->where( 'external_id', $customer_id )
+			->fresh()
+			->first();
+		if ( ! $identity ) {
+			return null;
+		}
+
+		$conversation = Conversation::where( 'identity_id', (int) $identity->id )->orderBy( 'id', 'desc' )->fresh()->first();
+		if ( ! $conversation ) {
+			return null;
+		}
+
+		$now = Conversations::now();
+		try {
+			$message = Message::create( [
+				'conversation_id' => $conversation->id,
+				'direction'       => 'out',
+				'sender_type'     => 'agent',
+				'sender_id'       => 0,
+				'body'            => $body,
+				'attachments'     => $attachments,
+				'channel'         => $channel,
+				'external_id'     => '' !== $message_id ? $message_id : null,
+				'delivery_status' => 'sent',
+				'meta'            => [ 'source' => 'channel_app' ],
+				'created_at'      => $now,
+			] );
+		} catch ( DatabaseException $e ) {
+			return null;
+		}
+
+		if ( $conversation->ai_enabled || 'bot' === $conversation->handler ) {
+			Conversations::hand_to_human( $conversation, '', false );
+		}
+		$conversation->last_message_preview = self::preview( $body, $attachments );
+		$conversation->last_message_at      = $now;
+		$conversation->unread_count         = 0;
+		$conversation->save();
+
+		return $message;
+	}
+
+	/**
+	 * Whether a contact is already known on this channel address.
+	 */
+	public static function knows( string $channel, string $account_id, string $external_id ): bool {
+		return (bool) Identity::where( 'channel', $channel )
+			->where( 'account_id', $account_id )
+			->where( 'external_id', $external_id )
+			->fresh()
+			->first();
+	}
+
+	/**
 	 * @param array<int,mixed> $attachments
 	 */
 	public static function preview( string $body, array $attachments = [] ): string {
 		$text = trim( wp_strip_all_tags( $body ) );
 		if ( '' === $text && ! empty( $attachments ) ) {
-			$text = __( '[Attachment]', 'zaplane' );
+			$first = is_array( $attachments[0] ?? null ) ? $attachments[0] : [];
+			$text  = 'product' === ( $first['type'] ?? '' ) && ! empty( $first['name'] )
+				/* translators: %s: product name. */
+				? sprintf( __( '[Product] %s', 'zaplane' ), $first['name'] )
+				: __( '[Attachment]', 'zaplane' );
 		}
 		return mb_substr( preg_replace( '/\s+/', ' ', $text ), 0, 250 );
 	}

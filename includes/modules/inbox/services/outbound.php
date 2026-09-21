@@ -120,7 +120,15 @@ class Outbound {
 		if ( ! empty( $result['error'] ) ) {
 			$message->error = (string) $result['error'];
 		}
-		$message->save();
+
+		try {
+			$message->save();
+		} catch ( \Throwable $e ) {
+			// The provider's id is already on another row (its echo got here
+			// first). The delivery still happened; keep it without the id.
+			$message->external_id = null;
+			$message->save();
+		}
 	}
 
 	private static function fail( Message $message, string $error ): void {

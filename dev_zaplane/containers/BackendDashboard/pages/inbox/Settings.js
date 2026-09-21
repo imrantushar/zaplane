@@ -19,6 +19,8 @@ const Settings = ({ onSaved }) => {
   const [notice, setNotice] = useState("");
   const [canned, setCanned] = useState([]);
   const [draft, setDraft] = useState({ title: "", shortcut: "", body: "" });
+  const [secrets, setSecrets] = useState({});
+  const setSecret = (slug, key, v) => setSecrets({ ...secrets, [slug]: { ...(secrets[slug] || {}), [key]: v } });
 
   useEffect(() => {
     inboxApi.settings().then((d) => {
@@ -35,6 +37,8 @@ const Settings = ({ onSaved }) => {
 
   const setWidget = (k, v) => setForm({ ...form, widget: { ...form.widget, [k]: v } });
   const setAi = (k, v) => setForm({ ...form, ai: { ...form.ai, [k]: v } });
+  const setChannel = (slug, k, v) =>
+    setForm({ ...form, channels: { ...form.channels, [slug]: { ...form.channels[slug], [k]: v } } });
 
   const save = async () => {
     setSaving(true);
@@ -46,7 +50,16 @@ const Settings = ({ onSaved }) => {
           allowed_origins: form.widget.allowed_origins.split(/\s+/).filter(Boolean),
         },
         ai: form.ai,
+        channels: form.channels,
       });
+      // Webhook secrets are stored with the integration, not the inbox.
+      for (const [slug, values] of Object.entries(secrets)) {
+        const clean = Object.fromEntries(Object.entries(values).filter(([, v]) => v.trim()));
+        if (Object.keys(clean).length) await inboxApi.webhookConfig(slug, clean);
+      }
+      setSecrets({});
+      const fresh = await inboxApi.settings();
+      setData(fresh);
       setData(res);
       setNotice(__("Settings saved.", "zaplane"));
       onSaved?.(res);
@@ -146,12 +159,107 @@ const Settings = ({ onSaved }) => {
             <input className="zaplane-inbox-input" value={form.ai.business_name} onChange={(e) => setAi("business_name", e.target.value)} />
           </Field>
         </div>
+        {data?.store ? (
+          <>
+            <div className="zaplane-inbox-field is-row">
+              <span>
+                {__("Help customers find products and show product cards", "zaplane")}
+                <em className="zaplane-inbox-hint"> — {data.store}</em>
+              </span>
+              <ZAPToggle checked={!!form.ai.sell} onChange={(v) => setAi("sell", v)} size="sm" />
+            </div>
+            <div className="zaplane-inbox-field is-row">
+              <span>
+                {__("Let the assistant place cash-on-delivery orders", "zaplane")}
+                <em className="zaplane-inbox-hint">
+                  {" "}
+                  — {__("only after the customer confirms the full order; at most 3 per conversation a day. When off, it collects the details and hands over.", "zaplane")}
+                </em>
+              </span>
+              <ZAPToggle checked={!!form.ai.can_order} disabled={!form.ai.sell} onChange={(v) => setAi("can_order", v)} size="sm" />
+            </div>
+          </>
+        ) : (
+          <p className="zaplane-inbox-hint">{__("Activate StoreEngine or WooCommerce to let the assistant sell.", "zaplane")}</p>
+        )}
         <Field
           label={__("Extra instructions", "zaplane")}
           help={__("Added to the assistant's built-in rules, for example your tone, opening hours or what it must never promise.", "zaplane")}
         >
           <textarea className="zaplane-inbox-input" rows={4} value={form.ai.instructions} onChange={(e) => setAi("instructions", e.target.value)} />
         </Field>
+      </section>
+
+      <section className="zaplane-inbox-card">
+        <div className="zaplane-inbox-card-head">
+          <div>
+            <h3>{__("Social channels", "zaplane")}</h3>
+            <p>{__("Bring Facebook Page messages and WhatsApp chats into this inbox, next to your website chat.", "zaplane")}</p>
+          </div>
+        </div>
+        {Object.entries(data?.channels || {}).map(([slug, ch]) => {
+          const cfg = form.channels?.[slug] || { enabled: false, connection_id: 0 };
+          return (
+            <div key={slug} className="zaplane-inbox-channel">
+              <div className="zaplane-inbox-field is-row">
+                <strong>{ch.label}</strong>
+                <ZAPToggle checked={!!cfg.enabled} onChange={(v) => setChannel(slug, "enabled", v)} label={__("Receive in the inbox", "zaplane")} />
+              </div>
+              <div className="zaplane-inbox-grid">
+                <Field
+                  label={__("Connection", "zaplane")}
+                  help={
+                    ch.connections.length === 0 ? (
+                      <>
+                        {__("No connection yet.", "zaplane")} <a href={connectionsUrl}>{__("Add one in Connections", "zaplane")}</a>
+                      </>
+                    ) : null
+                  }
+                >
+                  <select className="zaplane-inbox-select" value={cfg.connection_id || 0} onChange={(e) => setChannel(slug, "connection_id", parseInt(e.target.value, 10) || 0)}>
+                    <option value={0}>{__("Choose a connection", "zaplane")}</option>
+                    {ch.connections.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label={__("Callback URL for Meta", "zaplane")} help={__("Paste this into your Meta app's webhook settings and subscribe to messages.", "zaplane")}>
+                  <input className="zaplane-inbox-input" readOnly value={ch.webhook_url} onFocus={(e) => e.target.select()} />
+                </Field>
+                <Field
+                  label={__("Verify token", "zaplane")}
+                  help={ch.has_verify_token ? __("Saved. Type a new one to replace it.", "zaplane") : __("Make one up and use the same value in Meta.", "zaplane")}
+                >
+                  <input
+                    className="zaplane-inbox-input"
+                    type="password"
+                    autoComplete="off"
+                    value={secrets[slug]?.verify_token || ""}
+                    onChange={(e) => setSecret(slug, "verify_token", e.target.value)}
+                  />
+                </Field>
+                <Field
+                  label={__("App secret", "zaplane")}
+                  help={
+                    ch.has_app_secret
+                      ? __("Saved. Messages are checked against it.", "zaplane")
+                      : __("Required: without it the inbox ignores deliveries, because they can't be checked.", "zaplane")
+                  }
+                >
+                  <input
+                    className="zaplane-inbox-input"
+                    type="password"
+                    autoComplete="off"
+                    value={secrets[slug]?.app_secret || ""}
+                    onChange={(e) => setSecret(slug, "app_secret", e.target.value)}
+                  />
+                </Field>
+              </div>
+            </div>
+          );
+        })}
       </section>
 
       <div className="flex items-center gap-3">

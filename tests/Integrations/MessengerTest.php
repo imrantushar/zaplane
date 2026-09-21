@@ -71,9 +71,28 @@ class MessengerTest extends IntegrationTestCase {
 			] ] ] ],
 		] ) );
 
-		$this->assertSame( 'message_received', $parsed['event'] );
-		$this->assertSame( 'Hi, do you have this in stock?', $parsed['payload']['text'] );
-		$this->assertSame( '24607896878972', $parsed['payload']['sender_id'] );
+		$this->assertCount( 1, $parsed['events'] );
+		$this->assertSame( 'message_received', $parsed['events'][0]['event'] );
+		$this->assertSame( 'Hi, do you have this in stock?', $parsed['events'][0]['payload']['text'] );
+		$this->assertSame( '24607896878972', $parsed['events'][0]['payload']['sender_id'] );
+	}
+
+	public function test_parse_webhook_event_returns_every_message_in_a_batch(): void {
+		$parsed = Messenger::parse_webhook_event( $this->makeEventRequest( [
+			'entry' => [
+				[ 'messaging' => [
+					[ 'sender' => [ 'id' => 'a' ], 'message' => [ 'mid' => 'm_batch_1', 'text' => 'one' ] ],
+					[ 'sender' => [ 'id' => 'b' ], 'message' => [ 'mid' => 'm_batch_2', 'text' => 'two' ] ],
+				] ],
+				[ 'messaging' => [
+					[ 'sender' => [ 'id' => 'c' ], 'message' => [ 'mid' => 'm_batch_3', 'text' => 'three' ] ],
+				] ],
+			],
+		] ) );
+
+		$this->assertSame( [ 'one', 'two', 'three' ], array_map( static function ( $e ) {
+			return $e['payload']['text'];
+		}, $parsed['events'] ) );
 	}
 
 	public function test_parse_webhook_event_skips_our_own_echoes(): void {

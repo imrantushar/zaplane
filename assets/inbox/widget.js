@@ -262,7 +262,15 @@
 		if ( ! mine && m.sender_name ) {
 			item.appendChild( el( 'div', 'zpi-name', m.sender_name ) );
 		}
-		item.appendChild( el( 'div', 'zpi-bubble', m.body || '' ) );
+		if ( m.body ) {
+			item.appendChild( el( 'div', 'zpi-bubble', m.body ) );
+		}
+		( m.attachments || [] ).forEach( function ( a ) {
+			var node = attachment( a );
+			if ( node ) {
+				item.appendChild( node );
+			}
+		} );
 		item.appendChild( el( 'div', 'zpi-time', time( m.created_at ) ) );
 		list.insertBefore( item, typing );
 
@@ -272,6 +280,68 @@
 			badge.hidden = false;
 		}
 		scrollDown();
+	}
+
+	function safeUrl( url ) {
+		return /^https?:\/\//i.test( url || '' ) ? url : '';
+	}
+
+	/** A product card, an image, or a link to a file. Never raw HTML. */
+	function attachment( a ) {
+		if ( ! a ) {
+			return null;
+		}
+		var url = safeUrl( a.url );
+
+		if ( a.type === 'product' ) {
+			var card = el( url ? 'a' : 'div', 'zpi-card' );
+			if ( url ) {
+				card.href = url;
+				card.target = '_blank';
+				card.rel = 'noopener';
+			}
+			var img = safeUrl( a.image );
+			if ( img ) {
+				var pic = el( 'img', 'zpi-card-img' );
+				pic.src = img;
+				pic.alt = '';
+				pic.loading = 'lazy';
+				card.appendChild( pic );
+			}
+			var info = el( 'div', 'zpi-card-info' );
+			info.appendChild( el( 'div', 'zpi-card-name', a.name || '' ) );
+			info.appendChild( el( 'div', 'zpi-card-price', a.price_text || '' ) );
+			if ( a.in_stock === false ) {
+				info.appendChild( el( 'div', 'zpi-card-stock', t.outOfStock || 'Out of stock' ) );
+			}
+			if ( url ) {
+				info.appendChild( el( 'span', 'zpi-card-cta', t.viewProduct || 'View product' ) );
+			}
+			card.appendChild( info );
+			return card;
+		}
+
+		if ( a.type === 'image' && url ) {
+			var link = el( 'a', 'zpi-image' );
+			link.href = url;
+			link.target = '_blank';
+			link.rel = 'noopener';
+			var image = el( 'img' );
+			image.src = url;
+			image.alt = '';
+			image.loading = 'lazy';
+			link.appendChild( image );
+			return link;
+		}
+
+		if ( url ) {
+			var file = el( 'a', 'zpi-file', a.filename || t.attachment || 'Attachment' );
+			file.href = url;
+			file.target = '_blank';
+			file.rel = 'noopener';
+			return file;
+		}
+		return null;
 	}
 
 	function setWaiting( on ) {

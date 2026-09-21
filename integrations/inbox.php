@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Modules\Inbox\Commerce\Commerce;
 use Zaplane\Modules\Inbox\Services\AiResponder;
 use Zaplane\Modules\Inbox\Services\Conversations;
 use Zaplane\Modules\Inbox\Services\Outbound;
@@ -54,6 +55,10 @@ class Inbox extends IntegrationBase {
 			'handed_to_human'      => [
 				'label' => 'Assistant Handed Over to the Team',
 				'hook'  => 'zaplane/inbox/handed_to_human',
+			],
+			'order_created'        => [
+				'label' => 'Order Placed from a Conversation',
+				'hook'  => 'zaplane/inbox/order_created',
 			],
 		];
 	}
@@ -110,6 +115,16 @@ class Inbox extends IntegrationBase {
 			return $base + [ 'reason' => 'The customer asked for a refund.' ];
 		}
 
+		if ( 'order_created' === $trigger ) {
+			return $base + [
+				'order_id'     => 1024,
+				'order_number' => '1024',
+				'order_total'  => '৳1,250.00',
+				'store'        => 'storeengine',
+				'placed_by'    => 'ai',
+			];
+		}
+
 		return $base;
 	}
 
@@ -122,6 +137,9 @@ class Inbox extends IntegrationBase {
 			'set_status'       => [ 'label' => 'Change Status' ],
 			'set_ai'           => [ 'label' => 'Turn Assistant On or Off' ],
 			'forward_to_human' => [ 'label' => 'Hand Over to the Team' ],
+			'search_products'  => [ 'label' => 'Find Products' ],
+			'send_product'     => [ 'label' => 'Send Product Card' ],
+			'create_order'     => [ 'label' => 'Place Cash-on-Delivery Order' ],
 		];
 	}
 
@@ -232,6 +250,73 @@ class Inbox extends IntegrationBase {
 						'required' => false,
 					],
 				];
+			case 'search_products':
+				return [
+					[
+						'key'         => 'query',
+						'label'       => 'What the customer is looking for',
+						'type'        => 'expression',
+						'required'    => true,
+						'placeholder' => 'blue kurta',
+					],
+				];
+			case 'send_product':
+				return [
+					$conversation,
+					[
+						'key'      => 'product_id',
+						'label'    => 'Product ID',
+						'type'     => 'expression',
+						'required' => true,
+					],
+					[
+						'key'      => 'message',
+						'label'    => 'Message with the card',
+						'type'     => 'text',
+						'required' => false,
+					],
+				];
+			case 'create_order':
+				return [
+					$conversation,
+					[
+						'key'         => 'items',
+						'label'       => 'Products as id:quantity, comma separated',
+						'type'        => 'expression',
+						'required'    => true,
+						'placeholder' => '1575:1, 1652:2',
+					],
+					[
+						'key'      => 'name',
+						'label'    => 'Customer name',
+						'type'     => 'expression',
+						'required' => true,
+					],
+					[
+						'key'      => 'phone',
+						'label'    => 'Phone number',
+						'type'     => 'expression',
+						'required' => true,
+					],
+					[
+						'key'      => 'address',
+						'label'    => 'Delivery address',
+						'type'     => 'expression',
+						'required' => true,
+					],
+					[
+						'key'      => 'city',
+						'label'    => 'City',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'note',
+						'label'    => 'Delivery note',
+						'type'     => 'expression',
+						'required' => false,
+					],
+				];
 		}
 
 		return [];
@@ -245,10 +330,29 @@ class Inbox extends IntegrationBase {
 			return self::err( 'The Inbox module is not available.', $input );
 		}
 
+		// The only action that needs no conversation.
+		if ( 'search_products' === $event ) {
+			$store = Commerce::store();
+			if ( ! $store ) {
+				return self::err( 'No shop is active on this site.', $input );
+			}
+			$products = $store::search( (string) ( $config['query'] ?? '' ), 6 );
+			return self::ok( $input, [
+				'count'    => count( $products ),
+				'products' => array_map( static function ( $p ) {
+					unset( $p['price_id'] );
+					return $p;
+				}, $products ),
+			] );
+		}
+
 		$conversation = Conversations::find( (int) ( $config['conversation_id'] ?? 0 ) );
 		if ( ! $conversation ) {
 			return self::err( 'Conversation not found.', $input );
 		}
+
+		// Set only when the assistant runs this as a tool.
+		$by_ai = ! empty( $node['data']['config']['_by_ai'] );
 
 		switch ( $event ) {
 			case 'send_reply':
@@ -283,6 +387,42 @@ class Inbox extends IntegrationBase {
 				$mode = (string) ( $config['enabled'] ?? 'no' );
 				Conversations::set_handler( $conversation, 'yes' === $mode ? 'bot' : ( 'workflow' === $mode ? 'workflow' : 'human' ) );
 				return self::ok( $input, [ 'handler' => (string) $conversation->handler ] );
+
+			case 'send_product':
+				$sent = Commerce::send_product(
+					$conversation,
+					(int) ( $config['product_id'] ?? 0 ),
+					$by_ai ? 'ai' : 'workflow',
+					0,
+					(string) ( $config['message'] ?? '' )
+				);
+				if ( is_wp_error( $sent ) ) {
+					return self::err( $sent->get_error_message(), $input );
+				}
+				return self::ok( $input, [ 'message_id' => (int) $sent->id ] );
+
+			case 'create_order':
+				$items = Commerce::parse_items( (string) ( $config['items'] ?? '' ) );
+				$order = Commerce::place_order(
+					$conversation,
+					$items,
+					[
+						'name'    => (string) ( $config['name'] ?? '' ),
+						'phone'   => (string) ( $config['phone'] ?? '' ),
+						'address' => (string) ( $config['address'] ?? '' ),
+						'city'    => (string) ( $config['city'] ?? '' ),
+						'note'    => (string) ( $config['note'] ?? '' ),
+					],
+					$by_ai ? 'ai' : 'workflow'
+				);
+				if ( is_wp_error( $order ) ) {
+					return self::err( $order->get_error_message(), $input );
+				}
+				return self::ok( $input, [
+					'order_id'     => (int) $order['id'],
+					'order_number' => (string) $order['number'],
+					'order_total'  => (string) $order['total_text'],
+				] );
 
 			case 'forward_to_human':
 				AiResponder::note_handover( (int) $conversation->id );

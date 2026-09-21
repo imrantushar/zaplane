@@ -6,6 +6,9 @@ use WP_Error;
 use WP_REST_Request;
 use WP_REST_Server;
 use Zaplane\Models\Connection;
+use Zaplane\Modules\Inbox\Channels\MetaChannel;
+use Zaplane\Modules\Inbox\Channels\Registry;
+use Zaplane\Modules\Inbox\Commerce\Commerce;
 use Zaplane\Modules\Inbox\Models\CannedReply;
 use Zaplane\Modules\Inbox\Models\Contact;
 use Zaplane\Modules\Inbox\Models\Conversation;
@@ -78,6 +81,24 @@ class AdminController {
 		register_rest_route( self::NS, "/inbox/conversations/{$id}/read", [
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => [ $this, 'mark_read' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
+		register_rest_route( self::NS, "/inbox/conversations/{$id}/product", [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'send_product' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
+		register_rest_route( self::NS, "/inbox/conversations/{$id}/order", [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'place_order' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
+		register_rest_route( self::NS, '/inbox/products', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'search_products' ],
 			'permission_callback' => [ $this, 'can_manage' ],
 		] );
 
@@ -368,6 +389,90 @@ class AdminController {
 		$contact->save();
 	}
 
+	public function search_products( WP_REST_Request $request ) {
+		$store = Commerce::store();
+		if ( ! $store ) {
+			return rest_ensure_response( [
+				'store'    => null,
+				'products' => [],
+			] );
+		}
+		return rest_ensure_response( [
+			'store'    => $store::label(),
+			'products' => $store::search( sanitize_text_field( (string) $request->get_param( 'search' ) ), 12 ),
+		] );
+	}
+
+	public function send_product( WP_REST_Request $request ) {
+		$conversation = Conversations::find( (int) $request['id'] );
+		if ( ! $conversation ) {
+			return $this->not_found();
+		}
+
+		$message = Commerce::send_product(
+			$conversation,
+			(int) $request->get_param( 'product_id' ),
+			'agent',
+			get_current_user_id(),
+			sanitize_textarea_field( (string) $request->get_param( 'message' ) )
+		);
+		if ( is_wp_error( $message ) ) {
+			$message->add_data( [ 'status' => 400 ] );
+			return $message;
+		}
+
+		return rest_ensure_response( [
+			'message'      => Presenter::message( $message ),
+			'conversation' => Presenter::conversation( Conversations::find( (int) $conversation->id ) ),
+		] );
+	}
+
+	public function place_order( WP_REST_Request $request ) {
+		$conversation = Conversations::find( (int) $request['id'] );
+		if ( ! $conversation ) {
+			return $this->not_found();
+		}
+
+		$items = [];
+		foreach ( (array) $request->get_param( 'items' ) as $item ) {
+			if ( is_array( $item ) && ! empty( $item['product_id'] ) ) {
+				$items[] = [
+					'product_id' => (int) $item['product_id'],
+					'qty'        => max( 1, min( 99, (int) ( $item['qty'] ?? 1 ) ) ),
+				];
+			}
+		}
+
+		$customer = [];
+		foreach ( [ 'name', 'phone', 'email', 'address', 'city', 'note' ] as $key ) {
+			$customer[ $key ] = sanitize_text_field( (string) ( $request->get_param( 'customer' )[ $key ] ?? '' ) );
+		}
+
+		$order = Commerce::place_order( $conversation, $items, $customer, 'agent', get_current_user_id() );
+		if ( is_wp_error( $order ) ) {
+			$order->add_data( [ 'status' => 400 ] );
+			return $order;
+		}
+
+		// Tell the customer, in the conversation, what was ordered.
+		if ( rest_sanitize_boolean( $request->get_param( 'notify' ) ) ) {
+			Outbound::send( Conversations::find( (int) $conversation->id ), sprintf(
+				/* translators: 1: order number, 2: order total. */
+				__( 'Your order #%1$s is confirmed. Total %2$s, to pay on delivery. We will let you know when it ships.', 'zaplane' ),
+				$order['number'],
+				$order['total_text']
+			), [
+				'sender_type' => 'agent',
+				'sender_id'   => get_current_user_id(),
+			] );
+		}
+
+		return rest_ensure_response( [
+			'order'        => $order,
+			'conversation' => Presenter::conversation( Conversations::find( (int) $conversation->id ) ),
+		] );
+	}
+
 	public function mark_read( WP_REST_Request $request ) {
 		$conversation = Conversations::find( (int) $request['id'] );
 		if ( ! $conversation ) {
@@ -411,11 +516,37 @@ class AdminController {
 			];
 		}
 
+		$channels = [];
+		foreach ( Registry::all() as $slug => $class ) {
+			if ( ! is_subclass_of( $class, MetaChannel::class ) ) {
+				continue;
+			}
+			$integration = \Zaplane\Framework\Core\IntegrationLoader::get( $slug );
+			$options     = [];
+			foreach ( Connection::where( 'app', $slug )->fresh()->get()->all() as $connection ) {
+				$options[] = [
+					'id'   => (int) $connection->id,
+					'name' => (string) $connection->name,
+				];
+			}
+			$channels[ $slug ] = [
+				'label'           => $class::label(),
+				'connections'     => $options,
+				'webhook_url'     => $integration ? $integration::get_webhook_url() : '',
+				'has_app_secret'  => $integration ? '' !== $integration::get_webhook_app_secret() : false,
+				'has_verify_token' => $integration ? '' !== $integration::get_webhook_verify_token() : false,
+			];
+		}
+
+		$store = Commerce::store();
+
 		return [
 			'settings'       => InboxSettings::get(),
 			'ai_connections' => $connections,
 			'team'           => $team,
 			'site_origin'    => untrailingslashit( home_url() ),
+			'channels'       => $channels,
+			'store'          => $store ? $store::label() : null,
 		];
 	}
 

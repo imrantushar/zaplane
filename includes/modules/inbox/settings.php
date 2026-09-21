@@ -31,6 +31,16 @@ class Settings {
 				'ask_email'       => true,
 				'allowed_origins' => [],
 			],
+			'channels' => [
+				'messenger' => [
+					'enabled'       => false,
+					'connection_id' => 0,
+				],
+				'whatsapp'  => [
+					'enabled'       => false,
+					'connection_id' => 0,
+				],
+			],
 			'ai'     => [
 				'enabled'       => false,
 				'connection_id' => 0,
@@ -39,6 +49,8 @@ class Settings {
 				'business_name' => '',
 				'instructions'  => '',
 				'max_steps'     => 4,
+				'sell'          => true,
+				'can_order'     => false,
 			],
 		];
 	}
@@ -55,6 +67,10 @@ class Settings {
 			if ( isset( $saved[ $section ] ) && is_array( $saved[ $section ] ) ) {
 				$out[ $section ] = array_merge( $values, array_intersect_key( $saved[ $section ], $values ) );
 			}
+		}
+		foreach ( self::defaults()['channels'] as $slug => $values ) {
+			$stored                     = $saved['channels'][ $slug ] ?? [];
+			$out['channels'][ $slug ] = array_merge( $values, is_array( $stored ) ? array_intersect_key( $stored, $values ) : [] );
 		}
 		return $out;
 	}
@@ -92,6 +108,21 @@ class Settings {
 			unset( $c );
 		}
 
+		if ( isset( $input['channels'] ) && is_array( $input['channels'] ) ) {
+			foreach ( array_keys( self::defaults()['channels'] ) as $slug ) {
+				$in = $input['channels'][ $slug ] ?? null;
+				if ( ! is_array( $in ) ) {
+					continue;
+				}
+				if ( array_key_exists( 'enabled', $in ) ) {
+					$current['channels'][ $slug ]['enabled'] = (bool) $in['enabled'];
+				}
+				if ( isset( $in['connection_id'] ) ) {
+					$current['channels'][ $slug ]['connection_id'] = absint( $in['connection_id'] );
+				}
+			}
+		}
+
 		if ( isset( $input['ai'] ) && is_array( $input['ai'] ) ) {
 			$a = $input['ai'];
 			$c = &$current['ai'];
@@ -100,6 +131,11 @@ class Settings {
 			}
 			if ( isset( $a['connection_id'] ) ) {
 				$c['connection_id'] = absint( $a['connection_id'] );
+			}
+			foreach ( [ 'sell', 'can_order' ] as $k ) {
+				if ( array_key_exists( $k, $a ) ) {
+					$c[ $k ] = (bool) $a[ $k ];
+				}
 			}
 			if ( isset( $a['max_steps'] ) ) {
 				$c['max_steps'] = min( 8, max( 1, absint( $a['max_steps'] ) ) );

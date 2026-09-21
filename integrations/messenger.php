@@ -91,11 +91,26 @@ class Messenger extends IntegrationBase {
 			return null;
 		}
 
-		$messaging = $data['entry'][0]['messaging'][0] ?? null;
-		if ( ! is_array( $messaging ) ) {
-			return null;
+		// Meta batches: several entries, each with several messaging events.
+		$events = [];
+		foreach ( (array) ( $data['entry'] ?? [] ) as $entry ) {
+			foreach ( (array) ( $entry['messaging'] ?? [] ) as $messaging ) {
+				$event = self::message_event( is_array( $messaging ) ? $messaging : [] );
+				if ( null !== $event ) {
+					$events[] = $event;
+				}
+			}
 		}
 
+		return empty( $events ) ? null : [ 'events' => $events ];
+	}
+
+	/**
+	 * One inbound text message as a trigger event, or null for anything else.
+	 *
+	 * @param array<string,mixed> $messaging
+	 */
+	private static function message_event( array $messaging ): ?array {
 		$message = $messaging['message'] ?? null;
 
 		// Only react to inbound user text — skip delivery/read receipts,

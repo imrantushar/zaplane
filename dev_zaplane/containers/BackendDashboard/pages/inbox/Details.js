@@ -3,6 +3,7 @@ import { __ } from "@wordpress/i18n";
 import ZAPToggle from "@ZAPComponents/ZAPToggle";
 import { CHANNEL_LABELS, initials } from "./ConversationList";
 import { clockTime } from "./api";
+import OrderForm from "./OrderForm";
 
 const STATUSES = [
   { value: "open", label: __("Open", "zaplane") },
@@ -11,9 +12,11 @@ const STATUSES = [
   { value: "closed", label: __("Closed", "zaplane") },
 ];
 
-const Details = ({ conversation, other, team, aiReady, onUpdate }) => {
+const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceOrder }) => {
   const [contact, setContact] = useState({ name: "", email: "", phone: "" });
   const [tagText, setTagText] = useState("");
+  const [ordering, setOrdering] = useState(false);
+  const [placed, setPlaced] = useState(null);
 
   useEffect(() => {
     setContact({
@@ -22,6 +25,19 @@ const Details = ({ conversation, other, team, aiReady, onUpdate }) => {
       phone: conversation?.contact?.phone || "",
     });
     setTagText("");
+  }, [conversation?.id]);
+
+  useEffect(() => {
+    setOrdering(false);
+    setPlaced(null);
+  }, [conversation?.id]);
+
+  useEffect(() => {
+    setContact({
+      name: conversation?.contact?.name || "",
+      email: conversation?.contact?.email || "",
+      phone: conversation?.contact?.phone || "",
+    });
   }, [conversation?.id, conversation?.contact?.email, conversation?.contact?.name, conversation?.contact?.phone]);
 
   if (!conversation) return <aside className="zaplane-inbox-details" />;
@@ -96,6 +112,47 @@ const Details = ({ conversation, other, team, aiReady, onUpdate }) => {
           <p className="zaplane-inbox-hint">{__("A workflow is answering this conversation.", "zaplane")}</p>
         )}
       </section>
+
+      {store && (
+        <section className="zaplane-inbox-section">
+          <h3>{__("Orders", "zaplane")}</h3>
+          {placed && (
+            <p className="zaplane-inbox-success" role="status">
+              {__("Order", "zaplane")} #{placed.number} · {placed.total_text}{" "}
+              <a href={placed.admin_url} target="_blank" rel="noopener noreferrer">
+                {__("Open order", "zaplane")}
+              </a>
+            </p>
+          )}
+          {(conversation.orders || []).length > 0 && (
+            <ul className="zaplane-inbox-history">
+              {conversation.orders
+                .slice()
+                .reverse()
+                .map((o) => (
+                  <li key={o.id}>
+                    #{o.number} · {o.total} · {o.placed_by === "ai" ? __("by the assistant", "zaplane") : o.placed_by === "workflow" ? __("by a workflow", "zaplane") : __("by the team", "zaplane")}
+                  </li>
+                ))}
+            </ul>
+          )}
+          {ordering ? (
+            <OrderForm
+              conversation={conversation}
+              onCancel={() => setOrdering(false)}
+              onPlace={async (data) => {
+                const res = await onPlaceOrder(data);
+                setPlaced(res.order);
+                setOrdering(false);
+              }}
+            />
+          ) : (
+            <button type="button" className="zaplane-inbox-small" onClick={() => setOrdering(true)}>
+              {__("Create an order", "zaplane")} ({store})
+            </button>
+          )}
+        </section>
+      )}
 
       <section className="zaplane-inbox-section">
         <h3>{__("Contact", "zaplane")}</h3>

@@ -287,14 +287,29 @@ class Whatsapp extends IntegrationBase {
 			return null;
 		}
 
-		$value   = $data['entry'][0]['changes'][0]['value'] ?? [];
-		$message = $value['messages'][0] ?? null;
-
-		// No inbound message (status update, template event, etc.) → skip.
-		if ( ! is_array( $message ) ) {
-			return null;
+		// Meta batches: several entries and changes, each with several messages.
+		$events = [];
+		foreach ( (array) ( $data['entry'] ?? [] ) as $entry ) {
+			foreach ( (array) ( $entry['changes'] ?? [] ) as $change ) {
+				$value = (array) ( $change['value'] ?? [] );
+				foreach ( (array) ( $value['messages'] ?? [] ) as $message ) {
+					$event = self::message_event( $value, is_array( $message ) ? $message : [] );
+					if ( null !== $event ) {
+						$events[] = $event;
+					}
+				}
+			}
 		}
 
+		// No inbound message (status update, template event, etc.) → skip.
+		return empty( $events ) ? null : [ 'events' => $events ];
+	}
+
+	/**
+	 * @param array<string,mixed> $value   The change's value block.
+	 * @param array<string,mixed> $message One message from it.
+	 */
+	private static function message_event( array $value, array $message ): ?array {
 		// Idempotency: Meta retries webhooks until it gets a 200, so the same
 		// message id can arrive several times. Skip any id we've already seen
 		// within the dedup window to avoid firing the workflow (and replying)
@@ -308,18 +323,19 @@ class Whatsapp extends IntegrationBase {
 			set_transient( $seen_key, 1, 5 * MINUTE_IN_SECONDS );
 		}
 
-		$contact = $value['contacts'][0] ?? [];
-		$type    = $message['type'] ?? '';
-
-		$text = '';
-		if ( 'text' === $type ) {
-			$text = $message['text']['body'] ?? '';
-		} elseif ( 'button' === $type ) {
-			$text = $message['button']['text'] ?? '';
-		} elseif ( 'interactive' === $type ) {
-			$text = $message['interactive']['button_reply']['title']
-				?? ( $message['interactive']['list_reply']['title'] ?? '' );
+		// The contact block for this sender, not simply the first one.
+		$contact = [];
+		foreach ( (array) ( $value['contacts'] ?? [] ) as $candidate ) {
+			if ( ( $candidate['wa_id'] ?? '' ) === ( $message['from'] ?? '' ) ) {
+				$contact = $candidate;
+				break;
+			}
 		}
+		if ( empty( $contact ) ) {
+			$contact = $value['contacts'][0] ?? [];
+		}
+
+		$type = $message['type'] ?? '';
 
 		return [
 			'event'   => 'message_received',
@@ -328,11 +344,37 @@ class Whatsapp extends IntegrationBase {
 				'from'            => $message['from'] ?? '',
 				'sender_name'     => $contact['profile']['name'] ?? '',
 				'type'            => $type,
-				'text'            => $text,
+				'text'            => self::message_text( $message ),
 				'timestamp'       => $message['timestamp'] ?? '',
 				'phone_number_id' => $value['metadata']['phone_number_id'] ?? '',
 			],
 		];
+	}
+
+	/**
+	 * The readable text of an inbound message: the body, a button or list
+	 * choice, or a media caption.
+	 *
+	 * @param array<string,mixed> $message
+	 */
+	public static function message_text( array $message ): string {
+		$type = (string) ( $message['type'] ?? '' );
+
+		if ( 'text' === $type ) {
+			return (string) ( $message['text']['body'] ?? '' );
+		}
+		if ( 'button' === $type ) {
+			return (string) ( $message['button']['text'] ?? '' );
+		}
+		if ( 'interactive' === $type ) {
+			return (string) ( $message['interactive']['button_reply']['title']
+				?? ( $message['interactive']['list_reply']['title'] ?? '' ) );
+		}
+		if ( in_array( $type, [ 'image', 'video', 'document' ], true ) ) {
+			return (string) ( $message[ $type ]['caption'] ?? '' );
+		}
+
+		return '';
 	}
 
 	public static function get_webhook_setup_fields(): array {

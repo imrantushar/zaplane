@@ -13,7 +13,9 @@ class Registry {
 	 */
 	public static function all(): array {
 		$channels = [
-			Web::slug() => Web::class,
+			Web::slug()       => Web::class,
+			Messenger::slug() => Messenger::class,
+			Whatsapp::slug()  => Whatsapp::class,
 		];
 
 		/**
