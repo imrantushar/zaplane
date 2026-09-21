@@ -195,17 +195,47 @@ class Messenger extends IntegrationBase {
 			];
 		}
 
-		// We deliberately don't verify the token against the Graph API here.
-		// Reading the Page object (even just `id`) is gated by Meta behind
-		// pages_read_engagement / Page Public Content Access, which a
-		// pages_messaging-only token legitimately won't have — even though
-		// pages_messaging alone is all sending actually requires. Rejecting
-		// those otherwise-valid tokens here would be a false negative, so we
-		// accept any non-empty token and let the first send confirm it.
+		// Reading the Page itself is gated by Meta behind pages_read_engagement /
+		// Page Public Content Access, which a pages_messaging-only token
+		// legitimately lacks even though that's all sending needs. So only a
+		// token Meta calls invalid or expired (OAuthException code 190) is
+		// rejected; a permissions error still means the token itself is real.
+		$response = wp_remote_get(
+			MetaGraph::url( 'me', $credentials['api_version'] ?? null ) . '?fields=id,name&access_token=' . rawurlencode( $token ),
+			[ 'timeout' => 20 ]
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return [
+				'success' => false,
+				'message' => $response->get_error_message(),
+				'details' => []
+			];
+		}
+
+		$body  = json_decode( wp_remote_retrieve_body( $response ), true );
+		$error = is_array( $body ) ? ( $body['error'] ?? null ) : null;
+
+		if ( is_array( $error ) && 190 === (int) ( $error['code'] ?? 0 ) ) {
+			return [
+				'success' => false,
+				'message' => $error['message'] ?? 'The Page access token is invalid or has expired.',
+				'details' => []
+			];
+		}
+
+		if ( is_array( $error ) ) {
+			return [
+				'success' => true,
+				'message' => 'Token accepted. It can\'t read the Page profile, so sending will confirm it on first use.',
+				'details' => [],
+			];
+		}
+
 		return [
 			'success' => true,
-			'message' => 'Saved. Validity will be confirmed on first use.',
-			'details' => [],
+			'message' => 'Connected as: ' . ( $body['name'] ?? 'Facebook Page' ),
+			'details' => [ 'page_id' => $body['id'] ?? '' ],
 		];
 	}
 

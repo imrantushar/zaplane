@@ -152,38 +152,39 @@ class KnowledgeController extends WP_REST_Controller {
 		$table = Knowledge::getTable();
 		$like  = '%' . $wpdb->esc_like( $search ) . '%';
 
-		// Each filter is optional, so the WHERE clause is assembled from fixed
-		// column-name/placeholder fragments — never from request values, which
-		// only ever flow in as bound %s/%d params below.
-		$where  = [];
-		$params = [];
-
-		if ( '' !== $business ) {
-			$where[]  = 'business_key = %s';
-			$params[] = $business;
-		}
-		if ( '' !== $search ) {
-			$where[]  = '(title LIKE %s OR content LIKE %s)';
-			$params[] = $like;
-			$params[] = $like;
-		}
-		if ( '' !== $source ) {
-			$where[]  = 'source = %s';
-			$params[] = $source;
-		}
-
-		$where_sql = ! empty( $where ) ? ( 'WHERE ' . implode( ' AND ', $where ) ) : '';
-
+		// Each filter is optional. Rather than assembling the WHERE clause, every
+		// filter sits in one literal statement as "(%s = '' OR column = %s)": an
+		// empty value switches that filter off. Nothing about the query is built
+		// from the request — $business, $search and $source only arrive as values.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$total = (int) $wpdb->get_var(
-			$wpdb->prepare( "SELECT COUNT(*) FROM %i {$where_sql}", array_merge( [ $table ], $params ) ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where_sql holds only fixed column names/placeholders assembled above; values are always bound params.
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM %i WHERE (%s = '' OR business_key = %s) AND (%s = '' OR title LIKE %s OR content LIKE %s) AND (%s = '' OR source = %s)",
+				$table,
+				$business,
+				$business,
+				$search,
+				$like,
+				$like,
+				$source,
+				$source
+			)
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Literal statement, prepared here.
 		$rows = $wpdb->get_results(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- same as above.
-				"SELECT id, business_key, title, content, source, ref_id, updated_at FROM %i {$where_sql} ORDER BY id DESC LIMIT %d OFFSET %d",
-				array_merge( [ $table ], $params, [ $per_page, $offset ] )
+			$wpdb->prepare(
+				"SELECT id, business_key, title, content, source, ref_id, updated_at FROM %i WHERE (%s = '' OR business_key = %s) AND (%s = '' OR title LIKE %s OR content LIKE %s) AND (%s = '' OR source = %s) ORDER BY id DESC LIMIT %d OFFSET %d",
+				$table,
+				$business,
+				$business,
+				$search,
+				$like,
+				$like,
+				$source,
+				$source,
+				$per_page,
+				$offset
 			),
 			ARRAY_A
 		);
@@ -293,9 +294,19 @@ class KnowledgeController extends WP_REST_Controller {
 
 	/** Save semantic-search config: which AI Connection to embed with, and an optional model override. */
 	public function save_embeddings_config( $request ) {
+		$connection_id = (int) $request->get_param( 'connection_id' );
+
+		// Only a connection the picker offers this user can be newly linked. The
+		// one already saved stays accepted, so another admin can still toggle
+		// the setting without owning that connection.
+		$current = (int) KnowledgeEmbeddings::config()['connection_id'];
+		if ( $connection_id > 0 && $connection_id !== $current && ! $this->is_embeddings_connection( $connection_id ) ) {
+			return new WP_Error( 'zaplane_invalid_connection', __( 'Pick one of your OpenAI, Gemini, or OpenAI-compatible AI connections.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+
 		KnowledgeEmbeddings::save( [
 			'enabled'       => (bool) $request->get_param( 'enabled' ),
-			'connection_id' => (int) $request->get_param( 'connection_id' ),
+			'connection_id' => $connection_id,
 			'model'         => (string) $request->get_param( 'model' ),
 		] );
 
@@ -336,6 +347,16 @@ class KnowledgeController extends WP_REST_Controller {
 		}
 
 		return rest_ensure_response( [ 'connections' => $out ] );
+	}
+
+	/** Whether $id is an AI connection of the current user whose provider can embed. */
+	private function is_embeddings_connection( int $id ): bool {
+		$connection = \Zaplane\Models\Connection::find( $id );
+		if ( ! $connection || 'ai' !== $connection->app || (int) $connection->user_id !== get_current_user_id() ) {
+			return false;
+		}
+		$provider = strtolower( (string) ( $connection->getCredentials()['provider'] ?? '' ) );
+		return in_array( $provider, KnowledgeEmbeddings::SUPPORTED_PROVIDERS, true );
 	}
 
 	/** Embed entries missing a vector (admin button; loop until remaining = 0). */
@@ -464,8 +485,8 @@ class KnowledgeController extends WP_REST_Controller {
 		// FAQ rows (and any other bulk-created source) start with no embedding —
 		// queue a background batch so semantic search picks them up without a
 		// manual "Backfill now" click.
-		if ( $created > 0 && KnowledgeEmbeddings::enabled() && function_exists( 'as_enqueue_async_action' ) ) {
-			as_enqueue_async_action( 'zaplane_knowledge_embed_pending', [ 'business_key' => $business ], 'zaplane' );
+		if ( $created > 0 && KnowledgeEmbeddings::enabled() ) {
+			\Zaplane\Modules\KnowledgeAutomation\KnowledgeAutomationModule::queue_embedding( $business );
 		}
 
 		return rest_ensure_response( [

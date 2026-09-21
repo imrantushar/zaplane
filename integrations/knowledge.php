@@ -567,8 +567,8 @@ class Knowledge extends IntegrationBase {
 		// New/changed rows above were left unembedded (bulk syncs don't embed
 		// inline). Queue a background batch instead of requiring a manual
 		// "Backfill now" click.
-		if ( $synced > 0 && KnowledgeEmbeddings::enabled() && function_exists( 'as_enqueue_async_action' ) ) {
-			as_enqueue_async_action( 'zaplane_knowledge_embed_pending', [ 'business_key' => $key ], 'zaplane' );
+		if ( $synced > 0 && KnowledgeEmbeddings::enabled() ) {
+			\Zaplane\Modules\KnowledgeAutomation\KnowledgeAutomationModule::queue_embedding( $key );
 		}
 
 		return self::respond(
@@ -628,16 +628,41 @@ class Knowledge extends IntegrationBase {
 	}
 
 	/**
-	 * Remove every synced knowledge entry that referenced a now-deleted/trashed
-	 * post, across every business it was synced into. Manual/FAQ entries are
-	 * untouched (they're never sourced from a post).
+	 * Whether a post in $status belongs in a business under this sync profile.
+	 *
+	 * @param array<string,mixed> $profile
 	 */
-	public static function forget_synced_post( int $post_id, string $post_type ): void {
+	public static function profile_accepts_status( array $profile, string $status ): bool {
+		$wanted = sanitize_key( (string) ( $profile['post_status'] ?? 'publish' ) );
+		if ( '' === $wanted ) {
+			$wanted = 'publish';
+		}
+		if ( 'any' === $wanted ) {
+			return ! in_array( $status, [ 'trash', 'auto-draft', 'inherit' ], true );
+		}
+		return $status === $wanted;
+	}
+
+	/**
+	 * Remove the synced knowledge entry that referenced a post — from one
+	 * business, or from every business it was synced into when none is given.
+	 * Manual/FAQ entries are untouched (they're never sourced from a post).
+	 */
+	public static function forget_synced_post( int $post_id, string $post_type, string $business_key = '' ): void {
 		$ref = self::ref_for( $post_type, $post_id );
 		global $wpdb;
 		$table = KnowledgeModel::getTable();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE source = %s AND ref_id = %s', $table, self::source_for( $post_type ), $ref ) );
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM %i WHERE source = %s AND ref_id = %s AND (%s = '' OR business_key = %s)",
+				$table,
+				self::source_for( $post_type ),
+				$ref,
+				$business_key,
+				$business_key
+			)
+		);
 	}
 
 	/**

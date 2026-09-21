@@ -150,9 +150,13 @@ class Ai extends IntegrationBase {
 				]
 			);
 		} elseif ( 'gemini' === $provider ) {
+			// Header rather than ?key= so the key stays out of URLs and request logs.
 			$response = wp_remote_get(
-				add_query_arg( 'key', $api_key, 'https://generativelanguage.googleapis.com/v1beta/models' ),
-				[ 'timeout' => 20 ]
+				'https://generativelanguage.googleapis.com/v1beta/models',
+				[
+					'headers' => [ 'x-goog-api-key' => $api_key ],
+					'timeout' => 20,
+				]
 			);
 		} elseif ( 'openai' === $provider ) {
 			$response = wp_remote_get(
