@@ -1,6 +1,6 @@
 {
     "version": "1.3.1",
-    "generated_at": "2026-09-21 15:42:28",
+    "generated_at": "2026-09-21 15:46:21",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -32699,6 +32699,24 @@
                             "required": true,
                             "placeholder": "whatsapp:{{trigger.from}}",
                             "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
+                        },
+                        {
+                            "key": "source",
+                            "label": "History from",
+                            "type": "select",
+                            "required": false,
+                            "default": "memory",
+                            "options": [
+                                {
+                                    "value": "memory",
+                                    "label": "Saved turns (this Memory)"
+                                },
+                                {
+                                    "value": "inbox",
+                                    "label": "The Inbox conversation (includes your team's replies)"
+                                }
+                            ],
+                            "help": "With the Inbox, use a key like messenger:{{trigger.sender_id}} or whatsapp:{{trigger.from}}. The history is the real conversation (customer, assistant, team and workflow replies; never private notes), so turns aren't saved separately. If the Inbox is off or doesn't know this customer yet, saved turns are used."
                         },
                         {
                             "key": "limit",

@@ -36,6 +36,73 @@ class WorkflowSends {
 		add_action( 'zaplane/channel_send/held', [ self::class, 'held' ], 10, 2 );
 		add_action( 'zaplane/channel_send/sent', [ self::class, 'record' ], 10, 1 );
 		add_filter( 'zaplane/trigger/should_start', [ self::class, 'should_start' ], 10, 3 );
+		add_filter( 'zaplane/memory/inbox_history', [ self::class, 'memory_history' ], 10, 3 );
+	}
+
+	/**
+	 * A Memory step reading "the Inbox conversation": the real thread as chat
+	 * turns. Private notes, system lines and deleted messages are left out.
+	 *
+	 * The customer's newest message is left out when nothing has answered it
+	 * yet: that is the message the workflow is answering, and it arrives as
+	 * the agent's task.
+	 *
+	 * @param array<int,array{role:string,content:string}>|null $history
+	 * @return array<int,array{role:string,content:string}>|null
+	 */
+	public static function memory_history( $history, string $key, int $limit ) {
+		if ( is_array( $history ) || false === strpos( $key, ':' ) ) {
+			return $history;
+		}
+
+		list( $channel, $customer ) = array_map( 'trim', explode( ':', $key, 2 ) );
+		if ( 'whatsapp' === $channel ) {
+			$customer = (string) preg_replace( '/\D+/', '', $customer );
+		}
+
+		$conversation = self::conversation( [
+			'channel'   => $channel,
+			'recipient' => $customer,
+		] );
+		if ( ! $conversation ) {
+			return null;
+		}
+
+		$rows = Message::where( 'conversation_id', (int) $conversation->id )
+			->where( 'is_note', 0 )
+			->where( 'sender_type', '!=', 'system' )
+			->orderBy( 'id', 'desc' )
+			// Room for the pending message and deleted rows, which are dropped
+			// below; the result is trimmed to $limit afterwards.
+			->limit( max( 1, $limit ) * 2 + 10 )
+			->fresh()
+			->get()
+			->all();
+
+		if ( $rows && 'contact' === $rows[0]->sender_type ) {
+			array_shift( $rows );
+		}
+
+		$turns = [];
+		foreach ( array_reverse( $rows ) as $row ) {
+			$meta = is_array( $row->meta ) ? $row->meta : [];
+			$text = '';
+			if ( empty( $meta['deleted_at'] ) ) {
+				$text = trim( wp_strip_all_tags( (string) $row->body ) );
+				if ( '' === $text && ! empty( $row->attachments ) ) {
+					$text = Ingest::preview( '', (array) $row->attachments );
+				}
+			}
+			if ( '' === trim( $text ) ) {
+				continue;
+			}
+			$turns[] = [
+				'role'    => 'contact' === $row->sender_type ? 'user' : 'assistant',
+				'content' => $text,
+			];
+		}
+
+		return array_slice( $turns, -max( 1, $limit ) );
 	}
 
 	/** Channel => [ trigger payload key for the customer, key for the business account ]. */

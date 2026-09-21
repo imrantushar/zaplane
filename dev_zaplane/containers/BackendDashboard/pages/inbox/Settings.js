@@ -214,6 +214,9 @@ const Settings = ({ onSaved }) => {
   };
 
   const connections = data?.ai_connections || [];
+  const knowledgeKeys = data?.knowledge_keys || [];
+  const knowledgeUrl = "admin.php?page=zaplane-knowledge";
+  const selectedKnowledge = knowledgeKeys.find((k) => k.key === form.ai.business_key);
   const connectionsUrl = "admin.php?page=zaplane-connections";
   const aiReady = form.ai.enabled && form.ai.connection_id;
 
@@ -341,8 +344,40 @@ const Settings = ({ onSaved }) => {
                 ))}
               </select>
             </Field>
-            <Field label={__("Knowledge to answer from", "zaplane")} help={__("The Business Key used in Business Knowledge.", "zaplane")}>
-              <input className="zaplane-inbox-input" value={form.ai.business_key} onChange={(e) => setAi("business_key", e.target.value)} />
+            <Field
+              label={__("Knowledge to answer from", "zaplane")}
+              help={
+                knowledgeKeys.length === 0 ? (
+                  <>
+                    {__("Business Knowledge is empty, so the assistant has nothing to answer from.", "zaplane")}{" "}
+                    <a href={knowledgeUrl}>
+                      {__("Add entries", "zaplane")} <FiExternalLink />
+                    </a>
+                  </>
+                ) : !selectedKnowledge ? (
+                  <>
+                    {sprintf(__("“%s” has no entries yet.", "zaplane"), form.ai.business_key)}{" "}
+                    <a href={knowledgeUrl}>
+                      {__("Add some", "zaplane")} <FiExternalLink />
+                    </a>
+                  </>
+                ) : (
+                  sprintf(_n("%d entry the assistant searches.", "%d entries the assistant searches.", selectedKnowledge.count, "zaplane"), selectedKnowledge.count)
+                )
+              }
+            >
+              <select className="zaplane-inbox-select" value={form.ai.business_key} onChange={(e) => setAi("business_key", e.target.value)}>
+                {!selectedKnowledge && (
+                  <option value={form.ai.business_key}>
+                    {sprintf(__("%s (no entries)", "zaplane"), form.ai.business_key || "default")}
+                  </option>
+                )}
+                {knowledgeKeys.map((k) => (
+                  <option key={k.key} value={k.key}>
+                    {k.key} ({k.count})
+                  </option>
+                ))}
+              </select>
             </Field>
             <Field label={__("Assistant name", "zaplane")}>
               <input className="zaplane-inbox-input" value={form.ai.agent_name} onChange={(e) => setAi("agent_name", e.target.value)} />

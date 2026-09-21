@@ -115,7 +115,7 @@ Go through each node:
 
 3. **Run Agent** — click it, open **Configure**, and review the instructions (you can customize the wording, but don't remove the parts that tell it to use the tools).
 4. **Chat Model** (sub-node under Run Agent) — link it to the AI connection from Step 2, and pick a model.
-5. **Memory** (sub-node) — no changes usually needed; it automatically keeps one conversation thread per Messenger sender.
+5. **Memory** (sub-node) — no changes usually needed. **History from** is set to *The Inbox conversation*, so when the Inbox receives Messenger the agent sees the real thread, including replies your team typed in the Inbox. Without the Inbox it keeps its own thread per Messenger sender.
 6. **Business Knowledge** (Tool sub-node) — set its **Business Key** to match what you used in Step 3.
 7. **Get Product** (Tool sub-node) — this is already pointed at whichever store platform was detected. No changes needed unless the sticky note told you to swap it.
 8. **Send Reply** (action) — link it to the same Messenger connection from Step 1.

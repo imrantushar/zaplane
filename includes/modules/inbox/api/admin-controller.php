@@ -618,11 +618,40 @@ class AdminController {
 		return [
 			'settings'       => InboxSettings::get(),
 			'ai_connections' => $connections,
+			'knowledge_keys' => self::knowledge_keys(),
 			'team'           => $team,
 			'site_origin'    => untrailingslashit( home_url() ),
 			'channels'       => $channels,
 			'store'          => $store ? $store::label() : null,
 		];
+	}
+
+	/**
+	 * Business Knowledge keys that have entries, with how many, so the
+	 * assistant's knowledge is picked rather than typed (a typo would leave
+	 * it answering from nothing).
+	 *
+	 * @return array<int,array{key:string,count:int}>
+	 */
+	private static function knowledge_keys(): array {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare( 'SELECT business_key, COUNT(*) AS entries FROM %i GROUP BY business_key ORDER BY business_key ASC', \Zaplane\Models\Knowledge::getTable() ),
+			ARRAY_A
+		);
+
+		$out = [];
+		foreach ( (array) $rows as $row ) {
+			if ( '' === (string) ( $row['business_key'] ?? '' ) ) {
+				continue;
+			}
+			$out[] = [
+				'key'   => (string) $row['business_key'],
+				'count' => (int) $row['entries'],
+			];
+		}
+		return $out;
 	}
 
 	public function list_canned() {
