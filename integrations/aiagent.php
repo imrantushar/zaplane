@@ -230,6 +230,17 @@ class Aiagent extends IntegrationBase {
 		$ctx['tool_nodes'] = self::build_tool_nodes( $sub['ai_tool'] ?? [] );
 		$history           = empty( $sub['ai_memory'] ) ? [] : self::load_memory_history( $sub['ai_memory'] );
 
+		// A caller that already holds the transcript (the inbox) passes it in
+		// directly instead of wiring a Memory node.
+		if ( ! empty( $node['_history'] ) && is_array( $node['_history'] ) ) {
+			$history = self::trim_history( self::normalize_roles( array_values( array_filter(
+				$node['_history'],
+				static function ( $turn ) {
+					return is_array( $turn ) && '' !== (string) ( $turn['content'] ?? '' );
+				}
+			) ) ) );
+		}
+
 		$model     = sanitize_text_field( (string) ( $config['model'] ?? self::DEFAULT_MODEL ) );
 		if ( ! empty( $sub['ai_model']['data']['config']['model'] ) ) {
 			$model = sanitize_text_field( (string) $sub['ai_model']['data']['config']['model'] );
@@ -444,6 +455,19 @@ class Aiagent extends IntegrationBase {
 			$class  = get_class( $instance );
 			$schema = method_exists( $class, 'get_action_config_schema' ) ? $class::get_action_config_schema( $event ) : [];
 
+			// Config keys the caller fixes, such as the conversation a tool acts
+			// on. They are hidden from the model and re-applied on every call, so
+			// the model cannot point the tool somewhere else.
+			$locked = array_values( array_filter( array_map( 'strval', (array) ( $n['data']['locked'] ?? [] ) ) ) );
+			if ( ! empty( $locked ) ) {
+				$schema = array_values( array_filter(
+					$schema,
+					static function ( $field ) use ( $locked ) {
+						return ! in_array( (string) ( $field['key'] ?? '' ), $locked, true );
+					}
+				) );
+			}
+
 			$base = (string) ( $n['data']['name'] ?? ( $app . '_' . $event ) );
 			$name = 'tool_' . preg_replace( '/[^a-zA-Z0-9_-]/', '_', $base );
 			// Keep tool names unique across identically-named nodes.
@@ -459,9 +483,12 @@ class Aiagent extends IntegrationBase {
 				'event'        => $event,
 				'class'        => $class,
 				'saved_config' => is_array( $n['data']['config'] ?? null ) ? $n['data']['config'] : [],
+				'locked'       => $locked,
 				'spec'         => [
 					'name'        => $unique,
-					'description' => sprintf( 'Run the %s "%s" action and return its output.', $app, $event ),
+					'description' => ! empty( $n['data']['description'] )
+						? (string) $n['data']['description']
+						: sprintf( 'Run the %s "%s" action and return its output.', $app, $event ),
 					'schema'      => self::schema_to_json_schema( $schema ),
 				],
 			];
@@ -515,6 +542,9 @@ class Aiagent extends IntegrationBase {
 	 */
 	private static function run_tool_node( array $tool, array $args ): string {
 		$config = array_merge( $tool['saved_config'], is_array( $args ) ? $args : [] );
+		foreach ( $tool['locked'] ?? [] as $key ) {
+			$config[ $key ] = $tool['saved_config'][ $key ] ?? null;
+		}
 		try {
 			$out = $tool['class']::execute_node(
 				[

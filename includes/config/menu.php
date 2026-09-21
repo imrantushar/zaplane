@@ -10,6 +10,11 @@ return [
 			'title'       => __( 'Dashboard', 'zaplane' ),
 			'capability'  => 'manage_options',
 		],
+		ZAPLANE_PLUGIN_SLUG . '-inbox' => [
+			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
+			'title'       => __( 'Inbox', 'zaplane' ),
+			'capability'  => 'manage_options',
+		],
 		ZAPLANE_PLUGIN_SLUG . '-workflows' => [
 			'parent_slug' => ZAPLANE_PLUGIN_SLUG,
 			'title'       => __( 'Workflows', 'zaplane' ),

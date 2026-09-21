@@ -1,0 +1,236 @@
+/* Zaplane Inbox — website chat widget. Everything is scoped under #zpi-root so
+   theme styles cannot reach in and ours cannot leak out. */
+
+#zpi-root {
+	--zpi-color: #006bff;
+	--zpi-bg: #ffffff;
+	--zpi-surface: #f3f5f8;
+	--zpi-text: #1d2433;
+	--zpi-muted: #6b7384;
+	--zpi-border: #e3e7ee;
+	position: fixed;
+	bottom: 20px;
+	z-index: 2147483000;
+	font: 400 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	color: var(--zpi-text);
+	-webkit-font-smoothing: antialiased;
+}
+
+#zpi-root.zpi-right { right: 20px; }
+#zpi-root.zpi-left { left: 20px; }
+
+#zpi-root *,
+#zpi-root *::before,
+#zpi-root *::after {
+	box-sizing: border-box;
+	margin: 0;
+	letter-spacing: normal;
+	text-transform: none;
+}
+
+#zpi-root [hidden] { display: none !important; }
+
+#zpi-root button {
+	font: inherit;
+	cursor: pointer;
+	border: 0;
+	background: none;
+	padding: 0;
+	box-shadow: none;
+	min-height: 0;
+	line-height: 1;
+}
+
+#zpi-root svg { display: block; width: 100%; height: 100%; }
+
+#zpi-root .zpi-launcher {
+	position: relative;
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	background: var(--zpi-color);
+	color: #fff;
+	display: grid;
+	place-items: center;
+	box-shadow: 0 6px 20px rgba(16, 24, 40, 0.22);
+	transition: transform 0.15s ease;
+}
+
+#zpi-root.zpi-left .zpi-launcher { margin-right: auto; }
+#zpi-root.zpi-right .zpi-launcher { margin-left: auto; }
+
+#zpi-root .zpi-launcher:hover { transform: scale(1.05); }
+#zpi-root .zpi-launcher:focus-visible,
+#zpi-root .zpi-close:focus-visible,
+#zpi-root .zpi-send:focus-visible { outline: 3px solid rgba(0, 107, 255, 0.35); outline-offset: 2px; }
+
+#zpi-root .zpi-launcher svg { width: 26px; height: 26px; grid-area: 1 / 1; }
+#zpi-root .zpi-icon-close { display: none; }
+#zpi-root.zpi-is-open .zpi-icon-chat { display: none; }
+#zpi-root.zpi-is-open .zpi-icon-close { display: block; }
+
+#zpi-root .zpi-badge {
+	position: absolute;
+	top: -2px;
+	right: -2px;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 6px;
+	border-radius: 10px;
+	background: #e5484d;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 20px;
+	text-align: center;
+	border: 2px solid #fff;
+}
+
+#zpi-root .zpi-panel {
+	position: absolute;
+	bottom: 72px;
+	width: 370px;
+	height: min(600px, calc(100vh - 110px));
+	display: flex;
+	flex-direction: column;
+	background: var(--zpi-bg);
+	border-radius: 16px;
+	box-shadow: 0 16px 48px rgba(16, 24, 40, 0.24);
+	overflow: hidden;
+}
+
+#zpi-root.zpi-right .zpi-panel { right: 0; }
+#zpi-root.zpi-left .zpi-panel { left: 0; }
+
+#zpi-root .zpi-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 16px 16px 16px 20px;
+	background: var(--zpi-color);
+	color: #fff;
+}
+
+#zpi-root .zpi-titles { flex: 1; min-width: 0; }
+#zpi-root .zpi-title { font-size: 16px; font-weight: 600; line-height: 1.3; }
+#zpi-root .zpi-subtitle { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
+#zpi-root .zpi-close {
+	width: 32px;
+	height: 32px;
+	padding: 7px;
+	border-radius: 8px;
+	color: #fff;
+}
+
+#zpi-root .zpi-close:hover { background: rgba(255, 255, 255, 0.16); }
+
+#zpi-root .zpi-messages {
+	flex: 1;
+	overflow-y: auto;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	background: var(--zpi-surface);
+	overscroll-behavior: contain;
+}
+
+#zpi-root .zpi-msg { display: flex; flex-direction: column; max-width: 82%; }
+#zpi-root .zpi-them { align-self: flex-start; }
+#zpi-root .zpi-me { align-self: flex-end; align-items: flex-end; }
+
+#zpi-root .zpi-name { font-size: 12px; color: var(--zpi-muted); margin: 0 0 3px 4px; }
+
+#zpi-root .zpi-bubble {
+	padding: 9px 13px;
+	border-radius: 16px;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	overflow-wrap: anywhere;
+}
+
+#zpi-root .zpi-them .zpi-bubble {
+	background: var(--zpi-bg);
+	border: 1px solid var(--zpi-border);
+	border-bottom-left-radius: 4px;
+}
+
+#zpi-root .zpi-me .zpi-bubble {
+	background: var(--zpi-color);
+	color: #fff;
+	border-bottom-right-radius: 4px;
+}
+
+#zpi-root .zpi-time { font-size: 11px; color: var(--zpi-muted); margin: 3px 4px 0; }
+#zpi-root .zpi-typing .zpi-bubble { color: var(--zpi-muted); font-style: italic; }
+
+#zpi-root .zpi-form {
+	border-top: 1px solid var(--zpi-border);
+	padding: 12px;
+	background: var(--zpi-bg);
+}
+
+#zpi-root .zpi-details { display: grid; gap: 8px; margin-bottom: 8px; }
+
+#zpi-root .zpi-input,
+#zpi-root .zpi-text {
+	width: 100%;
+	font: inherit;
+	color: var(--zpi-text);
+	background: var(--zpi-bg);
+	border: 1px solid var(--zpi-border);
+	border-radius: 10px;
+	padding: 9px 12px;
+	outline: none;
+	box-shadow: none;
+	min-height: 0;
+}
+
+#zpi-root .zpi-input:focus,
+#zpi-root .zpi-text:focus { border-color: var(--zpi-color); }
+
+#zpi-root .zpi-row { display: flex; align-items: flex-end; gap: 8px; }
+#zpi-root .zpi-text { resize: none; max-height: 120px; line-height: 1.4; }
+
+#zpi-root .zpi-send {
+	flex: none;
+	width: 40px;
+	height: 40px;
+	padding: 10px;
+	border-radius: 10px;
+	background: var(--zpi-color);
+	color: #fff;
+}
+
+#zpi-root .zpi-send:disabled { opacity: 0.55; cursor: default; }
+#zpi-root .zpi-error { margin-top: 8px; font-size: 13px; color: #c62a2f; }
+
+@media (max-width: 480px) {
+	#zpi-root { bottom: 16px; }
+	#zpi-root.zpi-right { right: 16px; }
+	#zpi-root.zpi-left { left: 16px; }
+	#zpi-root .zpi-panel {
+		position: fixed;
+		inset: 0;
+		width: auto;
+		height: auto;
+		border-radius: 0;
+	}
+	#zpi-root.zpi-is-open .zpi-launcher { display: none; }
+}
+
+@media (prefers-color-scheme: dark) {
+	#zpi-root {
+		--zpi-bg: #1b1f27;
+		--zpi-surface: #13161c;
+		--zpi-text: #e8ebf1;
+		--zpi-muted: #9aa3b2;
+		--zpi-border: #2c323d;
+	}
+	#zpi-root .zpi-badge { border-color: #1b1f27; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#zpi-root .zpi-launcher { transition: none; }
+}

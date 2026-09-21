@@ -163,6 +163,16 @@ class Settings {
 				'apps'        => [ 'knowledge' ],
 				'since'       => '1.1.0',
 			],
+			'inbox'       => [
+				'key'         => 'inbox',
+				'title'       => __( 'Inbox', 'zaplane' ),
+				'description' => __( 'One inbox for every customer conversation, starting with a chat widget for your website. An AI assistant answers from your Business Knowledge and hands over to your team when needed. When off, nothing is added to your site.', 'zaplane' ),
+				'default'     => false,
+				'menu'        => 'inbox',
+				'panel'       => '',
+				'apps'        => [ 'inbox' ],
+				'since'       => '1.4.0',
+			],
 			'mcp_server'  => [
 				'key'         => 'mcp_server',
 				'title'       => __( 'AI access (MCP)', 'zaplane' ),

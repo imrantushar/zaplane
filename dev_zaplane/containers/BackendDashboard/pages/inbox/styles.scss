@@ -1,0 +1,686 @@
+// Inbox screen. Colours come from the --zaplane-* tokens so light and dark
+// themes both work without extra rules.
+//
+// Everything is nested under #zaplane-app: the dashboard's scoped preflight
+// (`.zaplane-scope *` zeroes every border, and buttons lose their padding and
+// background) otherwise outranks these single-class rules.
+
+#zaplane-app {
+
+.zaplane-inbox {
+	display: grid;
+	grid-template-columns: 320px minmax(0, 1fr) 280px;
+	height: calc(100vh - 200px);
+	min-height: 520px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 8px;
+	overflow: hidden;
+	background: var(--zaplane-background, #fff);
+	color: var(--zaplane-font-color);
+	font-size: 14px;
+
+	button {
+		font: inherit;
+		color: inherit;
+		cursor: pointer;
+	}
+}
+
+.zaplane-inbox-setup {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 12px;
+	padding: 10px 14px;
+	border-radius: 8px;
+	background: var(--zaplane-second-primary);
+	color: var(--zaplane-font-color);
+}
+
+.zaplane-inbox-link {
+	background: none;
+	border: 0;
+	padding: 0;
+	color: var(--zaplane-primary);
+	font-weight: 600;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+/* List ------------------------------------------------------------------ */
+
+.zaplane-inbox-list {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	border-right: 1px solid var(--zaplane-border-color);
+}
+
+.zaplane-inbox-list-head {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 12px;
+	border-bottom: 1px solid var(--zaplane-border-color);
+}
+
+.zaplane-inbox-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.zaplane-inbox-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 10px;
+	border: 0;
+	border-radius: 6px;
+	background: transparent;
+	color: var(--zaplane-font-secondary-color);
+	font-weight: 500;
+
+	&.is-active {
+		background: var(--zaplane-second-primary);
+		color: var(--zaplane-primary);
+	}
+}
+
+.zaplane-inbox-count {
+	min-width: 18px;
+	padding: 0 5px;
+	border-radius: 9px;
+	background: var(--zaplane-secondary);
+	font-size: 11px;
+	line-height: 18px;
+	text-align: center;
+}
+
+.zaplane-inbox-select,
+.zaplane-inbox-input {
+	width: 100%;
+	min-height: 34px;
+	padding: 6px 10px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 6px;
+	background: var(--zaplane-background, #fff);
+	color: var(--zaplane-font-color);
+	font: inherit;
+	box-shadow: none;
+
+	&:focus {
+		border-color: var(--zaplane-primary);
+		outline: none;
+		box-shadow: 0 0 0 2px var(--zaplane-second-primary);
+	}
+}
+
+select.zaplane-inbox-select {
+	appearance: none;
+	padding-right: 30px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7384' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+	background-size: 12px;
+	cursor: pointer;
+}
+
+.zaplane-inbox-list-head .zaplane-inbox-select {
+	width: auto;
+	max-width: 130px;
+}
+
+.zaplane-inbox-items {
+	flex: 1;
+	margin: 0;
+	padding: 0;
+	overflow-y: auto;
+	list-style: none;
+
+	li {
+		margin: 0;
+	}
+}
+
+.zaplane-inbox-empty {
+	padding: 32px 20px;
+	color: var(--zaplane-font-secondary-color);
+	text-align: center;
+}
+
+.zaplane-inbox-item {
+	display: flex;
+	gap: 10px;
+	width: 100%;
+	padding: 12px;
+	border: 0;
+	border-bottom: 1px solid var(--zaplane-border-color);
+	background: transparent;
+	text-align: left;
+
+	&:hover {
+		background: var(--zaplane-secondary-color);
+	}
+
+	&.is-active {
+		background: var(--zaplane-second-primary);
+	}
+
+	&.is-unread .zaplane-inbox-name,
+	&.is-unread .zaplane-inbox-preview {
+		font-weight: 700;
+		color: var(--zaplane-font-color);
+	}
+}
+
+.zaplane-inbox-avatar {
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: 36px;
+	height: 36px;
+	overflow: hidden;
+	border-radius: 50%;
+	background: var(--zaplane-second-primary);
+	color: var(--zaplane-primary);
+	font-size: 13px;
+	font-weight: 600;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	&.is-lg {
+		width: 48px;
+		height: 48px;
+		font-size: 16px;
+	}
+}
+
+.zaplane-inbox-item-body {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 3px;
+	min-width: 0;
+}
+
+.zaplane-inbox-item-top {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.zaplane-inbox-name {
+	overflow: hidden;
+	font-weight: 600;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.zaplane-inbox-time,
+.zaplane-inbox-sub,
+.zaplane-inbox-hint {
+	flex: none;
+	color: var(--zaplane-font-secondary-color);
+	font-size: 12px;
+	font-style: normal;
+}
+
+.zaplane-inbox-preview {
+	overflow: hidden;
+	color: var(--zaplane-font-secondary-color);
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.zaplane-inbox-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+}
+
+.zaplane-inbox-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 1px 8px;
+	border-radius: 10px;
+	background: var(--zaplane-secondary);
+	color: var(--zaplane-font-secondary-color);
+	font-size: 11px;
+	line-height: 18px;
+
+	&.is-ai {
+		background: var(--zaplane-second-primary);
+		color: var(--zaplane-primary);
+	}
+
+	button {
+		padding: 0;
+		border: 0;
+		background: none;
+		font-size: 14px;
+		line-height: 1;
+	}
+}
+
+.zaplane-inbox-unread {
+	margin-left: auto;
+	min-width: 18px;
+	padding: 0 5px;
+	border-radius: 9px;
+	background: var(--zaplane-primary);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 18px;
+	text-align: center;
+}
+
+/* Thread ---------------------------------------------------------------- */
+
+.zaplane-inbox-thread {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	min-width: 0;
+
+	&.is-empty {
+		align-items: center;
+		justify-content: center;
+		color: var(--zaplane-font-secondary-color);
+	}
+}
+
+.zaplane-inbox-banner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 16px;
+	border-bottom: 1px solid var(--zaplane-border-color);
+	background: var(--zaplane-second-primary);
+	font-size: 13px;
+}
+
+.zaplane-inbox-messages {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 12px;
+	padding: 20px;
+	overflow-y: auto;
+	background: var(--zaplane-secondary-color);
+}
+
+.zaplane-inbox-msg {
+	display: flex;
+	flex-direction: column;
+	max-width: 70%;
+
+	&.is-in {
+		align-self: flex-start;
+	}
+
+	&.is-out {
+		align-self: flex-end;
+		align-items: flex-end;
+	}
+}
+
+.zaplane-inbox-msg-meta {
+	display: flex;
+	gap: 8px;
+	margin: 0 4px 3px;
+	color: var(--zaplane-font-secondary-color);
+	font-size: 12px;
+}
+
+.zaplane-inbox-bubble {
+	padding: 9px 13px;
+	border-radius: 12px;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.zaplane-inbox-msg.is-in .zaplane-inbox-bubble {
+	border: 1px solid var(--zaplane-border-color);
+	background: var(--zaplane-background, #fff);
+}
+
+.zaplane-inbox-msg.is-out .zaplane-inbox-bubble {
+	background: var(--zaplane-primary);
+	color: #fff;
+}
+
+.zaplane-inbox-msg.is-note .zaplane-inbox-bubble {
+	border: 1px dashed var(--zaplane-warning, #d98b00);
+	background: #fff6e0;
+	color: #5b4200;
+}
+
+.zaplane-inbox-system {
+	align-self: center;
+	padding: 4px 10px;
+	border-radius: 10px;
+	background: var(--zaplane-secondary);
+	color: var(--zaplane-font-secondary-color);
+	font-size: 12px;
+	text-align: center;
+}
+
+.zaplane-inbox-failed {
+	margin-top: 4px;
+	color: var(--zaplane-danger, #c62a2f);
+	font-size: 12px;
+}
+
+.zaplane-inbox-composer {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 12px 16px;
+	border-top: 1px solid var(--zaplane-border-color);
+
+	textarea {
+		width: 100%;
+		padding: 10px 12px;
+		border: 1px solid var(--zaplane-border-color);
+		border-radius: 8px;
+		background: var(--zaplane-background, #fff);
+		color: var(--zaplane-font-color);
+		font: inherit;
+		resize: vertical;
+
+		&:focus {
+			border-color: var(--zaplane-primary);
+			outline: none;
+		}
+	}
+
+	&.is-note textarea {
+		background: #fff6e0;
+		color: #5b4200;
+	}
+}
+
+.zaplane-inbox-mode {
+	display: flex;
+	gap: 4px;
+
+	button {
+		padding: 4px 10px;
+		border: 0;
+		border-radius: 6px;
+		background: transparent;
+		color: var(--zaplane-font-secondary-color);
+		font-weight: 500;
+
+		&.is-active {
+			background: var(--zaplane-secondary);
+			color: var(--zaplane-font-color);
+		}
+	}
+}
+
+.zaplane-inbox-composer-foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.zaplane-inbox-send {
+	height: 36px;
+	padding: 0 18px;
+	border: 0;
+	border-radius: 6px;
+	background: var(--zaplane-primary) !important;
+	color: #fff !important;
+	font-weight: 600;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: default;
+	}
+}
+
+.zaplane-inbox-canned {
+	position: absolute;
+	right: 16px;
+	bottom: 100%;
+	left: 16px;
+	z-index: 5;
+	max-height: 240px;
+	margin: 0 0 4px;
+	padding: 4px;
+	overflow-y: auto;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 8px;
+	background: var(--zaplane-background, #fff);
+	box-shadow: 0 8px 24px rgba(16, 24, 40, 0.12);
+	list-style: none;
+
+	button {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		width: 100%;
+		padding: 8px 10px;
+		border: 0;
+		border-radius: 6px;
+		background: none;
+		text-align: left;
+
+		&:hover {
+			background: var(--zaplane-secondary-color);
+		}
+
+		span {
+			overflow: hidden;
+			color: var(--zaplane-font-secondary-color);
+			font-size: 12px;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+	}
+}
+
+/* Details --------------------------------------------------------------- */
+
+.zaplane-inbox-details {
+	min-height: 0;
+	overflow-y: auto;
+	border-left: 1px solid var(--zaplane-border-color);
+}
+
+.zaplane-inbox-contact {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 16px;
+	border-bottom: 1px solid var(--zaplane-border-color);
+}
+
+.zaplane-inbox-section {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 16px;
+	border-bottom: 1px solid var(--zaplane-border-color);
+
+	h3 {
+		margin: 0;
+		color: var(--zaplane-font-secondary-color);
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+}
+
+.zaplane-inbox-field {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+
+	> span {
+		font-size: 13px;
+		font-weight: 500;
+	}
+
+	&.is-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+}
+
+.zaplane-inbox-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.zaplane-inbox-history {
+	margin: 0;
+	padding: 0;
+	color: var(--zaplane-font-secondary-color);
+	font-size: 12px;
+	list-style: none;
+
+	li + li {
+		margin-top: 4px;
+	}
+}
+
+/* Settings -------------------------------------------------------------- */
+
+.zaplane-inbox-settings {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	max-width: 880px;
+}
+
+.zaplane-inbox-card {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 20px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 8px;
+	background: var(--zaplane-background, #fff);
+	color: var(--zaplane-font-color);
+
+	h3 {
+		margin: 0 0 4px;
+		font-size: 16px;
+		font-weight: 600;
+	}
+
+	p {
+		margin: 0;
+		color: var(--zaplane-font-secondary-color);
+	}
+}
+
+.zaplane-inbox-card-head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.zaplane-inbox-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 14px;
+}
+
+.zaplane-inbox-color {
+	width: 60px;
+	height: 34px;
+	padding: 2px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 6px;
+	background: none;
+}
+
+.zaplane-inbox-canned-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+
+	li {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 10px 0;
+		border-bottom: 1px solid var(--zaplane-border-color);
+	}
+
+	code {
+		margin-left: 8px;
+		font-size: 12px;
+	}
+
+	p {
+		margin-top: 2px;
+		white-space: pre-wrap;
+	}
+}
+
+@media (max-width: 1400px) {
+	.zaplane-inbox {
+		grid-template-columns: 260px minmax(0, 1fr) 240px;
+	}
+}
+
+// Narrow admin screens: the details panel drops below the thread instead of
+// disappearing, so status and assignment stay reachable.
+@media (max-width: 1100px) {
+	.zaplane-inbox {
+		grid-template-columns: 260px minmax(0, 1fr);
+		grid-template-rows: minmax(520px, calc(100vh - 200px)) auto;
+		height: auto;
+	}
+
+	.zaplane-inbox-details {
+		grid-column: 1 / -1;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		border-top: 1px solid var(--zaplane-border-color);
+		border-left: 0;
+	}
+}
+
+@media (max-width: 782px) {
+	.zaplane-inbox {
+		grid-template-columns: 1fr;
+		grid-template-rows: none;
+	}
+
+	.zaplane-inbox-list {
+		max-height: 360px;
+		border-right: 0;
+		border-bottom: 1px solid var(--zaplane-border-color);
+	}
+
+	.zaplane-inbox-thread {
+		min-height: 480px;
+	}
+
+	.zaplane-inbox-grid {
+		grid-template-columns: 1fr;
+	}
+}
+}

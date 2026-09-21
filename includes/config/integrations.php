@@ -113,6 +113,10 @@ $zaplane_registry = [
 		'file'  => 'memory.php',
 		'class' => \Zaplane\Integrations\Memory::class,
 	],
+	'inbox'               => [
+		'file'  => 'inbox.php',
+		'class' => \Zaplane\Integrations\Inbox::class,
+	],
 	'knowledge'           => [
 		'file'  => 'knowledge.php',
 		'class' => \Zaplane\Integrations\Knowledge::class,

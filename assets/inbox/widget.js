@@ -1,0 +1,403 @@
+/**
+ * Zaplane Inbox — website chat widget.
+ *
+ * Plain script, no framework: it loads on every page of the site, so it has to
+ * be small. Messages are rendered with textContent only — nothing a visitor or
+ * the team writes is ever parsed as HTML.
+ */
+( function () {
+	'use strict';
+
+	var cfg = window.ZaplaneInbox;
+	if ( ! cfg || ! cfg.rest || document.getElementById( 'zpi-root' ) ) {
+		return;
+	}
+
+	var STORE_KEY = 'zaplane_inbox_visitor';
+	var OPEN_POLL = 3000;
+	var IDLE_POLL = 20000;
+	var t = cfg.i18n || {};
+
+	var state = {
+		token: read( STORE_KEY ),
+		open: false,
+		lastId: 0,
+		unread: 0,
+		started: false,
+		waiting: false,
+		busy: false,
+		timer: null,
+		known: null,
+	};
+
+	function read( key ) {
+		try {
+			return window.localStorage.getItem( key ) || '';
+		} catch ( e ) {
+			return '';
+		}
+	}
+
+	function write( key, value ) {
+		try {
+			if ( value ) {
+				window.localStorage.setItem( key, value );
+			} else {
+				window.localStorage.removeItem( key );
+			}
+		} catch ( e ) {}
+	}
+
+	function el( tag, cls, text ) {
+		var node = document.createElement( tag );
+		if ( cls ) {
+			node.className = cls;
+		}
+		if ( text ) {
+			node.textContent = text;
+		}
+		return node;
+	}
+
+	/* ---------------------------------------------------------------- *
+	 * Network
+	 * ---------------------------------------------------------------- */
+
+	function request( method, path, body, withNonce ) {
+		var headers = { Accept: 'application/json' };
+		if ( body ) {
+			headers[ 'Content-Type' ] = 'application/json';
+		}
+		if ( state.token ) {
+			headers[ 'X-Zaplane-Visitor' ] = state.token;
+		}
+		if ( withNonce !== false && cfg.nonce ) {
+			headers[ 'X-WP-Nonce' ] = cfg.nonce;
+		}
+
+		return window
+			.fetch( cfg.rest + path, {
+				method: method,
+				headers: headers,
+				credentials: 'same-origin',
+				body: body ? JSON.stringify( body ) : undefined,
+			} )
+			.then( function ( res ) {
+				return res.json().then(
+					function ( data ) {
+						return { ok: res.ok, status: res.status, data: data };
+					},
+					function () {
+						return { ok: res.ok, status: res.status, data: {} };
+					}
+				);
+			} )
+			.then( function ( out ) {
+				// A cached page can carry a stale nonce; the chat still works
+				// anonymously without it.
+				if ( ! out.ok && withNonce !== false && cfg.nonce && out.data && out.data.code === 'rest_cookie_invalid_nonce' ) {
+					cfg.nonce = '';
+					return request( method, path, body, false );
+				}
+				return out;
+			} );
+	}
+
+	function ensureSession() {
+		if ( state.started ) {
+			return Promise.resolve( true );
+		}
+		return request( 'POST', 'session' ).then( function ( res ) {
+			if ( ! res.ok || ! res.data.token ) {
+				return false;
+			}
+			state.token = res.data.token;
+			state.known = res.data.visitor || null;
+			state.started = true;
+			write( STORE_KEY, state.token );
+			return true;
+		} );
+	}
+
+	function poll() {
+		if ( ! state.token ) {
+			return Promise.resolve();
+		}
+		return request( 'GET', 'messages' + ( state.lastId ? '?after_id=' + state.lastId : '' ) ).then( function ( res ) {
+			if ( res.status === 401 ) {
+				// The token no longer verifies (signed out, salts rotated). Start over.
+				state.token = '';
+				state.started = false;
+				write( STORE_KEY, '' );
+				return;
+			}
+			if ( ! res.ok ) {
+				return;
+			}
+			( res.data.messages || [] ).forEach( addMessage );
+			setWaiting( !! res.data.waiting );
+		} );
+	}
+
+	function schedule() {
+		window.clearTimeout( state.timer );
+		if ( ! state.token || document.visibilityState === 'hidden' ) {
+			return;
+		}
+		state.timer = window.setTimeout( function () {
+			poll().then( schedule, schedule );
+		}, state.open ? OPEN_POLL : IDLE_POLL );
+	}
+
+	/* ---------------------------------------------------------------- *
+	 * UI
+	 * ---------------------------------------------------------------- */
+
+	var root = el( 'div', 'zpi-root zpi-' + ( cfg.position === 'left' ? 'left' : 'right' ) );
+	root.id = 'zpi-root';
+	root.style.setProperty( '--zpi-color', cfg.color || '#006BFF' );
+
+	var launcher = el( 'button', 'zpi-launcher' );
+	launcher.type = 'button';
+	launcher.setAttribute( 'aria-label', t.open || 'Open chat' );
+	launcher.setAttribute( 'aria-expanded', 'false' );
+	launcher.innerHTML =
+		'<svg class="zpi-icon-chat" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="currentColor"/></svg>' +
+		'<svg class="zpi-icon-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+	var badge = el( 'span', 'zpi-badge' );
+	badge.hidden = true;
+	launcher.appendChild( badge );
+
+	var panel = el( 'div', 'zpi-panel' );
+	panel.setAttribute( 'role', 'dialog' );
+	panel.setAttribute( 'aria-label', cfg.title || 'Chat' );
+	panel.hidden = true;
+
+	var header = el( 'div', 'zpi-header' );
+	var titleWrap = el( 'div', 'zpi-titles' );
+	titleWrap.appendChild( el( 'div', 'zpi-title', cfg.title || '' ) );
+	if ( cfg.aiLabel ) {
+		titleWrap.appendChild( el( 'div', 'zpi-subtitle', cfg.aiLabel ) );
+	}
+	var closeBtn = el( 'button', 'zpi-close' );
+	closeBtn.type = 'button';
+	closeBtn.setAttribute( 'aria-label', t.close || 'Close chat' );
+	closeBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+	header.appendChild( titleWrap );
+	header.appendChild( closeBtn );
+
+	var list = el( 'div', 'zpi-messages' );
+	list.setAttribute( 'aria-live', 'polite' );
+
+	var greeting = el( 'div', 'zpi-msg zpi-them' );
+	greeting.appendChild( el( 'div', 'zpi-bubble', cfg.greeting || '' ) );
+	if ( cfg.greeting ) {
+		list.appendChild( greeting );
+	}
+
+	var typing = el( 'div', 'zpi-msg zpi-them zpi-typing' );
+	typing.appendChild( el( 'div', 'zpi-bubble', t.typing || '…' ) );
+	typing.hidden = true;
+
+	var form = el( 'form', 'zpi-form' );
+	var details = el( 'div', 'zpi-details' );
+	var nameInput = el( 'input', 'zpi-input' );
+	nameInput.type = 'text';
+	nameInput.placeholder = t.name || 'Your name';
+	nameInput.setAttribute( 'aria-label', t.name || 'Your name' );
+	nameInput.autocomplete = 'name';
+	var emailInput = el( 'input', 'zpi-input' );
+	emailInput.type = 'email';
+	emailInput.placeholder = t.email || 'Your email';
+	emailInput.setAttribute( 'aria-label', t.email || 'Your email' );
+	emailInput.autocomplete = 'email';
+	details.appendChild( nameInput );
+	details.appendChild( emailInput );
+	details.hidden = true;
+
+	var row = el( 'div', 'zpi-row' );
+	var text = el( 'textarea', 'zpi-text' );
+	text.rows = 1;
+	text.placeholder = t.placeholder || 'Type your message…';
+	text.setAttribute( 'aria-label', t.placeholder || 'Message' );
+	text.maxLength = 4000;
+	var send = el( 'button', 'zpi-send' );
+	send.type = 'submit';
+	send.setAttribute( 'aria-label', t.send || 'Send' );
+	send.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 21 3l-8.5 18-2.2-7.3L3 11.5z" fill="currentColor"/></svg>';
+	row.appendChild( text );
+	row.appendChild( send );
+
+	var error = el( 'div', 'zpi-error' );
+	error.hidden = true;
+
+	form.appendChild( details );
+	form.appendChild( row );
+	form.appendChild( error );
+
+	panel.appendChild( header );
+	panel.appendChild( list );
+	list.appendChild( typing );
+	panel.appendChild( form );
+
+	root.appendChild( panel );
+	root.appendChild( launcher );
+
+	function time( iso ) {
+		if ( ! iso ) {
+			return '';
+		}
+		var d = new Date( iso );
+		return isNaN( d ) ? '' : d.toLocaleTimeString( [], { hour: 'numeric', minute: '2-digit' } );
+	}
+
+	function addMessage( m ) {
+		if ( ! m || m.id <= state.lastId ) {
+			return;
+		}
+		state.lastId = m.id;
+
+		var mine = m.sender_type === 'contact';
+		var item = el( 'div', 'zpi-msg ' + ( mine ? 'zpi-me' : 'zpi-them' ) );
+		if ( ! mine && m.sender_name ) {
+			item.appendChild( el( 'div', 'zpi-name', m.sender_name ) );
+		}
+		item.appendChild( el( 'div', 'zpi-bubble', m.body || '' ) );
+		item.appendChild( el( 'div', 'zpi-time', time( m.created_at ) ) );
+		list.insertBefore( item, typing );
+
+		if ( ! mine && ! state.open ) {
+			state.unread++;
+			badge.textContent = String( state.unread );
+			badge.hidden = false;
+		}
+		scrollDown();
+	}
+
+	function setWaiting( on ) {
+		state.waiting = on;
+		typing.hidden = ! on;
+		if ( on ) {
+			scrollDown();
+		}
+	}
+
+	function scrollDown() {
+		list.scrollTop = list.scrollHeight;
+	}
+
+	function showError( msg ) {
+		error.textContent = msg || t.error || 'Something went wrong.';
+		error.hidden = false;
+	}
+
+	function toggle( open ) {
+		state.open = open;
+		panel.hidden = ! open;
+		root.classList.toggle( 'zpi-is-open', open );
+		launcher.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+		launcher.setAttribute( 'aria-label', open ? t.close || 'Close chat' : t.open || 'Open chat' );
+		if ( open ) {
+			state.unread = 0;
+			badge.hidden = true;
+			details.hidden = ! ( cfg.askEmail && ! state.lastId && ! ( state.known && state.known.email ) );
+			poll().then( schedule, schedule );
+			window.setTimeout( function () {
+				text.focus();
+			}, 50 );
+			scrollDown();
+		} else {
+			schedule();
+			launcher.focus();
+		}
+	}
+
+	launcher.addEventListener( 'click', function () {
+		toggle( ! state.open );
+	} );
+	closeBtn.addEventListener( 'click', function () {
+		toggle( false );
+	} );
+	panel.addEventListener( 'keydown', function ( e ) {
+		if ( e.key === 'Escape' ) {
+			toggle( false );
+		}
+	} );
+	text.addEventListener( 'keydown', function ( e ) {
+		if ( e.key === 'Enter' && ! e.shiftKey ) {
+			e.preventDefault();
+			form.requestSubmit ? form.requestSubmit() : form.dispatchEvent( new Event( 'submit', { cancelable: true } ) );
+		}
+	} );
+	text.addEventListener( 'input', function () {
+		text.style.height = 'auto';
+		text.style.height = Math.min( text.scrollHeight, 120 ) + 'px';
+	} );
+
+	form.addEventListener( 'submit', function ( e ) {
+		e.preventDefault();
+		var body = text.value.trim();
+		if ( ! body || state.busy ) {
+			return;
+		}
+		state.busy = true;
+		send.disabled = true;
+		error.hidden = true;
+
+		ensureSession()
+			.then( function ( ok ) {
+				if ( ! ok ) {
+					throw new Error();
+				}
+				return request( 'POST', 'messages', {
+					body: body,
+					name: nameInput.value.trim(),
+					email: emailInput.value.trim(),
+					page_url: window.location.href,
+				} );
+			} )
+			.then( function ( res ) {
+				if ( ! res.ok ) {
+					showError( res.data && res.data.message );
+					return;
+				}
+				text.value = '';
+				text.style.height = 'auto';
+				details.hidden = true;
+				addMessage( res.data.message );
+				if ( cfg.aiName ) {
+					setWaiting( true );
+				}
+				schedule();
+			} )
+			.catch( function () {
+				showError();
+			} )
+			.then( function () {
+				state.busy = false;
+				send.disabled = false;
+			} );
+	} );
+
+	document.addEventListener( 'visibilitychange', function () {
+		if ( document.visibilityState === 'visible' ) {
+			poll().then( schedule, schedule );
+		} else {
+			window.clearTimeout( state.timer );
+		}
+	} );
+
+	function mount() {
+		document.body.appendChild( root );
+		if ( state.token ) {
+			state.started = true;
+			poll().then( schedule, schedule );
+		}
+	}
+
+	if ( document.body ) {
+		mount();
+	} else {
+		document.addEventListener( 'DOMContentLoaded', mount );
+	}
+} )();
