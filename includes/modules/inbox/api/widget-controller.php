@@ -28,11 +28,18 @@ class WidgetController {
 
 	private const NS = 'zaplane/v1';
 
-	/** Messages a visitor (one IP) may send per minute. */
+	/** Messages one visitor may send per minute. */
 	private const RATE_MESSAGES = 20;
 
-	/** Sessions one IP may start per minute. */
-	private const RATE_SESSIONS = 10;
+	/**
+	 * Messages one IP may send per minute, across visitors. High on purpose:
+	 * mobile carriers put many customers behind one address (CGNAT), so this
+	 * only stops floods, never a busy shop.
+	 */
+	private const RATE_MESSAGES_IP = 300;
+
+	/** Sessions one IP may start per minute (same reasoning). */
+	private const RATE_SESSIONS = 60;
 
 	public function register_routes(): void {
 		register_rest_route( self::NS, '/inbox/widget/session', [
@@ -64,7 +71,7 @@ class WidgetController {
 		if ( true !== $open ) {
 			return $open;
 		}
-		return $this->within_rate( 'session', self::RATE_SESSIONS );
+		return $this->within_rate( 'session', self::ip(), self::RATE_SESSIONS );
 	}
 
 	public function is_visitor( WP_REST_Request $request ) {
@@ -82,7 +89,11 @@ class WidgetController {
 		if ( true !== $visitor ) {
 			return $visitor;
 		}
-		return $this->within_rate( 'message', self::RATE_MESSAGES );
+		$ip_ok = $this->within_rate( 'message_ip', self::ip(), self::RATE_MESSAGES_IP );
+		if ( true !== $ip_ok ) {
+			return $ip_ok;
+		}
+		return $this->within_rate( 'message', (string) self::visitor_from( $request ), self::RATE_MESSAGES );
 	}
 
 	/**
@@ -115,18 +126,46 @@ class WidgetController {
 	 *
 	 * @return true|WP_Error
 	 */
-	private function within_rate( string $bucket, int $limit ) {
-		$ip  = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
-		$key = 'zaplane_inbox_rl_' . $bucket . '_' . md5( $ip );
-
-		$count = (int) get_transient( $key );
-		if ( $count >= $limit ) {
-			return new WP_Error( 'zaplane_inbox_rate', __( 'You are sending messages too quickly. Please wait a moment.', 'zaplane' ), [ 'status' => 429 ] );
+	/**
+	 * A fixed one-minute window per bucket and subject. The window's end is
+	 * stored with the count, so each request doesn't push the reset back
+	 * (a plain transient TTL refresh would turn "20 a minute" into "20 until
+	 * you stop for a minute").
+	 */
+	private function within_rate( string $bucket, string $subject, int $limit ) {
+		$key  = 'zaplane_inbox_rl_' . $bucket . '_' . md5( $subject );
+		$now  = time();
+		$slot = get_transient( $key );
+		if ( ! is_array( $slot ) || (int) ( $slot['until'] ?? 0 ) <= $now ) {
+			$slot = [
+				'n'     => 0,
+				'until' => $now + MINUTE_IN_SECONDS,
+			];
 		}
-		set_transient( $key, $count + 1, MINUTE_IN_SECONDS );
+
+		if ( (int) $slot['n'] >= $limit ) {
+			$wait = max( 1, (int) $slot['until'] - $now );
+			return new WP_Error(
+				'zaplane_inbox_rate',
+				/* translators: %d: seconds to wait. */
+				sprintf( _n( 'You are sending messages very quickly. Please wait %d second.', 'You are sending messages very quickly. Please wait %d seconds.', $wait, 'zaplane' ), $wait ),
+				[
+					'status'      => 429,
+					'retry_after' => $wait,
+				]
+			);
+		}
+
+		++$slot['n'];
+		set_transient( $key, $slot, max( 1, (int) $slot['until'] - $now ) );
 
 		return true;
 	}
+
+	private static function ip(): string {
+		return isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+	}
+
 
 	/* ---------------------------------------------------------------- *
 	 * Visitor tokens
