@@ -195,36 +195,17 @@ class Messenger extends IntegrationBase {
 			];
 		}
 
-		// Only request `id` — the default response also includes `name`, which
-		// Meta gates behind pages_read_engagement / Page Public Content Access.
-		// Sending messages only needs pages_messaging, so requesting `name` here
-		// would fail otherwise-valid messaging tokens for an unrelated permission.
-		$response = wp_remote_get(
-			MetaGraph::url( 'me', $credentials['api_version'] ?? null ) . '?fields=id&access_token=' . rawurlencode( $token ),
-			[ 'timeout' => 20 ]
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return [
-				'success' => false,
-				'message' => $response->get_error_message(),
-				'details' => []
-			];
-		}
-
-		$body = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( isset( $body['error'] ) ) {
-			return [
-				'success' => false,
-				'message' => $body['error']['message'] ?? 'Unknown API error',
-				'details' => []
-			];
-		}
-
+		// We deliberately don't verify the token against the Graph API here.
+		// Reading the Page object (even just `id`) is gated by Meta behind
+		// pages_read_engagement / Page Public Content Access, which a
+		// pages_messaging-only token legitimately won't have — even though
+		// pages_messaging alone is all sending actually requires. Rejecting
+		// those otherwise-valid tokens here would be a false negative, so we
+		// accept any non-empty token and let the first send confirm it.
 		return [
 			'success' => true,
-			'message' => 'Connected' . ( ! empty( $body['id'] ) ? ' (Page ID: ' . $body['id'] . ')' : '' ),
-			'details' => [ 'page_id' => $body['id'] ?? '' ],
+			'message' => 'Saved. Validity will be confirmed on first use.',
+			'details' => [],
 		];
 	}
 
