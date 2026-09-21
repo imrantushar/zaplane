@@ -194,7 +194,7 @@ abstract class CustomAppBase extends IntegrationBase {
 		return $payload;
 	}
 
-	protected static function execute_local_action( array $action, string $event, array $config, array $credentials ): array {
+	protected static function execute_local_action( array $action, string $event, array $config, array $credentials, array $input = [] ): array {
 		$handler = is_array( $action['handler'] ?? null ) ? $action['handler'] : [];
 		$type    = (string) ( $handler['type'] ?? '' );
 
@@ -202,7 +202,7 @@ abstract class CustomAppBase extends IntegrationBase {
 			throw new \Exception( 'Unknown local action "' . esc_html( $event ) . '" for custom app "' . esc_html( static::get_slug() ) . '".' );
 		}
 
-		$context   = Template::build_context( $config, $credentials );
+		$context   = Template::build_context( $config, $credentials, $input );
 		$arg_specs = is_array( $handler['args'] ?? null ) ? $handler['args'] : [];
 		$args      = array_map(
 			static function ( $spec ) use ( $context ) {
@@ -489,14 +489,16 @@ abstract class CustomAppBase extends IntegrationBase {
 		$credentials = isset( $node['_connection_credentials'] ) && is_array( $node['_connection_credentials'] ) ? $node['_connection_credentials'] : [];
 
 		if ( 'local' === self::kind() ) {
-			return self::execute_local_action( $action, $event, $config, $credentials );
+			return self::execute_local_action( $action, $event, $config, $credentials, $input );
 		}
 
 		if ( empty( $action ) || empty( $action['request'] ) ) {
 			throw new \Exception( 'Unknown action "' . esc_html( $event ) . '" for custom app "' . esc_html( static::get_slug() ) . '".' );
 		}
 
-		$context = Template::build_context( $config, $credentials );
+		// Keep config fields available at the top level for existing manifests,
+		// while exposing upstream data explicitly under {{ input.* }}.
+		$context = Template::build_context( $config, $credentials, $input );
 		$request = RequestBuilder::build( $action['request'], $manifest, $context );
 
 		$response = HttpClient::request( $request['method'], $request['url'], $request['headers'], $request['body'] );
