@@ -43,6 +43,8 @@ class KnowledgeMatch {
 		'i', 'me', 'my', 'we', 'our', 'you', 'your', 'it', 'its', 'this', 'that', 'there', 'here', 'to', 'of', 'in', 'on',
 		'at', 'for', 'from', 'with', 'and', 'or', 'if', 'so', 'please', 'pls', 'plz', 'hi', 'hello', 'hey', 'what', 'how',
 		'when', 'where', 'which', 'who', 'why', 'any', 'have', 'has', 'get', 'got', 'want', 'need', 'know', 'tell', 'about',
+		// How people actually type in chat.
+		'whats', 'hows', 'wheres', 'whens', 'whos', 'u', 'ur', 'im', 'ive', 'dont', 'cant', 'wanna', 'gonna', 'plz', 'bro', 'sis', 'vai', 'apu',
 		// Bangla.
 		'কি', 'কী', 'আমি', 'আমার', 'আপনার', 'আপনি', 'আছে', 'এর', 'কত', 'করতে', 'হবে', 'না', 'এটা', 'এই', 'কেমন', 'ভাই', 'আপু',
 	];
@@ -126,9 +128,9 @@ class KnowledgeMatch {
 				// in both directions may be sent as the answer.
 				$strong = 'faq' === $entry['source'] && $score >= 0.8 && $back >= 0.5;
 				// A page to read is a softer offer: most of the question appears
-				// in it, and at least one word in its title.
+				// in it with a word in its title, or nearly all of it in the text.
 				$anywhere = self::overlap( $words, array_merge( $title, $body ) ) / count( $words );
-				$medium   = '' !== $entry['url'] && $in_title > 0 && $anywhere >= 0.6;
+				$medium   = '' !== $entry['url'] && ( ( $in_title > 0 && $anywhere >= 0.6 ) || $anywhere >= 0.8 );
 				$score    = $strong ? $score : max( $score, $anywhere * 0.9 );
 			}
 
