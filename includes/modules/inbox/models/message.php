@@ -12,7 +12,8 @@ class Message extends Model {
 
 	protected static string $table = 'inbox_messages';
 
-	// Messages are immutable once written; there is no updated_at column.
+	// No updated_at column: the rare edit or delete is recorded in `meta`
+	// (edited_at / deleted_at) by MessageActions.
 	protected static bool $timestamps = false;
 
 	protected static array $fillable = [ 'conversation_id', 'direction', 'sender_type', 'sender_id', 'body', 'attachments', 'is_note', 'is_ai_generated', 'channel', 'external_id', 'delivery_status', 'error', 'meta', 'created_at' ];

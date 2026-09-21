@@ -26,6 +26,7 @@ class Outbound {
 	 *   sender_id?:int,
 	 *   is_note?:bool,
 	 *   attachments?:array<int,mixed>,
+	 *   reply_to?:array<string,mixed>,
 	 *   meta?:array<string,mixed>
 	 * } $opts
 	 */
@@ -48,6 +49,11 @@ class Outbound {
 			}
 		}
 
+		$meta = (array) ( $opts['meta'] ?? [] );
+		if ( is_array( $opts['reply_to'] ?? null ) ) {
+			$meta['reply_to'] = $opts['reply_to'];
+		}
+
 		$message = Message::create( [
 			'conversation_id' => $conversation->id,
 			'direction'       => 'out',
@@ -59,7 +65,7 @@ class Outbound {
 			'is_ai_generated' => 'ai' === $sender_type,
 			'channel'         => $conversation->channel,
 			'delivery_status' => $is_note ? 'sent' : 'queued',
-			'meta'            => (array) ( $opts['meta'] ?? [] ),
+			'meta'            => $meta,
 			'created_at'      => $now,
 		] );
 

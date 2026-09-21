@@ -28,6 +28,8 @@
 		busy: false,
 		timer: null,
 		known: null,
+		revision: null,
+		reloading: false,
 	};
 
 	function read( key ) {
@@ -133,6 +135,20 @@
 			}
 			if ( ! res.ok ) {
 				return;
+			}
+			// A message was edited or deleted since we last looked: redraw the
+			// thread from scratch rather than patching individual bubbles.
+			var revision = typeof res.data.revision === 'number' ? res.data.revision : null;
+			if ( revision !== null && state.revision !== null && revision !== state.revision && state.lastId ) {
+				state.revision = revision;
+				clearMessages();
+				state.reloading = true;
+				return poll().then( function () {
+					state.reloading = false;
+				} );
+			}
+			if ( revision !== null ) {
+				state.revision = revision;
 			}
 			( res.data.messages || [] ).forEach( addMessage );
 			setWaiting( !! res.data.waiting );
@@ -251,6 +267,15 @@
 		return isNaN( d ) ? '' : d.toLocaleTimeString( [], { hour: 'numeric', minute: '2-digit' } );
 	}
 
+	function clearMessages() {
+		Array.prototype.slice.call( list.querySelectorAll( '.zpi-msg:not(.zpi-typing)' ) ).forEach( function ( node ) {
+			if ( node !== typing ) {
+				node.parentNode.removeChild( node );
+			}
+		} );
+		state.lastId = 0;
+	}
+
 	function addMessage( m ) {
 		if ( ! m || m.id <= state.lastId ) {
 			return;
@@ -262,7 +287,15 @@
 		if ( ! mine && m.sender_name ) {
 			item.appendChild( el( 'div', 'zpi-name', m.sender_name ) );
 		}
-		if ( m.body ) {
+		if ( m.reply_to && ! m.deleted ) {
+			var quote = el( 'div', 'zpi-quote' );
+			quote.appendChild( el( 'strong', '', m.reply_to.sender_name || '' ) );
+			quote.appendChild( el( 'span', '', m.reply_to.excerpt || '…' ) );
+			item.appendChild( quote );
+		}
+		if ( m.deleted ) {
+			item.appendChild( el( 'div', 'zpi-bubble zpi-deleted', t.deleted || 'Message deleted' ) );
+		} else if ( m.body ) {
 			item.appendChild( el( 'div', 'zpi-bubble', m.body ) );
 		}
 		( m.attachments || [] ).forEach( function ( a ) {
@@ -271,10 +304,10 @@
 				item.appendChild( node );
 			}
 		} );
-		item.appendChild( el( 'div', 'zpi-time', time( m.created_at ) ) );
+		item.appendChild( el( 'div', 'zpi-time', time( m.created_at ) + ( m.edited && ! m.deleted ? ' · ' + ( t.edited || 'edited' ) : '' ) ) );
 		list.insertBefore( item, typing );
 
-		if ( ! mine && ! state.open ) {
+		if ( ! mine && ! state.open && ! state.reloading ) {
 			state.unread++;
 			badge.textContent = String( state.unread );
 			badge.hidden = false;

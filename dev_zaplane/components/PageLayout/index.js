@@ -14,6 +14,8 @@ import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
  * @param {Array<{label: string, href?: string}>} [props.breadcrumbs] - Array of breadcrumb segments
  * @param {string} [props.heading] - SubTopBar heading (defaults to title or last breadcrumb)
  * @param {React.ReactNode} [props.actions] - Action components (buttons, etc)
+ * @param {React.ReactNode} [props.topBarActions] - Buttons shown in the top bar, before theme/help
+ * @param {boolean} [props.hideHeading] - Skip the heading row (full-screen pages)
  * @param {boolean} [props.isLoading] - Loading state
  * @param {React.ComponentType} [props.skeleton] - Skeleton component to show during loading
  * @param {React.ReactNode} props.children - Main content
@@ -26,7 +28,9 @@ const PageLayout = ({
   children,
   isLoading,
   skeleton: Skeleton,
-  topBarStyles = {}
+  topBarStyles = {},
+  topBarActions = null,
+  hideHeading = false
 }) => {
   if (isLoading && Skeleton) {
     return <Skeleton />;
@@ -42,7 +46,7 @@ const PageLayout = ({
   };
   const displayHeading = heading || (breadcrumbs ? breadcrumbs[breadcrumbs.length - 1].label : title);
   return <>
-            <TopBar topBarStyles={topBarStyles} leftContent={() => <>
+            <TopBar topBarStyles={topBarStyles} rightExtra={topBarActions} leftContent={() => <>
                         <div style={{height:'40px', width:'40px', background:'var(--zaplane-second-primary)'}} className="flex rounded-[20px] items-center justify-center">
                             <img src={`${plugin_root_url}assets/images/zaplane.svg`} alt="Zaplane" />
                         </div>
@@ -51,9 +55,9 @@ const PageLayout = ({
                         {renderBreadcrumbs()}
                     </>} />
             
-            <SubTopBar heading={__(displayHeading, "zaplane")}>
+            {!hideHeading && <SubTopBar heading={__(displayHeading, "zaplane")}>
                 {actions}
-            </SubTopBar>
+            </SubTopBar>}
 
             <div className="zaplane-page-content">
                 {children}

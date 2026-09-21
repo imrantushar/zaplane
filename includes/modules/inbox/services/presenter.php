@@ -80,6 +80,7 @@ class Presenter {
 			'updated_at'           => self::time( $conversation->updated_at ),
 			'contact'              => self::contact( $contact ),
 			'tags'                 => $tags[ (int) $conversation->id ] ?? Conversations::tags( (int) $conversation->id ),
+			'revision'             => MessageActions::revision( $conversation ),
 			'orders'               => array_values( (array) ( ( is_array( $conversation->meta ) ? $conversation->meta : [] )['orders'] ?? [] ) ),
 		];
 	}
@@ -88,7 +89,9 @@ class Presenter {
 	 * @return array<string,mixed>
 	 */
 	public static function message( Message $message, bool $for_visitor = false ): array {
-		$out = [
+		$meta  = is_array( $message->meta ) ? $message->meta : [];
+		$quote = is_array( $meta['reply_to'] ?? null ) ? $meta['reply_to'] : null;
+		$out   = [
 			'id'          => (int) $message->id,
 			'direction'   => (string) $message->direction,
 			'sender_type' => (string) $message->sender_type,
@@ -96,13 +99,25 @@ class Presenter {
 			'body'        => (string) $message->body,
 			'attachments' => is_array( $message->attachments ) ? $message->attachments : [],
 			'created_at'  => self::time( $message->created_at ),
+			'edited'      => ! empty( $meta['edited_at'] ),
+			'deleted'     => ! empty( $meta['deleted_at'] ),
+			'reply_to'    => $quote ? [
+				'id'          => (int) ( $quote['id'] ?? 0 ),
+				'sender_name' => (string) ( $quote['sender_name'] ?? '' ),
+				'direction'   => (string) ( $quote['direction'] ?? '' ),
+				'excerpt'     => (string) ( $quote['excerpt'] ?? '' ),
+			] : null,
 		];
 
 		if ( $for_visitor ) {
 			return $out;
 		}
 
+		$change = MessageActions::can_change( $message );
+
 		return $out + [
+			'can_change'      => $change['ok'],
+			'change_note'     => $change['reason'],
 			'sender_id'       => (int) $message->sender_id,
 			'is_note'         => (bool) $message->is_note,
 			'is_ai_generated' => (bool) $message->is_ai_generated,
@@ -122,6 +137,12 @@ class Presenter {
 				$user = self::user( (int) $message->sender_id );
 				return $user ? (string) $user['name'] : __( 'Team', 'zaplane' );
 			case 'workflow':
+				$meta = is_array( $message->meta ) ? $message->meta : [];
+				if ( ! empty( $meta['workflow_name'] ) ) {
+					/* translators: %s: workflow name. */
+					return sprintf( __( 'Workflow · %s', 'zaplane' ), (string) $meta['workflow_name'] );
+				}
+				return __( 'Workflow', 'zaplane' );
 			case 'system':
 				return __( 'Team', 'zaplane' );
 		}

@@ -58,6 +58,7 @@ class InboxModule implements ModuleInterface {
 		add_action( Router::AI_HOOK, [ AiResponder::class, 'handle' ], 10, 2 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_widget' ] );
 		add_action( 'zaplane/incoming_webhook', [ $this, 'incoming_webhook' ], 10, 2 );
+		Services\WorkflowSends::register();
 	}
 
 	/**
@@ -139,6 +140,8 @@ class InboxModule implements ModuleInterface {
 				'viewProduct' => __( 'View product', 'zaplane' ),
 				'outOfStock'  => __( 'Out of stock', 'zaplane' ),
 				'attachment'  => __( 'Attachment', 'zaplane' ),
+				'deleted'     => __( 'Message deleted', 'zaplane' ),
+				'edited'      => __( 'edited', 'zaplane' ),
 			],
 		] );
 	}

@@ -194,6 +194,11 @@
 #zpi-root .zpi-image img { display: block; max-width: 100%; border-radius: 12px; }
 #zpi-root .zpi-file { display: inline-block; margin-top: 4px; color: var(--zpi-color); text-decoration: underline; }
 
+#zpi-root .zpi-quote { display: flex; flex-direction: column; gap: 1px; max-width: 100%; margin: 0 0 3px; padding: 5px 9px; border-left: 3px solid var(--zpi-color); border-radius: 6px; background: rgba(127, 127, 127, 0.1); font-size: 12px; color: var(--zpi-muted); }
+#zpi-root .zpi-quote strong { color: inherit; font-weight: 600; }
+#zpi-root .zpi-quote span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+#zpi-root .zpi-me .zpi-quote { align-self: flex-end; }
+#zpi-root .zpi-bubble.zpi-deleted { font-style: italic; opacity: 0.7; }
 #zpi-root .zpi-time { font-size: 11px; color: var(--zpi-muted); margin: 3px 4px 0; }
 #zpi-root .zpi-typing .zpi-bubble { color: var(--zpi-muted); font-style: italic; }
 

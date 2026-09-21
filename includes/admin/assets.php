@@ -137,7 +137,11 @@ class Assets {
 	private function get_frontend_integrations_json(): string {
 		$file = ZAPLANE_ROOT_DIR_PATH . 'assets/json/integrations.json';
 
-		if ( empty( \Zaplane\CustomApps\ManifestStore::all() ) ) {
+		// The Inbox's own steps only work while its module is on (its tables
+		// exist only then), so the builder offers them only then.
+		$inbox_off = ! \Zaplane\Settings::feature_enabled( 'inbox' );
+
+		if ( empty( \Zaplane\CustomApps\ManifestStore::all() ) && ! $inbox_off ) {
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 			$raw = is_readable( $file ) ? (string) file_get_contents( $file ) : '';
 			$raw = str_replace( \Zaplane\Framework\Core\IntegrationManifest::REST_URL_TOKEN, rest_url(), $raw );
@@ -200,6 +204,10 @@ class Assets {
 
 		$integrations['apps']  = $integrations['apps'] ?? [];
 		$integrations['tools'] = $integrations['tools'] ?? [];
+
+		if ( ! \Zaplane\Settings::feature_enabled( 'inbox' ) ) {
+			unset( $integrations['apps']['inbox'], $integrations['tools']['inbox'] );
+		}
 
 		foreach ( \Zaplane\CustomApps\ManifestStore::all() as $slug => $manifest ) {
 			$slug        = (string) $slug;

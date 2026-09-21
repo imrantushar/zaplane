@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
+import { FiX, FiShoppingBag, FiChevronDown, FiMail, FiPhone, FiCopy, FiCheck, FiMessageCircle, FiUser, FiTag, FiClock } from "react-icons/fi";
 import ZAPToggle from "@ZAPComponents/ZAPToggle";
-import { CHANNEL_LABELS, initials } from "./ConversationList";
+import { Avatar, CHANNEL_LABELS } from "./channels";
 import { clockTime } from "./api";
 import OrderForm from "./OrderForm";
 
@@ -12,7 +13,69 @@ const STATUSES = [
   { value: "closed", label: __("Closed", "zaplane") },
 ];
 
-const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceOrder }) => {
+/** A details block whose body folds away; each remembers its state per browser. */
+const Section = ({ id, title, Icon, summary, children, aside, defaultOpen = false }) => {
+  const key = "zaplane-inbox-section-" + id;
+  const [open, setOpen] = useState(() => {
+    try {
+      const saved = window.localStorage.getItem(key);
+      return saved === null ? defaultOpen : saved === "1";
+    } catch (e) {
+      return defaultOpen;
+    }
+  });
+  const toggle = () => {
+    setOpen((o) => {
+      try {
+        window.localStorage.setItem(key, o ? "0" : "1");
+      } catch (e) {
+        // Convenience only.
+      }
+      return !o;
+    });
+  };
+  return (
+    <section className={"zaplane-inbox-section" + (open ? " is-open" : "")}>
+      <button type="button" className="zaplane-inbox-section-head" onClick={toggle} aria-expanded={open}>
+        <span className="zaplane-inbox-section-icon">{Icon && <Icon />}</span>
+        <span className="zaplane-inbox-section-text">
+          <h3>{title}</h3>
+          {!open && summary && <span className="zaplane-inbox-section-summary">{summary}</span>}
+        </span>
+        {aside}
+        <FiChevronDown className="zaplane-inbox-chevron" />
+      </button>
+      {open && <div className="zaplane-inbox-section-body">{children}</div>}
+    </section>
+  );
+};
+
+const CopyChip = ({ Icon, value }) => {
+  const [done, setDone] = useState(false);
+  if (!value) return null;
+  return (
+    <button
+      type="button"
+      className="zaplane-inbox-copychip"
+      title={__("Copy", "zaplane")}
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(value);
+          setDone(true);
+          window.setTimeout(() => setDone(false), 1200);
+        } catch (e) {
+          // Clipboard can be blocked.
+        }
+      }}
+    >
+      <Icon />
+      <span>{value}</span>
+      {done ? <FiCheck className="is-done" /> : <FiCopy className="is-copy" />}
+    </button>
+  );
+};
+
+const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceOrder, onClose }) => {
   const [contact, setContact] = useState({ name: "", email: "", phone: "" });
   const [tagText, setTagText] = useState("");
   const [ordering, setOrdering] = useState(false);
@@ -40,7 +103,7 @@ const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceO
     });
   }, [conversation?.id, conversation?.contact?.email, conversation?.contact?.name, conversation?.contact?.phone]);
 
-  if (!conversation) return <aside className="zaplane-inbox-details" />;
+  if (!conversation) return null;
 
   const saveContact = (field) => {
     if ((conversation.contact?.[field] || "") === contact[field]) return;
@@ -58,19 +121,37 @@ const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceO
   return (
     <aside className="zaplane-inbox-details" aria-label={__("Details", "zaplane")}>
       <div className="zaplane-inbox-contact">
-        <span className="zaplane-inbox-avatar is-lg" aria-hidden="true">
-          {conversation.contact?.avatar_url ? <img src={conversation.contact.avatar_url} alt="" /> : initials(conversation.contact?.name)}
-        </span>
-        <div className="min-w-0">
+        <Avatar contact={conversation.contact} channel={conversation.channel} size="lg" />
+        <div className="min-w-0 flex-1">
           <div className="zaplane-inbox-name">{conversation.contact?.name}</div>
           <div className="zaplane-inbox-sub">
             {CHANNEL_LABELS[conversation.channel] || conversation.channel} · {__("since", "zaplane")} {clockTime(conversation.created_at)}
           </div>
         </div>
+        <button type="button" className="zaplane-inbox-icon-btn is-close" onClick={onClose} aria-label={__("Close details", "zaplane")}>
+          <FiX />
+        </button>
       </div>
+      {(conversation.contact?.email || conversation.contact?.phone) && (
+        <div className="zaplane-inbox-copychips">
+          <CopyChip Icon={FiMail} value={conversation.contact?.email} />
+          <CopyChip Icon={FiPhone} value={conversation.contact?.phone} />
+        </div>
+      )}
 
-      <section className="zaplane-inbox-section">
-        <h3>{__("Conversation", "zaplane")}</h3>
+      <Section
+        id="conversation"
+        Icon={FiMessageCircle}
+        defaultOpen
+        title={__("Conversation", "zaplane")}
+        summary={[
+          (STATUSES.find((x) => x.value === conversation.status) || {}).label,
+          conversation.assignee?.name || __("Unassigned", "zaplane"),
+          conversation.handler === "bot" ? __("Assistant on", "zaplane") : null,
+        ]
+          .filter(Boolean)
+          .join(" · ")}
+      >
         <label className="zaplane-inbox-field">
           <span>{__("Status", "zaplane")}</span>
           <select className="zaplane-inbox-select" value={conversation.status} onChange={(e) => onUpdate({ status: e.target.value })}>
@@ -111,11 +192,20 @@ const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceO
         {conversation.handler === "workflow" && (
           <p className="zaplane-inbox-hint">{__("A workflow is answering this conversation.", "zaplane")}</p>
         )}
-      </section>
+      </Section>
 
       {store && (
-        <section className="zaplane-inbox-section">
-          <h3>{__("Orders", "zaplane")}</h3>
+        <Section
+          id="orders"
+          Icon={FiShoppingBag}
+          title={__("Orders", "zaplane")}
+          summary={
+            (conversation.orders || []).length
+              ? sprintf(__("Last: #%1$s · %2$s", "zaplane"), conversation.orders[conversation.orders.length - 1].number, conversation.orders[conversation.orders.length - 1].total)
+              : __("No orders yet", "zaplane")
+          }
+          aside={(conversation.orders || []).length ? <span className="zaplane-inbox-count">{conversation.orders.length}</span> : null}
+        >
           {placed && (
             <p className="zaplane-inbox-success" role="status">
               {__("Order", "zaplane")} #{placed.number} · {placed.total_text}{" "}
@@ -147,15 +237,20 @@ const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceO
               }}
             />
           ) : (
-            <button type="button" className="zaplane-inbox-small" onClick={() => setOrdering(true)}>
+            <button type="button" className="zaplane-inbox-small is-block" onClick={() => setOrdering(true)}>
+              <FiShoppingBag />
               {__("Create an order", "zaplane")} ({store})
             </button>
           )}
-        </section>
+        </Section>
       )}
 
-      <section className="zaplane-inbox-section">
-        <h3>{__("Contact", "zaplane")}</h3>
+      <Section
+        id="contact"
+        Icon={FiUser}
+        title={__("Contact", "zaplane")}
+        summary={[conversation.contact?.email, conversation.contact?.phone].filter(Boolean).join(" · ") || __("No email or phone yet", "zaplane")}
+      >
         {["name", "email", "phone"].map((field) => (
           <label className="zaplane-inbox-field" key={field}>
             <span>{{ name: __("Name", "zaplane"), email: __("Email", "zaplane"), phone: __("Phone", "zaplane") }[field]}</span>
@@ -168,10 +263,15 @@ const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceO
             />
           </label>
         ))}
-      </section>
+      </Section>
 
-      <section className="zaplane-inbox-section">
-        <h3>{__("Tags", "zaplane")}</h3>
+      <Section
+        id="tags"
+        Icon={FiTag}
+        title={__("Tags", "zaplane")}
+        summary={conversation.tags.length ? conversation.tags.join(", ") : __("No tags", "zaplane")}
+        aside={conversation.tags.length ? <span className="zaplane-inbox-count">{conversation.tags.length}</span> : null}
+      >
         <div className="zaplane-inbox-tags">
           {conversation.tags.map((tag) => (
             <span key={tag} className="zaplane-inbox-chip">
@@ -195,11 +295,16 @@ const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceO
             aria-label={__("Add a tag", "zaplane")}
           />
         </form>
-      </section>
+      </Section>
 
       {other.length > 0 && (
-        <section className="zaplane-inbox-section">
-          <h3>{__("Earlier conversations", "zaplane")}</h3>
+        <Section
+          id="history"
+          Icon={FiClock}
+          title={__("Earlier conversations", "zaplane")}
+          summary={sprintf(__("Last on %s", "zaplane"), clockTime(other[0].last_message_at))}
+          aside={<span className="zaplane-inbox-count">{other.length}</span>}
+        >
           <ul className="zaplane-inbox-history">
             {other.map((o) => (
               <li key={o.id}>
@@ -207,7 +312,7 @@ const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceO
               </li>
             ))}
           </ul>
-        </section>
+        </Section>
       )}
     </aside>
   );

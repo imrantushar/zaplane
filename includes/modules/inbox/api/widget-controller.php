@@ -215,6 +215,8 @@ class WidgetController {
 			}, $rows ),
 			'status'   => (string) $conversation->status,
 			'waiting'  => $this->assistant_is_typing( $conversation ),
+			// Bumped on every edit or delete; the widget reloads when it changes.
+			'revision' => \Zaplane\Modules\Inbox\Services\MessageActions::revision( $conversation ),
 		] );
 	}
 

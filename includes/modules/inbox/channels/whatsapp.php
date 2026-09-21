@@ -181,18 +181,26 @@ class Whatsapp extends MetaChannel {
 		}
 
 		$credentials = self::credentials();
-		$result      = self::graph_post(
-			(string) $credentials['phone_number_id'] . '/messages',
-			[
-				'messaging_product' => 'whatsapp',
-				'recipient_type'    => 'individual',
-				'to'                => (string) $identity->external_id,
-				'type'              => 'text',
-				'text'              => [
-					'body'        => (string) $message->body,
-					'preview_url' => true,
-				],
+		$payload     = [
+			'messaging_product' => 'whatsapp',
+			'recipient_type'    => 'individual',
+			'to'                => (string) $identity->external_id,
+			'type'              => 'text',
+			'text'              => [
+				'body'        => (string) $message->body,
+				'preview_url' => true,
 			],
+		];
+
+		// Shown as a quoted reply in WhatsApp when we know the original's id.
+		$quote = is_array( $message->meta['reply_to'] ?? null ) ? $message->meta['reply_to'] : [];
+		if ( ! empty( $quote['external_id'] ) ) {
+			$payload['context'] = [ 'message_id' => (string) $quote['external_id'] ];
+		}
+
+		$result = self::graph_post(
+			(string) $credentials['phone_number_id'] . '/messages',
+			$payload,
 			[ 'Authorization' => 'Bearer ' . (string) $credentials['access_token'] ],
 			$credentials['api_version'] ?? null
 		);

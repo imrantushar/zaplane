@@ -1,6 +1,7 @@
 <?php
 namespace Zaplane\Integrations;
 
+use Zaplane\Framework\Classes\ChannelSend;
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Classes\MetaGraph;
 
@@ -44,6 +45,21 @@ class Whatsapp extends IntegrationBase {
 	}
 
 	public static function get_action_config_schema( string $action ): array {
+		$fields = self::action_fields( $action );
+
+		// Every send except a template can answer a customer, so it gets the
+		// Inbox setting too (templates start conversations and are never held).
+		if ( $fields && 0 === strpos( $action, 'send_' ) && 'send_template' !== $action ) {
+			$fields[] = ChannelSend::mode_field();
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function action_fields( string $action ): array {
 		$to_field = [
 			'key'         => 'to',
 			'type'        => 'text',
@@ -419,32 +435,33 @@ class Whatsapp extends IntegrationBase {
 			throw new \Exception( 'WhatsApp credentials (access_token and phone_number_id) are required' );
 		}
 
+		// Workflows messaging a customer the Inbox also handles: see ChannelSend.
+		$context = self::send_context( (string) $action, $node, (string) $phone_number_id );
+		if ( $context && 'send_template' !== $action ) {
+			// Templates are the business starting a conversation (order updates,
+			// reminders), never an answer, so they are not held.
+			$reason = ChannelSend::check( $context );
+			if ( '' !== $reason ) {
+				return ChannelSend::held( $context, $reason, $input );
+			}
+		}
+
+		$out = null;
 		if ( 'send_text' === $action ) {
-			return self::action_send_text( $node, $input, $token, $phone_number_id, $api_version );
+			$out = self::action_send_text( $node, $input, $token, $phone_number_id, $api_version );
+		} elseif ( 'send_template' === $action ) {
+			$out = self::action_send_template( $node, $input, $token, $phone_number_id, $api_version );
+		} elseif ( in_array( $action, [ 'send_image', 'send_document', 'send_video', 'send_audio' ], true ) ) {
+			$out = self::action_send_media( $node, $input, $token, $phone_number_id, $api_version, substr( (string) $action, 5 ) );
+		} elseif ( 'send_location' === $action ) {
+			$out = self::action_send_location( $node, $input, $token, $phone_number_id, $api_version );
 		}
 
-		if ( 'send_template' === $action ) {
-			return self::action_send_template( $node, $input, $token, $phone_number_id, $api_version );
-		}
-
-		if ( 'send_image' === $action ) {
-			return self::action_send_media( $node, $input, $token, $phone_number_id, $api_version, 'image' );
-		}
-
-		if ( 'send_document' === $action ) {
-			return self::action_send_media( $node, $input, $token, $phone_number_id, $api_version, 'document' );
-		}
-
-		if ( 'send_video' === $action ) {
-			return self::action_send_media( $node, $input, $token, $phone_number_id, $api_version, 'video' );
-		}
-
-		if ( 'send_audio' === $action ) {
-			return self::action_send_media( $node, $input, $token, $phone_number_id, $api_version, 'audio' );
-		}
-
-		if ( 'send_location' === $action ) {
-			return self::action_send_location( $node, $input, $token, $phone_number_id, $api_version );
+		if ( null !== $out ) {
+			if ( $context ) {
+				ChannelSend::sent( array_merge( $context, [ 'message_id' => (string) ( $out['data']['whatsapp_message_id'] ?? '' ) ] ) );
+			}
+			return $out;
 		}
 
 		return [
@@ -545,6 +562,51 @@ class Whatsapp extends IntegrationBase {
 				'verified_name'        => $body['verified_name'] ?? '',
 			],
 		];
+	}
+
+	/**
+	 * What a send step is about to deliver, in ChannelSend's shape; null for
+	 * steps that don't message a customer.
+	 *
+	 * @param array<string,mixed> $node
+	 * @return array<string,mixed>|null
+	 */
+	private static function send_context( string $action, array $node, string $phone_number_id ): ?array {
+		$config = (array) ( $node['data']['config'] ?? [] );
+		$to     = preg_replace( '/\D+/', '', (string) ( $config['to'] ?? '' ) );
+		if ( '' === $to || 0 !== strpos( $action, 'send_' ) ) {
+			return null;
+		}
+
+		$body        = '';
+		$attachments = [];
+		switch ( $action ) {
+			case 'send_text':
+				$body = (string) ( $config['body'] ?? '' );
+				break;
+			case 'send_template':
+				/* translators: %s: WhatsApp template name. */
+				$body = sprintf( __( 'Template: %s', 'zaplane' ), (string) ( $config['template_name'] ?? '' ) );
+				break;
+			case 'send_location':
+				$body = trim( implode( ', ', array_filter( [ (string) ( $config['name'] ?? '' ), (string) ( $config['address'] ?? '' ) ] ) ) );
+				$body = '📍 ' . ( '' !== $body ? $body : ( $config['latitude'] ?? '' ) . ', ' . ( $config['longitude'] ?? '' ) );
+				break;
+			default:
+				$type          = substr( $action, 5 );
+				$body          = (string) ( $config['caption'] ?? '' );
+				$attachments[] = [
+					'type'     => 'image' === $type ? 'image' : 'file',
+					'url'      => (string) ( $config['link'] ?? '' ),
+					'filename' => (string) ( $config['filename'] ?? $type ),
+				];
+		}
+
+		return ChannelSend::context( 'whatsapp', $to, $node, [
+			'account_id'  => $phone_number_id,
+			'body'        => $body,
+			'attachments' => $attachments,
+		] );
 	}
 
 	private static function action_send_text( array $node, array $input, string $token, string $phone_number_id, string $api_version ): array {

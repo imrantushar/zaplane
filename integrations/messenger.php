@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Zaplane\Framework\Classes\ChannelSend;
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Classes\MetaGraph;
 
@@ -278,6 +279,7 @@ class Messenger extends IntegrationBase {
 					'required'    => true,
 					'placeholder' => 'Type your reply... use {{variable}} for dynamic values',
 				],
+				ChannelSend::mode_field(),
 			];
 		}
 
@@ -315,16 +317,29 @@ class Messenger extends IntegrationBase {
 			throw new \Exception( 'Messenger: message text is required' );
 		}
 
+		$context = ChannelSend::context( 'messenger', (string) $recipient, $node, [ 'body' => (string) $text ] );
+		$reason  = ChannelSend::check( $context );
+		if ( '' !== $reason ) {
+			return ChannelSend::held( $context, $reason, $input );
+		}
+
 		$payload = [
 			'messaging_type' => 'RESPONSE',
 			'recipient'      => [ 'id' => $recipient ],
-			'message'        => [ 'text' => $text ],
+			'message'        => [
+				'text'     => $text,
+				// The Inbox records this send itself, so it skips Meta's echo of it.
+				'metadata' => 'zaplane_inbox',
+			],
 		];
 
-		$url = MetaGraph::url( 'me/messages', $credentials['api_version'] ?? null ) . '?access_token=' . rawurlencode( $token );
+		$url = MetaGraph::url( 'me/messages', $credentials['api_version'] ?? null );
 
 		$response = wp_remote_post( $url, [
-			'headers' => [ 'Content-Type' => 'application/json' ],
+			'headers' => [
+				'Content-Type'  => 'application/json',
+				'Authorization' => 'Bearer ' . $token,
+			],
 			'body'    => wp_json_encode( $payload ),
 			'timeout' => 60,
 		] );
@@ -338,6 +353,8 @@ class Messenger extends IntegrationBase {
 		if ( isset( $data['error'] ) ) {
 			throw new \Exception( 'Messenger API error: ' . esc_html( $data['error']['message'] ?? 'Unknown error' ) );
 		}
+
+		ChannelSend::sent( array_merge( $context, [ 'message_id' => (string) ( $data['message_id'] ?? '' ) ] ) );
 
 		return [
 			'port' => 'main',

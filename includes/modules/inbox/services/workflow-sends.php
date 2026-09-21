@@ -1,0 +1,217 @@
+<?php
+
+namespace Zaplane\Modules\Inbox\Services;
+
+use Zaplane\Framework\Exceptions\DatabaseException;
+use Zaplane\Models\Run;
+use Zaplane\Models\Workflow;
+use Zaplane\Models\WorkflowVersion;
+use Zaplane\Modules\Inbox\Channels\MetaChannel;
+use Zaplane\Modules\Inbox\Channels\Registry;
+use Zaplane\Modules\Inbox\Models\Conversation;
+use Zaplane\Modules\Inbox\Models\Identity;
+use Zaplane\Modules\Inbox\Models\Message;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Messages a workflow sends straight through Messenger or WhatsApp (not the
+ * Inbox's own "Send Reply"), to a customer the Inbox already has.
+ *
+ * - One answerer per conversation: unless the conversation belongs to
+ *   workflows, a workflow's reply is held rather than sent, so the customer
+ *   never gets two answers. The held text is kept as a private note the team
+ *   can send with one click.
+ * - Whatever a workflow does send is recorded in the conversation, labelled
+ *   with the workflow, without counting as a person taking over.
+ *
+ * Listens to {@see \Zaplane\Framework\Classes\ChannelSend}.
+ */
+class WorkflowSends {
+
+	public static function register(): void {
+		add_filter( 'zaplane/channel_send/check', [ self::class, 'check' ], 10, 2 );
+		add_action( 'zaplane/channel_send/held', [ self::class, 'held' ], 10, 2 );
+		add_action( 'zaplane/channel_send/sent', [ self::class, 'record' ], 10, 1 );
+	}
+
+	/**
+	 * @param array<string,mixed> $context
+	 */
+	public static function check( string $reason, array $context ): string {
+		if ( '' !== $reason || 'always' === ( $context['mode'] ?? '' ) ) {
+			return $reason;
+		}
+		// A person running one step by hand from the builder meant to send it.
+		if ( (int) ( $context['run_id'] ?? 0 ) <= 0 ) {
+			return '';
+		}
+
+		$conversation = self::conversation( $context );
+		if ( ! $conversation || 'closed' === $conversation->status || 'workflow' === $conversation->handler ) {
+			return '';
+		}
+
+		return 'bot' === $conversation->handler
+			? __( 'Held: the Inbox AI assistant is answering this customer. Saved as a private note in the Inbox. To let workflows answer, set "Who answers" for this channel to Workflows in Inbox settings.', 'zaplane' )
+			: __( 'Held: someone on your team is handling this customer in the Inbox. Saved as a private note there.', 'zaplane' );
+	}
+
+	/**
+	 * @param array<string,mixed> $context
+	 */
+	public static function held( array $context, string $reason ): void {
+		$conversation = self::conversation( $context );
+		if ( ! $conversation || '' === trim( (string) ( $context['body'] ?? '' ) ) ) {
+			return;
+		}
+
+		Outbound::send( $conversation, (string) $context['body'], [
+			'sender_type' => 'workflow',
+			'is_note'     => true,
+			'meta'        => self::source( $context ) + [
+				'held'   => true,
+				'reason' => $reason,
+			],
+		] );
+	}
+
+	/**
+	 * @param array<string,mixed> $context
+	 */
+	public static function record( array $context ): void {
+		$conversation = self::conversation( $context );
+		if ( ! $conversation ) {
+			return;
+		}
+
+		$body        = (string) ( $context['body'] ?? '' );
+		$attachments = is_array( $context['attachments'] ?? null ) ? $context['attachments'] : [];
+		$message_id  = (string) ( $context['message_id'] ?? '' );
+		$now         = Conversations::now();
+
+		try {
+			Message::create( [
+				'conversation_id' => (int) $conversation->id,
+				'direction'       => 'out',
+				'sender_type'     => 'workflow',
+				'sender_id'       => 0,
+				'body'            => $body,
+				'attachments'     => $attachments,
+				'channel'         => (string) $conversation->channel,
+				'external_id'     => '' !== $message_id ? $message_id : null,
+				'delivery_status' => 'sent',
+				'meta'            => self::source( $context ),
+				'created_at'      => $now,
+			] );
+		} catch ( DatabaseException $e ) {
+			// Already recorded (Meta's echo of this message got here first).
+			return;
+		}
+
+		// Unlike a reply typed in the channel's own app, this isn't a person
+		// taking over: the assistant (if it's answering) stays on.
+		$conversation->last_message_preview = Ingest::preview( $body, $attachments );
+		$conversation->last_message_at      = $now;
+		$conversation->save();
+	}
+
+	/**
+	 * Active workflows that reply on a channel with its own send step, and so
+	 * wait their turn while the assistant or the team answers. Shown in Inbox
+	 * settings so nobody wonders why a workflow went quiet.
+	 *
+	 * @return array<int,array{id:int,name:string}>
+	 */
+	public static function senders( string $channel ): array {
+		$out = [];
+		foreach ( Workflow::where( 'status', 'active' )->fresh()->get()->all() as $workflow ) {
+			$version = WorkflowVersion::where( 'workflow_id', (int) $workflow->id )->where( 'is_active', 1 )->fresh()->first();
+			$graph   = $version && is_array( $version->graph_json ) ? $version->graph_json : [];
+			foreach ( (array) ( $graph['nodes'] ?? [] ) as $node ) {
+				$data  = (array) ( $node['data'] ?? [] );
+				$event = (string) ( $data['event'] ?? '' );
+				if (
+					$channel === ( $data['app'] ?? '' )
+					&& 0 === strpos( $event, 'send_' )
+					&& 'send_template' !== $event
+					&& 'always' !== ( $data['config']['inbox_mode'] ?? '' )
+				) {
+					$out[] = [
+						'id'   => (int) $workflow->id,
+						'name' => (string) $workflow->title,
+					];
+					break;
+				}
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * The Inbox conversation a workflow is messaging, if the Inbox receives
+	 * that channel and already knows the customer.
+	 *
+	 * @param array<string,mixed> $context
+	 */
+	private static function conversation( array $context ): ?Conversation {
+		$channel   = (string) ( $context['channel'] ?? '' );
+		$recipient = (string) ( $context['recipient'] ?? '' );
+		$class     = Registry::get( $channel );
+		if ( '' === $recipient || ! $class || ! is_subclass_of( $class, MetaChannel::class ) || ! $class::enabled() ) {
+			return null;
+		}
+
+		// A Messenger step doesn't know the Page id, but a PSID is already
+		// specific to one Page; WhatsApp numbers are matched on the sending number.
+		$query = Identity::where( 'channel', $channel )->where( 'external_id', $recipient );
+		if ( '' !== (string) ( $context['account_id'] ?? '' ) ) {
+			$query = $query->where( 'account_id', (string) $context['account_id'] );
+		}
+		$identity = $query->fresh()->first();
+		if ( ! $identity ) {
+			return null;
+		}
+
+		return Conversation::where( 'identity_id', (int) $identity->id )->orderBy( 'id', 'desc' )->fresh()->first();
+	}
+
+	/**
+	 * Which workflow sent it, for the label in the thread.
+	 *
+	 * @param array<string,mixed> $context
+	 * @return array<string,mixed>
+	 */
+	private static function source( array $context ): array {
+		$out = [
+			'source' => 'workflow',
+			'run_id' => (int) ( $context['run_id'] ?? 0 ),
+			'step'   => (string) ( $context['step'] ?? '' ),
+		];
+
+		$run = $out['run_id'] > 0 ? Run::find( $out['run_id'] ) : null;
+		if ( ! $run ) {
+			return $out;
+		}
+
+		$workflow = Workflow::find( (int) $run->workflow_id );
+		if ( $workflow ) {
+			$out['workflow_id']   = (int) $workflow->id;
+			$out['workflow_name'] = (string) $workflow->title;
+		}
+
+		// A workflow with an AI step most likely wrote this reply with AI.
+		$version = WorkflowVersion::find( (int) $run->workflow_version_id );
+		$graph   = $version && is_array( $version->graph_json ) ? $version->graph_json : [];
+		foreach ( (array) ( $graph['nodes'] ?? [] ) as $node ) {
+			if ( in_array( $node['data']['app'] ?? '', [ 'ai-agent', 'ai' ], true ) ) {
+				$out['by_ai'] = true;
+				break;
+			}
+		}
+
+		return $out;
+	}
+}

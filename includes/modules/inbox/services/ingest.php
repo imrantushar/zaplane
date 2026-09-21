@@ -168,15 +168,16 @@ class Ingest {
 			->fresh()
 			->first();
 
-		$ai_default = self::ai_default();
+		$handler = self::opening_handler( $channel );
 
 		if ( $conversation ) {
 			if ( 'closed' === $conversation->status ) {
-				// A new question after a close is a fresh start for the assistant.
+				// A new question after a close is a fresh start for whoever
+				// answers this channel.
 				$conversation->status     = 'open';
 				$conversation->closed_at  = null;
-				$conversation->ai_enabled = $ai_default;
-				$conversation->handler    = $ai_default ? 'bot' : 'human';
+				$conversation->ai_enabled = 'bot' === $handler;
+				$conversation->handler    = $handler;
 				$conversation->save();
 			}
 			return $conversation;
@@ -190,8 +191,8 @@ class Ingest {
 			'channel'      => $channel,
 			'account_id'   => $account_id,
 			'status'       => 'open',
-			'handler'      => $ai_default ? 'bot' : 'human',
-			'ai_enabled'   => $ai_default,
+			'handler'      => $handler,
+			'ai_enabled'   => 'bot' === $handler,
 			'assignee_id'  => 0,
 			'unread_count' => 0,
 			'meta'         => [],
@@ -201,6 +202,21 @@ class Ingest {
 	private static function ai_default(): bool {
 		$ai = InboxSettings::get()['ai'];
 		return ! empty( $ai['enabled'] ) && ! empty( $ai['connection_id'] );
+	}
+
+	/**
+	 * Who takes a new (or reopened) conversation on this channel: the
+	 * assistant when it's chosen and set up, workflows, or the team.
+	 */
+	private static function opening_handler( string $channel ): string {
+		switch ( InboxSettings::answered_by( $channel ) ) {
+			case 'workflows':
+				return 'workflow';
+			case 'team':
+				return 'human';
+			default:
+				return self::ai_default() ? 'bot' : 'human';
+		}
 	}
 
 	/**

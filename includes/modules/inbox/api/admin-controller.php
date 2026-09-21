@@ -15,6 +15,7 @@ use Zaplane\Modules\Inbox\Models\Conversation;
 use Zaplane\Modules\Inbox\Models\Message;
 use Zaplane\Modules\Inbox\Models\Tag;
 use Zaplane\Modules\Inbox\Services\Conversations;
+use Zaplane\Modules\Inbox\Services\MessageActions;
 use Zaplane\Modules\Inbox\Services\Outbound;
 use Zaplane\Modules\Inbox\Services\Presenter;
 use Zaplane\Modules\Inbox\Settings as InboxSettings;
@@ -74,6 +75,19 @@ class AdminController {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'send_message' ],
+				'permission_callback' => [ $this, 'can_manage' ],
+			],
+		] );
+
+		register_rest_route( self::NS, "/inbox/conversations/{$id}/messages/(?P<message_id>\d+)", [
+			[
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => [ $this, 'edit_message' ],
+				'permission_callback' => [ $this, 'can_manage' ],
+			],
+			[
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => [ $this, 'delete_message' ],
 				'permission_callback' => [ $this, 'can_manage' ],
 			],
 		] );
@@ -283,6 +297,59 @@ class AdminController {
 		] );
 	}
 
+	public function edit_message( WP_REST_Request $request ) {
+		$found = $this->changeable_message( $request );
+		if ( is_wp_error( $found ) ) {
+			return $found;
+		}
+		list( $conversation, $message ) = $found;
+
+		$body = trim( (string) $request->get_param( 'body' ) );
+		if ( '' === $body ) {
+			return new WP_Error( 'zaplane_inbox_empty', __( 'A message can\'t be empty. Delete it instead.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+
+		MessageActions::edit( $conversation, $message, sanitize_textarea_field( $body ) );
+		return $this->changed( $conversation, $message );
+	}
+
+	public function delete_message( WP_REST_Request $request ) {
+		$found = $this->changeable_message( $request );
+		if ( is_wp_error( $found ) ) {
+			return $found;
+		}
+		list( $conversation, $message ) = $found;
+
+		MessageActions::delete( $conversation, $message );
+		return $this->changed( $conversation, $message );
+	}
+
+	/**
+	 * @return array{0:Conversation,1:Message}|WP_Error
+	 */
+	private function changeable_message( WP_REST_Request $request ) {
+		$conversation = Conversations::find( (int) $request['id'] );
+		if ( ! $conversation ) {
+			return $this->not_found();
+		}
+		$message = Message::where( 'id', (int) $request['message_id'] )->where( 'conversation_id', (int) $conversation->id )->fresh()->first();
+		if ( ! $message ) {
+			return new WP_Error( 'zaplane_inbox_not_found', __( 'That message is no longer here.', 'zaplane' ), [ 'status' => 404 ] );
+		}
+		$check = MessageActions::can_change( $message );
+		if ( ! $check['ok'] ) {
+			return new WP_Error( 'zaplane_inbox_locked', $check['reason'], [ 'status' => 403 ] );
+		}
+		return [ $conversation, $message ];
+	}
+
+	private function changed( Conversation $conversation, Message $message ) {
+		return rest_ensure_response( [
+			'message'      => Presenter::message( $message ),
+			'conversation' => Presenter::conversation( Conversations::find( (int) $conversation->id ) ),
+		] );
+	}
+
 	public function get_messages( WP_REST_Request $request ) {
 		$conversation = Conversations::find( (int) $request['id'] );
 		if ( ! $conversation ) {
@@ -327,10 +394,17 @@ class AdminController {
 			return new WP_Error( 'zaplane_inbox_empty', __( 'Write a message first.', 'zaplane' ), [ 'status' => 400 ] );
 		}
 
+		$is_note = rest_sanitize_boolean( $request->get_param( 'is_note' ) );
+		$quote   = MessageActions::quote( $conversation, (int) $request->get_param( 'reply_to' ), $is_note );
+		if ( is_wp_error( $quote ) ) {
+			return $quote;
+		}
+
 		$message = Outbound::send( $conversation, sanitize_textarea_field( $body ), [
 			'sender_type' => 'agent',
 			'sender_id'   => get_current_user_id(),
-			'is_note'     => rest_sanitize_boolean( $request->get_param( 'is_note' ) ),
+			'is_note'     => $is_note,
+			'reply_to'    => $quote,
 		] );
 
 		return rest_ensure_response( [
@@ -535,6 +609,7 @@ class AdminController {
 				'webhook_url'     => $integration ? $integration::get_webhook_url() : '',
 				'has_app_secret'  => $integration ? '' !== $integration::get_webhook_app_secret() : false,
 				'has_verify_token' => $integration ? '' !== $integration::get_webhook_verify_token() : false,
+				'workflow_senders' => \Zaplane\Modules\Inbox\Services\WorkflowSends::senders( $slug ),
 			];
 		}
 

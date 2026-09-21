@@ -8,8 +8,11 @@ export const inboxApi = {
   get: (id) => API.get(base + "conversations/" + id).then((r) => r.data),
   messagesAfter: (id, afterId) =>
     API.get(base + "conversations/" + id + "/messages", { params: { after_id: afterId } }).then((r) => r.data),
-  send: (id, body, isNote) =>
-    API.post(base + "conversations/" + id + "/messages", { body, is_note: !!isNote }).then((r) => r.data),
+  send: (id, body, isNote, replyTo) =>
+    API.post(base + "conversations/" + id + "/messages", { body, is_note: !!isNote, reply_to: replyTo || 0 }).then((r) => r.data),
+  editMessage: (id, messageId, body) =>
+    API.post(base + "conversations/" + id + "/messages/" + messageId, { body }).then((r) => r.data),
+  deleteMessage: (id, messageId) => API.delete(base + "conversations/" + id + "/messages/" + messageId).then((r) => r.data),
   update: (id, data) => API.post(base + "conversations/" + id, data).then((r) => r.data),
   markRead: (id) => API.post(base + "conversations/" + id + "/read").then((r) => r.data),
   settings: () => API.get(base + "settings").then((r) => r.data),

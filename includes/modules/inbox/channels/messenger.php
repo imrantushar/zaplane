@@ -204,6 +204,12 @@ class Messenger extends MetaChannel {
 			],
 		];
 
+		// Shown as a quoted reply in Messenger when we know the original's id.
+		$quote = is_array( $message->meta['reply_to'] ?? null ) ? $message->meta['reply_to'] : [];
+		if ( ! empty( $quote['external_id'] ) ) {
+			$payload['message']['reply_to'] = [ 'mid' => (string) $quote['external_id'] ];
+		}
+
 		if ( $hours <= self::WINDOW_HOURS ) {
 			$payload['messaging_type'] = 'RESPONSE';
 		} elseif ( 'agent' === $message->sender_type ) {

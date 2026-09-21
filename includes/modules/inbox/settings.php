@@ -30,15 +30,18 @@ class Settings {
 				'position'        => 'right',
 				'ask_email'       => true,
 				'allowed_origins' => [],
+				'answered_by'     => 'assistant',
 			],
 			'channels' => [
 				'messenger' => [
 					'enabled'       => false,
 					'connection_id' => 0,
+					'answered_by'   => 'assistant',
 				],
 				'whatsapp'  => [
 					'enabled'       => false,
 					'connection_id' => 0,
+					'answered_by'   => 'assistant',
 				],
 			],
 			'ai'     => [
@@ -58,6 +61,18 @@ class Settings {
 	/**
 	 * @return array<string,mixed>
 	 */
+	/** Who answers a channel's new conversations. */
+	public const ANSWERERS = [ 'assistant', 'workflows', 'team' ];
+
+	/**
+	 * Who answers new conversations on a channel ("web" is the widget).
+	 */
+	public static function answered_by( string $channel ): string {
+		$all   = self::get();
+		$value = 'web' === $channel ? ( $all['widget']['answered_by'] ?? '' ) : ( $all['channels'][ $channel ]['answered_by'] ?? '' );
+		return in_array( $value, self::ANSWERERS, true ) ? $value : 'assistant';
+	}
+
 	public static function get(): array {
 		$saved = get_option( self::OPTION, [] );
 		$saved = is_array( $saved ) ? $saved : [];
@@ -102,6 +117,9 @@ class Settings {
 			if ( isset( $w['position'] ) ) {
 				$c['position'] = 'left' === $w['position'] ? 'left' : 'right';
 			}
+			if ( isset( $w['answered_by'] ) && in_array( $w['answered_by'], self::ANSWERERS, true ) ) {
+				$c['answered_by'] = $w['answered_by'];
+			}
 			if ( isset( $w['allowed_origins'] ) ) {
 				$c['allowed_origins'] = self::clean_origins( (array) $w['allowed_origins'] );
 			}
@@ -119,6 +137,9 @@ class Settings {
 				}
 				if ( isset( $in['connection_id'] ) ) {
 					$current['channels'][ $slug ]['connection_id'] = absint( $in['connection_id'] );
+				}
+				if ( isset( $in['answered_by'] ) && in_array( $in['answered_by'], self::ANSWERERS, true ) ) {
+					$current['channels'][ $slug ]['answered_by'] = $in['answered_by'];
 				}
 			}
 		}
