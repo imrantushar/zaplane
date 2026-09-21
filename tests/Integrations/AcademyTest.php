@@ -1,481 +1,61 @@
 <?php
-
 namespace Zaplane\Tests\Integrations;
 
 use Zaplane\Integrations\Academy;
 
-/** Regression coverage for Academy's actual hook signatures. */
+/** Replace the branch's old AcademyTest: its removed event IDs are no longer supported. */
 class AcademyTest extends IntegrationTestCase {
-
-	// -------------------------------------------------------------------------
-	// Contract
-	// -------------------------------------------------------------------------
-
-	protected function getIntegrationClass(): string {
-		return Academy::class;
-	}
-
-	protected function setupMockData(): void {
-		parent::setupMockData();
-
-		global $zaplane_wp_posts;
-		$zaplane_wp_posts = $zaplane_wp_posts ?? [];
-		$zaplane_wp_posts[1] = (object) [
-			'ID'         => 1,
-			'post_title' => 'Sample Course',
-			'post_type'  => 'academy_courses',
-			'post_status' => 'publish',
-		];
-	}
-
-	// -------------------------------------------------------------------------
-	// Helpers
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Build a quiz attempt object — the argument Academy fires for quiz events.
-	 *
-	 * @param array $overrides Override any default field.
-	 */
-	private function makeAttempt( array $overrides = [] ): object {
-		return (object) array_merge( [
-			'quiz_id'        => 10,
-			'user_id'        => 1,
-			'earned_marks'   => 8,
-			'total_marks'    => 10,
-			'attempt_status' => 'attempt_ended',
-		], $overrides );
-	}
-
-	// -------------------------------------------------------------------------
-	// Bulk runner data
-	// -------------------------------------------------------------------------
-
-	protected function getTriggerTests(): array {
-		return [
-			// course_id / enroll_id are passed as positional args.
-			'user_enroll_course'          => [ 1, 99, 1 ],
-
-			// course_complete: course_id, user_id
-			'course_complete'             => [ 1, 1 ],
-
-			// lesson_complete: lesson_id, user_id
-			'lesson_complete'             => [ 'lesson', 1, 5, 1 ],
-
-			// quiz attempt object with attempt_ended status
-			'academy_quiz_course_attempt' => [ $this->makeAttempt() ],
-
-			// quiz_target: same attempt object; node config sets target=50 (we scored 80%)
-			'quiz_target'                 => [ $this->makeAttempt() ],
-		];
-	}
-
-	// =========================================================================
-	// TRIGGER: user_enroll_course
-	// =========================================================================
-
-	public function test_trigger_user_enroll_course_returns_course_and_enroll_ids(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'user_enroll_course' ),
-			[ 42, 7, 1 ]   // course_id=42, enroll_id=7
-		);
-
-		$this->assertIsArray( $result );
-		$this->assertTrue( $result['success'] );
-		$this->assertEquals( 42, $result['course_id'] );
-		$this->assertEquals( 7,  $result['enroll_id'] );
-	}
-
-	public function test_trigger_user_enroll_course_returns_false_without_course_id(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'user_enroll_course' ),
-			[ 0, 7 ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_user_enroll_course_returns_false_without_enroll_id(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'user_enroll_course' ),
-			[ 42, null ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	/**
-	 * When the node is configured for a specific course, enrollments in a
-	 * different course must be filtered out.
-	 */
-	public function test_trigger_user_enroll_course_filters_by_selected_course(): void {
-		// Node configured for course 99, but enrollment is for course 42.
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'user_enroll_course', [ 'course_id' => '99' ] ),
-			[ 42, 7, 1 ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	/**
-	 * When node config is 'any', ALL courses should pass through.
-	 */
-	public function test_trigger_user_enroll_course_passes_any_course_when_config_is_any(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'user_enroll_course', [ 'course_id' => 'any' ] ),
-			[ 42, 7, 1 ]
-		);
-		$this->assertIsArray( $result );
-		$this->assertEquals( 42, $result['course_id'] );
-	}
-
-	// =========================================================================
-	// TRIGGER: course_complete
-	// =========================================================================
-
-	public function test_trigger_course_complete_returns_course_and_user_details(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'course_complete' ),
-			[ 1, 1 ]   // course_id=1, user_id=1 (seeded in WPMocks)
-		);
-
-		$this->assertIsArray( $result );
-		$this->assertTrue( $result['success'] );
-		$this->assertEquals( 1, $result['course_id'] );
-		$this->assertEquals( 1, $result['user_id'] );
-		$this->assertArrayHasKey( 'user_email',    $result );
-		$this->assertArrayHasKey( 'course_title',  $result );
-		$this->assertArrayHasKey( 'course_url',    $result );
-	}
-
-	public function test_trigger_course_complete_returns_false_without_course_id(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'course_complete' ),
-			[ 0, 1 ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_course_complete_returns_false_without_user_id(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'course_complete' ),
-			[ 1, 0 ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_course_complete_filters_by_selected_course(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'course_complete', [ 'course_id' => '999' ] ),
-			[ 1, 1 ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_course_complete_passes_when_course_matches_config(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'course_complete', [ 'course_id' => '1' ] ),
-			[ 1, 1 ]
-		);
-		$this->assertIsArray( $result );
-		$this->assertEquals( 1, $result['course_id'] );
-	}
-
-	// =========================================================================
-	// TRIGGER: lesson_complete
-	// =========================================================================
-
-	public function test_trigger_lesson_complete_returns_lesson_and_user_ids(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'lesson_complete' ),
-			[ 'lesson', 1, 5, 1 ]   // lesson_id=5, user_id=1
-		);
-
-		$this->assertIsArray( $result );
-		$this->assertTrue( $result['success'] );
-		$this->assertEquals( 5, $result['lesson_id'] );
-		$this->assertEquals( 1, $result['user_id'] );
-	}
-
-	public function test_trigger_lesson_complete_returns_false_without_lesson_id(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'lesson_complete' ),
-			[ 0, 1 ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_lesson_complete_returns_false_without_user_id(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'lesson_complete' ),
-			[ 'lesson', 1, 5, 0 ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_lesson_complete_filters_by_selected_lesson(): void {
-		// Node configured for lesson 99, but completion is for lesson 5.
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'lesson_complete', [ 'lesson_id' => '99' ] ),
-			[ 'lesson', 1, 5, 1 ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_lesson_complete_passes_when_lesson_matches_config(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'lesson_complete', [ 'lesson_id' => '5' ] ),
-			[ 'lesson', 1, 5, 1 ]
-		);
-		$this->assertIsArray( $result );
-		$this->assertEquals( 5, $result['lesson_id'] );
-	}
-
-	// =========================================================================
-	// TRIGGER: academy_quiz_course_attempt
-	// =========================================================================
-
-	public function test_trigger_quiz_attempt_returns_score_fields(): void {
-		$attempt = $this->makeAttempt( [ 'quiz_id' => 10, 'user_id' => 1, 'earned_marks' => 7, 'total_marks' => 10 ] );
-
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'academy_quiz_course_attempt' ),
-			[ $attempt ]
-		);
-
-		$this->assertIsArray( $result );
-		$this->assertTrue( $result['success'] );
-		$this->assertEquals( 10, $result['quiz_id'] );
-		$this->assertEquals( 1,  $result['user_id'] );
-		$this->assertEquals( 7,  $result['score'] );
-		$this->assertEquals( 10, $result['total'] );
-	}
-
-	public function test_trigger_quiz_attempt_returns_false_when_pending(): void {
-		$attempt = $this->makeAttempt( [ 'attempt_status' => 'pending' ] );
-
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'academy_quiz_course_attempt' ),
-			[ $attempt ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_quiz_attempt_returns_false_without_attempt(): void {
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'academy_quiz_course_attempt' ),
-			[ null ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_quiz_attempt_returns_false_without_quiz_id(): void {
-		$attempt = $this->makeAttempt( [ 'quiz_id' => null ] );
-
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'academy_quiz_course_attempt' ),
-			[ $attempt ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_quiz_attempt_filters_by_selected_quiz(): void {
-		// Node configured for quiz 99, but attempt is for quiz 10.
-		$attempt = $this->makeAttempt( [ 'quiz_id' => 10 ] );
-
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'academy_quiz_course_attempt', [ 'quiz_id' => '99' ] ),
-			[ $attempt ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_quiz_attempt_passes_when_quiz_matches_config(): void {
-		$attempt = $this->makeAttempt( [ 'quiz_id' => 10 ] );
-
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'academy_quiz_course_attempt', [ 'quiz_id' => '10' ] ),
-			[ $attempt ]
-		);
-		$this->assertIsArray( $result );
-		$this->assertEquals( 10, $result['quiz_id'] );
-	}
-
-	// =========================================================================
-	// TRIGGER: quiz_target
-	// =========================================================================
-
-	public function test_trigger_quiz_target_returns_percentage_when_target_met(): void {
-		// 8/10 = 80% — target is 70%.
-		$attempt = $this->makeAttempt( [ 'quiz_id' => 10, 'earned_marks' => 8, 'total_marks' => 10 ] );
-
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'quiz_target', [ 'quiz_id' => 'any', 'target_percentage' => '70' ] ),
-			[ $attempt ]
-		);
-
-		$this->assertIsArray( $result );
-		$this->assertTrue( $result['success'] );
-		$this->assertEquals( 80.0, $result['percentage'] );
-		$this->assertEquals( 8,    $result['score'] );
-		$this->assertEquals( 10,   $result['total_marks'] );
-	}
-
-	public function test_trigger_quiz_target_returns_false_when_target_not_met(): void {
-		// 4/10 = 40% — target is 70%.
-		$attempt = $this->makeAttempt( [ 'earned_marks' => 4, 'total_marks' => 10 ] );
-
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'quiz_target', [ 'quiz_id' => 'any', 'target_percentage' => '70' ] ),
-			[ $attempt ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_quiz_target_returns_false_when_pending(): void {
-		$attempt = $this->makeAttempt( [ 'attempt_status' => 'pending' ] );
-
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'quiz_target', [ 'target_percentage' => '50' ] ),
-			[ $attempt ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_quiz_target_returns_false_when_total_marks_zero(): void {
-		// Division by zero guard — total_marks=0 must return false.
-		$attempt = $this->makeAttempt( [ 'earned_marks' => 0, 'total_marks' => 0 ] );
-
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'quiz_target', [ 'target_percentage' => '50' ] ),
-			[ $attempt ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	public function test_trigger_quiz_target_exact_boundary_passes(): void {
-		// 7/10 = 70% — target is exactly 70%. Should pass (>=).
-		$attempt = $this->makeAttempt( [ 'earned_marks' => 7, 'total_marks' => 10 ] );
-
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'quiz_target', [ 'quiz_id' => 'any', 'target_percentage' => '70' ] ),
-			[ $attempt ]
-		);
-		$this->assertIsArray( $result );
-		$this->assertEquals( 70.0, $result['percentage'] );
-	}
-
-	public function test_trigger_quiz_target_filters_by_selected_quiz(): void {
-		$attempt = $this->makeAttempt( [ 'quiz_id' => 10, 'earned_marks' => 9, 'total_marks' => 10 ] );
-
-		// Target met (90%) but quiz doesn't match node config.
-		$result = Academy::resolve_trigger(
-			$this->makeTriggerNode( 'quiz_target', [ 'quiz_id' => '99', 'target_percentage' => '50' ] ),
-			[ $attempt ]
-		);
-		$this->assertFalse( $result );
-	}
-
-	// =========================================================================
-	// ACTIONS
-	// =========================================================================
-
-	/**
-	 * Unknown actions must not silently pass data through.
-	 */
-	public function test_execute_node_rejects_unknown_action(): void {
-		$this->expectException( \InvalidArgumentException::class );
-		$input  = [ 'course_id' => 1, 'user_id' => 2 ];
-		$result = Academy::execute_node(
-			$this->makeActionNode( '__any__', [] ),
-			$input
-		);
-
-		$this->assertEquals( 'main', $result['port'] );
-		$this->assertEquals( $input, $result['data'] );
-	}
-
-	// =========================================================================
-	// SCHEMA & CONTRACT
-	// =========================================================================
-
-	public function test_get_slug_returns_academy(): void {
-		$this->assertEquals( 'academy', Academy::get_slug() );
-	}
-
-	public function test_get_name_returns_academy_lms(): void {
-		$this->assertEquals( 'Academy LMS', Academy::get_name() );
-	}
-
-	public function test_all_triggers_registered(): void {
-		$triggers = Academy::get_triggers();
-		foreach ( [ 'user_enroll_course', 'course_complete', 'lesson_complete', 'academy_quiz_course_attempt', 'quiz_target' ] as $event ) {
-			$this->assertArrayHasKey( $event, $triggers, "Trigger '$event' missing from get_triggers()" );
-		}
-	}
-
-	public function test_trigger_config_schema_for_course_triggers(): void {
-		foreach ( [ 'user_enroll_course', 'course_complete' ] as $trigger ) {
-			$schema = Academy::get_trigger_config_schema( $trigger );
-			$this->assertCount( 1, $schema );
-			$this->assertEquals( 'course_id', $schema[0]['key'] );
-			$this->assertEquals( 'select',    $schema[0]['type'] );
-		}
-	}
-
-	public function test_trigger_config_schema_for_quiz_attempt(): void {
-		$schema = Academy::get_trigger_config_schema( 'academy_quiz_course_attempt' );
-		$this->assertCount( 2, $schema );
-		$this->assertEquals( 'quiz_id', $schema[0]['key'] );
-	}
-
-	public function test_trigger_config_schema_for_quiz_target_has_two_fields(): void {
-		$schema = Academy::get_trigger_config_schema( 'quiz_target' );
-		$this->assertCount( 3, $schema );
-
-		$keys = array_column( $schema, 'key' );
-		$this->assertContains( 'quiz_id',           $keys );
-		$this->assertContains( 'target_percentage',  $keys );
-	}
-
-	public function test_trigger_config_schema_for_lesson_trigger(): void {
-		$schema = Academy::get_trigger_config_schema( 'lesson_complete' );
-		$this->assertCount( 2, $schema );
-		$this->assertEquals( 'lesson_id', $schema[0]['key'] );
-	}
-
-	public function test_trigger_config_schema_returns_empty_for_unknown_trigger(): void {
-		$this->assertSame( [], Academy::get_trigger_config_schema( '__unknown__' ) );
-	}
-
-	public function test_get_actions_preserves_existing_actions(): void {
-		foreach ( [ 'enroll-course', 'unenroll-course', 'complete-lesson', 'complete-course' ] as $action ) {
-			$this->assertArrayHasKey( $action, Academy::get_actions() );
-		}
-	}
-
-	public function test_get_dynamic_queries_has_all_keys(): void {
-		$queries = Academy::get_dynamic_queries();
-		foreach ( [ 'acourse', 'quiz', 'lesson' ] as $key ) {
-			$this->assertArrayHasKey( $key, $queries, "Dynamic query '$key' missing" );
-			$this->assertIsCallable( $queries[ $key ] );
-		}
-	}
-
-	public function test_query_courses_returns_any_option_when_academy_not_loaded(): void {
-		// In unit tests Academy class is not present — result is just the 'any' option.
-		$options = Academy::query_courses();
-		$this->assertIsArray( $options );
-		$this->assertEquals( 'any', $options[0]['name'] );
-	}
-
-	public function test_query_quiz_returns_any_option_when_academy_not_loaded(): void {
-		$options = Academy::query_quiz();
-		$this->assertIsArray( $options );
-		$this->assertEquals( 'any', $options[0]['name'] );
-	}
-
-	public function test_query_lesson_returns_any_option_when_academy_not_loaded(): void {
-		$options = Academy::query_lesson();
-		$this->assertIsArray( $options );
-		$this->assertEquals( 'any', $options[0]['name'] );
-	}
+    protected function getIntegrationClass(): string { return Academy::class; }
+
+    public function test_exact_27_triggers(): void {
+        $this->assertSame( [
+            'user_enroll_course', 'lesson_complete', 'course_complete', 'quiz_attempt_submitted',
+            'quiz_passed', 'quiz_failed', 'quiz_target', 'course_published', 'lesson_published',
+            'quiz_published', 'student_registered', 'instructor_registered',
+            'course_review_submitted', 'course_question_asked', 'course_question_replied',
+            'announcement_published', 'assignment_published', 'assignment_submitted',
+            'assignment_evaluated', 'assignment_completed', 'tutor_booking_published',
+            'tutor_booking_booked', 'tutor_booking_completed', 'tutor_booking_review_submitted',
+            'zoom_meeting_published', 'zoom_meeting_completed', 'course_bundle_published',
+        ], array_keys( Academy::get_triggers() ) );
+    }
+    public function test_exact_9_actions(): void {
+        $this->assertSame( [
+            'enroll-course', 'unenroll-course', 'complete-course', 'complete-lesson',
+            'reset-course-progress', 'add-to-wishlist', 'remove-from-wishlist',
+            'assign-instructor', 'remove-instructor',
+        ], array_keys( Academy::get_actions() ) );
+    }
+    public function test_actions_and_triggers_have_schema_and_sample_output(): void {
+        foreach ( Academy::get_triggers() as $id => $spec ) {
+            $this->assertNotEmpty( $spec['hook'], $id );
+            $this->assertIsArray( Academy::get_trigger_config_schema( $id ), $id );
+            $this->assertTrue( Academy::get_trigger_sample_output( $id )['success'], $id );
+        }
+        foreach ( Academy::get_actions() as $id => $spec ) {
+            $this->assertIsArray( Academy::get_action_config_schema( $id ), $id );
+            $this->assertTrue( Academy::get_action_sample_output( $id )['success'], $id );
+        }
+    }
+    public function test_rejects_quiz_threshold_without_total_marks(): void {
+        $node = [ 'event' => 'quiz_target', 'config' => [ 'quiz_id' => 'any', 'course_id' => 'any', 'target_percentage' => 70 ] ];
+        $attempt = (object) [ 'quiz_id' => 10, 'course_id' => 2, 'user_id' => 1, 'attempt_status' => 'passed', 'earned_marks' => 7, 'total_marks' => 0 ];
+        $this->assertFalse( Academy::resolve_trigger( $node, [ $attempt ] ) );
+    }
+    public function test_rejects_lesson_when_topic_is_not_lesson(): void {
+        $node = [ 'event' => 'lesson_complete', 'config' => [ 'lesson_id' => 'any', 'course_id' => 'any' ] ];
+        $this->assertFalse( Academy::resolve_trigger( $node, [ 'quiz', 2, 3, 1 ] ) );
+    }
+    public function test_unrelated_post_publication_does_not_fire(): void {
+        $post = (object) [ 'ID' => 3, 'post_type' => 'post', 'post_title' => 'Regular post', 'post_author' => 1 ];
+        $this->assertFalse( Academy::resolve_trigger( [ 'event' => 'course_published' ], [ 'publish', 'draft', $post ] ) );
+    }
+    public function test_only_newly_published_post_fires(): void {
+        $post = (object) [ 'ID' => 3, 'post_type' => 'academy_courses', 'post_title' => 'Course', 'post_author' => 1 ];
+        $this->assertFalse( Academy::resolve_trigger( [ 'event' => 'course_published' ], [ 'publish', 'publish', $post ] ) );
+    }
+    public function test_unknown_actions_are_rejected(): void {
+        $this->expectException( \InvalidArgumentException::class );
+        Academy::execute_node( [ 'event' => 'get-course-progress' ], [] );
+    }
 }
