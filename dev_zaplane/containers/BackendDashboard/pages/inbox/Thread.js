@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
-import { FiArrowLeft, FiCheck, FiRotateCcw, FiSidebar, FiShoppingBag, FiSend, FiCpu, FiMessageSquare, FiLock, FiCornerUpLeft, FiCopy, FiEdit2, FiTrash2, FiX, FiGitBranch, FiPause } from "react-icons/fi";
+import { FiArrowLeft, FiCheck, FiRotateCcw, FiSidebar, FiShoppingBag, FiSend, FiCpu, FiMessageSquare, FiLock, FiCornerUpLeft, FiCopy, FiEdit2, FiTrash2, FiX, FiGitBranch, FiPause, FiBookOpen, FiThumbsUp, FiThumbsDown } from "react-icons/fi";
 import { safeUrl } from "./api";
 import ProductPicker from "./ProductPicker";
 import { Avatar, channelOf, dayLabel, hourTime } from "./channels";
@@ -17,6 +17,17 @@ const Attachment = ({ a }) => {
             {a.price_text}
             {a.in_stock === false && " · " + __("Out of stock", "zaplane")}
           </span>
+        </span>
+      </a>
+    );
+  }
+  if (a.type === "article" && url) {
+    return (
+      <a className="zaplane-inbox-article" href={url} target="_blank" rel="noopener noreferrer">
+        {safeUrl(a.image) ? <img src={a.image} alt="" /> : <FiBookOpen />}
+        <span>
+          <strong>{a.title}</strong>
+          {a.excerpt && <em>{a.excerpt}</em>}
         </span>
       </a>
     );
@@ -82,6 +93,7 @@ const Message = ({ m, contact, first, last, onReply, onEdit, onDelete, onJump, o
   const byWorkflow = m.sender_type === "workflow";
   const held = byWorkflow && !!meta.held;
   const byAi = m.sender_type === "ai" || (byWorkflow && !!meta.by_ai);
+  const byKnowledge = m.sender_type === "auto";
   // Offer edit/delete on the team's own replies; when the channel can't do it,
   // the buttons stay visible but disabled, with the reason as their tooltip.
   const showChange = mine && !m.deleted && (m.can_change || m.sender_type === "agent");
@@ -115,13 +127,14 @@ const Message = ({ m, contact, first, last, onReply, onEdit, onDelete, onJump, o
       className={"zaplane-inbox-row " + (mine ? "is-out" : "is-in") + (first ? " is-first" : "") + (last ? " is-last" : "") + (mode ? " is-busy" : "")}
     >
       {!mine && <span className="zaplane-inbox-row-avatar">{last && <Avatar contact={contact} size="sm" />}</span>}
-      <div className={"zaplane-inbox-msg " + (mine ? "is-out" : "is-in") + (m.is_note ? " is-note" : "") + (byAi ? " is-ai" : "") + (m.deleted ? " is-deleted" : "")}>
+      <div className={"zaplane-inbox-msg " + (mine ? "is-out" : "is-in") + (m.is_note ? " is-note" : "") + (byAi ? " is-ai" : "") + (byKnowledge ? " is-knowledge" : "") + (m.deleted ? " is-deleted" : "")}>
         {first && (
           <div className="zaplane-inbox-msg-meta">
             <span className="zaplane-inbox-msg-who">
               {m.is_note && !held && <FiLock />}
               {held && <FiPause />}
               {byWorkflow && !held && <FiGitBranch />}
+              {byKnowledge && <FiBookOpen />}
               {byAi && <FiCpu />}
               {held ? (
                 __("Held reply", "zaplane") + " · "
@@ -226,6 +239,23 @@ const Message = ({ m, contact, first, last, onReply, onEdit, onDelete, onJump, o
         {(m.attachments || []).map((a, i) => (
           <Attachment key={i} a={a} />
         ))}
+
+        {byKnowledge && (m.quick_replies || []).length > 0 && (
+          <div className="zaplane-inbox-qr" aria-label={__("Buttons the customer sees", "zaplane")}>
+            <em>{__("Did this answer your question?", "zaplane")}</em>
+            {m.quick_replies.map((q) => (
+              <span key={q} className={meta.feedback && q === (meta.feedback === "yes" ? m.quick_replies[0] : m.quick_replies[1]) ? "is-picked" : ""}>
+                {q}
+              </span>
+            ))}
+          </div>
+        )}
+        {byKnowledge && meta.feedback && (
+          <span className={"zaplane-inbox-feedback is-" + meta.feedback}>
+            {meta.feedback === "yes" ? <FiThumbsUp /> : <FiThumbsDown />}
+            {meta.feedback === "yes" ? __("Customer found this helpful", "zaplane") : __("Customer said this didn't help", "zaplane")}
+          </span>
+        )}
 
         {held && !m.deleted && (
           <div className="zaplane-inbox-held">

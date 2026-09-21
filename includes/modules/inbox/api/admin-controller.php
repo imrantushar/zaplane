@@ -15,6 +15,7 @@ use Zaplane\Modules\Inbox\Models\Conversation;
 use Zaplane\Modules\Inbox\Models\Message;
 use Zaplane\Modules\Inbox\Models\Tag;
 use Zaplane\Modules\Inbox\Services\Conversations;
+use Zaplane\Modules\Inbox\Services\KnowledgeAnswer;
 use Zaplane\Modules\Inbox\Services\MessageActions;
 use Zaplane\Modules\Inbox\Services\Outbound;
 use Zaplane\Modules\Inbox\Services\Presenter;
@@ -127,6 +128,24 @@ class AdminController {
 				'callback'            => [ $this, 'save_settings' ],
 				'permission_callback' => [ $this, 'can_manage' ],
 			],
+		] );
+
+		register_rest_route( self::NS, '/inbox/knowledge/test', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'test_knowledge' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
+		register_rest_route( self::NS, '/inbox/knowledge/gaps', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'knowledge_gaps' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
+		register_rest_route( self::NS, '/inbox/knowledge/gaps/(?P<key>[a-f0-9]{32})', [
+			'methods'             => WP_REST_Server::DELETABLE,
+			'callback'            => [ $this, 'dismiss_knowledge_gap' ],
+			'permission_callback' => [ $this, 'can_manage' ],
 		] );
 
 		register_rest_route( self::NS, '/inbox/canned-replies', [
@@ -619,6 +638,11 @@ class AdminController {
 			'settings'       => InboxSettings::get(),
 			'ai_connections' => $connections,
 			'knowledge_keys' => self::knowledge_keys(),
+			'answers'        => [
+				'stats'      => KnowledgeAnswer::stats(),
+				'gaps'       => array_slice( KnowledgeAnswer::gaps(), 0, 20 ),
+				'embeddings' => \Zaplane\Services\KnowledgeEmbeddings::enabled(),
+			],
 			'team'           => $team,
 			'site_origin'    => untrailingslashit( home_url() ),
 			'channels'       => $channels,
@@ -652,6 +676,24 @@ class AdminController {
 			];
 		}
 		return $out;
+	}
+
+	/** What an automatic answer would send for a question; nothing is sent. */
+	public function test_knowledge( WP_REST_Request $request ) {
+		$question = sanitize_textarea_field( (string) $request->get_param( 'question' ) );
+		if ( '' === trim( $question ) ) {
+			return new WP_Error( 'zaplane_inbox_empty', __( 'Type a question to test.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+		return rest_ensure_response( KnowledgeAnswer::preview( $question ) );
+	}
+
+	public function knowledge_gaps() {
+		return rest_ensure_response( KnowledgeAnswer::gaps() );
+	}
+
+	public function dismiss_knowledge_gap( WP_REST_Request $request ) {
+		KnowledgeAnswer::dismiss_gap( (string) $request['key'] );
+		return rest_ensure_response( KnowledgeAnswer::gaps() );
 	}
 
 	public function list_canned() {

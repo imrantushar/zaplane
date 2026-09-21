@@ -59,6 +59,7 @@ class InboxModule implements ModuleInterface {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_widget' ] );
 		add_action( 'zaplane/incoming_webhook', [ $this, 'incoming_webhook' ], 10, 2 );
 		Services\WorkflowSends::register();
+		add_action( Services\KnowledgeAnswer::HOOK, [ Services\KnowledgeAnswer::class, 'handle' ], 10, 2 );
 	}
 
 	/**
@@ -142,6 +143,8 @@ class InboxModule implements ModuleInterface {
 				'attachment'  => __( 'Attachment', 'zaplane' ),
 				'deleted'     => __( 'Message deleted', 'zaplane' ),
 				'edited'      => __( 'edited', 'zaplane' ),
+				'readMore'    => __( 'Read more', 'zaplane' ),
+				'didItHelp'   => __( 'Did this answer your question?', 'zaplane' ),
 			],
 		] );
 	}

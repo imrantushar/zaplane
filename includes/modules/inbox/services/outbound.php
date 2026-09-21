@@ -18,7 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Outbound {
 
-	public const SENDERS = [ 'agent', 'ai', 'workflow', 'system' ];
+	/** `auto` is an automatic answer from Business Knowledge (no model). */
+	public const SENDERS = [ 'agent', 'ai', 'auto', 'workflow', 'system' ];
 
 	/**
 	 * @param array{

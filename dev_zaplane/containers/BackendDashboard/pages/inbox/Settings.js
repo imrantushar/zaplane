@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
-import { FiMessageCircle, FiCpu, FiShare2, FiZap, FiCopy, FiCheck, FiTrash2, FiExternalLink, FiX, FiUsers, FiGitBranch } from "react-icons/fi";
+import { FiMessageCircle, FiCpu, FiShare2, FiZap, FiCopy, FiCheck, FiTrash2, FiExternalLink, FiX, FiUsers, FiGitBranch, FiBookOpen } from "react-icons/fi";
 import ZAPToggle from "@ZAPComponents/ZAPToggle";
 import { inboxApi } from "./api";
 import { channelOf } from "./channels";
+import KnowledgeSettings from "./KnowledgeSettings";
 
 const Field = ({ label, help, children, wide }) => (
   <label className={"zaplane-inbox-field" + (wide ? " is-wide" : "")}>
@@ -15,6 +16,7 @@ const Field = ({ label, help, children, wide }) => (
 
 const SECTIONS = [
   { id: "widget", label: __("Website chat", "zaplane"), Icon: FiMessageCircle },
+  { id: "knowledge", label: __("Knowledge & answers", "zaplane"), Icon: FiBookOpen },
   { id: "ai", label: __("AI assistant", "zaplane"), Icon: FiCpu },
   { id: "channels", label: __("Social channels", "zaplane"), Icon: FiShare2 },
   { id: "replies", label: __("Saved replies", "zaplane"), Icon: FiZap },
@@ -159,6 +161,7 @@ const Settings = ({ onSaved }) => {
 
   const setWidget = (k, v) => setForm({ ...form, widget: { ...form.widget, [k]: v } });
   const setAi = (k, v) => setForm({ ...form, ai: { ...form.ai, [k]: v } });
+  const setAnswers = (k, v) => setForm({ ...form, answers: { ...(form.answers || {}), [k]: v } });
   const setChannel = (slug, k, v) =>
     setForm({ ...form, channels: { ...form.channels, [slug]: { ...form.channels[slug], [k]: v } } });
 
@@ -172,6 +175,7 @@ const Settings = ({ onSaved }) => {
           allowed_origins: form.widget.allowed_origins.split(/\s+/).filter(Boolean),
         },
         ai: form.ai,
+        answers: form.answers,
         channels: form.channels,
       });
       // Webhook secrets are stored with the integration, not the inbox.
@@ -215,8 +219,7 @@ const Settings = ({ onSaved }) => {
 
   const connections = data?.ai_connections || [];
   const knowledgeKeys = data?.knowledge_keys || [];
-  const knowledgeUrl = "admin.php?page=zaplane-knowledge";
-  const selectedKnowledge = knowledgeKeys.find((k) => k.key === form.ai.business_key);
+
   const connectionsUrl = "admin.php?page=zaplane-connections";
   const aiReady = form.ai.enabled && form.ai.connection_id;
 
@@ -229,6 +232,9 @@ const Settings = ({ onSaved }) => {
 
   const navState = {
     widget: form.widget.enabled ? { tone: "success", text: __("On", "zaplane") } : { tone: "muted", text: __("Off", "zaplane") },
+    knowledge: form.answers?.enabled
+      ? { tone: "success", text: __("On", "zaplane") }
+      : { tone: "muted", text: __("Off", "zaplane") },
     ai: aiReady ? { tone: "success", text: __("On", "zaplane") } : form.ai.enabled ? { tone: "warning", text: __("Needs setup", "zaplane") } : { tone: "muted", text: __("Off", "zaplane") },
     channels: (() => {
       const on = Object.entries(data?.channels || {}).filter(([slug]) => form.channels?.[slug]?.enabled).length;
@@ -308,12 +314,21 @@ const Settings = ({ onSaved }) => {
           </div>
         </section>
 
+        <KnowledgeSettings
+          form={form}
+          setAi={setAi}
+          setAnswers={setAnswers}
+          knowledgeKeys={knowledgeKeys}
+          answersData={data?.answers}
+          aiOn={!!aiReady}
+        />
+
         <section className="zaplane-inbox-card" id="zaplane-inbox-ai" data-section="ai">
           <div className="zaplane-inbox-card-head">
             <div>
               <h3>{__("AI assistant", "zaplane")}</h3>
               <p>
-                {__("Answers new conversations from your Business Knowledge and hands them to your team when it can't help. It stops for good in a conversation as soon as someone on your team replies.", "zaplane")}
+                {__("Answers what automatic answers can't, using the knowledge chosen above, and hands conversations to your team when it can't help. It stops for good in a conversation as soon as someone on your team replies.", "zaplane")}
               </p>
             </div>
             <ZAPToggle checked={!!form.ai.enabled} onChange={(v) => setAi("enabled", v)} label={__("Let the assistant answer", "zaplane")} />
@@ -340,41 +355,6 @@ const Settings = ({ onSaved }) => {
                 {connections.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field
-              label={__("Knowledge to answer from", "zaplane")}
-              help={
-                knowledgeKeys.length === 0 ? (
-                  <>
-                    {__("Business Knowledge is empty, so the assistant has nothing to answer from.", "zaplane")}{" "}
-                    <a href={knowledgeUrl}>
-                      {__("Add entries", "zaplane")} <FiExternalLink />
-                    </a>
-                  </>
-                ) : !selectedKnowledge ? (
-                  <>
-                    {sprintf(__("“%s” has no entries yet.", "zaplane"), form.ai.business_key)}{" "}
-                    <a href={knowledgeUrl}>
-                      {__("Add some", "zaplane")} <FiExternalLink />
-                    </a>
-                  </>
-                ) : (
-                  sprintf(_n("%d entry the assistant searches.", "%d entries the assistant searches.", selectedKnowledge.count, "zaplane"), selectedKnowledge.count)
-                )
-              }
-            >
-              <select className="zaplane-inbox-select" value={form.ai.business_key} onChange={(e) => setAi("business_key", e.target.value)}>
-                {!selectedKnowledge && (
-                  <option value={form.ai.business_key}>
-                    {sprintf(__("%s (no entries)", "zaplane"), form.ai.business_key || "default")}
-                  </option>
-                )}
-                {knowledgeKeys.map((k) => (
-                  <option key={k.key} value={k.key}>
-                    {k.key} ({k.count})
                   </option>
                 ))}
               </select>

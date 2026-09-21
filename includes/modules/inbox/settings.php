@@ -44,6 +44,12 @@ class Settings {
 					'answered_by'   => 'assistant',
 				],
 			],
+			// Answer from Business Knowledge before (or instead of) the assistant.
+			'answers' => [
+				'enabled'    => false,
+				'strictness' => 'balanced',
+				'feedback'   => true,
+			],
 			'ai'     => [
 				'enabled'       => false,
 				'connection_id' => 0,
@@ -141,6 +147,18 @@ class Settings {
 				if ( isset( $in['answered_by'] ) && in_array( $in['answered_by'], self::ANSWERERS, true ) ) {
 					$current['channels'][ $slug ]['answered_by'] = $in['answered_by'];
 				}
+			}
+		}
+
+		if ( isset( $input['answers'] ) && is_array( $input['answers'] ) ) {
+			$a = $input['answers'];
+			foreach ( [ 'enabled', 'feedback' ] as $k ) {
+				if ( array_key_exists( $k, $a ) ) {
+					$current['answers'][ $k ] = (bool) $a[ $k ];
+				}
+			}
+			if ( isset( $a['strictness'] ) && in_array( $a['strictness'], [ 'strict', 'balanced', 'broad' ], true ) ) {
+				$current['answers']['strictness'] = $a['strictness'];
 			}
 		}
 

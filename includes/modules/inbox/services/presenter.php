@@ -101,6 +101,8 @@ class Presenter {
 			'created_at'  => self::time( $message->created_at ),
 			'edited'      => ! empty( $meta['edited_at'] ),
 			'deleted'     => ! empty( $meta['deleted_at'] ),
+			// Buttons offered under an automatic answer ("Did this answer…?").
+			'quick_replies' => array_values( array_filter( array_map( 'strval', (array) ( $meta['quick_replies'] ?? [] ) ) ) ),
 			'reply_to'    => $quote ? [
 				'id'          => (int) ( $quote['id'] ?? 0 ),
 				'sender_name' => (string) ( $quote['sender_name'] ?? '' ),
@@ -136,6 +138,8 @@ class Presenter {
 			case 'agent':
 				$user = self::user( (int) $message->sender_id );
 				return $user ? (string) $user['name'] : __( 'Team', 'zaplane' );
+			case 'auto':
+				return __( 'Automatic answer', 'zaplane' );
 			case 'workflow':
 				$meta = is_array( $message->meta ) ? $message->meta : [];
 				if ( ! empty( $meta['workflow_name'] ) ) {

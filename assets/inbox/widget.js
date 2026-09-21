@@ -304,6 +304,27 @@
 				item.appendChild( node );
 			}
 		} );
+		// Tappable answers ("Did this answer your question?"). Only the newest
+		// message keeps them; tapping one sends it like a typed reply.
+		Array.prototype.slice.call( list.querySelectorAll( '.zpi-qr, .zpi-qr-prompt' ) ).forEach( function ( node ) {
+			node.parentNode.removeChild( node );
+		} );
+		if ( ! mine && ! m.deleted && m.quick_replies && m.quick_replies.length ) {
+			if ( m.sender_type === 'auto' ) {
+				item.appendChild( el( 'div', 'zpi-qr-prompt', t.didItHelp || 'Did this answer your question?' ) );
+			}
+			var qr = el( 'div', 'zpi-qr' );
+			m.quick_replies.forEach( function ( label ) {
+				var btn = el( 'button', 'zpi-qr-btn', label );
+				btn.type = 'button';
+				btn.addEventListener( 'click', function () {
+					text.value = label;
+					form.requestSubmit ? form.requestSubmit() : form.dispatchEvent( new Event( 'submit', { cancelable: true } ) );
+				} );
+				qr.appendChild( btn );
+			} );
+			item.appendChild( qr );
+		}
 		item.appendChild( el( 'div', 'zpi-time', time( m.created_at ) + ( m.edited && ! m.deleted ? ' · ' + ( t.edited || 'edited' ) : '' ) ) );
 		list.insertBefore( item, typing );
 
@@ -352,6 +373,29 @@
 			}
 			card.appendChild( info );
 			return card;
+		}
+
+		if ( a.type === 'article' && url ) {
+			var article = el( 'a', 'zpi-article' );
+			article.href = url;
+			article.target = '_blank';
+			article.rel = 'noopener';
+			var thumb = safeUrl( a.image );
+			if ( thumb ) {
+				var tImg = el( 'img', 'zpi-article-img' );
+				tImg.src = thumb;
+				tImg.alt = '';
+				tImg.loading = 'lazy';
+				article.appendChild( tImg );
+			}
+			var aInfo = el( 'div', 'zpi-article-info' );
+			aInfo.appendChild( el( 'div', 'zpi-article-title', a.title || '' ) );
+			if ( a.excerpt ) {
+				aInfo.appendChild( el( 'div', 'zpi-article-excerpt', a.excerpt ) );
+			}
+			aInfo.appendChild( el( 'span', 'zpi-card-cta', t.readMore || 'Read more' ) );
+			article.appendChild( aInfo );
+			return article;
 		}
 
 		if ( a.type === 'image' && url ) {

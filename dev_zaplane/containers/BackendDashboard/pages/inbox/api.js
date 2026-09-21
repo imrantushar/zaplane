@@ -24,6 +24,8 @@ export const inboxApi = {
   sendProduct: (id, productId, message) =>
     API.post(base + "conversations/" + id + "/product", { product_id: productId, message }).then((r) => r.data),
   placeOrder: (id, data) => API.post(base + "conversations/" + id + "/order", data).then((r) => r.data),
+  testKnowledge: (question) => API.post(base + "knowledge/test", { question }).then((r) => r.data),
+  dismissGap: (key) => API.delete(base + "knowledge/gaps/" + key).then((r) => r.data),
   webhookConfig: (slug, values) =>
     API.post(namespace + "incoming/" + slug + "/config", values).then((r) => r.data),
 };

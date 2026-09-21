@@ -192,6 +192,29 @@ class Whatsapp extends MetaChannel {
 			],
 		];
 
+		// Up to three tappable answers ("Did this answer your question?") make
+		// it an interactive message; tapping one comes back as its title.
+		$buttons = array_slice( array_filter( (array) ( $message->meta['quick_replies'] ?? [] ) ), 0, 3 );
+		if ( $buttons && mb_strlen( (string) $message->body ) <= 1024 ) {
+			unset( $payload['text'] );
+			$payload['type']        = 'interactive';
+			$payload['interactive'] = [
+				'type'   => 'button',
+				'body'   => [ 'text' => (string) $message->body ],
+				'action' => [
+					'buttons' => array_map( static function ( $title, $i ) {
+						return [
+							'type'  => 'reply',
+							'reply' => [
+								'id'    => 'zaplane_qr_' . $i,
+								'title' => mb_substr( (string) $title, 0, 20 ),
+							],
+						];
+					}, array_values( $buttons ), array_keys( array_values( $buttons ) ) ),
+				],
+			];
+		}
+
 		// Shown as a quoted reply in WhatsApp when we know the original's id.
 		$quote = is_array( $message->meta['reply_to'] ?? null ) ? $message->meta['reply_to'] : [];
 		if ( ! empty( $quote['external_id'] ) ) {

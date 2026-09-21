@@ -204,6 +204,19 @@ class Messenger extends MetaChannel {
 			],
 		];
 
+		// Tappable answers under the message ("Did this answer your question?").
+		// Tapping one sends its title back as an ordinary message.
+		$buttons = array_slice( array_filter( (array) ( $message->meta['quick_replies'] ?? [] ) ), 0, 13 );
+		if ( $buttons ) {
+			$payload['message']['quick_replies'] = array_map( static function ( $title, $i ) {
+				return [
+					'content_type' => 'text',
+					'title'        => mb_substr( (string) $title, 0, 20 ),
+					'payload'      => 'ZAPLANE_QR_' . $i,
+				];
+			}, array_values( $buttons ), array_keys( array_values( $buttons ) ) );
+		}
+
 		// Shown as a quoted reply in Messenger when we know the original's id.
 		$quote = is_array( $message->meta['reply_to'] ?? null ) ? $message->meta['reply_to'] : [];
 		if ( ! empty( $quote['external_id'] ) ) {
