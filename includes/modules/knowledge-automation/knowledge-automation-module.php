@@ -19,8 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * - `save_post` re-syncs a single post shortly after it's saved, but only for
  *   a (business_key, post_type) pair that was already synced at least once
  *   manually — this never starts syncing content nobody opted into.
- * - Trashing/deleting a synced post removes its knowledge entry so stale
- *   product/content info doesn't linger.
+ * - Unpublishing, trashing or deleting a synced post removes its knowledge
+ *   entry so stale product/content info doesn't linger.
  */
 class KnowledgeAutomationModule implements ModuleInterface {
 
@@ -54,13 +54,26 @@ class KnowledgeAutomationModule implements ModuleInterface {
 	}
 
 	/**
+	 * Queue a background embedding run for a business, unless one is already
+	 * waiting — a bulk edit or several syncs in a row then share one run.
+	 */
+	public static function queue_embedding( string $business_key ): void {
+		if ( '' === $business_key || ! function_exists( 'as_enqueue_async_action' ) ) {
+			return;
+		}
+		$args = [ 'business_key' => $business_key ];
+		if ( self::is_pending( 'zaplane_knowledge_embed_pending', $args ) ) {
+			return;
+		}
+		as_enqueue_async_action( 'zaplane_knowledge_embed_pending', $args, 'zaplane' );
+	}
+
+	/**
 	 * Embed one batch of a business's un-embedded rows; re-enqueue itself if
 	 * more remain instead of doing an unbounded loop in one request.
 	 *
-	 * Action Scheduler (like WP's do_action_ref_array) calls this via
-	 * call_user_func_array() with the associative args array we enqueue —
-	 * PHP 8 matches those string keys to named parameters, so this parameter
-	 * name must match the 'business_key' key used at every enqueue call site.
+	 * Action Scheduler passes the enqueued args positionally (array_values), so
+	 * the parameter order must match the order of the keys at the enqueue site.
 	 */
 	public static function handle_embed_pending( string $business_key ): void {
 		if ( '' === $business_key ) {
@@ -70,8 +83,8 @@ class KnowledgeAutomationModule implements ModuleInterface {
 		$result = Knowledge::action_embed_backfill( $business_key, [ 'limit' => self::EMBED_BATCH ], [] );
 		$data   = $result['data'] ?? [];
 
-		if ( ! empty( $data['success'] ) && (int) ( $data['remaining'] ?? 0 ) > 0 && function_exists( 'as_enqueue_async_action' ) ) {
-			as_enqueue_async_action( 'zaplane_knowledge_embed_pending', [ 'business_key' => $business_key ], 'zaplane' );
+		if ( ! empty( $data['success'] ) && (int) ( $data['remaining'] ?? 0 ) > 0 ) {
+			self::queue_embedding( $business_key );
 		}
 	}
 
@@ -84,14 +97,6 @@ class KnowledgeAutomationModule implements ModuleInterface {
 		if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
 			return;
 		}
-		if ( 'publish' !== $post->post_status ) {
-			// Only auto-resync content that's actually live; an unpublished
-			// draft isn't visible to a customer-facing agent anyway, and a
-			// status change away from publish is handled by handle_post_removed
-			// only on trash/delete — a manual unsync is on the user, same as
-			// today's manual-sync workflow.
-			return;
-		}
 
 		$profiles = Knowledge::sync_profiles_for_post_type( $post->post_type );
 		if ( empty( $profiles ) || ! function_exists( 'as_schedule_single_action' ) ) {
@@ -99,23 +104,34 @@ class KnowledgeAutomationModule implements ModuleInterface {
 		}
 
 		foreach ( $profiles as $profile ) {
-			as_schedule_single_action(
-				time() + self::AUTOSYNC_DELAY,
-				'zaplane_knowledge_autosync_post',
-				[
-					'business_key' => (string) $profile['business_key'],
-					'post_type'    => (string) $profile['post_type'],
-					'post_id'      => $post_id,
-				],
-				'zaplane'
-			);
-		}
+			$business_key = (string) $profile['business_key'];
+
+			// Moved out of the status this business syncs (e.g. published → draft):
+			// a customer-facing agent must stop quoting it right away.
+			if ( ! Knowledge::profile_accepts_status( $profile, $post->post_status ) ) {
+				Knowledge::forget_synced_post( $post_id, $post->post_type, $business_key );
+				continue;
+			}
+
+			$args = [
+				'business_key' => $business_key,
+				'post_type'    => (string) $profile['post_type'],
+				'post_id'      => $post_id,
+			];
+
+			// Debounce: saves while a re-sync is still waiting fold into it.
+			if ( self::is_pending( 'zaplane_knowledge_autosync_post', $args ) ) {
+				continue;
+			}
+
+			as_schedule_single_action( time() + self::AUTOSYNC_DELAY, 'zaplane_knowledge_autosync_post', $args, 'zaplane' );
+		}//end foreach
 	}
 
 	/**
 	 * Re-sync exactly one post using its remembered profile settings, then
 	 * queue embedding for whatever that just produced/changed. See the note on
-	 * handle_embed_pending() — parameter names must match the enqueued keys.
+	 * handle_embed_pending() — parameter order must match the enqueued keys.
 	 */
 	public static function handle_autosync_post( string $business_key, string $post_type, int $post_id ): void {
 		if ( '' === $business_key || '' === $post_type || $post_id <= 0 ) {
@@ -134,6 +150,13 @@ class KnowledgeAutomationModule implements ModuleInterface {
 			return; // profile removed since the save (e.g. business cleared) — nothing to do
 		}
 
+		// The post may have changed status since the save that queued this.
+		$post = get_post( $post_id );
+		if ( ! $post || ! Knowledge::profile_accepts_status( $profile, $post->post_status ) ) {
+			Knowledge::forget_synced_post( $post_id, $post_type, $business_key );
+			return;
+		}
+
 		$profile['post_id'] = $post_id;
 		Knowledge::action_sync_content( $business_key, $profile, [] );
 	}
@@ -149,5 +172,23 @@ class KnowledgeAutomationModule implements ModuleInterface {
 			return;
 		}
 		Knowledge::forget_synced_post( $post_id, $post->post_type );
+	}
+
+	/** Whether an action with exactly these args is still waiting to run (a running one doesn't count). */
+	private static function is_pending( string $hook, array $args ): bool {
+		if ( ! function_exists( 'as_get_scheduled_actions' ) || ! class_exists( '\ActionScheduler_Store' ) ) {
+			return false;
+		}
+		$ids = as_get_scheduled_actions(
+			[
+				'hook'     => $hook,
+				'args'     => $args,
+				'group'    => 'zaplane',
+				'status'   => \ActionScheduler_Store::STATUS_PENDING,
+				'per_page' => 1,
+			],
+			'ids'
+		);
+		return ! empty( $ids );
 	}
 }

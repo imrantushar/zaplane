@@ -719,6 +719,11 @@ const KnowledgePage = () => {
                 onChange={(opt) => setEmbed({ ...embed, connection_id: opt?.value || 0 })}
                 placeholder={__("Select a connection…", "zaplane")}
               />
+              {!embed.connection_id && embed.has_key && (
+                <p className="text-sm mt-1" style={{ color: "var(--zaplane-font-secondary-color)" }}>
+                  {__("Using the API key saved by an earlier version. Pick a connection to switch to it.", "zaplane")}
+                </p>
+              )}
               {!embedConnections.length && (
                 <p className="text-sm mt-1" style={{ color: "var(--zaplane-font-secondary-color)" }}>
                   {__("No eligible connections yet. Create an OpenAI, Gemini, or OpenAI-compatible connection under Connections first (Anthropic and WordPress Core AI don't support embeddings).", "zaplane")}
@@ -743,7 +748,7 @@ const KnowledgePage = () => {
                 type="button"
                 style={outlineBtn}
                 onClick={runBackfill}
-                disabled={syncing || !embed.enabled || !embed.connection_id}
+                disabled={syncing || !embed.enabled || (!embed.connection_id && !embed.has_key)}
               >
                 {syncing ? __("Working...", "zaplane") : __("Backfill now", "zaplane")}
               </button>

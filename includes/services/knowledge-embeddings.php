@@ -3,6 +3,7 @@
 namespace Zaplane\Services;
 
 use Zaplane\Framework\Classes\AiHttp;
+use Zaplane\Framework\Classes\Encryption;
 use Zaplane\Models\Connection;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,29 +45,14 @@ class KnowledgeEmbeddings {
 	public static function config(): array {
 		$raw = self::raw_option();
 
-		$connection_id = (int) ( $raw['connection_id'] ?? 0 );
-		$provider      = '';
-		$api_key       = '';
-		$base_url      = '';
-
-		if ( $connection_id > 0 ) {
-			$connection = Connection::find( $connection_id );
-			if ( $connection && 'ai' === $connection->app ) {
-				$creds    = $connection->getCredentials();
-				$provider = strtolower( (string) ( $creds['provider'] ?? '' ) );
-				$api_key  = (string) ( $creds['api_key'] ?? '' );
-				$base_url = (string) ( $creds['base_url'] ?? '' );
-			}
-		}
-
-		$cfg = [
-			'enabled'       => ! empty( $raw['enabled'] ),
-			'connection_id' => $connection_id,
-			'provider'      => $provider,
-			'api_key'       => $api_key,
-			'base_url'      => $base_url,
-			'model'         => (string) ( $raw['model'] ?? '' ),
-		];
+		$cfg = array_merge(
+			[
+				'enabled'       => ! empty( $raw['enabled'] ),
+				'connection_id' => (int) ( $raw['connection_id'] ?? 0 ),
+			],
+			self::resolve( $raw ),
+			[ 'model' => (string) ( $raw['model'] ?? '' ) ]
+		);
 
 		/**
 		 * Filter the embeddings config (e.g. to source the key from elsewhere).
@@ -80,6 +66,11 @@ class KnowledgeEmbeddings {
 	 * Persist config. The connection itself carries the credentials — this only
 	 * stores which connection and model to use.
 	 *
+	 * A key saved before AI Connections were used here (`provider` + `api_key_enc`,
+	 * or a legacy plaintext `api_key`) is carried over untouched, and keeps
+	 * working until a connection is picked — so updating doesn't silently turn
+	 * semantic search off.
+	 *
 	 * @param array{enabled?:bool,connection_id?:int,model?:string} $cfg
 	 */
 	public static function save( array $cfg ): void {
@@ -90,16 +81,20 @@ class KnowledgeEmbeddings {
 			'connection_id' => (int) ( $cfg['connection_id'] ?? 0 ),
 			'model'         => sanitize_text_field( (string) ( $cfg['model'] ?? '' ) ),
 		];
+		foreach ( [ 'provider', 'api_key_enc', 'api_key' ] as $legacy ) {
+			if ( ! empty( $existing[ $legacy ] ) ) {
+				$store[ $legacy ] = (string) $existing[ $legacy ];
+			}
+		}
 
 		// Changing the connection or model can change the embedding space
 		// (different provider/model = different dimensionality). Compare the
 		// resolved tag before/after and drop stale vectors so backfill re-embeds
 		// instead of retrieval silently skipping incompatible ones.
-		$old_tag = self::tag( self::resolve( (int) ( $existing['connection_id'] ?? 0 ), (string) ( $existing['model'] ?? '' ) ) );
+		$old_tag = self::tag( array_merge( self::resolve( $existing ), [ 'model' => (string) ( $existing['model'] ?? '' ) ] ) );
+		$new_tag = self::tag( array_merge( self::resolve( $store ), [ 'model' => $store['model'] ] ) );
 
 		update_option( self::OPTION, $store, false );
-
-		$new_tag = self::tag( self::config() );
 
 		if ( $old_tag !== $new_tag ) {
 			self::invalidate_all_vectors();
@@ -107,23 +102,47 @@ class KnowledgeEmbeddings {
 	}
 
 	/**
-	 * Resolve a connection_id/model pair into the same shape config() returns,
-	 * without touching the stored option. Used by save() to compare the old tag.
+	 * The provider and credentials a stored option points at: the linked AI
+	 * Connection when one is set, otherwise a key saved by an older version.
 	 *
-	 * @return array{provider:string,model:string}
+	 * @param array<string,mixed> $raw
+	 * @return array{provider:string,api_key:string,base_url:string}
 	 */
-	private static function resolve( int $connection_id, string $model ): array {
-		$provider = '';
+	private static function resolve( array $raw ): array {
+		$connection_id = (int) ( $raw['connection_id'] ?? 0 );
+
 		if ( $connection_id > 0 ) {
 			$connection = Connection::find( $connection_id );
-			if ( $connection && 'ai' === $connection->app ) {
-				$creds    = $connection->getCredentials();
-				$provider = strtolower( (string) ( $creds['provider'] ?? '' ) );
+			if ( ! $connection || 'ai' !== $connection->app ) {
+				return [
+					'provider' => '',
+					'api_key'  => '',
+					'base_url' => '',
+				];
 			}
+			$creds = $connection->getCredentials();
+			return [
+				'provider' => strtolower( (string) ( $creds['provider'] ?? '' ) ),
+				'api_key'  => (string) ( $creds['api_key'] ?? '' ),
+				'base_url' => (string) ( $creds['base_url'] ?? '' ),
+			];
 		}
+
+		$api_key = '';
+		if ( ! empty( $raw['api_key_enc'] ) && Encryption::is_available() ) {
+			try {
+				$api_key = (string) ( Encryption::decrypt( (string) $raw['api_key_enc'] )['k'] ?? '' );
+			} catch ( \Throwable $e ) {
+				$api_key = '';
+			}
+		} elseif ( ! empty( $raw['api_key'] ) ) {
+			$api_key = (string) $raw['api_key'];
+		}
+
 		return [
-			'provider' => $provider,
-			'model'    => $model,
+			'provider' => '' !== $api_key ? strtolower( (string) ( $raw['provider'] ?? 'openai' ) ) : '',
+			'api_key'  => $api_key,
+			'base_url' => '',
 		];
 	}
 
@@ -141,15 +160,18 @@ class KnowledgeEmbeddings {
 		return is_array( $o ) ? $o : [];
 	}
 
-	/** Whether semantic retrieval can run right now. */
+	/** Whether semantic retrieval can run right now: switched on, and something to embed with. */
 	public static function enabled(): bool {
-		if ( has_filter( 'zaplane_embeddings_vector' ) ) {
-			return true; // a custom/local vector provider works with no connection at all
-		}
 		$cfg = self::config();
 		if ( empty( $cfg['enabled'] ) ) {
 			return false;
 		}
+		// A usable provider, or a custom/local vector provider wired via the filter.
+		return self::provider_ready( $cfg ) || has_filter( 'zaplane_embeddings_vector' );
+	}
+
+	/** Whether $cfg names a provider this class can call, with what that provider needs. */
+	private static function provider_ready( array $cfg ): bool {
 		if ( ! in_array( (string) $cfg['provider'], self::SUPPORTED_PROVIDERS, true ) ) {
 			return false;
 		}
@@ -194,7 +216,7 @@ class KnowledgeEmbeddings {
 			return array_map( 'floatval', $injected );
 		}
 
-		if ( ! self::enabled() ) {
+		if ( empty( $cfg['enabled'] ) || ! self::provider_ready( $cfg ) ) {
 			return null;
 		}
 
@@ -233,11 +255,10 @@ class KnowledgeEmbeddings {
 			return array_map( static fn( $t ) => self::embed( (string) $t ), $texts );
 		}
 
-		if ( ! self::enabled() ) {
+		$cfg = self::config();
+		if ( empty( $cfg['enabled'] ) || ! self::provider_ready( $cfg ) ) {
 			return array_fill( 0, count( $texts ), null );
 		}
-
-		$cfg = self::config();
 
 		// Gemini's single endpoint has no array input here — loop it (still one
 		// place, still resilient via AiHttp).
