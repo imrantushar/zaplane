@@ -133,7 +133,32 @@ class Ai extends IntegrationBase {
 			];
 		}
 
-		if ( 'openai' === $provider ) {
+		if ( 'openai_compatible' === $provider ) {
+			$base_url = trim( (string) ( $credentials['base_url'] ?? '' ) );
+			if ( '' === $base_url ) {
+				return [
+					'success' => false,
+					'message' => 'A Base URL is required for OpenAI-compatible providers',
+					'details' => [],
+				];
+			}
+			$response = wp_remote_get(
+				rtrim( $base_url, '/' ) . '/models',
+				[
+					'headers' => [ 'Authorization' => 'Bearer ' . $api_key ],
+					'timeout' => 20,
+				]
+			);
+		} elseif ( 'gemini' === $provider ) {
+			// Header rather than ?key= so the key stays out of URLs and request logs.
+			$response = wp_remote_get(
+				'https://generativelanguage.googleapis.com/v1beta/models',
+				[
+					'headers' => [ 'x-goog-api-key' => $api_key ],
+					'timeout' => 20,
+				]
+			);
+		} elseif ( 'openai' === $provider ) {
 			$response = wp_remote_get(
 				'https://api.openai.com/v1/models',
 				[
@@ -173,9 +198,16 @@ class Ai extends IntegrationBase {
 			];
 		}
 
+		$labels = [
+			'openai'            => 'OpenAI',
+			'anthropic'         => 'Anthropic',
+			'gemini'            => 'Gemini',
+			'openai_compatible' => 'the OpenAI-compatible endpoint',
+		];
+
 		return [
 			'success' => true,
-			'message' => 'Connected to ' . ( 'openai' === $provider ? 'OpenAI' : 'Anthropic' ),
+			'message' => 'Connected to ' . ( $labels[ $provider ] ?? $provider ),
 			'details' => [ 'provider' => $provider ],
 		];
 	}

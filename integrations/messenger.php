@@ -210,8 +210,13 @@ class Messenger extends IntegrationBase {
 			];
 		}
 
+		// Reading the Page itself is gated by Meta behind pages_read_engagement /
+		// Page Public Content Access, which a pages_messaging-only token
+		// legitimately lacks even though that's all sending needs. So only a
+		// token Meta calls invalid or expired (OAuthException code 190) is
+		// rejected; a permissions error still means the token itself is real.
 		$response = wp_remote_get(
-			MetaGraph::url( 'me', $credentials['api_version'] ?? null ) . '?access_token=' . rawurlencode( $token ),
+			MetaGraph::url( 'me', $credentials['api_version'] ?? null ) . '?fields=id,name&access_token=' . rawurlencode( $token ),
 			[ 'timeout' => 20 ]
 		);
 
@@ -223,12 +228,22 @@ class Messenger extends IntegrationBase {
 			];
 		}
 
-		$body = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( isset( $body['error'] ) ) {
+		$body  = json_decode( wp_remote_retrieve_body( $response ), true );
+		$error = is_array( $body ) ? ( $body['error'] ?? null ) : null;
+
+		if ( is_array( $error ) && 190 === (int) ( $error['code'] ?? 0 ) ) {
 			return [
 				'success' => false,
-				'message' => $body['error']['message'] ?? 'Unknown API error',
+				'message' => $error['message'] ?? 'The Page access token is invalid or has expired.',
 				'details' => []
+			];
+		}
+
+		if ( is_array( $error ) ) {
+			return [
+				'success' => true,
+				'message' => 'Token accepted. It can\'t read the Page profile, so sending will confirm it on first use.',
+				'details' => [],
 			];
 		}
 

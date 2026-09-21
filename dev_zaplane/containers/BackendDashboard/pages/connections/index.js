@@ -26,11 +26,13 @@ const Connections = () => {
         openDrawer,
         closeDrawer,
         selectApp,
+        startEdit,
         goBack,
         selectAuthType,
         updateCredential,
         saveConnection,
         loading,
+        editingConnectionId,
         search,
         setDrawerSearch,
         searchList
@@ -49,7 +51,7 @@ const Connections = () => {
     >
         <Teaser screen="connections" />
 
-        <ConnectionTable />
+        <ConnectionTable onEdit={startEdit} />
 
         <ZAPDrawer
             open={isDrawerOpen}
@@ -73,7 +75,11 @@ const Connections = () => {
                         onClick={saveConnection}
                         disabled={!selectedAuthType || loadingOAuth}
                     >
-                        {loadingOAuth ? __("Connecting...", "zaplane") : __("Save Connection", "zaplane")}
+                        {loadingOAuth
+                            ? __("Connecting...", "zaplane")
+                            : editingConnectionId
+                                ? __("Update Connection", "zaplane")
+                                : __("Save Connection", "zaplane")}
                     </button>
                 </div>
             ) : null}
@@ -89,7 +95,7 @@ const Connections = () => {
 
             {drawerStep === "configure" && (
                 <div className="flex flex-col gap-8">
-                    {Object.keys(authTypes).length > 1 && (
+                    {!editingConnectionId && Object.keys(authTypes).length > 1 && (
                         <div className="flex bg-[var(--zaplane-secondary-color)]/50 p-1.5 rounded-xl gap-2">
                             {Object.keys(authTypes).map(key => (
                                 <button
@@ -104,6 +110,12 @@ const Connections = () => {
                                 </button>
                             ))}
                         </div>
+                    )}
+
+                    {editingConnectionId && (
+                        <p className="text-[13px] text-[var(--zaplane-text-muted)] leading-relaxed">
+                            {__("For security, existing credentials aren't shown here. Re-enter all fields below to update this connection.", "zaplane")}
+                        </p>
                     )}
 
                     {authFields?.auth_fields && selectedAuthType ? (

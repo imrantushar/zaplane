@@ -259,12 +259,21 @@ class ConnectionsController extends WP_REST_Controller {
 			$manager->update( $connection_id, $update_data );
 		}
 
+		$test_result = null;
 		$credentials = $request->get_param( 'credentials' );
 		if ( is_array( $credentials ) && ! empty( $credentials ) ) {
-			$manager->update_credentials( $connection_id, $credentials );
+			try {
+				$result      = $manager->update_credentials( $connection_id, $credentials );
+				$test_result = $result['test_result'];
+			} catch ( \Zaplane\Framework\Exceptions\ConnectionException $e ) {
+				return new WP_Error( 'connection_test_failed', $e->getMessage(), [ 'status' => 400 ] );
+			}
 		}
 
-		return rest_ensure_response( $manager->get( $connection_id ) );
+		$connection                = $manager->get( $connection_id );
+		$connection['test_result'] = $test_result;
+
+		return rest_ensure_response( $connection );
 	}
 
 	public function delete_item( $request ) {

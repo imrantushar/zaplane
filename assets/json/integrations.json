@@ -1,6 +1,6 @@
 {
     "version": "1.3.1",
-    "generated_at": "2026-09-21 11:19:34",
+    "generated_at": "2026-09-21 17:25:16",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -2177,6 +2177,30 @@
                             "type": "boolean",
                             "required": false,
                             "help": "Makes a code built from an order or customer number impossible to guess."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_product": {
+                    "label": "Get Product (search by name/SKU)",
+                    "key": "get_product",
+                    "schema": [
+                        {
+                            "key": "query",
+                            "label": "Product Name or Keyword",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.text}}",
+                            "help": "Searched against the product title. Returns the closest live match(es) with current price and stock \u2014 use this (wired as an Agent tool) for exact, up-to-date pricing rather than a cached knowledge snippet."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Max Matches",
+                            "type": "number",
+                            "required": false,
+                            "default": 1
                         }
                     ],
                     "outputs": [
@@ -22305,6 +22329,30 @@
                         "main"
                     ]
                 },
+                "get_product": {
+                    "label": "Get Product (search by name/SKU)",
+                    "key": "get_product",
+                    "schema": [
+                        {
+                            "key": "query",
+                            "label": "Product Name or Keyword",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.text}}",
+                            "help": "Searched against the product title/SKU. Returns the closest live match(es) with current price and stock \u2014 wire this onto an AI Agent's Tools handle for exact, up-to-date pricing rather than a cached knowledge snippet."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Max Matches",
+                            "type": "number",
+                            "required": false,
+                            "default": 1
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "get_products_totals": {
                     "label": "Get Products Totals",
                     "key": "get_products_totals",
@@ -29682,38 +29730,6 @@
                     ]
                 }
             }
-        },
-        "gemcrm-email-inbox": {
-            "slug": "gemcrm-email-inbox",
-            "name": "GemCRM Email Inbox",
-            "icon": "crm.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_route": "",
-            "webhook_setup": [],
-            "triggers": {
-                "email_received": {
-                    "label": "Email Received",
-                    "hook": "gemcrm/email_inbox/received",
-                    "key": "email_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "email_received_unmatched": {
-                    "label": "Email Received (Unmatched)",
-                    "hook": "gemcrm/email_inbox/received_unmatched",
-                    "key": "email_received_unmatched",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": []
         }
     },
     "tools": {
@@ -31606,483 +31622,6 @@
                             "label": "Crop to exact size",
                             "type": "checkbox",
                             "default": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "inbox": {
-            "slug": "inbox",
-            "name": "Inbox",
-            "icon": "inbox.svg",
-            "category": "tool",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_route": "",
-            "webhook_setup": [],
-            "triggers": {
-                "message_received": {
-                    "label": "Customer Message Received",
-                    "hook": "zaplane/inbox/message_received",
-                    "key": "message_received",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "label": "Channel",
-                            "type": "select",
-                            "default": "",
-                            "options": [
-                                {
-                                    "value": "",
-                                    "label": "Any channel"
-                                },
-                                {
-                                    "value": "web",
-                                    "label": "Website chat"
-                                },
-                                {
-                                    "value": "messenger",
-                                    "label": "Messenger"
-                                },
-                                {
-                                    "value": "whatsapp",
-                                    "label": "WhatsApp"
-                                }
-                            ],
-                            "help": "Run only for conversations on this channel."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "conversation_created": {
-                    "label": "Conversation Started",
-                    "hook": "zaplane/inbox/conversation_created",
-                    "key": "conversation_created",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "label": "Channel",
-                            "type": "select",
-                            "default": "",
-                            "options": [
-                                {
-                                    "value": "",
-                                    "label": "Any channel"
-                                },
-                                {
-                                    "value": "web",
-                                    "label": "Website chat"
-                                },
-                                {
-                                    "value": "messenger",
-                                    "label": "Messenger"
-                                },
-                                {
-                                    "value": "whatsapp",
-                                    "label": "WhatsApp"
-                                }
-                            ],
-                            "help": "Run only for conversations on this channel."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "conversation_closed": {
-                    "label": "Conversation Closed",
-                    "hook": "zaplane/inbox/conversation_closed",
-                    "key": "conversation_closed",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "label": "Channel",
-                            "type": "select",
-                            "default": "",
-                            "options": [
-                                {
-                                    "value": "",
-                                    "label": "Any channel"
-                                },
-                                {
-                                    "value": "web",
-                                    "label": "Website chat"
-                                },
-                                {
-                                    "value": "messenger",
-                                    "label": "Messenger"
-                                },
-                                {
-                                    "value": "whatsapp",
-                                    "label": "WhatsApp"
-                                }
-                            ],
-                            "help": "Run only for conversations on this channel."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "handed_to_human": {
-                    "label": "Assistant Handed Over to the Team",
-                    "hook": "zaplane/inbox/handed_to_human",
-                    "key": "handed_to_human",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "label": "Channel",
-                            "type": "select",
-                            "default": "",
-                            "options": [
-                                {
-                                    "value": "",
-                                    "label": "Any channel"
-                                },
-                                {
-                                    "value": "web",
-                                    "label": "Website chat"
-                                },
-                                {
-                                    "value": "messenger",
-                                    "label": "Messenger"
-                                },
-                                {
-                                    "value": "whatsapp",
-                                    "label": "WhatsApp"
-                                }
-                            ],
-                            "help": "Run only for conversations on this channel."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "order_created": {
-                    "label": "Order Placed from a Conversation",
-                    "hook": "zaplane/inbox/order_created",
-                    "key": "order_created",
-                    "schema": [
-                        {
-                            "key": "channel",
-                            "label": "Channel",
-                            "type": "select",
-                            "default": "",
-                            "options": [
-                                {
-                                    "value": "",
-                                    "label": "Any channel"
-                                },
-                                {
-                                    "value": "web",
-                                    "label": "Website chat"
-                                },
-                                {
-                                    "value": "messenger",
-                                    "label": "Messenger"
-                                },
-                                {
-                                    "value": "whatsapp",
-                                    "label": "WhatsApp"
-                                }
-                            ],
-                            "help": "Run only for conversations on this channel."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "send_reply": {
-                    "label": "Send Reply",
-                    "key": "send_reply",
-                    "schema": [
-                        {
-                            "key": "conversation_id",
-                            "label": "Conversation ID",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "{{trigger.conversation_id}}"
-                        },
-                        {
-                            "key": "message",
-                            "label": "Reply",
-                            "type": "textarea",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_note": {
-                    "label": "Add Private Note",
-                    "key": "add_note",
-                    "schema": [
-                        {
-                            "key": "conversation_id",
-                            "label": "Conversation ID",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "{{trigger.conversation_id}}"
-                        },
-                        {
-                            "key": "message",
-                            "label": "Note",
-                            "type": "textarea",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "assign": {
-                    "label": "Assign Conversation",
-                    "key": "assign",
-                    "schema": [
-                        {
-                            "key": "conversation_id",
-                            "label": "Conversation ID",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "{{trigger.conversation_id}}"
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "Team member (WordPress user ID)",
-                            "type": "expression",
-                            "required": true,
-                            "help": "Use 0 to unassign."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_tag": {
-                    "label": "Add Tag",
-                    "key": "add_tag",
-                    "schema": [
-                        {
-                            "key": "conversation_id",
-                            "label": "Conversation ID",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "{{trigger.conversation_id}}"
-                        },
-                        {
-                            "key": "tag",
-                            "label": "Tag",
-                            "type": "expression",
-                            "required": true,
-                            "help": "Separate several tags with commas."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "set_status": {
-                    "label": "Change Status",
-                    "key": "set_status",
-                    "schema": [
-                        {
-                            "key": "conversation_id",
-                            "label": "Conversation ID",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "{{trigger.conversation_id}}"
-                        },
-                        {
-                            "key": "status",
-                            "label": "Status",
-                            "type": "select",
-                            "required": true,
-                            "default": "closed",
-                            "options": [
-                                {
-                                    "value": "open",
-                                    "label": "Open"
-                                },
-                                {
-                                    "value": "pending",
-                                    "label": "Pending"
-                                },
-                                {
-                                    "value": "snoozed",
-                                    "label": "Snoozed"
-                                },
-                                {
-                                    "value": "closed",
-                                    "label": "Closed"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "set_ai": {
-                    "label": "Turn Assistant On or Off",
-                    "key": "set_ai",
-                    "schema": [
-                        {
-                            "key": "conversation_id",
-                            "label": "Conversation ID",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "{{trigger.conversation_id}}"
-                        },
-                        {
-                            "key": "enabled",
-                            "label": "Assistant",
-                            "type": "select",
-                            "required": true,
-                            "default": "no",
-                            "options": [
-                                {
-                                    "value": "yes",
-                                    "label": "On \u2014 the assistant answers"
-                                },
-                                {
-                                    "value": "no",
-                                    "label": "Off \u2014 the team answers"
-                                },
-                                {
-                                    "value": "workflow",
-                                    "label": "Off \u2014 workflows answer"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "forward_to_human": {
-                    "label": "Hand Over to the Team",
-                    "key": "forward_to_human",
-                    "schema": [
-                        {
-                            "key": "conversation_id",
-                            "label": "Conversation ID",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "{{trigger.conversation_id}}"
-                        },
-                        {
-                            "key": "reason",
-                            "label": "Reason",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "search_products": {
-                    "label": "Find Products",
-                    "key": "search_products",
-                    "schema": [
-                        {
-                            "key": "query",
-                            "label": "What the customer is looking for",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "blue kurta"
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "send_product": {
-                    "label": "Send Product Card",
-                    "key": "send_product",
-                    "schema": [
-                        {
-                            "key": "conversation_id",
-                            "label": "Conversation ID",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "{{trigger.conversation_id}}"
-                        },
-                        {
-                            "key": "product_id",
-                            "label": "Product ID",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "message",
-                            "label": "Message with the card",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_order": {
-                    "label": "Place Cash-on-Delivery Order",
-                    "key": "create_order",
-                    "schema": [
-                        {
-                            "key": "conversation_id",
-                            "label": "Conversation ID",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "{{trigger.conversation_id}}"
-                        },
-                        {
-                            "key": "items",
-                            "label": "Products as id:quantity, comma separated",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "1575:1, 1652:2"
-                        },
-                        {
-                            "key": "name",
-                            "label": "Customer name",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "phone",
-                            "label": "Phone number",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "address",
-                            "label": "Delivery address",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "city",
-                            "label": "City",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "note",
-                            "label": "Delivery note",
-                            "type": "expression",
-                            "required": false
                         }
                     ],
                     "outputs": [
