@@ -184,11 +184,14 @@ class AiResponder {
 			return false;
 		}
 
-		// Someone already answered it.
+		// Someone already answered it. A workflow's message here is a
+		// notification (order shipped…) sent while the assistant owns the
+		// conversation; it doesn't answer what the customer asked.
 		$answered = Message::where( 'conversation_id', (int) $conversation->id )
 			->where( 'id', '>', $message_id )
 			->where( 'direction', 'out' )
 			->where( 'is_note', 0 )
+			->where( 'sender_type', '!=', 'workflow' )
 			->fresh()
 			->first();
 

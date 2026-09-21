@@ -89,11 +89,11 @@ const AnsweredBy = ({ value, onChange, aiReady }) => (
     <em className="zaplane-inbox-hint">
       {value === "assistant"
         ? aiReady
-          ? __("The assistant replies until someone on your team does. Workflow replies to the same customer wait as private notes.", "zaplane")
+          ? __("The assistant replies until someone on your team does. Workflows that reply on this channel skip these customers.", "zaplane")
           : __("The assistant isn't set up yet, so your team answers for now.", "zaplane")
         : value === "workflows"
           ? __("Your workflows reply. The assistant stays quiet, and the team can still step in.", "zaplane")
-          : __("Only your team replies. Workflow replies wait as private notes.", "zaplane")}
+          : __("Only your team replies. Workflows that reply on this channel skip these customers.", "zaplane")}
     </em>
   </div>
 );
@@ -425,7 +425,7 @@ const Settings = ({ onSaved }) => {
                             </span>
                           ))}
                           .{" "}
-                          {__("To stop double replies, their replies to customers the Inbox is already handling wait as private notes.", "zaplane")}{" "}
+                          {__("To stop double replies (and double AI costs), they don't run for customers the assistant or your team is already answering.", "zaplane")}{" "}
                           <button type="button" className="zaplane-inbox-link" onClick={() => setChannel(slug, "answered_by", "workflows")}>
                             {__("Let workflows answer instead", "zaplane")}
                           </button>

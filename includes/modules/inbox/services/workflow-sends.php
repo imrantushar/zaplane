@@ -35,6 +35,68 @@ class WorkflowSends {
 		add_filter( 'zaplane/channel_send/check', [ self::class, 'check' ], 10, 2 );
 		add_action( 'zaplane/channel_send/held', [ self::class, 'held' ], 10, 2 );
 		add_action( 'zaplane/channel_send/sent', [ self::class, 'record' ], 10, 1 );
+		add_filter( 'zaplane/trigger/should_start', [ self::class, 'should_start' ], 10, 3 );
+	}
+
+	/** Channel => [ trigger payload key for the customer, key for the business account ]. */
+	private const TRIGGER_KEYS = [
+		'messenger' => [ 'sender_id', '' ],
+		'whatsapp'  => [ 'from', 'phone_number_id' ],
+	];
+
+	/**
+	 * Don't start a workflow that replies to customers for a message in a
+	 * conversation someone else is answering. Holding its reply later would
+	 * still spend the AI call, and would leave that unsent reply in the
+	 * workflow's Memory. Workflows that don't reply on the channel (alerts,
+	 * logging) always run.
+	 *
+	 * @param array<string,mixed> $trigger
+	 * @param array<string,mixed> $payload
+	 */
+	public static function should_start( bool $start, array $trigger, array $payload ): bool {
+		$data    = (array) ( $trigger['graph_node']['data'] ?? [] );
+		$channel = (string) ( $data['app'] ?? '' );
+		if ( ! $start || 'message_received' !== ( $data['event'] ?? '' ) || ! isset( self::TRIGGER_KEYS[ $channel ] ) ) {
+			return $start;
+		}
+
+		list( $customer_key, $account_key ) = self::TRIGGER_KEYS[ $channel ];
+		$conversation = self::conversation( [
+			'channel'    => $channel,
+			'recipient'  => preg_replace( '/\s+/', '', (string) ( $payload[ $customer_key ] ?? '' ) ),
+			'account_id' => '' !== $account_key ? (string) ( $payload[ $account_key ] ?? '' ) : '',
+		] );
+		if ( ! $conversation || 'closed' === $conversation->status || 'workflow' === $conversation->handler ) {
+			return true;
+		}
+
+		$version = WorkflowVersion::find( (int) ( $trigger['workflow_version_id'] ?? 0 ) );
+		$graph   = $version && is_array( $version->graph_json ) ? $version->graph_json : [];
+
+		return ! self::replies_on( $graph, $channel );
+	}
+
+	/**
+	 * Whether a workflow graph has a step that replies on this channel and
+	 * waits its turn in the Inbox (the default for send steps).
+	 *
+	 * @param array<string,mixed> $graph
+	 */
+	private static function replies_on( array $graph, string $channel ): bool {
+		foreach ( (array) ( $graph['nodes'] ?? [] ) as $node ) {
+			$data  = (array) ( $node['data'] ?? [] );
+			$event = (string) ( $data['event'] ?? '' );
+			if (
+				$channel === ( $data['app'] ?? '' )
+				&& 0 === strpos( $event, 'send_' )
+				&& 'send_template' !== $event
+				&& 'always' !== ( $data['config']['inbox_mode'] ?? '' )
+			) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -130,21 +192,11 @@ class WorkflowSends {
 		foreach ( Workflow::where( 'status', 'active' )->fresh()->get()->all() as $workflow ) {
 			$version = WorkflowVersion::where( 'workflow_id', (int) $workflow->id )->where( 'is_active', 1 )->fresh()->first();
 			$graph   = $version && is_array( $version->graph_json ) ? $version->graph_json : [];
-			foreach ( (array) ( $graph['nodes'] ?? [] ) as $node ) {
-				$data  = (array) ( $node['data'] ?? [] );
-				$event = (string) ( $data['event'] ?? '' );
-				if (
-					$channel === ( $data['app'] ?? '' )
-					&& 0 === strpos( $event, 'send_' )
-					&& 'send_template' !== $event
-					&& 'always' !== ( $data['config']['inbox_mode'] ?? '' )
-				) {
-					$out[] = [
-						'id'   => (int) $workflow->id,
-						'name' => (string) $workflow->title,
-					];
-					break;
-				}
+			if ( self::replies_on( $graph, $channel ) ) {
+				$out[] = [
+					'id'   => (int) $workflow->id,
+					'name' => (string) $workflow->title,
+				];
 			}
 		}
 		return $out;

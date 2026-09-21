@@ -52,7 +52,7 @@ class ChannelSend {
 					'label' => 'Always send (order updates and other notifications)',
 				],
 			],
-			'help'     => 'The Inbox decides who answers each conversation: the AI assistant, your team, or workflows. With the first option this step waits its turn; a held reply is saved in the conversation as a private note.',
+			'help'     => 'The Inbox decides who answers each conversation: the AI assistant, your team, or workflows. With the first option, a workflow started by a customer message doesn\'t run for customers someone else is answering, and any other reply that isn\'t its turn is saved in the conversation as a private note instead of being sent.',
 		];
 	}
 
