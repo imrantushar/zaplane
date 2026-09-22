@@ -2981,7 +2981,7 @@ $settings-sticky: 124px;
 		grid-template-columns: minmax(0, 1fr);
 	}
 
-	.zaplane-inbox-head-btn span {
+	.zaplane-inbox-head-btn > span:not(.zaplane-inbox-live-count) {
 		display: none;
 	}
 
@@ -3043,4 +3043,236 @@ $settings-sticky: 124px;
 		padding: 0 10px;
 	}
 }
+}
+
+/* Live visitors ----------------------------------------------------------- */
+
+.zaplane-inbox-live-count {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 0 7px;
+	border-radius: 999px;
+	background: color-mix(in srgb, #12b76a 14%, transparent);
+	color: #067647;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 20px;
+}
+
+.zaplane-inbox-live-dot {
+	position: relative;
+	display: inline-block;
+	flex: none;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #12b76a;
+
+	&::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: 50%;
+		background: #12b76a;
+		animation: zaplane-inbox-live 1.8s ease-out infinite;
+	}
+}
+
+@keyframes zaplane-inbox-live {
+	0% { transform: scale(1); opacity: 0.6; }
+	100% { transform: scale(2.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.zaplane-inbox-live-dot::after { animation: none; }
+}
+
+.zaplane-inbox-visitors {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 20px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 12px;
+	background: var(--zaplane-background, #fff);
+	color: var(--zaplane-font-color);
+
+	&.is-empty {
+		align-items: center;
+		padding: 48px 20px;
+		text-align: center;
+
+		> svg {
+			width: 32px;
+			height: 32px;
+			color: var(--zaplane-font-secondary-color);
+		}
+
+		p {
+			max-width: 420px;
+			margin: 0;
+			color: var(--zaplane-font-secondary-color);
+		}
+	}
+
+	&.is-inline {
+		border: 0;
+		padding: 32px 0;
+	}
+}
+
+.zaplane-inbox-visitors-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 10px;
+
+	.zaplane-inbox-hint {
+		flex-basis: 100%;
+		padding-left: 18px;
+	}
+}
+
+.zaplane-inbox-visitor-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+
+	> li {
+		border-top: 1px solid var(--zaplane-border-color);
+
+		&.is-composing {
+			background: var(--zaplane-secondary-color);
+			border-radius: 10px;
+		}
+	}
+}
+
+.zaplane-inbox-visitor {
+	display: grid;
+	grid-template-columns: auto minmax(140px, 1fr) minmax(180px, 1.6fr) auto auto;
+	align-items: center;
+	gap: 14px;
+	padding: 12px 8px;
+}
+
+.zaplane-inbox-visitor-who,
+.zaplane-inbox-visitor-page {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+
+	strong {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.zaplane-inbox-sub {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+}
+
+.zaplane-inbox-visitor-page a {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+	color: var(--zaplane-font-color);
+	text-decoration: none;
+
+	svg {
+		flex: none;
+		color: var(--zaplane-font-secondary-color);
+	}
+
+	&:hover strong {
+		color: var(--zaplane-primary);
+	}
+}
+
+.zaplane-inbox-visitor-meta {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	color: var(--zaplane-font-secondary-color);
+	font-size: 12px;
+	white-space: nowrap;
+
+	span {
+		display: inline-flex;
+		align-items: center;
+	}
+}
+
+.zaplane-inbox-visitor-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.zaplane-inbox-visitor-compose {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	padding: 0 8px 12px 62px;
+
+	.zaplane-inbox-input {
+		flex: 1;
+		min-width: 200px;
+	}
+
+	.zaplane-inbox-failed {
+		flex-basis: 100%;
+	}
+}
+
+@media (max-width: 1100px) {
+	.zaplane-inbox-visitor {
+		grid-template-columns: auto minmax(0, 1fr) auto;
+
+		.zaplane-inbox-visitor-page,
+		.zaplane-inbox-visitor-meta {
+			grid-column: 2 / -1;
+		}
+
+		.zaplane-inbox-visitor-actions {
+			grid-column: 2 / -1;
+			justify-content: flex-start;
+		}
+	}
+
+	.zaplane-inbox-visitor-compose {
+		padding-left: 8px;
+	}
+}
+
+/* Email confirmed with a code, or only typed. */
+.zaplane-inbox-verified {
+	display: inline-flex;
+	align-self: flex-start;
+	align-items: center;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: color-mix(in srgb, #f79009 14%, transparent);
+	color: #b54708;
+	font-size: 11px;
+	font-weight: 600;
+	cursor: help;
+
+	&.is-yes {
+		background: color-mix(in srgb, #12b76a 14%, transparent);
+		color: #067647;
+	}
+}
+
+em.zaplane-inbox-hint {
+	font-style: normal;
 }

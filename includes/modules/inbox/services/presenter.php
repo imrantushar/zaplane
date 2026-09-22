@@ -45,6 +45,7 @@ class Presenter {
 			'phone'      => (string) $contact->phone,
 			'avatar_url' => (string) $contact->avatar_url,
 			'wp_user_id' => (int) $contact->wp_user_id,
+			'email_verified' => VisitorContact::verified( $contact ),
 		];
 	}
 

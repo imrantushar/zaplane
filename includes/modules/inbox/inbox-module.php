@@ -59,6 +59,7 @@ class InboxModule implements ModuleInterface {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_widget' ] );
 		add_action( 'zaplane/incoming_webhook', [ $this, 'incoming_webhook' ], 10, 2 );
 		Services\WorkflowSends::register();
+		Services\VisitorContact::register();
 		add_action( Services\KnowledgeAnswer::HOOK, [ Services\KnowledgeAnswer::class, 'handle' ], 10, 2 );
 	}
 
@@ -124,6 +125,11 @@ class InboxModule implements ModuleInterface {
 			'color'    => (string) $widget['color'],
 			'position' => (string) $widget['position'],
 			'askEmail' => (bool) $widget['ask_email'],
+			// Report the page for the team's Visitors list.
+			'visitors' => (bool) $widget['visitors'],
+			// A reply from the team opens the chat, with a sound.
+			'autoOpen' => (bool) $widget['auto_open'],
+			'sound'    => (bool) $widget['sound'],
 			// Buttons under the greeting, before the visitor has typed anything.
 			'questions' => Services\AnswerMenu::top_level(),
 			'menu'      => Services\AnswerMenu::for_widget(),
@@ -152,6 +158,18 @@ class InboxModule implements ModuleInterface {
 				'commonQuestions' => __( 'Common questions', 'zaplane' ),
 				'talkToPerson'    => Services\KnowledgeAnswer::person_label(),
 				'allTopics'       => Services\AnswerMenu::topics_label(),
+				'contactTitle'    => __( 'How can we reach you?', 'zaplane' ),
+				'contactHint'     => __( "If you leave the page, we'll email you our reply.", 'zaplane' ),
+				'contactSave'     => __( 'Save', 'zaplane' ),
+				'contactSkip'     => __( 'Not now', 'zaplane' ),
+				'contactSaved'    => __( "Thanks! We'll email you if you leave before we reply.", 'zaplane' ),
+				/* translators: %s: email address. */
+				'codeTitle'       => __( 'Enter the 6-digit code we sent to %s', 'zaplane' ),
+				'codeVerify'      => __( 'Confirm', 'zaplane' ),
+				'codeResend'      => __( 'Send a new code', 'zaplane' ),
+				'codeChange'      => __( 'Change email', 'zaplane' ),
+				'codeLabel'       => __( 'Verification code', 'zaplane' ),
+				'newMessage'      => __( 'New message', 'zaplane' ),
 			],
 		] );
 	}

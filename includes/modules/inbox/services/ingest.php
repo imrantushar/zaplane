@@ -107,6 +107,25 @@ class Ingest {
 	}
 
 	/**
+	 * The conversation with this sender, started if there is none yet: for
+	 * the team reaching out first (a visitor browsing the site).
+	 *
+	 * @param array<string,mixed> $contact
+	 */
+	public static function open( string $channel, string $account_id, string $external_id, array $contact = [] ): Conversation {
+		$identity     = self::identity( $channel, $account_id, $external_id, $contact );
+		$conversation = self::conversation( $identity, $channel, $account_id, $is_new );
+		if ( $is_new ) {
+			// Someone on the team started it: they answer, not the assistant.
+			$conversation->handler    = 'human';
+			$conversation->ai_enabled = false;
+			$conversation->save();
+			do_action( 'zaplane/inbox/conversation_created', Conversations::payload( $conversation, [ 'sender_id' => $external_id ] ) );
+		}
+		return $conversation;
+	}
+
+	/**
 	 * @param array<string,mixed> $contact Known details: name, email, phone, avatar_url, wp_user_id.
 	 */
 	private static function identity( string $channel, string $account_id, string $external_id, array $contact ): Identity {

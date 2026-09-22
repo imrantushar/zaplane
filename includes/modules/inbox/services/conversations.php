@@ -24,6 +24,27 @@ class Conversations {
 		return current_time( 'mysql' );
 	}
 
+	/**
+	 * Change some meta keys (null removes one) on the stored row, keeping
+	 * the others as they are now.
+	 *
+	 * @param array<string,mixed> $changes
+	 */
+	public static function set_meta( Conversation $conversation, array $changes ): void {
+		$fresh = self::find( (int) $conversation->id ) ?: $conversation;
+		$meta  = is_array( $fresh->meta ) ? $fresh->meta : [];
+		foreach ( $changes as $key => $value ) {
+			if ( null === $value ) {
+				unset( $meta[ $key ] );
+			} else {
+				$meta[ $key ] = $value;
+			}
+		}
+		$fresh->meta        = $meta;
+		$conversation->meta = $meta;
+		$fresh->save();
+	}
+
 	public static function find( int $id ): ?Conversation {
 		if ( $id <= 0 ) {
 			return null;
@@ -49,6 +70,8 @@ class Conversations {
 		if ( ! $was_bot ) {
 			return;
 		}
+		// Waiting on a person from now on (the chat asks for an email).
+		self::set_meta( $conversation, [ 'person_at' => time() ] );
 
 		if ( $announce ) {
 			self::system_note( $conversation, '' !== $reason

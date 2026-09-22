@@ -29,6 +29,17 @@ class Settings {
 				'color'           => '#006BFF',
 				'position'        => 'right',
 				'ask_email'       => true,
+				// Live visitors list: the widget reports the page it is on.
+				'visitors'        => true,
+				// A reply from the team opens the chat, with a sound.
+				'auto_open'       => true,
+				'sound'           => true,
+				// Ask for name + email in the chat once a person will answer.
+				'ask_contact'     => true,
+				// Confirm that email with a one-time code.
+				'verify_email'    => false,
+				// Email a reply the visitor didn't see in the chat.
+				'notify_email'    => true,
 				'allowed_origins' => [],
 				'answered_by'     => 'assistant',
 			],
@@ -114,8 +125,10 @@ class Settings {
 			if ( array_key_exists( 'enabled', $w ) ) {
 				$c['enabled'] = (bool) $w['enabled'];
 			}
-			if ( array_key_exists( 'ask_email', $w ) ) {
-				$c['ask_email'] = (bool) $w['ask_email'];
+			foreach ( [ 'ask_email', 'visitors', 'auto_open', 'sound', 'ask_contact', 'verify_email', 'notify_email' ] as $k ) {
+				if ( array_key_exists( $k, $w ) ) {
+					$c[ $k ] = (bool) $w[ $k ];
+				}
 			}
 			foreach ( [ 'title', 'greeting' ] as $k ) {
 				if ( isset( $w[ $k ] ) ) {

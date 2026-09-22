@@ -18,6 +18,9 @@
 	// While an answer is on its way, look sooner.
 	var WAITING_POLL = 1200;
 	var IDLE_POLL = 20000;
+	// While the chat is closed, the page reports itself this often; the answer
+	// says whether a new message is waiting (the team may write first).
+	var PRESENCE_EVERY = 20000;
 	var t = cfg.i18n || {};
 
 	var state = {
@@ -32,6 +35,12 @@
 		known: null,
 		revision: null,
 		reloading: false,
+		// The first fetch (history) is done: later messages are new.
+		loaded: false,
+		presenceTimer: null,
+		ask: null,
+		readUpto: 0,
+		fresh: 0,
 	};
 
 	function read( key ) {
@@ -127,7 +136,14 @@
 		if ( ! state.token ) {
 			return Promise.resolve();
 		}
-		return request( 'GET', 'messages' + ( state.lastId ? '?after_id=' + state.lastId : '' ) ).then( function ( res ) {
+		var query = [];
+		if ( state.lastId ) {
+			query.push( 'after_id=' + state.lastId );
+		}
+		if ( state.open ) {
+			query.push( 'seen=1' );
+		}
+		return request( 'GET', 'messages' + ( query.length ? '?' + query.join( '&' ) : '' ) ).then( function ( res ) {
 			if ( res.status === 401 ) {
 				// The token no longer verifies (signed out, salts rotated). Start over.
 				state.token = '';
@@ -152,9 +168,111 @@
 			if ( revision !== null ) {
 				state.revision = revision;
 			}
+			if ( ! state.loaded ) {
+				state.readUpto = res.data.read_upto || 0;
+			}
+			state.fresh = 0;
 			( res.data.messages || [] ).forEach( addMessage );
+			state.loaded = true;
+			if ( state.fresh ) {
+				announce( state.fresh );
+			}
 			setWaiting( !! res.data.waiting );
+			showContact( res.data.ask_contact || null );
 		} );
+	}
+
+	/**
+	 * Tell the site which page this is (the team's Visitors list) and learn
+	 * whether a message is waiting; fetch it if so.
+	 */
+	function presence() {
+		if ( ! state.token || document.visibilityState === 'hidden' ) {
+			return Promise.resolve();
+		}
+		return request( 'POST', 'presence', {
+			page_url: window.location.href,
+			page_title: document.title,
+			referrer: document.referrer,
+		} ).then( function ( res ) {
+			if ( res.ok && res.data.latest_id > state.lastId ) {
+				return poll();
+			}
+		} );
+	}
+
+	/** New message(s) from the business: a chime, and the chat opens (or a badge). */
+	function announce( count ) {
+		chime();
+		if ( state.open ) {
+			return;
+		}
+		if ( cfg.autoOpen ) {
+			toggle( true, true );
+			return;
+		}
+		state.unread += count;
+		badge.textContent = String( state.unread );
+		badge.hidden = false;
+		launcher.classList.add( 'zpi-ping' );
+	}
+
+	function schedulePresence() {
+		window.clearTimeout( state.presenceTimer );
+		if ( ! state.token || document.visibilityState === 'hidden' ) {
+			return;
+		}
+		state.presenceTimer = window.setTimeout( function () {
+			// An open chat polls the thread already; the page is still reported.
+			presence().then( schedulePresence, schedulePresence );
+		}, PRESENCE_EVERY );
+	}
+
+	/* A soft two-note chime, made on the fly: no sound file to load. Browsers
+	 * only allow sound after the visitor has interacted with the page, so the
+	 * audio is unlocked on their first tap or key press. */
+	var audio = null;
+	function unlockAudio() {
+		if ( audio || ! cfg.sound ) {
+			return;
+		}
+		var Ctx = window.AudioContext || window.webkitAudioContext;
+		if ( Ctx ) {
+			try {
+				audio = new Ctx();
+			} catch ( e ) {
+				audio = null;
+			}
+		}
+	}
+	[ 'pointerdown', 'keydown', 'touchstart' ].forEach( function ( type ) {
+		document.addEventListener( type, unlockAudio, { once: true, passive: true, capture: true } );
+	} );
+	function chime() {
+		if ( ! cfg.sound || ! audio ) {
+			return;
+		}
+		try {
+			if ( audio.state === 'suspended' ) {
+				audio.resume();
+			}
+			var now = audio.currentTime;
+			[ [ 880, 0 ], [ 1318.5, 0.12 ] ].forEach( function ( note ) {
+				var osc = audio.createOscillator();
+				var gain = audio.createGain();
+				osc.type = 'sine';
+				osc.frequency.value = note[ 0 ];
+				gain.gain.setValueAtTime( 0.0001, now + note[ 1 ] );
+				gain.gain.exponentialRampToValueAtTime( 0.18, now + note[ 1 ] + 0.02 );
+				gain.gain.exponentialRampToValueAtTime( 0.0001, now + note[ 1 ] + 0.35 );
+				osc.connect( gain );
+				gain.connect( audio.destination );
+				osc.start( now + note[ 1 ] );
+				osc.stop( now + note[ 1 ] + 0.4 );
+			} );
+		} catch ( e ) {
+			// Sound is a nicety only.
+		}
 	}
 
 	function schedule() {
@@ -162,9 +280,13 @@
 		if ( ! state.token || document.visibilityState === 'hidden' ) {
 			return;
 		}
+		// Closed: the presence report finds new messages, no need to poll.
+		if ( ! state.open ) {
+			return;
+		}
 		state.timer = window.setTimeout( function () {
 			poll().then( schedule, schedule );
-		}, state.open ? ( state.waiting ? WAITING_POLL : OPEN_POLL ) : IDLE_POLL );
+		}, state.waiting ? WAITING_POLL : OPEN_POLL );
 	}
 
 	/* ---------------------------------------------------------------- *
@@ -333,6 +455,11 @@
 	var error = el( 'div', 'zpi-error' );
 	error.hidden = true;
 
+	// "How can we reach you?" — shown once a person will answer and we have
+	// no (confirmed) email; see showContact().
+	var contactCard = el( 'div', 'zpi-contact' );
+	contactCard.hidden = true;
+	form.appendChild( contactCard );
 	form.appendChild( details );
 	if ( askMenu ) {
 		form.appendChild( askMenu );
@@ -420,10 +547,10 @@
 		item.appendChild( el( 'div', 'zpi-time', time( m.created_at ) + ( m.edited && ! m.deleted ? ' · ' + ( t.edited || 'edited' ) : '' ) ) );
 		list.insertBefore( item, typing );
 
-		if ( ! mine && ! state.open && ! state.reloading ) {
-			state.unread++;
-			badge.textContent = String( state.unread );
-			badge.hidden = false;
+		// Something new from the business (not history, not a redraw): the
+		// poll that brought it announces it once.
+		if ( ! mine && ( state.loaded || m.id > state.readUpto ) && ! state.reloading && ! m.deleted ) {
+			state.fresh++;
 		}
 		scrollDown();
 	}
@@ -520,6 +647,195 @@
 		return null;
 	}
 
+	/**
+	 * The contact card: name + email, then (when codes are on) the code
+	 * that was emailed. `ask` comes from the server on every poll; null
+	 * hides the card.
+	 */
+	function showContact( ask ) {
+		var key = ask ? JSON.stringify( ask ) : '';
+		if ( key === state.ask || contactCard.contains( document.activeElement ) ) {
+			return;
+		}
+		state.ask = key;
+		contactCard.textContent = '';
+		contactCard.hidden = ! ask;
+		if ( ! ask ) {
+			return;
+		}
+		if ( ask.pending ) {
+			codeStep( ask.pending );
+		} else {
+			detailsStep( ask );
+		}
+		scrollDown();
+	}
+
+	function cardError( msg ) {
+		var e = contactCard.querySelector( '.zpi-contact-error' );
+		e.textContent = msg || t.error || 'Something went wrong.';
+		e.hidden = false;
+	}
+
+	function cardButton( label, cls, onClick ) {
+		var b = el( 'button', cls, label );
+		b.type = 'button';
+		b.addEventListener( 'click', onClick );
+		return b;
+	}
+
+	function contactRequest( body, btn ) {
+		btn.disabled = true;
+		return request( 'POST', 'contact', body ).then( function ( res ) {
+			btn.disabled = false;
+			if ( ! res.ok ) {
+				cardError( res.data && res.data.message );
+				return null;
+			}
+			return res.data;
+		}, function () {
+			btn.disabled = false;
+			cardError();
+			return null;
+		} );
+	}
+
+	function detailsStep( ask ) {
+		contactCard.appendChild( el( 'div', 'zpi-contact-title', t.contactTitle || 'How can we reach you?' ) );
+		contactCard.appendChild( el( 'div', 'zpi-contact-hint', t.contactHint || '' ) );
+		var name = null;
+		if ( ask.name ) {
+			name = el( 'input', 'zpi-input' );
+			name.type = 'text';
+			name.autocomplete = 'name';
+			name.placeholder = t.name || 'Your name';
+			name.setAttribute( 'aria-label', t.name || 'Your name' );
+			name.value = nameInput.value;
+			contactCard.appendChild( name );
+		}
+		var email = el( 'input', 'zpi-input' );
+		email.type = 'email';
+		email.autocomplete = 'email';
+		email.required = true;
+		email.placeholder = 'you@example.com';
+		email.setAttribute( 'aria-label', t.email || 'Your email' );
+		email.value = ask.email || emailInput.value;
+		contactCard.appendChild( email );
+		var err = el( 'div', 'zpi-contact-error' );
+		err.hidden = true;
+		contactCard.appendChild( err );
+
+		var actions = el( 'div', 'zpi-contact-actions' );
+		var save = cardButton( t.contactSave || 'Save', 'zpi-contact-save', function () {
+			if ( ! email.value.trim() || ! email.checkValidity() ) {
+				cardError( t.email || 'Your email' );
+				email.focus();
+				return;
+			}
+			contactRequest( { name: name ? name.value.trim() : '', email: email.value.trim() }, save ).then( function ( data ) {
+				if ( ! data ) {
+					return;
+				}
+				state.ask = null;
+				contactCard.textContent = '';
+				if ( data.status === 'code_sent' ) {
+					state.ask = 'pending:' + data.email;
+					codeStep( data.email );
+				} else {
+					done();
+				}
+			} );
+		} );
+		var skip = cardButton( t.contactSkip || 'Not now', 'zpi-contact-skip', function () {
+			contactRequest( { skip: true }, skip ).then( function ( data ) {
+				if ( data ) {
+					contactCard.hidden = true;
+				}
+			} );
+		} );
+		actions.appendChild( skip );
+		actions.appendChild( save );
+		contactCard.appendChild( actions );
+		[ name, email ].forEach( function ( input ) {
+			if ( input ) {
+				input.addEventListener( 'keydown', function ( e ) {
+					if ( e.key === 'Enter' ) {
+						e.preventDefault();
+						save.click();
+					}
+				} );
+			}
+		} );
+	}
+
+	function codeStep( address ) {
+		contactCard.hidden = false;
+		contactCard.appendChild( el( 'div', 'zpi-contact-title', ( t.codeTitle || 'Enter the code we sent to %s' ).replace( '%s', address ) ) );
+		var code = el( 'input', 'zpi-input zpi-code' );
+		code.type = 'text';
+		code.inputMode = 'numeric';
+		code.autocomplete = 'one-time-code';
+		code.maxLength = 6;
+		code.placeholder = '••••••';
+		code.setAttribute( 'aria-label', t.codeLabel || 'Verification code' );
+		contactCard.appendChild( code );
+		var err = el( 'div', 'zpi-contact-error' );
+		err.hidden = true;
+		contactCard.appendChild( err );
+
+		var actions = el( 'div', 'zpi-contact-actions' );
+		var links = el( 'div', 'zpi-contact-links' );
+		var resend = cardButton( t.codeResend || 'Send a new code', 'zpi-contact-link', function () {
+			contactRequest( { email: address }, resend ).then( function ( data ) {
+				if ( data ) {
+					err.hidden = true;
+					code.value = '';
+					code.focus();
+				}
+			} );
+		} );
+		var change = cardButton( t.codeChange || 'Change email', 'zpi-contact-link', function () {
+			state.ask = null;
+			contactCard.textContent = '';
+			detailsStep( { name: false, email: '' } );
+		} );
+		links.appendChild( resend );
+		links.appendChild( change );
+		var verify = cardButton( t.codeVerify || 'Confirm', 'zpi-contact-save', function () {
+			if ( code.value.replace( /\D/g, '' ).length !== 6 ) {
+				code.focus();
+				return;
+			}
+			contactRequest( { code: code.value }, verify ).then( function ( data ) {
+				if ( data ) {
+					done();
+				}
+			} );
+		} );
+		actions.appendChild( links );
+		actions.appendChild( verify );
+		contactCard.appendChild( actions );
+		code.addEventListener( 'input', function () {
+			code.value = code.value.replace( /\D/g, '' ).slice( 0, 6 );
+			if ( code.value.length === 6 ) {
+				verify.click();
+			}
+		} );
+		window.setTimeout( function () {
+			code.focus();
+		}, 50 );
+	}
+
+	function done() {
+		contactCard.textContent = '';
+		contactCard.appendChild( el( 'div', 'zpi-contact-done', t.contactSaved || 'Thanks!' ) );
+		state.ask = '';
+		window.setTimeout( function () {
+			contactCard.hidden = true;
+			contactCard.textContent = '';
+		}, 4000 );
+	}
+
 	function setWaiting( on ) {
 		state.waiting = on;
 		typing.hidden = ! on;
@@ -537,8 +853,9 @@
 		error.hidden = false;
 	}
 
-	function toggle( open ) {
+	function toggle( open, byMessage ) {
 		state.open = open;
+		launcher.classList.remove( 'zpi-ping' );
 		panel.hidden = ! open;
 		root.classList.toggle( 'zpi-is-open', open );
 		launcher.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
@@ -548,9 +865,12 @@
 			badge.hidden = true;
 			details.hidden = ! ( cfg.askEmail && ! state.lastId && ! ( state.known && state.known.email ) );
 			poll().then( schedule, schedule );
-			window.setTimeout( function () {
-				text.focus();
-			}, 50 );
+			// Opened by a new message: don't pull the keyboard up on a phone.
+			if ( ! byMessage ) {
+				window.setTimeout( function () {
+					text.focus();
+				}, 50 );
+			}
 			scrollDown();
 		} else {
 			schedule();
@@ -611,6 +931,9 @@
 				text.style.height = 'auto';
 				details.hidden = true;
 				addMessage( res.data.message );
+				if ( ! state.presenceTimer ) {
+					schedulePresence();
+				}
 				// Something will answer on its own (knowledge or the assistant):
 				// show it's on the way. The next poll says when it's done.
 				if ( cfg.aiName || cfg.autoAnswers ) {
@@ -630,16 +953,32 @@
 	document.addEventListener( 'visibilitychange', function () {
 		if ( document.visibilityState === 'visible' ) {
 			poll().then( schedule, schedule );
+			presence().then( schedulePresence, schedulePresence );
 		} else {
 			window.clearTimeout( state.timer );
+			window.clearTimeout( state.presenceTimer );
 		}
 	} );
 
+	function startPresence() {
+		presence().then( schedulePresence, schedulePresence );
+	}
+
 	function mount() {
 		document.body.appendChild( root );
-		if ( state.token ) {
-			state.started = true;
-			poll().then( schedule, schedule );
+		var start = state.token ? Promise.resolve( ( state.started = true ) ) : cfg.visitors ? ensureSession() : Promise.resolve( false );
+		start.then( function () {
+			if ( ! state.token ) {
+				return;
+			}
+			poll().then( function () {
+				schedule();
+				startPresence();
+			}, startPresence );
+		} );
+		// A "continue the chat" link from an email lands with #zaplane-chat.
+		if ( window.location.hash === '#zaplane-chat' ) {
+			toggle( true );
 		}
 	}
 

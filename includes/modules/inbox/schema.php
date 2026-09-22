@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Schema extends Migrator {
 
 	/** Bump when a migration is added to modules/inbox/migrations. */
-	public const VERSION = '1';
+	public const VERSION = '2';
 
 	public const OPTION = 'zaplane_inbox_schema';
 

@@ -10,6 +10,8 @@ use Zaplane\Modules\Inbox\Models\Identity;
 use Zaplane\Modules\Inbox\Models\Message;
 use Zaplane\Modules\Inbox\Services\Ingest;
 use Zaplane\Modules\Inbox\Services\Presenter;
+use Zaplane\Modules\Inbox\Services\VisitorContact;
+use Zaplane\Modules\Inbox\Services\Visitors;
 use Zaplane\Modules\Inbox\Settings as InboxSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,11 +43,29 @@ class WidgetController {
 	/** Sessions one IP may start per minute (same reasoning). */
 	private const RATE_SESSIONS = 60;
 
+	/** Page reports one visitor may send per minute (one every ~30s, plus tabs). */
+	private const RATE_PRESENCE = 20;
+
+	/** Contact-form submits one visitor may make per minute. */
+	private const RATE_CONTACT = 6;
+
 	public function register_routes(): void {
 		register_rest_route( self::NS, '/inbox/widget/session', [
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => [ $this, 'start_session' ],
 			'permission_callback' => [ $this, 'can_start_session' ],
+		] );
+
+		register_rest_route( self::NS, '/inbox/widget/presence', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'presence' ],
+			'permission_callback' => fn( $r ) => $this->visitor_within( $r, 'presence', self::RATE_PRESENCE ),
+		] );
+
+		register_rest_route( self::NS, '/inbox/widget/contact', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'contact' ],
+			'permission_callback' => fn( $r ) => $this->visitor_within( $r, 'contact', self::RATE_CONTACT ),
 		] );
 
 		register_rest_route( self::NS, '/inbox/widget/messages', [
@@ -94,6 +114,19 @@ class WidgetController {
 			return $ip_ok;
 		}
 		return $this->within_rate( 'message', (string) self::visitor_from( $request ), self::RATE_MESSAGES );
+	}
+
+	/**
+	 * A visitor, and under the per-minute limit for this kind of request.
+	 *
+	 * @return true|WP_Error
+	 */
+	private function visitor_within( WP_REST_Request $request, string $bucket, int $limit ) {
+		$visitor = $this->is_visitor( $request );
+		if ( true !== $visitor ) {
+			return $visitor;
+		}
+		return $this->within_rate( $bucket, (string) self::visitor_from( $request ), $limit );
 	}
 
 	/**
@@ -248,11 +281,20 @@ class WidgetController {
 			? $query->where( 'id', '>', $after )->orderBy( 'id', 'asc' )->limit( 100 )->get()->all()
 			: array_reverse( $query->orderBy( 'id', 'desc' )->limit( 50 )->get()->all() );
 
+		// Shown to the visitor (the chat is open): no email for these.
+		if ( $rows && rest_sanitize_boolean( $request->get_param( 'seen' ) ) ) {
+			VisitorContact::seen_upto( $conversation, (int) end( $rows )->id );
+		}
+
 		return rest_ensure_response( [
 			'messages' => array_map( static function ( $m ) {
 				return Presenter::message( $m, true );
 			}, $rows ),
 			'status'   => (string) $conversation->status,
+			// Messages after this one are new to the visitor (history loads quietly).
+			'read_upto'   => $this->read_upto( $conversation ),
+			// A person is answering and we have no (confirmed) email: ask in the chat.
+			'ask_contact' => VisitorContact::ask( $conversation ),
 			'waiting'  => $this->assistant_is_typing( $conversation ),
 			// Bumped on every edit or delete; the widget reloads when it changes.
 			'revision' => \Zaplane\Modules\Inbox\Services\MessageActions::revision( $conversation ),
@@ -298,6 +340,71 @@ class WidgetController {
 		}
 
 		return rest_ensure_response( [ 'message' => Presenter::message( $message, true ) ] );
+	}
+
+	/**
+	 * The widget is open on a page: record it for the Visitors list, and say
+	 * what the newest message is so the widget fetches (and opens on) a
+	 * message the team started without polling the thread itself.
+	 */
+	public function presence( WP_REST_Request $request ) {
+		$visitor_id = (string) self::visitor_from( $request );
+		if ( Visitors::enabled() ) {
+			Visitors::seen( $visitor_id, [
+				'page_url'   => (string) $request->get_param( 'page_url' ),
+				'page_title' => (string) $request->get_param( 'page_title' ),
+				'referrer'   => (string) $request->get_param( 'referrer' ),
+				'user_agent' => (string) $request->get_header( 'user_agent' ),
+				'wp_user_id' => 0 === strpos( $visitor_id, 'u_' ) ? (int) substr( $visitor_id, 2 ) : 0,
+			] );
+		}
+
+		$conversation = $this->conversation_for( $visitor_id );
+		$latest       = $conversation
+			? Message::where( 'conversation_id', (int) $conversation->id )->where( 'is_note', 0 )->orderBy( 'id', 'desc' )->fresh()->first()
+			: null;
+
+		return rest_ensure_response( [ 'latest_id' => $latest ? (int) $latest->id : 0 ] );
+	}
+
+	/**
+	 * Name and email from the chat, a code to confirm it, or "not now".
+	 */
+	public function contact( WP_REST_Request $request ) {
+		$conversation = $this->conversation_for( (string) self::visitor_from( $request ) );
+		if ( ! $conversation ) {
+			return new WP_Error( 'zaplane_inbox_contact', __( 'Start the chat first.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+
+		if ( rest_sanitize_boolean( $request->get_param( 'skip' ) ) ) {
+			VisitorContact::skip( $conversation );
+			return rest_ensure_response( [ 'status' => 'skipped' ] );
+		}
+
+		$code = (string) $request->get_param( 'code' );
+		$out  = '' !== $code
+			? VisitorContact::verify( $conversation, $code )
+			: VisitorContact::submit( $conversation, (string) $request->get_param( 'name' ), (string) $request->get_param( 'email' ) );
+
+		return is_wp_error( $out ) ? $out : rest_ensure_response( $out );
+	}
+
+	/**
+	 * The last message the visitor has seen. Before the widget recorded that,
+	 * a conversation they wrote in counts as read; one the team started
+	 * without them has nothing read yet.
+	 */
+	private function read_upto( Conversation $conversation ): int {
+		$meta = is_array( $conversation->meta ) ? $conversation->meta : [];
+		if ( isset( $meta['read_upto'] ) ) {
+			return (int) $meta['read_upto'];
+		}
+		$theirs = Message::where( 'conversation_id', (int) $conversation->id )->where( 'sender_type', 'contact' )->orderBy( 'id', 'desc' )->fresh()->first();
+		if ( ! $theirs ) {
+			return 0;
+		}
+		$last = Message::where( 'conversation_id', (int) $conversation->id )->orderBy( 'id', 'desc' )->fresh()->first();
+		return $last ? (int) $last->id : 0;
 	}
 
 	private function conversation_for( string $visitor_id ): ?Conversation {

@@ -20,6 +20,7 @@ use Zaplane\Modules\Inbox\Services\KnowledgeAnswer;
 use Zaplane\Modules\Inbox\Services\MessageActions;
 use Zaplane\Modules\Inbox\Services\Outbound;
 use Zaplane\Modules\Inbox\Services\Presenter;
+use Zaplane\Modules\Inbox\Services\Visitors;
 use Zaplane\Modules\Inbox\Settings as InboxSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -109,6 +110,18 @@ class AdminController {
 		register_rest_route( self::NS, "/inbox/conversations/{$id}/order", [
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => [ $this, 'place_order' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
+		register_rest_route( self::NS, '/inbox/visitors', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'visitors' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
+		register_rest_route( self::NS, '/inbox/visitors/(?P<visitor>v_[a-f0-9]{24}|u_\d+)/message', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'message_visitor' ],
 			'permission_callback' => [ $this, 'can_manage' ],
 		] );
 
@@ -500,6 +513,44 @@ class AdminController {
 		return rest_ensure_response( [
 			'store'    => $store::label(),
 			'products' => $store::search( sanitize_text_field( (string) $request->get_param( 'search' ) ), 12 ),
+		] );
+	}
+
+	/**
+	 * Everyone on the site now. `count_only` for the top-bar badge.
+	 */
+	public function visitors( WP_REST_Request $request ) {
+		if ( ! Visitors::enabled() ) {
+			return rest_ensure_response( [
+				'enabled'  => false,
+				'count'    => 0,
+				'visitors' => [],
+			] );
+		}
+		$count_only = rest_sanitize_boolean( $request->get_param( 'count_only' ) );
+		return rest_ensure_response( [
+			'enabled'  => true,
+			'count'    => Visitors::count_online(),
+			'visitors' => $count_only ? [] : Visitors::online(),
+		] );
+	}
+
+	/**
+	 * Say hello to someone browsing: starts their conversation if needed.
+	 */
+	public function message_visitor( WP_REST_Request $request ) {
+		$body = trim( sanitize_textarea_field( (string) $request->get_param( 'body' ) ) );
+		if ( '' === $body ) {
+			return new WP_Error( 'zaplane_inbox_empty', __( 'Write a message first.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+		$message = Visitors::message( (string) $request['visitor'], mb_substr( $body, 0, 4000 ), get_current_user_id() );
+		if ( is_wp_error( $message ) ) {
+			$message->add_data( [ 'status' => 400 ] );
+			return $message;
+		}
+		return rest_ensure_response( [
+			'message'      => Presenter::message( $message ),
+			'conversation' => Presenter::conversation( Conversations::find( (int) $message->conversation_id ) ),
 		] );
 	}
 

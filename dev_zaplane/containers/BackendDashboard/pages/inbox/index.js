@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { __ } from "@wordpress/i18n";
-import { FiSettings, FiArrowLeft, FiInfo } from "react-icons/fi";
+import { __, sprintf } from "@wordpress/i18n";
+import { FiSettings, FiArrowLeft, FiInfo, FiUsers } from "react-icons/fi";
 import PageLayout from "@ZAPComponents/PageLayout";
 import { outlineBtn } from "../../../../../assets/scss/chakra/recipe";
 import ConversationList from "./ConversationList";
 import Thread from "./Thread";
 import Details from "./Details";
 import Settings from "./Settings";
+import Visitors from "./Visitors";
 import { inboxApi, visiblePoll } from "./api";
 import "./styles.scss";
 
@@ -65,7 +66,11 @@ const useFillHeight = (ref, deps) => {
 
 const InboxPage = () => {
   // "?view=settings" (the gear on the Modules screen) opens Settings.
-  const [view, setView] = useState(() => (new URLSearchParams(window.location.search).get("view") === "settings" ? "settings" : "inbox"));
+  const [view, setView] = useState(() => {
+    const asked = new URLSearchParams(window.location.search).get("view");
+    return ["settings", "visitors"].includes(asked) ? asked : "inbox";
+  });
+  const [online, setOnline] = useState(0);
   const [filters, setFilters] = useState({ status: "open", assignee: "any", search: "" });
   const [list, setList] = useState({ items: [], counts: {}, loading: true });
   const [activeId, setActiveId] = useState(0);
@@ -233,6 +238,21 @@ const InboxPage = () => {
     loadList();
   };
 
+  // The count on the Visitors button, while the inbox is on screen.
+  useEffect(() => {
+    if (view !== "inbox" || !meta.widgetOn) return undefined;
+    const count = async () => setOnline((await inboxApi.visitors(true)).count || 0);
+    count().catch(() => {});
+    return visiblePoll(count, 30000);
+  }, [view, meta.widgetOn]);
+
+  const openFromVisitors = (id) => {
+    setView("inbox");
+    setFilters((f) => ({ ...f, status: "all" }));
+    setPane("thread");
+    openConversation(id);
+  };
+
   const showSetup = !meta.widgetOn && !meta.channelsOn;
   useFillHeight(inboxRef, [view, showSetup]);
 
@@ -243,10 +263,24 @@ const InboxPage = () => {
 
   const topBarActions =
     view === "inbox" ? (
-      <button type="button" style={outlineBtn} className="zaplane-inbox-head-btn" onClick={() => setView("settings")}>
-        <FiSettings />
-        <span>{__("Settings", "zaplane")}</span>
-      </button>
+      <>
+        {meta.widgetOn && (
+          <button type="button" style={outlineBtn} className="zaplane-inbox-head-btn" onClick={() => setView("visitors")}>
+            <FiUsers />
+            <span>{__("Visitors", "zaplane")}</span>
+            {online > 0 && (
+              <span className="zaplane-inbox-live-count" aria-label={sprintf(__("%d online", "zaplane"), online)}>
+                <span className="zaplane-inbox-live-dot" aria-hidden="true" />
+                {online}
+              </span>
+            )}
+          </button>
+        )}
+        <button type="button" style={outlineBtn} className="zaplane-inbox-head-btn" onClick={() => setView("settings")}>
+          <FiSettings />
+          <span>{__("Settings", "zaplane")}</span>
+        </button>
+      </>
     ) : (
       <button type="button" style={outlineBtn} className="zaplane-inbox-head-btn" onClick={() => setView("inbox")}>
         <FiArrowLeft />
@@ -260,12 +294,18 @@ const InboxPage = () => {
   return (
     <div className="zaplane-inbox-page">
       <PageLayout
-        breadcrumbs={view === "inbox" ? [{ label: __("Inbox", "zaplane") }] : [{ label: __("Inbox", "zaplane") }, { label: __("Settings", "zaplane") }]}
+        breadcrumbs={
+          view === "inbox"
+            ? [{ label: __("Inbox", "zaplane") }]
+            : [{ label: __("Inbox", "zaplane") }, { label: view === "visitors" ? __("Visitors", "zaplane") : __("Settings", "zaplane") }]
+        }
         topBarActions={topBarActions}
         hideHeading
       >
         {view === "settings" ? (
           <Settings onSaved={loadMeta} />
+        ) : view === "visitors" ? (
+          <Visitors onOpenConversation={openFromVisitors} onCount={setOnline} onOpenSettings={() => setView("settings")} />
         ) : (
           <>
             {showSetup && (

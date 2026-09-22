@@ -135,6 +135,18 @@ const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceO
       {(conversation.contact?.email || conversation.contact?.phone) && (
         <div className="zaplane-inbox-copychips">
           <CopyChip Icon={FiMail} value={conversation.contact?.email} />
+          {conversation.contact?.email && conversation.channel === "web" && !conversation.contact?.wp_user_id && (
+            <span
+              className={"zaplane-inbox-verified" + (conversation.contact.email_verified ? " is-yes" : "")}
+              title={
+                conversation.contact.email_verified
+                  ? __("The visitor entered the code we emailed to this address.", "zaplane")
+                  : __("Typed by the visitor and not confirmed with a code. It may be mistyped or made up.", "zaplane")
+              }
+            >
+              {conversation.contact.email_verified ? "✓ " + __("Verified", "zaplane") : __("Not verified", "zaplane")}
+            </span>
+          )}
           <CopyChip Icon={FiPhone} value={conversation.contact?.phone} />
         </div>
       )}

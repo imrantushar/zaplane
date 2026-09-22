@@ -299,3 +299,49 @@
 @media (prefers-reduced-motion: reduce) {
 	#zpi-root .zpi-launcher { transition: none; }
 }
+
+/* "How can we reach you?" card, above the message box. */
+#zpi-root .zpi-contact {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin: 0 0 10px;
+	padding: 12px;
+	border: 1px solid var(--zpi-border);
+	border-radius: 12px;
+	background: var(--zpi-surface);
+}
+#zpi-root .zpi-contact[hidden] { display: none; }
+#zpi-root .zpi-contact-title { font-weight: 600; }
+#zpi-root .zpi-contact-hint { margin-top: -4px; color: var(--zpi-muted); font-size: 12px; }
+#zpi-root .zpi-contact .zpi-input { margin: 0; background: var(--zpi-bg); }
+#zpi-root .zpi-code { letter-spacing: 0.4em; font-size: 18px; text-align: center; }
+#zpi-root .zpi-contact-error { color: #c62a2f; font-size: 12px; }
+#zpi-root .zpi-contact-error[hidden] { display: none; }
+#zpi-root .zpi-contact-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+#zpi-root .zpi-contact-links { display: flex; flex: 1; flex-wrap: wrap; gap: 4px 12px; }
+#zpi-root .zpi-contact-save,
+#zpi-root .zpi-contact-skip,
+#zpi-root .zpi-contact-link {
+	margin: 0;
+	border: 0;
+	border-radius: 8px;
+	font: inherit;
+	font-size: 13px;
+	cursor: pointer;
+}
+#zpi-root .zpi-contact-save { padding: 7px 16px; background: var(--zpi-color); color: #fff; font-weight: 600; }
+#zpi-root .zpi-contact-save:disabled { opacity: 0.6; cursor: default; }
+#zpi-root .zpi-contact-skip { padding: 7px 10px; background: transparent; color: var(--zpi-muted); }
+#zpi-root .zpi-contact-link { padding: 0; background: none; color: var(--zpi-color); font-size: 12px; text-decoration: underline; }
+#zpi-root .zpi-contact-done { color: #0e7a4d; font-weight: 500; }
+
+/* A new message while closed (and auto-open is off). */
+#zpi-root .zpi-launcher.zpi-ping { animation: zpi-ping 1.2s ease-out 2; }
+@keyframes zpi-ping {
+	0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--zpi-color) 55%, transparent); }
+	100% { box-shadow: 0 0 0 16px transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+	#zpi-root .zpi-launcher.zpi-ping { animation: none; }
+}

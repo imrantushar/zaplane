@@ -306,6 +306,47 @@ const Settings = ({ onSaved }) => {
                 <span>{__("Ask visitors for their name and email before the first message", "zaplane")}</span>
                 <ZAPToggle checked={!!form.widget.ask_email} onChange={(v) => setWidget("ask_email", v)} size="sm" />
               </div>
+              <div className="zaplane-inbox-field is-row is-wide">
+                <span>
+                  {__("Ask for an email when a person takes over", "zaplane")}
+                  <em className="zaplane-inbox-hint">{__("Shown in the chat after “Talk to a person” (or whenever your team answers) if we don't have their email yet.", "zaplane")}</em>
+                </span>
+                <ZAPToggle checked={!!form.widget.ask_contact} onChange={(v) => setWidget("ask_contact", v)} size="sm" />
+              </div>
+              <div className="zaplane-inbox-field is-row is-wide">
+                <span>
+                  {__("Verify emails with a 6-digit code", "zaplane")}
+                  <em className="zaplane-inbox-hint">{__("Two steps: the visitor enters a code we email them. Stops typos and made-up addresses. Needs working email on this site.", "zaplane")}</em>
+                </span>
+                <ZAPToggle checked={!!form.widget.verify_email} onChange={(v) => setWidget("verify_email", v)} size="sm" />
+              </div>
+              <div className="zaplane-inbox-field is-row is-wide">
+                <span>
+                  {__("Email replies the visitor missed", "zaplane")}
+                  <em className="zaplane-inbox-hint">{__("If they left before your reply, it's emailed to them two minutes later with a link back to the chat.", "zaplane")}</em>
+                </span>
+                <ZAPToggle checked={!!form.widget.notify_email} onChange={(v) => setWidget("notify_email", v)} size="sm" />
+              </div>
+              <div className="zaplane-inbox-field is-row is-wide">
+                <span>
+                  {__("Open the chat with a sound on new replies", "zaplane")}
+                  <em className="zaplane-inbox-hint">{__("When your team writes, the visitor's chat opens by itself and plays a short chime.", "zaplane")}</em>
+                </span>
+                <span className="flex items-center gap-3" style={{ flexDirection: "row" }}>
+                  <label className="zaplane-inbox-check">
+                    <input type="checkbox" checked={!!form.widget.sound} onChange={(e) => setWidget("sound", e.target.checked)} />
+                    {__("Sound", "zaplane")}
+                  </label>
+                  <ZAPToggle checked={!!form.widget.auto_open} onChange={(v) => setWidget("auto_open", v)} size="sm" />
+                </span>
+              </div>
+              <div className="zaplane-inbox-field is-row is-wide">
+                <span>
+                  {__("Show live visitors", "zaplane")}
+                  <em className="zaplane-inbox-hint">{__("See who is on your site now and which page they're on, and start a chat with them. The widget reports the page every 20 seconds; nothing is kept after a day.", "zaplane")}</em>
+                </span>
+                <ZAPToggle checked={!!form.widget.visitors} onChange={(v) => setWidget("visitors", v)} size="sm" />
+              </div>
               <Field wide label={__("Other websites allowed to use this chat", "zaplane")} help={__("One address per line, like https://shop.example.com. Your own site is always allowed.", "zaplane")}>
                 <textarea className="zaplane-inbox-input" rows={3} value={form.widget.allowed_origins} onChange={(e) => setWidget("allowed_origins", e.target.value)} />
               </Field>
