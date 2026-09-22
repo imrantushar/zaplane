@@ -1,5 +1,5 @@
-// Status tabs, folder filter and search above the workflow list.
-.zaplane-workflow-filters {
+// Status tabs, a dropdown filter and search above a list (workflows, connections…).
+.zaplane-list-filters {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -8,7 +8,7 @@
 	margin-bottom: 16px;
 }
 
-.zaplane-workflow-filters .zaplane-workflow-filters__tabs {
+.zaplane-list-filters .zaplane-list-filters__tabs {
 	display: inline-flex;
 	gap: 4px;
 	padding: 4px;
@@ -43,7 +43,7 @@
 	}
 }
 
-.zaplane-workflow-filters__dot {
+.zaplane-list-filters__dot {
 	width: 7px;
 	height: 7px;
 	border-radius: 50%;
@@ -57,12 +57,13 @@
 		background: #f79009;
 	}
 
-	&.is-draft {
+	&.is-draft,
+	&.is-muted {
 		background: #98a2b3;
 	}
 }
 
-.zaplane-workflow-filters__count {
+.zaplane-list-filters__count {
 	min-width: 20px;
 	padding: 0 6px;
 	border-radius: 999px;
@@ -79,14 +80,14 @@
 	}
 }
 
-.zaplane-workflow-filters__right {
+.zaplane-list-filters__right {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 8px;
 }
 
-.zaplane-workflow-filters__folder {
+.zaplane-list-filters__group {
 	position: relative;
 	width: 210px;
 
@@ -102,15 +103,18 @@
 
 	.zaplane-select__control {
 		min-height: 38px;
+	}
+
+	&.has-icon .zaplane-select__control {
 		padding-left: 24px;
 	}
 }
 
-.zaplane-workflow-filters .zaplane-workflow-filters__search {
+.zaplane-list-filters .zaplane-list-filters__search {
 	width: 240px;
 }
 
-.zaplane-workflow-filters .zaplane-workflow-filters__clear {
+.zaplane-list-filters .zaplane-list-filters__clear {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
@@ -141,8 +145,8 @@
 }
 
 @media (max-width: 782px) {
-	.zaplane-workflow-filters__folder,
-	.zaplane-workflow-filters .zaplane-workflow-filters__search {
+	.zaplane-list-filters__group,
+	.zaplane-list-filters .zaplane-list-filters__search {
 		width: 100%;
 	}
 }

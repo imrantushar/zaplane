@@ -19,7 +19,6 @@ import FolderCell from "@ZAPComponents/FolderCell";
 import SubTopBar from "@ZAPComponents/SubTopBar";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 import WorkflowFilters, { readFilters, writeFilters } from "./WorkflowFilters";
-import "./styles.scss";
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LiaEditSolid } from "react-icons/lia";
@@ -64,7 +63,7 @@ const WorkflowTable = ({
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
   // Status / folder / search, for the all-workflows list (a folder's own
   // page is already one folder).
-  const [filters, setFilters] = useState(() => (isFolder ? { status: "", folder: "", search: "" } : readFilters()));
+  const [filters, setFilters] = useState(() => (isFolder ? { status: "", folder: "", search: "" } : readFilters(["status", "folder", "search"])));
   const handleRefresh = useCallback(async (page = 1, per_page = activePerPage ?? 10, withFilters = filters) => {
     setLoading(true);
     if (isFolder) {

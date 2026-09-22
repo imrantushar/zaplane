@@ -180,10 +180,15 @@ class ConnectionsController extends WP_REST_Controller {
 		$per_page = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 
 		$manager = $this->get_connection_manager();
-		$result  = $manager->get_user_connections( $user_id, $app, $page, $per_page );
+		$result  = $manager->get_user_connections( $user_id, $app, $page, $per_page, [
+			'status' => sanitize_key( (string) ( $request->get_param( 'status' ) ?? '' ) ),
+			'search' => sanitize_text_field( (string) ( $request->get_param( 'search' ) ?? '' ) ),
+		] );
 
 		return rest_ensure_response( [
 			'data'       => $result['data'],
+			'counts'     => $result['counts'],
+			'apps'       => $result['apps'],
 			'pagination' => $result['pagination'],
 		] );
 	}

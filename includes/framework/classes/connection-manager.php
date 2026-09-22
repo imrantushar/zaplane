@@ -84,21 +84,52 @@ class ConnectionManager {
 		return $data;
 	}
 
-	public function get_user_connections( int $user_id, ?string $app = null, int $page = 1, int $perPage = 20 ): array {
-		$query = Connection::where( 'user_id', $user_id );
+	/**
+	 * @param array{status?:string,search?:string} $filters
+	 */
+	public function get_user_connections( int $user_id, ?string $app = null, int $page = 1, int $perPage = 20, array $filters = [] ): array {
+		$status = in_array( $filters['status'] ?? '', [ 'active', 'inactive' ], true ) ? $filters['status'] : '';
+		$search = trim( (string) ( $filters['search'] ?? '' ) );
 
-		if ( null !== $app ) {
-			$query->where( 'app', $app );
-		}
+		// A fresh query each time: count() rewrites the one it runs on.
+		$base = static function ( bool $with_status = true ) use ( $user_id, $app, $status, $search ) {
+			$q = Connection::where( 'user_id', $user_id );
+			if ( null !== $app && '' !== $app ) {
+				$q->where( 'app', $app );
+			}
+			if ( '' !== $search ) {
+				global $wpdb;
+				$like = '%' . $wpdb->esc_like( $search ) . '%';
+				$q->whereRaw( '(name LIKE %s OR app LIKE %s)', [ $like, $like ] );
+			}
+			if ( $with_status && '' !== $status ) {
+				$q->where( 'status', $status );
+			}
+			return $q;
+		};
+		$query = $base();
 
-		$total = ( clone $query )->count();
+		$total = $base()->count();
 
 		$connections = $query->orderBy( 'name', 'asc' )
 			->forPage( $page, $perPage )
 			->get();
 
+		// For the list's filters: per-status totals (other filters applied) and
+		// the apps this user has connections for.
+		$counts = [ 'all' => $base( false )->count() ];
+		foreach ( [ 'active', 'inactive' ] as $one ) {
+			$counts[ $one ] = $base( false )->where( 'status', $one )->count();
+		}
+		$apps = [];
+		foreach ( Connection::where( 'user_id', $user_id )->get() as $row ) {
+			$apps[ (string) $row->app ] = true;
+		}
+
 		return [
 			'data' => $connections->toArray(),
+			'counts' => $counts,
+			'apps' => array_keys( $apps ),
 			'pagination' => [
 				'page' => $page,
 				'per_page' => $perPage,
