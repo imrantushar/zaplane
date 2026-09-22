@@ -84,12 +84,28 @@ function zt_mock_meta( array &$calls ): void {
 	}, 10, 3 );
 }
 
+/**
+ * Pretend these workflow steps are active (and nothing else): the inbox
+ * reads which channels and sources are connected from active workflows.
+ *
+ * @param array<int,array<string,mixed>> $nodes Node data: app, event, config, connection_id.
+ */
+function zt_connectors( array $nodes ): void {
+	remove_all_filters( 'zaplane/inbox/connector_nodes' );
+	add_filter( 'zaplane/inbox/connector_nodes', static function () use ( $nodes ) {
+		return array_map( static fn( $n, $i ) => [ 'workflow_id' => 9000 + $i, 'title' => 'ZZ ' . $n['event'], 'node' => $n ], $nodes, array_keys( $nodes ) );
+	} );
+	\Zaplane\Modules\Inbox\Services\Connectors::reset();
+}
+
 /** Pretend Messenger/WhatsApp have working connections. */
 function zt_fake_channel_credentials(): void {
-	\Zaplane\Modules\Inbox\Settings::save( [ 'channels' => [
-		'messenger' => [ 'enabled' => true, 'connection_id' => 1 ],
-		'whatsapp'  => [ 'enabled' => true, 'connection_id' => 1 ],
-	] ] );
+	zt_connectors( [
+		[ 'app' => 'messenger', 'event' => 'inbox_receive', 'connection_id' => 1 ],
+		[ 'app' => 'messenger', 'event' => 'inbox_send', 'connection_id' => 1 ],
+		[ 'app' => 'whatsapp', 'event' => 'inbox_receive', 'connection_id' => 1 ],
+		[ 'app' => 'whatsapp', 'event' => 'inbox_send', 'connection_id' => 1 ],
+	] );
 	$ref = new ReflectionProperty( \Zaplane\Modules\Inbox\Channels\MetaChannel::class, 'credentials' );
 	$ref->setAccessible( true );
 	$ref->setValue( null, [

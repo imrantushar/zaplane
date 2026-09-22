@@ -17,6 +17,7 @@ export const inboxApi = {
   markRead: (id) => API.post(base + "conversations/" + id + "/read").then((r) => r.data),
   settings: () => API.get(base + "settings").then((r) => r.data),
   saveSettings: (data) => API.post(base + "settings", data).then((r) => r.data),
+  connectors: () => API.get(base + "connectors").then((r) => r.data),
   visitors: (countOnly = false) => API.get(base + "visitors" + (countOnly ? "?count_only=1" : "")).then((r) => r.data),
   messageVisitor: (visitorId, body) => API.post(base + "visitors/" + visitorId + "/message", { body }).then((r) => r.data),
   canned: () => API.get(base + "canned-replies").then((r) => r.data),

@@ -99,7 +99,7 @@ class Inbox extends IntegrationBase {
 		}
 
 		if ( 'reply_requested' === ( $node['event'] ?? '' ) ) {
-			$source = \Zaplane\Modules\Inbox\Services\Sources::slug( (string) ( $node['config']['source'] ?? '' ) );
+			$source = \Zaplane\Modules\Inbox\Services\Sources::key( (string) ( $node['config']['source'] ?? '' ) );
 			return '' !== $source && $source === ( $payload['source'] ?? '' ) ? $payload : false;
 		}
 

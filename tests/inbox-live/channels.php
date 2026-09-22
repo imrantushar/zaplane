@@ -41,18 +41,18 @@ zt_run( function () {
 	$cm = zt_conversation( 'messenger', 'human', [ 'customer' => 'PS_BTN' ] );
 	$id = Identity::where( 'id', $cm->identity_id )->fresh()->first();
 	$mm = zt_message( $cm, 'ans', 'auto', [ 'meta' => [ 'quick_replies' => [ 'Yes, thanks', 'What is your return policy?' ] ] ] );
-	Messenger::send( $cm, $id, $mm );
+	Messenger::deliver( $cm, $id, $mm );
 	$q = end( $calls )['body']['message']['quick_replies'];
 	zt_ok( 'Messenger quick replies: title cut to 20, full text in the payload', 20 >= mb_strlen( $q[1]['title'] ) && 'ZAPLANE_QR:What is your return policy?' === $q[1]['payload'] );
 
 	zt_fake_channel_credentials();
 	$cw = zt_conversation( 'whatsapp', 'human', [ 'customer' => '8801700000009', 'account' => 'PN1' ] );
 	$iw = Identity::where( 'id', $cw->identity_id )->fresh()->first();
-	Whatsapp::send( $cw, $iw, zt_message( $cw, 'Did it help?', 'auto', [ 'meta' => [ 'quick_replies' => [ 'Yes, thanks', 'No, I need help' ] ] ] ) );
+	Whatsapp::deliver( $cw, $iw, zt_message( $cw, 'Did it help?', 'auto', [ 'meta' => [ 'quick_replies' => [ 'Yes, thanks', 'No, I need help' ] ] ] ) );
 	$w = end( $calls )['body'];
 	zt_ok( 'WhatsApp short labels → reply buttons', 'interactive' === $w['type'] && 'No, I need help' === $w['interactive']['action']['buttons'][1]['reply']['title'] );
 	zt_fake_channel_credentials();
-	Whatsapp::send( $cw, $iw, zt_message( $cw, 'Anything else?', 'auto', [ 'meta' => [ 'quick_replies' => [ 'What is your return policy?' ] ] ] ) );
+	Whatsapp::deliver( $cw, $iw, zt_message( $cw, 'Anything else?', 'auto', [ 'meta' => [ 'quick_replies' => [ 'What is your return policy?' ] ] ] ) );
 	$w = end( $calls )['body'];
 	zt_ok( 'WhatsApp long labels → a list menu', 'interactive' === $w['type'] && 'list' === $w['interactive']['type'] && 'What is your return policy?' === $w['interactive']['action']['sections'][0]['rows'][0]['description'] );
 

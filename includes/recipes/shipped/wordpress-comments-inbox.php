@@ -30,6 +30,7 @@ return [
 	'description' => 'Answer your site\'s comments from the Inbox. Each comment thread becomes a conversation (with the page it\'s on), and your reply is posted under the comment as you. Replies made in wp-admin show up in the conversation too.',
 	'folder'      => 'Inbox: Comments',
 	'tags'        => [ 'inbox' ],
+	'inbox'       => [ 'source' => $source ],
 	'workflows'   => [
 		[
 			'key'         => 'comments_in',

@@ -108,7 +108,8 @@ const InboxPage = () => {
       canned: canned || [],
       aiReady: !!(s.settings?.ai?.enabled && s.settings?.ai?.connection_id),
       widgetOn: !!s.settings?.widget?.enabled,
-      channelsOn: Object.values(s.settings?.channels || {}).some((c) => c.enabled),
+      // Channels and sources are on while their workflows are.
+      channelsOn: (s.connectors || []).some((c) => c.receiving),
       store: s.store || null,
     });
   }, []);

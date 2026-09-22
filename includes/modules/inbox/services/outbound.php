@@ -120,7 +120,19 @@ class Outbound {
 			];
 		}
 
-		$message->delivery_status = 'sent' === ( $result['status'] ?? '' ) ? 'sent' : 'failed';
+		self::record( $message, $result );
+	}
+
+	/**
+	 * Store how a delivery went: sent (with the provider's id), failed (with
+	 * why), or queued, when a workflow delivers it and reports back.
+	 *
+	 * @param array{status?:string,external_id?:string,error?:string} $result
+	 */
+	public static function record( Message $message, array $result ): void {
+		$status                   = (string) ( $result['status'] ?? '' );
+		$message->delivery_status = in_array( $status, [ 'sent', 'queued' ], true ) ? $status : 'failed';
+		$message->error           = null;
 		if ( ! empty( $result['external_id'] ) ) {
 			$message->external_id = (string) $result['external_id'];
 		}

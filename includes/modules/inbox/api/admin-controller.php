@@ -113,6 +113,12 @@ class AdminController {
 			'permission_callback' => [ $this, 'can_manage' ],
 		] );
 
+		register_rest_route( self::NS, '/inbox/connectors', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => fn() => rest_ensure_response( \Zaplane\Modules\Inbox\Services\Connectors::catalog() ),
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
 		register_rest_route( self::NS, '/inbox/visitors', [
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => [ $this, 'visitors' ],
@@ -728,6 +734,8 @@ class AdminController {
 			'channels'       => $channels,
 			// Sources workflows bring in (comments, forms…), see Services\Sources.
 			'sources'        => \Zaplane\Modules\Inbox\Services\Sources::for_admin(),
+			// Inbox recipes: what connects each channel and source, and if it's live.
+			'connectors'     => \Zaplane\Modules\Inbox\Services\Connectors::catalog(),
 			'store'          => $store ? $store::label() : null,
 		];
 	}

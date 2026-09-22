@@ -90,7 +90,7 @@ zt_run( function () {
 	$cw = zt_conversation( 'whatsapp', 'human', [ 'customer' => '8801700000077', 'account' => 'PN1' ] );
 	$iw = Identity::where( 'id', $cw->identity_id )->fresh()->first();
 	$options = [ 'Do you gift wrap orders?', 'Shipping and delivery times', 'All topics', 'Talk to a person' ];
-	Whatsapp::send( $cw, $iw, zt_message( $cw, 'Delivery: which question?', 'auto', [ 'meta' => [ 'quick_replies' => $options ] ] ) );
+	Whatsapp::deliver( $cw, $iw, zt_message( $cw, 'Delivery: which question?', 'auto', [ 'meta' => [ 'quick_replies' => $options ] ] ) );
 	$b = end( $calls )['body'];
 	zt_ok( 'WhatsApp: a list menu with one row per option', 'list' === $b['interactive']['type'] && 4 === count( $b['interactive']['action']['sections'][0]['rows'] ) && 'zqr_1' === $b['interactive']['action']['sections'][0]['rows'][1]['id'] );
 	zt_ok( 'long labels are cut to 24 with the full text below', 24 >= mb_strlen( $b['interactive']['action']['sections'][0]['rows'][1]['title'] ) && 'Shipping and delivery times' === $b['interactive']['action']['sections'][0]['rows'][1]['description'] );

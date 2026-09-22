@@ -173,10 +173,14 @@ class Messenger extends MetaChannel {
 	}
 
 	public static function can_send( Conversation $conversation ): array {
+		$missing = static::not_set_up();
+		if ( $missing ) {
+			return $missing;
+		}
 		if ( empty( self::credentials()['page_access_token'] ) ) {
 			return [
 				'ok'     => false,
-				'reason' => __( 'Messenger is not connected. Choose a Messenger connection in Inbox settings.', 'zaplane' ),
+				'reason' => __( 'Messenger is not connected. Link a Messenger connection to the “Send Inbox Reply” step of its workflow.', 'zaplane' ),
 			];
 		}
 
@@ -232,7 +236,7 @@ class Messenger extends MetaChannel {
 		];
 	}
 
-	public static function send( Conversation $conversation, ?Identity $identity, Message $message ): array {
+	public static function deliver( Conversation $conversation, ?Identity $identity, Message $message ): array {
 		if ( ! $identity ) {
 			return [
 				'status' => 'failed',

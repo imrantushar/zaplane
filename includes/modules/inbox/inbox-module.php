@@ -57,32 +57,9 @@ class InboxModule implements ModuleInterface {
 		add_action( 'rest_api_init', [ $this, 'register_routes' ] );
 		add_action( Router::AI_HOOK, [ AiResponder::class, 'handle' ], 10, 2 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_widget' ] );
-		add_action( 'zaplane/incoming_webhook', [ $this, 'incoming_webhook' ], 10, 2 );
 		Services\WorkflowSends::register();
 		Services\VisitorContact::register();
 		add_action( Services\KnowledgeAnswer::HOOK, [ Services\KnowledgeAnswer::class, 'handle' ], 10, 2 );
-	}
-
-	/**
-	 * A channel's webhook delivery: store its messages in the inbox. The
-	 * integration's own workflow triggers still fire afterwards.
-	 */
-	public function incoming_webhook( string $slug, \WP_REST_Request $request ): void {
-		$channel = Channels\Registry::get( $slug );
-		if ( ! $channel || ! is_subclass_of( $channel, Channels\MetaChannel::class ) ) {
-			return;
-		}
-		if ( ! $channel::enabled() || ! $channel::verified( $request ) ) {
-			return;
-		}
-
-		try {
-			$channel::ingest( $request );
-		} catch ( \Throwable $e ) {
-			// A bad delivery must not stop the workflow triggers after it.
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Surfaced for site owners debugging a channel.
-			error_log( 'Zaplane Inbox: ' . $slug . ' delivery failed: ' . $e->getMessage() );
-		}
 	}
 
 	public function register_routes(): void {

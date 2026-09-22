@@ -59,11 +59,13 @@ zt_run( function () {
 
 	// Replying: no delivering workflow → refused with a reason.
 	remove_all_actions( 'zaplane/inbox/reply_requested' );
+	zt_connectors( [] );
 	$m = Outbound::send( Conversations::find( (int) $conv->id ), 'Yes! 5–7 days.', [ 'sender_type' => 'agent', 'sender_id' => 1 ] );
 	zt_ok( 'no workflow delivers replies → the reply fails and says why', 'failed' === $m->delivery_status && false !== strpos( (string) $m->error, 'Reply to Deliver' ) );
 
 	// With one: it gets everything it needs to post the reply.
 	$got = null;
+	zt_connectors( [ [ 'app' => 'inbox', 'event' => 'reply_requested', 'config' => [ 'source' => 'wp_comments' ] ] ] );
 	add_action( 'zaplane/inbox/reply_requested', function ( $p ) use ( &$got ) {
 		$got = $p;
 	} );

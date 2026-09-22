@@ -71,10 +71,39 @@ class MessengerTest extends IntegrationTestCase {
 			] ] ] ],
 		] ) );
 
-		$this->assertCount( 1, $parsed['events'] );
-		$this->assertSame( 'message_received', $parsed['events'][0]['event'] );
-		$this->assertSame( 'Hi, do you have this in stock?', $parsed['events'][0]['payload']['text'] );
-		$this->assertSame( '24607896878972', $parsed['events'][0]['payload']['sender_id'] );
+		$messages = $this->messages( $parsed );
+		$this->assertCount( 1, $messages );
+		$this->assertSame( 'Hi, do you have this in stock?', $messages[0]['payload']['text'] );
+		$this->assertSame( '24607896878972', $messages[0]['payload']['sender_id'] );
+	}
+
+	public function test_parse_webhook_event_hands_the_whole_delivery_to_webhook_received(): void {
+		$request = $this->makeEventRequest( [
+			'object' => 'page',
+			'entry'  => [ [ 'messaging' => [
+				[ 'sender' => [ 'id' => 'a' ], 'message' => [ 'mid' => 'm_whole_1', 'text' => 'one' ] ],
+				[ 'sender' => [ 'id' => 'a' ], 'postback' => [ 'title' => 'Delivery times', 'payload' => 'ZAPLANE_STARTER_0' ] ],
+			] ] ],
+		] );
+		$request->set_header( 'x_hub_signature_256', 'sha256=abc' );
+		$parsed = Messenger::parse_webhook_event( $request );
+
+		$whole = $parsed['events'][0];
+		$this->assertSame( 'webhook_received', $whole['event'] );
+		$this->assertSame( $request->get_body(), $whole['payload']['body'] );
+		$this->assertSame( 'sha256=abc', $whole['payload']['signature'] );
+		$this->assertSame( 2, $whole['payload']['events'] );
+		$this->assertSame( $whole['payload'], Messenger::resolve_trigger( $this->makeTriggerNode( 'webhook_received' ), [ $whole['payload'] ] ) );
+	}
+
+	/**
+	 * The one-per-message events ("Message Received"), without the
+	 * whole-delivery one that comes first.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	private function messages( ?array $parsed ): array {
+		return array_values( array_filter( (array) ( $parsed['events'] ?? [] ), static fn( $e ) => 'message_received' === $e['event'] ) );
 	}
 
 	public function test_parse_webhook_event_returns_every_message_in_a_batch(): void {
@@ -92,16 +121,18 @@ class MessengerTest extends IntegrationTestCase {
 
 		$this->assertSame( [ 'one', 'two', 'three' ], array_map( static function ( $e ) {
 			return $e['payload']['text'];
-		}, $parsed['events'] ) );
+		}, $this->messages( $parsed ) ) );
 	}
 
 	public function test_parse_webhook_event_skips_our_own_echoes(): void {
-		$this->assertNull( Messenger::parse_webhook_event( $this->makeEventRequest( [
+		// The Inbox still reads it (as the delivery), but no workflow is
+		// started as if the customer had written.
+		$this->assertSame( [], $this->messages( Messenger::parse_webhook_event( $this->makeEventRequest( [
 			'entry' => [ [ 'messaging' => [ [
 				'sender'  => [ 'id' => '1' ],
 				'message' => [ 'mid' => 'm_echo', 'text' => 'sent by us', 'is_echo' => true ],
 			] ] ] ],
-		] ) ) );
+		] ) ) ) );
 	}
 
 	public function test_trigger_rejects_empty_payload(): void {

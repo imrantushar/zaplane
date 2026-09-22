@@ -320,6 +320,10 @@ class WhatsappTest extends IntegrationTestCase {
 	public function test_all_action_schemas_have_to_field(): void {
 		$actions = Whatsapp::get_actions();
 		foreach ( array_keys( $actions ) as $action ) {
+			// The Inbox steps work from an Inbox message, not a number.
+			if ( 0 === strpos( $action, 'inbox_' ) ) {
+				continue;
+			}
 			$schema = Whatsapp::get_action_config_schema( $action );
 			$keys   = array_column( $schema, 'key' );
 			$this->assertContains( 'to', $keys, "Action '{$action}' schema is missing the 'to' field" );

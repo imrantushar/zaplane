@@ -61,7 +61,7 @@ zt_run( function () {
 	$sent = Commerce::send_product( $cm, (int) $multi['id'], 'agent', 1, 'Here it is!', (int) $second['id'] );
 	zt_ok( 'the stored message keeps a text copy (list preview, search)', false !== strpos( (string) $sent->body, $second['label'] ) && false !== strpos( (string) $sent->body, 'Here it is!' ) );
 	$calls = [];
-	$out   = Messenger::send( $cm, $im, $sent );
+	$out   = Messenger::deliver( $cm, $im, $sent );
 	$tpl   = $calls[1]['body']['message']['attachment']['payload']['elements'][0] ?? [];
 	zt_ok( 'Messenger: note first, then the card', 'sent' === $out['status'] && 2 === count( $calls ) && 'Here it is!' === $calls[0]['body']['message']['text'] );
 	zt_ok( '…a generic template: title, "price · option" subtitle, View product button', $multi['name'] === $tpl['title'] && 0 === strpos( $tpl['subtitle'], $second['price_text'] ) && false !== strpos( $tpl['subtitle'], $second['label'] ) && 'web_url' === $tpl['buttons'][0]['type'] && $multi['url'] === $tpl['buttons'][0]['url'] );
@@ -71,7 +71,7 @@ zt_run( function () {
 	$iw   = Identity::where( 'id', $cw->identity_id )->fresh()->first();
 	$sent = Commerce::send_product( $cw, (int) $multi['id'], 'agent', 1, '', (int) $second['id'] );
 	$calls = [];
-	Whatsapp::send( $cw, $iw, $sent );
+	Whatsapp::deliver( $cw, $iw, $sent );
 	$b = $calls[0]['body'];
 	zt_ok( 'WhatsApp: a cta_url message, name in bold, price in the body', 'interactive' === $b['type'] && 'cta_url' === $b['interactive']['type'] && false !== strpos( $b['interactive']['body']['text'], '*' . $multi['name'] . '*' ) && false !== strpos( $b['interactive']['body']['text'], $second['price_text'] ) && $multi['url'] === $b['interactive']['action']['parameters']['url'] );
 
@@ -91,6 +91,6 @@ zt_run( function () {
 	}, 10, 3 );
 	zt_fake_channel_credentials();
 	$sent = Commerce::send_product( $cm, (int) $multi['id'], 'agent', 1 );
-	$out  = Messenger::send( $cm, $im, $sent );
+	$out  = Messenger::deliver( $cm, $im, $sent );
 	zt_ok( 'card refused → sent as text with the link', 'sent' === $out['status'] && false !== strpos( (string) end( $tries )['message']['text'], $multi['url'] ) );
 } );

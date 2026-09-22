@@ -29,12 +29,18 @@ class Whatsapp extends IntegrationBase {
 				'label' => 'Message Received',
 				'hook'  => 'zaplane/whatsapp/message_received',
 			],
+			'webhook_received' => [
+				'label' => 'Webhook Received (every event)',
+				'hook'  => 'zaplane/whatsapp/webhook_received',
+			],
 		];
 	}
 
 	public static function get_actions(): array {
 		return [
 			'send_text'     => [ 'label' => 'Send Text Message' ],
+			'inbox_receive' => [ 'label' => 'Add Event to Inbox' ],
+			'inbox_send'    => [ 'label' => 'Send Inbox Reply' ],
 			'send_template' => [ 'label' => 'Send Template Message' ],
 			'send_image'    => [ 'label' => 'Send Image' ],
 			'send_document' => [ 'label' => 'Send Document' ],
@@ -45,6 +51,30 @@ class Whatsapp extends IntegrationBase {
 	}
 
 	public static function get_action_config_schema( string $action ): array {
+		if ( 'inbox_receive' === $action ) {
+			return [
+				[
+					'key'         => 'body',
+					'label'       => 'Webhook body',
+					'type'        => 'expression',
+					'required'    => false,
+					'placeholder' => '{{trigger.body}}',
+					'help'        => 'Leave empty right after the "Webhook Received" trigger: it passes the delivery on.',
+				],
+			];
+		}
+		if ( 'inbox_send' === $action ) {
+			return [
+				[
+					'key'         => 'message_id',
+					'label'       => 'Inbox message ID',
+					'type'        => 'expression',
+					'required'    => true,
+					'placeholder' => '{{trigger.message_id}}',
+					'help'        => 'From the Inbox "Reply to Deliver" trigger.',
+				],
+			];
+		}
 		$fields = self::action_fields( $action );
 
 		// Every send except a template can answer a customer, so it gets the
@@ -237,6 +267,11 @@ class Whatsapp extends IntegrationBase {
 	public static function resolve_trigger( array $node, array $args ) {
 		$event = $node['event'] ?? '';
 
+		if ( 'webhook_received' === $event ) {
+			$payload = $args[0] ?? [];
+			return is_array( $payload ) && ! empty( $payload['body'] ) ? $payload : false;
+		}
+
 		if ( 'message_received' === $event ) {
 			// The incoming-webhook controller fires the hook with the parsed
 			// payload as the single argument.
@@ -259,6 +294,15 @@ class Whatsapp extends IntegrationBase {
 	}
 
 	public static function get_trigger_sample_output( string $trigger ): array {
+		if ( 'webhook_received' === $trigger ) {
+			return [
+				'object'    => 'whatsapp_business_account',
+				'body'      => '{"object":"whatsapp_business_account","entry":[{"changes":[{"field":"messages","value":{"messages":[{"id":"wamid.1","from":"8801700000000","type":"text","text":{"body":"Hi"}}]}}]}]}',
+				'signature' => 'sha256=…',
+				'events'    => 1,
+			];
+		}
+
 		if ( 'message_received' === $trigger ) {
 			return [
 				'message_id'      => 'wamid.HBgLMTU1NTEyMzQ1NjcVAgARGBI...',
@@ -296,6 +340,64 @@ class Whatsapp extends IntegrationBase {
 		return hash_equals( $expected, $signature );
 	}
 
+	/**
+	 * "Add Event to Inbox" and "Send Inbox Reply": the workflow side of the
+	 * Inbox's WhatsApp channel. The channel is on while these are active.
+	 *
+	 * @param array<string,mixed> $node
+	 * @param array<string,mixed> $input
+	 */
+	private static function inbox_step( string $action, array $node, array $input ): array {
+		$channel = '\\Zaplane\\Modules\\Inbox\\Channels\\Whatsapp';
+		if ( ! class_exists( $channel ) || ! \Zaplane\Settings::feature_enabled( 'inbox' ) ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [ 'success' => false, 'error' => 'The Inbox module is off.' ] ),
+			];
+		}
+		$config      = (array) ( $node['data']['config'] ?? [] );
+		$credentials = (array) ( $node['_connection_credentials'] ?? [] );
+
+		if ( 'inbox_receive' === $action ) {
+			$body   = trim( (string) ( $config['body'] ?? '' ) );
+			$result = $channel::receive_from_workflow(
+				'' !== $body ? $body : (string) ( $input['body'] ?? '' ),
+				(string) ( $input['signature'] ?? '' ),
+				$credentials
+			);
+		} else {
+			$result = $channel::send_from_workflow( (int) ( $config['message_id'] ?? 0 ), $credentials );
+		}
+
+		return [
+			'port' => 'main',
+			'data' => array_merge( $input, [ 'success' => (bool) $result['ok'] ], $result ),
+		];
+	}
+
+	/**
+	 * The whole delivery as one "Webhook Received" event: the raw body and
+	 * Meta's signature, so the Inbox can check it and read every event in it.
+	 *
+	 * @param array<string,mixed> $data The decoded body.
+	 * @return array{event:string,payload:array<string,mixed>}
+	 */
+	private static function delivery_event( \WP_REST_Request $request, array $data, string $key ): array {
+		$count = 0;
+		foreach ( (array) ( $data['entry'] ?? [] ) as $entry ) {
+			$count += count( (array) ( $entry[ $key ] ?? [] ) );
+		}
+		return [
+			'event'   => 'webhook_received',
+			'payload' => [
+				'object'    => (string) ( $data['object'] ?? '' ),
+				'body'      => (string) $request->get_body(),
+				'signature' => (string) $request->get_header( 'x_hub_signature_256' ),
+				'events'    => $count,
+			],
+		];
+	}
+
 	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
 		$data = json_decode( $request->get_body(), true );
 
@@ -304,7 +406,9 @@ class Whatsapp extends IntegrationBase {
 		}
 
 		// Meta batches: several entries and changes, each with several messages.
-		$events = [];
+		// "Webhook Received" gets the whole delivery, statuses included (the
+		// Inbox reads all of it); "Message Received" one event per message.
+		$events = [ self::delivery_event( $request, $data, 'changes' ) ];
 		foreach ( (array) ( $data['entry'] ?? [] ) as $entry ) {
 			foreach ( (array) ( $entry['changes'] ?? [] ) as $change ) {
 				$value = (array) ( $change['value'] ?? [] );
@@ -317,8 +421,7 @@ class Whatsapp extends IntegrationBase {
 			}
 		}
 
-		// No inbound message (status update, template event, etc.) → skip.
-		return empty( $events ) ? null : [ 'events' => $events ];
+		return [ 'events' => $events ];
 	}
 
 	/**
@@ -422,6 +525,12 @@ class Whatsapp extends IntegrationBase {
 	public static function execute_node( array $node, array $input ): array {
 		$action      = $node['data']['event'] ?? '';
 		$credentials = $node['_connection_credentials'] ?? null;
+
+		// The Inbox's own steps: everything WhatsApp can carry (pictures, taps,
+		// replies sent from the app…) goes through the Inbox's WhatsApp code.
+		if ( 'inbox_receive' === $action || 'inbox_send' === $action ) {
+			return self::inbox_step( $action, $node, $input );
+		}
 
 		if ( ! $credentials ) {
 			throw new \Exception( 'No connection credentials available for WhatsApp' );

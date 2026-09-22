@@ -158,11 +158,15 @@ class Whatsapp extends MetaChannel {
 	}
 
 	public static function can_send( Conversation $conversation ): array {
+		$missing = static::not_set_up();
+		if ( $missing ) {
+			return $missing;
+		}
 		$credentials = self::credentials();
 		if ( empty( $credentials['access_token'] ) || empty( $credentials['phone_number_id'] ) ) {
 			return [
 				'ok'     => false,
-				'reason' => __( 'WhatsApp is not connected. Choose a WhatsApp connection in Inbox settings.', 'zaplane' ),
+				'reason' => __( 'WhatsApp is not connected. Link a WhatsApp connection to the “Send Inbox Reply” step of its workflow.', 'zaplane' ),
 			];
 		}
 
@@ -235,7 +239,7 @@ class Whatsapp extends MetaChannel {
 		];
 	}
 
-	public static function send( Conversation $conversation, ?Identity $identity, Message $message ): array {
+	public static function deliver( Conversation $conversation, ?Identity $identity, Message $message ): array {
 		if ( ! $identity ) {
 			return [
 				'status' => 'failed',

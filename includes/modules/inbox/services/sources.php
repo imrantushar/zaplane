@@ -45,11 +45,19 @@ class Sources {
 	}
 
 	/**
-	 * A clean source slug, or '' when it can't be one (empty, or the name of
-	 * a built-in channel).
+	 * A channel or source name as stored ("WP Comments" → wp_comments).
+	 * Built-in channels pass: "Reply to Deliver" matches them too.
+	 */
+	public static function key( string $raw ): string {
+		return substr( sanitize_key( str_replace( [ ' ', '-' ], '_', strtolower( $raw ) ) ), 0, 30 );
+	}
+
+	/**
+	 * A clean slug for a new source, or '' when it can't be one (empty, or
+	 * the name of a built-in channel, which has its own workflow steps).
 	 */
 	public static function slug( string $raw ): string {
-		$slug = substr( sanitize_key( str_replace( [ ' ', '-' ], '_', strtolower( $raw ) ) ), 0, 30 );
+		$slug = self::key( $raw );
 		if ( '' === $slug ) {
 			return '';
 		}
@@ -110,17 +118,48 @@ class Sources {
 				'answered_by'   => (string) $source['answered_by'],
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 				'conversations' => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE channel = %s', \Zaplane\Modules\Inbox\Models\Conversation::getTable(), $slug ) ),
-				'delivers'      => self::has_delivery(),
+				'delivers'      => self::has_delivery( $slug ),
 			];
 		}
 		return $out;
 	}
 
+	/** An active "Reply to Deliver" workflow posts this source's replies. */
+	public static function has_delivery( string $slug = '' ): bool {
+		return Connectors::delivers_source( $slug );
+	}
+
 	/**
-	 * Whether any active workflow starts on "Reply to Deliver". Triggers hook
-	 * in only for active workflows, so a listener means one is live.
+	 * What "Reply to Deliver" hands a workflow: the text, where it goes, the
+	 * message to reply under and who wrote it.
+	 *
+	 * @return array<string,mixed>
 	 */
-	public static function has_delivery(): bool {
-		return (bool) has_action( 'zaplane/inbox/reply_requested' );
+	public static function reply_payload( \Zaplane\Modules\Inbox\Models\Conversation $conversation, ?\Zaplane\Modules\Inbox\Models\Identity $identity, \Zaplane\Modules\Inbox\Models\Message $message ): array {
+		$meta = is_array( $conversation->meta ) ? $conversation->meta : [];
+
+		// Reply under the newest message from the customer.
+		$last_in = \Zaplane\Modules\Inbox\Models\Message::where( 'conversation_id', (int) $conversation->id )
+			->where( 'direction', 'in' )
+			->orderBy( 'id', 'desc' )
+			->fresh()
+			->first();
+
+		$user = 'agent' === $message->sender_type && $message->sender_id ? get_userdata( (int) $message->sender_id ) : null;
+
+		return Conversations::payload( $conversation, [
+			'message_id'     => (int) $message->id,
+			'text'           => (string) $message->body,
+			'source'         => (string) $conversation->channel,
+			'thread_id'      => $identity ? (string) $identity->external_id : '',
+			// The source's own ID (stored as "source:id" for sources).
+			'reply_to'       => $last_in ? (string) preg_replace( '/^[a-z0-9_]+:/', '', (string) $last_in->external_id ) : '',
+			'link_url'       => (string) ( $meta['link_url'] ?? '' ),
+			'link_title'     => (string) ( $meta['link_title'] ?? '' ),
+			'sender_type'    => (string) $message->sender_type,
+			'sender_user_id' => $user ? (int) $user->ID : 0,
+			'sender_name'    => $user ? (string) $user->display_name : (string) ( Presenter::message( $message )['sender_name'] ?? '' ),
+			'sender_email'   => $user ? (string) $user->user_email : (string) get_option( 'admin_email' ),
+		] );
 	}
 }

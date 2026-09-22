@@ -6,6 +6,7 @@ import { inboxApi } from "./api";
 import { channelOf } from "./channels";
 import KnowledgeSettings from "./KnowledgeSettings";
 import SourcesSettings from "./SourcesSettings";
+import ConnectorCard, { connectorState } from "./ConnectorCard";
 
 const Field = ({ label, help, children, wide }) => (
   <label className={"zaplane-inbox-field" + (wide ? " is-wide" : "")}>
@@ -119,12 +120,33 @@ const Settings = ({ onSaved }) => {
   const [secrets, setSecrets] = useState({});
   const [active, setActive] = useState("widget");
   const [removedSources, setRemovedSources] = useState([]);
+  const [connectors, setConnectors] = useState([]);
+
+  // What's connected comes from workflows, which can change on another
+  // screen: read it again whenever this tab comes back into view.
+  const refreshConnectors = async () => {
+    try {
+      setConnectors((await inboxApi.connectors()) || []);
+    } catch (e) {
+      // Keep what we have.
+    }
+  };
+  useEffect(() => {
+    const onFocus = () => document.visibilityState === "visible" && refreshConnectors();
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
+    };
+  }, []);
   const pinnedUntil = useRef(0); // a nav click wins over the scroll spy for a moment
   const setSecret = (slug, key, v) => setSecrets({ ...secrets, [slug]: { ...(secrets[slug] || {}), [key]: v } });
 
   useEffect(() => {
     inboxApi.settings().then((d) => {
       setData(d);
+      setConnectors(d.connectors || []);
       setForm(toForm(d.settings, d));
       setSaved(toForm(d.settings, d));
     });
@@ -233,13 +255,6 @@ const Settings = ({ onSaved }) => {
   const connectionsUrl = "admin.php?page=zaplane-connections";
   const aiReady = form.ai.enabled && form.ai.connection_id;
 
-  const channelState = (slug, ch) => {
-    const cfg = form.channels?.[slug] || {};
-    if (!cfg.enabled) return { tone: "muted", text: __("Off", "zaplane") };
-    if (!cfg.connection_id || !ch.has_app_secret) return { tone: "warning", text: __("Needs setup", "zaplane") };
-    return { tone: "success", text: __("Receiving", "zaplane") };
-  };
-
   const navState = {
     widget: form.widget.enabled ? { tone: "success", text: __("On", "zaplane") } : { tone: "muted", text: __("Off", "zaplane") },
     knowledge: form.answers?.enabled
@@ -247,7 +262,7 @@ const Settings = ({ onSaved }) => {
       : { tone: "muted", text: __("Off", "zaplane") },
     ai: aiReady ? { tone: "success", text: __("On", "zaplane") } : form.ai.enabled ? { tone: "warning", text: __("Needs setup", "zaplane") } : { tone: "muted", text: __("Off", "zaplane") },
     channels: (() => {
-      const on = Object.entries(data?.channels || {}).filter(([slug]) => form.channels?.[slug]?.enabled).length;
+      const on = connectors.filter((c) => c.kind === "channel" && connectorState(c).on).length;
       return on ? { tone: "success", text: sprintf(__("%d on", "zaplane"), on) } : { tone: "muted", text: __("Off", "zaplane") };
     })(),
     sources: form.sources.length
@@ -458,26 +473,19 @@ const Settings = ({ onSaved }) => {
             <div>
               <h3>{__("Social channels", "zaplane")}</h3>
               <p>
-                {__("Bring Facebook Page messages and WhatsApp chats into this inbox, next to your website chat. Each channel uses a connection from Connections, the same one your workflows use.", "zaplane")}
+                {__("Bring Facebook Page messages and WhatsApp chats into this inbox. Each channel runs on two workflows set up from its recipe (messages in, replies out), with the connection you choose there. Turn them off here or on the Workflows screen.", "zaplane")}
               </p>
             </div>
           </div>
           <div className="zaplane-inbox-channels">
-            {Object.entries(data?.channels || {}).map(([slug, ch]) => {
-              const cfg = form.channels?.[slug] || { enabled: false, connection_id: 0 };
-              const { Icon, color } = channelOf(slug);
-              const state = channelState(slug, ch);
-              return (
-                <div key={slug} className={"zaplane-inbox-channel" + (cfg.enabled ? " is-on" : "")}>
-                  <div className="zaplane-inbox-channel-head">
-                    <span className="zaplane-inbox-channel-icon" style={{ color }}>
-                      <Icon />
-                    </span>
-                    <strong>{ch.label}</strong>
-                    <Status tone={state.tone}>{state.text}</Status>
-                    <ZAPToggle checked={!!cfg.enabled} onChange={(v) => setChannel(slug, "enabled", v)} label={__("Receive in the inbox", "zaplane")} />
-                  </div>
-                  {cfg.enabled && (
+            {connectors
+              .filter((c) => c.kind === "channel")
+              .map((c) => {
+                const slug = c.target;
+                const ch = data?.channels?.[slug] || {};
+                const cfg = form.channels?.[slug] || {};
+                return (
+                  <ConnectorCard key={c.id} connector={c} onChanged={refreshConnectors}>
                     <div className="zaplane-inbox-channel-routing">
                       <AnsweredBy value={cfg.answered_by || "assistant"} onChange={(v) => setChannel(slug, "answered_by", v)} aiReady={!!aiReady} />
                       {(ch.workflow_senders || []).length > 0 && (cfg.answered_by || "assistant") !== "workflows" && (
@@ -503,79 +511,56 @@ const Settings = ({ onSaved }) => {
                         </div>
                       )}
                     </div>
-                  )}
-                  {cfg.enabled && (
-                    <ol className="zaplane-inbox-steps">
-                      <li>
-                        <Field
-                          label={__("Connection", "zaplane")}
-                          help={
-                            ch.connections.length === 0 ? (
-                              <>
-                                {sprintf(__("No %s connection yet.", "zaplane"), ch.label)}{" "}
-                                <a href={connectionsUrl}>
-                                  {__("Add one in Connections", "zaplane")} <FiExternalLink />
-                                </a>
-                              </>
-                            ) : (
-                              __("Sends replies with this connection's token.", "zaplane")
-                            )
-                          }
-                        >
-                          <select className="zaplane-inbox-select" value={cfg.connection_id || 0} onChange={(e) => setChannel(slug, "connection_id", parseInt(e.target.value, 10) || 0)}>
-                            <option value={0}>{__("Choose a connection", "zaplane")}</option>
-                            {ch.connections.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.name}
-                              </option>
-                            ))}
-                          </select>
-                        </Field>
-                      </li>
-                      <li>
-                        <Field label={__("Callback URL for Meta", "zaplane")} help={__("Paste this into your Meta app's webhook settings and subscribe to messages.", "zaplane")}>
-                          <CopyField value={ch.webhook_url} />
-                        </Field>
-                      </li>
-                      <li>
-                        <Field
-                          label={__("Verify token", "zaplane")}
-                          help={ch.has_verify_token ? __("Saved. Type a new one to replace it.", "zaplane") : __("Make one up and use the same value in Meta.", "zaplane")}
-                        >
-                          <input
-                            className="zaplane-inbox-input"
-                            type="password"
-                            autoComplete="off"
-                            placeholder={ch.has_verify_token ? "••••••••" : ""}
-                            value={secrets[slug]?.verify_token || ""}
-                            onChange={(e) => setSecret(slug, "verify_token", e.target.value)}
-                          />
-                        </Field>
-                      </li>
-                      <li>
-                        <Field
-                          label={__("App secret", "zaplane")}
-                          help={
-                            ch.has_app_secret
-                              ? __("Saved. Messages are checked against it.", "zaplane")
-                              : __("Required: without it the inbox ignores deliveries, because they can't be checked.", "zaplane")
-                          }
-                        >
-                          <input
-                            className="zaplane-inbox-input"
-                            type="password"
-                            autoComplete="off"
-                            placeholder={ch.has_app_secret ? "••••••••" : ""}
-                            value={secrets[slug]?.app_secret || ""}
-                            onChange={(e) => setSecret(slug, "app_secret", e.target.value)}
-                          />
-                        </Field>
-                      </li>
-                    </ol>
-                  )}
-                </div>
-              );
-            })}
+                    <details className="zaplane-inbox-webhook" open={!ch.has_app_secret}>
+                      <summary>
+                        {__("Meta webhook", "zaplane")}{" "}
+                        {ch.has_app_secret ? <Status tone="success">{__("Ready", "zaplane")}</Status> : <Status tone="warning">{__("Needs setup", "zaplane")}</Status>}
+                      </summary>
+                      <ol className="zaplane-inbox-steps">
+                        <li>
+                          <Field label={__("Callback URL for Meta", "zaplane")} help={__("Paste this into your Meta app's webhook settings and subscribe to messages.", "zaplane")}>
+                            <CopyField value={ch.webhook_url} />
+                          </Field>
+                        </li>
+                        <li>
+                          <Field
+                            label={__("Verify token", "zaplane")}
+                            help={ch.has_verify_token ? __("Saved. Type a new one to replace it.", "zaplane") : __("Make one up and use the same value in Meta.", "zaplane")}
+                          >
+                            <input
+                              className="zaplane-inbox-input"
+                              type="password"
+                              autoComplete="off"
+                              placeholder={ch.has_verify_token ? "••••••••" : ""}
+                              value={secrets[slug]?.verify_token || ""}
+                              onChange={(e) => setSecret(slug, "verify_token", e.target.value)}
+                            />
+                          </Field>
+                        </li>
+                        <li>
+                          <Field
+                            label={__("App secret", "zaplane")}
+                            help={
+                              ch.has_app_secret
+                                ? __("Saved. Messages are checked against it.", "zaplane")
+                                : __("Required: without it the inbox ignores deliveries, because they can't be checked.", "zaplane")
+                            }
+                          >
+                            <input
+                              className="zaplane-inbox-input"
+                              type="password"
+                              autoComplete="off"
+                              placeholder={ch.has_app_secret ? "••••••••" : ""}
+                              value={secrets[slug]?.app_secret || ""}
+                              onChange={(e) => setSecret(slug, "app_secret", e.target.value)}
+                            />
+                          </Field>
+                        </li>
+                      </ol>
+                    </details>
+                  </ConnectorCard>
+                );
+              })}
           </div>
         </section>
 
@@ -587,6 +572,8 @@ const Settings = ({ onSaved }) => {
             </div>
           </div>
           <SourcesSettings
+            connectors={connectors.filter((c) => c.kind === "source")}
+            onConnectorsChanged={refreshConnectors}
             sources={form.sources}
             onChange={(sources) => setForm({ ...form, sources })}
             removed={removedSources}

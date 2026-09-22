@@ -15,7 +15,11 @@ use Zaplane\Integrations\{Messenger, Whatsapp, Memory};
 zt_run( function () {
 	$calls = [];
 	zt_mock_meta( $calls );
-	IS::save( [ 'channels' => [ 'messenger' => [ 'enabled' => true, 'connection_id' => 1 ], 'whatsapp' => [ 'enabled' => true, 'connection_id' => 1 ] ] ] );
+	// Messenger and WhatsApp reach the inbox (their workflows are active).
+	zt_connectors( [
+		[ 'app' => 'messenger', 'event' => 'inbox_receive', 'connection_id' => 1 ],
+		[ 'app' => 'whatsapp', 'event' => 'inbox_receive', 'connection_id' => 1 ],
+	] );
 
 	$graph = fn( $mode ) => [ 'nodes' => [
 		[ 'id' => '1', 'data' => [ 'app' => 'messenger', 'event' => 'message_received' ] ],

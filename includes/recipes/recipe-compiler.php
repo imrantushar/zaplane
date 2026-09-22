@@ -93,6 +93,8 @@ final class RecipeCompiler {
 			'workflows' => array_values( $compiled ),
 			// Where else it's offered, e.g. "inbox": the Inbox lists those.
 			'tags'      => self::tags( $recipe['tags'] ?? [] ),
+			// For the Inbox: the channel or source these workflows connect.
+			'inbox'     => array_map( 'sanitize_key', array_intersect_key( (array) ( $recipe['inbox'] ?? [] ), [ 'channel' => 1, 'source' => 1 ] ) ),
 		];
 	}
 
