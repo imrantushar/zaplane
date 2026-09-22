@@ -17,7 +17,12 @@ import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import FlowTopBar from "./FlowTopBar/FlowTopBar";
-import MissingConnections from "./MissingConnections";
+import MissingConnections, { stepsMissingConnection } from "./MissingConnections";
+import useConnection from "@ZAPHooks/useConnection/useConnection";
+import ConnectionDrawer from "@ZAPComponents/ConnectionDrawer";
+import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
+import { integrations } from "@ZAPUtils/helper";
+import { _n, sprintf } from "@wordpress/i18n";
 
 // What the node and edge renderers need that changes from render to render. The
 // renderers themselves are defined once, below. Building nodeTypes inside the
@@ -127,6 +132,36 @@ export default function FlowCanvas({
     canvasLayout,
     setCanvasLayOut
   });
+  // "Add connection" from the notice: the connection form opens right here,
+  // and the new connection is linked to every step of that app still
+  // missing one (saved with the workflow on Update).
+  const missingApps = [...new Set(stepsMissingConnection(nodes).map(node => node.data.app))];
+  const [connectionsVersion, setConnectionsVersion] = useState(0);
+  const linkConnection = ({ id, app }) => {
+    const count = nodes.filter(node => node.data?.app === app && !node.data?.connection_id).length;
+    setNodes(nds => nds.map(node => node.data?.app === app && !node.data?.connection_id ? {
+      ...node,
+      data: { ...node.data, connection_id: String(id) }
+    } : node));
+    setConnectionsVersion(v => v + 1);
+    const appName = (integrations?.apps?.[app] || integrations?.tools?.[app])?.name || app;
+    dispatch(showNotification({
+      isShow: true,
+      type: "success",
+      message: count
+        ? sprintf(_n("%1$s connected and linked to %2$d step. Click Update to save the workflow.", "%1$s connected and linked to %2$d steps. Click Update to save the workflow.", count, "zaplane"), appName, count)
+        : sprintf(__("%s connected.", "zaplane"), appName)
+    }));
+  };
+  const connection = useConnection({ onlyApps: missingApps, onSaved: linkConnection });
+  const [lockedApp, setLockedApp] = useState(false);
+  const addConnection = app => {
+    const target = app || (missingApps.length === 1 ? missingApps[0] : null);
+    setLockedApp(!!target);
+    if (target) connection.openForApp(target);
+    else connection.openDrawer();
+  };
+
   const onAddNode = edgeId => {
     const edge = edges.find(e => e.id === edgeId);
     setDrawerContext({
@@ -212,7 +247,8 @@ export default function FlowCanvas({
     <FlowTopBar workFlow={workFlow} isFullscreen={isFullscreen} toggleFullscreen={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)} id={id} values={values} setFieldValue={setFieldValue} handleSubmit={handleSubmit} activeDrawer={activeDrawer} setActiveDrawer={setActiveDrawer} isFlowDirty={isFlowDirty} onNavigateBack={onNavigateBack} renderTopBar={renderTopBar} />
 
     <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-    {!loading && <MissingConnections nodes={nodes} status={values?.status || workFlow?.workflow?.status} onOpenStep={openDrawerForNode} />}
+    {!loading && <MissingConnections nodes={nodes} status={values?.status || workFlow?.workflow?.status} onOpenStep={openDrawerForNode} onAddConnection={addConnection} refreshKey={connectionsVersion} />}
+    <ConnectionDrawer {...connection} variant="modal" lockedApp={lockedApp} />
     {loading ? <ZAPLoading /> : <CanvasContext.Provider value={canvas}>
     <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} isValidConnection={isValidConnection} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} onConnectStart={onConnectStart} onConnectEnd={onConnectEnd}
       // A line snaps to a handle from this far away, so it needn't land on the dot.

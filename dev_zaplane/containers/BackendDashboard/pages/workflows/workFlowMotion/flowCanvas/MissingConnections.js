@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
 import { FiAlertTriangle, FiArrowRight, FiChevronDown, FiChevronUp, FiPlus } from "react-icons/fi";
-import { integrations, plugin_root_url, route_path } from "@ZAPUtils/helper";
+import { API, integrations, namespace, plugin_root_url } from "@ZAPUtils/helper";
 
 const appOf = (node) => integrations?.apps?.[node?.data?.app] || integrations?.tools?.[node?.data?.app];
 
@@ -32,7 +32,7 @@ const readFolded = () => {
   }
 };
 
-const MissingConnections = ({ nodes, status, onOpenStep }) => {
+const MissingConnections = ({ nodes, status, onOpenStep, onAddConnection, refreshKey = 0 }) => {
   const [folded, setFoldedState] = useState(readFolded);
   const setFolded = (value) => {
     setFoldedState(value);
@@ -43,6 +43,23 @@ const MissingConnections = ({ nodes, status, onOpenStep }) => {
     }
   };
   const missing = stepsMissingConnection(nodes);
+  const apps = [...new Set(missing.map((node) => node.data.app))];
+
+  // How many accounts each app already has: none → the step offers to add
+  // one here; some → it opens the step to pick one.
+  const [counts, setCounts] = useState({});
+  useEffect(() => {
+    let live = true;
+    apps.forEach((app) =>
+      API.get(namespace + "connections", { params: { app, per_page: 1 } })
+        .then((res) => live && setCounts((c) => ({ ...c, [app]: res?.data?.pagination?.total ?? (res?.data?.data || []).length })))
+        .catch(() => {})
+    );
+    return () => {
+      live = false;
+    };
+  }, [apps.join(","), refreshKey]);
+
   if (!missing.length) return null;
 
   const live = status === "active";
@@ -74,19 +91,21 @@ const MissingConnections = ({ nodes, status, onOpenStep }) => {
               : __("Pick an account for each step below, then turn the workflow on.", "zaplane")}
           </span>
         </div>
-        <a className="zaplane-needs-connection__add" href={`${route_path}admin.php?page=zaplane-connections`} target="_blank" rel="noopener noreferrer">
+        <button type="button" className="zaplane-needs-connection__add" onClick={() => onAddConnection()}>
           <FiPlus aria-hidden="true" />
           {__("Add connection", "zaplane")}
-        </a>
+        </button>
         <button type="button" className="zaplane-needs-connection__fold" onClick={() => setFolded(true)} aria-label={__("Hide", "zaplane")} title={__("Hide", "zaplane")}>
           <FiChevronUp />
         </button>
       </div>
 
       <ul className="zaplane-needs-connection__steps">
-        {missing.map((node) => (
+        {missing.map((node) => {
+          const none = counts[node.data.app] === 0;
+          return (
           <li key={node.id}>
-            <button type="button" onClick={() => onOpenStep(node)}>
+            <button type="button" onClick={() => (none ? onAddConnection(node.data.app) : onOpenStep(node))}>
               <span className="zaplane-needs-connection__mark">
                 <AppMark node={node} />
               </span>
@@ -95,12 +114,13 @@ const MissingConnections = ({ nodes, status, onOpenStep }) => {
                 <em>{appOf(node)?.name || node.data.app}</em>
               </span>
               <span className="zaplane-needs-connection__choose">
-                {__("Choose account", "zaplane")}
-                <FiArrowRight aria-hidden="true" />
+                {none ? __("Add account", "zaplane") : __("Choose account", "zaplane")}
+                {none ? <FiPlus aria-hidden="true" /> : <FiArrowRight aria-hidden="true" />}
               </span>
             </button>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );

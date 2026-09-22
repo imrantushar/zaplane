@@ -253,7 +253,9 @@
 	}
 }
 
-.zaplane-needs-connection__add {
+.zaplane-needs-connection .zaplane-needs-connection__add {
+	font-family: inherit;
+	cursor: pointer;
 	display: inline-flex;
 	flex: none;
 	align-items: center;
