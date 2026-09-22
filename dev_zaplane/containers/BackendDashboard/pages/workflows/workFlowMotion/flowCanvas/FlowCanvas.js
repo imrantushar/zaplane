@@ -211,9 +211,8 @@ export default function FlowCanvas({
 
     <FlowTopBar workFlow={workFlow} isFullscreen={isFullscreen} toggleFullscreen={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)} id={id} values={values} setFieldValue={setFieldValue} handleSubmit={handleSubmit} activeDrawer={activeDrawer} setActiveDrawer={setActiveDrawer} isFlowDirty={isFlowDirty} onNavigateBack={onNavigateBack} renderTopBar={renderTopBar} />
 
+    <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
     {!loading && <MissingConnections nodes={nodes} status={values?.status || workFlow?.workflow?.status} onOpenStep={openDrawerForNode} />}
-
-    <div style={{ flex: 1, overflow: 'hidden' }}>
     {loading ? <ZAPLoading /> : <CanvasContext.Provider value={canvas}>
     <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} isValidConnection={isValidConnection} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} onConnectStart={onConnectStart} onConnectEnd={onConnectEnd}
       // A line snaps to a handle from this far away, so it needn't land on the dot.
