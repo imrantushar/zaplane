@@ -49,9 +49,8 @@ const ListFilters = ({ tabs, counts, group = null, filters, onChange, searchPlac
 
       <div className="zaplane-list-filters__right">
         {filtered && (
-          <button type="button" className="zaplane-list-filters__clear" onClick={() => onChange(empty)} title={__("Clear all filters", "zaplane")}>
+          <button type="button" className="zaplane-list-filters__clear" onClick={() => onChange(empty)} title={__("Clear filters", "zaplane")} aria-label={__("Clear filters", "zaplane")}>
             <FiX aria-hidden="true" />
-            {__("Clear filters", "zaplane")}
           </button>
         )}
         {group && (
