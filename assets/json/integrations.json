@@ -2352,6 +2352,16 @@
                         "main"
                     ]
                 },
+                "subscription_renewal_payment_failed": {
+                    "label": "Subscription Renewal Payment Failed",
+                    "hook": "storeengine/subscription/renewal_payment_failed",
+                    "requires_addon": "subscription",
+                    "key": "subscription_renewal_payment_failed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "subscription_trial_ended": {
                     "label": "Subscription Trial Ended",
                     "hook": "storeengine/subscription/trial_ended",
@@ -2839,6 +2849,13 @@
                             "label": "Usage Limit (total)",
                             "type": "expression",
                             "required": false
+                        },
+                        {
+                            "key": "random_suffix",
+                            "label": "Add a random ending to the code",
+                            "type": "boolean",
+                            "required": false,
+                            "help": "Makes a code built from an order or customer number impossible to guess."
                         }
                     ],
                     "outputs": [
@@ -6855,44 +6872,811 @@
             "webhook_route": "",
             "webhook_setup": [],
             "triggers": {
-                "attendEvent": {
-                    "label": "User attended an event",
-                    "hook": "event_tickets_checkin",
-                    "key": "attendEvent",
-                    "schema": [],
+                "event_created": {
+                    "label": "Event Created",
+                    "hook": [
+                        "wp_after_insert_post",
+                        "tribe_events_update_meta"
+                    ],
+                    "key": "event_created",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "attendeeRegistered": {
-                    "label": "Attendee registered for an event",
-                    "hook": "event_tickets_rsvp_attendee_created",
-                    "key": "attendeeRegistered",
-                    "schema": [],
+                "event_published": {
+                    "label": "Event Published",
+                    "hook": "transition_post_status",
+                    "key": "event_published",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "new_status",
+                            "label": "Only new status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "newAttendee": {
-                    "label": "New attendee registered",
-                    "hook": "event_tickets_rsvp_tickets_generated_for_product",
-                    "key": "newAttendee",
-                    "schema": [],
+                "event_updated": {
+                    "label": "Event Updated",
+                    "hook": "wp_after_insert_post",
+                    "key": "event_updated",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "attendeeRegisteredWc": {
-                    "label": "Attendee registered via WooCommerce",
-                    "hook": "tribe_tickets_attendee_repository_create_attendee_for_ticket_after_create",
-                    "key": "attendeeRegisteredWc",
-                    "schema": [],
+                "event_deleted": {
+                    "label": "Event Deleted",
+                    "hook": "before_delete_post",
+                    "key": "event_deleted",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "event_status_changed": {
+                    "label": "Event Status Changed",
+                    "hook": "transition_post_status",
+                    "key": "event_status_changed",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "new_status",
+                            "label": "Only new status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "venue_created": {
+                    "label": "Venue Created",
+                    "hook": "wp_after_insert_post",
+                    "key": "venue_created",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Only venue ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "venue_status",
+                            "label": "Only venue status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "venue_updated": {
+                    "label": "Venue Updated",
+                    "hook": "wp_after_insert_post",
+                    "key": "venue_updated",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Only venue ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "venue_status",
+                            "label": "Only venue status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "venue_deleted": {
+                    "label": "Venue Deleted",
+                    "hook": "before_delete_post",
+                    "key": "venue_deleted",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Only venue ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "venue_status",
+                            "label": "Only venue status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "organizer_created": {
+                    "label": "Organizer Created",
+                    "hook": "wp_after_insert_post",
+                    "key": "organizer_created",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Only organizer ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "organizer_status",
+                            "label": "Only organizer status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "organizer_updated": {
+                    "label": "Organizer Updated",
+                    "hook": "wp_after_insert_post",
+                    "key": "organizer_updated",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Only organizer ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "organizer_status",
+                            "label": "Only organizer status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "organizer_deleted": {
+                    "label": "Organizer Deleted",
+                    "hook": "before_delete_post",
+                    "key": "organizer_deleted",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Only organizer ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "organizer_status",
+                            "label": "Only organizer status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "event_linked_related_post": {
+                    "label": "Event Linked to Related Post",
+                    "hook": [
+                        "added_post_meta",
+                        "updated_post_meta"
+                    ],
+                    "key": "event_linked_related_post",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "related_type",
+                            "label": "Only venue or organizer (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "related_post_id",
+                            "label": "Only related post ID (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "event_unlinked_related_post": {
+                    "label": "Event Unlinked from Related Post",
+                    "hook": [
+                        "deleted_post_meta",
+                        "updated_post_meta"
+                    ],
+                    "key": "event_unlinked_related_post",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "related_type",
+                            "label": "Only venue or organizer (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "related_post_id",
+                            "label": "Only related post ID (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 }
             },
-            "actions": []
+            "actions": {
+                "create_event": {
+                    "label": "Create Event",
+                    "key": "create_event",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Event Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "start",
+                            "label": "Start (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "end",
+                            "label": "End (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status: draft or publish",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_event": {
+                    "label": "Update Event",
+                    "key": "update_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Event Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "start",
+                            "label": "Start (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "end",
+                            "label": "End (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "content",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status: draft, publish, pending or private",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_event": {
+                    "label": "Delete Event",
+                    "key": "delete_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_event_details": {
+                    "label": "Get Event Details",
+                    "key": "get_event_details",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_events": {
+                    "label": "Search Events",
+                    "key": "search_events",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search text",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_venue": {
+                    "label": "Create Venue",
+                    "key": "create_venue",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Venue Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "address",
+                            "label": "Address",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "country",
+                            "label": "Country",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "zip",
+                            "label": "Zip",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_venue": {
+                    "label": "Update Venue",
+                    "key": "update_venue",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Venue ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Venue Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "address",
+                            "label": "Address",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "country",
+                            "label": "Country",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "zip",
+                            "label": "Zip",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_venue": {
+                    "label": "Delete Venue",
+                    "key": "delete_venue",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Venue ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_venue_details": {
+                    "label": "Get Venue Details",
+                    "key": "get_venue_details",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Venue ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_venues": {
+                    "label": "Search Venues",
+                    "key": "search_venues",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search text",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_organizer": {
+                    "label": "Create Organizer",
+                    "key": "create_organizer",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Organizer Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "website",
+                            "label": "Website",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_organizer": {
+                    "label": "Update Organizer",
+                    "key": "update_organizer",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Organizer ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Organizer Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "website",
+                            "label": "Website",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_organizer": {
+                    "label": "Delete Organizer",
+                    "key": "delete_organizer",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Organizer ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_organizer_details": {
+                    "label": "Get Organizer Details",
+                    "key": "get_organizer_details",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Organizer ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_organizers": {
+                    "label": "Search Organizers",
+                    "key": "search_organizers",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search text",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_venue_to_event": {
+                    "label": "Add Venue to Event",
+                    "key": "add_venue_to_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "venue_id",
+                            "label": "Venue ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_venue_from_event": {
+                    "label": "Remove Venue from Event",
+                    "key": "remove_venue_from_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "venue_id",
+                            "label": "Venue ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_organizer_to_event": {
+                    "label": "Add Organizer to Event",
+                    "key": "add_organizer_to_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "organizer_id",
+                            "label": "Organizer ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_organizer_from_event": {
+                    "label": "Remove Organizer from Event",
+                    "key": "remove_organizer_from_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "organizer_id",
+                            "label": "Organizer ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         },
         "fillout": {
             "slug": "fillout",

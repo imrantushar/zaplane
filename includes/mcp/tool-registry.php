@@ -11,7 +11,9 @@ use Zaplane\Models\NodeRun;
 use Zaplane\Models\Recipe;
 use Zaplane\Models\Run;
 use Zaplane\Models\Workflow;
+use Zaplane\Recipes\Registry;
 use Zaplane\Services\BlueprintService;
+use Zaplane\Services\RecipeGroupService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -156,7 +158,7 @@ class ToolRegistry {
 			],
 			'create_workflow_from_recipe' => [
 				'scope'       => TokenStore::SCOPE_WRITE,
-				'description' => 'Create a workflow from a ready-made recipe. Any connections it uses must be linked afterwards in the editor.',
+				'description' => 'Create a workflow from a ready-made recipe. Any connections it uses must be linked afterwards in the editor. A group recipe (type "group" in list_recipes) sets up several workflows and is set up from the dashboard instead.',
 				'properties'  => [
 					'recipe_id' => $i( 'Recipe to instantiate.' ),
 					'title'     => $s( 'Optional title for the new workflow.' ),
@@ -184,7 +186,7 @@ class ToolRegistry {
 			],
 			'list_recipes' => [
 				'scope'       => TokenStore::SCOPE_READ,
-				'description' => 'List the ready-made recipe templates available on this site.',
+				'description' => 'List the ready-made recipe templates available on this site. type is "workflow" for a recipe that creates one workflow, or "group" for one that sets up several.',
 				'properties'  => [],
 				'required'    => [],
 			],
@@ -616,15 +618,30 @@ class ToolRegistry {
 			throw new \InvalidArgumentException( 'Recipe ' . (int) $recipe_id . ' not found.' );
 		}
 
+		if ( $recipe->isGroup() ) {
+			throw new \InvalidArgumentException( 'Recipe ' . (int) $recipe_id . ' is a group recipe, which sets up several workflows. Set it up from Recipes in the Zaplane dashboard.' );
+		}
+
 		$blueprint = $recipe->getBlueprint();
 		if ( empty( $blueprint ) ) {
 			throw new \RuntimeException( 'Recipe blueprint is empty.' );
 		}
 
-		$workflow = ( new BlueprintService() )->import(
-			$blueprint,
-			sanitize_text_field( (string) ( $args['title'] ?? '' ) )
-		);
+		$title = sanitize_text_field( (string) ( $args['title'] ?? '' ) );
+
+		// A registered recipe is set up as the dashboard does it, with its defaults.
+		if ( isset( $blueprint['workflows'] ) ) {
+			$created = ( new RecipeGroupService() )->install( $recipe, [ 'title' => $title ] )['workflows'][0];
+
+			return [
+				'workflow_id'           => (int) $created['id'],
+				'title'                 => (string) $created['title'],
+				'status'                => (string) $created['status'],
+				'connections_to_relink' => [],
+			];
+		}
+
+		$workflow = ( new BlueprintService() )->import( $blueprint, $title );
 
 		return [
 			'workflow_id'           => (int) $workflow->id,
@@ -688,11 +705,14 @@ class ToolRegistry {
 	 * @return array<string,mixed>
 	 */
 	private static function list_recipes(): array {
+		Registry::instance()->sync();
+
 		$out = [];
 
 		foreach ( Recipe::orderBy( 'id', 'asc' )->limit( self::MAX_LIMIT )->get() as $recipe ) {
 			$out[] = [
 				'id'          => (int) $recipe->id,
+				'type'        => $recipe->isGroup() ? Recipe::TYPE_GROUP : Recipe::TYPE_WORKFLOW,
 				'title'       => $recipe->title,
 				'description' => $recipe->description ?? '',
 			];

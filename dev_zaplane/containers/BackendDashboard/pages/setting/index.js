@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { __ } from '@wordpress/i18n';
 import { FiCpu, FiDroplet, FiGrid } from 'react-icons/fi';
 import PageLayout from '@ZAPComponents/PageLayout';
+import Toggle from '@ZAPComponents/ZAPToggle';
 import { getSettings, saveSettings } from '@ZAPRedux/Slices/settingSlice/settingSlice';
 import { fetchAdminMenuItems } from '@ZAPRedux/Slices/menuSlice/menuSlice';
 import { applyThemePalettes, useThemeMode } from '@ZAPUtils/theme';
@@ -31,24 +32,6 @@ const panelTabs = (modules, features) =>
     }));
 
 const clone = obj => JSON.parse(JSON.stringify(obj));
-
-const Toggle = ({ checked, onChange }) => (
-  <button
-    type="button"
-    role="switch"
-    aria-checked={checked}
-    onClick={() => onChange(!checked)}
-    // Track color set inline so it beats Tailwind preflight's transparent
-    // background-color on [type=button] (which outranks the bg-[...] utility).
-    style={{ backgroundColor: checked ? 'var(--zaplane-primary)' : 'var(--zaplane-border-color)' }}
-    className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors"
-  >
-    <span
-      className={`inline-block h-[18px] w-[18px] transform rounded-full bg-white transition-transform ${checked ? 'translate-x-[23px]' : 'translate-x-[3px]'}`}
-      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
-    />
-  </button>
-);
 
 const ColorRow = ({ label, value, onChange }) => (
   <div className="flex items-center justify-between gap-3 py-2">
