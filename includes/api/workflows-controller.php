@@ -240,9 +240,27 @@ class WorkflowsController extends WP_REST_Controller {
 	}
 
 	public function create_item( $request ) {
+		$userId = get_current_user_id();
+		$title  = sanitize_text_field( $request['title'] ?? '' );
+
+		if ( empty( $title ) ) {
+			return new WP_Error( 'missing_title', 'Workflow title is required', [ 'status' => 400 ] );
+		}
+
+		// Prevent rapid duplicate creation (within 2 seconds for same title and user)
+		$existing = Workflow::where( 'title', $title )
+			->where( 'user_id', $userId )
+			->where( 'created_at', '>=', gmdate( 'Y-m-d H:i:s', time() - 2 ) )
+			->orderBy( 'id', 'desc' )
+			->first();
+
+		if ( $existing ) {
+			return rest_ensure_response( [ 'id' => $existing->id ] );
+		}
+
 		$workflow = Workflow::create([
-			'user_id' => get_current_user_id(),
-			'title'   => sanitize_text_field( $request['title'] ),
+			'user_id' => $userId,
+			'title'   => $title,
 			'status'  => 'draft',
 		]);
 

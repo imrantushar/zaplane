@@ -20,7 +20,6 @@ const RunsTable = ({
   const {
     runs = [],
     currentPage,
-    perPage,
     totalItems,
     itemPerPage
   } = useSelector(state => state.workflows);
@@ -46,10 +45,10 @@ const RunsTable = ({
     return () => clearInterval(interval);
   }, [currentPage, itemPerPage, activeDrawer]);
   const handlePageChange = newPage => {
-    handleRefresh(newPage, perPage);
+    handleRefresh(newPage, itemPerPage);
   };
   const handlePerPageChange = itemsPerPage => {
-    handleRefresh(currentPage, itemsPerPage);
+    handleRefresh(1, itemsPerPage);
   };
   const columns = [{
     name: __('Run ID', 'zaplane'),
@@ -112,13 +111,12 @@ const RunsTable = ({
        data={runs} 
        showSubHeader={false} 
        showColumnFilter={false} 
-       showPagination={totalItems >= 10} 
+       showPagination={totalItems > 0}
        noDataText={__("No history found", "zaplane")} 
        totalItems={totalItems} 
        dataFetchingStatus={loading} 
        suffix="history-table" 
        currentPageNumber={currentPage} 
-       perPage={perPage} 
        rowsPerPage={itemPerPage} 
        onChangePage={handlePageChange} 
        onChangeItemsPerPage={handlePerPageChange} />

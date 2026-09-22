@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HiChevronDoubleLeft, HiChevronDoubleRight } from 'react-icons/hi';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import './styles.scss';
@@ -10,20 +10,18 @@ const Pagination = ({
 }) => {
   const [page, setPage] = useState(currentPageNumber ? currentPageNumber : 1);
   const totalPages = Math.ceil(totalItems / rowsPerPage) || 0;
-  const renderFirstPage = rowsPerPage >= totalItems ? 1 : currentPageNumber;
+  const safeCurrentPage = Math.min(
+    Math.max(Number(currentPageNumber) || 1, 1),
+    totalPages || 1
+  );
   const pageNumbers = Array.from({
     length: totalPages
   }, (_, index) => index + 1);
-  const showNextButton = page < pageNumbers.length && totalItems > rowsPerPage;
-  const showPrevButton = page > 1 && totalItems > rowsPerPage;
+  const canGoNext = page < pageNumbers.length;
+  const canGoPrev = page > 1;
   useEffect(() => {
-    setPage(renderFirstPage);
-  }, [rowsPerPage]);
-  useMemo(() => {
-    if (currentPageNumber !== page) {
-      setPage(currentPageNumber);
-    }
-  }, [currentPageNumber]);
+    setPage(safeCurrentPage);
+  }, [safeCurrentPage]);
   const handlePageChange = newPage => {
     setPage(newPage);
     fetchHandler(newPage, rowsPerPage);
@@ -110,38 +108,38 @@ const Pagination = ({
     return renderedPages;
   };
   return <div className="zaplane-pagination">
-			{showPrevButton && <>
-					<button borderWidth="1px" _hover={{
+			{pageNumbers.length > 0 && <>
+					<button disabled={!canGoPrev} aria-label="First page" borderWidth="1px" _hover={{
         bg: 'var(--zaplane-secondary-color)'
       }} height="auto" minWidth="auto" padding="6px" onClick={() => {
         handlePageChange(1);
-      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent">
+      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent disabled:opacity-40 disabled:cursor-not-allowed">
 						<IoIosArrowBack style={{width:"16px", height:"16px"}} />
 					</button>
-					<button borderWidth="1px" _hover={{
+					<button disabled={!canGoPrev} aria-label="Previous page" borderWidth="1px" _hover={{
         bg: 'var(--zaplane-secondary-color)'
       }} height="auto" minWidth="auto" padding="6px" onClick={() => {
         handlePageChange(page - 1);
-      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent">
+      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent disabled:opacity-40 disabled:cursor-not-allowed">
 						<HiChevronDoubleLeft style={{width:"16px", height:"16px"}} />
 					</button>
 				</>}
-			{pageNumbers.length > 1 && <ul className="zaplane-pagination-list">
+			{pageNumbers.length > 0 && <ul className="zaplane-pagination-list">
 					{renderPageNumbers()}
 				</ul>}
-			{showNextButton && <>
-					<button borderWidth="1px" _hover={{
+			{pageNumbers.length > 0 && <>
+					<button disabled={!canGoNext} aria-label="Next page" borderWidth="1px" _hover={{
         bg: 'var(--zaplane-secondary-color)'
       }} height="auto" minWidth="auto" padding="6px" onClick={() => {
         handlePageChange(page + 1);
-      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent">
+      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent disabled:opacity-40 disabled:cursor-not-allowed">
 						<IoIosArrowForward style={{width:"16px", height:"16px"}} />
 					</button>
-					<button borderWidth="1px" _hover={{
+					<button disabled={!canGoNext} aria-label="Last page" borderWidth="1px" _hover={{
         bg: 'var(--zaplane-secondary-color)'
       }} height="auto" minWidth="auto" padding="6px" onClick={() => {
         handlePageChange(pageNumbers.length);
-      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent">
+      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent disabled:opacity-40 disabled:cursor-not-allowed">
 						<HiChevronDoubleRight style={{width:"16px", height:"16px"}} />
 					</button>
 				</>}

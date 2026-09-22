@@ -93,6 +93,10 @@ Under **Actions → Add action**:
    - **Method**: `GET` / `POST` / …
    - **Path**: relative to the base URL, e.g. `/deals/{{ deal_id }}`
    - **Headers (JSON)** and **Body (JSON)** — may contain `{{ placeholders }}`.
+   - Upstream workflow output is available under `{{ input.* }}`, e.g.
+     `{{ input.id }}` or `{{ input.response.data }}`. This is useful when an
+     action should pass data from the preceding node without adding a duplicate
+     input field.
 4. **Outputs** — fields downstream nodes can use (see step 5).
 
 ### ✅ Send test request — the key verification step
@@ -100,8 +104,11 @@ Under **Actions → Add action**:
 Below the request there's a **Test** panel:
 
 1. Fill the **(test)** sample values for your input fields.
-2. Click **Send test request**.
-3. You'll see the live result:
+2. If the app uses authentication, fill the **Authentication values (test only)**
+   fields shown below the input fields. These values are sent only for this
+   preview and are never saved into the app manifest.
+3. Click **Send test request**.
+4. You'll see the live result:
    - The resolved **URL** and **HTTP status** (green = 2xx).
    - The full **response body** (JSON).
    - An error message if the call failed.
@@ -192,6 +199,7 @@ field *definitions* — so imported apps ask each site to enter their own.)
 | Test request refused by filter | A `zaplane_http_block_request` filter is blocking the host (e.g. private/localhost ranges). |
 | `401` / `403` | Auth not injected correctly — check the inject **Name**/**template**, or the connection credentials. |
 | Placeholders come through literally (`{{ post_id }}`) | The field key doesn't match the placeholder, or you didn't supply a test value. |
+| Upstream data is missing from an action request | Reference it through the `input` namespace, for example `{{ input.id }}`. |
 | Body sent as a string, API rejects it | Ensure the **Body (JSON)** is valid JSON; the builder shows a parse error if not. |
 | Outputs empty downstream | Add explicit **Outputs** (or reference `response.<path>`); run/test the node so real values are captured. |
 
