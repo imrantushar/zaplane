@@ -41,18 +41,18 @@ const WorkflowTable = ({
     data: folderData,
     totalItems: folderTotal,
     currentPage: folderPage,
-    perPage: folderPerPage
+    itemPerPage: folderPerPage
   } = folderState;
   const {
     allWorkFlows,
     totalItems,
     currentPage,
-    perPage
+    itemPerPage
   } = globalState;
   const workflows = isFolder ? folderData ?? [] : Array.isArray(allWorkFlows) ? allWorkFlows : [];
   const totalCount = isFolder ? folderTotal : totalItems;
-  const activePage = isFolder ? folderPage : currentPage;
-  const activePerPage = isFolder ? folderPerPage : perPage;
+  const activePage = (isFolder ? folderPage : currentPage) ?? 1;
+  const activePerPage = (isFolder ? folderPerPage : itemPerPage) ?? 10;
   const [loading, setLoading] = useState(workflows.length === 0);
   const [selection, setSelection] = useState([]);
   const [activeRunId, setActiveRunId] = useState(null);
@@ -66,7 +66,7 @@ const WorkflowTable = ({
       await dispatch(getFolderWorkflows({
         folder_id: folderId,
         page,
-        perPage: per_page
+        per_page
       }));
     } else {
       await dispatch(getWorkFlow({
@@ -80,7 +80,7 @@ const WorkflowTable = ({
     handleRefresh();
   }, []);
   const handlePageChange = newPage => handleRefresh(newPage, activePerPage);
-  const handlePerPageChange = itemsPerPage => handleRefresh(activePage, itemsPerPage);
+  const handlePerPageChange = itemsPerPage => handleRefresh(1, itemsPerPage);
   const handleExport = async row => {
     try {
       const res = await dispatch(exportWorkflows({
@@ -245,11 +245,11 @@ const WorkflowTable = ({
       data={workflows} 
       isRowSelectable 
       getSelectRowValue={rows => setSelection(rows || [])} 
-      showPagination={totalCount > 10} noDataText={__("No workflows found", "zaplane")} 
+      showPagination={totalCount > 0} noDataText={__("No workflows found", "zaplane")}
       dataFetchingStatus={loading} 
       totalItems={totalCount} 
       currentPageNumber={activePage} 
-      perPage={activePerPage} 
+      rowsPerPage={activePerPage}
       onChangePage={handlePageChange} 
       onChangeItemsPerPage={handlePerPageChange} />
 
