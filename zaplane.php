@@ -150,9 +150,11 @@ final class Zaplane {
 		// Activation covers fresh installs; this covers plugin updates (where the
 		// activation hook doesn't fire). Previously the seeders ran unconditionally
 		// on every page load, REST call and cron tick — five SELECTs of pure waste.
-		if ( version_compare( (string) get_option( 'zaplane_db_version', '0.0.0' ), ZAPLANE_VERSION, '<' ) ) {
-			\Zaplane\Installer::init()->run();
-		}
+        add_action( 'init', function () {
+            if ( version_compare( (string) get_option( 'zaplane_db_version', '0.0.0' ), ZAPLANE_VERSION, '<' ) ) {
+                \Zaplane\Installer::init()->run();
+            }
+        }, 20 );
 
 		do_action( 'zaplane_init' );
 	}
