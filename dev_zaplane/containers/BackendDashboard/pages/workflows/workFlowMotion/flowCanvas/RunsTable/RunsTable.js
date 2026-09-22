@@ -57,10 +57,12 @@ const RunsTable = ({
     textAlign: "center"
   }, {
     name: __('Trigger', 'zaplane'),
-    cell: row => row.trigger ? <span className="truncate" title={row.trigger.label || ""}>
+    cell: row => row.trigger ? <span className="block truncate whitespace-nowrap" title={row.trigger.label || ""}>
           {sprintf(__("Trigger %d", "zaplane"), row.trigger.number)}
           {row.trigger.label ? <span className="text-[var(--zaplane-font-secondary-color)]">{` · ${row.trigger.label}`}</span> : null}
-        </span> : <span className="text-[var(--zaplane-font-secondary-color)]">—</span>
+        </span> : <span className="text-[var(--zaplane-font-secondary-color)]">—</span>,
+    columnWidth: "280px",
+    textAlign: "start"
   }, {
     name: __('Status', 'zaplane'),
     cell: row => <span textTransform="capitalize" style={statusStyle(row.status)} className="px-2 py-0.5 rounded-md text-[xs]">
