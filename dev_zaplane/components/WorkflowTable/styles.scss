@@ -1,0 +1,137 @@
+// Status tabs, folder filter and search above the workflow list.
+.zaplane-workflow-filters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px 16px;
+	margin-bottom: 16px;
+}
+
+.zaplane-workflow-filters .zaplane-workflow-filters__tabs {
+	display: inline-flex;
+	gap: 4px;
+	padding: 4px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 10px;
+	background: var(--zaplane-background, #fff);
+
+	button {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 6px 12px;
+		border: 0;
+		border-radius: 7px;
+		background: transparent;
+		color: var(--zaplane-font-secondary-color);
+		font: inherit;
+		font-size: 13px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background 0.15s, color 0.15s;
+
+		&:hover {
+			color: var(--zaplane-font-color);
+		}
+
+		&.is-active {
+			background: var(--zaplane-second-primary, #e6f0ff);
+			color: var(--zaplane-primary);
+			font-weight: 600;
+		}
+	}
+}
+
+.zaplane-workflow-filters__dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--zaplane-font-secondary-color);
+
+	&.is-active {
+		background: #12b76a;
+	}
+
+	&.is-paused {
+		background: #f79009;
+	}
+
+	&.is-draft {
+		background: #98a2b3;
+	}
+}
+
+.zaplane-workflow-filters__count {
+	min-width: 20px;
+	padding: 0 6px;
+	border-radius: 999px;
+	background: var(--zaplane-secondary-color, #f2f4f7);
+	color: var(--zaplane-font-secondary-color);
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 18px;
+	text-align: center;
+
+	.is-active > & {
+		background: var(--zaplane-background, #fff);
+		color: var(--zaplane-primary);
+	}
+}
+
+.zaplane-workflow-filters__right {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.zaplane-workflow-filters__folder {
+	position: relative;
+	width: 210px;
+
+	> svg {
+		position: absolute;
+		top: 50%;
+		left: 12px;
+		z-index: 1;
+		color: var(--zaplane-font-secondary-color);
+		transform: translateY(-50%);
+		pointer-events: none;
+	}
+
+	.zaplane-select__control {
+		min-height: 38px;
+		padding-left: 24px;
+	}
+}
+
+.zaplane-workflow-filters .zaplane-workflow-filters__search {
+	width: 240px;
+}
+
+.zaplane-workflow-filters .zaplane-workflow-filters__clear {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 8px;
+	border: 0;
+	border-radius: 6px;
+	background: transparent;
+	color: var(--zaplane-font-secondary-color);
+	font: inherit;
+	font-size: 13px;
+	cursor: pointer;
+
+	&:hover {
+		background: var(--zaplane-secondary-color);
+		color: var(--zaplane-font-color);
+	}
+}
+
+@media (max-width: 782px) {
+	.zaplane-workflow-filters__folder,
+	.zaplane-workflow-filters .zaplane-workflow-filters__search {
+		width: 100%;
+	}
+}

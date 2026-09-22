@@ -27,15 +27,19 @@ export const getWorkFlow = createAsyncThunk(
   'zaplane/getWorkFlow',
   async (args = {}, thunkAPI) => {
     try {
-      const { page = 1, per_page = 20 } = args;
-      const res = await API.get(namespace + "workflows", {
-        params: { page, per_page },
-      });
+      const { page = 1, per_page = 20, status = "", folder = "", search = "" } = args;
+      const params = { page, per_page };
+      // Filters are sent only when set.
+      if (status) params.status = status;
+      if (folder) params.folder = folder;
+      if (search) params.search = search;
+      const res = await API.get(namespace + "workflows", { params });
 
-      const { data, pagination } = res.data;
+      const { data, pagination, counts } = res.data;
 
       return {
         data,
+        counts: counts || null,
         currentPage: pagination.page,
         itemPerPage: pagination.per_page,
         totalItems: pagination.total,

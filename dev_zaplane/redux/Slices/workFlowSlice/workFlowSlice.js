@@ -15,6 +15,8 @@ const workflowsSlice = createSlice({
 	initialState: {
 		appConnections: [],
 		allWorkFlows: [],
+		// Per-status totals for the list's filter tabs.
+		counts: null,
 		workFlow: {},
 		runs: [],
 		versions: [],
@@ -63,9 +65,10 @@ const workflowsSlice = createSlice({
 				state.allWorkFlows = action.payload;
 			})
 			.addCase(getWorkFlow.fulfilled, (state, action) => {
-				const { data, totalItems, currentPage, itemPerPage } =
+				const { data, totalItems, currentPage, itemPerPage, counts } =
 					action.payload;
 				state.allWorkFlows = data;
+				state.counts = counts;
 				state.totalItems = totalItems;
 				state.currentPage = currentPage;
 				state.itemPerPage = itemPerPage;
