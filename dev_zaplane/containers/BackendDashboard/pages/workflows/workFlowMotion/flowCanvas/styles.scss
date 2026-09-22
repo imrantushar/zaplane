@@ -406,3 +406,9 @@
 		margin-left: 0;
 	}
 }
+
+// The shared top bar keeps 32px below itself on ordinary pages; on the
+// canvas that was a bare strip between the bar and the grid.
+.zaplane-scope .zaplane_flowcanvas > .zaplane-topbar {
+	margin-bottom: 0;
+}
