@@ -4,16 +4,7 @@ namespace Zaplane;
 
 use Zaplane\Framework\Database\ORM\Migrator;
 use Zaplane\Settings;
-use Zaplane\Database\Seeders\DefaultRecipesSeeder;
-use Zaplane\Database\Seeders\BirthdayRecipeSeeder;
-use Zaplane\Database\Seeders\InactiveCustomerRecipeSeeder;
-use Zaplane\Database\Seeders\OrderCompleteFeedbackRecipeSeeder;
-use Zaplane\Database\Seeders\PostPurchaseUpsellRecipeSeeder;
-use Zaplane\Database\Seeders\ProductRecommendationRecipeSeeder;
-use Zaplane\Database\Seeders\AiWebhookAgentRecipeSeeder;
-use Zaplane\Database\Seeders\AiKnowledgeReplyRecipeSeeder;
-use Zaplane\Database\Seeders\AiSupportAgentRecipeSeeder;
-use Zaplane\Database\Seeders\AiVoiceSupportRecipeSeeder;
+use Zaplane\Recipes\Registry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -46,16 +37,8 @@ class Installer {
 	public function run(): void {
 		$this->migrate();
 		$this->pin_module_state();
-		( new DefaultRecipesSeeder() )->run();
-		( new BirthdayRecipeSeeder() )->run();
-		( new InactiveCustomerRecipeSeeder() )->run();
-		( new OrderCompleteFeedbackRecipeSeeder() )->run();
-		( new PostPurchaseUpsellRecipeSeeder() )->run();
-		( new ProductRecommendationRecipeSeeder() )->run();
-		( new AiWebhookAgentRecipeSeeder() )->run();
-		( new AiKnowledgeReplyRecipeSeeder() )->run();
-		( new AiSupportAgentRecipeSeeder() )->run();
-		( new AiVoiceSupportRecipeSeeder() )->run();
+		// Saved again on every update, so a recipe that changed reaches sites that have it.
+		Registry::instance()->sync( true );
 
 		$current_db_version = get_option( $this->db_version_option, '0.0.0' );
 		if ( version_compare( $current_db_version, $this->plugin_version, '<' ) ) {

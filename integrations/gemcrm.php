@@ -1094,14 +1094,18 @@ class Gemcrm extends IntegrationBase {
 					return self::action_error( 'Contact not found or has no valid email', $input );
 				}
 
-				try {
-					( new \GemCrm\Classes\EmailSender( $subject, $body, $pre_header ?: null ) )
-						->from( $from_email ?: null, $from_name ?: null )
-						->reply_to( $reply_to_email ?: null, $reply_to_name ?: null )
-						->to( $to )
-						->send();
-				} catch ( \Throwable $e ) {
-					return self::action_error( 'Failed to send email: ' . $e->getMessage(), $input );
+				if ( self::gemcrm_email_blocked( $to ) ) {
+					return self::action_success( array_merge( $input, [
+						'recipient_type' => 'contact',
+						'sent_to'        => $to,
+						'sent_count'     => 0,
+						'skipped'        => 'Recipient has unsubscribed, bounced or complained in GemCRM',
+					] ) );
+				}
+
+				$error = self::send_gemcrm_email( $to, $subject, $body, $pre_header, $from_email, $from_name, $reply_to_email, $reply_to_name );
+				if ( null !== $error ) {
+					return self::action_error( 'Failed to send email: ' . $error, $input );
 				}
 
 				return self::action_success( array_merge( $input, [
@@ -1128,6 +1132,7 @@ class Gemcrm extends IntegrationBase {
 					'list_id'        => $list_id,
 					'sent_count'     => $stats['sent'],
 					'failed_count'   => count( $stats['failed'] ),
+					'skipped_count'  => $stats['skipped'],
 					'failed_emails'  => $stats['failed'],
 				] ) );
 
@@ -1138,14 +1143,18 @@ class Gemcrm extends IntegrationBase {
 					return self::action_error( 'A valid custom email address is required', $input );
 				}
 
-				try {
-					( new \GemCrm\Classes\EmailSender( $subject, $body, $pre_header ?: null ) )
-						->from( $from_email ?: null, $from_name ?: null )
-						->reply_to( $reply_to_email ?: null, $reply_to_name ?: null )
-						->to( $to )
-						->send();
-				} catch ( \Throwable $e ) {
-					return self::action_error( 'Failed to send email: ' . $e->getMessage(), $input );
+				if ( self::gemcrm_email_blocked( $to ) ) {
+					return self::action_success( array_merge( $input, [
+						'recipient_type' => 'custom',
+						'sent_to'        => $to,
+						'sent_count'     => 0,
+						'skipped'        => 'Recipient has unsubscribed, bounced or complained in GemCRM',
+					] ) );
+				}
+
+				$error = self::send_gemcrm_email( $to, $subject, $body, $pre_header, $from_email, $from_name, $reply_to_email, $reply_to_name );
+				if ( null !== $error ) {
+					return self::action_error( 'Failed to send email: ' . $error, $input );
 				}
 
 				return self::action_success( array_merge( $input, [
@@ -1157,38 +1166,79 @@ class Gemcrm extends IntegrationBase {
 	}
 
 	/**
+	 * Sends one automation email. Returns null when the mail server accepted
+	 * it, otherwise the reason it wasn't sent. EmailSender::send() reports a
+	 * rejected message by returning false, not by throwing, so ignoring its
+	 * result reported failed sends as sent.
+	 */
+	private static function send_gemcrm_email( string $to, string $subject, string $body, ?string $pre_header, ?string $from_email, ?string $from_name, ?string $reply_to_email, ?string $reply_to_name ): ?string {
+		try {
+			$sent = ( new \GemCrm\Classes\EmailSender( $subject, $body, $pre_header ?: null ) )
+				->from( $from_email ?: null, $from_name ?: null )
+				->reply_to( $reply_to_email ?: null, $reply_to_name ?: null )
+				->to( $to )
+				->send();
+		} catch ( \Throwable $e ) {
+			return $e->getMessage();
+		}
+
+		return $sent ? null : 'the mail server did not accept the message';
+	}
+
+	/**
+	 * GemCRM statuses that must not receive automation email: unsubscribed,
+	 * bounced, complained (and the legacy "spamed").
+	 */
+	private static function gemcrm_status_blocks_email( string $status ): bool {
+		if ( method_exists( \GemCrm\Database\Models\Contact::class, 'can_receive_email' ) ) {
+			return ! \GemCrm\Database\Models\Contact::can_receive_email( $status );
+		}
+
+		return in_array( $status, [ 'unsubscribed', 'spamed', 'bounced', 'complained' ], true );
+	}
+
+	/**
+	 * Whether GemCRM holds this address as a contact who must not be emailed.
+	 * Addresses GemCRM doesn't know about are allowed.
+	 */
+	private static function gemcrm_email_blocked( string $email ): bool {
+		if ( ! class_exists( \GemCrm\Database\Utils\QueryBuilder::class ) ) {
+			return false;
+		}
+
+		$status = \GemCrm\Database\Utils\QueryBuilder::ins()
+			->from( 'gemcrm_contacts' )
+			->where( 'email', '=', $email )
+			->value( 'status' );
+
+		return null !== $status && self::gemcrm_status_blocks_email( (string) $status );
+	}
+
+	/**
 	 * Fetch a contact's email address by ID.
 	 * Tries Contact::find() first (ORM pattern), falls back to index().
 	 */
 	private static function find_contact_email( int $contact_id ): ?string {
-		if ( ! class_exists( \GemCrm\Database\Models\Contact::class ) ) {
+		if ( ! $contact_id || ! class_exists( \GemCrm\Database\Utils\QueryBuilder::class ) ) {
 			return null;
 		}
 
-		if ( method_exists( \GemCrm\Database\Models\Contact::class, 'find' ) ) {
-			$contact = \GemCrm\Database\Models\Contact::find( $contact_id );
-			if ( $contact ) {
-				return is_array( $contact )
-					? ( $contact['email'] ?? null )
-					: ( $contact->email ?? null );
-			}
-			return null;
-		}
+		// Read by id directly. The old fallback passed 'id' to Contact::index(),
+		// whose sanitizer drops keys it doesn't know — it returned the newest
+		// contact instead, so the email went to the wrong person.
+		$email = \GemCrm\Database\Utils\QueryBuilder::ins()
+			->from( 'gemcrm_contacts' )
+			->where( 'id', '=', $contact_id )
+			->value( 'email' );
 
-		// Fallback: search by ID via index
-		$result = \GemCrm\Database\Models\Contact::index( [
-			'id'       => $contact_id,
-			'per_page' => 1,
-		], null );
-
-		return $result['records'][0]['email'] ?? null;
+		return null === $email ? null : (string) $email;
 	}
 
 	/**
 	 * Send the email to every contact in a list, paginating 100 at a time
 	 * so large lists don't exhaust memory or hit the API in a single burst.
 	 *
-	 * @return array{ sent: int, failed: string[] }
+	 * @return array{ sent: int, failed: string[], skipped: int }
 	 */
 	private static function send_to_list_contacts(
 		int $list_id,
@@ -1200,19 +1250,34 @@ class Gemcrm extends IntegrationBase {
 		?string $reply_to_email,
 		?string $reply_to_name
 	): array {
-		$page     = 1;
 		$per_page = 100;
 		$sent     = 0;
 		$failed   = [];
+		$skipped  = 0;
+
+		$after_id = 0;
 
 		do {
-			$result  = \GemCrm\Database\Models\Contact::index( [
-				'list_id'  => $list_id,
-				'page'     => $page,
-				'per_page' => $per_page,
-			], null );
-
-			$records = $result['records'] ?? [];
+			// Members of the list only. This used Contact::index( [ 'list_id' => … ] ),
+			// but index() drops unknown keys, so every contact in the CRM was mailed.
+			$records = \GemCrm\Database\Utils\QueryBuilder::ins()
+				->select( [ 'c.id', 'c.email', 'c.status' ] )
+				->from( 'gemcrm_contacts', 'c' )
+				->join_(
+					'gemcrm_contact_relations',
+					'cr',
+					function ( \GemCrm\Database\Utils\QueryBuilder $q ) use ( $list_id ): void {
+						$q->where_column( 'cr.contact_id', '=', 'c.id' )
+							->where( 'cr.type', '=', 'list' )
+							->where( 'cr.target_id', '=', $list_id );
+					},
+					'INNER'
+				)
+				->where( 'c.id', '>', $after_id )
+				->group_by( [ 'c.id' ] )
+				->order_by( 'c.id', 'ASC' )
+				->limit( $per_page )
+				->get();
 
 			foreach ( $records as $contact ) {
 				$to = sanitize_email( $contact['email'] ?? '' );
@@ -1220,24 +1285,30 @@ class Gemcrm extends IntegrationBase {
 					continue;
 				}
 
-				try {
-					( new \GemCrm\Classes\EmailSender( $subject, $body, $pre_header ) )
-						->from( $from_email, $from_name )
-						->reply_to( $reply_to_email, $reply_to_name )
-						->to( $to )
-						->send();
+				$blocked = array_key_exists( 'status', $contact )
+					? self::gemcrm_status_blocks_email( (string) $contact['status'] )
+					: self::gemcrm_email_blocked( $to );
+				if ( $blocked ) {
+					$skipped++;
+					continue;
+				}
+
+				if ( null === self::send_gemcrm_email( $to, $subject, $body, $pre_header, $from_email, $from_name, $reply_to_email, $reply_to_name ) ) {
 					$sent++;
-				} catch ( \Throwable $e ) {
+				} else {
 					$failed[] = $to;
 				}
 			}
 
-			$page++;
+			if ( ! empty( $records ) ) {
+				$after_id = (int) end( $records )['id'];
+			}
 		} while ( count( $records ) === $per_page );
 
 		return [
-			'sent' => $sent,
-			'failed' => $failed
+			'sent'    => $sent,
+			'failed'  => $failed,
+			'skipped' => $skipped,
 		];
 	}
 
