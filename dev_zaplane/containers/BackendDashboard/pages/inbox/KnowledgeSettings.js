@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
-import { FiExternalLink, FiSearch, FiX, FiPlus, FiBookOpen } from "react-icons/fi";
+import { FiExternalLink, FiSearch, FiBookOpen } from "react-icons/fi";
 import MenuEditor from "./MenuEditor";
+import GapsPanel from "./GapsPanel";
 import ZAPToggle from "@ZAPComponents/ZAPToggle";
 import { inboxApi } from "./api";
 
@@ -34,7 +35,7 @@ const Stat = ({ value, label, tone }) => (
 );
 
 /** Business Knowledge: what the Inbox answers from, and whether it answers on its own. */
-const KnowledgeSettings = ({ form, setAi, setAnswers, knowledgeKeys, answersData, aiOn, channels }) => {
+const KnowledgeSettings = ({ form, setAi, setAnswers, knowledgeKeys, answersData, aiOn, channels, onAnswersData }) => {
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState(null);
   const [testing, setTesting] = useState(false);
@@ -216,36 +217,22 @@ const KnowledgeSettings = ({ form, setAi, setAnswers, knowledgeKeys, answersData
         )}
       </form>
 
-      <div className="zaplane-inbox-gaps">
-        <div className="zaplane-inbox-gaps-head">
-          <span className="zaplane-inbox-field-label">{__("Questions we couldn't answer", "zaplane")}</span>
-          <a href={knowledgeUrl} className="zaplane-inbox-small">
-            <FiPlus />
-            {__("Add FAQs", "zaplane")}
-          </a>
-        </div>
-        {gaps.length === 0 ? (
-          <p className="zaplane-inbox-hint">{__("None yet. Questions nothing answered, and answers customers said didn't help, show up here so you can add the missing FAQ.", "zaplane")}</p>
-        ) : (
-          <ul>
-            {gaps.map((g) => (
-              <li key={g.key}>
-                <span className="min-w-0 flex-1">{g.question}</span>
-                {g.count > 1 && <span className="zaplane-inbox-count">{sprintf(__("%d×", "zaplane"), g.count)}</span>}
-                <button
-                  type="button"
-                  className="zaplane-inbox-icon-btn is-ghost"
-                  title={__("Dismiss", "zaplane")}
-                  aria-label={__("Dismiss", "zaplane")}
-                  onClick={async () => setGaps((await inboxApi.dismissGap(g.key)).slice(0, 20))}
-                >
-                  <FiX />
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <GapsPanel
+        gaps={gaps}
+        setGaps={setGaps}
+        faqs={answersData?.faqs || []}
+        onFaqs={(faqs) => onAnswersData?.({ faqs })}
+        menu={answers.menu}
+        onAddToMenu={(entry, categoryId) => {
+          const menu = answers.menu || { grouped: false, categories: [], questions: [] };
+          const q = { id: "q_" + Math.random().toString(36).slice(2, 10), ...entry };
+          if (categoryId && menu.grouped) {
+            setAnswers("menu", { ...menu, categories: menu.categories.map((c) => (c.id === categoryId ? { ...c, questions: [...c.questions, q] } : c)) });
+          } else {
+            setAnswers("menu", { ...menu, questions: [...(menu.questions || []), q] });
+          }
+        }}
+      />
     </section>
   );
 };

@@ -267,7 +267,8 @@ class AnswerMenu {
 		return is_array( $row ) ? $row : null;
 	}
 
-	private static function store_answer( int $knowledge_id, string $question, string $answer, string $business_key ): int {
+	/** Save an answer as an FAQ: update the linked one, or create it. Returns its id. */
+	public static function store_answer( int $knowledge_id, string $question, string $answer, string $business_key ): int {
 		global $wpdb;
 		$table = Knowledge::getTable();
 		$row   = self::knowledge_row( $knowledge_id );

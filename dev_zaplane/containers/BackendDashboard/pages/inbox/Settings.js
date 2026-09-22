@@ -325,6 +325,7 @@ const Settings = ({ onSaved }) => {
           answersData={data?.answers}
           aiOn={!!aiReady}
           channels={data?.channels}
+          onAnswersData={(patch) => setData((d) => ({ ...d, answers: { ...(d?.answers || {}), ...patch } }))}
         />
 
         <section className="zaplane-inbox-card" id="zaplane-inbox-ai" data-section="ai">

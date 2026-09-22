@@ -253,7 +253,8 @@ class KnowledgeAnswer {
 
 		self::count( 'not_helpful' );
 		$question = (string) ( $answer ? ( $answer->meta['question'] ?? '' ) : '' );
-		self::gap( $question, (int) $conversation->id );
+		$sent_ids = $answer ? (array) ( $answer->meta['knowledge']['entries'] ?? [] ) : [];
+		self::gap( $question, (int) $conversation->id, 'unhelpful', (int) ( $sent_ids[0] ?? 0 ) );
 
 		// Let the customer choose what happens next.
 		$options = [ self::more_label(), self::person_label() ];
@@ -624,48 +625,176 @@ class KnowledgeAnswer {
 	/* Knowledge gaps and the weekly tally ------------------------------- */
 
 	/**
-	 * Remember a question nothing answered, so the team can add it as an FAQ.
+	 * Remember a question automatic answers couldn't settle, so the team can
+	 * turn it into an FAQ: nothing matched ("unmatched"), or the customer said
+	 * the answer didn't help ("unhelpful", with the entry that was sent).
+	 * The same question in other words is one gap, keeping the wordings.
 	 */
-	public static function gap( string $question, int $conversation_id ): void {
+	public static function gap( string $question, int $conversation_id, string $reason = 'unmatched', int $answer_id = 0 ): void {
 		$question = trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( $question ) ) );
 		if ( '' === $question ) {
 			return;
 		}
 
-		$gaps = get_option( self::GAPS_OPTION, [] );
-		$gaps = is_array( $gaps ) ? $gaps : [];
-		$key  = md5( mb_strtolower( $question ) );
+		$gaps = self::load_gaps();
+		$key  = self::gap_key( $question );
+		$gap  = $gaps[ $key ] ?? [];
+
+		$reasons            = (array) ( $gap['reasons'] ?? [] );
+		$reasons[ $reason ] = (int) ( $reasons[ $reason ] ?? 0 ) + 1;
 
 		$gaps[ $key ] = [
 			'question'        => mb_substr( $question, 0, 300 ),
-			'count'           => (int) ( $gaps[ $key ]['count'] ?? 0 ) + 1,
+			'variants'        => array_slice( array_values( array_unique( array_merge( [ mb_substr( $question, 0, 300 ) ], (array) ( $gap['variants'] ?? [] ) ) ) ), 0, 5 ),
+			'count'           => (int) ( $gap['count'] ?? 0 ) + 1,
+			'reasons'         => $reasons,
+			'answer_id'       => $answer_id > 0 ? $answer_id : (int) ( $gap['answer_id'] ?? 0 ),
 			'last_at'         => time(),
 			'conversation_id' => $conversation_id,
 		];
 
-		uasort( $gaps, static fn( $a, $b ) => $b['last_at'] <=> $a['last_at'] );
-		update_option( self::GAPS_OPTION, array_slice( $gaps, 0, self::MAX_GAPS, true ), false );
+		self::save_gaps( $gaps );
 	}
 
 	/**
-	 * @return array<int,array<string,mixed>> Most asked first.
+	 * @return array<int,array<string,mixed>> Most asked first, each with why it's
+	 *         here and, for unhelpful answers, the answer that was sent.
 	 */
 	public static function gaps(): array {
-		$gaps = get_option( self::GAPS_OPTION, [] );
-		$out  = [];
-		foreach ( is_array( $gaps ) ? $gaps : [] as $key => $gap ) {
-			$out[] = [ 'key' => (string) $key ] + (array) $gap;
+		$out          = [];
+		$business_key = (string) InboxSettings::get()['ai']['business_key'];
+		foreach ( self::load_gaps() as $key => $gap ) {
+			$reasons = (array) ( $gap['reasons'] ?? [] );
+			$row     = ! empty( $gap['answer_id'] ) ? AnswerMenu::knowledge_row( (int) $gap['answer_id'] ) : null;
+			// No answer on record (or a row from before reasons were kept):
+			// if an FAQ answers it now, offer to review that one instead of
+			// writing a duplicate. Words only, so this never calls an API.
+			$matched_now = false;
+			if ( ! $row ) {
+				$match = KnowledgeMatch::find( $business_key, (string) $gap['question'], 'balanced', false );
+				if ( 'strong' === $match['tier'] ) {
+					$row         = AnswerMenu::knowledge_row( (int) $match['entries'][0]['id'] );
+					$matched_now = (bool) $row;
+				}
+			}
+			$out[]   = [
+				'key'             => (string) $key,
+				'question'        => (string) $gap['question'],
+				'variants'        => array_values( (array) ( $gap['variants'] ?? [ $gap['question'] ] ) ),
+				'count'           => (int) ( $gap['count'] ?? 1 ),
+				'reason'          => ! empty( $reasons['unhelpful'] ) ? 'unhelpful' : 'unmatched',
+				'matched_now'     => $matched_now,
+				'reasons'         => $reasons,
+				'answer'          => $row ? [
+					'id'      => (int) $row['id'],
+					'title'   => (string) $row['title'],
+					'content' => (string) $row['content'],
+					'source'  => (string) $row['source'],
+				] : null,
+				'last_at'         => (int) ( $gap['last_at'] ?? 0 ),
+				'conversation_id' => (int) ( $gap['conversation_id'] ?? 0 ),
+			];
 		}
 		usort( $out, static fn( $a, $b ) => [ $b['count'], $b['last_at'] ] <=> [ $a['count'], $a['last_at'] ] );
 		return $out;
 	}
 
-	public static function dismiss_gap( string $key ): void {
-		$gaps = get_option( self::GAPS_OPTION, [] );
-		if ( is_array( $gaps ) && isset( $gaps[ $key ] ) ) {
-			unset( $gaps[ $key ] );
-			update_option( self::GAPS_OPTION, $gaps, false );
+	/**
+	 * Turn a gap into an answer: a new FAQ with the customer's question, or an
+	 * improved answer on the FAQ that didn't help. The gap goes away.
+	 *
+	 * @return array{id:int,title:string,answer:string}|\WP_Error
+	 */
+	public static function resolve_gap( string $key, string $question, string $answer, int $knowledge_id = 0 ) {
+		$gaps = self::load_gaps();
+		if ( ! isset( $gaps[ $key ] ) ) {
+			return new \WP_Error( 'zaplane_inbox_gap', __( 'That question is no longer on the list.', 'zaplane' ), [ 'status' => 404 ] );
 		}
+		$question = trim( sanitize_text_field( $question ) );
+		$answer   = trim( $answer );
+		if ( '' === $question || '' === $answer ) {
+			return new \WP_Error( 'zaplane_inbox_gap', __( 'Write both the question and the answer.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+
+		$business_key = (string) InboxSettings::get()['ai']['business_key'];
+		$existing     = $knowledge_id > 0 ? AnswerMenu::knowledge_row( $knowledge_id ) : null;
+		// Improving an FAQ keeps its question; anything else is a new FAQ.
+		$id = AnswerMenu::store_answer( $existing ? $knowledge_id : 0, $existing ? (string) $existing['title'] : $question, $answer, $business_key );
+
+		if ( \Zaplane\Services\KnowledgeEmbeddings::enabled() ) {
+			\Zaplane\Modules\KnowledgeAutomation\KnowledgeAutomationModule::queue_embedding( $business_key );
+		}
+
+		unset( $gaps[ $key ] );
+		self::save_gaps( $gaps );
+
+		$row = AnswerMenu::knowledge_row( $id );
+		return [
+			'id'     => $id,
+			'title'  => (string) ( $row['title'] ?? $question ),
+			'answer' => (string) ( $row['content'] ?? $answer ),
+		];
+	}
+
+	public static function dismiss_gap( string $key ): void {
+		$gaps = self::load_gaps();
+		if ( isset( $gaps[ $key ] ) ) {
+			unset( $gaps[ $key ] );
+			self::save_gaps( $gaps );
+		}
+	}
+
+	/** Same meaningful words, same gap: "whats the return policy?" = "What is your return policy?". */
+	private static function gap_key( string $question ): string {
+		$words = KnowledgeMatch::words( $question );
+		sort( $words );
+		return md5( $words ? implode( ' ', $words ) : mb_strtolower( $question ) );
+	}
+
+	/**
+	 * Stored gaps, keyed by meaning. Entries saved before gaps were grouped
+	 * (keyed by exact text) are merged in on the way.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	private static function load_gaps(): array {
+		$stored = get_option( self::GAPS_OPTION, [] );
+		$out    = [];
+		foreach ( is_array( $stored ) ? $stored : [] as $gap ) {
+			if ( ! is_array( $gap ) || '' === (string) ( $gap['question'] ?? '' ) ) {
+				continue;
+			}
+			$key = self::gap_key( (string) $gap['question'] );
+			if ( isset( $out[ $key ] ) ) {
+				$prev                    = $out[ $key ];
+				$out[ $key ]['count']    = (int) $prev['count'] + (int) ( $gap['count'] ?? 1 );
+				$out[ $key ]['variants'] = array_slice( array_values( array_unique( array_merge( (array) $prev['variants'], (array) ( $gap['variants'] ?? [ $gap['question'] ] ) ) ) ), 0, 5 );
+				foreach ( (array) ( $gap['reasons'] ?? [] ) as $r => $n ) {
+					$out[ $key ]['reasons'][ $r ] = (int) ( $out[ $key ]['reasons'][ $r ] ?? 0 ) + (int) $n;
+				}
+				if ( (int) ( $gap['last_at'] ?? 0 ) > (int) $prev['last_at'] ) {
+					$out[ $key ]['last_at']         = (int) $gap['last_at'];
+					$out[ $key ]['conversation_id'] = (int) ( $gap['conversation_id'] ?? 0 );
+				}
+				continue;
+			}
+			$out[ $key ] = [
+				'question'        => (string) $gap['question'],
+				'variants'        => (array) ( $gap['variants'] ?? [ $gap['question'] ] ),
+				'count'           => (int) ( $gap['count'] ?? 1 ),
+				'reasons'         => (array) ( $gap['reasons'] ?? [] ),
+				'answer_id'       => (int) ( $gap['answer_id'] ?? 0 ),
+				'last_at'         => (int) ( $gap['last_at'] ?? 0 ),
+				'conversation_id' => (int) ( $gap['conversation_id'] ?? 0 ),
+			];
+		}
+		return $out;
+	}
+
+	/** @param array<string,array<string,mixed>> $gaps */
+	private static function save_gaps( array $gaps ): void {
+		uasort( $gaps, static fn( $a, $b ) => $b['last_at'] <=> $a['last_at'] );
+		update_option( self::GAPS_OPTION, array_slice( $gaps, 0, self::MAX_GAPS, true ), false );
 	}
 
 	private static function count( string $what ): void {

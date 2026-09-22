@@ -155,6 +155,18 @@ const InboxPage = () => {
     loadMeta();
   }, [loadMeta]);
 
+  // "?page=zaplane-inbox&conversation=12" (e.g. "View chat" in settings)
+  // opens that conversation, whatever its status.
+  useEffect(() => {
+    const id = parseInt(new URLSearchParams(window.location.search).get("conversation") || "0", 10);
+    if (id > 0) {
+      setFilters((f) => ({ ...f, status: "all" }));
+      setPane("thread");
+      openConversation(id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (view !== "inbox") return undefined;
     setList((l) => ({ ...l, loading: true }));

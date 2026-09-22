@@ -17,12 +17,15 @@ export const channelOf = (slug) => CHANNELS[slug] || { label: slug || "", Icon: 
 export const CHANNEL_LABELS = Object.fromEntries(Object.entries(CHANNELS).map(([k, v]) => [k, v.label]));
 
 export function initials(name) {
-  return (name || "?")
+  // Letters only: "Visitor #189" → "V", not "V#".
+  const letters = (name || "")
     .split(/\s+/)
+    .map((p) => (p.match(/\p{L}/u) || [""])[0])
     .filter(Boolean)
     .slice(0, 2)
-    .map((p) => p[0].toUpperCase())
+    .map((c) => c.toUpperCase())
     .join("");
+  return letters || "?";
 }
 
 // A steady colour per contact, so the same person is easy to spot again.

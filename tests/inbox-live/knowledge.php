@@ -30,7 +30,8 @@ zt_run( function () {
 
 	// Replies in a team conversation (assistant off).
 	IS::save( [
-		'answers' => [ 'enabled' => true, 'strictness' => 'balanced', 'feedback' => true, 'common_questions' => [ 'What is your return policy?', 'Opening hours', 'Payment methods accepted' ] ],
+		// Its own flat menu, whatever the site has saved.
+		'answers' => [ 'enabled' => true, 'strictness' => 'balanced', 'feedback' => true, 'menu' => [ 'grouped' => false, 'questions' => [ [ 'question' => 'What is your return policy?' ], [ 'question' => 'Opening hours' ], [ 'question' => 'Payment methods accepted' ] ] ] ],
 		'ai'      => [ 'enabled' => false, 'business_key' => 'zz_kb' ],
 	] );
 	$cv  = zt_conversation( 'web', 'human' );

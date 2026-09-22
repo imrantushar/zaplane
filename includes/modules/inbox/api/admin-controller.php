@@ -143,6 +143,12 @@ class AdminController {
 			'permission_callback' => [ $this, 'can_manage' ],
 		] );
 
+		register_rest_route( self::NS, '/inbox/knowledge/gaps/(?P<key>[a-f0-9]{32})/resolve', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'resolve_knowledge_gap' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
 		register_rest_route( self::NS, '/inbox/knowledge/gaps/(?P<key>[a-f0-9]{32})', [
 			'methods'             => WP_REST_Server::DELETABLE,
 			'callback'            => [ $this, 'dismiss_knowledge_gap' ],
@@ -727,6 +733,28 @@ class AdminController {
 
 	public function knowledge_gaps() {
 		return rest_ensure_response( KnowledgeAnswer::gaps() );
+	}
+
+	/**
+	 * Answer a gap: a new FAQ with the question, or an improved answer on the
+	 * FAQ that didn't help. Returns the FAQ, the remaining gaps and the FAQ list
+	 * (so the menu editor can offer the new one straight away).
+	 */
+	public function resolve_knowledge_gap( WP_REST_Request $request ) {
+		$faq = KnowledgeAnswer::resolve_gap(
+			(string) $request['key'],
+			(string) $request->get_param( 'question' ),
+			sanitize_textarea_field( (string) $request->get_param( 'answer' ) ),
+			(int) $request->get_param( 'knowledge_id' )
+		);
+		if ( is_wp_error( $faq ) ) {
+			return $faq;
+		}
+		return rest_ensure_response( [
+			'faq'  => $faq,
+			'gaps' => array_slice( KnowledgeAnswer::gaps(), 0, 20 ),
+			'faqs' => self::faq_questions( (string) InboxSettings::get()['ai']['business_key'] ),
+		] );
 	}
 
 	public function dismiss_knowledge_gap( WP_REST_Request $request ) {

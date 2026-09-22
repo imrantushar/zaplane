@@ -61,7 +61,11 @@ class KnowledgeMatch {
 	 *   entries:array<int,array<string,mixed>>
 	 * }
 	 */
-	public static function find( string $business_key, string $question, string $strictness = 'balanced' ): array {
+	/**
+	 * @param bool $semantic Match by meaning when embeddings are on. Off for
+	 *                       cheap checks that must not call the embeddings API.
+	 */
+	public static function find( string $business_key, string $question, string $strictness = 'balanced', bool $semantic = true ): array {
 		$none = static function ( string $reason, string $method = '' ): array {
 			return [
 				'tier'       => 'none',
@@ -87,7 +91,7 @@ class KnowledgeMatch {
 			return $none( 'empty_knowledge' );
 		}
 
-		$vector = KnowledgeEmbeddings::enabled() ? KnowledgeEmbeddings::embed( $question ) : null;
+		$vector = $semantic && KnowledgeEmbeddings::enabled() ? KnowledgeEmbeddings::embed( $question ) : null;
 		$method = $vector ? 'semantic' : 'keyword';
 		$tag    = $vector ? KnowledgeEmbeddings::tag() : '';
 

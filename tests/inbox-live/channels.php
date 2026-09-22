@@ -59,7 +59,7 @@ zt_run( function () {
 	// Tapping: Ice Breaker (postback) and a cut-off quick reply both arrive as the full question.
 	global $wpdb;
 	$wpdb->insert( \Zaplane\Models\Knowledge::getTable(), [ 'business_key' => 'zz_ch', 'title' => 'What is your return policy?', 'content' => 'Returns within 7 days.', 'source' => 'faq' ] );
-	IS::save( [ 'answers' => [ 'enabled' => true ], 'ai' => [ 'enabled' => false, 'business_key' => 'zz_ch' ] ] );
+	IS::save( [ 'answers' => [ 'enabled' => true, 'menu' => [] ], 'ai' => [ 'enabled' => false, 'business_key' => 'zz_ch' ] ] );
 	add_filter( 'pre_http_request', fn( $pre, $a, $url ) => false !== strpos( $url, 'fields=' ) ? [ 'headers' => [], 'body' => '{}', 'response' => [ 'code' => 200 ], 'cookies' => [] ] : $pre, 5, 3 );
 
 	$deliver = function ( array $messaging ) {
