@@ -21,8 +21,11 @@ const OrderForm = ({ conversation, onPlace, onCancel }) => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  // One line per product and price option: "Kurta (Large)" and "Kurta (Small)" are two lines.
+  const keyOf = (p) => p.id + "/" + (p.option_id || 0);
   const addLine = (p) => {
-    setLines((ls) => (ls.some((l) => l.id === p.id) ? ls.map((l) => (l.id === p.id ? { ...l, qty: l.qty + 1 } : l)) : [...ls, { ...p, qty: 1 }]));
+    const k = keyOf(p);
+    setLines((ls) => (ls.some((l) => keyOf(l) === k) ? ls.map((l) => (keyOf(l) === k ? { ...l, qty: l.qty + 1 } : l)) : [...ls, { ...p, qty: 1 }]));
     setPicking(false);
   };
 
@@ -34,7 +37,7 @@ const OrderForm = ({ conversation, onPlace, onCancel }) => {
     setBusy(true);
     try {
       await onPlace({
-        items: lines.map((l) => ({ product_id: l.id, qty: l.qty })),
+        items: lines.map((l) => ({ product_id: l.id, option_id: l.option_id || 0, qty: l.qty })),
         customer,
         notify,
       });
@@ -56,9 +59,10 @@ const OrderForm = ({ conversation, onPlace, onCancel }) => {
     <form className="zaplane-inbox-order" onSubmit={submit}>
       <ul className="zaplane-inbox-lines">
         {lines.map((l) => (
-          <li key={l.id}>
+          <li key={keyOf(l)}>
             <span className="min-w-0 flex-1">
               <strong>{l.name}</strong>
+              {l.option_label && <span className="zaplane-inbox-sub">{l.option_label}</span>}
               <span className="zaplane-inbox-sub">{l.price_text}</span>
             </span>
             <input
@@ -68,9 +72,9 @@ const OrderForm = ({ conversation, onPlace, onCancel }) => {
               max={99}
               value={l.qty}
               aria-label={__("Quantity", "zaplane")}
-              onChange={(e) => setLines(lines.map((x) => (x.id === l.id ? { ...x, qty: Math.max(1, parseInt(e.target.value, 10) || 1) } : x)))}
+              onChange={(e) => setLines(lines.map((x) => (keyOf(x) === keyOf(l) ? { ...x, qty: Math.max(1, parseInt(e.target.value, 10) || 1) } : x)))}
             />
-            <button type="button" className="zaplane-inbox-link" aria-label={__("Remove", "zaplane") + " " + l.name} onClick={() => setLines(lines.filter((x) => x.id !== l.id))}>
+            <button type="button" className="zaplane-inbox-link" aria-label={__("Remove", "zaplane") + " " + l.name} onClick={() => setLines(lines.filter((x) => keyOf(x) !== keyOf(l)))}>
               ×
             </button>
           </li>

@@ -2,6 +2,7 @@
 
 namespace Zaplane\Modules\Inbox\Channels;
 
+use Zaplane\Modules\Inbox\Commerce\Commerce;
 use Zaplane\Modules\Inbox\Models\Conversation;
 use Zaplane\Modules\Inbox\Models\Identity;
 use Zaplane\Modules\Inbox\Models\Message;
@@ -300,18 +301,37 @@ class Whatsapp extends MetaChannel {
 			}
 		}
 
+		// A product goes as a card: its picture on top, name, price and a
+		// "View product" button.
+		$card = empty( $payload['interactive'] ) ? Commerce::card_of( $message ) : null;
+		if ( $card ) {
+			unset( $payload['text'] );
+			$payload = array_merge( $payload, self::product_message( $card, (string) ( $message->meta['product_note'] ?? '' ) ) );
+		}
+
 		// Shown as a quoted reply in WhatsApp when we know the original's id.
 		$quote = is_array( $message->meta['reply_to'] ?? null ) ? $message->meta['reply_to'] : [];
 		if ( ! empty( $quote['external_id'] ) ) {
 			$payload['context'] = [ 'message_id' => (string) $quote['external_id'] ];
 		}
 
-		$result = self::graph_post(
+		$send   = static fn( array $p ) => self::graph_post(
 			(string) $credentials['phone_number_id'] . '/messages',
-			$payload,
+			$p,
 			[ 'Authorization' => 'Bearer ' . (string) $credentials['access_token'] ],
 			$credentials['api_version'] ?? null
 		);
+		$result = $send( $payload );
+		if ( ! $result['ok'] && $card ) {
+			// A card WhatsApp won't take (a picture it can't fetch…): the text with a link preview.
+			$payload         = array_diff_key( $payload, [ 'interactive' => 1, 'image' => 1 ] );
+			$payload['type'] = 'text';
+			$payload['text'] = [
+				'body'        => (string) $message->body,
+				'preview_url' => true,
+			];
+			$result          = $send( $payload );
+		}
 
 		return $result['ok']
 			? [
@@ -322,5 +342,58 @@ class Whatsapp extends MetaChannel {
 				'status' => 'failed',
 				'error'  => $result['error'],
 			];
+	}
+
+	/**
+	 * One product card as a WhatsApp message: the picture on top and a
+	 * "View product" button when there is a link, else the picture with a
+	 * caption, else plain text.
+	 *
+	 * @param array<string,mixed> $card Commerce::card().
+	 * @return array<string,mixed> type + its payload.
+	 */
+	public static function product_message( array $card, string $note = '' ): array {
+		$url   = (string) ( $card['url'] ?? '' );
+		$image = (string) ( $card['image'] ?? '' );
+		$text  = trim( trim( $note ) . "\n\n*" . $card['name'] . "*\n" . Commerce::card_subtitle( $card ) );
+
+		if ( '' !== $url ) {
+			return [
+				'type'        => 'interactive',
+				'interactive' => array_filter( [
+					'type'   => 'cta_url',
+					'header' => '' !== $image ? [
+						'type'  => 'image',
+						'image' => [ 'link' => $image ],
+					] : null,
+					'body'   => [ 'text' => mb_substr( $text, 0, 1024 ) ],
+					'action' => [
+						'name'       => 'cta_url',
+						'parameters' => [
+							'display_text' => mb_substr( __( 'View product', 'zaplane' ), 0, 20 ),
+							'url'          => $url,
+						],
+					],
+				] ),
+			];
+		}
+
+		if ( '' !== $image ) {
+			return [
+				'type'  => 'image',
+				'image' => [
+					'link'    => $image,
+					'caption' => mb_substr( $text, 0, 1024 ),
+				],
+			];
+		}
+
+		return [
+			'type' => 'text',
+			'text' => [
+				'body'        => $text,
+				'preview_url' => false,
+			],
+		];
 	}
 }

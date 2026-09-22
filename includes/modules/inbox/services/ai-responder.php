@@ -394,10 +394,10 @@ class AiResponder {
 		$tools = [ $tool( 'forward_to_human', 'Hand this conversation to a human teammate. Give a short reason.' ) ];
 
 		if ( self::selling( $ai ) ) {
-			$tools[] = $tool( 'search_products', 'Search the shop. Returns matching products with id, name, price, stock and link.' );
-			$tools[] = $tool( 'send_product', 'Show the customer one product as a card with its picture, price and link. Pass the product id from search results.' );
+			$tools[] = $tool( 'search_products', 'Search the shop. Returns matching products with id, name, price, stock and link. A product with several prices or variations lists them under options (id, label, price).' );
+			$tools[] = $tool( 'send_product', 'Show the customer one product as a card with its picture, price and link. Pass the product id from search results, and option_id when the customer wants one of its options.' );
 			if ( ! empty( $ai['can_order'] ) ) {
-				$tools[] = $tool( 'create_order', 'Place a cash-on-delivery order, only after the customer confirmed the full order summary. items is "productId:quantity" pairs separated by commas.' );
+				$tools[] = $tool( 'create_order', 'Place a cash-on-delivery order, only after the customer confirmed the full order summary. items is "productId:quantity" pairs separated by commas; for a product option write "productId/optionId:quantity".' );
 			}
 		}
 

@@ -151,9 +151,11 @@ const InboxPage = () => {
     }
   }, [activeId]);
 
+  // Again on each return from Settings: saved replies added there show up
+  // under "/" straight away.
   useEffect(() => {
-    loadMeta();
-  }, [loadMeta]);
+    if (view === "inbox") loadMeta();
+  }, [loadMeta, view]);
 
   // "?page=zaplane-inbox&conversation=12" (e.g. "View chat" in settings)
   // opens that conversation, whatever its status.
@@ -211,8 +213,8 @@ const InboxPage = () => {
     loadList();
   };
 
-  const sendProduct = async (productId, message) => {
-    appendMessage(await inboxApi.sendProduct(activeId, productId, message));
+  const sendProduct = async (productId, message, optionId = 0) => {
+    appendMessage(await inboxApi.sendProduct(activeId, productId, message, optionId));
   };
 
   const placeOrder = async (data) => {

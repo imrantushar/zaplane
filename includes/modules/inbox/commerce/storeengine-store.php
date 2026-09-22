@@ -48,7 +48,7 @@ class StoreengineStore implements StoreInterface {
 		return $out;
 	}
 
-	public static function product( int $id ): ?array {
+	public static function product( int $id, int $option_id = 0 ): ?array {
 		if ( $id <= 0 || get_post_type( $id ) !== self::post_type() || 'publish' !== get_post_status( $id ) ) {
 			return null;
 		}
@@ -58,19 +58,67 @@ class StoreengineStore implements StoreInterface {
 			return null;
 		}
 
-		$prices = $product->get_prices();
-		$price  = ! empty( $prices ) ? $prices[0] : null;
-		$amount = $price ? (float) $price->get_price() : 0.0;
+		$in_stock = (bool) $product->is_in_stock();
+		$options  = [];
+		$chosen   = null;
+		foreach ( (array) $product->get_prices() as $price ) {
+			if ( ! is_object( $price ) || ( method_exists( $price, 'get_is_hidden' ) && $price->get_is_hidden() ) ) {
+				continue;
+			}
+			$option    = self::option( $price, $in_stock );
+			$options[] = $option;
+			if ( $option['id'] === $option_id ) {
+				$chosen = $option;
+			}
+		}
+		$chosen = $chosen ?? ( $options[0] ?? null );
 
 		return [
-			'id'         => $id,
-			'price_id'   => $price ? (int) $price->get_id() : 0,
-			'name'       => wp_specialchars_decode( get_the_title( $id ), ENT_QUOTES ),
-			'price'      => $amount,
-			'price_text' => self::money( $amount ),
-			'in_stock'   => (bool) $product->is_in_stock(),
-			'url'        => (string) get_permalink( $id ),
-			'image'      => (string) get_the_post_thumbnail_url( $id, 'medium' ),
+			'id'           => $id,
+			'price_id'     => $chosen ? (int) $chosen['id'] : 0,
+			'option_id'    => $chosen ? (int) $chosen['id'] : 0,
+			// Named only when there is a choice to tell apart.
+			'option_label' => $chosen && count( $options ) > 1 ? (string) $chosen['label'] : '',
+			'name'         => wp_specialchars_decode( get_the_title( $id ), ENT_QUOTES ),
+			'price'        => $chosen ? (float) $chosen['price'] : 0.0,
+			'price_text'   => $chosen ? (string) $chosen['price_text'] : self::money( 0 ),
+			'compare_text' => $chosen ? (string) $chosen['compare_text'] : '',
+			'in_stock'     => $in_stock,
+			'url'          => (string) get_permalink( $id ),
+			'image'        => (string) get_the_post_thumbnail_url( $id, 'medium' ),
+			'options'      => count( $options ) > 1 ? $options : [],
+		];
+	}
+
+	/**
+	 * One of a product's prices as a choosable option: "Large", "Monthly
+	 * plan"… with its price (and the "was" price when it's on sale).
+	 *
+	 * @param object $price \StoreEngine\Classes\Price
+	 * @return array{id:int,label:string,price:float,price_text:string,compare_text:string,in_stock:bool}
+	 */
+	private static function option( $price, bool $in_stock ): array {
+		$amount  = (float) $price->get_price();
+		$compare = method_exists( $price, 'get_compare_price' ) ? $price->get_compare_price() : null;
+		$label   = method_exists( $price, 'get_price_name' ) ? trim( (string) $price->get_price_name() ) : '';
+		$text    = self::money( $amount );
+
+		if ( method_exists( $price, 'get_price_type' ) && 'subscription' === $price->get_price_type() && method_exists( $price, 'get_period' ) ) {
+			$every = method_exists( $price, 'get_payment_duration' ) ? max( 1, (int) $price->get_payment_duration() ) : 1;
+			$text  = 1 === $every
+				/* translators: 1: price, 2: billing period: day, week, month or year. */
+				? sprintf( __( '%1$s / %2$s', 'zaplane' ), $text, $price->get_period() )
+				/* translators: 1: price, 2: how many, 3: billing period: day, week, month or year. */
+				: sprintf( __( '%1$s every %2$d %3$ss', 'zaplane' ), $text, $every, $price->get_period() );
+		}
+
+		return [
+			'id'           => (int) $price->get_id(),
+			'label'        => '' !== $label ? $label : $text,
+			'price'        => $amount,
+			'price_text'   => $text,
+			'compare_text' => null !== $compare && (float) $compare > $amount ? self::money( (float) $compare ) : '',
+			'in_stock'     => $in_stock,
 		];
 	}
 
@@ -98,7 +146,7 @@ class StoreengineStore implements StoreInterface {
 
 			$added = 0;
 			foreach ( $items as $item ) {
-				$product = self::product( (int) $item['product_id'] );
+				$product = self::product( (int) $item['product_id'], (int) ( $item['option_id'] ?? 0 ) );
 				if ( ! $product || ! $product['price_id'] ) {
 					continue;
 				}

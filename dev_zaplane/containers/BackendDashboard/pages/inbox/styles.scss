@@ -909,8 +909,13 @@ kbd {
 		background: none;
 		text-align: left;
 
-		&:hover {
+		&:hover,
+		&.is-active {
 			background: var(--zaplane-secondary-color);
+		}
+
+		&.is-active {
+			box-shadow: inset 2px 0 0 var(--zaplane-primary);
 		}
 
 		span {
@@ -1012,12 +1017,16 @@ kbd {
 }
 
 .zaplane-inbox-thumb {
+	display: flex;
 	flex: none;
+	align-items: center;
+	justify-content: center;
 	width: 40px;
 	height: 40px;
 	overflow: hidden;
 	border-radius: 6px;
 	background: var(--zaplane-secondary-color);
+	color: var(--zaplane-font-secondary-color);
 
 	img {
 		width: 100%;
@@ -1043,18 +1052,84 @@ kbd {
 		border-color: var(--zaplane-primary);
 	}
 
+	strong {
+		display: -webkit-box;
+		overflow: hidden;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		line-height: 1.35;
+	}
+}
+
+.zaplane-inbox-product-img {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 150px;
+	background: var(--zaplane-secondary-color);
+	color: var(--zaplane-font-secondary-color);
+	font-size: 28px;
+
 	img {
 		width: 100%;
-		height: 140px;
+		height: 100%;
 		object-fit: cover;
 	}
+}
 
-	> span {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		padding: 10px 12px;
+.zaplane-inbox-product-body {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	padding: 10px 12px 12px;
+}
+
+.zaplane-inbox-product-option {
+	align-self: flex-start;
+	padding: 1px 8px;
+	border-radius: 999px;
+	background: var(--zaplane-secondary-color);
+	color: var(--zaplane-font-secondary-color);
+	font-size: 12px;
+}
+
+.zaplane-inbox-product-price {
+	color: var(--zaplane-primary);
+	font-weight: 600;
+
+	s {
+		margin-left: 6px;
+		color: var(--zaplane-font-secondary-color);
+		font-weight: 400;
 	}
+}
+
+.zaplane-inbox-product-stock {
+	color: #d92d20;
+	font-size: 12px;
+}
+
+.zaplane-inbox-product-cta {
+	margin-top: 6px;
+	padding-top: 8px;
+	border-top: 1px solid var(--zaplane-border-color);
+	color: var(--zaplane-primary);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.zaplane-inbox-was {
+	margin-left: 6px;
+}
+
+.zaplane-inbox-option-select {
+	margin-top: 4px;
+	max-width: 100%;
+	height: 30px;
+	min-height: 30px;
+	padding-top: 0;
+	padding-bottom: 0;
+	font-size: 12px;
 }
 
 .zaplane-inbox-image {

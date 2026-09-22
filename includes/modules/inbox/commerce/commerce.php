@@ -48,14 +48,18 @@ class Commerce {
 	 *
 	 * @return \Zaplane\Modules\Inbox\Models\Message|WP_Error
 	 */
-	public static function send_product( Conversation $conversation, int $product_id, string $sender_type, int $sender_id = 0, string $text = '' ) {
+	public static function send_product( Conversation $conversation, int $product_id, string $sender_type, int $sender_id = 0, string $text = '', int $option_id = 0 ) {
 		$store   = self::store();
-		$product = $store ? $store::product( $product_id ) : null;
+		$product = $store ? $store::product( $product_id, $option_id ) : null;
 		if ( ! $product ) {
 			return new WP_Error( 'zaplane_inbox_no_product', __( 'That product is not available.', 'zaplane' ) );
 		}
 
-		$body = trim( $text );
+		// The body keeps a plain-text copy for previews, search and the
+		// assistant's context; Messenger and WhatsApp send the card itself
+		// (picture, name, price, button) with the note before it.
+		$note = trim( $text );
+		$body = $note;
 		if ( 'web' !== $conversation->channel ) {
 			$body = trim( $body . "\n\n" . self::product_line( $product ) );
 		}
@@ -64,6 +68,7 @@ class Commerce {
 			'sender_type' => $sender_type,
 			'sender_id'   => $sender_id,
 			'attachments' => [ self::card( $product ) ],
+			'meta'        => [ 'product_note' => $note ],
 		] );
 	}
 
@@ -74,20 +79,54 @@ class Commerce {
 	public static function card( array $product ): array {
 		return [
 			'type'       => 'product',
-			'product_id' => (int) $product['id'],
-			'name'       => (string) $product['name'],
-			'price_text' => (string) $product['price_text'],
-			'in_stock'   => (bool) $product['in_stock'],
-			'url'        => (string) $product['url'],
-			'image'      => (string) $product['image'],
+			'product_id'   => (int) $product['id'],
+			'option_id'    => (int) ( $product['option_id'] ?? 0 ),
+			'option_label' => (string) ( $product['option_label'] ?? '' ),
+			'name'         => (string) $product['name'],
+			'price_text'   => (string) $product['price_text'],
+			'compare_text' => (string) ( $product['compare_text'] ?? '' ),
+			'in_stock'     => (bool) $product['in_stock'],
+			'url'          => (string) $product['url'],
+			'image'        => (string) $product['image'],
 		];
+	}
+
+	/**
+	 * The product card on a message, if it carries one.
+	 *
+	 * @return array<string,mixed>|null
+	 */
+	public static function card_of( $message ): ?array {
+		foreach ( (array) ( $message->attachments ?? [] ) as $a ) {
+			if ( is_array( $a ) && 'product' === ( $a['type'] ?? '' ) && ! empty( $a['name'] ) ) {
+				return $a;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * "৳1,200 · Large · Out of stock": the line under a card's name.
+	 */
+	public static function card_subtitle( array $card ): string {
+		$price = (string) ( $card['price_text'] ?? '' );
+		if ( ! empty( $card['compare_text'] ) ) {
+			/* translators: 1: sale price, 2: regular price. */
+			$price = sprintf( __( '%1$s (was %2$s)', 'zaplane' ), $price, $card['compare_text'] );
+		}
+		return implode( ' · ', array_filter( [
+			$price,
+			(string) ( $card['option_label'] ?? '' ),
+			empty( $card['in_stock'] ) ? __( 'Out of stock', 'zaplane' ) : '',
+		] ) );
 	}
 
 	/**
 	 * @param array<string,mixed> $product
 	 */
 	public static function product_line( array $product ): string {
-		return sprintf( '%1$s — %2$s%3$s', $product['name'], $product['price_text'], $product['url'] ? "\n" . $product['url'] : '' );
+		$name = $product['name'] . ( ! empty( $product['option_label'] ) ? ' (' . $product['option_label'] . ')' : '' );
+		return sprintf( '%1$s — %2$s%3$s', $name, $product['price_text'], $product['url'] ? "\n" . $product['url'] : '' );
 	}
 
 	/**
@@ -98,14 +137,18 @@ class Commerce {
 	public static function parse_items( string $spec ): array {
 		$items = [];
 		foreach ( preg_split( '/[,;\n]+/', $spec ) as $part ) {
-			if ( ! preg_match( '/^\s*#?(\d+)\s*(?:[:x×*]\s*(\d+))?\s*$/u', $part, $m ) ) {
+			// "12", "12:2", or with a price option/variation "12/34:2".
+			if ( ! preg_match( '/^\s*#?(\d+)\s*(?:[\/@]\s*(\d+))?\s*(?:[:x×*]\s*(\d+))?\s*$/u', $part, $m ) ) {
 				continue;
 			}
-			$id           = (int) $m[1];
-			$qty          = isset( $m[2] ) ? max( 1, min( 99, (int) $m[2] ) ) : 1;
-			$items[ $id ] = [
+			$id            = (int) $m[1];
+			$option        = isset( $m[2] ) && '' !== $m[2] ? (int) $m[2] : 0;
+			$qty           = isset( $m[3] ) ? max( 1, min( 99, (int) $m[3] ) ) : 1;
+			$key           = $id . '/' . $option;
+			$items[ $key ] = [
 				'product_id' => $id,
-				'qty'        => ( $items[ $id ]['qty'] ?? 0 ) + $qty,
+				'option_id'  => $option,
+				'qty'        => ( $items[ $key ]['qty'] ?? 0 ) + $qty,
 			];
 		}
 		return array_values( $items );

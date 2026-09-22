@@ -10,13 +10,16 @@ const Attachment = ({ a }) => {
   if (a.type === "product") {
     return (
       <a className="zaplane-inbox-product" href={url || undefined} target="_blank" rel="noopener noreferrer">
-        {safeUrl(a.image) && <img src={a.image} alt="" />}
-        <span>
+        <span className="zaplane-inbox-product-img">{safeUrl(a.image) ? <img src={a.image} alt="" /> : <FiShoppingBag />}</span>
+        <span className="zaplane-inbox-product-body">
           <strong>{a.name}</strong>
-          <span className="zaplane-inbox-sub">
+          {a.option_label && <span className="zaplane-inbox-product-option">{a.option_label}</span>}
+          <span className="zaplane-inbox-product-price">
             {a.price_text}
-            {a.in_stock === false && " · " + __("Out of stock", "zaplane")}
+            {a.compare_text && <s>{a.compare_text}</s>}
           </span>
+          {a.in_stock === false && <span className="zaplane-inbox-product-stock">{__("Out of stock", "zaplane")}</span>}
+          {url && <span className="zaplane-inbox-product-cta">{__("View product", "zaplane")} ↗</span>}
         </span>
       </a>
     );
@@ -310,6 +313,7 @@ const Thread = ({ conversation, messages, canned, onSend, onSendProduct, onEditM
   const inputRef = useRef(null);
   const [picking, setPicking] = useState(false);
   const [isNote, setIsNote] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(0);
   const [error, setError] = useState("");
   const listRef = useRef(null);
   const lastId = messages.length ? messages[messages.length - 1].id : 0;
@@ -366,7 +370,25 @@ const Thread = ({ conversation, messages, canned, onSend, onSendProduct, onEditM
   const suggestions =
     slash === null
       ? []
-      : canned.filter((c) => (c.shortcut || "").startsWith(slash) || c.title.toLowerCase().includes(slash)).slice(0, 6);
+      : canned
+          .filter((c) => (c.shortcut || "").toLowerCase().startsWith(slash) || (c.title || "").toLowerCase().includes(slash))
+          .slice(0, 6);
+  const highlighted = Math.min(activeSuggestion, Math.max(0, suggestions.length - 1));
+
+  // {name} / {first_name} become the customer's name.
+  const applyCanned = (c) => {
+    const full = (conversation.contact?.name || "").trim();
+    const known = full && !/^visitor\b/i.test(full);
+    const first = known ? full.split(/\s+/)[0] : "";
+    setText(
+      (c.body || "")
+        .replace(/\{\s*first_name\s*\}/gi, first)
+        .replace(/\{\s*name\s*\}/gi, known ? full : "")
+        .replace(/[ \t]+([,.!?])/g, "$1")
+    );
+    setActiveSuggestion(0);
+    inputRef.current?.focus();
+  };
 
   const submit = async (e) => {
     e?.preventDefault();
@@ -482,7 +504,7 @@ const Thread = ({ conversation, messages, canned, onSend, onSendProduct, onEditM
             onPick={async (p) => {
               setError("");
               try {
-                await onSendProduct(p.id, text.trim());
+                await onSendProduct(p.id, text.trim(), p.option_id || 0);
                 setText("");
                 setPicking(false);
               } catch (err) {
@@ -494,9 +516,15 @@ const Thread = ({ conversation, messages, canned, onSend, onSendProduct, onEditM
 
         {suggestions.length > 0 && (
           <ul className="zaplane-inbox-canned" role="listbox">
-            {suggestions.map((c) => (
-              <li key={c.id}>
-                <button type="button" onClick={() => setText(c.body)}>
+            {suggestions.map((c, i) => (
+              <li key={c.id} role="option" aria-selected={i === highlighted}>
+                <button
+                  type="button"
+                  className={i === highlighted ? "is-active" : ""}
+                  onMouseEnter={() => setActiveSuggestion(i)}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => applyCanned(c)}
+                >
                   <strong>{c.shortcut ? "/" + c.shortcut : c.title}</strong>
                   <span>{c.body}</span>
                 </button>
@@ -523,8 +551,30 @@ const Thread = ({ conversation, messages, canned, onSend, onSendProduct, onEditM
           <textarea
             ref={inputRef}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => {
+              setText(e.target.value);
+              setActiveSuggestion(0);
+            }}
             onKeyDown={(e) => {
+              // Saved-reply list open: arrows move, Enter/Tab picks, Esc closes.
+              if (suggestions.length > 0 && !e.metaKey && !e.ctrlKey) {
+                if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                  e.preventDefault();
+                  const step = e.key === "ArrowDown" ? 1 : -1;
+                  setActiveSuggestion((highlighted + step + suggestions.length) % suggestions.length);
+                  return;
+                }
+                if ((e.key === "Enter" && !e.shiftKey) || e.key === "Tab") {
+                  e.preventDefault();
+                  applyCanned(suggestions[highlighted]);
+                  return;
+                }
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  setText(text.slice(1));
+                  return;
+                }
+              }
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit(e);
               if (e.key === "Escape" && replyTo) setReplyTo(null);
             }}

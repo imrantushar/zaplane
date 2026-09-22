@@ -1,6 +1,51 @@
 import { useEffect, useState } from "react";
 import { __ } from "@wordpress/i18n";
+import { FiShoppingBag } from "react-icons/fi";
 import { inboxApi, safeUrl } from "./api";
+
+/** The product as it will be sent: priced with the chosen option. */
+const withOption = (p, optionId) => {
+  const o = (p.options || []).find((x) => x.id === optionId);
+  return o ? { ...p, option_id: o.id, option_label: o.label, price: o.price, price_text: o.price_text, compare_text: o.compare_text, in_stock: o.in_stock } : p;
+};
+
+const Row = ({ p, actionLabel, onPick }) => {
+  const options = p.options || [];
+  const [optionId, setOptionId] = useState(p.option_id || 0);
+  const shown = withOption(p, optionId);
+  return (
+    <li>
+      <span className="zaplane-inbox-thumb">{safeUrl(p.image) ? <img src={p.image} alt="" /> : <FiShoppingBag />}</span>
+      <span className="min-w-0 flex-1">
+        <strong>{p.name}</strong>
+        <span className="zaplane-inbox-sub">
+          {shown.price_text}
+          {shown.compare_text && <s className="zaplane-inbox-was">{shown.compare_text}</s>}
+          {!shown.in_stock && " · " + __("Out of stock", "zaplane")}
+          {options.length > 1 && !shown.option_label && " · " + options.length + " " + __("options", "zaplane")}
+        </span>
+        {options.length > 1 && (
+          <select
+            className="zaplane-inbox-select zaplane-inbox-option-select"
+            value={optionId}
+            onChange={(e) => setOptionId(parseInt(e.target.value, 10))}
+            aria-label={__("Price option", "zaplane") + " — " + p.name}
+          >
+            {options.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.label === o.price_text ? o.price_text : o.label + " — " + o.price_text}
+                {o.in_stock ? "" : " (" + __("out of stock", "zaplane") + ")"}
+              </option>
+            ))}
+          </select>
+        )}
+      </span>
+      <button type="button" className="zaplane-inbox-small" onClick={() => onPick(shown)}>
+        {actionLabel}
+      </button>
+    </li>
+  );
+};
 
 /**
  * Search the shop and hand one product back. Used to send a card from the
@@ -52,19 +97,7 @@ const ProductPicker = ({ onPick, actionLabel, onClose }) => {
       )}
       <ul>
         {state.products.map((p) => (
-          <li key={p.id}>
-            <span className="zaplane-inbox-thumb">{safeUrl(p.image) && <img src={p.image} alt="" />}</span>
-            <span className="min-w-0 flex-1">
-              <strong>{p.name}</strong>
-              <span className="zaplane-inbox-sub">
-                {p.price_text}
-                {!p.in_stock && " · " + __("Out of stock", "zaplane")}
-              </span>
-            </span>
-            <button type="button" className="zaplane-inbox-small" onClick={() => onPick(p)}>
-              {actionLabel}
-            </button>
-          </li>
+          <Row key={p.id} p={p} actionLabel={actionLabel} onPick={onPick} />
         ))}
       </ul>
     </div>

@@ -456,7 +456,14 @@
 			}
 			var info = el( 'div', 'zpi-card-info' );
 			info.appendChild( el( 'div', 'zpi-card-name', a.name || '' ) );
-			info.appendChild( el( 'div', 'zpi-card-price', a.price_text || '' ) );
+			if ( a.option_label ) {
+				info.appendChild( el( 'div', 'zpi-card-option', a.option_label ) );
+			}
+			var price = el( 'div', 'zpi-card-price', a.price_text || '' );
+			if ( a.compare_text ) {
+				price.appendChild( el( 's', 'zpi-card-was', a.compare_text ) );
+			}
+			info.appendChild( price );
 			if ( a.in_stock === false ) {
 				info.appendChild( el( 'div', 'zpi-card-stock', t.outOfStock || 'Out of stock' ) );
 			}

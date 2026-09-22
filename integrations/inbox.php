@@ -270,6 +270,13 @@ class Inbox extends IntegrationBase {
 						'required' => true,
 					],
 					[
+						'key'         => 'option_id',
+						'label'       => 'Price option / variation ID',
+						'type'        => 'expression',
+						'required'    => false,
+						'help'        => 'For products with several prices or variations. Leave empty for the first one.',
+					],
+					[
 						'key'      => 'message',
 						'label'    => 'Message with the card',
 						'type'     => 'text',
@@ -284,7 +291,8 @@ class Inbox extends IntegrationBase {
 						'label'       => 'Products as id:quantity, comma separated',
 						'type'        => 'expression',
 						'required'    => true,
-						'placeholder' => '1575:1, 1652:2',
+						'placeholder' => '1575:1, 1652/88:2',
+						'help'        => 'Add a price option / variation ID after a slash: 1652/88:2.',
 					],
 					[
 						'key'      => 'name',
@@ -394,7 +402,8 @@ class Inbox extends IntegrationBase {
 					(int) ( $config['product_id'] ?? 0 ),
 					$by_ai ? 'ai' : 'workflow',
 					0,
-					(string) ( $config['message'] ?? '' )
+					(string) ( $config['message'] ?? '' ),
+					(int) ( $config['option_id'] ?? 0 )
 				);
 				if ( is_wp_error( $sent ) ) {
 					return self::err( $sent->get_error_message(), $input );

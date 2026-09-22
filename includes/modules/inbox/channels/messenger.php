@@ -3,6 +3,7 @@
 namespace Zaplane\Modules\Inbox\Channels;
 
 use Zaplane\Framework\Classes\MetaGraph;
+use Zaplane\Modules\Inbox\Commerce\Commerce;
 use Zaplane\Modules\Inbox\Models\Conversation;
 use Zaplane\Modules\Inbox\Models\Identity;
 use Zaplane\Modules\Inbox\Models\Message;
@@ -270,6 +271,17 @@ class Messenger extends MetaChannel {
 			$payload['message']['reply_to'] = [ 'mid' => (string) $quote['external_id'] ];
 		}
 
+		// A product goes as a card: picture, name, price and a "View product"
+		// button. Messenger can't put text and a card in one message, so
+		// any note goes just before it.
+		$card = Commerce::card_of( $message );
+		$note = '';
+		if ( $card ) {
+			$note                             = trim( (string) ( $message->meta['product_note'] ?? '' ) );
+			$payload['message']['attachment'] = self::product_template( $card );
+			unset( $payload['message']['text'] );
+		}
+
 		if ( $hours <= self::WINDOW_HOURS ) {
 			$payload['messaging_type'] = 'RESPONSE';
 		} elseif ( 'agent' === $message->sender_type ) {
@@ -282,12 +294,22 @@ class Messenger extends MetaChannel {
 			];
 		}
 
-		$result = self::graph_post(
-			'me/messages',
-			$payload,
-			[ 'Authorization' => 'Bearer ' . (string) ( $credentials['page_access_token'] ?? '' ) ],
-			$credentials['api_version'] ?? null
-		);
+		$headers = [ 'Authorization' => 'Bearer ' . (string) ( $credentials['page_access_token'] ?? '' ) ];
+		if ( '' !== $note ) {
+			$first = $payload;
+			unset( $first['message']['attachment'], $first['message']['quick_replies'] );
+			$first['message']['text'] = $note;
+			self::graph_post( 'me/messages', $first, $headers, $credentials['api_version'] ?? null );
+			unset( $payload['message']['reply_to'] );
+		}
+
+		$result = self::graph_post( 'me/messages', $payload, $headers, $credentials['api_version'] ?? null );
+		if ( ! $result['ok'] && $card ) {
+			// A card Messenger won't take (a picture it can't fetch…): send the plain text.
+			unset( $payload['message']['attachment'] );
+			$payload['message']['text'] = Commerce::product_line( $card + [ 'id' => $card['product_id'] ] );
+			$result                     = self::graph_post( 'me/messages', $payload, $headers, $credentials['api_version'] ?? null );
+		}
 
 		return $result['ok']
 			? [
@@ -298,5 +320,42 @@ class Messenger extends MetaChannel {
 				'status' => 'failed',
 				'error'  => $result['error'],
 			];
+	}
+
+	/**
+	 * Messenger's generic template for one product card.
+	 *
+	 * @param array<string,mixed> $card Commerce::card().
+	 * @return array<string,mixed>
+	 */
+	public static function product_template( array $card ): array {
+		$url     = (string) ( $card['url'] ?? '' );
+		$element = array_filter( [
+			'title'     => mb_substr( (string) $card['name'], 0, 80 ),
+			'subtitle'  => mb_substr( Commerce::card_subtitle( $card ), 0, 80 ),
+			'image_url' => (string) ( $card['image'] ?? '' ),
+		] );
+		if ( '' !== $url ) {
+			$element['default_action'] = [
+				'type' => 'web_url',
+				'url'  => $url,
+			];
+			$element['buttons']        = [
+				[
+					'type'  => 'web_url',
+					'url'   => $url,
+					'title' => __( 'View product', 'zaplane' ),
+				],
+			];
+		}
+
+		return [
+			'type'    => 'template',
+			'payload' => [
+				'template_type'      => 'generic',
+				'image_aspect_ratio' => 'square',
+				'elements'           => [ $element ],
+			],
+		];
 	}
 }

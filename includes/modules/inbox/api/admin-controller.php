@@ -514,7 +514,8 @@ class AdminController {
 			(int) $request->get_param( 'product_id' ),
 			'agent',
 			get_current_user_id(),
-			sanitize_textarea_field( (string) $request->get_param( 'message' ) )
+			sanitize_textarea_field( (string) $request->get_param( 'message' ) ),
+			(int) $request->get_param( 'option_id' )
 		);
 		if ( is_wp_error( $message ) ) {
 			$message->add_data( [ 'status' => 400 ] );
@@ -538,6 +539,7 @@ class AdminController {
 			if ( is_array( $item ) && ! empty( $item['product_id'] ) ) {
 				$items[] = [
 					'product_id' => (int) $item['product_id'],
+					'option_id'  => (int) ( $item['option_id'] ?? 0 ),
 					'qty'        => max( 1, min( 99, (int) ( $item['qty'] ?? 1 ) ) ),
 				];
 			}

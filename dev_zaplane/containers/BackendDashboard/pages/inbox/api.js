@@ -21,8 +21,8 @@ export const inboxApi = {
   saveCanned: (data) => API.post(base + "canned-replies", data).then((r) => r.data),
   deleteCanned: (id) => API.delete(base + "canned-replies/" + id).then((r) => r.data),
   products: (search) => API.get(base + "products", { params: { search } }).then((r) => r.data),
-  sendProduct: (id, productId, message) =>
-    API.post(base + "conversations/" + id + "/product", { product_id: productId, message }).then((r) => r.data),
+  sendProduct: (id, productId, message, optionId = 0) =>
+    API.post(base + "conversations/" + id + "/product", { product_id: productId, option_id: optionId, message }).then((r) => r.data),
   placeOrder: (id, data) => API.post(base + "conversations/" + id + "/order", data).then((r) => r.data),
   testKnowledge: (question) => API.post(base + "knowledge/test", { question }).then((r) => r.data),
   resolveGap: (key, data) => API.post(base + "knowledge/gaps/" + key + "/resolve", data).then((r) => r.data),

@@ -42,24 +42,79 @@ class WoocommerceStore implements StoreInterface {
 		return $out;
 	}
 
-	public static function product( int $id ): ?array {
+	public static function product( int $id, int $option_id = 0 ): ?array {
 		$product = $id > 0 ? wc_get_product( $id ) : null;
 		if ( ! $product || 'publish' !== $product->get_status() ) {
 			return null;
 		}
 
-		$amount = (float) $product->get_price();
+		// A variable product's variations are its options: "Red / Large"…
+		$options = [];
+		$chosen  = null;
+		if ( $product->is_type( 'variable' ) ) {
+			foreach ( $product->get_children() as $child_id ) {
+				$variation = wc_get_product( $child_id );
+				if ( ! $variation || ! $variation->variation_is_visible() ) {
+					continue;
+				}
+				$option    = self::option( $variation );
+				$options[] = $option;
+				if ( $option['id'] === $option_id ) {
+					$chosen = $option;
+				}
+			}
+		}
+		$chosen = $chosen ?? ( $options[0] ?? null );
+		$amount = $chosen ? (float) $chosen['price'] : (float) $product->get_price();
 		$image  = $product->get_image_id() ? wp_get_attachment_image_url( $product->get_image_id(), 'medium' ) : '';
+		if ( $chosen && $chosen['image'] ) {
+			$image = $chosen['image'];
+		}
 
 		return [
-			'id'         => $id,
-			'name'       => wp_specialchars_decode( $product->get_name(), ENT_QUOTES ),
-			'price'      => $amount,
-			'price_text' => html_entity_decode( wp_strip_all_tags( wc_price( $amount ) ), ENT_QUOTES, 'UTF-8' ),
-			'in_stock'   => $product->is_in_stock(),
-			'url'        => (string) $product->get_permalink(),
-			'image'      => (string) $image,
+			'id'           => $id,
+			'option_id'    => $chosen ? (int) $chosen['id'] : 0,
+			'option_label' => $chosen && count( $options ) > 1 ? (string) $chosen['label'] : '',
+			'name'         => wp_specialchars_decode( $product->get_name(), ENT_QUOTES ),
+			'price'        => $amount,
+			'price_text'   => self::money( $amount ),
+			'compare_text' => $chosen ? (string) $chosen['compare_text'] : self::compare( $product ),
+			'in_stock'     => $chosen ? (bool) $chosen['in_stock'] : $product->is_in_stock(),
+			'url'          => (string) $product->get_permalink(),
+			'image'        => (string) $image,
+			'options'      => count( $options ) > 1 ? array_map( fn( $o ) => array_diff_key( $o, [ 'image' => 1 ] ), $options ) : [],
 		];
+	}
+
+	/**
+	 * One variation as a choosable option.
+	 *
+	 * @param \WC_Product_Variation $variation
+	 * @return array{id:int,label:string,price:float,price_text:string,compare_text:string,in_stock:bool,image:string}
+	 */
+	private static function option( $variation ): array {
+		$amount = (float) $variation->get_price();
+		$label  = wc_get_formatted_variation( $variation, true, false, true );
+
+		return [
+			'id'           => (int) $variation->get_id(),
+			'label'        => '' !== trim( (string) $label ) ? wp_strip_all_tags( (string) $label ) : '#' . $variation->get_id(),
+			'price'        => $amount,
+			'price_text'   => self::money( $amount ),
+			'compare_text' => self::compare( $variation ),
+			'in_stock'     => $variation->is_in_stock(),
+			'image'        => $variation->get_image_id() ? (string) wp_get_attachment_image_url( $variation->get_image_id(), 'medium' ) : '',
+		];
+	}
+
+	/** The "was" price while on sale, else ''. */
+	private static function compare( $product ): string {
+		$regular = (float) $product->get_regular_price();
+		return $product->is_on_sale() && $regular > (float) $product->get_price() ? self::money( $regular ) : '';
+	}
+
+	private static function money( float $amount ): string {
+		return html_entity_decode( wp_strip_all_tags( wc_price( $amount ) ), ENT_QUOTES, 'UTF-8' );
 	}
 
 	public static function create_order( array $items, array $customer, array $context ) {
@@ -75,6 +130,11 @@ class WoocommerceStore implements StoreInterface {
 			$added = 0;
 			foreach ( $items as $item ) {
 				$product = wc_get_product( (int) $item['product_id'] );
+				if ( $product && $product->is_type( 'variable' ) ) {
+					// The chosen variation, else the first one on sale.
+					$picked  = self::product( (int) $item['product_id'], (int) ( $item['option_id'] ?? 0 ) );
+					$product = $picked && $picked['option_id'] ? wc_get_product( $picked['option_id'] ) : null;
+				}
 				if ( ! $product || ! $product->is_purchasable() ) {
 					continue;
 				}
