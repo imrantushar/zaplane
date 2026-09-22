@@ -503,15 +503,18 @@ abstract class CustomAppBase extends IntegrationBase {
 
 		$response = HttpClient::request( $request['method'], $request['url'], $request['headers'], $request['body'] );
 
-		if ( ! empty( $response['error'] ) ) {
-			return [
-				'port' => 'main',
-				'data' => [
-					'success' => false,
-					'status'  => $response['status'],
-					'error'   => $response['error'],
-				],
-			];
+		// A failed external request must fail the node, not send empty mapped
+		// values into downstream actions or mark the entire workflow completed.
+		// The automation engine catches this exception, records a failed node/run,
+		// and does not spawn children. The builder's test-request preview still
+		// returns the raw HTTP response so users can inspect error bodies.
+		if ( ! empty( $response['error'] ) || $response['status'] < 200 || $response['status'] >= 300 ) {
+			$reason = ! empty( $response['error'] )
+				? (string) $response['error']
+				: 'HTTP ' . (int) $response['status'];
+			throw new \RuntimeException(
+				'Custom app "' . static::get_slug() . '" action "' . $event . '" request failed: ' . $reason
+			);
 		}
 
 		$outputs = ResponseMapper::map_outputs( $response['body'], is_array( $action['output'] ?? null ) ? $action['output'] : [] );
