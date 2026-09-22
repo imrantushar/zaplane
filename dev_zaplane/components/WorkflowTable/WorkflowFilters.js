@@ -61,6 +61,12 @@ const WorkflowFilters = ({ filters, counts, onChange }) => {
       </div>
 
       <div className="zaplane-workflow-filters__right">
+        {filtered && (
+          <button type="button" className="zaplane-workflow-filters__clear" onClick={() => onChange({ status: "", folder: "", search: "" })} title={__("Clear all filters", "zaplane")}>
+            <FiX aria-hidden="true" />
+            {__("Clear filters", "zaplane")}
+          </button>
+        )}
         <div className="zaplane-workflow-filters__folder">
           <FiFolder aria-hidden="true" />
           <Select
@@ -81,12 +87,6 @@ const WorkflowFilters = ({ filters, counts, onChange }) => {
           debounce={350}
           onSearchHandler={(search) => set({ search: search.trim() })}
         />
-        {filtered && (
-          <button type="button" className="zaplane-workflow-filters__clear" onClick={() => onChange({ status: "", folder: "", search: "" })}>
-            <FiX aria-hidden="true" />
-            {__("Clear", "zaplane")}
-          </button>
-        )}
       </div>
     </div>
   );

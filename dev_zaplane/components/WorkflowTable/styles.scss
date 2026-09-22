@@ -113,19 +113,30 @@
 .zaplane-workflow-filters .zaplane-workflow-filters__clear {
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
-	padding: 6px 8px;
-	border: 0;
-	border-radius: 6px;
-	background: transparent;
-	color: var(--zaplane-font-secondary-color);
+	gap: 6px;
+	height: 38px;
+	padding: 0 12px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 8px;
+	background: var(--zaplane-background, #fff);
+	color: var(--zaplane-font-color);
 	font: inherit;
 	font-size: 13px;
+	font-weight: 500;
 	cursor: pointer;
+	transition: border-color 0.15s, color 0.15s;
+
+	svg {
+		color: var(--zaplane-font-secondary-color);
+	}
 
 	&:hover {
-		background: var(--zaplane-secondary-color);
-		color: var(--zaplane-font-color);
+		border-color: #f04438;
+		color: #d92d20;
+
+		svg {
+			color: #d92d20;
+		}
 	}
 }
 
