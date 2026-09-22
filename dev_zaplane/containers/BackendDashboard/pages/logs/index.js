@@ -61,7 +61,6 @@ const Logs = () => {
   const {
     data = [],
     currentPage,
-    perPage,
     itemPerPage,
     totalItems
   } = useSelector(state => state.logs || {});
@@ -80,7 +79,7 @@ const Logs = () => {
   }, []);
   const handleStatusFilter = status => {
     setStatusFilter(status);
-    handleRefresh(1, perPage, status);
+    handleRefresh(1, itemPerPage, status);
   };
   const statusFilterOptions = [{
     label: __("All statuses", "zaplane"),
@@ -96,10 +95,10 @@ const Logs = () => {
     value: "running"
   }];
   const handlePageChange = newPage => {
-    handleRefresh(newPage, perPage);
+    handleRefresh(newPage, itemPerPage);
   };
   const handlePerPageChange = itemsPerPage => {
-    handleRefresh(currentPage, itemsPerPage);
+    handleRefresh(1, itemsPerPage);
   };
   const handleClearLogs = async () => {
     // eslint-disable-next-line no-alert
@@ -108,7 +107,7 @@ const Logs = () => {
     }
     const result = await dispatch(clearRuns());
     if (!result?.error) {
-      handleRefresh(1, perPage);
+      handleRefresh(1, itemPerPage);
     }
   };
   const handleDeleteRow = async row => {
@@ -119,7 +118,7 @@ const Logs = () => {
     }
     const result = await dispatch(deleteRun(row.id));
     if (!result?.error) {
-      handleRefresh(currentPage, perPage);
+      handleRefresh(currentPage, itemPerPage);
     }
   };
   const handleDeleteSelected = async () => {
@@ -128,7 +127,7 @@ const Logs = () => {
       selection.map(row => row?.id).filter(Boolean).map(id => dispatch(deleteRun(id)))
     );
     setSelection([]);
-    handleRefresh(currentPage, perPage);
+    handleRefresh(currentPage, itemPerPage);
   };
   const columns = [{
     name: <span>
@@ -296,13 +295,12 @@ const Logs = () => {
             </div>
           }
           showColumnFilter={false}
-          showPagination={totalItems > itemPerPage}
+          showPagination={totalItems > 0}
           noDataText={__("No logs found", "zaplane")} 
           totalItems={totalItems} 
           dataFetchingStatus={loading} 
           suffix="logs-table" 
           currentPageNumber={currentPage} 
-          perPage={perPage} 
           rowsPerPage={itemPerPage} 
           onChangePage={handlePageChange}
           onChangeItemsPerPage={handlePerPageChange}

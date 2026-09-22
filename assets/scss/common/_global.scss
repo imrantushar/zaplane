@@ -339,6 +339,10 @@ input.zaplane-checkbox:hover {
     color: var(--zaplane-font-secondary-color);
 }
 
+.zaplane-textarea {
+    padding: 8px 12px !important;
+}
+
 // ── Themed form controls (dark-mode-aware) ────────────────────────────────
 // Any input/select/textarea inside a Zaplane surface — the main app AND portaled
 // modals/drawers (which re-apply `.zaplane-scope`) — must use themed colors so

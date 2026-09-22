@@ -32,8 +32,55 @@ All notable changes to Zaplane are documented here. This project adheres to
   to one from nearby. While you drag, the steps that can take the line are
   outlined, and letting go on empty canvas opens the step picker, already
   connected. Lines into a trigger, loops and duplicate lines are refused.
+- **Group recipes.** One recipe can set up several workflows at once. Run Group
+  Recipe opens a setup: switch each workflow, and some of their steps, on or off,
+  fill in a few values such as a coupon's discount, pick the connections they
+  need, and create them together in a new folder, as drafts or turned on. The
+  first is *WooCommerce Customer Lifecycle*: abandoned carts, a thank-you coupon,
+  a feedback request, a win-back email and a birthday coupon.
+- **Register a recipe with an array.** Name each step by its app and event, such
+  as `gemcrm.send_email`, and give its settings. Zaplane lays the steps out,
+  connects them and fills in their labels, icons and trigger hooks. Use
+  `zaplane_register_recipe()` or the `zaplane_register_recipes` action; see
+  `docs/recipes/registering-recipes.md`. Recipes a plugin registers show up the
+  next time Recipes is opened.
+- **Every recipe gets a setup.** Use Recipe opens the same setup as a group recipe,
+  showing only what that recipe needs: its optional steps, its settings, its
+  connections, and a name for the workflow.
+- A folder set up from a group recipe says which one. Any folder can turn all of
+  its workflows on, or pause them, in one go.
+- The Recipes page can show only group recipes, or only single-workflow recipes.
+- **StoreEngine Store Emails**, a group recipe that sends a StoreEngine store's
+  emails from workflows: order confirmation, status, note, refund, shipping,
+  delivery and cancellation emails, failed payment and failed renewal recovery,
+  renewal and cancelled subscription emails, alerts to the store for new orders
+  and failed payments, and a review request after delivery. Each email is a
+  workflow you can add to, and some come with a follow-up coupon or an order
+  note. While one of these workflows is on, StoreEngine's own copy of its email
+  is switched off; pause the workflow and StoreEngine sends it again. This needs
+  a StoreEngine version with the `storeengine/email/setting` filter.
+- StoreEngine: a **Subscription Renewal Payment Failed** trigger, with a link to
+  pay again. Order triggers also give `first_name`, `order_date`,
+  `total_formatted`, `items_summary`, `payment_method_title`, `order_url`,
+  `payment_url` and `edit_order_url`. Status triggers give status labels, Order
+  Item Shipped gives the item name, courier and tracking, refund triggers give
+  the amount and reason, and subscription triggers give the customer's name and
+  formatted total.
+- StoreEngine's Create Coupon step can add a random ending to the code, so a code
+  built from an order number can't be guessed.
+- The recipes that ship with Zaplane no longer refer to steps by number. Their
+  emails and steps read the trigger as `{{trigger.first_name}}`, and a field of
+  an earlier step by its name, such as `{{coupon.code}}` in the email after a
+  Create Coupon step. Workflows already made from a recipe keep working as they are.
 
 ### Fixed
+- Workflows made from the WooCommerce and GemCRM recipes that ship with Zaplane
+  couldn't go live: their Send Email steps were missing the Email Content
+  setting. Recipes already on a site are corrected on update.
+- Renaming a recipe that ships with Zaplane added a second copy on the next
+  update, and deleting one brought it back. Shipped recipes are now known by a
+  slug, and a deleted one stays deleted.
+- The Recipes page showed only the first 20 recipes.
 - A step got nothing from a field whose name has a hyphen, such as a Contact Form 7
   form's `your-email`, so a Create Contact step said a valid email was required.
   A minus between two values still subtracts.

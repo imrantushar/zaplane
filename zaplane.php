@@ -38,6 +38,10 @@ final class Zaplane {
 
 		$this->container = $this->boot_container();
 
+		// StoreEngine builds its emails on plugins_loaded, before this plugin's own
+		// callback runs, and each email reads its settings as it is built.
+		\Zaplane\Services\StoreengineEmailHandover::boot();
+
 		register_activation_hook( __FILE__, [ $this, 'activate_plugin' ] );
 		register_deactivation_hook( __FILE__, [ $this, 'deactivate_plugin' ] );
 
@@ -146,9 +150,11 @@ final class Zaplane {
 		// Activation covers fresh installs; this covers plugin updates (where the
 		// activation hook doesn't fire). Previously the seeders ran unconditionally
 		// on every page load, REST call and cron tick — five SELECTs of pure waste.
-		if ( version_compare( (string) get_option( 'zaplane_db_version', '0.0.0' ), ZAPLANE_VERSION, '<' ) ) {
-			\Zaplane\Installer::init()->run();
-		}
+        add_action( 'init', function () {
+            if ( version_compare( (string) get_option( 'zaplane_db_version', '0.0.0' ), ZAPLANE_VERSION, '<' ) ) {
+                \Zaplane\Installer::init()->run();
+            }
+        }, 20 );
 
 		do_action( 'zaplane_init' );
 	}
