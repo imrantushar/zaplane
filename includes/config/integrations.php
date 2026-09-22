@@ -187,7 +187,7 @@ $zaplane_registry = [
 	],
 	'jotform'        => [
 		'file'  => 'jotform.php',
-		'class' => \Zaplane\Integrations\Jotform::class
+		'class' => \Zaplane\Integrations\Jotform::class,
 	],
 	'contact-form-7'      => [
 		'file'  => 'contact-form.php',
@@ -371,19 +371,24 @@ $zaplane_registry = [
 	],
 	'brevo'        => [
 		'file'  => 'brevo.php',
-		'class' => \Zaplane\Integrations\Brevo::class
+		'class' => \Zaplane\Integrations\Brevo::class,
 	],
 	'trello'        => [
 		'file'  => 'trello.php',
-		'class' => \Zaplane\Integrations\Trello::class
+		'class' => \Zaplane\Integrations\Trello::class,
+	],
+	'gembooking'              => [
+		'file'  => 'gembooking.php',
+		'class' => \Zaplane\Integrations\Gembooking::class,
 	],
 ];
 
 $zaplane_priority = [
 	'academy',
-	'ablocks',
-	'gemcrm',
 	'storeengine',
+	'gemcrm',
+	'ablocks',
+	'gembooking',
 ];
 
 $zaplane_priority_items = [];

@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-08 12:56:18",
+    "generated_at": "2026-09-22 12:52:20",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -290,960 +290,6 @@
                                 ]
                             },
                             "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "ablocks": {
-            "slug": "ablocks",
-            "name": "aBlocks",
-            "icon": "ablocks.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_route": "",
-            "webhook_setup": [],
-            "triggers": {
-                "form_submitted": {
-                    "label": "Form Submitted",
-                    "hook": "ablocks/form_builder/after_submission",
-                    "key": "form_submitted",
-                    "schema": [
-                        {
-                            "key": "form_id",
-                            "label": "Forms",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "ablocks",
-                                "query": "form_query",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": []
-        },
-        "gemcrm": {
-            "slug": "gemcrm",
-            "name": "GemCRM",
-            "icon": "crm.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_route": "",
-            "webhook_setup": [],
-            "triggers": {
-                "contact_created": {
-                    "label": "Contact Created",
-                    "hook": "gemcrm/contact/created",
-                    "key": "contact_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "contact_tag_attached": {
-                    "label": "Tag Added To Contact",
-                    "hook": "gemcrm/contact/tag/attached",
-                    "key": "contact_tag_attached",
-                    "schema": [
-                        {
-                            "key": "tag_id",
-                            "label": "Tag",
-                            "type": "select",
-                            "required": true,
-                            "placeholder": "Leave empty to trigger for any tag",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "contact_tag_removed": {
-                    "label": "Tag Removed From Contact",
-                    "hook": "gemcrm/contact/tag/removed",
-                    "key": "contact_tag_removed",
-                    "schema": [
-                        {
-                            "key": "tag_id",
-                            "label": "Tag",
-                            "type": "select",
-                            "required": true,
-                            "placeholder": "Leave empty to trigger for any tag",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "contact_list_attached": {
-                    "label": "Contact Added To List",
-                    "hook": "gemcrm/contact/list/attached",
-                    "key": "contact_list_attached",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "List",
-                            "type": "select",
-                            "required": true,
-                            "placeholder": "Leave empty to trigger for any list",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "contact_list_removed": {
-                    "label": "Contact Removed From List",
-                    "hook": "gemcrm/contact/list/removed",
-                    "key": "contact_list_removed",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "List",
-                            "type": "select",
-                            "required": true,
-                            "placeholder": "Leave empty to trigger for any list",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "contact_birthday": {
-                    "label": "Contact Birthday",
-                    "hook": "zaplane_gemcrm_contact_birthday",
-                    "key": "contact_birthday",
-                    "schema": [
-                        {
-                            "key": "purchase_tag_id",
-                            "label": "Apply Tag on Purchase (optional)",
-                            "type": "select",
-                            "required": false,
-                            "placeholder": "Leave empty to skip tag on purchase",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_contact": {
-                    "label": "Create Contact",
-                    "key": "create_contact",
-                    "schema": [
-                        {
-                            "key": "first_name",
-                            "label": "First Name",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "last_name",
-                            "label": "Last Name",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "email",
-                            "label": "Email",
-                            "type": "email",
-                            "subtype": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "phone",
-                            "label": "Phone",
-                            "type": "number",
-                            "required": false
-                        },
-                        {
-                            "key": "gemcrm_status",
-                            "label": "Status",
-                            "type": "select",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "draft",
-                                    "label": "Draft"
-                                },
-                                {
-                                    "value": "pending",
-                                    "label": "Pending"
-                                },
-                                {
-                                    "value": "subscribed",
-                                    "label": "Subscribed"
-                                },
-                                {
-                                    "value": "unsubscribed",
-                                    "label": "Unsubscribed"
-                                },
-                                {
-                                    "value": "spamed",
-                                    "label": "Spamed"
-                                },
-                                {
-                                    "value": "bounced",
-                                    "label": "Bounced"
-                                },
-                                {
-                                    "value": "complained",
-                                    "label": "Complained"
-                                },
-                                {
-                                    "value": "transactional",
-                                    "label": "Transactional"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "type",
-                            "label": "Type",
-                            "type": "select",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "lead",
-                                    "label": "Lead"
-                                },
-                                {
-                                    "value": "customer",
-                                    "label": "Customer"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "linked_id",
-                            "label": "Linked ID",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "photo_id",
-                            "label": "Photo ID",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "tag_ids",
-                            "label": "Tags",
-                            "type": "multi-select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "list_ids",
-                            "label": "Lists",
-                            "type": "multi-select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "addr_line_1",
-                            "label": "Address Line 1",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "addr_line_2",
-                            "label": "Address Line 2",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "city",
-                            "label": "City",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "state",
-                            "label": "State",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "zip",
-                            "label": "ZIP",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "country",
-                            "label": "Country",
-                            "type": "expression",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_contact": {
-                    "label": "Update Contact",
-                    "key": "update_contact",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "subtype": "number",
-                            "required": true,
-                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_contact_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "first_name",
-                            "label": "First Name",
-                            "type": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "last_name",
-                            "label": "Last Name",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "email",
-                            "label": "Email",
-                            "type": "email",
-                            "subtype": "expression",
-                            "required": true
-                        },
-                        {
-                            "key": "phone",
-                            "label": "Phone",
-                            "type": "number",
-                            "required": false
-                        },
-                        {
-                            "key": "gemcrm_status",
-                            "label": "Status",
-                            "type": "select",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "draft",
-                                    "label": "Draft"
-                                },
-                                {
-                                    "value": "pending",
-                                    "label": "Pending"
-                                },
-                                {
-                                    "value": "subscribed",
-                                    "label": "Subscribed"
-                                },
-                                {
-                                    "value": "unsubscribed",
-                                    "label": "Unsubscribed"
-                                },
-                                {
-                                    "value": "spamed",
-                                    "label": "Spamed"
-                                },
-                                {
-                                    "value": "bounced",
-                                    "label": "Bounced"
-                                },
-                                {
-                                    "value": "complained",
-                                    "label": "Complained"
-                                },
-                                {
-                                    "value": "transactional",
-                                    "label": "Transactional"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "type",
-                            "label": "Type",
-                            "type": "select",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "lead",
-                                    "label": "Lead"
-                                },
-                                {
-                                    "value": "customer",
-                                    "label": "Customer"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "linked_id",
-                            "label": "Linked ID",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "photo_id",
-                            "label": "Photo ID",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "tag_ids",
-                            "label": "Tags",
-                            "type": "multi-select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "list_ids",
-                            "label": "Lists",
-                            "type": "multi-select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "addr_line_1",
-                            "label": "Address Line 1",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "addr_line_2",
-                            "label": "Address Line 2",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "city",
-                            "label": "City",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "state",
-                            "label": "State",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "zip",
-                            "label": "ZIP",
-                            "type": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "country",
-                            "label": "Country",
-                            "type": "expression",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_contact": {
-                    "label": "Delete Contact",
-                    "key": "delete_contact",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "subtype": "number",
-                            "required": true,
-                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_contact_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "apply_tag": {
-                    "label": "Apply Tag To Contact",
-                    "key": "apply_tag",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "subtype": "number",
-                            "required": true,
-                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_contact_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "tag_id",
-                            "label": "Tag",
-                            "type": "multi-select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "apply_list": {
-                    "label": "Add Contact To List",
-                    "key": "apply_list",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "subtype": "number",
-                            "required": true,
-                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_contact_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "list_id",
-                            "label": "List",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "remove_from_tag": {
-                    "label": "Remove Tag From Contact",
-                    "key": "remove_from_tag",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "subtype": "number",
-                            "required": true,
-                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_contact_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "tag_id",
-                            "label": "Tag",
-                            "type": "multi-select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_tag_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "remove_from_list": {
-                    "label": "Remove Contact From List",
-                    "key": "remove_from_list",
-                    "schema": [
-                        {
-                            "key": "contact_id",
-                            "label": "Contact ID",
-                            "type": "expression",
-                            "subtype": "number",
-                            "required": true,
-                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_contact_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "list_id",
-                            "label": "List",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "send_campaign": {
-                    "label": "Send Email Campaign",
-                    "key": "send_campaign",
-                    "schema": [
-                        {
-                            "key": "campaign_id",
-                            "label": "Email Campaign",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_campaign_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "send_email": {
-                    "label": "Send Email",
-                    "key": "send_email",
-                    "schema": [
-                        {
-                            "key": "recipient_type",
-                            "label": "Send To",
-                            "type": "select",
-                            "required": true,
-                            "default": "contact",
-                            "options": [
-                                {
-                                    "value": "contact",
-                                    "label": "Specific Contact"
-                                },
-                                {
-                                    "value": "list",
-                                    "label": "Contact List"
-                                },
-                                {
-                                    "value": "custom",
-                                    "label": "Custom Email"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "contact_id",
-                            "label": "Contact",
-                            "type": "select",
-                            "required": false,
-                            "depends_on": {
-                                "recipient_type": "contact"
-                            },
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_contact_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "list_id",
-                            "label": "Contact List",
-                            "type": "select",
-                            "required": false,
-                            "depends_on": {
-                                "recipient_type": "list"
-                            },
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_list_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "custom_email",
-                            "label": "Email Address",
-                            "type": "email",
-                            "subtype": "expression",
-                            "required": false,
-                            "depends_on": {
-                                "recipient_type": "custom"
-                            },
-                            "placeholder": "someone@example.com or use @ to pick a variable"
-                        },
-                        {
-                            "key": "subject",
-                            "label": "Subject",
-                            "type": "expression",
-                            "required": true,
-                            "placeholder": "Your subject line\u2026 (leave empty to use the template subject)"
-                        },
-                        {
-                            "key": "content_source",
-                            "label": "Email Content",
-                            "type": "select",
-                            "required": true,
-                            "default": "custom",
-                            "options": [
-                                {
-                                    "value": "custom",
-                                    "label": "Custom Email"
-                                },
-                                {
-                                    "value": "template",
-                                    "label": "Existing Template"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "template_id",
-                            "label": "Email Template",
-                            "type": "select",
-                            "required": false,
-                            "depends_on": {
-                                "content_source": "template"
-                            },
-                            "help": "Pick a saved template (designed on the Zaplane \u2192 Email Templates page). Its design is used as the email body.",
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_email_template_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "body",
-                            "label": "Email Body",
-                            "type": "richtext",
-                            "required": false,
-                            "depends_on": {
-                                "content_source": "custom"
-                            },
-                            "placeholder": "Write your email here\u2026",
-                            "merge_tags": [
-                                {
-                                    "value": "{{contact.first_name}}",
-                                    "label": "First Name"
-                                },
-                                {
-                                    "value": "{{contact.last_name}}",
-                                    "label": "Last Name"
-                                },
-                                {
-                                    "value": "{{contact.email}}",
-                                    "label": "Email"
-                                },
-                                {
-                                    "value": "{{contact.phone}}",
-                                    "label": "Phone"
-                                },
-                                {
-                                    "value": "{{contact.id}}",
-                                    "label": "Contact ID"
-                                },
-                                {
-                                    "value": "{{unsubscribe_link}}",
-                                    "label": "Unsubscribe Link"
-                                },
-                                {
-                                    "value": "{{update_preferences_link}}",
-                                    "label": "Update Preferences Link"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "pre_header",
-                            "label": "Pre-header Text",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "Short preview text shown in inbox\u2026"
-                        },
-                        {
-                            "key": "from_email",
-                            "label": "From Email",
-                            "type": "email",
-                            "subtype": "expression",
-                            "required": false,
-                            "placeholder": "Leave empty to use system default"
-                        },
-                        {
-                            "key": "from_name",
-                            "label": "From Name",
-                            "type": "expression",
-                            "required": false,
-                            "placeholder": "Leave empty to use system default"
-                        },
-                        {
-                            "key": "reply_to_email",
-                            "label": "Reply-To Email",
-                            "type": "email",
-                            "subtype": "expression",
-                            "required": false
-                        },
-                        {
-                            "key": "reply_to_name",
-                            "label": "Reply-To Name",
-                            "type": "expression",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "reapply_sequence": {
-                    "label": "Re Apply A Sequence",
-                    "key": "reapply_sequence",
-                    "schema": [
-                        {
-                            "key": "sequence_id",
-                            "label": "Email Sequence",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemcrm",
-                                "query": "gemcrm_sequence_query",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
                         }
                     ],
                     "outputs": [
@@ -2456,6 +1502,1926 @@
                                 {
                                     "value": "yes",
                                     "label": "Yes \u2014 Permanently Delete"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "gemcrm": {
+            "slug": "gemcrm",
+            "name": "GemCRM",
+            "icon": "crm.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "triggers": {
+                "contact_created": {
+                    "label": "Contact Created",
+                    "hook": "gemcrm/contact/created",
+                    "key": "contact_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_tag_attached": {
+                    "label": "Tag Added To Contact",
+                    "hook": "gemcrm/contact/tag/attached",
+                    "key": "contact_tag_attached",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag",
+                            "type": "select",
+                            "required": true,
+                            "placeholder": "Leave empty to trigger for any tag",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_tag_removed": {
+                    "label": "Tag Removed From Contact",
+                    "hook": "gemcrm/contact/tag/removed",
+                    "key": "contact_tag_removed",
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag",
+                            "type": "select",
+                            "required": true,
+                            "placeholder": "Leave empty to trigger for any tag",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_list_attached": {
+                    "label": "Contact Added To List",
+                    "hook": "gemcrm/contact/list/attached",
+                    "key": "contact_list_attached",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "List",
+                            "type": "select",
+                            "required": true,
+                            "placeholder": "Leave empty to trigger for any list",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_list_removed": {
+                    "label": "Contact Removed From List",
+                    "hook": "gemcrm/contact/list/removed",
+                    "key": "contact_list_removed",
+                    "schema": [
+                        {
+                            "key": "list_id",
+                            "label": "List",
+                            "type": "select",
+                            "required": true,
+                            "placeholder": "Leave empty to trigger for any list",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "contact_birthday": {
+                    "label": "Contact Birthday",
+                    "hook": "zaplane_gemcrm_contact_birthday",
+                    "key": "contact_birthday",
+                    "schema": [
+                        {
+                            "key": "purchase_tag_id",
+                            "label": "Apply Tag on Purchase (optional)",
+                            "type": "select",
+                            "required": false,
+                            "placeholder": "Leave empty to skip tag on purchase",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_contact": {
+                    "label": "Create Contact",
+                    "key": "create_contact",
+                    "schema": [
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "email",
+                            "subtype": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "gemcrm_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending"
+                                },
+                                {
+                                    "value": "subscribed",
+                                    "label": "Subscribed"
+                                },
+                                {
+                                    "value": "unsubscribed",
+                                    "label": "Unsubscribed"
+                                },
+                                {
+                                    "value": "spamed",
+                                    "label": "Spamed"
+                                },
+                                {
+                                    "value": "bounced",
+                                    "label": "Bounced"
+                                },
+                                {
+                                    "value": "complained",
+                                    "label": "Complained"
+                                },
+                                {
+                                    "value": "transactional",
+                                    "label": "Transactional"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "type",
+                            "label": "Type",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "lead",
+                                    "label": "Lead"
+                                },
+                                {
+                                    "value": "customer",
+                                    "label": "Customer"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "linked_id",
+                            "label": "Linked ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "photo_id",
+                            "label": "Photo ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "tag_ids",
+                            "label": "Tags",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "list_ids",
+                            "label": "Lists",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "addr_line_1",
+                            "label": "Address Line 1",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "addr_line_2",
+                            "label": "Address Line 2",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "state",
+                            "label": "State",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "zip",
+                            "label": "ZIP",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "country",
+                            "label": "Country",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_contact": {
+                    "label": "Update Contact",
+                    "key": "update_contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
+                            "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "email",
+                            "subtype": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "gemcrm_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending"
+                                },
+                                {
+                                    "value": "subscribed",
+                                    "label": "Subscribed"
+                                },
+                                {
+                                    "value": "unsubscribed",
+                                    "label": "Unsubscribed"
+                                },
+                                {
+                                    "value": "spamed",
+                                    "label": "Spamed"
+                                },
+                                {
+                                    "value": "bounced",
+                                    "label": "Bounced"
+                                },
+                                {
+                                    "value": "complained",
+                                    "label": "Complained"
+                                },
+                                {
+                                    "value": "transactional",
+                                    "label": "Transactional"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "type",
+                            "label": "Type",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "lead",
+                                    "label": "Lead"
+                                },
+                                {
+                                    "value": "customer",
+                                    "label": "Customer"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "linked_id",
+                            "label": "Linked ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "photo_id",
+                            "label": "Photo ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "tag_ids",
+                            "label": "Tags",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "list_ids",
+                            "label": "Lists",
+                            "type": "multi-select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "addr_line_1",
+                            "label": "Address Line 1",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "addr_line_2",
+                            "label": "Address Line 2",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "state",
+                            "label": "State",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "zip",
+                            "label": "ZIP",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "country",
+                            "label": "Country",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_contact": {
+                    "label": "Delete Contact",
+                    "key": "delete_contact",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
+                            "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "apply_tag": {
+                    "label": "Apply Tag To Contact",
+                    "key": "apply_tag",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
+                            "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "tag_id",
+                            "label": "Tag",
+                            "type": "multi-select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "apply_list": {
+                    "label": "Add Contact To List",
+                    "key": "apply_list",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
+                            "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "List",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_from_tag": {
+                    "label": "Remove Tag From Contact",
+                    "key": "remove_from_tag",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
+                            "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "tag_id",
+                            "label": "Tag",
+                            "type": "multi-select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_tag_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_from_list": {
+                    "label": "Remove Contact From List",
+                    "key": "remove_from_list",
+                    "schema": [
+                        {
+                            "key": "contact_id",
+                            "label": "Contact ID",
+                            "type": "expression",
+                            "subtype": "number",
+                            "required": true,
+                            "placeholder": "Enter ID or use {{previous_node.contact_id}}",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "List",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_campaign": {
+                    "label": "Send Email Campaign",
+                    "key": "send_campaign",
+                    "schema": [
+                        {
+                            "key": "campaign_id",
+                            "label": "Email Campaign",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_campaign_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_email": {
+                    "label": "Send Email",
+                    "key": "send_email",
+                    "schema": [
+                        {
+                            "key": "recipient_type",
+                            "label": "Send To",
+                            "type": "select",
+                            "required": true,
+                            "default": "contact",
+                            "options": [
+                                {
+                                    "value": "contact",
+                                    "label": "Specific Contact"
+                                },
+                                {
+                                    "value": "list",
+                                    "label": "Contact List"
+                                },
+                                {
+                                    "value": "custom",
+                                    "label": "Custom Email"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "contact_id",
+                            "label": "Contact",
+                            "type": "select",
+                            "required": false,
+                            "depends_on": {
+                                "recipient_type": "contact"
+                            },
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_contact_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "list_id",
+                            "label": "Contact List",
+                            "type": "select",
+                            "required": false,
+                            "depends_on": {
+                                "recipient_type": "list"
+                            },
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_list_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "custom_email",
+                            "label": "Email Address",
+                            "type": "email",
+                            "subtype": "expression",
+                            "required": false,
+                            "depends_on": {
+                                "recipient_type": "custom"
+                            },
+                            "placeholder": "someone@example.com or use @ to pick a variable"
+                        },
+                        {
+                            "key": "subject",
+                            "label": "Subject",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "Your subject line\u2026 (leave empty to use the template subject)"
+                        },
+                        {
+                            "key": "content_source",
+                            "label": "Email Content",
+                            "type": "select",
+                            "required": true,
+                            "default": "custom",
+                            "options": [
+                                {
+                                    "value": "custom",
+                                    "label": "Custom Email"
+                                },
+                                {
+                                    "value": "template",
+                                    "label": "Existing Template"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "template_id",
+                            "label": "Email Template",
+                            "type": "select",
+                            "required": false,
+                            "depends_on": {
+                                "content_source": "template"
+                            },
+                            "help": "Pick a saved template (designed on the Zaplane \u2192 Email Templates page). Its design is used as the email body.",
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_email_template_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "body",
+                            "label": "Email Body",
+                            "type": "richtext",
+                            "required": false,
+                            "depends_on": {
+                                "content_source": "custom"
+                            },
+                            "placeholder": "Write your email here\u2026",
+                            "merge_tags": [
+                                {
+                                    "value": "{{contact.first_name}}",
+                                    "label": "First Name"
+                                },
+                                {
+                                    "value": "{{contact.last_name}}",
+                                    "label": "Last Name"
+                                },
+                                {
+                                    "value": "{{contact.email}}",
+                                    "label": "Email"
+                                },
+                                {
+                                    "value": "{{contact.phone}}",
+                                    "label": "Phone"
+                                },
+                                {
+                                    "value": "{{contact.id}}",
+                                    "label": "Contact ID"
+                                },
+                                {
+                                    "value": "{{unsubscribe_link}}",
+                                    "label": "Unsubscribe Link"
+                                },
+                                {
+                                    "value": "{{update_preferences_link}}",
+                                    "label": "Update Preferences Link"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "pre_header",
+                            "label": "Pre-header Text",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "Short preview text shown in inbox\u2026"
+                        },
+                        {
+                            "key": "from_email",
+                            "label": "From Email",
+                            "type": "email",
+                            "subtype": "expression",
+                            "required": false,
+                            "placeholder": "Leave empty to use system default"
+                        },
+                        {
+                            "key": "from_name",
+                            "label": "From Name",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "Leave empty to use system default"
+                        },
+                        {
+                            "key": "reply_to_email",
+                            "label": "Reply-To Email",
+                            "type": "email",
+                            "subtype": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "reply_to_name",
+                            "label": "Reply-To Name",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reapply_sequence": {
+                    "label": "Re Apply A Sequence",
+                    "key": "reapply_sequence",
+                    "schema": [
+                        {
+                            "key": "sequence_id",
+                            "label": "Email Sequence",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemcrm",
+                                "query": "gemcrm_sequence_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "ablocks": {
+            "slug": "ablocks",
+            "name": "aBlocks",
+            "icon": "ablocks.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "triggers": {
+                "form_submitted": {
+                    "label": "Form Submitted",
+                    "hook": "ablocks/form_builder/after_submission",
+                    "key": "form_submitted",
+                    "schema": [
+                        {
+                            "key": "form_id",
+                            "label": "Forms",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "ablocks",
+                                "query": "form_query",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": []
+        },
+        "gembooking": {
+            "slug": "gembooking",
+            "name": "GemBooking",
+            "icon": "gembooking.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "triggers": {
+                "booking_created": {
+                    "label": "Booking Created",
+                    "hook": "gembooking/after_booking_persisted",
+                    "key": "booking_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_confirmed": {
+                    "label": "Booking Status Confirmed",
+                    "hook": "gembooking/booking/confirmed",
+                    "key": "booking_confirmed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_pending": {
+                    "label": "Booking Pending",
+                    "hook": "gembooking/booking/pending",
+                    "key": "booking_pending",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_rescheduled": {
+                    "label": "Booking Rescheduled",
+                    "hook": "gembooking/booking/rescheduled",
+                    "key": "booking_rescheduled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_cancelled": {
+                    "label": "Booking Cancelled",
+                    "hook": "gembooking/booking/cancelled",
+                    "key": "booking_cancelled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_abandoned": {
+                    "label": "Booking Abandoned",
+                    "hook": "gembooking/booking/abandoned",
+                    "key": "booking_abandoned",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_status_changed_by_admin": {
+                    "label": "Booking Status Changed by Admin",
+                    "hook": "gembooking/after_status_update_booked",
+                    "key": "booking_status_changed_by_admin",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_deleted": {
+                    "label": "Booking Deleted",
+                    "hook": "gembooking/after_delete_booked",
+                    "key": "booking_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "booking_form_abandoned": {
+                    "label": "Booking Form Abandoned",
+                    "hook": "gembooking/form/lead_abandoned",
+                    "key": "booking_form_abandoned",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "staff_member_added": {
+                    "label": "Staff Member Added",
+                    "hook": "gembooking/after_create_team",
+                    "key": "staff_member_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "staff_member_updated": {
+                    "label": "Staff Member Updated",
+                    "hook": "gembooking/after_update_team",
+                    "key": "staff_member_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "staff_member_removed": {
+                    "label": "Staff Member Removed",
+                    "hook": "gembooking/after_delete_team",
+                    "key": "staff_member_removed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "bookable_duplicated": {
+                    "label": "Service, Event or Resource Duplicated",
+                    "hook": "gembooking/duplicated",
+                    "key": "bookable_duplicated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "woocommerce_product_linked": {
+                    "label": "Product Linked (WooCommerce)",
+                    "hook": "gembooking/woocommerce/product_linked",
+                    "key": "woocommerce_product_linked",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "woocommerce_product_unlinked": {
+                    "label": "Product Unlinked (WooCommerce)",
+                    "hook": "gembooking/woocommerce/product_unlinked",
+                    "key": "woocommerce_product_unlinked",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "storeengine_product_linked": {
+                    "label": "Product Linked (StoreEngine)",
+                    "hook": "gembooking/storeengine/product_linked",
+                    "key": "storeengine_product_linked",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "storeengine_product_unlinked": {
+                    "label": "Product Unlinked (StoreEngine)",
+                    "hook": "gembooking/storeengine/product_unlinked",
+                    "key": "storeengine_product_unlinked",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "service_saved": {
+                    "label": "Service Saved",
+                    "hook": "save_post_gembk_service",
+                    "key": "service_saved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "event_saved": {
+                    "label": "Event Saved",
+                    "hook": "save_post_gembk_event",
+                    "key": "event_saved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "resource_saved": {
+                    "label": "Resource Saved",
+                    "hook": "save_post_gembk_resource",
+                    "key": "resource_saved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "integration_unresolved": {
+                    "label": "Meeting Link or Calendar Sync Failed",
+                    "hook": "gembooking/integrations/unresolved",
+                    "key": "integration_unresolved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "external_calendar_cancelled": {
+                    "label": "Booking Cancelled from External Calendar",
+                    "hook": "gembooking/booking/external_cancel",
+                    "key": "external_calendar_cancelled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "external_calendar_rescheduled": {
+                    "label": "Booking Moved from External Calendar",
+                    "hook": "gembooking/booking/external_reschedule",
+                    "key": "external_calendar_rescheduled",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "package_purchased": {
+                    "label": "Package Purchased",
+                    "hook": "gembooking/package/purchased",
+                    "requires_addon": "package",
+                    "key": "package_purchased",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "package_granted": {
+                    "label": "Package Granted Manually",
+                    "hook": "gembooking/package/granted",
+                    "requires_addon": "package",
+                    "key": "package_granted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "package_status_changed": {
+                    "label": "Package Status Changed",
+                    "hook": "gembooking/package/status_changed",
+                    "requires_addon": "package",
+                    "key": "package_status_changed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "package_purchases_deleted": {
+                    "label": "Package Purchases Deleted",
+                    "hook": "gembooking/package/purchases_deleted",
+                    "requires_addon": "package",
+                    "key": "package_purchases_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_booking": {
+                    "label": "Create Booking",
+                    "key": "create_booking",
+                    "schema": [
+                        {
+                            "key": "booking_type",
+                            "label": "Booking Type",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "service",
+                                    "label": "Service"
+                                },
+                                {
+                                    "value": "event",
+                                    "label": "Event"
+                                },
+                                {
+                                    "value": "resource",
+                                    "label": "Resource"
+                                },
+                                {
+                                    "value": "package",
+                                    "label": "Package"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "bookable",
+                            "label": "Bookable",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_bookable_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "booking_type"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "customer_id",
+                            "label": "Existing Customer (search by name or email)",
+                            "type": "select",
+                            "required": false,
+                            "show_if": {
+                                "booking_type": "package"
+                            },
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_customer_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "customer_email",
+                            "label": "Or Customer Email (no account yet)",
+                            "type": "email",
+                            "required": false,
+                            "show_if": {
+                                "booking_type": "package"
+                            }
+                        },
+                        {
+                            "key": "start_at",
+                            "label": "Date (Y-m-d)",
+                            "type": "datetime",
+                            "required": true,
+                            "show_if": {
+                                "booking_type": [
+                                    "service",
+                                    "event",
+                                    "resource"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "timezone",
+                            "label": "Timezone",
+                            "type": "select",
+                            "required": false,
+                            "show_if": {
+                                "booking_type": [
+                                    "service",
+                                    "event",
+                                    "resource"
+                                ]
+                            },
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_timezone_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "Customer Name",
+                            "type": "text",
+                            "required": true,
+                            "show_if": {
+                                "booking_type": [
+                                    "service",
+                                    "event",
+                                    "resource"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "email",
+                            "label": "Customer Email",
+                            "type": "email",
+                            "required": true,
+                            "show_if": {
+                                "booking_type": [
+                                    "service",
+                                    "event",
+                                    "resource"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "required": false,
+                            "show_if": {
+                                "booking_type": [
+                                    "service",
+                                    "event",
+                                    "resource"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "note",
+                            "label": "Comment / Notes",
+                            "type": "textarea",
+                            "required": false,
+                            "show_if": {
+                                "booking_type": [
+                                    "service",
+                                    "event",
+                                    "resource"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "change_booking_status": {
+                    "label": "Change Booking Status",
+                    "key": "change_booking_status",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "booking_status",
+                            "label": "Booking Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "pending",
+                                    "label": "Pending"
+                                },
+                                {
+                                    "value": "confirmed",
+                                    "label": "Confirmed"
+                                },
+                                {
+                                    "value": "cancelled",
+                                    "label": "Cancelled"
+                                },
+                                {
+                                    "value": "rescheduled",
+                                    "label": "Rescheduled"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reschedule_booking": {
+                    "label": "Reschedule Booking",
+                    "key": "reschedule_booking",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "start_at",
+                            "label": "New Start At",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "end_at",
+                            "label": "New End At",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cancel_booking": {
+                    "label": "Cancel Booking",
+                    "key": "cancel_booking",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "reason",
+                            "label": "Reason",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_booking": {
+                    "label": "Delete Booking",
+                    "key": "delete_booking",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_booking_note": {
+                    "label": "Add Internal Note",
+                    "key": "add_booking_note",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "note",
+                            "label": "Note",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reply_customer": {
+                    "label": "Reply to Customer",
+                    "key": "reply_customer",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_booking_field": {
+                    "label": "Update Booking Custom Field",
+                    "key": "update_booking_field",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "field_key",
+                            "label": "Custom Field Key",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "find_booking": {
+                    "label": "Find Booking",
+                    "key": "find_booking",
+                    "schema": [
+                        {
+                            "key": "booking_id",
+                            "label": "Booking ID (leave empty to search)",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "search",
+                            "label": "Search Term (name or email)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status Filter",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Limit",
+                            "type": "number",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "check_slot_availability": {
+                    "label": "Check Slot Availability",
+                    "key": "check_slot_availability",
+                    "schema": [
+                        {
+                            "key": "object_id",
+                            "label": "Service/Event/Resource ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "start_at",
+                            "label": "Start At",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "end_at",
+                            "label": "End At",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "team_id",
+                            "label": "Staff/Team ID",
+                            "type": "number",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_staff_time_off": {
+                    "label": "Add Staff Time Off",
+                    "key": "add_staff_time_off",
+                    "schema": [
+                        {
+                            "key": "team_id",
+                            "label": "Staff Member ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "start_date",
+                            "label": "Start Date",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "end_date",
+                            "label": "End Date (leave empty for a single day)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "reason",
+                            "label": "Reason",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_customer_profile": {
+                    "label": "Update Customer Profile",
+                    "key": "update_customer_profile",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "Customer User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "data",
+                            "label": "Profile data (JSON \u2014 first_name, last_name, display_name, user_email, phone, timezone)",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "duplicate_bookable": {
+                    "label": "Duplicate Service, Event or Resource",
+                    "key": "duplicate_bookable",
+                    "schema": [
+                        {
+                            "key": "source_id",
+                            "label": "Source Service/Event/Resource ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_staff": {
+                    "label": "Create Staff Member",
+                    "key": "create_staff",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_template_email": {
+                    "label": "Send Email in GemBooking Template",
+                    "requires_addon": "email",
+                    "key": "send_template_email",
+                    "schema": [
+                        {
+                            "key": "to",
+                            "label": "To",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "subject",
+                            "label": "Subject",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "body",
+                            "label": "Body",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "grant_package": {
+                    "label": "Grant Package to Customer",
+                    "requires_addon": "package",
+                    "key": "grant_package",
+                    "schema": [
+                        {
+                            "key": "package_id",
+                            "label": "Package ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "Customer User ID (or use Email below)",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "email",
+                            "label": "Customer Email (used if no User ID)",
+                            "type": "email",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "change_package_status": {
+                    "label": "Change Package Status",
+                    "requires_addon": "package",
+                    "key": "change_package_status",
+                    "schema": [
+                        {
+                            "key": "purchase_id",
+                            "label": "Package Purchase ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "active",
+                                    "label": "Active"
+                                },
+                                {
+                                    "value": "cancelled",
+                                    "label": "Cancelled"
+                                },
+                                {
+                                    "value": "expired",
+                                    "label": "Expired"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_package_purchase": {
+                    "label": "Delete Package Purchase",
+                    "requires_addon": "package",
+                    "key": "delete_package_purchase",
+                    "schema": [
+                        {
+                            "key": "purchase_id",
+                            "label": "Package Purchase ID (single)",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "ids",
+                            "label": "Purchase IDs (comma-separated, for bulk delete)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "check_in_ticket": {
+                    "label": "Check In Ticket",
+                    "requires_addon": "ticket",
+                    "key": "check_in_ticket",
+                    "schema": [
+                        {
+                            "key": "ticket_code",
+                            "label": "Ticket Code",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "undo_ticket_checkin": {
+                    "label": "Undo Ticket Check-In",
+                    "requires_addon": "ticket",
+                    "key": "undo_ticket_checkin",
+                    "schema": [
+                        {
+                            "key": "ticket_code",
+                            "label": "Ticket Code",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "check_in_all_tickets": {
+                    "label": "Check In All Tickets on a Booking",
+                    "requires_addon": "ticket",
+                    "key": "check_in_all_tickets",
+                    "schema": [
+                        {
+                            "key": "ticket_code",
+                            "label": "Ticket Code (any ticket on the booking)",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_sms_whatsapp": {
+                    "label": "Send SMS or WhatsApp",
+                    "requires_addon": "sms",
+                    "key": "send_sms_whatsapp",
+                    "schema": [
+                        {
+                            "key": "to",
+                            "label": "Phone Number",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "channel",
+                            "label": "Channel",
+                            "type": "select",
+                            "required": false,
+                            "default": "sms",
+                            "options": [
+                                {
+                                    "value": "sms",
+                                    "label": "SMS"
+                                },
+                                {
+                                    "value": "whatsapp",
+                                    "label": "WhatsApp"
                                 }
                             ]
                         }

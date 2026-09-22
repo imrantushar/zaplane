@@ -47,6 +47,7 @@ return [
 	// --- CRM / marketing ---
 	'fluentcrm'           => [ 'fluent-crm/fluent-crm.php' ],
 	'gemcrm'              => [ 'gemcrm/gemcrm.php' ],
+	'gembooking'          => [ 'gembooking/gembooking.php' ],
 	'groundhogg'          => [ 'groundhogg/groundhogg.php' ],
 
 	// --- Email / payments ---
