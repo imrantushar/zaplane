@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-14T06:55:41+00:00\n"
+"POT-Creation-Date: 2026-09-15T08:06:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: zaplane\n"
@@ -273,6 +273,14 @@ msgstr ""
 msgid "Application password"
 msgstr ""
 
+#: includes/api/recipe-controller.php:283
+msgid "This recipe sets up several workflows. Use Run Group Recipe to choose them."
+msgstr ""
+
+#: includes/api/recipe-controller.php:361
+msgid "Recipe not found."
+msgstr ""
+
 #. translators: %d: the trigger's number on the canvas
 #: includes/api/workflows-controller.php:834
 #: includes/authoring/trigger-advisor.php:219
@@ -342,6 +350,7 @@ msgid "Dashboard"
 msgstr ""
 
 #: includes/config/menu.php:15
+#: dev_zaplane/components/RecipeGroupWizard/index.js:113
 #: dev_zaplane/components/WorkflowTable/index.js:236
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/index.js:15
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/index.js:30
@@ -349,6 +358,7 @@ msgid "Workflows"
 msgstr ""
 
 #: includes/config/menu.php:20
+#: dev_zaplane/components/RecipeGroupWizard/index.js:142
 msgid "Connections"
 msgstr ""
 
@@ -385,7 +395,9 @@ msgid "Logs"
 msgstr ""
 
 #: includes/config/menu.php:55
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:248
+#: dev_zaplane/components/RecipeGroupWizard/index.js:130
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:52
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:231
 msgid "Settings"
 msgstr ""
 
@@ -573,6 +585,49 @@ msgstr ""
 
 #: includes/modules/abandoned-cart/abandoned-cart-module.php:113
 msgid "Automation runs"
+msgstr ""
+
+#: includes/services/recipe-group-builder.php:219
+msgid "Pick at least one workflow to set up."
+msgstr ""
+
+#. translators: %s: name of a setup value, e.g. "Sender name".
+#: includes/services/recipe-group-builder.php:558
+#: dev_zaplane/components/RecipeGroupWizard/parts.js:97
+#, php-format,js-format
+msgid "%s is required."
+msgstr ""
+
+#. translators: %s: name of a setup value, e.g. "Coupon discount".
+#: includes/services/recipe-group-builder.php:566
+#: dev_zaplane/components/RecipeGroupWizard/parts.js:101
+#, php-format,js-format
+msgid "%s must be a number."
+msgstr ""
+
+#. translators: 1: name of a setup value, 2: lowest allowed number, 3: highest allowed number.
+#: includes/services/recipe-group-builder.php:576
+#: dev_zaplane/components/RecipeGroupWizard/parts.js:109
+#, php-format,js-format
+msgid "%1$s must be between %2$s and %3$s."
+msgstr ""
+
+#. translators: 1: name of a setup value, 2: lowest allowed number.
+#: includes/services/recipe-group-builder.php:579
+#: dev_zaplane/components/RecipeGroupWizard/parts.js:112
+#, php-format,js-format
+msgid "%1$s must be at least %2$s."
+msgstr ""
+
+#. translators: 1: name of a setup value, 2: highest allowed number.
+#: includes/services/recipe-group-builder.php:582
+#: dev_zaplane/components/RecipeGroupWizard/parts.js:113
+#, php-format,js-format
+msgid "%1$s must be at most %2$s."
+msgstr ""
+
+#: includes/services/recipe-group-service.php:367
+msgid "A connection picked in the setup no longer exists. Pick one again."
 msgstr ""
 
 #: includes/settings.php:146
@@ -900,27 +955,333 @@ msgstr ""
 msgid "Close notification"
 msgstr ""
 
-#: dev_zaplane/components/SaveAsRecipeModal/index.js:59
+#: dev_zaplane/components/RecipeGroupWizard/ConnectionsStep.js:54
+msgid "Add connection"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ConnectionsStep.js:65
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:48
+msgid "Select a connection"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ConnectionsStep.js:66
+msgid "No connections yet"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ConnectionsStep.js:74
+msgid "You can skip this. The workflows that need it stay drafts until you link one."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ConnectionsStep.js:84
+msgid "Connect your accounts"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ConnectionsStep.js:85
+msgid "Pick the account each app should use. A connection added in another tab shows up here when you come back."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/DoneStep.js:16
+#, js-format
+msgid "Created %d workflow"
+msgid_plural "Created %d workflows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: dev_zaplane/components/RecipeGroupWizard/DoneStep.js:20
+#, js-format
+msgid "In the folder “%s”."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/DoneStep.js:21
+msgid "It's with your other workflows."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/DoneStep.js:22
+#, js-format
+msgid "%d couldn't be turned on yet."
+msgid_plural "%d couldn't be turned on yet."
+msgstr[0] ""
+msgstr[1] ""
+
+#: dev_zaplane/components/RecipeGroupWizard/DoneStep.js:38
+#: dev_zaplane/components/StatusOptions/index.js:16
+msgid "Active"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/DoneStep.js:38
+#: dev_zaplane/components/StatusOptions/index.js:18
+msgid "Draft"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/DoneStep.js:41
+msgid "Open"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:76
+msgid "The setup could not be loaded."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:114
+#, js-format
+msgid "%1$d of %2$d on"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:121
+msgid "Steps"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:122
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:38
+#: dev_zaplane/components/RecipeGroupWizard/WorkflowsStep.js:28
+#, js-format
+msgid "%d step"
+msgid_plural "%d steps"
+msgstr[0] ""
+msgstr[1] ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:132
+#, js-format
+msgid "%d value"
+msgid_plural "%d values"
+msgstr[0] ""
+msgstr[1] ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:133
+msgid "A value needs a look"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:144
+#, js-format
+msgid "%1$d of %2$d linked"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:153
+msgid "Review"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:154
+msgid "Name the workflow and create"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:154
+msgid "Name the folder and create"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:195
+msgid "The workflow could not be created."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:195
+msgid "The workflows could not be created."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:297
+msgid "Recipe"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:336
+#, js-format
+msgid "In the folder “%s”"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:337
+msgid "Created as a workflow"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:338
+#, js-format
+msgid "Step %1$d of %2$d · %3$s"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:345
+#: dev_zaplane/components/ZAPActionBar/index.js:33
+msgid "Close"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:358
+msgid "Open folder"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:358
+msgid "Open workflow"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:367
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:63
+#: dev_zaplane/containers/BackendDashboard/pages/email-templates/Editor.js:89
+msgid "Back"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:376
+msgid "Creating…"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:380
+msgid "Create workflow"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:381
+#, js-format
+msgid "Create %d workflow"
+msgid_plural "Create %d workflows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: dev_zaplane/components/RecipeGroupWizard/index.js:386
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:258
+msgid "Continue"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/parts.js:63
+#, js-format
+msgid "Steps of %s"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/parts.js:73
+msgid "(left out)"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/Rail.js:11
+msgid "Setup"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/Rail.js:39
+msgid "Created"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/Rail.js:39
+msgid "Will create"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/Rail.js:42
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:27
+#, js-format
+msgid "%d workflow"
+msgid_plural "%d workflows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: dev_zaplane/components/RecipeGroupWizard/Rail.js:45
+#, js-format
+msgid "%d step in all"
+msgid_plural "%d steps in all"
+msgstr[0] ""
+msgstr[1] ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:8
+msgid "Review and create"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:8
+msgid "Check what will be created, then create it."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:12
+msgid "Workflow name"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:12
+msgid "Folder name"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:20
+#, js-format
+msgid "Already set up in “%s”. This creates another folder."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:42
+#, js-format
+msgid "Without: %s"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:67
+#: dev_zaplane/components/RecipeGroupWizard/WorkflowsStep.js:117
+#, js-format
+msgid "%s isn't active on this site. The workflows that use it are created, but won't run until it is."
+msgid_plural "%s aren't active on this site. The workflows that use them are created, but won't run until they are."
+msgstr[0] ""
+msgstr[1] ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:83
+msgid "Turn the workflow on after creating it"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:84
+msgid "Turn the workflows on after creating them"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:88
+msgid "It's checked first. If it can't run yet, it stays a draft, and says why."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/ReviewStep.js:89
+msgid "Each one is checked first. One that can't run yet stays a draft, and says why."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/SettingsStep.js:23
+msgid "Used by"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/SettingsStep.js:75
+msgid "Adjust the settings"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/SettingsStep.js:76
+msgid "They are written into the steps that use them. You can still change them in each workflow later."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/WorkflowsStep.js:78
+#, js-format
+msgid "+%d step"
+msgid_plural "+%d steps"
+msgstr[0] ""
+msgstr[1] ""
+
+#: dev_zaplane/components/RecipeGroupWizard/WorkflowsStep.js:99
+msgid "Choose the optional steps"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/WorkflowsStep.js:100
+msgid "Switch on the steps you want. The ones left off aren't added to the workflow."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/WorkflowsStep.js:104
+msgid "Choose what to set up"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/WorkflowsStep.js:105
+msgid "Each one becomes its own workflow in a new folder. Click a card to switch it on or off."
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/WorkflowsStep.js:108
+msgid "Clear all"
+msgstr ""
+
+#: dev_zaplane/components/RecipeGroupWizard/WorkflowsStep.js:108
+msgid "Select all"
+msgstr ""
+
+#: dev_zaplane/components/SaveAsRecipeModal/index.js:55
 #: dev_zaplane/components/WorkflowTable/index.js:227
 msgid "Save as Recipe"
 msgstr ""
 
-#: dev_zaplane/components/SaveAsRecipeModal/index.js:61
+#: dev_zaplane/components/SaveAsRecipeModal/index.js:57
 #: dev_zaplane/components/WorkflowTable/index.js:167
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:305
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:428
 msgid "Title"
 msgstr ""
 
-#: dev_zaplane/components/SaveAsRecipeModal/index.js:61
+#: dev_zaplane/components/SaveAsRecipeModal/index.js:57
 msgid "Recipe title"
 msgstr ""
 
-#: dev_zaplane/components/SaveAsRecipeModal/index.js:62
+#: dev_zaplane/components/SaveAsRecipeModal/index.js:58
 msgid "Short description (optional)"
 msgstr ""
 
-#: dev_zaplane/components/SaveAsRecipeModal/index.js:100
+#: dev_zaplane/components/SaveAsRecipeModal/index.js:96
 msgid "Create Recipe"
 msgstr ""
 
@@ -940,16 +1301,8 @@ msgstr ""
 msgid "No results found"
 msgstr ""
 
-#: dev_zaplane/components/StatusOptions/index.js:16
-msgid "Active"
-msgstr ""
-
 #: dev_zaplane/components/StatusOptions/index.js:17
 msgid "Paused"
-msgstr ""
-
-#: dev_zaplane/components/StatusOptions/index.js:18
-msgid "Draft"
 msgstr ""
 
 #: dev_zaplane/components/StatusOptions/index.js:19
@@ -991,6 +1344,7 @@ msgid "Dismiss"
 msgstr ""
 
 #: dev_zaplane/components/Teaser/index.js:74
+#: dev_zaplane/containers/BackendDashboard/pages/Folders/Folder/index.js:82
 msgid "Turning on…"
 msgstr ""
 
@@ -1146,7 +1500,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/FolderCard.js:59
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:331
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:224
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:78
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:58
 msgid "Delete"
 msgstr ""
 
@@ -1176,10 +1530,6 @@ msgstr ""
 
 #: dev_zaplane/components/ZAPActionBar/index.js:18
 msgid "items selected"
-msgstr ""
-
-#: dev_zaplane/components/ZAPActionBar/index.js:33
-msgid "Close"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/index.js:27
@@ -1430,18 +1780,13 @@ msgstr ""
 msgid "No custom apps match your search"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:63
-#: dev_zaplane/containers/BackendDashboard/pages/email-templates/Editor.js:89
-msgid "Back"
-msgstr ""
-
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:65
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:132
 msgid "New Custom App"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:84
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:243
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:226
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:218
 msgid "Saving…"
 msgstr ""
@@ -1813,6 +2158,45 @@ msgstr ""
 msgid "Create a template to design beautiful emails with the builder."
 msgstr ""
 
+#: dev_zaplane/containers/BackendDashboard/pages/Folders/Folder/index.js:45
+#, js-format
+msgid "“%1$s” could not be turned on: %2$s"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/Folders/Folder/index.js:47
+#, js-format
+msgid "%d workflows could not be turned on. Open each one to see what it still needs."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/Folders/Folder/index.js:50
+msgid "Every workflow in this folder is on."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/Folders/Folder/index.js:51
+msgid "The workflows in this folder are paused."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/Folders/Folder/index.js:64
+msgid "The workflows could not be changed."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/Folders/Folder/index.js:79
+msgid "Pausing…"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/Folders/Folder/index.js:79
+msgid "Pause all"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/Folders/Folder/index.js:82
+msgid "Turn all on"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/Folders/Folder/index.js:90
+#, js-format
+msgid "Set up from the “%s” group recipe"
+msgstr ""
+
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/FolderCard.js:25
 msgid "1 Workflow"
 msgstr ""
@@ -1823,7 +2207,7 @@ msgid "%d Workflows"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/FolderCard.js:56
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:75
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:55
 msgid "Rename"
 msgstr ""
 
@@ -1837,7 +2221,7 @@ msgid "Rename Folder"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/FolderCard.js:98
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:146
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:124
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:280
 msgid "Update"
 msgstr ""
@@ -2137,6 +2521,7 @@ msgid "Refused"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/logs/AiAccessLog.js:23
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:15
 msgid "All"
 msgstr ""
 
@@ -2226,56 +2611,72 @@ msgstr ""
 msgid "Run Details"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:31
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:16
+msgid "Group recipes"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:17
+msgid "Single workflows"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:46
 msgid "Search recipes..."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:36
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:48
+msgid "Recipe type"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:66
 msgid "No recipes found"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:36
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:66
 msgid "No recipes match your search."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:36
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/index.js:66
 msgid "Recipes you save will appear here."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:94
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:75
+#, js-format
+msgid "Group recipe · %d workflow"
+msgid_plural "Group recipe · %d workflows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:85
 msgid "No description"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:100
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:91
 msgid "See less"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:100
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:91
 msgid "See more"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:114
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:99
+msgid "Choose which workflows to set up"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:99
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:105
 msgid "Use Recipe"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:121
-msgid "Convert Workflow"
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:105
+msgid "Run Group Recipe"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:124
-msgid "Workflow title (optional)"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:130
-msgid "Convert"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:137
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:115
 msgid "Rename Recipe"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:140
-#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:141
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:118
+#: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:119
 msgid "Enter recipe name"
 msgstr ""
 
@@ -2467,46 +2868,46 @@ msgstr ""
 msgid "Copied"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:16
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:17
 msgid "Appearance"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:17
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:128
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:18
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:111
 msgid "Modules"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:84
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:99
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:67
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:82
 msgid "Light"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:85
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:99
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:68
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:82
 msgid "Dark"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:90
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:73
 msgid "Colors"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:90
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:73
 msgid "Pick a mode to edit its palette — the app previews it live as you change colors."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:108
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:91
 msgid "Reset to default"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:128
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:111
 msgid "Turn optional features on or off. Disabled modules are removed from the menu."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:145
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:128
 msgid "Configure"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:243
+#: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:226
 msgid "Save changes"
 msgstr ""
 
@@ -2744,10 +3145,6 @@ msgstr ""
 msgid "Add Action"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:258
-msgid "Continue"
-msgstr ""
-
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:265
 msgid "Search apps or tools..."
 msgstr ""
@@ -2819,10 +3216,6 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:47
 msgid "Select Connection"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:48
-msgid "Select a connection"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/SelectTab.js:20
@@ -3136,19 +3529,19 @@ msgstr ""
 msgid "Log deleted successfully"
 msgstr ""
 
-#: dev_zaplane/redux/Slices/recipeSlice/recipeSlice.js:43
+#: dev_zaplane/redux/Slices/recipeSlice/recipeSlice.js:45
 msgid "Recipe updated successfully."
 msgstr ""
 
-#: dev_zaplane/redux/Slices/recipeSlice/recipeSlice.js:56
+#: dev_zaplane/redux/Slices/recipeSlice/recipeSlice.js:58
 msgid "Recipe deleted successfully."
 msgstr ""
 
-#: dev_zaplane/redux/Slices/recipeSlice/recipeSlice.js:73
+#: dev_zaplane/redux/Slices/recipeSlice/recipeSlice.js:75
 msgid "Recipe created successfully."
 msgstr ""
 
-#: dev_zaplane/redux/Slices/recipeSlice/recipeSlice.js:86
+#: dev_zaplane/redux/Slices/recipeSlice/recipeSlice.js:88
 msgid "Workflow created successfully."
 msgstr ""
 

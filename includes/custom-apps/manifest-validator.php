@@ -104,6 +104,16 @@ class ManifestValidator {
 					$errors[] = sprintf( 'OAuth2 auth requires a valid %s.', $required );
 				}
 			}
+			if ( ! empty( $oauth['refresh_url'] ) && ! self::is_safe_url( (string) $oauth['refresh_url'] ) ) {
+				$errors[] = 'OAuth2 auth has an invalid refresh_url.';
+			}
+		}
+
+		if ( ! empty( $auth['fields'] ) ) {
+			$errors = array_merge( $errors, self::validate_fields( $auth['fields'], 'Authentication' ) );
+		}
+		if ( ! empty( $auth['test'] ) ) {
+			$errors = array_merge( $errors, self::validate_request( $auth['test'], $base_url, 'Authentication test' ) );
 		}
 
 		// --- Actions -------------------------------------------------------
@@ -114,6 +124,7 @@ class ManifestValidator {
 			$errors[] = 'A custom app needs at least one action or trigger.';
 		}
 
+		$action_keys = [];
 		foreach ( $actions as $i => $action ) {
 			$label = 'Action #' . ( (int) $i + 1 );
 			if ( ! is_array( $action ) ) {
@@ -122,6 +133,12 @@ class ManifestValidator {
 			}
 			if ( empty( $action['key'] ) ) {
 				$errors[] = $label . ' is missing a key.';
+			} elseif ( self::sanitize_key( (string) $action['key'] ) !== (string) $action['key'] ) {
+				$errors[] = $label . ' key must contain only lowercase letters, numbers and underscores.';
+			} elseif ( isset( $action_keys[ (string) $action['key'] ] ) ) {
+				$errors[] = $label . ' duplicates the key used by Action #' . $action_keys[ (string) $action['key'] ] . '.';
+			} else {
+				$action_keys[ (string) $action['key'] ] = (int) $i + 1;
 			}
 			if ( '' === trim( (string) ( $action['label'] ?? '' ) ) ) {
 				$errors[] = $label . ' needs a label (shown in the Action Type dropdown).';
@@ -131,6 +148,7 @@ class ManifestValidator {
 		}
 
 		// --- Triggers ------------------------------------------------------
+		$trigger_keys = [];
 		foreach ( $triggers as $i => $trigger ) {
 			$label = 'Trigger #' . ( (int) $i + 1 );
 			if ( ! is_array( $trigger ) ) {
@@ -139,6 +157,12 @@ class ManifestValidator {
 			}
 			if ( empty( $trigger['key'] ) ) {
 				$errors[] = $label . ' is missing a key.';
+			} elseif ( self::sanitize_key( (string) $trigger['key'] ) !== (string) $trigger['key'] ) {
+				$errors[] = $label . ' key must contain only lowercase letters, numbers and underscores.';
+			} elseif ( isset( $trigger_keys[ (string) $trigger['key'] ] ) ) {
+				$errors[] = $label . ' duplicates the key used by Trigger #' . $trigger_keys[ (string) $trigger['key'] ] . '.';
+			} else {
+				$trigger_keys[ (string) $trigger['key'] ] = (int) $i + 1;
 			}
 			if ( '' === trim( (string) ( $trigger['label'] ?? '' ) ) ) {
 				$errors[] = $label . ' needs a label (shown in the Trigger Type dropdown).';
@@ -180,11 +204,19 @@ class ManifestValidator {
 			$errors[] = 'A custom app needs at least one action or trigger.';
 		}
 
+		$action_keys = [];
 		foreach ( $actions as $i => $action ) {
 			$label = 'Action #' . ( (int) $i + 1 );
 			if ( ! is_array( $action ) || empty( $action['key'] ) ) {
 				$errors[] = $label . ' is missing a key.';
 				continue;
+			}
+			if ( self::sanitize_key( (string) $action['key'] ) !== (string) $action['key'] ) {
+				$errors[] = $label . ' key must contain only lowercase letters, numbers and underscores.';
+			} elseif ( isset( $action_keys[ (string) $action['key'] ] ) ) {
+				$errors[] = $label . ' duplicates the key used by Action #' . $action_keys[ (string) $action['key'] ] . '.';
+			} else {
+				$action_keys[ (string) $action['key'] ] = (int) $i + 1;
 			}
 			if ( '' === trim( (string) ( $action['label'] ?? '' ) ) ) {
 				$errors[] = $label . ' needs a label (shown in the Action Type dropdown).';
@@ -203,11 +235,19 @@ class ManifestValidator {
 			$errors = array_merge( $errors, self::validate_fields( $action['fields'] ?? [], $label ) );
 		}//end foreach
 
+		$trigger_keys = [];
 		foreach ( $triggers as $i => $trigger ) {
 			$label = 'Trigger #' . ( (int) $i + 1 );
 			if ( ! is_array( $trigger ) || empty( $trigger['key'] ) ) {
 				$errors[] = $label . ' is missing a key.';
 				continue;
+			}
+			if ( self::sanitize_key( (string) $trigger['key'] ) !== (string) $trigger['key'] ) {
+				$errors[] = $label . ' key must contain only lowercase letters, numbers and underscores.';
+			} elseif ( isset( $trigger_keys[ (string) $trigger['key'] ] ) ) {
+				$errors[] = $label . ' duplicates the key used by Trigger #' . $trigger_keys[ (string) $trigger['key'] ] . '.';
+			} else {
+				$trigger_keys[ (string) $trigger['key'] ] = (int) $i + 1;
 			}
 			if ( '' === trim( (string) ( $trigger['label'] ?? '' ) ) ) {
 				$errors[] = $label . ' needs a label (shown in the Trigger Type dropdown).';
@@ -274,9 +314,16 @@ class ManifestValidator {
 		}
 
 		$errors = [];
+		$field_keys = [];
 		foreach ( $fields as $field ) {
 			if ( ! is_array( $field ) || empty( $field['key'] ) ) {
 				$errors[] = $label . ' has a field with no key.';
+			} elseif ( self::sanitize_key( (string) $field['key'] ) !== (string) $field['key'] ) {
+				$errors[] = $label . ' has a field key that must contain only lowercase letters, numbers and underscores.';
+			} elseif ( isset( $field_keys[ (string) $field['key'] ] ) ) {
+				$errors[] = $label . ' has duplicate field key "' . (string) $field['key'] . '".';
+			} else {
+				$field_keys[ (string) $field['key'] ] = true;
 			}
 		}
 		return $errors;
