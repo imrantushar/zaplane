@@ -26,6 +26,11 @@
        color: var(--zaplane-font-color);
        border: 1px solid var(--zaplane-border-color);
 
+       // A clear border as the edge, not WP core's layered shadow.
+       &.components-modal__frame {
+              box-shadow: none;
+       }
+
        .components-modal__header{
               background: var(--zaplane-background);
               border-bottom: none;
