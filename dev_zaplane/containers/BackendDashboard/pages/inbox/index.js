@@ -64,7 +64,8 @@ const useFillHeight = (ref, deps) => {
 };
 
 const InboxPage = () => {
-  const [view, setView] = useState("inbox");
+  // "?view=settings" (the gear on the Modules screen) opens Settings.
+  const [view, setView] = useState(() => (new URLSearchParams(window.location.search).get("view") === "settings" ? "settings" : "inbox"));
   const [filters, setFilters] = useState({ status: "open", assignee: "any", search: "" });
   const [list, setList] = useState({ items: [], counts: {}, loading: true });
   const [activeId, setActiveId] = useState(0);

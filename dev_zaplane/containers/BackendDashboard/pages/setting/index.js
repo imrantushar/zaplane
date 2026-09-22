@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { __ } from '@wordpress/i18n';
-import { FiCpu, FiDroplet, FiGrid } from 'react-icons/fi';
+import { __, sprintf } from '@wordpress/i18n';
+import { FiCpu, FiDroplet, FiGrid, FiSettings } from 'react-icons/fi';
 import PageLayout from '@ZAPComponents/PageLayout';
 import Toggle from '@ZAPComponents/ZAPToggle';
 import { getSettings, saveSettings } from '@ZAPRedux/Slices/settingSlice/settingSlice';
@@ -106,6 +106,37 @@ const AppearanceTab = ({ form, paletteFields, paletteTab, setPaletteTab, setActi
   );
 };
 
+// The gear beside a module's switch: its settings tab here, or its own page.
+// Only live once the module is on — there is nothing to configure otherwise.
+const ModuleSettingsButton = ({ module, on, setActiveTab }) => {
+  if (!module.panel && !module.settings) return <span className="w-8" aria-hidden="true" />;
+  const label = on
+    ? sprintf(__('%s settings', 'zaplane'), module.title)
+    : sprintf(__('Turn on %s to configure it', 'zaplane'), module.title);
+  const cls =
+    'inline-flex h-8 w-8 items-center justify-center rounded-md border border-solid border-[var(--zaplane-border-color)] bg-transparent text-[16px] text-[var(--zaplane-font-secondary-color)] transition-colors';
+  const live = ' cursor-pointer hover:border-[var(--zaplane-primary)] hover:text-[var(--zaplane-primary)] focus-visible:border-[var(--zaplane-primary)] focus-visible:text-[var(--zaplane-primary)]';
+  if (!on) {
+    return (
+      <span className={cls + ' cursor-not-allowed opacity-40'} title={label} aria-label={label} role="img">
+        <FiSettings />
+      </span>
+    );
+  }
+  if (module.panel) {
+    return (
+      <button type="button" className={cls + live} title={label} aria-label={label} onClick={() => setActiveTab(module.panel)}>
+        <FiSettings />
+      </button>
+    );
+  }
+  return (
+    <a className={cls + live + ' no-underline'} href={module.settings} title={label} aria-label={label}>
+      <FiSettings />
+    </a>
+  );
+};
+
 const ModulesTab = ({ form, modules, setFeature, setActiveTab }) => (
   <div>
     <SectionTitle title={__('Modules', 'zaplane')} description={__('Turn optional features on or off. Disabled modules are removed from the menu.', 'zaplane')} />
@@ -117,19 +148,11 @@ const ModulesTab = ({ form, modules, setFeature, setActiveTab }) => (
             <div>
               <div className="text-[14px] font-medium text-[var(--zaplane-font-color)]">{module.title}</div>
               <div className="mt-0.5 text-[13px] text-[var(--zaplane-font-secondary-color)]">{module.description}</div>
-              {/* A module with its own settings panel links straight to it, but
-                  only once it is on — there is nothing to configure otherwise. */}
-              {module.panel && on && (
-                <button
-                  type="button"
-                  onClick={() => setActiveTab(module.panel)}
-                  className="mt-1.5 cursor-pointer border-0 bg-transparent p-0 text-[13px] font-semibold text-[var(--zaplane-primary)] hover:underline"
-                >
-                  {__('Configure', 'zaplane')} →
-                </button>
-              )}
             </div>
-            <Toggle checked={on} onChange={val => setFeature(module.key, val)} />
+            <div className="flex shrink-0 items-center gap-3">
+              <ModuleSettingsButton module={module} on={on} setActiveTab={setActiveTab} />
+              <Toggle checked={on} onChange={val => setFeature(module.key, val)} />
+            </div>
           </div>
         );
       })}
