@@ -1,3 +1,64 @@
-.connection-popaver{
- right: 510px !important;
+.zaplane-connection-select {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.zaplane-connection-select__error {
+	margin: 0;
+	color: var(--zaplane-danger);
+	font-size: 12px;
+}
+
+// Two classes: the scoped reset (.zaplane-scope button) would win otherwise.
+.zaplane-connection-select .zaplane-connection-select__hint {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px 8px;
+	margin: 0;
+	color: var(--zaplane-font-secondary-color);
+	font-size: 12px;
+
+	button {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 0;
+		border: 0;
+		background: none;
+		color: var(--zaplane-primary);
+		font: inherit;
+		font-weight: 600;
+		cursor: pointer;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
+
+// The last row of the connection list.
+.zaplane-select__menu-list .zaplane-connection-select__create {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	margin-top: 4px;
+	padding: 10px 12px;
+	border: 0;
+	border-top: 1px solid var(--zaplane-border-color);
+	background: transparent;
+	color: var(--zaplane-primary);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	text-align: left;
+	cursor: pointer;
+
+	&:hover,
+	&:focus-visible {
+		background: var(--zaplane-secondary-color);
+		outline: none;
+	}
 }
