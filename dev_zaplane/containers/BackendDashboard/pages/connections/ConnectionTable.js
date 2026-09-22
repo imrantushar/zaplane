@@ -22,7 +22,7 @@ const ConnectionTable = ({ onEdit }) => {
     isLoading,
     connection,
     currentPage,
-    perPage,
+    itemPerPage,
     totalItems
   } = useSelector(state => state.connections);
   const [selection, setSelection] = useState([]);
@@ -43,10 +43,10 @@ const ConnectionTable = ({ onEdit }) => {
     handleRefresh();
   }, []);
   const handlePageChange = newPage => {
-    handleRefresh(newPage, perPage);
+    handleRefresh(newPage, itemPerPage);
   };
   const handlePerPageChange = itemsPerPage => {
-    handleRefresh(currentPage, itemsPerPage);
+    handleRefresh(1, itemsPerPage);
   };
   const handleStatusChange = (row, newStatus) => {
     if (!row?.id || !newStatus) return;
@@ -68,7 +68,7 @@ const ConnectionTable = ({ onEdit }) => {
       setSelection([]);
       dispatch(fetchConnections({
         page: currentPage,
-        per_page: perPage
+        per_page: itemPerPage
       }));
     } catch (e) {
       console.error("Failed to delete selected team members", e);
@@ -181,7 +181,7 @@ const ConnectionTable = ({ onEdit }) => {
     textAlign: "center"
   }];
   return <>
-            <ListTable columns={columns} data={filteredConnections} isRowSelectable={true} showSubHeader={true} subHeaderComponent={<Search placeholder={__("Search connections...", "zaplane")} onSearchHandler={setSearchTerm} />} showColumnFilter={false} showPagination={totalItems >= 10} noDataText={__("No connections found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="connection-table" currentPageNumber={currentPage} perPage={perPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} getSelectRowValue={rows => {
+            <ListTable columns={columns} data={filteredConnections} isRowSelectable={true} showSubHeader={true} subHeaderComponent={<Search placeholder={__("Search connections...", "zaplane")} onSearchHandler={setSearchTerm} />} showColumnFilter={false} showPagination={totalItems > 0} noDataText={__("No connections found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="connection-table" currentPageNumber={currentPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} getSelectRowValue={rows => {
       setSelection(rows || []);
     }} />
             <ZAPActionBar selection={selection} onDelete={handleDeleteSelected} onClose={() => setSelection([])} />

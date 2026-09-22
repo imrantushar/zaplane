@@ -33,8 +33,9 @@ const ImportWorkflow = () => {
   };
   return <>
             <ZAPTooltip content={__("Import Workflow", "zaplane")}>
-                <button style={outlineBtn}  onClick={() => setIsOpen(true)}>
+                <button className="flex items-center gap-2" style={outlineBtn} onClick={() => setIsOpen(true)}>
                     <FiUpload />
+                    {__("Import", "zaplane")}
                 </button>
             </ZAPTooltip>
 

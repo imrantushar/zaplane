@@ -150,14 +150,19 @@ final class Zaplane {
 		// Activation covers fresh installs; this covers plugin updates (where the
 		// activation hook doesn't fire). Previously the seeders ran unconditionally
 		// on every page load, REST call and cron tick — five SELECTs of pure waste.
-		if ( version_compare( (string) get_option( 'zaplane_db_version', '0.0.0' ), ZAPLANE_VERSION, '<' ) ) {
-			// On `init`, not here: seeding recipes resolves REST URLs, and WordPress
-			// creates the rewrite object rest_url() needs only after plugins load.
-			if ( did_action( 'init' ) ) {
+		// On `init`, not here: seeding recipes resolves REST URLs, and WordPress
+		// creates the rewrite object rest_url() needs only after plugins load.
+		// Late on `init` (20), after what registers at the default priority;
+		// straight away if `init` has already run.
+		$install = static function () {
+			if ( version_compare( (string) get_option( 'zaplane_db_version', '0.0.0' ), ZAPLANE_VERSION, '<' ) ) {
 				\Zaplane\Installer::init()->run();
-			} else {
-				add_action( 'init', [ \Zaplane\Installer::init(), 'run' ], 1 );
 			}
+		};
+		if ( did_action( 'init' ) ) {
+			$install();
+		} else {
+			add_action( 'init', $install, 20 );
 		}
 
 		do_action( 'zaplane_init' );

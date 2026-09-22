@@ -4,6 +4,11 @@
     justify-content: center;
     align-items: center;
     gap: 5px;
+
+    button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
     
     .zaplane-pagination-list {
         display: flex;
