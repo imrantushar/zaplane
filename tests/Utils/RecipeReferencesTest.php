@@ -27,6 +27,8 @@ class RecipeReferencesTest extends TestCase {
 		'knowledge.retrieve'                   => [ 'context' ],
 		'ai-agent.run_agent'                   => [ 'reply' ],
 		'ai.transcribe'                        => [ 'text' ],
+		'wordpress.reply_comment'              => [ 'comment_id', 'parent_id' ],
+		'inbox.receive_message'                => [ 'conversation_id', 'message_id' ],
 	];
 
 	/**

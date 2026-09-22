@@ -90,6 +90,9 @@ class Settings {
 	 * Who answers new conversations on a channel ("web" is the widget).
 	 */
 	public static function answered_by( string $channel ): string {
+		if ( Services\Sources::is( $channel ) ) {
+			return Services\Sources::answered_by( $channel );
+		}
 		$all   = self::get();
 		$value = 'web' === $channel ? ( $all['widget']['answered_by'] ?? '' ) : ( $all['channels'][ $channel ]['answered_by'] ?? '' );
 		return in_array( $value, self::ANSWERERS, true ) ? $value : 'assistant';

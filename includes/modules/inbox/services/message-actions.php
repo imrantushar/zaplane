@@ -52,6 +52,9 @@ class MessageActions {
 			return self::no( __( 'Only the person who sent it, or an administrator, can change this message.', 'zaplane' ) );
 		}
 
+		if ( ! $message->is_note && Sources::is( (string) $message->channel ) ) {
+			return self::no( __( 'A workflow delivered this reply, so it can only be changed where it was posted.', 'zaplane' ) );
+		}
 		if ( ! $message->is_note && ! in_array( (string) $message->channel, self::EDITABLE_CHANNELS, true ) ) {
 			return self::no(
 				/* translators: %s: channel name, e.g. Messenger. */
@@ -155,6 +158,9 @@ class MessageActions {
 	}
 
 	private static function channel_label( string $slug ): string {
+		if ( Sources::is( $slug ) ) {
+			return Sources::label( $slug );
+		}
 		$class = \Zaplane\Modules\Inbox\Channels\Registry::get( $slug );
 		return $class ? (string) $class::label() : $slug;
 	}

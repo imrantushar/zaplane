@@ -52,6 +52,11 @@ class RecipeController extends WP_REST_Controller {
 						'enum'    => [ '', Recipe::TYPE_WORKFLOW, Recipe::TYPE_GROUP ],
 						'default' => '',
 					],
+					'tag'      => [
+						'type'              => 'string',
+						'default'           => '',
+						'sanitize_callback' => 'sanitize_key',
+					],
 				],
 			],
 		] );
@@ -143,6 +148,22 @@ class RecipeController extends WP_REST_Controller {
 		$perPage = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 		$type    = (string) ( $request->get_param( 'type' ) ?? '' );
 		$byType  = in_array( $type, [ Recipe::TYPE_WORKFLOW, Recipe::TYPE_GROUP ], true );
+
+		// Tags live in the blueprint, and there are few recipes: filter here.
+		$tag = (string) ( $request->get_param( 'tag' ) ?? '' );
+		if ( '' !== $tag ) {
+			$query  = $byType ? Recipe::where( 'type', $type )->orderBy( 'title', 'asc' ) : Recipe::orderBy( 'title', 'asc' );
+			$tagged = array_values( array_filter( $query->get()->all(), fn( $r ) => in_array( $tag, $r->tags(), true ) ) );
+			return rest_ensure_response( [
+				'data'       => array_map( fn( $r ) => $r->toResponse(), array_slice( $tagged, ( $page - 1 ) * $perPage, $perPage ) ),
+				'pagination' => [
+					'page'        => $page,
+					'per_page'    => $perPage,
+					'total'       => count( $tagged ),
+					'total_pages' => (int) ceil( count( $tagged ) / $perPage ),
+				],
+			] );
+		}
 
 		$total   = $byType ? Recipe::where( 'type', $type )->count() : Recipe::count();
 		$query   = $byType ? Recipe::where( 'type', $type )->orderBy( 'title', 'asc' ) : Recipe::orderBy( 'title', 'asc' );

@@ -32,14 +32,24 @@ trait CommentActionsTrait {
 			return static::error( "Parent comment ID {$config['parent_id']} not found" );
 		}
 
+		$user = ! empty( $config['user_id'] ) ? get_userdata( (int) $config['user_id'] ) : false;
+
 		$comment_id = wp_insert_comment([
 			'comment_post_ID'      => $parent->comment_post_ID,
 			'comment_parent'       => $config['parent_id'],
-			'comment_author'       => $config['author_name'],
-			'comment_author_email' => $config['author_email'],
+			'comment_author'       => $user ? $user->display_name : $config['author_name'],
+			'comment_author_email' => $user ? $user->user_email : $config['author_email'],
+			'comment_author_url'   => $user ? $user->user_url : '',
+			'user_id'              => $user ? (int) $user->ID : 0,
 			'comment_content'      => $config['content'],
 			'comment_approved'     => 1,
 		]);
+
+		// Replying approves the comment replied to, as WordPress's own
+		// "Approve and Reply" does.
+		if ( $comment_id && '0' === (string) $parent->comment_approved ) {
+			wp_set_comment_status( (int) $parent->comment_ID, 'approve' );
+		}
 
 		if ( is_wp_error( $comment_id ) ) {
 			return static::error( $comment_id->get_error_message() );

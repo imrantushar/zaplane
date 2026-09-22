@@ -121,11 +121,11 @@ const Details = ({ conversation, other, team, aiReady, onUpdate, store, onPlaceO
   return (
     <aside className="zaplane-inbox-details" aria-label={__("Details", "zaplane")}>
       <div className="zaplane-inbox-contact">
-        <Avatar contact={conversation.contact} channel={conversation.channel} size="lg" />
+        <Avatar contact={conversation.contact} channel={conversation.channel} channelLabel={conversation.channel_label} size="lg" />
         <div className="min-w-0 flex-1">
           <div className="zaplane-inbox-name">{conversation.contact?.name}</div>
           <div className="zaplane-inbox-sub">
-            {CHANNEL_LABELS[conversation.channel] || conversation.channel} · {__("since", "zaplane")} {clockTime(conversation.created_at)}
+            {CHANNEL_LABELS[conversation.channel] || conversation.channel_label || conversation.channel} · {__("since", "zaplane")} {clockTime(conversation.created_at)}
           </div>
         </div>
         <button type="button" className="zaplane-inbox-icon-btn is-close" onClick={onClose} aria-label={__("Close details", "zaplane")}>

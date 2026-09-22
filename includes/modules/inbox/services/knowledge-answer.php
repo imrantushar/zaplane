@@ -94,6 +94,10 @@ class KnowledgeAnswer {
 		if ( empty( $settings['enabled'] ) || 'closed' === $conversation->status ) {
 			return false;
 		}
+		// A workflow source (comments…) is often public: only when chosen.
+		if ( Sources::is( (string) $conversation->channel ) && 'assistant' !== Sources::answered_by( (string) $conversation->channel ) ) {
+			return false;
+		}
 		// The customer asked for a person: stay out of the way for a day.
 		$meta = is_array( $conversation->meta ) ? $conversation->meta : [];
 		if ( (int) ( $meta['kb_person_at'] ?? 0 ) > time() - DAY_IN_SECONDS ) {

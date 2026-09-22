@@ -69,6 +69,9 @@ class Presenter {
 		return [
 			'id'                   => (int) $conversation->id,
 			'channel'              => (string) $conversation->channel,
+			// A workflow source is named by its workflow ("Comments").
+			'channel_label'        => Sources::is( (string) $conversation->channel ) ? Sources::label( (string) $conversation->channel ) : '',
+			'link'                 => self::link( $conversation ),
 			'status'               => (string) $conversation->status,
 			'handler'              => (string) $conversation->handler,
 			'ai_enabled'           => (bool) $conversation->ai_enabled,
@@ -83,6 +86,24 @@ class Presenter {
 			'tags'                 => $tags[ (int) $conversation->id ] ?? Conversations::tags( (int) $conversation->id ),
 			'revision'             => MessageActions::revision( $conversation ),
 			'orders'               => array_values( (array) ( ( is_array( $conversation->meta ) ? $conversation->meta : [] )['orders'] ?? [] ) ),
+		];
+	}
+
+	/**
+	 * What the conversation is about, when its source said (the page a
+	 * comment is on, say).
+	 *
+	 * @return array{url:string,title:string}|null
+	 */
+	private static function link( Conversation $conversation ): ?array {
+		$meta = is_array( $conversation->meta ) ? $conversation->meta : [];
+		$url  = esc_url_raw( (string) ( $meta['link_url'] ?? '' ) );
+		if ( '' === $url ) {
+			return null;
+		}
+		return [
+			'url'   => $url,
+			'title' => (string) ( $meta['link_title'] ?? '' ),
 		];
 	}
 

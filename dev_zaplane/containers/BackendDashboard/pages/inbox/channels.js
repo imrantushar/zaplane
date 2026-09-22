@@ -1,5 +1,5 @@
 import { __ } from "@wordpress/i18n";
-import { FiGlobe, FiMail } from "react-icons/fi";
+import { FiGlobe, FiMail, FiGitBranch } from "react-icons/fi";
 import { FaFacebookMessenger, FaWhatsapp, FaInstagram, FaTelegramPlane } from "react-icons/fa";
 
 /** How each channel is labelled and marked in the list, thread and details. */
@@ -12,7 +12,11 @@ export const CHANNELS = {
   telegram: { label: __("Telegram", "zaplane"), Icon: FaTelegramPlane, color: "#229ED9" },
 };
 
-export const channelOf = (slug) => CHANNELS[slug] || { label: slug || "", Icon: FiGlobe, color: "#6B7384" };
+/**
+ * A channel's name and mark. Anything else is a source a workflow brings in
+ * (comments, forms…): named by its workflow, with a workflow mark.
+ */
+export const channelOf = (slug, label = "") => CHANNELS[slug] || { label: label || slug || "", Icon: FiGitBranch, color: "#7C3AED", isSource: true };
 
 export const CHANNEL_LABELS = Object.fromEntries(Object.entries(CHANNELS).map(([k, v]) => [k, v.label]));
 
@@ -37,8 +41,8 @@ export function tintFor(seed) {
 }
 
 /** Avatar with the channel's mark in the corner. */
-export const Avatar = ({ contact, channel, size = "md" }) => {
-  const { Icon, color, label } = channelOf(channel);
+export const Avatar = ({ contact, channel, channelLabel = "", size = "md" }) => {
+  const { Icon, color, label } = channelOf(channel, channelLabel);
   const tint = tintFor(contact?.id || contact?.name);
   return (
     <span className={"zaplane-inbox-avatar is-" + size} aria-hidden="true" style={{ "--tint": tint }}>

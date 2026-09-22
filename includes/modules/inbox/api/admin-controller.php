@@ -651,6 +651,12 @@ class AdminController {
 		}
 
 		InboxSettings::save( $params );
+		if ( isset( $params['sources'] ) && is_array( $params['sources'] ) ) {
+			\Zaplane\Modules\Inbox\Services\Sources::save_answerers( array_map( 'strval', array_column( $params['sources'], 'answered_by', 'slug' ) ) );
+			foreach ( (array) ( $params['remove_sources'] ?? [] ) as $slug ) {
+				\Zaplane\Modules\Inbox\Services\Sources::forget( sanitize_key( (string) $slug ) );
+			}
+		}
 		// Messenger / WhatsApp keep their own copy of the common questions.
 		CommonQuestions::sync();
 		return rest_ensure_response( $this->settings_payload() );
@@ -720,6 +726,8 @@ class AdminController {
 			'team'           => $team,
 			'site_origin'    => untrailingslashit( home_url() ),
 			'channels'       => $channels,
+			// Sources workflows bring in (comments, forms…), see Services\Sources.
+			'sources'        => \Zaplane\Modules\Inbox\Services\Sources::for_admin(),
 			'store'          => $store ? $store::label() : null,
 		];
 	}

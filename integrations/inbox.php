@@ -56,6 +56,10 @@ class Inbox extends IntegrationBase {
 				'label' => 'Assistant Handed Over to the Team',
 				'hook'  => 'zaplane/inbox/handed_to_human',
 			],
+			'reply_requested'      => [
+				'label' => 'Reply to Deliver (workflow source)',
+				'hook'  => 'zaplane/inbox/reply_requested',
+			],
 			'order_created'        => [
 				'label' => 'Order Placed from a Conversation',
 				'hook'  => 'zaplane/inbox/order_created',
@@ -64,6 +68,18 @@ class Inbox extends IntegrationBase {
 	}
 
 	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( 'reply_requested' === $trigger ) {
+			return [
+				[
+					'key'         => 'source',
+					'label'       => 'Source',
+					'type'        => 'text',
+					'required'    => true,
+					'placeholder' => 'wp_comments',
+					'help'        => 'The source name used in "Add Incoming Message". Runs when someone replies in one of its conversations; this workflow then posts the reply where it belongs.',
+				],
+			];
+		}
 		return [
 			[
 				'key'     => 'channel',
@@ -80,6 +96,11 @@ class Inbox extends IntegrationBase {
 		$payload = $args[0] ?? [];
 		if ( ! is_array( $payload ) || empty( $payload['conversation_id'] ) ) {
 			return false;
+		}
+
+		if ( 'reply_requested' === ( $node['event'] ?? '' ) ) {
+			$source = \Zaplane\Modules\Inbox\Services\Sources::slug( (string) ( $node['config']['source'] ?? '' ) );
+			return '' !== $source && $source === ( $payload['source'] ?? '' ) ? $payload : false;
 		}
 
 		$channel = (string) ( $node['config']['channel'] ?? '' );
@@ -111,6 +132,24 @@ class Inbox extends IntegrationBase {
 			];
 		}
 
+		if ( 'reply_requested' === $trigger ) {
+			return array_merge( $base, [
+				'channel'        => 'wp_comments',
+				'handler'        => 'human',
+				'message_id'     => 316,
+				'text'           => 'Thanks Jane! Yes, it ships worldwide.',
+				'source'         => 'wp_comments',
+				'thread_id'      => 'comment-55',
+				'reply_to'       => '58',
+				'link_url'       => home_url( '/hello-world/' ),
+				'link_title'     => 'Hello world!',
+				'sender_type'    => 'agent',
+				'sender_user_id' => 1,
+				'sender_name'    => 'Tushar',
+				'sender_email'   => 'team@example.com',
+			] );
+		}
+
 		if ( 'handed_to_human' === $trigger ) {
 			return $base + [ 'reason' => 'The customer asked for a refund.' ];
 		}
@@ -130,6 +169,8 @@ class Inbox extends IntegrationBase {
 
 	public static function get_actions(): array {
 		return [
+			'receive_message'   => [ 'label' => 'Add Incoming Message' ],
+			'confirm_delivery'  => [ 'label' => 'Confirm Reply Delivered' ],
 			'send_reply'       => [ 'label' => 'Send Reply' ],
 			'add_note'         => [ 'label' => 'Add Private Note' ],
 			'assign'           => [ 'label' => 'Assign Conversation' ],
@@ -250,6 +291,98 @@ class Inbox extends IntegrationBase {
 						'required' => false,
 					],
 				];
+			case 'receive_message':
+				return [
+					[
+						'key'         => 'source',
+						'label'       => 'Source',
+						'type'        => 'text',
+						'required'    => true,
+						'placeholder' => 'wp_comments',
+						'help'        => 'A short name for where these messages come from. Conversations are filed under it, and replies go out through "Reply to Deliver" with the same source.',
+					],
+					[
+						'key'         => 'source_label',
+						'label'       => 'Source name shown in the inbox',
+						'type'        => 'text',
+						'required'    => false,
+						'placeholder' => 'Comments',
+					],
+					[
+						'key'         => 'thread_id',
+						'label'       => 'Thread ID',
+						'type'        => 'expression',
+						'required'    => true,
+						'help'        => 'Messages with the same thread ID are one conversation (a comment thread, a ticket number…).',
+					],
+					[
+						'key'      => 'message_id',
+						'label'    => 'Message ID',
+						'type'     => 'expression',
+						'required' => false,
+						'help'     => 'The ID of this message where it came from. A reply is posted under it, and the same ID twice is only added once.',
+					],
+					[
+						'key'      => 'text',
+						'label'    => 'Message',
+						'type'     => 'expression',
+						'required' => true,
+					],
+					[
+						'key'      => 'name',
+						'label'    => 'Name',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'email',
+						'label'    => 'Email',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'link_url',
+						'label'    => 'Link (what it is about)',
+						'type'     => 'expression',
+						'required' => false,
+						'help'     => 'Shown at the top of the conversation, e.g. the page a comment is on.',
+					],
+					[
+						'key'      => 'link_title',
+						'label'    => 'Link title',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'from_team',
+						'label'    => 'Written by your team',
+						'type'     => 'expression',
+						'required' => false,
+						'help'     => 'Anything true ("1", "yes") records it as your team\'s reply, e.g. a comment answered in wp-admin.',
+					],
+				];
+			case 'confirm_delivery':
+				return [
+					[
+						'key'      => 'message_id',
+						'label'    => 'Inbox message ID',
+						'type'     => 'expression',
+						'required' => true,
+						'help'     => 'From the "Reply to Deliver" trigger: {{trigger.message_id}}.',
+					],
+					[
+						'key'      => 'external_id',
+						'label'    => 'ID where it was posted',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'error',
+						'label'    => 'Error (marks it failed)',
+						'type'     => 'expression',
+						'required' => false,
+					],
+				];
 			case 'search_products':
 				return [
 					[
@@ -336,6 +469,32 @@ class Inbox extends IntegrationBase {
 
 		if ( ! class_exists( Conversations::class ) ) {
 			return self::err( 'The Inbox module is not available.', $input );
+		}
+
+		if ( 'receive_message' === $event ) {
+			return self::receive_message( $config, $input );
+		}
+		if ( 'confirm_delivery' === $event ) {
+			$message = \Zaplane\Modules\Inbox\Models\Message::where( 'id', (int) ( $config['message_id'] ?? 0 ) )->where( 'direction', 'out' )->fresh()->first();
+			if ( ! $message ) {
+				return self::err( 'Inbox message not found.', $input );
+			}
+			$error = trim( (string) ( $config['error'] ?? '' ) );
+			$message->delivery_status = '' === $error ? 'sent' : 'failed';
+			$message->error           = '' === $error ? null : mb_substr( $error, 0, 500 );
+			$external                 = trim( (string) ( $config['external_id'] ?? '' ) );
+			if ( '' !== $external ) {
+				// Stored as source:id, like incoming ones, so the same item
+				// arriving back through the source isn't added twice.
+				$message->external_id = mb_substr( $message->channel . ':' . $external, 0, 191 );
+			}
+			try {
+				$message->save();
+			} catch ( \Throwable $e ) {
+				$message->external_id = null;
+				$message->save();
+			}
+			return self::ok( $input, [ 'status' => (string) $message->delivery_status ] );
 		}
 
 		// The only action that needs no conversation.
@@ -461,6 +620,65 @@ class Inbox extends IntegrationBase {
 			}
 		}
 		return $options;
+	}
+
+	/**
+	 * A message from a workflow source: filed as a conversation per thread,
+	 * answered by whoever answers that source (the team by default).
+	 *
+	 * @param array<string,mixed> $config
+	 * @param array<string,mixed> $input
+	 */
+	private static function receive_message( array $config, array $input ): array {
+		$source = \Zaplane\Modules\Inbox\Services\Sources::slug( (string) ( $config['source'] ?? '' ) );
+		$thread = mb_substr( trim( (string) ( $config['thread_id'] ?? '' ) ), 0, 180 );
+		$text   = trim( wp_strip_all_tags( (string) ( $config['text'] ?? '' ) ) );
+		if ( '' === $source ) {
+			return self::err( 'Give the source a short name (not web, messenger or whatsapp).', $input );
+		}
+		if ( '' === $thread || '' === $text ) {
+			return self::err( 'A thread ID and a message are required.', $input );
+		}
+		\Zaplane\Modules\Inbox\Services\Sources::remember( $source, (string) ( $config['source_label'] ?? '' ) );
+
+		$message_id = mb_substr( trim( (string) ( $config['message_id'] ?? '' ) ), 0, 150 );
+		$external   = '' !== $message_id ? $source . ':' . $message_id : '';
+		$contact    = [
+			'name'  => (string) ( $config['name'] ?? '' ),
+			'email' => (string) ( $config['email'] ?? '' ),
+		];
+		$link = [
+			'link_url'   => esc_url_raw( (string) ( $config['link_url'] ?? '' ) ),
+			'link_title' => mb_substr( sanitize_text_field( (string) ( $config['link_title'] ?? '' ) ), 0, 200 ),
+		];
+
+		if ( rest_sanitize_boolean( $config['from_team'] ?? false ) ) {
+			$conversation = \Zaplane\Modules\Inbox\Services\Ingest::open( $source, '', $thread, $contact );
+			$message      = \Zaplane\Modules\Inbox\Services\Ingest::external_reply( $source, '', $thread, $external, $text );
+		} else {
+			$message = \Zaplane\Modules\Inbox\Services\Ingest::inbound( [
+				'channel'     => $source,
+				'external_id' => $thread,
+				'message_id'  => $external,
+				'body'        => $text,
+				'contact'     => $contact,
+				'meta'        => array_filter( $link ),
+			] );
+			$conversation = $message ? Conversations::find( (int) $message->conversation_id ) : null;
+		}
+
+		if ( ! $message || ! $conversation ) {
+			// Already there (the same message ID again).
+			return self::ok( $input, [ 'duplicate' => true ] );
+		}
+		if ( '' !== $link['link_url'] ) {
+			Conversations::set_meta( $conversation, $link );
+		}
+
+		return self::ok( $input, [
+			'conversation_id' => (int) $conversation->id,
+			'message_id'      => (int) $message->id,
+		] );
 	}
 
 	/**

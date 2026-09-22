@@ -86,7 +86,7 @@ const Rail = ({ items, counts, filters, activeId, onSelect, onToggleCollapsed })
             aria-label={c.contact?.name}
             aria-current={c.id === activeId ? "true" : undefined}
           >
-            <Avatar contact={c.contact} channel={c.channel} />
+            <Avatar contact={c.contact} channel={c.channel} channelLabel={c.channel_label} />
             {c.unread_count > 0 && <span className="zaplane-inbox-rail-unread">{c.unread_count > 9 ? "9+" : c.unread_count}</span>}
           </button>
         </li>
@@ -155,7 +155,7 @@ const ConversationList = (props) => {
       {loading && items.length === 0 && <Skeleton />}
       {!loading && items.length === 0 && <Empty filters={filters} />}
       {items.map((c) => {
-        const channel = channelOf(c.channel);
+        const channel = channelOf(c.channel, c.channel_label);
         return (
           <li key={c.id}>
             <button
@@ -164,7 +164,7 @@ const ConversationList = (props) => {
               onClick={() => onSelect(c.id)}
               aria-current={c.id === activeId ? "true" : undefined}
             >
-              <Avatar contact={c.contact} channel={c.channel} />
+              <Avatar contact={c.contact} channel={c.channel} channelLabel={c.channel_label} />
               <span className="zaplane-inbox-item-body">
                 <span className="zaplane-inbox-item-top">
                   <span className="zaplane-inbox-name">{c.contact?.name}</span>

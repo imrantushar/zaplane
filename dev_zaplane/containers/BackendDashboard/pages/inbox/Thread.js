@@ -342,7 +342,7 @@ const Thread = ({ conversation, messages, canned, onSend, onSendProduct, onEditM
     );
   }
 
-  const channel = channelOf(conversation.channel);
+  const channel = channelOf(conversation.channel, conversation.channel_label);
 
   // A reply to the customer can't quote a private note, so quoting one
   // switches the box to a note.
@@ -410,12 +410,20 @@ const Thread = ({ conversation, messages, canned, onSend, onSendProduct, onEditM
         <button type="button" className="zaplane-inbox-icon-btn is-back" onClick={onBack} aria-label={__("Back to conversations", "zaplane")}>
           <FiArrowLeft />
         </button>
-        <Avatar contact={conversation.contact} channel={conversation.channel} />
+        <Avatar contact={conversation.contact} channel={conversation.channel} channelLabel={conversation.channel_label} />
         <div className="zaplane-inbox-thread-title">
           <strong>{conversation.contact?.name}</strong>
           <span className="zaplane-inbox-sub">
             {channel.label}
             {conversation.contact?.email ? " · " + conversation.contact.email : ""}
+            {safeUrl(conversation.link?.url) && (
+              <>
+                {" · "}
+                <a className="zaplane-inbox-thread-link" href={conversation.link.url} target="_blank" rel="noopener noreferrer" title={conversation.link.url}>
+                  {sprintf(__("on “%s”", "zaplane"), conversation.link.title || conversation.link.url)} ↗
+                </a>
+              </>
+            )}
           </span>
         </div>
         <div className="zaplane-inbox-thread-actions">
@@ -443,6 +451,13 @@ const Thread = ({ conversation, messages, canned, onSend, onSendProduct, onEditM
           </button>
         </div>
       </header>
+
+      {channel.isSource && (
+        <div className="zaplane-inbox-banner is-source">
+          <FiGitBranch />
+          <span>{sprintf(__("From %s, brought in by a workflow. Your reply is handed to its “Reply to Deliver” workflow, which posts it there (it may be public).", "zaplane"), channel.label)}</span>
+        </div>
+      )}
 
       {conversation.handler === "bot" && (
         <div className="zaplane-inbox-banner">

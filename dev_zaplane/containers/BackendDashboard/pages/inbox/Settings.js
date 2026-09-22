@@ -5,6 +5,7 @@ import ZAPToggle from "@ZAPComponents/ZAPToggle";
 import { inboxApi } from "./api";
 import { channelOf } from "./channels";
 import KnowledgeSettings from "./KnowledgeSettings";
+import SourcesSettings from "./SourcesSettings";
 
 const Field = ({ label, help, children, wide }) => (
   <label className={"zaplane-inbox-field" + (wide ? " is-wide" : "")}>
@@ -19,6 +20,7 @@ const SECTIONS = [
   { id: "knowledge", label: __("Knowledge & answers", "zaplane"), Icon: FiBookOpen },
   { id: "ai", label: __("AI assistant", "zaplane"), Icon: FiCpu },
   { id: "channels", label: __("Social channels", "zaplane"), Icon: FiShare2 },
+  { id: "sources", label: __("More sources", "zaplane"), Icon: FiGitBranch },
   { id: "replies", label: __("Saved replies", "zaplane"), Icon: FiZap },
 ];
 
@@ -28,6 +30,7 @@ const toForm = (settings, payload) => ({
   ...settings,
   answers: { ...(settings.answers || {}), menu: payload?.answers?.menu || settings.answers?.menu },
   widget: { ...settings.widget, allowed_origins: (settings.widget.allowed_origins || []).join("\n") },
+  sources: payload?.sources || [],
 });
 
 const CopyField = ({ value }) => {
@@ -115,6 +118,7 @@ const Settings = ({ onSaved }) => {
   const [draft, setDraft] = useState({ title: "", shortcut: "", body: "" });
   const [secrets, setSecrets] = useState({});
   const [active, setActive] = useState("widget");
+  const [removedSources, setRemovedSources] = useState([]);
   const pinnedUntil = useRef(0); // a nav click wins over the scroll spy for a moment
   const setSecret = (slug, key, v) => setSecrets({ ...secrets, [slug]: { ...(secrets[slug] || {}), [key]: v } });
 
@@ -130,8 +134,8 @@ const Settings = ({ onSaved }) => {
   const dirty = useMemo(() => {
     if (!form || !saved) return false;
     const typedSecret = Object.values(secrets).some((v) => Object.values(v || {}).some((x) => (x || "").trim()));
-    return typedSecret || JSON.stringify(form) !== JSON.stringify(saved);
-  }, [form, saved, secrets]);
+    return typedSecret || removedSources.length > 0 || JSON.stringify(form) !== JSON.stringify(saved);
+  }, [form, saved, secrets, removedSources]);
 
   useEffect(() => {
     if (notice?.tone !== "success") return undefined;
@@ -180,7 +184,10 @@ const Settings = ({ onSaved }) => {
         ai: form.ai,
         answers: form.answers,
         channels: form.channels,
+        sources: form.sources.map(({ slug, answered_by }) => ({ slug, answered_by })),
+        remove_sources: removedSources,
       });
+      setRemovedSources([]);
       // Webhook secrets are stored with the integration, not the inbox.
       for (const [slug, values] of Object.entries(secrets)) {
         const clean = Object.fromEntries(Object.entries(values).filter(([, v]) => v.trim()));
@@ -243,6 +250,9 @@ const Settings = ({ onSaved }) => {
       const on = Object.entries(data?.channels || {}).filter(([slug]) => form.channels?.[slug]?.enabled).length;
       return on ? { tone: "success", text: sprintf(__("%d on", "zaplane"), on) } : { tone: "muted", text: __("Off", "zaplane") };
     })(),
+    sources: form.sources.length
+      ? { tone: "success", text: String(form.sources.length) }
+      : { tone: "muted", text: __("None", "zaplane") },
     replies: { tone: "muted", text: String(canned.length) },
   };
 
@@ -567,6 +577,22 @@ const Settings = ({ onSaved }) => {
               );
             })}
           </div>
+        </section>
+
+        <section className="zaplane-inbox-card" id="zaplane-inbox-sources" data-section="sources">
+          <div className="zaplane-inbox-card-head">
+            <div>
+              <h3>{__("More sources", "zaplane")}</h3>
+              <p>{__("Bring anything a workflow can read into the inbox (your site's comments, form entries, tickets…) and answer it here. Replies go back through a workflow, so each source posts them its own way.", "zaplane")}</p>
+            </div>
+          </div>
+          <SourcesSettings
+            sources={form.sources}
+            onChange={(sources) => setForm({ ...form, sources })}
+            removed={removedSources}
+            onRemove={(slug) => setRemovedSources([...removedSources, slug])}
+            onRestore={(slug) => setRemovedSources(removedSources.filter((s) => s !== slug))}
+          />
         </section>
 
         <section className="zaplane-inbox-card" id="zaplane-inbox-replies" data-section="replies">

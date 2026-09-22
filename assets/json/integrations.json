@@ -1,6 +1,6 @@
 {
     "version": "1.3.1",
-    "generated_at": "2026-09-21 15:46:21",
+    "generated_at": "2026-09-22 09:39:13",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -27331,6 +27331,13 @@
                             "label": "Reply Content",
                             "type": "textarea",
                             "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "Reply as user (ID)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Posts the reply as this WordPress user, with their name and avatar."
                         }
                     ],
                     "outputs": [
@@ -31907,6 +31914,24 @@
                         "main"
                     ]
                 },
+                "reply_requested": {
+                    "label": "Reply to Deliver (workflow source)",
+                    "hook": "zaplane/inbox/reply_requested",
+                    "key": "reply_requested",
+                    "schema": [
+                        {
+                            "key": "source",
+                            "label": "Source",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "wp_comments",
+                            "help": "The source name used in \"Add Incoming Message\". Runs when someone replies in one of its conversations; this workflow then posts the reply where it belongs."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "order_created": {
                     "label": "Order Placed from a Conversation",
                     "hook": "zaplane/inbox/order_created",
@@ -31944,6 +31969,110 @@
                 }
             },
             "actions": {
+                "receive_message": {
+                    "label": "Add Incoming Message",
+                    "key": "receive_message",
+                    "schema": [
+                        {
+                            "key": "source",
+                            "label": "Source",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "wp_comments",
+                            "help": "A short name for where these messages come from. Conversations are filed under it, and replies go out through \"Reply to Deliver\" with the same source."
+                        },
+                        {
+                            "key": "source_label",
+                            "label": "Source name shown in the inbox",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "Comments"
+                        },
+                        {
+                            "key": "thread_id",
+                            "label": "Thread ID",
+                            "type": "expression",
+                            "required": true,
+                            "help": "Messages with the same thread ID are one conversation (a comment thread, a ticket number\u2026)."
+                        },
+                        {
+                            "key": "message_id",
+                            "label": "Message ID",
+                            "type": "expression",
+                            "required": false,
+                            "help": "The ID of this message where it came from. A reply is posted under it, and the same ID twice is only added once."
+                        },
+                        {
+                            "key": "text",
+                            "label": "Message",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "link_url",
+                            "label": "Link (what it is about)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Shown at the top of the conversation, e.g. the page a comment is on."
+                        },
+                        {
+                            "key": "link_title",
+                            "label": "Link title",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "from_team",
+                            "label": "Written by your team",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Anything true (\"1\", \"yes\") records it as your team's reply, e.g. a comment answered in wp-admin."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "confirm_delivery": {
+                    "label": "Confirm Reply Delivered",
+                    "key": "confirm_delivery",
+                    "schema": [
+                        {
+                            "key": "message_id",
+                            "label": "Inbox message ID",
+                            "type": "expression",
+                            "required": true,
+                            "help": "From the \"Reply to Deliver\" trigger: {{trigger.message_id}}."
+                        },
+                        {
+                            "key": "external_id",
+                            "label": "ID where it was posted",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "error",
+                            "label": "Error (marks it failed)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "send_reply": {
                     "label": "Send Reply",
                     "key": "send_reply",
@@ -32168,6 +32297,13 @@
                             "required": true
                         },
                         {
+                            "key": "option_id",
+                            "label": "Price option / variation ID",
+                            "type": "expression",
+                            "required": false,
+                            "help": "For products with several prices or variations. Leave empty for the first one."
+                        },
+                        {
                             "key": "message",
                             "label": "Message with the card",
                             "type": "text",
@@ -32194,7 +32330,8 @@
                             "label": "Products as id:quantity, comma separated",
                             "type": "expression",
                             "required": true,
-                            "placeholder": "1575:1, 1652:2"
+                            "placeholder": "1575:1, 1652/88:2",
+                            "help": "Add a price option / variation ID after a slash: 1652/88:2."
                         },
                         {
                             "key": "name",
