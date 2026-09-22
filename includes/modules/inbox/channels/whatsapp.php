@@ -92,6 +92,10 @@ class Whatsapp extends MetaChannel {
 		}
 
 		$body = \Zaplane\Integrations\Whatsapp::message_text( $message );
+		$picked = self::picked_option( $number_id, $from, $message );
+		if ( null !== $picked ) {
+			$body = $picked;
+		}
 		if ( 'location' === $type ) {
 			$loc  = (array) ( $message['location'] ?? [] );
 			$body = trim( ( $loc['name'] ?? '' ) . ' ' . ( $loc['address'] ?? '' ) . ' ' . sprintf( '(%s, %s)', $loc['latitude'] ?? '', $loc['longitude'] ?? '' ) );
@@ -173,6 +177,34 @@ class Whatsapp extends MetaChannel {
 	}
 
 	/**
+	 * The full label of a tapped button or list row we sent (ids "zqr_N" are
+	 * indexes into that message's options); null for anything else.
+	 *
+	 * @param array<string,mixed> $message
+	 */
+	private static function picked_option( string $number_id, string $from, array $message ): ?string {
+		$reply = (array) ( $message['interactive']['list_reply'] ?? $message['interactive']['button_reply'] ?? [] );
+		if ( ! preg_match( '/^zqr_(\d+)$/', (string) ( $reply['id'] ?? '' ), $m ) ) {
+			return null;
+		}
+		$identity = Identity::where( 'channel', 'whatsapp' )->where( 'account_id', $number_id )->where( 'external_id', $from )->fresh()->first();
+		if ( ! $identity ) {
+			return null;
+		}
+		$conversation = Conversation::where( 'identity_id', (int) $identity->id )->orderBy( 'id', 'desc' )->fresh()->first();
+		if ( ! $conversation ) {
+			return null;
+		}
+		foreach ( Message::where( 'conversation_id', (int) $conversation->id )->where( 'direction', 'out' )->orderBy( 'id', 'desc' )->limit( 5 )->fresh()->get()->all() as $sent ) {
+			$options = (array) ( is_array( $sent->meta ) ? ( $sent->meta['quick_replies'] ?? [] ) : [] );
+			if ( $options ) {
+				return isset( $options[ (int) $m[1] ] ) ? (string) $options[ (int) $m[1] ] : null;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * WhatsApp conversation starters ("ice breakers"): shown when a customer
 	 * opens a chat with the business number for the first time. Tapping one
 	 * sends it as an ordinary text message.
@@ -222,34 +254,50 @@ class Whatsapp extends MetaChannel {
 			],
 		];
 
-		// Up to three tappable answers ("Did this answer your question?") make
-		// it an interactive message; tapping one comes back as its title.
-		$buttons = array_slice( array_filter( (array) ( $message->meta['quick_replies'] ?? [] ) ), 0, 3 );
-		// WhatsApp buttons hold 20 characters and send back only their title,
-		// so longer labels (full questions) are left as plain text.
-		$fits = ! array_filter( $buttons, static fn( $b ) => mb_strlen( (string) $b ) > 20 );
-		if ( $buttons && ! $fits ) {
-			// Show them as a list instead, so the customer can copy one.
-			$payload['text']['body'] = (string) $message->body . "\n\n" . implode( "\n", array_map( static fn( $b ) => '• ' . $b, $buttons ) );
-		}
-		if ( $buttons && $fits && mb_strlen( (string) $message->body ) <= 1024 ) {
+		// Tappable options. Up to three short ones are reply buttons; more, or
+		// longer ones (full questions), a list menu of up to ten rows. Either
+		// way a tap comes back with our row id, which ingest maps to the full
+		// label (WhatsApp only returns a shortened title).
+		$options = array_values( array_filter( array_map( 'strval', (array) ( $message->meta['quick_replies'] ?? [] ) ) ) );
+		$body    = (string) $message->body;
+		if ( $options && mb_strlen( $body ) <= 1024 ) {
+			$short = count( $options ) <= 3 && ! array_filter( $options, static fn( $o ) => mb_strlen( $o ) > 20 );
 			unset( $payload['text'] );
-			$payload['type']        = 'interactive';
-			$payload['interactive'] = [
-				'type'   => 'button',
-				'body'   => [ 'text' => (string) $message->body ],
-				'action' => [
-					'buttons' => array_map( static function ( $title, $i ) {
-						return [
+			$payload['type'] = 'interactive';
+
+			if ( $short ) {
+				$payload['interactive'] = [
+					'type'   => 'button',
+					'body'   => [ 'text' => $body ],
+					'action' => [
+						'buttons' => array_map( static fn( $o, $i ) => [
 							'type'  => 'reply',
 							'reply' => [
-								'id'    => 'zaplane_qr_' . $i,
-								'title' => mb_substr( (string) $title, 0, 20 ),
+								'id'    => 'zqr_' . $i,
+								'title' => $o,
 							],
-						];
-					}, array_values( $buttons ), array_keys( array_values( $buttons ) ) ),
-				],
-			];
+						], $options, array_keys( $options ) ),
+					],
+				];
+			} else {
+				$payload['interactive'] = [
+					'type'   => 'list',
+					'body'   => [ 'text' => $body ],
+					'action' => [
+						'button'   => __( 'Choose', 'zaplane' ),
+						'sections' => [
+							[
+								'title' => mb_substr( __( 'Options', 'zaplane' ), 0, 24 ),
+								'rows'  => array_map( static fn( $o, $i ) => array_filter( [
+									'id'          => 'zqr_' . $i,
+									'title'       => mb_strlen( $o ) > 24 ? rtrim( mb_substr( $o, 0, 23 ) ) . '…' : $o,
+									'description' => mb_strlen( $o ) > 24 ? mb_substr( $o, 0, 72 ) : '',
+								] ), array_slice( $options, 0, 10 ), array_keys( array_slice( $options, 0, 10 ) ) ),
+							],
+						],
+					],
+				];
+			}
 		}
 
 		// Shown as a quoted reply in WhatsApp when we know the original's id.

@@ -22,8 +22,11 @@ const SECTIONS = [
   { id: "replies", label: __("Saved replies", "zaplane"), Icon: FiZap },
 ];
 
-const toForm = (settings) => ({
+// The menu editor needs each question's answer text, which the settings
+// endpoint returns alongside (answers.menu), not in the raw settings.
+const toForm = (settings, payload) => ({
   ...settings,
+  answers: { ...(settings.answers || {}), menu: payload?.answers?.menu || settings.answers?.menu },
   widget: { ...settings.widget, allowed_origins: (settings.widget.allowed_origins || []).join("\n") },
 });
 
@@ -118,8 +121,8 @@ const Settings = ({ onSaved }) => {
   useEffect(() => {
     inboxApi.settings().then((d) => {
       setData(d);
-      setForm(toForm(d.settings));
-      setSaved(toForm(d.settings));
+      setForm(toForm(d.settings, d));
+      setSaved(toForm(d.settings, d));
     });
     inboxApi.canned().then(setCanned);
   }, []);
@@ -175,7 +178,7 @@ const Settings = ({ onSaved }) => {
           allowed_origins: form.widget.allowed_origins.split(/\s+/).filter(Boolean),
         },
         ai: form.ai,
-        answers: { ...(form.answers || {}), common_questions: (form.answers?.common_questions || []).map((q) => q.trim()).filter(Boolean) },
+        answers: form.answers,
         channels: form.channels,
       });
       // Webhook secrets are stored with the integration, not the inbox.
@@ -187,8 +190,8 @@ const Settings = ({ onSaved }) => {
       // Read back after the secrets too, so "saved" badges are current.
       const fresh = await inboxApi.settings();
       setData(fresh);
-      setForm(toForm(fresh.settings));
-      setSaved(toForm(fresh.settings));
+      setForm(toForm(fresh.settings, fresh));
+      setSaved(toForm(fresh.settings, fresh));
       setNotice({ tone: "success", text: __("Settings saved.", "zaplane") });
       onSaved?.(fresh);
     } catch (e) {

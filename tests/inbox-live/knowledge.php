@@ -50,8 +50,9 @@ zt_run( function () {
 	$y = Presenter::message( zt_last( $cv ), true );
 	zt_ok( 'yes → "Anything else?" with the questions not asked yet', 0 === strpos( $y['body'], 'Glad that helped!' ) && [ 'Opening hours', 'Payment methods accepted' ] === $y['quick_replies'] && '' !== $y['quick_prompt'] );
 
-	$ask( 'what is your return policy?' );
-	zt_ok( 'same FAQ not sent twice', 'contact' === zt_last( $cv )->sender_type || 'auto' !== zt_last( $cv )->sender_type || false === strpos( zt_last( $cv )->body, '30 days' ) );
+	// Asked again in other words (not a menu tap), the same FAQ isn't repeated.
+	$ask( 'whats your return policy please' );
+	zt_ok( 'same FAQ not sent twice', false === strpos( (string) zt_last( $cv )->body, '30 days' ) );
 
 	$ask( 'How long is shipping and delivery to Chattogram?' );
 	$b = zt_last( $cv );
@@ -94,7 +95,7 @@ zt_run( function () {
 	zt_ok( 'assistant on → menu offers "Try our assistant"', 'Try our assistant' === ( Presenter::message( zt_last( $cb ), true )['quick_replies'][0] ?? '' ) );
 	$mq = zt_message( $cb, 'Try our assistant' );
 	KnowledgeAnswer::handle( (int) $cb->id, (int) $mq->id );
-	zt_ok( '"Try our assistant" asks it the original question', 'what is your return policy' === $task );
+	zt_ok( '"Try our assistant" asks it the original question', 'what is your return policy' === rtrim( mb_strtolower( (string) $task ), '?' ) );
 	IS::save( [ 'ai' => [ 'enabled' => false ] ] );
 
 	// A question nothing answers, in a fresh team conversation: told once.

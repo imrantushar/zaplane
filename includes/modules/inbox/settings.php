@@ -52,6 +52,8 @@ class Settings {
 				// Up to four questions offered before the customer types: buttons
 				// in the website chat, Messenger Ice Breakers, WhatsApp starters.
 				'common_questions' => [],
+				// Quick answers menu, see Services\AnswerMenu.
+				'menu'             => [],
 			],
 			'ai'     => [
 				'enabled'       => false,
@@ -165,6 +167,11 @@ class Settings {
 			}
 			if ( isset( $a['common_questions'] ) && is_array( $a['common_questions'] ) ) {
 				$current['answers']['common_questions'] = self::clean_questions( $a['common_questions'] );
+			}
+			if ( isset( $a['menu'] ) && is_array( $a['menu'] ) ) {
+				$current['answers']['menu'] = Services\AnswerMenu::sanitize( $a['menu'] );
+				// The menu replaces the older flat list.
+				$current['answers']['common_questions'] = [];
 			}
 		}
 

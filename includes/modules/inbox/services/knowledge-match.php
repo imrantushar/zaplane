@@ -245,7 +245,7 @@ class KnowledgeMatch {
 	 * @param array<string,mixed> $row
 	 * @return array{id:int,title:string,answer:string,source:string,url:string,image:string,excerpt:string}
 	 */
-	private static function entry( array $row ): array {
+	public static function entry( array $row ): array {
 		$source  = (string) ( $row['source'] ?? '' );
 		$content = trim( wp_strip_all_tags( (string) ( $row['content'] ?? '' ) ) );
 		$url     = '';

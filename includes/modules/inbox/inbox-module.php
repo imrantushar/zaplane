@@ -125,7 +125,8 @@ class InboxModule implements ModuleInterface {
 			'position' => (string) $widget['position'],
 			'askEmail' => (bool) $widget['ask_email'],
 			// Buttons under the greeting, before the visitor has typed anything.
-			'questions' => array_values( (array) ( Settings::get()['answers']['common_questions'] ?? [] ) ),
+			'questions' => Services\AnswerMenu::top_level(),
+			'menu'      => Services\AnswerMenu::for_widget(),
 			// Knowledge may answer on its own, so show "typing…" after sending.
 			'autoAnswers' => ! empty( Settings::get()['answers']['enabled'] ),
 			'aiName'   => $ai_on ? $agent : '',
@@ -150,6 +151,7 @@ class InboxModule implements ModuleInterface {
 				'readMore'    => __( 'Read more', 'zaplane' ),
 				'commonQuestions' => __( 'Common questions', 'zaplane' ),
 				'talkToPerson'    => Services\KnowledgeAnswer::person_label(),
+				'allTopics'       => Services\AnswerMenu::topics_label(),
 			],
 		] );
 	}

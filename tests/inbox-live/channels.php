@@ -54,7 +54,7 @@ zt_run( function () {
 	zt_fake_channel_credentials();
 	Whatsapp::send( $cw, $iw, zt_message( $cw, 'Anything else?', 'auto', [ 'meta' => [ 'quick_replies' => [ 'What is your return policy?' ] ] ] ) );
 	$w = end( $calls )['body'];
-	zt_ok( 'WhatsApp long labels → listed in the text instead', 'text' === $w['type'] && false !== strpos( $w['text']['body'], '• What is your return policy?' ) );
+	zt_ok( 'WhatsApp long labels → a list menu', 'interactive' === $w['type'] && 'list' === $w['interactive']['type'] && 'What is your return policy?' === $w['interactive']['action']['sections'][0]['rows'][0]['description'] );
 
 	// Tapping: Ice Breaker (postback) and a cut-off quick reply both arrive as the full question.
 	global $wpdb;

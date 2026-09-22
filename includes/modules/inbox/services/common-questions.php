@@ -27,7 +27,7 @@ class CommonQuestions {
 	 */
 	public static function sync( bool $force = false ): array {
 		$settings  = InboxSettings::get();
-		$questions = array_values( (array) ( $settings['answers']['common_questions'] ?? [] ) );
+		$questions = AnswerMenu::starters();
 		$status    = self::status();
 
 		MetaChannel::reset();

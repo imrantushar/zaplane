@@ -582,7 +582,16 @@ class AdminController {
 
 	public function save_settings( WP_REST_Request $request ) {
 		$params = $request->get_json_params() ?: [];
-		InboxSettings::save( is_array( $params ) ? $params : [] );
+		$params = is_array( $params ) ? $params : [];
+
+		// Answers written in the menu editor become FAQs in Business Knowledge;
+		// the menu keeps only the link.
+		if ( isset( $params['answers']['menu'] ) && is_array( $params['answers']['menu'] ) ) {
+			$key                         = sanitize_key( (string) ( $params['ai']['business_key'] ?? InboxSettings::get()['ai']['business_key'] ) ) ?: 'default';
+			$params['answers']['menu'] = \Zaplane\Modules\Inbox\Services\AnswerMenu::prepare( $params['answers']['menu'], $key );
+		}
+
+		InboxSettings::save( $params );
 		// Messenger / WhatsApp keep their own copy of the common questions.
 		CommonQuestions::sync();
 		return rest_ensure_response( $this->settings_payload() );
@@ -647,6 +656,7 @@ class AdminController {
 				'embeddings' => \Zaplane\Services\KnowledgeEmbeddings::enabled(),
 				'common'     => CommonQuestions::status(),
 				'faqs'       => self::faq_questions( (string) InboxSettings::get()['ai']['business_key'] ),
+				'menu'       => \Zaplane\Modules\Inbox\Services\AnswerMenu::for_admin(),
 			],
 			'team'           => $team,
 			'site_origin'    => untrailingslashit( home_url() ),
@@ -663,21 +673,26 @@ class AdminController {
 	 * @return array<int,array{key:string,count:int}>
 	 */
 	/**
-	 * FAQ questions in a knowledge key, to pick common questions from.
+	 * FAQs in a knowledge key, for the menu editor's "Answer from an FAQ".
 	 *
-	 * @return array<int,string>
+	 * @return array<int,array{id:int,title:string,answer:string}>
 	 */
 	private static function faq_questions( string $business_key ): array {
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$titles = $wpdb->get_col(
+		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT title FROM %i WHERE business_key = %s AND source = 'faq' AND title <> '' ORDER BY id ASC LIMIT 100",
+				"SELECT id, title, content FROM %i WHERE business_key = %s AND source = 'faq' AND title <> '' ORDER BY id ASC LIMIT 200",
 				\Zaplane\Models\Knowledge::getTable(),
 				$business_key
-			)
+			),
+			ARRAY_A
 		);
-		return array_values( array_map( 'strval', (array) $titles ) );
+		return array_map( static fn( $r ) => [
+			'id'     => (int) $r['id'],
+			'title'  => (string) $r['title'],
+			'answer' => (string) $r['content'],
+		], (array) $rows );
 	}
 
 	private static function knowledge_keys(): array {

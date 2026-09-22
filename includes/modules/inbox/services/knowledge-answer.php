@@ -138,6 +138,11 @@ class KnowledgeAnswer {
 			return;
 		}
 
+		// A tap on the quick-answers menu: a category, a question, or "All topics".
+		if ( $in_flow && self::menu_navigation( $conversation, $message ) ) {
+			return;
+		}
+
 		if ( $in_flow ) {
 			if ( self::menu_choice( $conversation, $message ) || self::feedback( $conversation, $message ) || ( self::applies( $conversation ) && self::answer( $conversation, $message ) ) ) {
 				return;
@@ -168,7 +173,12 @@ class KnowledgeAnswer {
 	 * @return array<int,string>
 	 */
 	private static function remaining_questions( Conversation $conversation ): array {
-		$common = array_values( (array) ( InboxSettings::get()['answers']['common_questions'] ?? [] ) );
+		// Grouped menus offer their categories again; flat ones the questions
+		// not asked yet.
+		if ( AnswerMenu::grouped() ) {
+			return AnswerMenu::top_level();
+		}
+		$common = AnswerMenu::top_level();
 		if ( ! $common ) {
 			return [];
 		}
@@ -260,6 +270,89 @@ class KnowledgeAnswer {
 				'at'       => time(),
 			],
 		] );
+		return true;
+	}
+
+	/**
+	 * Follow a tap on the quick-answers menu. Menu picks are explicit, so they
+	 * aren't limited by the daily cap or the "never twice" rule.
+	 */
+	private static function menu_navigation( Conversation $conversation, Message $message ): bool {
+		$hit = AnswerMenu::lookup( (string) $message->body );
+		if ( ! $hit ) {
+			return false;
+		}
+		self::set_meta( $conversation, [
+			'kb_pending' => null,
+			'kb_menu'    => null,
+		] );
+
+		if ( 'topics' === $hit['type'] ) {
+			Outbound::send( $conversation, __( 'What can we help you with?', 'zaplane' ), [
+				'sender_type' => 'auto',
+				'meta'        => [ 'quick_replies' => array_merge( AnswerMenu::top_level(), [ self::person_label() ] ) ],
+			] );
+			return true;
+		}
+
+		if ( 'category' === $hit['type'] ) {
+			$questions = array_column( (array) $hit['item']['questions'], 'question' );
+			Outbound::send( $conversation, $questions
+				/* translators: %s: category name, e.g. Delivery. */
+				? sprintf( __( '%s: which question?', 'zaplane' ), $hit['item']['title'] )
+				: __( "We don't have questions here yet. Our team can help.", 'zaplane' ), [
+				'sender_type' => 'auto',
+				'meta'        => [ 'quick_replies' => array_merge( $questions, [ AnswerMenu::topics_label(), self::person_label() ] ) ],
+			] );
+			return true;
+		}
+
+		// A question: send its linked answer. Without one it's an ordinary
+		// question, and matching (or the team) takes it.
+		$row = AnswerMenu::knowledge_row( (int) $hit['item']['knowledge_id'] );
+		if ( ! $row || '' === trim( (string) $row['content'] ) ) {
+			return false;
+		}
+
+		$settings = InboxSettings::get();
+		$ask      = ! empty( $settings['answers']['feedback'] );
+		$match    = [
+			'tier'       => 'strong',
+			'confidence' => 1.0,
+			'method'     => 'menu',
+			'reason'     => '',
+			// A menu answer is the answer: send the text even for a page entry.
+			'entries'    => [ [ 'source' => 'faq' ] + KnowledgeMatch::entry( $row ) ],
+		];
+		$reply = self::compose( (string) $conversation->channel, $match, $ask );
+		$sent  = Outbound::send( $conversation, $reply['body'], [
+			'sender_type' => 'auto',
+			'attachments' => $reply['attachments'],
+			'meta'        => [
+				'knowledge'     => [
+					'tier'       => 'strong',
+					'confidence' => 1.0,
+					'method'     => 'menu',
+					'entries'    => [ (int) $row['id'] ],
+				],
+				'question'      => (string) $hit['item']['question'],
+				'quick_replies' => $ask ? [ self::yes_label(), self::no_label() ] : [],
+				'quick_prompt'  => $ask ? __( 'Did this answer your question?', 'zaplane' ) : '',
+			],
+		] );
+		if ( 'failed' === $sent->delivery_status ) {
+			return false;
+		}
+
+		$meta = is_array( $conversation->meta ) ? $conversation->meta : [];
+		self::set_meta( $conversation, [
+			'kb_sent'    => array_values( array_unique( array_merge( array_map( 'intval', (array) ( $meta['kb_sent'] ?? [] ) ), [ (int) $row['id'] ] ) ) ),
+			'kb_pending' => $ask ? [
+				'message_id' => (int) $sent->id,
+				'at'         => time(),
+			] : null,
+		] );
+		self::count( 'answered' );
 		return true;
 	}
 

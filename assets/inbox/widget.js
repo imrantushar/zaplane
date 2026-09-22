@@ -210,19 +210,57 @@
 	var greeting = el( 'div', 'zpi-msg zpi-them' );
 	greeting.appendChild( el( 'div', 'zpi-bubble', cfg.greeting || '' ) );
 
-	// Common questions: tap one instead of typing. Gone once the chat starts.
-	var starters = null;
-	if ( cfg.questions && cfg.questions.length ) {
-		starters = el( 'div', 'zpi-starters' );
-		cfg.questions.forEach( function ( question ) {
-			var btn = el( 'button', 'zpi-starter', question );
-			btn.type = 'button';
-			btn.addEventListener( 'click', function () {
-				text.value = question;
-				form.requestSubmit ? form.requestSubmit() : form.dispatchEvent( new Event( 'submit', { cancelable: true } ) );
-			} );
-			starters.appendChild( btn );
+	// Quick answers: tap instead of typing. Grouped menus show categories
+	// first; a category opens its questions in place, without a message.
+	var menu = cfg.menu || { grouped: false, categories: [], questions: cfg.questions || [] };
+	var hasMenu = ( menu.grouped && menu.categories.length ) || ( menu.questions && menu.questions.length );
+
+	function askText( question ) {
+		text.value = question;
+		form.requestSubmit ? form.requestSubmit() : form.dispatchEvent( new Event( 'submit', { cancelable: true } ) );
+	}
+
+	/**
+	 * Fill `box` with the menu's first level, or one category's questions.
+	 * `after` are extra items (e.g. "Talk to a person") at the end.
+	 */
+	function renderMenu( box, itemClass, onPick, after, category ) {
+		Array.prototype.slice.call( box.querySelectorAll( '.' + itemClass.split( ' ' )[0] ) ).forEach( function ( n ) {
+			n.parentNode.removeChild( n );
 		} );
+		var add = function ( label, cls, handler ) {
+			var b = el( 'button', itemClass + ( cls ? ' ' + cls : '' ), label );
+			b.type = 'button';
+			b.addEventListener( 'click', handler );
+			box.appendChild( b );
+		};
+		if ( category ) {
+			add( '← ' + ( t.allTopics || 'All topics' ), 'is-back', function () {
+				renderMenu( box, itemClass, onPick, after, null );
+			} );
+			category.questions.forEach( function ( q ) {
+				add( q, '', function () { onPick( q ); } );
+			} );
+		} else if ( menu.grouped && menu.categories.length ) {
+			menu.categories.forEach( function ( c ) {
+				add( c.title, 'is-category', function () {
+					renderMenu( box, itemClass, onPick, after, c );
+				} );
+			} );
+		} else {
+			( menu.questions || [] ).forEach( function ( q ) {
+				add( q, '', function () { onPick( q ); } );
+			} );
+		}
+		( after || [] ).forEach( function ( label ) {
+			add( label, 'is-person', function () { onPick( label ); } );
+		} );
+	}
+
+	var starters = null;
+	if ( hasMenu ) {
+		starters = el( 'div', 'zpi-starters' );
+		renderMenu( starters, 'zpi-starter', askText, [], null );
 		greeting.appendChild( starters );
 	}
 
@@ -260,10 +298,10 @@
 	send.type = 'submit';
 	send.setAttribute( 'aria-label', t.send || 'Send' );
 	send.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 21 3l-8.5 18-2.2-7.3L3 11.5z" fill="currentColor"/></svg>';
-	// Common questions stay one tap away for the whole chat.
+	// The same menu stays one tap away for the whole chat.
 	var askBtn = null;
 	var askMenu = null;
-	if ( ( cfg.questions && cfg.questions.length ) || cfg.autoAnswers ) {
+	if ( hasMenu || cfg.autoAnswers ) {
 		askBtn = el( 'button', 'zpi-ask' );
 		askBtn.type = 'button';
 		askBtn.setAttribute( 'aria-label', t.commonQuestions || 'Common questions' );
@@ -274,24 +312,16 @@
 		askMenu.hidden = true;
 		askMenu.setAttribute( 'role', 'menu' );
 		askMenu.appendChild( el( 'div', 'zpi-ask-title', t.commonQuestions || 'Common questions' ) );
-		// Asking for a person is always there, after the questions.
-		var askItems = ( cfg.questions || [] ).slice();
-		if ( cfg.autoAnswers && t.talkToPerson ) {
-			askItems.push( t.talkToPerson );
-		}
-		askItems.forEach( function ( question ) {
-			var item = el( 'button', 'zpi-ask-item' + ( question === t.talkToPerson ? ' zpi-ask-person' : '' ), question );
-			item.type = 'button';
-			item.setAttribute( 'role', 'menuitem' );
-			item.addEventListener( 'click', function () {
-				askMenu.hidden = true;
-				askBtn.setAttribute( 'aria-expanded', 'false' );
-				text.value = question;
-				form.requestSubmit ? form.requestSubmit() : form.dispatchEvent( new Event( 'submit', { cancelable: true } ) );
-			} );
-			askMenu.appendChild( item );
-		} );
+		var closeAsk = function ( question ) {
+			askMenu.hidden = true;
+			askBtn.setAttribute( 'aria-expanded', 'false' );
+			askText( question );
+		};
+		var askAfter = cfg.autoAnswers && t.talkToPerson ? [ t.talkToPerson ] : [];
 		askBtn.addEventListener( 'click', function () {
+			if ( askMenu.hidden ) {
+				renderMenu( askMenu, 'zpi-ask-item', closeAsk, askAfter, null );
+			}
 			askMenu.hidden = ! askMenu.hidden;
 			askBtn.setAttribute( 'aria-expanded', askMenu.hidden ? 'false' : 'true' );
 		} );
