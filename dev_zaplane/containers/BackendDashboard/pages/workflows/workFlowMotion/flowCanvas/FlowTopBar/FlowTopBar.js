@@ -71,10 +71,14 @@ export default function FlowTopBar({
     const updateStatusAndTitle = async () => {
       try {
         if (values?.status && values.status !== workFlow.workflow.status) {
-          await dispatch(updateWorkFlowStatus({
+          const result = await dispatch(updateWorkFlowStatus({
             id,
             status: values.status
           }));
+          // Refused (it can't go live yet): show the status it still has.
+          if (updateWorkFlowStatus.rejected.match(result)) {
+            setFieldValue("status", workFlow.workflow.status);
+          }
         }
         if (values?.title && values.title !== workFlow.workflow.title) {
           await dispatch(updateWorkFlowTitle({

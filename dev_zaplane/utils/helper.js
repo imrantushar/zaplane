@@ -84,7 +84,14 @@ export const makeRequest = async (
             form_data.append( key, value );
         }
     } );
-    const response = await axios.post( ajaxurl, form_data );
+    let response;
+    try {
+        response = await axios.post( ajaxurl, form_data );
+    } catch ( e ) {
+        // wp_send_json_error() answers with a 4xx, so axios throws: surface
+        // the server's own message rather than "status code 400".
+        processAjaxError( e?.response?.data?.data, e?.response || null, e );
+    }
     const {
         data: { success, data },
     } = response;
@@ -94,6 +101,22 @@ export const makeRequest = async (
     }
 
     return data;
+};
+
+/**
+ * Throw an Error carrying the message an admin-ajax handler sent back
+ * (a string, or { message }), so callers can show it as it is.
+ */
+export const processAjaxError = ( data, response = null, cause = null ) => {
+    const message =
+        ( typeof data === 'string' && data ) ||
+        data?.message ||
+        cause?.message ||
+        __( 'Something went wrong. Please try again.', 'zaplane' );
+    const error = new Error( message );
+    error.response = response;
+    error.data = data;
+    throw error;
 };
 
 export const sliceString = ( text, length = 20, more = '...' ) => {

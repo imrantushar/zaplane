@@ -111,19 +111,21 @@ export const updateWorkFlowStatus = createAsyncThunk(
 	'zaplane/updateWorkFlowStatus',
 	async (payload, thunkAPI) => {
 		try {
-			await makeRequest('update_workflow_status', {
+			const saved = await makeRequest('update_workflow_status', {
 				id: payload.id,
 				...payload,
 			});
-			return payload;
+			// What the server kept, which is what every table should show.
+			return { ...payload, status: saved?.status || payload.status };
 		} catch (e) {
 			thunkAPI.dispatch(
 				showNotification({
-					message: e,
+					message: e?.message || e,
 					isShow: true,
 					type: 'error',
 				})
 			);
+			return thunkAPI.rejectWithValue(e);
 		}
 	}
 )

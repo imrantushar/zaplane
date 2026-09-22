@@ -7,6 +7,7 @@ import {
     handleSliceError,
     namespace,
 } from '@ZAPUtils/helper';
+import { updateWorkFlowStatus } from '../workFlowSlice/actions/workFlow';
 
 
 
@@ -236,6 +237,15 @@ const folderSlice = createSlice({
                     state.folders.data[index].workflow_count =
                         action.payload.workflow_count;
                 }
+            })
+            // A status changed in a folder's table: its rows live here, not in
+            // the workflows slice, so update them too.
+            .addCase(updateWorkFlowStatus.fulfilled, (state, action) => {
+                const { id, status } = action.payload || {};
+                if (!id || !status || !Array.isArray(state.folderWorkflows?.data)) return;
+                state.folderWorkflows.data = state.folderWorkflows.data.map((item) =>
+                    Number(item.id) === Number(id) ? { ...item, status } : item
+                );
             })
             .addCase(getFolderWorkflows.fulfilled, (state, action) => {
                 const { folderId } = action.payload;
