@@ -362,7 +362,8 @@ class RecipeController extends WP_REST_Controller {
 		}
 
 		try {
-			$result = ( new RecipeGroupService() )->install( $recipe, (array) ( $request->get_json_params() ?? [] ) );
+			// The wizard's setup: no workflow is created without its connections.
+			$result = ( new RecipeGroupService() )->install( $recipe, array_merge( (array) ( $request->get_json_params() ?? [] ), [ 'require_connections' => true ] ) );
 		} catch ( \InvalidArgumentException $e ) {
 			return new WP_Error( 'invalid_setup', $e->getMessage(), [ 'status' => 400 ] );
 		} catch ( \Throwable $e ) {

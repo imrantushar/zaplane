@@ -17,6 +17,7 @@ import { IoSwapHorizontal, IoSwapVerticalOutline } from "react-icons/io5";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
 import { getSingleWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import FlowTopBar from "./FlowTopBar/FlowTopBar";
+import MissingConnections from "./MissingConnections";
 
 // What the node and edge renderers need that changes from render to render. The
 // renderers themselves are defined once, below. Building nodeTypes inside the
@@ -209,6 +210,8 @@ export default function FlowCanvas({
     style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 32px)' }}>
 
     <FlowTopBar workFlow={workFlow} isFullscreen={isFullscreen} toggleFullscreen={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)} id={id} values={values} setFieldValue={setFieldValue} handleSubmit={handleSubmit} activeDrawer={activeDrawer} setActiveDrawer={setActiveDrawer} isFlowDirty={isFlowDirty} onNavigateBack={onNavigateBack} renderTopBar={renderTopBar} />
+
+    {!loading && <MissingConnections nodes={nodes} status={values?.status || workFlow?.workflow?.status} onOpenStep={openDrawerForNode} />}
 
     <div style={{ flex: 1, overflow: 'hidden' }}>
     {loading ? <ZAPLoading /> : <CanvasContext.Provider value={canvas}>

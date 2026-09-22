@@ -165,3 +165,89 @@
   pointer-events: none;
   z-index: 20;
 }
+
+/* Steps that need a connection, above the canvas. */
+.zaplane-missing-connections {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin: 0;
+	padding: 12px 20px;
+	border-bottom: 1px solid color-mix(in srgb, #f79009 40%, transparent);
+	background: color-mix(in srgb, #f79009 10%, var(--zaplane-background, #fff));
+	color: var(--zaplane-font-color);
+	font-size: 13px;
+
+	&.is-live {
+		border-bottom-color: color-mix(in srgb, #d92d20 40%, transparent);
+		background: color-mix(in srgb, #d92d20 8%, var(--zaplane-background, #fff));
+
+		.zaplane-missing-connections__icon {
+			color: #d92d20;
+		}
+	}
+}
+
+.zaplane-missing-connections__icon {
+	flex: none;
+	margin-top: 2px;
+	color: #b54708;
+	font-size: 16px;
+}
+
+.zaplane-missing-connections__text {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 0;
+}
+
+.zaplane-missing-connections__steps {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+
+	button {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 4px 10px;
+		border: 1px solid var(--zaplane-border-color);
+		border-radius: 999px;
+		background: var(--zaplane-background, #fff);
+		color: var(--zaplane-font-color);
+		font: inherit;
+		font-size: 12px;
+		cursor: pointer;
+
+		em {
+			color: var(--zaplane-font-secondary-color);
+			font-style: normal;
+		}
+
+		&:hover {
+			border-color: var(--zaplane-primary);
+			color: var(--zaplane-primary);
+		}
+	}
+}
+
+.zaplane-missing-connections__add {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border-radius: 8px;
+	background: var(--zaplane-primary);
+	color: #fff;
+	font-weight: 600;
+	text-decoration: none;
+
+	&:hover,
+	&:focus {
+		color: #fff;
+		opacity: 0.9;
+	}
+}

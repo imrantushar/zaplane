@@ -93,6 +93,18 @@ zt_run( function () {
 	$catalog = array_column( Connectors::catalog(), null, 'slug' );
 	zt_ok( 'settings list Messenger, WhatsApp and Comments as Inbox recipes', isset( $catalog['messenger-inbox'], $catalog['whatsapp-inbox'], $catalog['wordpress-comments-inbox'] ) && 'channel' === $catalog['whatsapp-inbox']['kind'] && 'source' === $catalog['wordpress-comments-inbox']['kind'] );
 
+	// The setup wizard can't create workflows without their connections.
+	global $wpdb;
+	$before  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}zaplane_workflows" );
+	$recipe  = \Zaplane\Models\Recipe::where( 'slug', 'whatsapp-inbox' )->fresh()->first();
+	$setup   = new WP_REST_Request( 'POST', "/zaplane/v1/recipes/{$recipe->id}/setup" );
+	$setup->set_header( 'content-type', 'application/json' );
+	$setup->set_body( wp_json_encode( [ 'workflows' => [ 'receive' => true, 'deliver' => true ] ] ) );
+	$res = rest_do_request( $setup );
+	zt_ok( 'recipe setup without its connection is refused, nothing created', 400 === $res->get_status() && false !== strpos( $res->get_data()['message'], 'WhatsApp' ) && $before === (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}zaplane_workflows" ) );
+	$comments = \Zaplane\Models\Recipe::where( 'slug', 'wordpress-comments-inbox' )->fresh()->first();
+	zt_ok( 'a recipe whose apps need no account still sets up', [] === array_values( array_filter( ( new \Zaplane\Services\RecipeGroupService() )->setup( $comments )['apps'], fn( $a ) => $a['requires_connection'] ) ) );
+
 	// Turning a workflow on from the list runs the same checks as the editor.
 	$bad = Workflow::create( [ 'user_id' => 1, 'title' => 'ZZ broken', 'status' => 'draft' ] );
 	WorkflowVersion::create( [ 'workflow_id' => $bad->id, 'is_active' => 1, 'version_number' => 1, 'graph_hash' => 'zz2', 'graph_json' => [ 'nodes' => [
