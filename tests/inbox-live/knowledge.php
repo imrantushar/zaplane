@@ -58,10 +58,44 @@ zt_run( function () {
 	zt_ok( 'page answer as an article card', 'article' === ( $b->attachments[0]['type'] ?? '' ) );
 
 	$ask( 'No, I need help' );
-	$fresh = Conversation::where( 'id', $cv->id )->fresh()->first();
-	$msgs  = array_map( fn( $m ) => $m->sender_type . ':' . mb_substr( $m->body, 0, 20 ), array_slice( \Zaplane\Modules\Inbox\Models\Message::where( 'conversation_id', $cv->id )->orderBy( 'id', 'desc' )->limit( 2 )->fresh()->get()->all(), 0, 2 ) );
-	zt_ok( 'no → the customer is told the team will reply, the team gets a note', false !== strpos( implode( '|', $msgs ), "auto:No problem. I've pa" ) && false !== strpos( implode( '|', $msgs ), 'system:' ) );
+	$menu = Presenter::message( zt_last( $cv ), true );
+	zt_ok( 'no → the customer chooses: other questions or a person', 0 === strpos( $menu['body'], "Sorry that didn't help" ) && [ 'Other questions', 'Talk to a person' ] === $menu['quick_replies'] );
 	zt_ok( 'no → question logged as a gap', 1 === count( KnowledgeAnswer::gaps() ) );
+
+	$ask( 'Other questions' );
+	$list = Presenter::message( zt_last( $cv ), true );
+	zt_ok( '"Other questions" → the questions not asked yet, then "Talk to a person"', 'Talk to a person' === end( $list['quick_replies'] ) && in_array( 'Opening hours', $list['quick_replies'], true ) && ! in_array( 'What is your return policy?', $list['quick_replies'], true ) );
+
+	$ask( 'Talk to a person' );
+	$fresh = Conversation::where( 'id', $cv->id )->fresh()->first();
+	$last2 = \Zaplane\Modules\Inbox\Models\Message::where( 'conversation_id', $cv->id )->orderBy( 'id', 'desc' )->limit( 2 )->fresh()->get()->all();
+	$types = array_map( fn( $m ) => $m->sender_type, $last2 );
+	zt_ok( '"Talk to a person" → the team gets a note, the customer hears back', in_array( 'system', $types, true ) && 0 === strpos( zt_last( $cv )->body, 'Sure!' ) );
+	zt_ok( '…and automatic answers stay out of it', ! KnowledgeAnswer::applies( $fresh ) );
+
+	foreach ( [ 'can I talk to a human please?', 'মানুষের সাথে কথা বলতে চাই', 'agent' ] as $typed ) {
+		$ct = zt_conversation( 'web', 'human' );
+		$mt = zt_message( $ct, $typed );
+		KnowledgeAnswer::handle( (int) $ct->id, (int) $mt->id );
+		zt_ok( "typed \"$typed\" → handed to a person", 0 === strpos( zt_last( $ct )->body, 'Sure!' ) );
+	}
+	zt_ok( 'a normal question is not taken as asking for a person', ! KnowledgeAnswer::wants_person( 'Do you deliver to Chattogram?' ) );
+
+	// With the assistant on, "Try our assistant" answers the ORIGINAL question.
+	$conn = \Zaplane\Models\Connection::create( [ 'user_id' => 1, 'app' => 'ai-agent', 'name' => 'ZZ AI', 'auth_type' => 'api_key', 'encrypted_credentials' => \Zaplane\Framework\Classes\Encryption::encrypt( [ 'provider' => 'anthropic', 'api_key' => 'x' ] ) ] );
+	IS::save( [ 'ai' => [ 'enabled' => true, 'connection_id' => (int) $conn->id, 'business_key' => 'zz_kb' ] ] );
+	$task = null;
+	add_filter( 'zaplane/inbox/ai_node', function ( $node ) use ( &$task ) { $task = $node['data']['config']['task'] ?? null; $node['data']['config']['task'] = ''; return $node; } );
+	$cb = zt_conversation( 'web', 'bot' );
+	foreach ( [ 'what is your return policy', 'No, I need help' ] as $q ) {
+		$mq = zt_message( $cb, $q );
+		KnowledgeAnswer::handle( (int) $cb->id, (int) $mq->id );
+	}
+	zt_ok( 'assistant on → menu offers "Try our assistant"', 'Try our assistant' === ( Presenter::message( zt_last( $cb ), true )['quick_replies'][0] ?? '' ) );
+	$mq = zt_message( $cb, 'Try our assistant' );
+	KnowledgeAnswer::handle( (int) $cb->id, (int) $mq->id );
+	zt_ok( '"Try our assistant" asks it the original question', 'what is your return policy' === $task );
+	IS::save( [ 'ai' => [ 'enabled' => false ] ] );
 
 	// A question nothing answers, in a fresh team conversation: told once.
 	$cv2  = zt_conversation( 'web', 'human' );

@@ -57,6 +57,33 @@ class KnowledgeAnswer {
 		return __( 'No, I need help', 'zaplane' );
 	}
 
+	public static function person_label(): string {
+		return __( 'Talk to a person', 'zaplane' );
+	}
+
+	public static function more_label(): string {
+		return __( 'Other questions', 'zaplane' );
+	}
+
+	public static function assistant_label(): string {
+		return __( 'Try our assistant', 'zaplane' );
+	}
+
+	/**
+	 * Whether a message asks for a human: the button, or the usual ways of
+	 * typing it ("talk to a person", "agent", "মানুষের সাথে কথা বলতে চাই").
+	 */
+	public static function wants_person( string $text ): bool {
+		$said = trim( mb_strtolower( wp_strip_all_tags( $text ) ), " \t\n.!?" );
+		if ( mb_strtolower( self::person_label() ) === $said ) {
+			return true;
+		}
+		return (bool) preg_match(
+			'/\b(talk|speak|chat)\s+(to|with)\s+(a\s+|an\s+|the\s+|some\s*)?(person|human|agent|someone|staff|team|representative|real person)\b|^(human|agent|person|representative|operator|real person|customer (care|service))$|মানুষ|এজেন্ট|কাস্টমার কেয়ার|প্রতিনিধি/iu',
+			$said
+		);
+	}
+
 	/**
 	 * Whether automatic answers may be tried in this conversation: switched on,
 	 * and the conversation belongs to the assistant, or to the team while
@@ -65,6 +92,11 @@ class KnowledgeAnswer {
 	public static function applies( Conversation $conversation ): bool {
 		$settings = InboxSettings::get()['answers'];
 		if ( empty( $settings['enabled'] ) || 'closed' === $conversation->status ) {
+			return false;
+		}
+		// The customer asked for a person: stay out of the way for a day.
+		$meta = is_array( $conversation->meta ) ? $conversation->meta : [];
+		if ( (int) ( $meta['kb_person_at'] ?? 0 ) > time() - DAY_IN_SECONDS ) {
 			return false;
 		}
 		if ( 'bot' === $conversation->handler ) {
@@ -98,8 +130,16 @@ class KnowledgeAnswer {
 			return;
 		}
 
-		if ( self::applies( $conversation ) || self::pending( $conversation ) ) {
-			if ( self::feedback( $conversation, $message ) || ( self::applies( $conversation ) && self::answer( $conversation, $message ) ) ) {
+		$in_flow = self::applies( $conversation ) || self::pending( $conversation ) || self::menu_pending( $conversation );
+
+		// "Talk to a person", from a button or typed, at any point.
+		if ( $in_flow && self::wants_person( (string) $message->body ) ) {
+			self::to_person( $conversation );
+			return;
+		}
+
+		if ( $in_flow ) {
+			if ( self::menu_choice( $conversation, $message ) || self::feedback( $conversation, $message ) || ( self::applies( $conversation ) && self::answer( $conversation, $message ) ) ) {
 				return;
 			}
 		}
@@ -202,17 +242,118 @@ class KnowledgeAnswer {
 		}
 
 		self::count( 'not_helpful' );
-		self::gap( (string) ( $answer->meta['question'] ?? '' ), (int) $conversation->id );
+		$question = (string) ( $answer ? ( $answer->meta['question'] ?? '' ) : '' );
+		self::gap( $question, (int) $conversation->id );
 
-		if ( 'bot' === $conversation->handler && $conversation->ai_enabled ) {
-			// The assistant reads the whole exchange, so it knows what wasn't enough.
-			AiResponder::handle( (int) $conversation->id, (int) $message->id );
-		} else {
-			Outbound::send( $conversation, __( "No problem. I've passed this to our team, and someone will reply here soon.", 'zaplane' ), [ 'sender_type' => 'auto' ] );
-			self::set_meta( $conversation, [ 'kb_ack_at' => time() ] );
-			Conversations::system_note( $conversation, __( "The automatic answer didn't help. Over to the team.", 'zaplane' ) );
+		// Let the customer choose what happens next.
+		$options = [ self::more_label(), self::person_label() ];
+		if ( self::assistant_ready( $conversation ) ) {
+			array_unshift( $options, self::assistant_label() );
 		}
+		Outbound::send( $conversation, __( "Sorry that didn't help. What would you like to do?", 'zaplane' ), [
+			'sender_type' => 'auto',
+			'meta'        => [ 'quick_replies' => $options ],
+		] );
+		self::set_meta( $conversation, [
+			'kb_menu' => [
+				'question' => $question,
+				'at'       => time(),
+			],
+		] );
 		return true;
+	}
+
+	/**
+	 * The customer's pick after "Sorry that didn't help". Anything else is a
+	 * new question and goes on as usual.
+	 */
+	private static function menu_choice( Conversation $conversation, Message $message ): bool {
+		$menu = self::menu_pending( $conversation );
+		if ( ! $menu ) {
+			return false;
+		}
+		self::set_meta( $conversation, [ 'kb_menu' => null ] );
+
+		$said = trim( mb_strtolower( wp_strip_all_tags( (string) $message->body ) ), " \t\n.!?" );
+
+		if ( mb_strtolower( self::assistant_label() ) === $said && self::assistant_ready( $conversation ) ) {
+			// Answer the question that started it, not the button's text.
+			AiResponder::handle( (int) $conversation->id, (int) $message->id, (string) ( $menu['question'] ?? '' ) );
+			return true;
+		}
+
+		if ( mb_strtolower( self::more_label() ) === $said ) {
+			$questions = self::remaining_questions( $conversation );
+			if ( ! $questions ) {
+				$questions = self::faq_questions( 4 );
+			}
+			if ( ! $questions ) {
+				self::to_person( $conversation );
+				return true;
+			}
+			$questions[] = self::person_label();
+			Outbound::send( $conversation, __( 'Here are some questions people often ask:', 'zaplane' ), [
+				'sender_type' => 'auto',
+				'meta'        => [ 'quick_replies' => $questions ],
+			] );
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Hand the conversation to the team because the customer asked, tell the
+	 * customer, and keep automatic answers out of it for a day.
+	 */
+	public static function to_person( Conversation $conversation ): void {
+		$reason = __( 'the customer asked to talk to a person', 'zaplane' );
+		if ( 'bot' === $conversation->handler || $conversation->ai_enabled ) {
+			Conversations::hand_to_human( $conversation, $reason );
+		} else {
+			Conversations::system_note( $conversation, __( 'The customer asked to talk to a person.', 'zaplane' ) );
+			do_action( 'zaplane/inbox/handed_to_human', Conversations::payload( $conversation, [ 'reason' => $reason ] ) );
+		}
+
+		Outbound::send( $conversation, __( "Sure! I've let our team know, and someone will reply here soon.", 'zaplane' ), [ 'sender_type' => 'auto' ] );
+		self::set_meta( $conversation, [
+			'kb_person_at' => time(),
+			'kb_ack_at'    => time(),
+			'kb_pending'   => null,
+			'kb_menu'      => null,
+		] );
+	}
+
+	private static function assistant_ready( Conversation $conversation ): bool {
+		$ai = InboxSettings::get()['ai'];
+		return 'bot' === $conversation->handler && $conversation->ai_enabled && ! empty( $ai['enabled'] ) && ! empty( $ai['connection_id'] );
+	}
+
+	/** @return array{question:string,at:int}|null */
+	private static function menu_pending( Conversation $conversation ): ?array {
+		$meta = is_array( $conversation->meta ) ? $conversation->meta : [];
+		$menu = $meta['kb_menu'] ?? null;
+		return is_array( $menu ) && (int) ( $menu['at'] ?? 0 ) > time() - self::FEEDBACK_WINDOW ? $menu : null;
+	}
+
+	/**
+	 * FAQ questions from the knowledge in use, for "Other questions" when no
+	 * common questions are set.
+	 *
+	 * @return array<int,string>
+	 */
+	private static function faq_questions( int $limit ): array {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$titles = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT title FROM %i WHERE business_key = %s AND source = 'faq' AND title <> '' AND CHAR_LENGTH(title) <= 80 ORDER BY id ASC LIMIT %d",
+				\Zaplane\Models\Knowledge::getTable(),
+				(string) InboxSettings::get()['ai']['business_key'],
+				$limit
+			)
+		);
+		return array_values( array_map( 'strval', (array) $titles ) );
 	}
 
 	private static function answer( Conversation $conversation, Message $message ): bool {

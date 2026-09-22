@@ -40,7 +40,7 @@ class Router {
 
 	private static function awaiting_feedback( Conversation $conversation ): bool {
 		$meta = is_array( $conversation->meta ) ? $conversation->meta : [];
-		return ! empty( $meta['kb_pending'] );
+		return ! empty( $meta['kb_pending'] ) || ! empty( $meta['kb_menu'] );
 	}
 
 	/** Jobs queued in this request, to run as soon as the customer has their response. */

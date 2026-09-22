@@ -51,7 +51,12 @@ class AiResponder {
 		}
 	}
 
-	public static function handle( int $conversation_id, int $message_id ): void {
+	/**
+	 * @param string $task What to answer, when it isn't simply the customer's
+	 *                     latest messages (e.g. "Try our assistant" tapped after
+	 *                     an automatic answer: the task is the original question).
+	 */
+	public static function handle( int $conversation_id, int $message_id, string $task = '' ): void {
 		$ai = InboxSettings::get()['ai'];
 		if ( empty( $ai['enabled'] ) || empty( $ai['connection_id'] ) ) {
 			return;
@@ -68,7 +73,7 @@ class AiResponder {
 
 		self::$current = $conversation_id;
 		try {
-			self::reply( $conversation, $message_id, $ai );
+			self::reply( $conversation, $message_id, $ai, $task );
 		} finally {
 			self::$current = 0;
 			delete_option( self::lock_key( $conversation_id ) );
@@ -79,7 +84,7 @@ class AiResponder {
 	/**
 	 * @param array<string,mixed> $ai
 	 */
-	private static function reply( Conversation $conversation, int $message_id, array $ai ): void {
+	private static function reply( Conversation $conversation, int $message_id, array $ai, string $task_override = '' ): void {
 		try {
 			$credentials = ( new ConnectionManager() )->get_execution_credentials( (int) $ai['connection_id'] );
 		} catch ( \Throwable $e ) {
@@ -88,6 +93,9 @@ class AiResponder {
 		}
 
 		[ $history, $task ] = self::transcript( $conversation, $message_id );
+		if ( '' !== trim( $task_override ) ) {
+			$task = $task_override;
+		}
 		if ( '' === trim( $task ) ) {
 			return;
 		}

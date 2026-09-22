@@ -263,7 +263,7 @@
 	// Common questions stay one tap away for the whole chat.
 	var askBtn = null;
 	var askMenu = null;
-	if ( cfg.questions && cfg.questions.length ) {
+	if ( ( cfg.questions && cfg.questions.length ) || cfg.autoAnswers ) {
 		askBtn = el( 'button', 'zpi-ask' );
 		askBtn.type = 'button';
 		askBtn.setAttribute( 'aria-label', t.commonQuestions || 'Common questions' );
@@ -274,8 +274,13 @@
 		askMenu.hidden = true;
 		askMenu.setAttribute( 'role', 'menu' );
 		askMenu.appendChild( el( 'div', 'zpi-ask-title', t.commonQuestions || 'Common questions' ) );
-		cfg.questions.forEach( function ( question ) {
-			var item = el( 'button', 'zpi-ask-item', question );
+		// Asking for a person is always there, after the questions.
+		var askItems = ( cfg.questions || [] ).slice();
+		if ( cfg.autoAnswers && t.talkToPerson ) {
+			askItems.push( t.talkToPerson );
+		}
+		askItems.forEach( function ( question ) {
+			var item = el( 'button', 'zpi-ask-item' + ( question === t.talkToPerson ? ' zpi-ask-person' : '' ), question );
 			item.type = 'button';
 			item.setAttribute( 'role', 'menuitem' );
 			item.addEventListener( 'click', function () {
@@ -372,7 +377,7 @@
 			}
 			var qr = el( 'div', 'zpi-qr' );
 			m.quick_replies.forEach( function ( label ) {
-				var btn = el( 'button', 'zpi-qr-btn', label );
+				var btn = el( 'button', 'zpi-qr-btn' + ( label === t.talkToPerson ? ' zpi-qr-person' : '' ), label );
 				btn.type = 'button';
 				btn.addEventListener( 'click', function () {
 					text.value = label;

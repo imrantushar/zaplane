@@ -149,6 +149,7 @@ class InboxModule implements ModuleInterface {
 				'edited'      => __( 'edited', 'zaplane' ),
 				'readMore'    => __( 'Read more', 'zaplane' ),
 				'commonQuestions' => __( 'Common questions', 'zaplane' ),
+				'talkToPerson'    => Services\KnowledgeAnswer::person_label(),
 			],
 		] );
 	}
