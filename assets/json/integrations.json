@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-08 12:56:18",
+    "generated_at": "2026-09-21 09:21:56",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -14,7 +14,7 @@
             "webhook_setup": [],
             "triggers": {
                 "user_enroll_course": {
-                    "label": "User enrolled in a course",
+                    "label": "User Enrolled in Course",
                     "hook": "academy/course/after_enroll",
                     "key": "user_enroll_course",
                     "schema": [
@@ -22,6 +22,8 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
+                            "required": true,
+                            "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
                                 "query": "acourse",
@@ -29,32 +31,7 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "academy_quiz_course_attempt": {
-                    "label": "User attempted (submitted) a quiz",
-                    "hook": "academy_quizzes/api/after_quiz_attempt_finished",
-                    "key": "academy_quiz_course_attempt",
-                    "schema": [
-                        {
-                            "key": "quiz_id",
-                            "label": "Quiz",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "academy",
-                                "query": "quiz",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
+                            }
                         }
                     ],
                     "outputs": [
@@ -62,7 +39,7 @@
                     ]
                 },
                 "lesson_complete": {
-                    "label": "User completed a lesson",
+                    "label": "Lesson Completed",
                     "hook": "academy/frontend/after_mark_topic_complete",
                     "key": "lesson_complete",
                     "schema": [
@@ -70,6 +47,8 @@
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
+                            "required": true,
+                            "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
                                 "query": "lesson",
@@ -77,23 +56,14 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "course_complete": {
-                    "label": "User completed a course",
-                    "hook": "academy/admin/course_complete_after",
-                    "key": "course_complete",
-                    "schema": [
+                            }
+                        },
                         {
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
+                            "required": true,
+                            "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
                                 "query": "acourse",
@@ -101,23 +71,49 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "quiz_target": {
-                    "label": "User achieved target percentage on a quiz",
+                "course_complete": {
+                    "label": "Course Completed",
+                    "hook": "academy/admin/course_complete_after",
+                    "key": "course_complete",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_attempt_submitted": {
+                    "label": "Quiz Attempt Submitted",
                     "hook": "academy_quizzes/api/after_quiz_attempt_finished",
-                    "key": "quiz_target",
+                    "key": "quiz_attempt_submitted",
                     "schema": [
                         {
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
+                            "required": true,
+                            "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
                                 "query": "quiz",
@@ -125,16 +121,525 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_passed": {
+                    "label": "Quiz Passed",
+                    "hook": [
+                        "academy_quizzes/api/after_quiz_attempt_finished",
+                        "academy_quizzes/after_quiz_attempt_manual_review"
+                    ],
+                    "key": "quiz_passed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_failed": {
+                    "label": "Quiz Failed",
+                    "hook": [
+                        "academy_quizzes/api/after_quiz_attempt_finished",
+                        "academy_quizzes/after_quiz_attempt_manual_review"
+                    ],
+                    "key": "quiz_failed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_target": {
+                    "label": "Quiz Score Threshold Reached",
+                    "hook": [
+                        "academy_quizzes/api/after_quiz_attempt_finished",
+                        "academy_quizzes/after_quiz_attempt_manual_review"
+                    ],
+                    "key": "quiz_target",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "target_percentage",
-                            "label": "Target Percentage (%)",
+                            "label": "Minimum percentage (0-100)",
                             "type": "number",
                             "required": true
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_published": {
+                    "label": "Course Published",
+                    "hook": "transition_post_status",
+                    "key": "course_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lesson_published": {
+                    "label": "Lesson Published",
+                    "hook": "academy_new_lesson_published",
+                    "key": "lesson_published",
+                    "schema": [
+                        {
+                            "key": "lesson_id",
+                            "label": "Lesson",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "lesson",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_published": {
+                    "label": "Quiz Published",
+                    "hook": "transition_post_status",
+                    "key": "quiz_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "student_registered": {
+                    "label": "Student Registered",
+                    "hook": [
+                        "academy/admin/after_register_student",
+                        "academy/api/auth/after_student_registration",
+                        "academy/shortcode/after_student_registration",
+                        "academy/admin/after_student_registration"
+                    ],
+                    "key": "student_registered",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "instructor_registered": {
+                    "label": "Instructor Registered",
+                    "hook": [
+                        "academy/admin/after_register_instructor",
+                        "academy/api/auth/after_instructor_registration",
+                        "academy/shortcode/after_instructor_registration"
+                    ],
+                    "key": "instructor_registered",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_review_submitted": {
+                    "label": "Course Review Submitted",
+                    "hook": "academy/frontend/after_course_rating",
+                    "key": "course_review_submitted",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_question_asked": {
+                    "label": "Course Question Asked",
+                    "hook": "academy/frontend/insert_course_qa",
+                    "key": "course_question_asked",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_question_replied": {
+                    "label": "Course Question Replied",
+                    "hook": "academy/frontend/insert_course_qa_answered",
+                    "key": "course_question_replied",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "announcement_published": {
+                    "label": "Announcement Published",
+                    "hook": "transition_post_status",
+                    "key": "announcement_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assignment_published": {
+                    "label": "Assignment Published",
+                    "hook": "transition_post_status",
+                    "key": "assignment_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assignment_submitted": {
+                    "label": "Assignment Submitted",
+                    "hook": "academy_pro/frontend/submitted_assignment",
+                    "key": "assignment_submitted",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assignment_evaluated": {
+                    "label": "Assignment Evaluated",
+                    "hook": "academy_pro/frontend/evaluate_submitted_assignment",
+                    "key": "assignment_evaluated",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assignment_completed": {
+                    "label": "Assignment Completed",
+                    "hook": "academy/frontend/after_mark_topic_complete",
+                    "key": "assignment_completed",
+                    "schema": [
+                        {
+                            "key": "topic_id",
+                            "label": "Topic ID (optional; empty means any)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_booking_published": {
+                    "label": "Tutor Booking Published",
+                    "hook": "transition_post_status",
+                    "key": "tutor_booking_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_booking_booked": {
+                    "label": "Tutor Booking Booked",
+                    "hook": "academy_pro/booking/after_booked",
+                    "key": "tutor_booking_booked",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_booking_completed": {
+                    "label": "Tutor Booking Completed",
+                    "hook": "academy/frontend/after_mark_topic_complete",
+                    "key": "tutor_booking_completed",
+                    "schema": [
+                        {
+                            "key": "topic_id",
+                            "label": "Topic ID (optional; empty means any)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_booking_review_submitted": {
+                    "label": "Tutor Booking Review Submitted",
+                    "hook": "academy_pro/fronted/academy_booking_review",
+                    "key": "tutor_booking_review_submitted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "zoom_meeting_published": {
+                    "label": "Zoom Meeting Published",
+                    "hook": "academy_pro/frontend/after_zoom_publish",
+                    "key": "zoom_meeting_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "zoom_meeting_completed": {
+                    "label": "Zoom Meeting Completed",
+                    "hook": "academy/frontend/after_mark_topic_complete",
+                    "key": "zoom_meeting_completed",
+                    "schema": [
+                        {
+                            "key": "topic_id",
+                            "label": "Topic ID (optional; empty means any)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_bundle_published": {
+                    "label": "Course Bundle Published",
+                    "hook": "transition_post_status",
+                    "key": "course_bundle_published",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -142,21 +647,22 @@
             },
             "actions": {
                 "enroll-course": {
-                    "label": "Enroll in Course",
-                    "description": "Enroll a user in one or more courses.",
+                    "label": "Enroll User in Course",
+                    "description": "Enroll an existing WordPress user in a course.",
                     "key": "enroll-course",
                     "schema": [
                         {
                             "key": "user_id",
-                            "label": "User Email",
-                            "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
-                            "required": false
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
                         },
                         {
                             "key": "selectedCourse",
                             "label": "Courses",
                             "type": "select",
+                            "required": false,
                             "multiple": true,
                             "dynamic": {
                                 "integration": "academy",
@@ -165,14 +671,14 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "all_courses",
-                            "label": "Enroll in all courses",
+                            "label": "All courses",
                             "type": "checkbox",
-                            "help": "If checked, all published courses will be enrolled, ignoring the selection above."
+                            "required": false,
+                            "help": "Enroll in all published courses or cancel all active enrollments for this user."
                         }
                     ],
                     "outputs": [
@@ -180,21 +686,22 @@
                     ]
                 },
                 "unenroll-course": {
-                    "label": "Unenroll from Course",
-                    "description": "Unenroll a user from one or more courses.",
+                    "label": "Unenroll User from Course",
+                    "description": "Cancel the selected enrollment.",
                     "key": "unenroll-course",
                     "schema": [
                         {
                             "key": "user_id",
-                            "label": "User Email",
-                            "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
-                            "required": false
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
                         },
                         {
                             "key": "selectedCourse",
                             "label": "Courses",
                             "type": "select",
+                            "required": false,
                             "multiple": true,
                             "dynamic": {
                                 "integration": "academy",
@@ -203,36 +710,37 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "all_courses",
-                            "label": "Unenroll from all courses",
+                            "label": "All courses",
                             "type": "checkbox",
-                            "help": "If checked, all courses will be unenrolled, ignoring the selection above."
+                            "required": false,
+                            "help": "Enroll in all published courses or cancel all active enrollments for this user."
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "complete-lesson": {
-                    "label": "Complete Lesson",
-                    "description": "Mark a specific lesson as complete for the user.",
-                    "key": "complete-lesson",
+                "complete-course": {
+                    "label": "Mark Course Complete for User",
+                    "description": "Record Academy course completion.",
+                    "key": "complete-course",
                     "schema": [
                         {
                             "key": "user_id",
-                            "label": "User Email",
-                            "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
-                            "required": false
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
                         },
                         {
                             "key": "selectedCourse",
                             "label": "Course",
                             "type": "select",
+                            "required": true,
                             "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
@@ -241,13 +749,51 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
+                        },
+                        {
+                            "key": "force_completion",
+                            "label": "Allow completion with unfinished topics",
+                            "type": "checkbox",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "complete-lesson": {
+                    "label": "Mark Lesson Complete for User",
+                    "description": "Mark a course curriculum lesson complete.",
+                    "key": "complete-lesson",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "selectedLesson",
                             "label": "Lesson",
                             "type": "select",
+                            "required": true,
                             "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
@@ -256,30 +802,30 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "complete-course": {
-                    "label": "Complete Course",
-                    "description": "Mark an entire course as completed for the user.",
-                    "key": "complete-course",
+                "reset-course-progress": {
+                    "label": "Reset User Course Progress",
+                    "description": "Remove completed-topic progress and course-completion record without cancelling enrollment or deleting quiz attempt history.",
+                    "key": "reset-course-progress",
                     "schema": [
                         {
                             "key": "user_id",
-                            "label": "User Email",
-                            "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
-                            "required": false
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
                         },
                         {
                             "key": "selectedCourse",
                             "label": "Course",
                             "type": "select",
+                            "required": true,
                             "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
@@ -288,8 +834,141 @@
                                     "name",
                                     "label"
                                 ]
-                            },
+                            }
+                        },
+                        {
+                            "key": "confirm_reset",
+                            "label": "I understand completed topics and course completion will be deleted",
+                            "type": "checkbox",
                             "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add-to-wishlist": {
+                    "label": "Add Course to Wishlist",
+                    "description": "Add selected courses to Academy wishlist.",
+                    "key": "add-to-wishlist",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Courses",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove-from-wishlist": {
+                    "label": "Remove Course from Wishlist",
+                    "description": "Remove selected courses from Academy wishlist.",
+                    "key": "remove-from-wishlist",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Courses",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assign-instructor": {
+                    "label": "Assign Instructor to Course",
+                    "description": "Assign approved instructor to selected courses.",
+                    "key": "assign-instructor",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Courses",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove-instructor": {
+                    "label": "Remove Instructor from Course",
+                    "description": "Remove an instructor assignment; cannot remove the author.",
+                    "key": "remove-instructor",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Courses",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [

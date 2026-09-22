@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-14T06:55:41+00:00\n"
+"POT-Creation-Date: 2026-09-21T04:23:16+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: zaplane\n"
@@ -547,7 +547,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:456
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:528
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:634
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:251
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:251
 msgid "Cancel"
 msgstr ""
 
@@ -803,7 +803,7 @@ msgstr ""
 
 #: dev_zaplane/components/FolderCell/index.js:133
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/parts.js:151
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ConditionGroupField/ConditionGroupField.js:62
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ConditionGroupField/ConditionGroupField.js:62
 msgid "Add"
 msgstr ""
 
@@ -887,12 +887,12 @@ msgid "%s"
 msgstr ""
 
 #: dev_zaplane/components/LogDetails/index.js:59
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestDetails/TestDetails.js:34
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestDetails/TestDetails.js:34
 msgid "Input"
 msgstr ""
 
 #: dev_zaplane/components/LogDetails/index.js:66
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestDetails/TestDetails.js:42
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestDetails/TestDetails.js:42
 msgid "Output"
 msgstr ""
 
@@ -932,7 +932,7 @@ msgstr ""
 
 #: dev_zaplane/components/SearchableDrawerList/DrawerItemList/DrawerItemButton.js:27
 #: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:40
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:244
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:244
 msgid "App"
 msgstr ""
 
@@ -1257,12 +1257,12 @@ msgid "Create credential"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:76
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:191
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:191
 msgid "Connecting..."
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:76
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:192
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:192
 msgid "Save Connection"
 msgstr ""
 
@@ -1442,7 +1442,7 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:84
 #: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:243
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:218
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:218
 msgid "Saving…"
 msgstr ""
 
@@ -1578,7 +1578,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/parts.js:143
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:490
 #: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:518
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:230
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:230
 msgid "Remove"
 msgstr ""
 
@@ -1765,7 +1765,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:413
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:459
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:637
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:191
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:191
 msgid "Saving..."
 msgstr ""
 
@@ -1991,8 +1991,8 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:413
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:637
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:258
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:218
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:258
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:218
 msgid "Save"
 msgstr ""
 
@@ -2723,227 +2723,227 @@ msgstr[1] ""
 msgid "connected app"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:112
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:128
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:112
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:128
 msgid "This field is required"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:139
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:139
 msgid "Enter a valid email address"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:151
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:151
 msgid "A connection is required"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:244
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:244
 msgid "Add Trigger"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:244
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:244
 msgid "Add Action"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:258
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:258
 msgid "Continue"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:265
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:265
 msgid "Search apps or tools..."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:296
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:296
 msgid "No configuration required for this action."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:75
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:75
 msgid "Save the workflow to generate its webhook URL."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:130
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:130
 msgid "name@example.com — or type \"@\" for dynamic data"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:168
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:168
 msgid "Type \"@\" here to add dynamic"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:186
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:186
 msgid "Select a file"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:187
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:187
 msgid "Use this file"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:223
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:223
 msgid "Change"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:240
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:240
 msgid "Upload or select a file"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/CopyInput.js:15
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/CopyInput.js:15
 msgid "Copied to clipboard!"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/CopyInput.js:36
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/CopyInput.js:36
 msgid "Copy to clipboard"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ConditionGroupField/ConditionGroupField.js:29
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ConditionGroupField/ConditionGroupField.js:29
 msgid "OR"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ConditionGroupField/ConditionGroupField.js:48
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ConditionGroupField/ConditionGroupField.js:48
 msgid "Type \"@\" here to..."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ConditionGroupField/ConditionGroupField.js:83
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ConditionGroupField/ConditionGroupField.js:83
 msgid "OR Group"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/RepeaterField/RepeaterField.js:70
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/RepeaterField/RepeaterField.js:70
 msgid "Add Row"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:112
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:41
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:112
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:41
 msgid "Create New Connection"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:192
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:192
 msgid "Connect with OAuth"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:47
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:47
 msgid "Select Connection"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:48
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:48
 msgid "Select a connection"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/SelectTab.js:20
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:20
 msgid "Trigger Type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/SelectTab.js:21
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:21
 msgid "Action Type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/SelectTab.js:29
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:29
 msgid "Select Action Type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:79
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:79
 msgid "Webhook settings saved."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:89
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:89
 msgid "Could not save the webhook settings."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:116
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:116
 msgid "Webhook Setup"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:128
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:128
 msgid "Hide"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:128
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:128
 msgid "Show"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:136
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:136
 msgid "Callback URL"
 msgstr ""
 
 #. translators: %s: integration name, e.g. Slack.
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:140
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:140
 #, js-format
 msgid "Paste this into %s so it delivers events here. This trigger cannot fire until it does."
 msgstr ""
 
 #. translators: %s: comma-separated list of setting names.
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:152
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:152
 #, js-format
 msgid "Set %s below before registering the URL — until then the provider's verification is rejected and deliveries are not authenticated."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:170
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:170
 msgid "saved"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:181
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:181
 msgid "••••••••  (leave blank to keep)"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:191
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:191
 msgid "Generate a value"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:105
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js:105
 msgid "Test Trigger"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:107
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js:107
 msgid "Stop Listening"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:110
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js:110
 msgid "Listening for trigger…"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:110
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js:110
 msgid "Go perform the action that fires this trigger (for example, submit the form). The captured data will appear below."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:118
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js:118
 msgid "Test Action"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:114
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:114
 #, js-format
 msgid "Trigger %1$d · %2$s"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:136
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:136
 msgid "Match fields to another trigger"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:138
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:138
 msgid "Steps built for another trigger read its fields, such as {{1.email}}. When this trigger fires, those fields take the values you match here."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:143
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:143
 msgid "Trigger to match"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:147
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:147
 msgid "Don't match fields"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:159
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:159
 msgid "Loading fields…"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:164
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:164
 msgid "That trigger has no fields to match yet. Test it once to capture its data."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:172
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:172
 #, js-format
 msgid "%1$d of %2$d fields matched"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:179
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:179
 msgid "Match same names"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:200
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:200
 msgid "Not matched"
 msgstr ""
 
