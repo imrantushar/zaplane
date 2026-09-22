@@ -89,7 +89,12 @@ class Messenger extends MetaChannel {
 		$message_id = '';
 		$attach     = [];
 		if ( $message ) {
-			$body       = (string) ( $message['text'] ?? '' );
+			$body = (string) ( $message['text'] ?? '' );
+			// A tapped quick reply carries its full text (the title may be cut).
+			$qr = (string) ( $message['quick_reply']['payload'] ?? '' );
+			if ( 0 === strpos( $qr, 'ZAPLANE_QR:' ) ) {
+				$body = substr( $qr, strlen( 'ZAPLANE_QR:' ) );
+			}
 			$message_id = (string) ( $message['mid'] ?? '' );
 			$attach     = self::attachments( $message );
 		} elseif ( is_array( $event['postback'] ?? null ) ) {
@@ -253,7 +258,8 @@ class Messenger extends MetaChannel {
 				return [
 					'content_type' => 'text',
 					'title'        => mb_substr( (string) $title, 0, 20 ),
-					'payload'      => 'ZAPLANE_QR_' . $i,
+					// The full text rides in the payload: titles are cut at 20.
+					'payload'      => 'ZAPLANE_QR:' . mb_substr( (string) $title, 0, 900 ),
 				];
 			}, array_values( $buttons ), array_keys( array_values( $buttons ) ) );
 		}

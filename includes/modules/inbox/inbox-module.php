@@ -126,6 +126,8 @@ class InboxModule implements ModuleInterface {
 			'askEmail' => (bool) $widget['ask_email'],
 			// Buttons under the greeting, before the visitor has typed anything.
 			'questions' => array_values( (array) ( Settings::get()['answers']['common_questions'] ?? [] ) ),
+			// Knowledge may answer on its own, so show "typing…" after sending.
+			'autoAnswers' => ! empty( Settings::get()['answers']['enabled'] ),
 			'aiName'   => $ai_on ? $agent : '',
 			/* translators: %s: assistant name. */
 			'aiLabel'  => $ai_on ? sprintf( __( '%s · AI assistant', 'zaplane' ), $agent ) : '',
@@ -146,7 +148,7 @@ class InboxModule implements ModuleInterface {
 				'deleted'     => __( 'Message deleted', 'zaplane' ),
 				'edited'      => __( 'edited', 'zaplane' ),
 				'readMore'    => __( 'Read more', 'zaplane' ),
-				'didItHelp'   => __( 'Did this answer your question?', 'zaplane' ),
+				'commonQuestions' => __( 'Common questions', 'zaplane' ),
 			],
 		] );
 	}

@@ -242,7 +242,7 @@ const Message = ({ m, contact, first, last, onReply, onEdit, onDelete, onJump, o
 
         {byKnowledge && (m.quick_replies || []).length > 0 && (
           <div className="zaplane-inbox-qr" aria-label={__("Buttons the customer sees", "zaplane")}>
-            <em>{__("Did this answer your question?", "zaplane")}</em>
+            {m.quick_prompt && <em>{m.quick_prompt}</em>}
             {m.quick_replies.map((q) => (
               <span key={q} className={meta.feedback && q === (meta.feedback === "yes" ? m.quick_replies[0] : m.quick_replies[1]) ? "is-picked" : ""}>
                 {q}

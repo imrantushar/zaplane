@@ -208,6 +208,13 @@
 #zpi-root .zpi-starters { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-top: 8px; }
 #zpi-root .zpi-starter { max-width: 100%; padding: 7px 12px; border: 1px solid var(--zpi-color); border-radius: 14px; background: var(--zpi-bg, #fff); color: var(--zpi-color); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
 #zpi-root .zpi-starter:hover { background: var(--zpi-color); color: #fff; }
+#zpi-root .zpi-ask { flex: none; width: 36px; height: 36px; border: 1px solid var(--zpi-border); border-radius: 50%; background: var(--zpi-bg, #fff); color: var(--zpi-color); font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+#zpi-root .zpi-ask[aria-expanded="true"], #zpi-root .zpi-ask:hover { border-color: var(--zpi-color); background: var(--zpi-color); color: #fff; }
+#zpi-root .zpi-ask-menu { display: flex; flex-direction: column; gap: 6px; margin: 0 0 8px; padding: 10px; border: 1px solid var(--zpi-border); border-radius: 12px; background: var(--zpi-bg, #fff); box-shadow: 0 6px 20px rgba(16, 24, 40, 0.12); }
+#zpi-root .zpi-ask-menu[hidden] { display: none; }
+#zpi-root .zpi-ask-title { font-size: 12px; font-weight: 600; color: var(--zpi-muted); }
+#zpi-root .zpi-ask-item { padding: 7px 10px; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+#zpi-root .zpi-ask-item:hover { background: rgba(127, 127, 127, 0.1); color: var(--zpi-color); }
 #zpi-root .zpi-qr-prompt { margin-top: 8px; font-size: 12px; color: var(--zpi-muted); }
 #zpi-root .zpi-qr { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 #zpi-root .zpi-qr-btn { padding: 6px 12px; border: 1px solid var(--zpi-color); border-radius: 999px; background: transparent; color: var(--zpi-color); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }

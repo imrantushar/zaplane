@@ -45,6 +45,9 @@ class KnowledgeAnswer {
 
 	private const MAX_GAPS = 100;
 
+	/** "Our team will reply soon" is said at most this often per conversation. */
+	private const ACK_EVERY = 12 * HOUR_IN_SECONDS;
+
 	/** Button labels; Messenger and WhatsApp cut them at 20 characters. */
 	public static function yes_label(): string {
 		return __( 'Yes, thanks', 'zaplane' );
@@ -105,7 +108,42 @@ class KnowledgeAnswer {
 		$fresh = Conversations::find( $conversation_id );
 		if ( $fresh && 'bot' === $fresh->handler && $fresh->ai_enabled ) {
 			AiResponder::handle( $conversation_id, $message_id );
+			return;
 		}
+
+		// A person will answer. Say so (once in a while), so the customer isn't
+		// left wondering whether anyone saw the message.
+		if ( $fresh && self::applies( $fresh ) ) {
+			$meta = is_array( $fresh->meta ) ? $fresh->meta : [];
+			if ( (int) ( $meta['kb_ack_at'] ?? 0 ) < time() - self::ACK_EVERY ) {
+				Outbound::send( $fresh, __( 'Thanks! Our team will reply here soon.', 'zaplane' ), [ 'sender_type' => 'auto' ] );
+				self::set_meta( $fresh, [ 'kb_ack_at' => time() ] );
+			}
+		}
+	}
+
+	/**
+	 * Common questions this customer hasn't asked yet in this conversation.
+	 *
+	 * @return array<int,string>
+	 */
+	private static function remaining_questions( Conversation $conversation ): array {
+		$common = array_values( (array) ( InboxSettings::get()['answers']['common_questions'] ?? [] ) );
+		if ( ! $common ) {
+			return [];
+		}
+		// Compare meaningful words, so "what is your return policy" counts as
+		// having asked "What is your return policy?".
+		$key   = static function ( string $text ): string {
+			$words = KnowledgeMatch::words( $text );
+			sort( $words );
+			return implode( ' ', $words );
+		};
+		$asked = [];
+		foreach ( Message::where( 'conversation_id', (int) $conversation->id )->where( 'sender_type', 'contact' )->fresh()->get()->all() as $m ) {
+			$asked[ $key( (string) $m->body ) ] = true;
+		}
+		return array_values( array_filter( $common, static fn( $q ) => ! isset( $asked[ $key( (string) $q ) ] ) ) );
 	}
 
 	/**
@@ -152,7 +190,14 @@ class KnowledgeAnswer {
 
 		if ( $yes ) {
 			self::count( 'helpful' );
-			Outbound::send( $conversation, __( 'Glad that helped! 😊', 'zaplane' ), [ 'sender_type' => 'auto' ] );
+			$more = self::remaining_questions( $conversation );
+			Outbound::send( $conversation, $more ? __( 'Glad that helped! 😊 Anything else?', 'zaplane' ) : __( 'Glad that helped! 😊', 'zaplane' ), [
+				'sender_type' => 'auto',
+				'meta'        => [
+					'quick_replies' => $more,
+					'quick_prompt'  => $more ? __( 'You can also ask:', 'zaplane' ) : '',
+				],
+			] );
 			return true;
 		}
 
@@ -163,6 +208,8 @@ class KnowledgeAnswer {
 			// The assistant reads the whole exchange, so it knows what wasn't enough.
 			AiResponder::handle( (int) $conversation->id, (int) $message->id );
 		} else {
+			Outbound::send( $conversation, __( "No problem. I've passed this to our team, and someone will reply here soon.", 'zaplane' ), [ 'sender_type' => 'auto' ] );
+			self::set_meta( $conversation, [ 'kb_ack_at' => time() ] );
 			Conversations::system_note( $conversation, __( "The automatic answer didn't help. Over to the team.", 'zaplane' ) );
 		}
 		return true;
@@ -208,6 +255,7 @@ class KnowledgeAnswer {
 				],
 				'question'      => mb_substr( $question, 0, 500 ),
 				'quick_replies' => $ask ? [ self::yes_label(), self::no_label() ] : [],
+				'quick_prompt'  => $ask ? __( 'Did this answer your question?', 'zaplane' ) : '',
 			],
 		] );
 

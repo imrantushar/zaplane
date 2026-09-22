@@ -316,17 +316,32 @@ class WidgetController {
 	/**
 	 * The assistant owes the latest customer message a reply.
 	 */
+	/**
+	 * Whether an answer is on its way: the customer spoke last and the
+	 * assistant owns the conversation, or an automatic-answer job for that
+	 * message is still queued or running. Never for long: after a minute the
+	 * dots go away even if nothing came.
+	 */
 	private function assistant_is_typing( Conversation $conversation ): bool {
-		if ( 'bot' !== $conversation->handler || ! $conversation->ai_enabled ) {
-			return false;
-		}
-
 		$last = Message::where( 'conversation_id', (int) $conversation->id )
 			->where( 'is_note', 0 )
 			->orderBy( 'id', 'desc' )
 			->fresh()
 			->first();
+		if ( ! $last || 'contact' !== $last->sender_type ) {
+			return false;
+		}
 
-		return $last && 'contact' === $last->sender_type;
+		$at = strtotime( get_gmt_from_date( (string) $last->created_at ) . ' UTC' );
+		if ( $at && $at < time() - MINUTE_IN_SECONDS ) {
+			return false;
+		}
+
+		if ( 'bot' === $conversation->handler && $conversation->ai_enabled ) {
+			return true;
+		}
+
+		return function_exists( 'as_has_scheduled_action' )
+			&& as_has_scheduled_action( \Zaplane\Modules\Inbox\Services\KnowledgeAnswer::HOOK, [ (int) $conversation->id, (int) $last->id ], \Zaplane\Modules\Inbox\Services\Router::AS_GROUP );
 	}
 }

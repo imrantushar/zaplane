@@ -15,6 +15,8 @@
 
 	var STORE_KEY = 'zaplane_inbox_visitor';
 	var OPEN_POLL = 3000;
+	// While an answer is on its way, look sooner.
+	var WAITING_POLL = 1200;
 	var IDLE_POLL = 20000;
 	var t = cfg.i18n || {};
 
@@ -162,7 +164,7 @@
 		}
 		state.timer = window.setTimeout( function () {
 			poll().then( schedule, schedule );
-		}, state.open ? OPEN_POLL : IDLE_POLL );
+		}, state.open ? ( state.waiting ? WAITING_POLL : OPEN_POLL ) : IDLE_POLL );
 	}
 
 	/* ---------------------------------------------------------------- *
@@ -258,6 +260,38 @@
 	send.type = 'submit';
 	send.setAttribute( 'aria-label', t.send || 'Send' );
 	send.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 21 3l-8.5 18-2.2-7.3L3 11.5z" fill="currentColor"/></svg>';
+	// Common questions stay one tap away for the whole chat.
+	var askBtn = null;
+	var askMenu = null;
+	if ( cfg.questions && cfg.questions.length ) {
+		askBtn = el( 'button', 'zpi-ask' );
+		askBtn.type = 'button';
+		askBtn.setAttribute( 'aria-label', t.commonQuestions || 'Common questions' );
+		askBtn.setAttribute( 'aria-expanded', 'false' );
+		askBtn.title = t.commonQuestions || 'Common questions';
+		askBtn.textContent = '?';
+		askMenu = el( 'div', 'zpi-ask-menu' );
+		askMenu.hidden = true;
+		askMenu.setAttribute( 'role', 'menu' );
+		askMenu.appendChild( el( 'div', 'zpi-ask-title', t.commonQuestions || 'Common questions' ) );
+		cfg.questions.forEach( function ( question ) {
+			var item = el( 'button', 'zpi-ask-item', question );
+			item.type = 'button';
+			item.setAttribute( 'role', 'menuitem' );
+			item.addEventListener( 'click', function () {
+				askMenu.hidden = true;
+				askBtn.setAttribute( 'aria-expanded', 'false' );
+				text.value = question;
+				form.requestSubmit ? form.requestSubmit() : form.dispatchEvent( new Event( 'submit', { cancelable: true } ) );
+			} );
+			askMenu.appendChild( item );
+		} );
+		askBtn.addEventListener( 'click', function () {
+			askMenu.hidden = ! askMenu.hidden;
+			askBtn.setAttribute( 'aria-expanded', askMenu.hidden ? 'false' : 'true' );
+		} );
+		row.appendChild( askBtn );
+	}
 	row.appendChild( text );
 	row.appendChild( send );
 
@@ -265,6 +299,9 @@
 	error.hidden = true;
 
 	form.appendChild( details );
+	if ( askMenu ) {
+		form.appendChild( askMenu );
+	}
 	form.appendChild( row );
 	form.appendChild( error );
 
@@ -330,8 +367,8 @@
 			node.parentNode.removeChild( node );
 		} );
 		if ( ! mine && ! m.deleted && m.quick_replies && m.quick_replies.length ) {
-			if ( m.sender_type === 'auto' ) {
-				item.appendChild( el( 'div', 'zpi-qr-prompt', t.didItHelp || 'Did this answer your question?' ) );
+			if ( m.quick_prompt ) {
+				item.appendChild( el( 'div', 'zpi-qr-prompt', m.quick_prompt ) );
 			}
 			var qr = el( 'div', 'zpi-qr' );
 			m.quick_replies.forEach( function ( label ) {
@@ -532,7 +569,9 @@
 				text.style.height = 'auto';
 				details.hidden = true;
 				addMessage( res.data.message );
-				if ( cfg.aiName ) {
+				// Something will answer on its own (knowledge or the assistant):
+				// show it's on the way. The next poll says when it's done.
+				if ( cfg.aiName || cfg.autoAnswers ) {
 					setWaiting( true );
 				}
 				schedule();

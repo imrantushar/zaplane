@@ -225,7 +225,14 @@ class Whatsapp extends MetaChannel {
 		// Up to three tappable answers ("Did this answer your question?") make
 		// it an interactive message; tapping one comes back as its title.
 		$buttons = array_slice( array_filter( (array) ( $message->meta['quick_replies'] ?? [] ) ), 0, 3 );
-		if ( $buttons && mb_strlen( (string) $message->body ) <= 1024 ) {
+		// WhatsApp buttons hold 20 characters and send back only their title,
+		// so longer labels (full questions) are left as plain text.
+		$fits = ! array_filter( $buttons, static fn( $b ) => mb_strlen( (string) $b ) > 20 );
+		if ( $buttons && ! $fits ) {
+			// Show them as a list instead, so the customer can copy one.
+			$payload['text']['body'] = (string) $message->body . "\n\n" . implode( "\n", array_map( static fn( $b ) => '• ' . $b, $buttons ) );
+		}
+		if ( $buttons && $fits && mb_strlen( (string) $message->body ) <= 1024 ) {
 			unset( $payload['text'] );
 			$payload['type']        = 'interactive';
 			$payload['interactive'] = [

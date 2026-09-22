@@ -103,6 +103,7 @@ class Presenter {
 			'deleted'     => ! empty( $meta['deleted_at'] ),
 			// Buttons offered under an automatic answer ("Did this answer…?").
 			'quick_replies' => array_values( array_filter( array_map( 'strval', (array) ( $meta['quick_replies'] ?? [] ) ) ) ),
+			'quick_prompt'  => (string) ( $meta['quick_prompt'] ?? '' ),
 			'reply_to'    => $quote ? [
 				'id'          => (int) ( $quote['id'] ?? 0 ),
 				'sender_name' => (string) ( $quote['sender_name'] ?? '' ),
