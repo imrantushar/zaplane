@@ -106,7 +106,7 @@ const ConnectorCard = ({ connector: c, onChanged, children }) => {
           {errors.map((e) => (
             <div key={e}>{e}</div>
           ))}
-          {errors.some((e) => /needs a connection/i.test(e)) && (
+          {errors.some((e) => /needs a connection|Link (a|an) .*account/i.test(e)) && (
             <div className="zaplane-inbox-hint">
               {__("Add the connection in Connections, then open each workflow and choose it on the steps that ask for it.", "zaplane")}{" "}
               <a href="admin.php?page=zaplane-connections">

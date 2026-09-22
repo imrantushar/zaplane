@@ -108,11 +108,13 @@ export const makeRequest = async (
  * (a string, or { message }), so callers can show it as it is.
  */
 export const processAjaxError = ( data, response = null, cause = null ) => {
-    const message =
+    const raw =
         ( typeof data === 'string' && data ) ||
         data?.message ||
         cause?.message ||
         __( 'Something went wrong. Please try again.', 'zaplane' );
+    // Some messages arrive HTML-escaped (&quot;…); show them as text.
+    const message = new DOMParser().parseFromString( String( raw ), 'text/html' ).documentElement.textContent;
     const error = new Error( message );
     error.response = response;
     error.data = data;
