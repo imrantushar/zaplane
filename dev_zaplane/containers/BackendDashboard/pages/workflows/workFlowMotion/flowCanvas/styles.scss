@@ -412,3 +412,31 @@
 .zaplane-scope .zaplane_flowcanvas > .zaplane-topbar {
 	margin-bottom: 0;
 }
+
+// Renaming the workflow in the top bar: a real text field while editing.
+.zaplane-topbar .zaplane-title-input {
+	max-width: min(520px, 45vw);
+	height: 34px;
+	margin: 0;
+	padding: 0 10px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 8px;
+	background: var(--zaplane-background, #fff);
+	box-shadow: none;
+	color: var(--zaplane-font-color);
+	font: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 32px;
+	transition: border-color 0.15s, box-shadow 0.15s;
+
+	&:hover {
+		border-color: color-mix(in srgb, var(--zaplane-primary) 45%, var(--zaplane-border-color));
+	}
+
+	&:focus {
+		border-color: var(--zaplane-primary);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--zaplane-primary) 18%, transparent);
+		outline: none;
+	}
+}
