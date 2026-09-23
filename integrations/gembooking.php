@@ -608,35 +608,190 @@ class Gembooking extends IntegrationBase {
 		];
 	}
 
+	private static function booking_type_field(): array {
+		return [
+			[
+				'key'      => 'booking_type',
+				'label'    => 'Booking Type',
+				'type'     => 'select',
+				'required' => true,
+				'options'  => [
+					[ 'value' => 'service', 'label' => 'Service' ],
+					[ 'value' => 'event', 'label' => 'Event' ],
+					[ 'value' => 'resource', 'label' => 'Resource' ],
+					[ 'value' => 'package', 'label' => 'Package' ],
+				],
+			],
+		];
+	}
+
+	private static function bookable_field(): array {
+		return [
+			[
+				'key'      => 'bookable',
+				'label'    => 'Bookable',
+				'type'     => 'select',
+				'required' => true,
+				'dynamic'  => [
+					'integration' => 'gembooking',
+					'query'       => 'gembooking_bookable_query',
+					'select'      => [ 'value', 'label' ],
+					'depends_on'  => [ 'booking_type' ],
+				],
+			],
+		];
+	}
+
+	private static function package_id_field(): array {
+		return [
+			[
+				'key'      => 'package_id',
+				'label'    => 'Package',
+				'type'     => 'select',
+				'required' => true,
+				'dynamic'  => [
+					'integration' => 'gembooking',
+					'query'       => 'gembooking_package_query',
+					'select'      => [ 'value', 'label' ],
+				],
+			],
+		];
+	}
+
+	private static function timezone_field(): array {
+		return [
+			[
+				'key'      => 'timezone',
+				'label'    => 'Timezone',
+				'type'     => 'select',
+				'required' => false,
+				'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
+				'dynamic'  => [
+					'integration' => 'gembooking',
+					'query'       => 'gembooking_timezone_query',
+					'select'      => [ 'value', 'label' ],
+				],
+			],
+		];
+	}
+
+	private static function start_at_field(): array {
+		return [
+			[
+				'key'      => 'start_at',
+				'label'    => 'Start At',
+				'type'     => 'datetime',
+				'required' => true,
+				'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
+			],
+		];
+	}
+
+	private static function end_at_field(): array {
+		return [
+			[
+				'key'      => 'end_at',
+				'label'    => 'End At',
+				'type'     => 'datetime',
+				'required' => true,
+				'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
+			],
+		];
+	}
+
+	private static function first_name_field(): array {
+		return [
+			[
+				'key' => 'first_name',
+				'label' => 'First Name',
+				'type' => 'text',
+				'required' => true,
+			],
+		];
+	}
+
+	private static function last_name_field(): array {
+		return [
+			[
+				'key' => 'last_name',
+				'label' => 'Last Name',
+				'type' => 'text',
+				'required' => false,
+			],
+		];
+	}
+
+	private static function email_field(): array {
+		return [
+			[
+				'key'      => 'email',
+				'label'    => 'Email',
+				'type'     => 'email',
+				'required' => true,
+			],
+		];
+	}
+
+	private static function reason_field(): array {
+		return [
+			[
+				'key'      => 'reason',
+				'label'    => 'Reason',
+				'type'     => 'textarea',
+				'required' => false,
+			],
+		];
+	}
+
+	private static function message_field(): array {
+		return [
+			[
+				'key' => 'message',
+				'label' => 'Message',
+				'type' => 'textarea',
+				'required' => true,
+			],
+		];
+	}
+
+	private static function team_id_field(): array {
+		return [
+			[
+				'key' => 'team_id',
+				'label' => 'Staff Member ID',
+				'type' => 'number',
+				'required' => true,
+			],
+		];
+	}
+
+	private static function phone_field(): array {
+		return [
+			[
+				'key' => 'phone',
+				'label' => 'Phone Number',
+				'type' => 'number',
+				'required' => true,
+			],
+		];
+	}
+
+	private static function ticket_code_field(): array {
+		return [
+			[
+				'key' => 'ticket_code',
+				'label' => 'Ticket Code',
+				'type' => 'text',
+				'required' => true,
+			],
+		];
+	}
+
 	public static function get_action_config_schema( string $action ): array {
 		$schemas = [
 			'create_booking' => [
-				[
-					'key'      => 'booking_type',
-					'label'    => 'Booking Type',
-					'type'     => 'select',
-					'required' => true,
-					'options'  => [
-						[ 'value' => 'service', 'label' => 'Service' ],
-						[ 'value' => 'event', 'label' => 'Event' ],
-						[ 'value' => 'resource', 'label' => 'Resource' ],
-						[ 'value' => 'package', 'label' => 'Package' ],
-					],
-				],
-				[
-					'key'      => 'bookable',
-					'label'    => 'Bookable',
-					'type'     => 'select',
-					'required' => true,
-					'dynamic'  => [
-						'integration' => 'gembooking',
-						'query'       => 'gembooking_bookable_query',
-						'select'      => [ 'value', 'label' ],
-						'depends_on'  => [ 'booking_type' ],
-					],
-				],
-
-				// --- Package flow (booking_type = package) ---
+				...self::booking_type_field(),
+				...self::bookable_field(),
 				[
 					'key'      => 'customer_id',
 					'label'    => 'Existing Customer (search by name or email)',
@@ -650,40 +805,15 @@ class Gembooking extends IntegrationBase {
 					],
 				],
 				[
-					'key'      => 'customer_email',
+					'key'      => 'email',
 					'label'    => 'Or Customer Email (no account yet)',
 					'type'     => 'email',
 					'required' => false,
 					'show_if'  => [ 'booking_type' => 'package' ],
 				],
-
-				// --- Service / Event / Resource flow ---
-				[
-					'key'      => 'start_at',
-					'label'    => 'Start At',
-					'type'     => 'datetime',
-					'required' => true,
-					'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
-				],
-				[
-					'key'      => 'end_at',
-					'label'    => 'End At',
-					'type'     => 'datetime',
-					'required' => true,
-					'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
-				],
-				[
-					'key'      => 'timezone',
-					'label'    => 'Timezone',
-					'type'     => 'select',
-					'required' => false,
-					'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
-					'dynamic'  => [
-						'integration' => 'gembooking',
-						'query'       => 'gembooking_timezone_query',
-						'select'      => [ 'value', 'label' ],
-					],
-				],
+				...self::start_at_field(),
+				...self::end_at_field(),
+				...self::timezone_field(),
 				[
 					'key'      => 'first_name',
 					'label'    => 'Customer Name',
@@ -751,27 +881,12 @@ class Gembooking extends IntegrationBase {
 			],
 			'reschedule_booking' => [
 				...self::booking_id_field(),
-				[
-					'key'      => 'start_at',
-					'label'    => 'New Start At',
-					'type'     => 'datetime',
-					'required' => true,
-				],
-				[
-					'key'      => 'end_at',
-					'label'    => 'New End At',
-					'type'     => 'datetime',
-					'required' => true,
-				],
+				...self::start_at_field(),
+				...self::end_at_field(),
 			],
 			'cancel_booking' => [
 				...self::booking_id_field(),
-				[
-					'key'      => 'reason',
-					'label'    => 'Reason',
-					'type'     => 'textarea',
-					'required' => false,
-				],
+				...self::reason_field(),
 			],
 			'delete_booking' => [
 				...self::booking_id_field(),
@@ -787,12 +902,7 @@ class Gembooking extends IntegrationBase {
 			],
 			'reply_customer' => [
 				...self::booking_id_field(),
-				[
-					'key' => 'message',
-					'label' => 'Message',
-					'type' => 'textarea',
-					'required' => true,
-				],
+				...self::message_field(),
 			],
 			'update_booking_field' => [
 				...self::booking_id_field(),
@@ -812,97 +922,106 @@ class Gembooking extends IntegrationBase {
 			'find_booking' => [
 				...self::booking_id_field(),
 				[
-					'key' => 'search', 'label' => 'Search Term (name or email)', 'type' => 'text', 'required' => false ],
-				[ 'key' => 'status', 'label' => 'Status Filter', 'type' => 'text', 'required' => false ],
-				[ 'key' => 'limit', 'label' => 'Limit', 'type' => 'number', 'required' => false ],
-			],
-			'check_slot_availability' => [
-				[
-					'key'      => 'booking_type',
-					'label'    => 'Booking Type',
-					'type'     => 'select',
-					'required' => true,
-					'options'  => [
-						[ 'value' => 'service', 'label' => 'Service' ],
-						[ 'value' => 'event', 'label' => 'Event' ],
-						[ 'value' => 'resource', 'label' => 'Resource' ],
-					],
+					'key' => 'search',
+					'label' => 'Search Term (name or email)',
+					'type' => 'text',
+					'required' => false,
 				],
 				[
-					'key'      => 'bookable',
-					'label'    => 'Bookable',
-					'type'     => 'select',
-					'required' => true,
-					'dynamic'  => [
-						'integration' => 'gembooking',
-						'query'       => 'gembooking_bookable_query',
-						'select'      => [ 'value', 'label' ],
-						'depends_on'  => [ 'booking_type' ],
-					],
+					'key' => 'filter_status',
+					'label' => 'Status Filter',
+					'type' => 'text',
+					'required' => false,
 				],
 				[
-					'key' => 'start_at',
-					'label' => 'Start At',
-					'type' => 'datetime',
-					'required' => true,
-				],
-				[
-					'key' => 'end_at',
-					'label' => 'End At',
-					'type' => 'datetime',
-					'required' => true,
-				],
-				[
-					'key' => 'team_id',
-					'label' => 'Staff/Team ID',
+					'key' => 'limit',
+					'label' => 'Limit',
 					'type' => 'number',
 					'required' => false,
 				],
 			],
+			'check_slot_availability' => [
+				...self::booking_type_field(),
+				...self::bookable_field(),
+				...self::start_at_field(),
+				...self::end_at_field(),
+				...self::team_id_field(),
+			],
 			'add_staff_time_off' => [
-				[
-					'key' => 'team_id', 'label' => 'Staff Member ID', 'type' => 'number', 'required' => true ],
-				[
-					'key' => 'start_at',
-					'label' => 'Start At',
-					'type' => 'datetime',
-					'required' => true,
-				],
-				[
-					'key' => 'end_at',
-					'label' => 'End At',
-					'type' => 'datetime',
-					'required' => true,
-				],
-				[ 'key' => 'reason', 'label' => 'Reason', 'type' => 'text', 'required' => false ],
+				...self::team_id_field(),
+				...self::start_at_field(),
+				...self::end_at_field(),
+				...self::reason_field(),
 			],
 			'update_customer_profile' => [
-				[ 'key' => 'user_id', 'label' => 'Customer User ID', 'type' => 'number', 'required' => true ],
-				[ 'key' => 'data', 'label' => 'Profile data (JSON — first_name, last_name, display_name, user_email, phone, timezone)', 'type' => 'textarea', 'required' => true ],
+				[
+					'key' => 'user_id',
+					'label' => 'Customer User ID',
+					'type' => 'number',
+					'required' => true,
+				],
+				...self::first_name_field(),
+				...self::last_name_field(),
+				[
+					'key' => 'display_name',
+					'label' => 'Display Name',
+					'type' => 'text',
+					'required' => true,
+				],
+				...self::email_field(),
+				...self::phone_field(),
+				...self::timezone_field(),
 			],
 			'duplicate_bookable' => [
-				[ 'key' => 'source_id', 'label' => 'Source Service/Event/Resource ID', 'type' => 'number', 'required' => true ],
+				...self::booking_type_field(),
+				...self::bookable_field(),
 			],
 			'create_staff' => [
-				[ 'key' => 'name', 'label' => 'Name', 'type' => 'text', 'required' => true ],
-				[ 'key' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => true ],
-				[ 'key' => 'role', 'label' => 'Role', 'type' => 'text', 'required' => false ],
+				...self::first_name_field(),
+				...self::last_name_field(),
+				...self::email_field(),
+				...self::phone_field(),
 			],
 			'send_template_email' => [
-				[ 'key' => 'to', 'label' => 'To', 'type' => 'email', 'required' => true ],
-				[ 'key' => 'subject', 'label' => 'Subject', 'type' => 'text', 'required' => true ],
-				[ 'key' => 'body', 'label' => 'Body', 'type' => 'textarea', 'required' => true ],
+				[
+					'key' => 'to',
+					'label' => 'To',
+					'type' => 'email',
+					'required' => true,
+				],
+				[
+					'key' => 'subject',
+					'label' => 'Subject',
+					'type' => 'text',
+					'required' => true,
+				],
+				[
+					'key' => 'body',
+					'label' => 'Body',
+					'type' => 'textarea',
+					'required' => true,
+				],
 			],
 			'grant_package' => [
-				[ 'key' => 'package_id', 'label' => 'Package ID', 'type' => 'number', 'required' => true ],
-				[ 'key' => 'user_id', 'label' => 'Customer User ID (or use Email below)', 'type' => 'number', 'required' => false ],
-				[ 'key' => 'email', 'label' => 'Customer Email (used if no User ID)', 'type' => 'email', 'required' => false ],
+				...self::package_id_field(),
+				...self::email_field(),
+				...self::email_field(),
 			],
 			'change_package_status' => [
-				[ 'key' => 'purchase_id', 'label' => 'Package Purchase ID', 'type' => 'number', 'required' => true ],
 				[
-					'key'      => 'status',
-					'label'    => 'Status',
+					'key'      => 'purchase_id',
+					'label'    => 'Package Purchase',
+					'type'     => 'select',
+					'required' => true,
+					'dynamic'  => [
+						'integration' => 'gembooking',
+						'query'       => 'gembooking_purchase_query',
+						'select'      => [ 'value', 'label' ],
+					],
+				],
+				[
+					'key'      => 'package_status',
+					'label'    => 'Package Status',
 					'type'     => 'select',
 					'required' => true,
 					'options'  => [
@@ -913,21 +1032,26 @@ class Gembooking extends IntegrationBase {
 				],
 			],
 			'delete_package_purchase' => [
-				[ 'key' => 'purchase_id', 'label' => 'Package Purchase ID (single)', 'type' => 'number', 'required' => false ],
-				[ 'key' => 'ids', 'label' => 'Purchase IDs (comma-separated, for bulk delete)', 'type' => 'text', 'required' => false ],
+				...self::package_id_field(),
+				[
+					'key' => 'ids',
+					'label' => 'Purchase IDs (comma-separated, for bulk delete)',
+					'type' => 'number',
+					'required' => false,
+				],
 			],
 			'check_in_ticket' => [
-				[ 'key' => 'ticket_code', 'label' => 'Ticket Code', 'type' => 'text', 'required' => true ],
+				...self::ticket_code_field(),
 			],
 			'undo_ticket_checkin' => [
-				[ 'key' => 'ticket_code', 'label' => 'Ticket Code', 'type' => 'text', 'required' => true ],
+				...self::ticket_code_field(),
 			],
 			'check_in_all_tickets' => [
-				[ 'key' => 'ticket_code', 'label' => 'Ticket Code (any ticket on the booking)', 'type' => 'text', 'required' => true ],
+				...self::ticket_code_field(),
 			],
 			'send_sms_whatsapp' => [
-				[ 'key' => 'to', 'label' => 'Phone Number', 'type' => 'text', 'required' => true ],
-				[ 'key' => 'message', 'label' => 'Message', 'type' => 'textarea', 'required' => true ],
+				...self::phone_field(),
+				...self::message_field(),
 				[
 					'key'      => 'channel',
 					'label'    => 'Channel',
@@ -943,7 +1067,12 @@ class Gembooking extends IntegrationBase {
 		];
 		return $schemas[ $action ] ?? [
 			...self::booking_id_field(),
-			[ 'key' => 'data', 'label' => 'Data (JSON)', 'type' => 'textarea', 'required' => false ],
+			[
+				'key' => 'data',
+				'label' => 'Data (JSON)',
+				'type' => 'textarea',
+				'required' => false,
+			],
 		];
 	}
 
@@ -1021,7 +1150,7 @@ class Gembooking extends IntegrationBase {
 
 		if ( 'package' === $type ) {
 			$customer_id = absint( $config['customer_id'] ?? 0 );
-			$email       = sanitize_email( (string) ( $config['customer_email'] ?? '' ) );
+			$email       = sanitize_email( (string) ( $config['email'] ?? '' ) );
 
 			if ( ! $customer_id && ! is_email( $email ) ) {
 				return self::action_error( 'Select an existing customer or provide a customer_email.' );
@@ -1239,7 +1368,7 @@ class Gembooking extends IntegrationBase {
 			absint( $config['page'] ?? 1 ) ?: 1,
 			absint( $config['limit'] ?? 20 ) ?: 20,
 			sanitize_text_field( (string) ( $config['search'] ?? '' ) ),
-			sanitize_key( (string) ( $config['status'] ?? '' ) )
+			sanitize_key( (string) ( $config['filter_status'] ?? '' ) )
 		) );
 	}
 
@@ -1276,51 +1405,15 @@ class Gembooking extends IntegrationBase {
 	private static function action_add_staff_time_off( array $config, array $input ): array {
 		$team_id = absint( $config['team_id'] ?? 0 );
 
-		// Support both start_at/start_date and end_at/end_date for compatibility
-		$start_date = (string) ( $config['start_at'] ?? $config['start_date'] ?? '' );
-		$end_date = (string) ( $config['end_at'] ?? $config['end_date'] ?? '' );
-
-		if ( ! $team_id || '' === $start_date ) {
+		if ( ! $team_id || '' === (string) ( $config['start_at'] ?? '' ) ) {
 			return self::action_error( 'A valid team_id and start_at are required.' );
 		}
 
-		// Convert datetime to date format if needed
-		$start_time = strtotime( $start_date );
-		if ( false === $start_time ) {
-			return self::action_error( 'Invalid start_at format.' );
-		}
-
-		// Extract just the date part (YYYY-MM-DD)
-		$start_date = date( 'Y-m-d', $start_time );
-
-		// Handle end_date
-		if ( '' !== $end_date ) {
-			$end_time = strtotime( $end_date );
-			if ( false === $end_time ) {
-				return self::action_error( 'Invalid end_at format.' );
-			}
-			$end_date = date( 'Y-m-d', $end_time );
-		} else {
-			// Default to single day if end_date not provided
-			$end_date = $start_date;
-		}
-
-		// Build the proper exception format expected by GemBooking
-		$exceptions = [];
-		$current_date = $start_date;
-		
-		while ( strtotime( $current_date ) <= strtotime( $end_date ) ) {
-			$exceptions[] = [
-				'date' => $current_date,
-				'type' => 'unavailable',
-			];
-			$current_date = date( 'Y-m-d', strtotime( $current_date . ' +1 day' ) );
-		}
-
-		return self::call_controller( 'GemBooking\API\ExceptionController', 'store', [
-			'source' => 'team',
-			'id' => $team_id,
-			'exceptions' => $exceptions,
+		return self::call_controller( '\\GemBooking\\API\\ExceptionController', 'store', [
+			'team_id' => $team_id,
+			'start_at' => (string) $config['start_at'],
+			'end_at' => (string) ( $config['end_at'] ?? $config['start_at'] ),
+			'reason' => (string) ( $config['reason'] ?? '' ),
 		] );
 	}
 
@@ -1357,18 +1450,18 @@ class Gembooking extends IntegrationBase {
 			}
 		}
 
-		return self::action_success( [ 'user_id' => $id, 'updated' => true ] );
+		return self::action_success( [ 'user_id' => $id ] );
 	}
 
 	private static function action_duplicate_bookable( array $config, array $input ): array {
-		$source_id = absint( $config['source_id'] ?? 0 );
+		$source_id = absint( $config['booking_type'] ?? $config['bookable'] ?? $config['id'] ?? 0 );
 
 		if ( ! $source_id ) {
 			return self::action_error( 'A valid source_id is required.' );
 		}
 
-		// DuplicateController expects 'id' parameter (the source item to duplicate)
 		return self::call_controller( '\\GemBooking\\API\\DuplicateController', 'duplicate', [
+			'source_id' => $source_id,
 			'id' => $source_id,
 		] );
 	}
@@ -1428,7 +1521,7 @@ class Gembooking extends IntegrationBase {
 
 	private static function action_change_package_status( array $config, array $input ): array {
 		$id     = absint( $config['purchase_id'] ?? $config['id'] ?? 0 );
-		$status = sanitize_key( (string) ( $config['status'] ?? '' ) );
+		$status = sanitize_key( (string) ( $config['package_status'] ?? '' ) );
 
 		if ( ! $id || '' === $status ) {
 			return self::action_error( 'A valid purchase_id and status are required.' );
@@ -1529,18 +1622,8 @@ class Gembooking extends IntegrationBase {
 	 * via AJAX (reads $_POST, ends with wp_send_json + die()). Until that
 	 * logic is refactored into a plain method on GemBooking's side, this
 	 * stays behind a filter so a site can hook it in safely.
-	 *
-	 * Schema expects: name (required), email (required), role (optional)
 	 */
 	private static function action_create_staff( array $config, array $input ): array {
-		$name  = sanitize_text_field( (string) ( $config['name'] ?? '' ) );
-		$email = sanitize_email( (string) ( $config['email'] ?? '' ) );
-		$role  = sanitize_text_field( (string) ( $config['role'] ?? '' ) );
-
-		if ( '' === $name || ! is_email( $email ) ) {
-			return self::action_error( 'A valid name and email are required.' );
-		}
-
 		$result = apply_filters( 'zaplane/gembooking_action', null, 'create_staff', $config, $input );
 
 		return null === $result
@@ -1654,6 +1737,7 @@ class Gembooking extends IntegrationBase {
 			'gembooking_customer_query' => [ self::class, 'query_customers' ],
 			'gembooking_timezone_query' => [ self::class, 'query_timezones' ],
 			'gembooking_query'          => [ self::class, 'query_booking' ],
+			'gembooking_package_query'  => [ self::class, 'query_packages' ],
 		];
 	}
 
@@ -1799,7 +1883,7 @@ class Gembooking extends IntegrationBase {
 			'service'  => self::bookable_post_type( 'service', 'gembk_service' ),
 			'event'    => self::bookable_post_type( 'event', 'gembk_event' ),
 			'resource' => self::bookable_post_type( 'resource', 'gembk_resource' ),
-			'package'  => 'gembk_package',
+			'package'  => self::bookable_post_type( 'package', 'gembk_package' ),
 		];
 		$post_type = $post_type_map[ $type ] ?? $post_type_map['service'];
 
@@ -1812,6 +1896,69 @@ class Gembooking extends IntegrationBase {
 		] );
 
 		return array_map( static fn( $p ) => [ 'value' => $p->ID, 'label' => $p->post_title ], $posts );
+	}
+
+	public static function query_packages( $q = null ): array {
+		$search = is_array( $q )
+			? sanitize_text_field( (string) ( $q['search'] ?? '' ) )
+			: ( is_string( $q ) ? sanitize_text_field( $q ) : '' );
+
+		$args = [
+			'post_type'      => self::bookable_post_type( 'package', 'gembk_package' ),
+			'post_status'    => 'publish',
+			'posts_per_page' => 100,
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+		];
+
+		if ( '' !== $search ) {
+			$args['s'] = $search;
+		}
+
+		$posts = get_posts( $args );
+
+		return array_map( static fn( $p ) => [ 'value' => $p->ID, 'label' => $p->post_title ], $posts );
+	}
+
+	public static function query_purchases( $q = null ): array {
+		global $wpdb;
+		$search = is_array( $q )
+			? sanitize_text_field( (string) ( $q['search'] ?? '' ) )
+			: ( is_string( $q ) ? sanitize_text_field( $q ) : '' );
+
+		$table = $wpdb->prefix . 'gembk_package_purchases';
+
+		$sql = "SELECT id, package_id, user_id, email, status FROM {$table} ORDER BY id DESC LIMIT 100";
+		$rows = $wpdb->get_results( $sql, ARRAY_A );
+
+		if ( ! is_array( $rows ) ) {
+			return [];
+		}
+
+		$options = [];
+		foreach ( $rows as $row ) {
+			$label = 'Purchase #' . $row['id'];
+			if ( $row['email'] ) {
+				$label .= ' - ' . $row['email'];
+			} elseif ( $row['user_id'] ) {
+				$user = get_user_by( 'id', $row['user_id'] );
+				if ( $user ) {
+					$label .= ' - ' . $user->display_name . ' (' . $user->user_email . ')';
+				}
+			}
+			$label .= ' - Package ID: ' . $row['package_id'] . ' - Status: ' . ucfirst( $row['status'] );
+
+			if ( '' !== $search && false === stripos( $label, $search ) ) {
+				continue;
+			}
+
+			$options[] = [
+				'value' => (int) $row['id'],
+				'label' => $label,
+			];
+		}
+
+		return $options;
 	}
 
 	public static function query_customers( $q = null ): array {

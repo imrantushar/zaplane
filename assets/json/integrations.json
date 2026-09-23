@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-23 11:37:35",
+    "generated_at": "2026-09-23 12:10:16",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -3976,7 +3976,7 @@
                         {
                             "key": "reason",
                             "label": "Reason",
-                            "type": "text",
+                            "type": "textarea",
                             "required": false
                         }
                     ],
@@ -3995,10 +3995,55 @@
                             "required": true
                         },
                         {
-                            "key": "data",
-                            "label": "Profile data (JSON \u2014 first_name, last_name, display_name, user_email, phone, timezone)",
-                            "type": "textarea",
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text",
                             "required": true
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "display_name",
+                            "label": "Display Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "Customer Email",
+                            "type": "email",
+                            "required": true
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone Number",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "timezone",
+                            "label": "Timezone",
+                            "type": "select",
+                            "required": false,
+                            "show_if": {
+                                "booking_type": [
+                                    "service",
+                                    "event",
+                                    "resource"
+                                ]
+                            },
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_timezone_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -4010,10 +4055,41 @@
                     "key": "duplicate_bookable",
                     "schema": [
                         {
-                            "key": "source_id",
-                            "label": "Source Service/Event/Resource ID",
-                            "type": "number",
-                            "required": true
+                            "key": "booking_type",
+                            "label": "Booking Type",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "service",
+                                    "label": "Service"
+                                },
+                                {
+                                    "value": "event",
+                                    "label": "Event"
+                                },
+                                {
+                                    "value": "resource",
+                                    "label": "Resource"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "bookable",
+                            "label": "Bookable",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_bookable_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ],
+                                "depends_on": [
+                                    "booking_type"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -4025,10 +4101,16 @@
                     "key": "create_staff",
                     "schema": [
                         {
-                            "key": "name",
-                            "label": "Name",
+                            "key": "first_name",
+                            "label": "First Name",
                             "type": "text",
                             "required": true
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text",
+                            "required": false
                         },
                         {
                             "key": "email",
@@ -4037,9 +4119,9 @@
                             "required": true
                         },
                         {
-                            "key": "role",
-                            "label": "Role",
-                            "type": "text",
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "number",
                             "required": false
                         }
                     ],
@@ -4082,9 +4164,17 @@
                     "schema": [
                         {
                             "key": "package_id",
-                            "label": "Package ID",
-                            "type": "number",
-                            "required": true
+                            "label": "Package",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_package_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "user_id",
@@ -4109,13 +4199,21 @@
                     "key": "change_package_status",
                     "schema": [
                         {
-                            "key": "purchase_id",
-                            "label": "Package Purchase ID",
-                            "type": "number",
-                            "required": true
+                            "key": "package_id",
+                            "label": "Package",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_package_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
-                            "key": "status",
+                            "key": "package_status",
                             "label": "Status",
                             "type": "select",
                             "required": true,
@@ -4145,15 +4243,23 @@
                     "key": "delete_package_purchase",
                     "schema": [
                         {
-                            "key": "purchase_id",
-                            "label": "Package Purchase ID (single)",
-                            "type": "number",
-                            "required": false
+                            "key": "package_id",
+                            "label": "Package",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_package_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "ids",
                             "label": "Purchase IDs (comma-separated, for bulk delete)",
-                            "type": "text",
+                            "type": "number",
                             "required": false
                         }
                     ],
@@ -4215,7 +4321,7 @@
                     "key": "send_sms_whatsapp",
                     "schema": [
                         {
-                            "key": "to",
+                            "key": "phone",
                             "label": "Phone Number",
                             "type": "text",
                             "required": true
