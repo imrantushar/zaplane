@@ -239,7 +239,7 @@ class GraphTester {
 				continue;
 			}
 
-			if ( ! is_string( $value ) || ! str_contains( $value, '{{' ) ) {
+			if ( ! is_string( $value ) || ! \Zaplane\Utils\Helper::contains( $value, '{{' ) ) {
 				$out[ $key ] = $value;
 				continue;
 			}

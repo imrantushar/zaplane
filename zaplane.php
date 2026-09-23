@@ -3,7 +3,7 @@
  * Plugin Name:       Zaplane
  * Plugin URI:        https://zaplane.app/
  * Description:       WordPress Automation Plugin
- * Version:           1.3.1
+ * Version:           1.3.2
  * Author:            kodezen
  * Author URI:        https://kodezen.com
  * License:           GPL-3.0-or-later
@@ -61,7 +61,7 @@ final class Zaplane {
 	}
 
 	public function define_constants(): void {
-		define( 'ZAPLANE_VERSION', '1.3.1' );
+		define( 'ZAPLANE_VERSION', '1.3.2' );
 		define( 'ZAPLANE_ALLOW_LOGS', true );
 		define( 'ZAPLANE_PLUGIN_SLUG', 'zaplane' );
 		define( 'ZAPLANE_PLUGIN_FILE', __FILE__ );
@@ -167,6 +167,12 @@ final class Zaplane {
 		Gemcrm::unschedule_birthday_cron();
 		\Zaplane\Integrations\Woocommerce::unschedule_inactive_customer_cron();
 		\Zaplane\CustomApps\Poller::unschedule();
+
+		// Action Scheduler's queue runner is on a schedule it registers itself, so
+		// once it stops loading the event cannot be rescheduled and WordPress logs
+		// an error on every cron run. Another plugin that bundles it re-adds the
+		// event on its next load.
+		wp_clear_scheduled_hook( 'action_scheduler_run_queue', [ 'WP Cron' ] );
 	}
 }
 

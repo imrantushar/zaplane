@@ -11,6 +11,7 @@ use Zaplane\Models\NodeRun;
 use Zaplane\Models\Recipe;
 use Zaplane\Models\Run;
 use Zaplane\Models\Workflow;
+use Zaplane\Models\WorkflowVersion;
 use Zaplane\Recipes\Registry;
 use Zaplane\Services\BlueprintService;
 use Zaplane\Services\RecipeGroupService;
@@ -320,17 +321,27 @@ class ToolRegistry {
 			case 'describe_app':
 				return self::describe_app( $args );
 			case 'list_field_options':
+				if ( RemotePolicy::is_restricted( (string) ( $args['app'] ?? '' ), (string) ( $args['event'] ?? '' ) ) ) {
+					throw new \InvalidArgumentException( 'This action is not available to MCP clients.' );
+				}
 				return self::list_field_options( $args );
 			case 'validate_graph':
+				RemotePolicy::assert_allowed( $args['graph'] ?? null );
 				return self::validate_graph( $args );
 			case 'test_workflow':
+				RemotePolicy::assert_allowed( $args['graph'] ?? null );
+				self::assert_workflow_allowed( (int) ( $args['workflow_id'] ?? 0 ) );
 				return self::test_workflow( $args );
 			case 'create_workflow':
+				RemotePolicy::assert_allowed( $args['graph'] ?? null );
 				return self::create_workflow( $args, $token );
 			case 'update_workflow':
+				RemotePolicy::assert_allowed( $args['graph'] ?? null );
+				self::assert_workflow_allowed( (int) ( $args['workflow_id'] ?? 0 ) );
 				self::require_run_for_live( (int) ( $args['workflow_id'] ?? 0 ), $token, false );
 				return self::update_workflow( $args );
 			case 'set_workflow_status':
+				self::assert_workflow_allowed( (int) ( $args['workflow_id'] ?? 0 ) );
 				if ( 'active' === (string) ( $args['status'] ?? '' ) ) {
 					self::require_run_for_live( (int) ( $args['workflow_id'] ?? 0 ), $token, true );
 				}
@@ -343,6 +354,9 @@ class ToolRegistry {
 			case 'list_workflows':
 				return self::list_workflows( $args );
 			case 'get_workflow':
+				// The graph carries the trigger config, including a webhook's shared
+				// secret, which would let the client start the workflow directly.
+				self::assert_workflow_allowed( (int) ( $args['workflow_id'] ?? 0 ) );
 				return self::get_workflow( $args );
 			case 'list_recipes':
 				return self::list_recipes();
@@ -359,6 +373,7 @@ class ToolRegistry {
 			case 'sync_content':
 				return self::sync_content( $args );
 			case 'run_workflow':
+				self::assert_workflow_allowed( (int) ( $args['workflow_id'] ?? 0 ) );
 				return self::run_workflow( $args );
 		}
 
@@ -393,6 +408,30 @@ class ToolRegistry {
 		}
 	}
 
+	/**
+	 * Refuse a workflow that uses an action RemotePolicy keeps from MCP clients.
+	 *
+	 * Both the active version and the newest one are checked: an MCP client must
+	 * not be able to read, edit, pause, reactivate or start a workflow the site
+	 * owner built around one of those actions.
+	 *
+	 * @throws \InvalidArgumentException When the workflow uses one.
+	 */
+	private static function assert_workflow_allowed( int $workflow_id ): void {
+		$workflow = $workflow_id ? Workflow::find( $workflow_id ) : null;
+		if ( ! $workflow ) {
+			return;
+		}
+
+		$latest = WorkflowVersion::where( 'workflow_id', $workflow->id )->orderBy( 'id', 'desc' )->first();
+
+		foreach ( [ $workflow->activeVersion(), $latest ] as $version ) {
+			if ( $version ) {
+				RemotePolicy::assert_allowed( $version->getGraph() );
+			}
+		}
+	}
+
 	/* ------------------------------ handlers ------------------------------ */
 
 	/**
@@ -410,7 +449,13 @@ class ToolRegistry {
 			throw new \InvalidArgumentException( 'type must be "trigger", "action", or omitted.' );
 		}
 
-		$matches = Catalog::search( $query, $type, self::limit( $args, 20 ) );
+		$matches = array_values(
+			array_filter(
+				Catalog::search( $query, $type, self::limit( $args, 20 ) + 20 ),
+				fn( $m ) => 'action' !== $m['type'] || ! RemotePolicy::is_restricted( (string) $m['app'], (string) $m['key'] )
+			)
+		);
+		$matches = array_slice( $matches, 0, self::limit( $args, 20 ) );
 
 		return [
 			'matches' => $matches,
@@ -431,6 +476,13 @@ class ToolRegistry {
 		if ( null === $app ) {
 			throw new \InvalidArgumentException( 'Unknown app "' . esc_html( $slug ) . '". Use list_apps or search_capabilities to find valid slugs.' );
 		}
+
+		$app['actions'] = array_values(
+			array_filter(
+				(array) $app['actions'],
+				fn( $action ) => ! RemotePolicy::is_restricted( $slug, (string) $action['key'] )
+			)
+		);
 
 		return $app;
 	}
@@ -626,6 +678,8 @@ class ToolRegistry {
 		if ( empty( $blueprint ) ) {
 			throw new \RuntimeException( 'Recipe blueprint is empty.' );
 		}
+
+		RemotePolicy::assert_allowed( $blueprint );
 
 		$title = sanitize_text_field( (string) ( $args['title'] ?? '' ) );
 
