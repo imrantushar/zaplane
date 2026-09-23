@@ -104,6 +104,20 @@ const WebhookSetup = ({ appSlug, selectedIntegration }) => {
   const missingRequired = fields.filter(
     (f) => f.required && !configured[f.key] && !values[f.key]
   );
+  const callbackHelp =
+    "mailchimp" === appSlug
+      ? __(
+          "Paste this URL into Mailchimp → Audience → Audience settings → Webhooks so it can deliver events here. This trigger cannot fire until the webhook is saved.",
+          "zaplane"
+        )
+      : sprintf(
+          /* translators: %s: integration name, e.g. Slack. */
+          __(
+            "Paste this into %s so it delivers events here. This trigger cannot fire until it does.",
+            "zaplane"
+          ),
+          selectedIntegration?.name ?? appSlug
+        );
 
   return (
     <div className="mt-4 rounded-md border border-solid border-[var(--zaplane-border-color)]">
@@ -135,14 +149,7 @@ const WebhookSetup = ({ appSlug, selectedIntegration }) => {
           <CopyInput
             label={__("Callback URL", "zaplane")}
             value={webhookUrl}
-            help={sprintf(
-              /* translators: %s: integration name, e.g. Slack. */
-              __(
-                "Paste this into %s so it delivers events here. This trigger cannot fire until it does.",
-                "zaplane"
-              ),
-              selectedIntegration?.name ?? appSlug
-            )}
+            help={callbackHelp}
           />
 
           {missingRequired.length > 0 && (

@@ -201,15 +201,28 @@ class FolderController extends WP_REST_Controller {
 	}
 
 	public function create_item( $request ) {
-		$title = $request->get_param( 'title' );
+		$title = sanitize_text_field( $request->get_param( 'title' ) ?? '' );
 
 		if ( ! $title ) {
 			return new WP_Error( 'missing_title', 'Folder title is required.', [ 'status' => 400 ] );
 		}
 
+		$userId = get_current_user_id();
+
+		// Prevent rapid duplicate creation (within 2 seconds for same title and user)
+		$existing = Folder::where( 'title', $title )
+			->where( 'created_by', $userId )
+			->where( 'created_at', '>=', gmdate( 'Y-m-d H:i:s', time() - 2 ) )
+			->orderBy( 'id', 'desc' )
+			->first();
+
+		if ( $existing ) {
+			return rest_ensure_response( $existing->toResponse() );
+		}
+
 		$folder = Folder::create( [
 			'title'      => $title,
-			'created_by' => get_current_user_id(),
+			'created_by' => $userId,
 		] );
 
 		return rest_ensure_response( $folder->toResponse() );
