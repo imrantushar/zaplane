@@ -81,6 +81,14 @@ class RemotePolicy {
 			// Creates a WordPress user.
 			'create_customer',
 		],
+		'memberpress'         => [
+			// Creates a WordPress user.
+			'create_member',
+		],
+		'buddyboss'           => [
+			// Suspends or unsuspends any account, administrators included.
+			'update_user_status',
+		],
 	];
 
 	/**

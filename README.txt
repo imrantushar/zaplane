@@ -282,6 +282,7 @@ The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `compo
 
 **Fixed**
 * Conditions, filters and a few triggers no longer call string functions that need PHP 8, so Zaplane runs on PHP 7.4 as declared.
+* Workflow steps now run when Action Scheduler is processed from WP-CLI, as many hosts do from a system cron. Before, every queued step failed there.
 
 = 1.3.1 =
 **Security and privacy**
