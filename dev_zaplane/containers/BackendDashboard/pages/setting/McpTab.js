@@ -243,6 +243,12 @@ const McpTab = () => {
             'zaplane'
           )}
         </p>
+        <p className="mt-1 text-[13px] text-[var(--zaplane-font-secondary-color)]">
+          {__(
+            'It cannot administer the site: actions that manage plugins, users, roles, capabilities or site options are unavailable to it, and so is any workflow that uses one.',
+            'zaplane'
+          )}
+        </p>
       </div>
 
       {loading && <p className="text-[13px] text-[var(--zaplane-text-muted)]">{__('Loading…', 'zaplane')}</p>}

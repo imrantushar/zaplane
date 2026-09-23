@@ -4,7 +4,7 @@ Tags: automation, workflow, woocommerce, marketing automation, crm
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -72,6 +72,10 @@ Workflows, run logs and connection credentials are stored in your WordPress data
 = Can workflows reach private or internal addresses? =
 
 Not by default. HTTP Request, Send Webhook, Custom Apps and every other step that fetches a URL refuse loopback, private, link-local and reserved addresses, including after a redirect. A developer can allow a specific internal host with the `zaplane_http_allowed_private_hosts` filter.
+
+= What can an AI client connected through the MCP server do? =
+
+Read your workflows, runs and recipes, draft and test workflows, and, if you gave its token the run scope, start them. It cannot administer your site. Actions that activate or deactivate plugins, create, change or delete users, change roles or capabilities, or change site options are hidden from it, and it cannot create, read, edit, activate, test or run a workflow that uses one, including one you built yourself. You can still use those actions in workflows you build in the Zaplane dashboard.
 
 = Can a Custom App call PHP functions? =
 
@@ -272,6 +276,13 @@ The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `compo
 
 == Changelog ==
 
+= 1.3.2 =
+**Security**
+* An AI client connected through the MCP server can no longer reach actions that administer the site: activating or deactivating plugins, creating, changing or deleting users, changing roles and capabilities, and changing site options. It cannot add them to a workflow, or read, edit, activate, test or run a workflow that uses them.
+
+**Fixed**
+* Conditions, filters and a few triggers no longer call string functions that need PHP 8, so Zaplane runs on PHP 7.4 as declared.
+
 = 1.3.1 =
 **Security and privacy**
 * Removed the Switch Theme and Authenticate User actions. Which theme a site runs, and signing in, are the site owner's own decisions.
@@ -374,6 +385,9 @@ The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `compo
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.3.2 =
+MCP clients can no longer use actions that administer the site, and PHP 7.4 compatibility is fixed.
 
 = 1.3.1 =
 Security hardening throughout, and two actions removed: Switch Theme and Authenticate User.
