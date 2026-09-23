@@ -15,7 +15,7 @@ class Menu {
 	public function admin_menu() {
 		$icon_url = $this->get_toplevel_menu_icon_url();
 		$page_title = $this->get_toplevel_menu_title();
-		add_menu_page( $page_title, $page_title, 'manage_options', ZAPLANE_PLUGIN_SLUG, [ $this, 'load_main_template' ], $icon_url, 2 );
+		add_menu_page( $page_title, $page_title, 'manage_options', ZAPLANE_PLUGIN_SLUG, [ $this, 'load_main_template' ], $icon_url );
 		foreach ( Helper::get_admin_menu_list() as $item_key => $item ) {
 			add_submenu_page( $item['parent_slug'], $item['title'], $item['title'], $item['capability'], $item_key, [ $this, 'load_main_template' ] );
 		}

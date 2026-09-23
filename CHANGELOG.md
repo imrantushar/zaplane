@@ -5,7 +5,66 @@ All notable changes to Zaplane are documented here. This project adheres to
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-09-20
+
+### Removed
+- **Switch Theme action.** Changing the active theme is the site owner's decision,
+  taken in the Appearance screens. The Theme Switch *trigger* stays: a workflow can
+  still react to a switch the owner makes.
+- **Authenticate User action.** It called `wp_signon()` with credentials stored in
+  the workflow, which set auth cookies on whatever request happened to be running
+  the run — a visitor's page view could end up signed in as that account.
+
+### Security
+- Create, Update and Delete User accept only the fields their own form offers,
+  filtered and sanitized per field, and only a role the site actually defines.
+  Delete refuses the last remaining administrator and the account the run is using.
+- The incoming-webhook and Catch Webhook routes verify the provider's signature or
+  the trigger's shared secret in their `permission_callback`, so an unsigned
+  request never reaches the code that dispatches a workflow.
+- The ORM refuses any table, column, operator, sort direction, join type or
+  aggregate that is not a plain identifier or a known keyword (`Identifier`), and
+  prepares every value in the same call that runs the statement.
+- Schema changes and the remaining direct reads pass table names as `%i`
+  identifiers to `$wpdb->prepare()`.
+- The admin colour palette is validated before it becomes CSS, the integrations
+  catalogue is escaped before it is inlined in a `<script>`, the MCP consent page
+  goes through `wp_kses()`, and the webhook handshake echo is constrained and
+  escaped.
+
+### Changed
+- LifterLMS, GamiPress and Paid Memberships Pro option lists are read through
+  `get_posts()`/`prepare()` rather than the posts table directly.
+- README documents the Telegram API address and the links the MCP screen offers to
+  claude.ai and ChatGPT.
+
+### Fixed
+- `select()`, `addSelect()` and `groupBy()` accept an array of columns again;
+  passing one nested the array and produced `SELECT \`Array\``, which broke
+  `pluck()` and `value()`.
+
+## [1.3.0] - 2026-09-15
+
 ### Added
+- **AI steps use the WordPress AI Client by default.** On WordPress 7.0 and later
+  the AI, AI Agent and Generate Image steps run on the provider the site owner set
+  up in WordPress, with no key stored in Zaplane. The AI Agent's tool calling runs
+  through it too. Your own OpenAI, Anthropic, Gemini or OpenAI-compatible key is
+  still available, for older WordPress versions, audio transcription and
+  knowledge-base embeddings.
+- **Hosted AI connectors can sign in to the MCP server.** claude.ai and ChatGPT
+  attach through OAuth 2.1 with dynamic client registration or a client ID
+  metadata document, and an administrator approves each one on a consent screen.
+  A WordPress application password also works, capped at read and write.
+- MCP: every tool call is logged on the Logs screen. You get an email the first
+  time a token runs a workflow and when a token is refused repeatedly. Tokens can
+  expire, and a run token can be limited to chosen workflows.
+- MCP: someone without admin rights can ask to connect a client, and an
+  administrator allows it. The token acts as the person who asked.
+- MCP: Settings → AI access has a self-check for clients that will not connect, and
+  writes the configuration file for the client you pick.
+- MCP: `list_field_options` gives a client the site's own choices for a field,
+  such as courses, products, forms and CRM lists, so it doesn't guess ids.
 - **A workflow can start from more than one trigger.** Add another trigger under
   the first one on the canvas. Whichever fires starts a run from itself and
   follows only its own connections. Triggers are numbered on the canvas, the Logs
@@ -73,7 +132,31 @@ All notable changes to Zaplane are documented here. This project adheres to
   an earlier step by its name, such as `{{coupon.code}}` in the email after a
   Create Coupon step. Workflows already made from a recipe keep working as they are.
 
+### Changed
+- Updates now come only from WordPress.org. The bundled licensing SDK is gone. It
+  checked store.kodezen.com for updates, fetched promotions, and could send usage
+  data after the opt-in was declined.
+- Action Scheduler 4.1.0. WordPress 6.8 or later is now required (was 6.0).
+- The Zaplane admin menu no longer asks to sit near the top of the menu.
+- The uncompiled source of the admin app ships with the plugin. Every built file
+  names its source.
+
+### Security
+- Merge tags are parsed instead of being compiled to PHP and run with eval(). A
+  webhook body could previously reach a function call.
+- URLs that come from workflow settings or run data are checked on every redirect.
+  Private and reserved network addresses are refused.
+- An MCP token now acts as the user it was issued to, and that user needs
+  `manage_options` on every call. Before, a token reached as far as an
+  administrator's, even for a user who was later demoted or deleted.
+
 ### Fixed
+- GemCRM Send Email to a contact could reach the wrong contact, and Send Email to a
+  list mailed every contact. Both now reach only the chosen recipients, and
+  unsubscribed or bounced contacts are skipped.
+- The admin menu icon rendered as a grey smudge in most admin colour schemes.
+- MCP: a batch request got an extra response, and hitting the rate limit answered
+  401 instead of 429.
 - Workflows made from the WooCommerce and GemCRM recipes that ship with Zaplane
   couldn't go live: their Send Email steps were missing the Email Content
   setting. Recipes already on a site are corrected on update.

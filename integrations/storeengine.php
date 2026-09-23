@@ -512,6 +512,78 @@ class Storeengine extends IntegrationBase {
 		return array_merge( $data, $extra );
 	}
 
+	/**
+	 * Live product lookup by name/SKU keyword — meant to be wired onto an AI
+	 * Agent's Tools sub-handle so the model can pull exact, current price/stock
+	 * instead of relying on a cached Business Knowledge snippet (which can lag
+	 * behind a price change until the next sync).
+	 */
+	private static function action_get_product( array $config, array $input ): array {
+		$query = trim( (string) ( $config['query'] ?? '' ) );
+		if ( '' === $query ) {
+			return self::action_error( 'A product name or keyword is required.' );
+		}
+		if ( ! function_exists( 'storeengine_get_product' ) ) {
+			return self::action_error( 'StoreEngine is not active.' );
+		}
+
+		$limit = max( 1, min( 5, (int) ( $config['limit'] ?? 1 ) ) );
+
+		$posts = get_posts( [
+			'post_type'      => 'storeengine_product',
+			'post_status'    => 'publish',
+			'posts_per_page' => $limit,
+			's'              => $query,
+		] );
+
+		if ( empty( $posts ) ) {
+			return self::action_success( [
+				'found'    => false,
+				'products' => [],
+			] );
+		}
+
+		$products = [];
+		foreach ( $posts as $post ) {
+			$product = storeengine_get_product( (int) $post->ID );
+			$products[] = self::resolve_product_payload(
+				( $product && ! is_wp_error( $product ) ) ? $product : (int) $post->ID,
+				[ 'price' => self::product_price_line( $product ) ]
+			);
+		}
+
+		return self::action_success( [
+			'found'    => true,
+			'product'  => $products[0],
+			'products' => $products,
+		] );
+	}
+
+	/** A human-readable "Label: $X.XX, ..." price line for a StoreEngine product object. */
+	private static function product_price_line( $product ): string {
+		if ( ! is_object( $product ) || is_wp_error( $product ) || ! method_exists( $product, 'get_prices' ) ) {
+			return '';
+		}
+
+		$symbol = '';
+		if ( class_exists( '\StoreEngine\Utils\Helper' ) && method_exists( '\StoreEngine\Utils\Helper', 'get_currency_symbol' ) ) {
+			$symbol = (string) \StoreEngine\Utils\Helper::get_currency_symbol();
+		}
+
+		$parts = [];
+		foreach ( (array) $product->get_prices() as $price ) {
+			if ( ! is_object( $price ) || ! method_exists( $price, 'get_price' ) ) {
+				continue;
+			}
+			$amount = $price->get_price();
+			$label  = method_exists( $price, 'get_name' ) ? trim( (string) $price->get_name() ) : '';
+			$value  = $symbol . rtrim( rtrim( number_format( (float) $amount, 2 ), '0' ), '.' );
+			$parts[] = ( '' !== $label ) ? ( $label . ': ' . $value ) : $value;
+		}
+
+		return implode( ', ', $parts );
+	}
+
 	private static function resolve_subscription_payload( $subscription, array $extra = [] ) {
 		if ( is_object( $subscription ) && method_exists( $subscription, 'get_id' ) ) {
 			$sub = $subscription;
@@ -1135,6 +1207,7 @@ class Storeengine extends IntegrationBase {
 			'adjust_stock'        => [ 'label' => 'Adjust Product Stock' ],
 			'set_stock_status'    => [ 'label' => 'Set Product Stock Status' ],
 			'create_coupon'       => [ 'label' => 'Create Coupon' ],
+			'get_product'         => [ 'label' => 'Get Product (search by name/SKU)' ],
 		];
 		$actions += self::gate( [
 			'update_subscription_status' => [ 'label' => 'Update Subscription Status' ],
@@ -1152,6 +1225,25 @@ class Storeengine extends IntegrationBase {
 
 	public static function get_action_config_schema( string $action ): array {
 		switch ( $action ) {
+
+			case 'get_product':
+				return [
+					[
+						'key'         => 'query',
+						'label'       => 'Product Name or Keyword',
+						'type'        => 'expression',
+						'required'    => true,
+						'placeholder' => '{{trigger.text}}',
+						'help'        => 'Searched against the product title. Returns the closest live match(es) with current price and stock — use this (wired as an Agent tool) for exact, up-to-date pricing rather than a cached knowledge snippet.',
+					],
+					[
+						'key'      => 'limit',
+						'label'    => 'Max Matches',
+						'type'     => 'number',
+						'required' => false,
+						'default'  => 1,
+					],
+				];
 
 			case 'update_order_status':
 				return [

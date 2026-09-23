@@ -8,7 +8,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Assembles statements for the models in this plugin.
+ *
+ * Two rules hold everywhere in this class, and together they are what keeps the
+ * statements it produces safe:
+ *
+ * 1. Every *value* is a `%s`/`%d` placeholder filled in by `$wpdb->prepare()`.
+ *    Values are collected in `$this->bindings` as the query is built and handed
+ *    to prepare() in the same method that runs the statement.
+ * 2. Every *identifier and keyword* — table, column, operator, sort direction,
+ *    join type, aggregate — goes through {@see Identifier}, which accepts plain
+ *    names and a fixed list of keywords and throws on anything else. Nothing is
+ *    interpolated into SQL without passing it.
+ *
+ * `selectRaw()` and `whereRaw()` are the deliberate exceptions: they take SQL
+ * written in this plugin's own code (with their values still placeheld), and
+ * are never given anything that arrived with a request.
+ */
 class QueryBuilder {
+
+	// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// The statement is assembled by this class: identifiers through Identifier, values as placeholders filled in by prepare() in the same call. See the class note.
 
 	protected string $table;
 	protected array $columns = [ '*' ];
@@ -34,17 +55,51 @@ class QueryBuilder {
 		return $this;
 	}
 
+	/**
+	 * Columns to select, as arguments or as one array of them.
+	 *
+	 * Both spellings are in use — `select( 'id', 'status' )` and
+	 * `select( [ 'id', 'status' ] )` — so the arguments are flattened rather
+	 * than one nested array being passed on to the compiler as a column.
+	 *
+	 * @param mixed ...$columns Column names, or arrays of them.
+	 */
 	public function select( ...$columns ): self {
+		$columns = self::flatten( $columns );
 		$this->columns = $columns ? $columns : [ '*' ];
 		return $this;
 	}
 
+	/**
+	 * @param mixed ...$columns Column names, or arrays of them.
+	 */
 	public function addSelect( ...$columns ): self {
 		if ( [ '*' ] === $this->columns ) {
 			$this->columns = [];
 		}
-		$this->columns = array_merge( $this->columns, $columns );
+		$this->columns = array_merge( $this->columns, self::flatten( $columns ) );
 		return $this;
+	}
+
+	/**
+	 * One level of nesting removed from a variadic column list.
+	 *
+	 * @param array<int,mixed> $columns Arguments as received.
+	 * @return array<int,mixed>
+	 */
+	private static function flatten( array $columns ): array {
+		$flat = [];
+
+		foreach ( $columns as $column ) {
+			if ( is_array( $column ) ) {
+				$flat = array_merge( $flat, array_values( $column ) );
+				continue;
+			}
+
+			$flat[] = $column;
+		}
+
+		return $flat;
 	}
 
 	public function selectRaw( string $expression ): self {
@@ -260,8 +315,11 @@ class QueryBuilder {
 		return $this->join( $table, $first, $operator, $second, 'right' );
 	}
 
+	/**
+	 * @param mixed ...$columns Column names, or arrays of them.
+	 */
 	public function groupBy( ...$columns ): self {
-		$this->groups = array_merge( $this->groups, $columns );
+		$this->groups = array_merge( $this->groups, self::flatten( $columns ) );
 		return $this;
 	}
 
@@ -298,13 +356,10 @@ class QueryBuilder {
 			return clone self::$queryCache[ $cacheKey ];
 		}
 
-		if ( ! empty( $bindings ) ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is built internally by toSql().
-			$sql = $wpdb->prepare( $sql, ...$bindings );
-		}
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_results( $sql, ARRAY_A );
+		$results = $wpdb->get_results(
+			empty( $bindings ) ? $sql : $wpdb->prepare( $sql, ...$bindings ),
+			ARRAY_A
+		);
 
 		if ( $this->modelClass && $results ) {
 			$collection = new Collection( array_map( fn( $row) => $this->modelClass::hydrate( $row ), $results ) );
@@ -376,17 +431,11 @@ class QueryBuilder {
 	public function count( string $column = '*' ): int {
 		global $wpdb;
 
-		$this->columns = [ new RawExpression( "COUNT({$column}) as aggregate" ) ];
+		$this->columns = [ new RawExpression( 'COUNT(' . Identifier::quote( $column ) . ') as aggregate' ) ];
 		$sql = $this->toSql();
 		$bindings = $this->getBindings();
 
-		if ( ! empty( $bindings ) ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is built internally by toSql().
-			$sql = $wpdb->prepare( $sql, ...$bindings );
-		}
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return (int) $wpdb->get_var( $sql );
+		return (int) $wpdb->get_var( empty( $bindings ) ? $sql : $wpdb->prepare( $sql, ...$bindings ) );
 	}
 
 	public function sum( string $column ): float {
@@ -408,17 +457,15 @@ class QueryBuilder {
 	protected function aggregate( string $function, string $column ): float {
 		global $wpdb;
 
-		$this->columns = [ new RawExpression( "{$function}({$column}) as aggregate" ) ];
+		$this->columns = [
+			new RawExpression(
+				Identifier::aggregate( $function ) . '(' . Identifier::quote( $column ) . ') as aggregate'
+			),
+		];
 		$sql = $this->toSql();
 		$bindings = $this->getBindings();
 
-		if ( ! empty( $bindings ) ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is built internally by toSql().
-			$sql = $wpdb->prepare( $sql, ...$bindings );
-		}
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return (float) $wpdb->get_var( $sql );
+		return (float) $wpdb->get_var( empty( $bindings ) ? $sql : $wpdb->prepare( $sql, ...$bindings ) );
 	}
 
 	public function exists(): bool {
@@ -432,7 +479,6 @@ class QueryBuilder {
 	public function insert( array $values ): int {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$result = $wpdb->insert( $this->table, $values );
 
 		if ( false === $result ) {
@@ -453,12 +499,12 @@ class QueryBuilder {
 			throw new DatabaseException( 'Cannot update without where clause' );
 		}
 
-		$sql = "UPDATE {$this->table} SET ";
+		$sql = 'UPDATE ' . Identifier::quote( $this->table ) . ' SET ';
 		$setParts = [];
 		$bindings = [];
 
 		foreach ( $values as $column => $value ) {
-			$setParts[] = "{$column} = %s";
+			$setParts[] = Identifier::quote( (string) $column ) . ' = %s';
 			$bindings[] = $value;
 		}
 
@@ -467,7 +513,6 @@ class QueryBuilder {
 
 		$bindings = array_merge( $bindings, $this->bindings );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->query( $wpdb->prepare( $sql, ...$bindings ) );
 	}
 
@@ -478,33 +523,27 @@ class QueryBuilder {
 			throw new DatabaseException( 'Cannot delete without where clause' );
 		}
 
-		$sql = "DELETE FROM {$this->table}" . $this->compileWheres();
+		$sql = 'DELETE FROM ' . Identifier::quote( $this->table ) . $this->compileWheres();
 		$bindings = $this->getBindings();
 
-		if ( ! empty( $bindings ) ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is built internally.
-			$sql = $wpdb->prepare( $sql, ...$bindings );
-		}
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return (int) $wpdb->query( $sql );
+		return (int) $wpdb->query( empty( $bindings ) ? $sql : $wpdb->prepare( $sql, ...$bindings ) );
 	}
 
 	public function increment( string $column, int $amount = 1, array $extra = [] ): int {
 		global $wpdb;
 
-		$sql = "UPDATE {$this->table} SET {$column} = {$column} + %d";
+		$quoted   = Identifier::quote( $column );
+		$sql      = 'UPDATE ' . Identifier::quote( $this->table ) . ' SET ' . $quoted . ' = ' . $quoted . ' + %d';
 		$bindings = [ $amount ];
 
 		foreach ( $extra as $col => $value ) {
-			$sql .= ", {$col} = %s";
+			$sql .= ', ' . Identifier::quote( (string) $col ) . ' = %s';
 			$bindings[] = $value;
 		}
 
 		$sql .= $this->compileWheres();
 		$bindings = array_merge( $bindings, $this->bindings );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->query( $wpdb->prepare( $sql, ...$bindings ) );
 	}
 
@@ -514,12 +553,11 @@ class QueryBuilder {
 
 	public function truncate(): void {
 		global $wpdb;
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->query( "TRUNCATE TABLE {$this->table}" );
+		$wpdb->query( 'TRUNCATE TABLE ' . Identifier::quote( $this->table ) );
 	}
 
 	public function toSql(): string {
-		$sql = 'SELECT ' . $this->compileColumns() . ' FROM ' . $this->table;
+		$sql = 'SELECT ' . $this->compileColumns() . ' FROM ' . Identifier::quote( $this->table );
 
 		if ( ! empty( $this->joins ) ) {
 			$sql .= $this->compileJoins();
@@ -530,7 +568,7 @@ class QueryBuilder {
 		}
 
 		if ( ! empty( $this->groups ) ) {
-			$sql .= ' GROUP BY ' . implode( ', ', $this->groups );
+			$sql .= ' GROUP BY ' . implode( ', ', array_map( [ Identifier::class, 'quote' ], $this->groups ) );
 		}
 
 		if ( ! empty( $this->havings ) ) {
@@ -542,11 +580,11 @@ class QueryBuilder {
 		}
 
 		if ( null !== $this->limitValue ) {
-			$sql .= ' LIMIT ' . $this->limitValue;
+			$sql .= ' LIMIT ' . (int) $this->limitValue;
 		}
 
 		if ( null !== $this->offsetValue ) {
-			$sql .= ' OFFSET ' . $this->offsetValue;
+			$sql .= ' OFFSET ' . (int) $this->offsetValue;
 		}
 
 		return $sql;
@@ -562,7 +600,7 @@ class QueryBuilder {
 			if ( $column instanceof RawExpression ) {
 				$compiled[] = $column->getValue();
 			} else {
-				$compiled[] = $column;
+				$compiled[] = Identifier::quote( (string) $column );
 			}
 		}
 		return implode( ', ', $compiled );
@@ -571,8 +609,10 @@ class QueryBuilder {
 	protected function compileJoins(): string {
 		$sql = '';
 		foreach ( $this->joins as $join ) {
-			$sql .= ' ' . strtoupper( $join['type'] ) . ' JOIN ' . $join['table'];
-			$sql .= ' ON ' . $join['first'] . ' ' . $join['operator'] . ' ' . $join['second'];
+			$sql .= ' ' . Identifier::join_type( (string) $join['type'] ) . ' JOIN ' . Identifier::quote( (string) $join['table'] );
+			$sql .= ' ON ' . Identifier::quote( (string) $join['first'] )
+				. ' ' . Identifier::operator( (string) $join['operator'] )
+				. ' ' . Identifier::quote( (string) $join['second'] );
 		}
 		return $sql;
 	}
@@ -589,27 +629,28 @@ class QueryBuilder {
 			$part = '';
 
 			if ( $i > 0 ) {
-				$part .= ' ' . $where['boolean'] . ' ';
+				$part .= 'OR' === strtoupper( (string) $where['boolean'] ) ? ' OR ' : ' AND ';
 			}
 
 			switch ( $where['type'] ) {
 				case 'basic':
-					$part .= $where['column'] . ' ' . $where['operator'] . ' %s';
+					$part .= Identifier::quote( (string) $where['column'] )
+						. ' ' . Identifier::operator( (string) $where['operator'] ) . ' %s';
 					break;
 
 				case 'in':
 					$placeholders = implode( ', ', array_fill( 0, count( $where['values'] ), '%s' ) );
 					$notStr = $where['not'] ? 'NOT ' : '';
-					$part .= $where['column'] . ' ' . $notStr . 'IN (' . $placeholders . ')';
+					$part .= Identifier::quote( (string) $where['column'] ) . ' ' . $notStr . 'IN (' . $placeholders . ')';
 					break;
 
 				case 'null':
 					$notStr = $where['not'] ? 'NOT ' : '';
-					$part .= $where['column'] . ' IS ' . $notStr . 'NULL';
+					$part .= Identifier::quote( (string) $where['column'] ) . ' IS ' . $notStr . 'NULL';
 					break;
 
 				case 'between':
-					$part .= $where['column'] . ' BETWEEN %s AND %s';
+					$part .= Identifier::quote( (string) $where['column'] ) . ' BETWEEN %s AND %s';
 					break;
 
 				case 'raw':
@@ -632,7 +673,7 @@ class QueryBuilder {
 	protected function compileOrders(): string {
 		$parts = [];
 		foreach ( $this->orders as $order ) {
-			$parts[] = $order['column'] . ' ' . $order['direction'];
+			$parts[] = Identifier::quote( (string) $order['column'] ) . ' ' . Identifier::direction( (string) $order['direction'] );
 		}
 		return ' ORDER BY ' . implode( ', ', $parts );
 	}
@@ -644,9 +685,10 @@ class QueryBuilder {
 		foreach ( $this->havings as $i => $having ) {
 			$part = '';
 			if ( $i > 0 ) {
-				$part .= ' ' . $having['boolean'] . ' ';
+				$part .= 'OR' === strtoupper( (string) $having['boolean'] ) ? ' OR ' : ' AND ';
 			}
-			$part .= $having['column'] . ' ' . $having['operator'] . ' %s';
+			$part .= Identifier::quote( (string) $having['column'] )
+				. ' ' . Identifier::operator( (string) $having['operator'] ) . ' %s';
 			$parts[] = $part;
 		}
 
@@ -660,4 +702,7 @@ class QueryBuilder {
 	public function clone(): self {
 		return clone $this;
 	}
+
+	// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+
 }

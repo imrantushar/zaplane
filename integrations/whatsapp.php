@@ -2,15 +2,13 @@
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Framework\Classes\MetaGraph;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 class Whatsapp extends IntegrationBase {
-
-	private const API_BASE_URL = 'https://graph.facebook.com';
-	private const DEFAULT_API_VERSION = 'v19.0';
 
 	public static function get_slug(): string {
 		return 'whatsapp';
@@ -373,7 +371,7 @@ class Whatsapp extends IntegrationBase {
 
 		$token           = $credentials['access_token'] ?? '';
 		$phone_number_id = $credentials['phone_number_id'] ?? '';
-		$api_version     = $credentials['api_version'] ?? self::DEFAULT_API_VERSION;
+		$api_version     = (string) ( $credentials['api_version'] ?? '' );
 
 		if ( empty( $token ) || empty( $phone_number_id ) ) {
 			throw new \Exception( 'WhatsApp credentials (access_token and phone_number_id) are required' );
@@ -440,9 +438,9 @@ class Whatsapp extends IntegrationBase {
 			'api_version'     => [
 				'type'        => 'text',
 				'label'       => 'API Version',
-				'placeholder' => 'v19.0',
+				'placeholder' => MetaGraph::DEFAULT_VERSION,
 				'required'    => false,
-				'help'        => 'Meta Graph API version (default: v19.0).',
+				'help'        => 'Meta Graph API version. Leave blank to use ' . MetaGraph::DEFAULT_VERSION . '.',
 			],
 		];
 	}
@@ -450,7 +448,7 @@ class Whatsapp extends IntegrationBase {
 	public static function test_connection( array $credentials ): array {
 		$token           = $credentials['access_token'] ?? '';
 		$phone_number_id = $credentials['phone_number_id'] ?? '';
-		$api_version     = $credentials['api_version'] ?? self::DEFAULT_API_VERSION;
+		$api_version     = (string) ( $credentials['api_version'] ?? '' );
 
 		if ( empty( $token ) ) {
 			return [
@@ -468,7 +466,7 @@ class Whatsapp extends IntegrationBase {
 			];
 		}
 
-		$url      = self::API_BASE_URL . '/' . $api_version . '/' . $phone_number_id;
+		$url      = MetaGraph::url( $phone_number_id, $api_version );
 		$response = wp_remote_get(
 			$url,
 			[
@@ -709,7 +707,7 @@ class Whatsapp extends IntegrationBase {
 	}
 
 	private static function whatsapp_request( string $token, string $phone_number_id, string $api_version, array $body ): array {
-		$url = self::API_BASE_URL . '/' . $api_version . '/' . $phone_number_id . '/messages';
+		$url = MetaGraph::url( $phone_number_id . '/messages', $api_version );
 
 		$response = wp_remote_post(
 			$url,

@@ -63,7 +63,7 @@
 // #wpcontent to position:relative), so it sits outside #wpbody-content's own
 // box and shows WP core's light background through unless #wpcontent itself
 // is themed too.
-#wpcontent{
+body[class*="_page_zaplane"] #wpcontent{
     padding: 0;
     background: var(--zaplane-body-background);
 }

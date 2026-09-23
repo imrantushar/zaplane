@@ -35,6 +35,13 @@ class HitlController extends WP_REST_Controller {
 	}
 
 	public function register_routes(): void {
+		// Public on purpose, and it has to be: the person approving is whoever
+		// received the mail, who is often not a user of this site at all and has
+		// no capability to ask about. The signature on the link is the credential
+		// — respond() refuses any request whose `sig` does not match the one this
+		// site produced for that exact run, node, decision and expiry, so a
+		// capability check here would add nothing and would lock out the very
+		// people the step exists to ask.
 		register_rest_route( $this->namespace, '/' . $this->rest_base . '/respond', [
 			'methods'             => [ WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ],
 			'callback'            => [ $this, 'respond' ],

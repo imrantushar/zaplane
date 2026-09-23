@@ -50,8 +50,12 @@ class Aiagent extends IntegrationBase {
 				'type'     => 'select',
 				'label'    => 'Provider',
 				'required' => true,
-				'default'  => 'anthropic',
+				'default'  => 'wordpress',
 				'options'  => [
+					[
+						'value' => 'wordpress',
+						'label' => 'WordPress AI (uses the provider configured in WordPress)'
+					],
 					[
 						'value' => 'anthropic',
 						'label' => 'Anthropic (Claude)'
@@ -65,18 +69,19 @@ class Aiagent extends IntegrationBase {
 						'label' => 'OpenAI-compatible (Azure, OpenRouter, Ollama, local…)'
 					],
 				],
-				'help'     => 'The AI Agent needs tool-calling. Use Anthropic, OpenAI, or any OpenAI-compatible endpoint that supports tools (not WordPress Core AI).',
+				'help'     => 'WordPress AI runs the agent on the provider configured in WordPress 7.0+, with no key stored here. Choose another provider to use your own key; the model must support tool calling.',
 			],
 			'api_key'  => [
-				'type'     => 'password',
-				'label'    => 'API Key',
-				'required' => true,
+				'type'       => 'password',
+				'label'      => 'API Key',
+				'required'   => false,
+				'depends_on' => [ 'provider' => [ 'anthropic', 'openai', 'openai_compatible' ] ],
 			],
 			'base_url' => [
 				'type'        => 'text',
 				'label'       => 'Base URL',
 				'required'    => false,
-				'placeholder' => 'https://openrouter.ai/api/v1',
+				'placeholder' => 'https://api.example.com/v1',
 				'depends_on'  => [ 'provider' => [ 'openai_compatible' ] ],
 				'help'        => 'For OpenAI-compatible endpoints — the base URL; /chat/completions is appended automatically. The model must support tool/function calling.',
 			],
@@ -163,10 +168,12 @@ class Aiagent extends IntegrationBase {
 		$config      = $node['data']['config'] ?? [];
 		$credentials = $node['_connection_credentials'] ?? [];
 
-		$provider = $credentials['provider'] ?? 'anthropic';
 		$api_key  = $credentials['api_key'] ?? '';
+		// Connections saved before the WordPress provider existed carry a key and
+		// no provider; they were Anthropic.
+		$provider = $credentials['provider'] ?? ( '' !== $api_key ? 'anthropic' : 'wordpress' );
 
-		if ( '' === $api_key ) {
+		if ( 'wordpress' !== $provider && '' === $api_key ) {
 			return self::err( 'No AI Agent connection credentials available.', $input );
 		}
 
@@ -236,7 +243,10 @@ class Aiagent extends IntegrationBase {
 			$system = trim( $system . "\n\nReturn ONLY a single valid JSON object as your final answer — no prose, no markdown code fences." );
 		}
 
-		if ( 'openai' === $provider ) {
+		if ( 'wordpress' === $provider ) {
+			$result = self::run_wordpress( $system, $task, $ctx, $max_steps, 'json' === $format, $history );
+			$model  = $result['model'] ?? $model;
+		} elseif ( 'openai' === $provider ) {
 			$result = self::run_openai( $api_key, $model, $system, $task, $ctx, $max_steps, 'json' === $format, $history );
 		} elseif ( 'openai_compatible' === $provider ) {
 			$base     = trim( (string) ( $credentials['base_url'] ?? '' ) );
@@ -792,6 +802,113 @@ class Aiagent extends IntegrationBase {
 				'role' => 'user',
 				'content' => $tool_results
 			];
+		}//end for
+
+		return [ 'error' => 'Agent reached the max step limit without finishing.' ];
+	}
+
+	/**
+	 * Run the tool loop through the AI Client in WordPress core (7.0+), on the
+	 * provider the site owner configured in WordPress.
+	 *
+	 * @param array<int,array{role:string,content:mixed}> $history
+	 */
+	private static function run_wordpress( string $system, string $task, array $ctx, int $max_steps, bool $json = false, array $history = [] ): array {
+		if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
+			return [ 'error' => 'WordPress AI is unavailable (requires WordPress 7.0+). Choose another provider on this connection.' ];
+		}
+		if ( function_exists( 'wp_supports_ai' ) && ! wp_supports_ai() ) {
+			return [ 'error' => 'AI features are disabled in this WordPress environment.' ];
+		}
+
+		$declarations = [];
+		foreach ( self::tool_specs( $ctx ) as $t ) {
+			$declarations[] = new \WordPress\AiClient\Tools\DTO\FunctionDeclaration( $t['name'], $t['description'], $t['schema'] );
+		}
+
+		$messages = [];
+		foreach ( self::normalize_roles( array_merge( $history, [ [ 'role' => 'user', 'content' => $task ] ] ) ) as $turn ) {
+			$text = is_string( $turn['content'] ?? null ) ? $turn['content'] : (string) wp_json_encode( $turn['content'] ?? '' );
+			if ( '' === trim( $text ) ) {
+				continue;
+			}
+			// The AI Client insists the conversation opens with the user.
+			if ( empty( $messages ) && 'assistant' === ( $turn['role'] ?? '' ) ) {
+				continue;
+			}
+			$part       = new \WordPress\AiClient\Messages\DTO\MessagePart( $text );
+			$messages[] = 'assistant' === ( $turn['role'] ?? '' )
+				? new \WordPress\AiClient\Messages\DTO\ModelMessage( [ $part ] )
+				: new \WordPress\AiClient\Messages\DTO\UserMessage( [ $part ] );
+		}
+
+		$tool_calls = [];
+		$usage      = self::empty_usage();
+
+		for ( $step = 0; $step <= $max_steps; $step++ ) {
+			$builder = wp_ai_client_prompt( $messages )->using_max_tokens( 2048 );
+			if ( '' !== trim( $system ) ) {
+				$builder->using_system_instruction( $system );
+			}
+			if ( ! empty( $declarations ) ) {
+				$builder->using_function_declarations( ...$declarations );
+			}
+
+			$result = $builder->generate_text_result();
+			if ( is_wp_error( $result ) ) {
+				return [ 'error' => 'WordPress AI: ' . $result->get_error_message() ];
+			}
+
+			$tokens = $result->getTokenUsage();
+			$usage  = self::add_usage( $usage, [
+				'input_tokens'  => $tokens->getPromptTokens(),
+				'output_tokens' => $tokens->getCompletionTokens(),
+				'total_tokens'  => $tokens->getTotalTokens(),
+			] );
+
+			$message    = $result->toMessage();
+			$messages[] = $message;
+
+			$calls = [];
+			$reply = '';
+			foreach ( $message->getParts() as $part ) {
+				if ( null !== $part->getFunctionCall() ) {
+					$calls[] = $part->getFunctionCall();
+				} elseif ( null !== $part->getText() && $part->getChannel()->isContent() ) {
+					$reply .= $part->getText();
+				}
+			}
+
+			if ( empty( $calls ) ) {
+				return [
+					'reply'      => $reply,
+					'steps'      => $step,
+					'tool_calls' => $tool_calls,
+					'usage'      => $usage,
+					'model'      => $result->getModelMetadata()->getId(),
+				];
+			}
+
+			// One message per result: some providers refuse a function response
+			// that shares its message with anything else.
+			foreach ( $calls as $call ) {
+				$name = (string) $call->getName();
+				$args = $call->getArgs();
+				if ( is_string( $args ) ) {
+					$args = json_decode( $args, true );
+				}
+				$args         = is_array( $args ) ? $args : [];
+				$out          = self::run_tool( $name, $args, $ctx );
+				$tool_calls[] = [
+					'tool'  => $name,
+					'input' => $args,
+				];
+				$messages[]   = new \WordPress\AiClient\Messages\DTO\UserMessage( [
+					new \WordPress\AiClient\Messages\DTO\MessagePart(
+						new \WordPress\AiClient\Tools\DTO\FunctionResponse( $call->getId(), $name, $out )
+					),
+				] );
+			}
 		}//end for
 
 		return [ 'error' => 'Agent reached the max step limit without finishing.' ];
