@@ -145,17 +145,19 @@ class Repeater extends IntegrationBase {
 				$step = 1;
 			}
 
+			// Stop at the cap while counting: a huge range (1 → 1e9) would
+			// otherwise be built in full before being cut down.
 			$out = [];
 			if ( $from <= $to ) {
-				for ( $i = $from; $i <= $to; $i += $step ) {
+				for ( $i = $from; $i <= $to && count( $out ) < self::MAX_ITEMS; $i += $step ) {
 					$out[] = $i;
 				}
 			} else {
-				for ( $i = $from; $i >= $to; $i -= $step ) {
+				for ( $i = $from; $i >= $to && count( $out ) < self::MAX_ITEMS; $i -= $step ) {
 					$out[] = $i;
 				}
 			}
-			return array_slice( $out, 0, self::MAX_ITEMS );
+			return $out;
 		}
 
 		$times = min( self::MAX_ITEMS, max( 0, (int) ( $config['times'] ?? 0 ) ) );

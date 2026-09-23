@@ -17,6 +17,7 @@ use Zaplane\Integrations\Wordpress\RoleActionsTrait;
 use Zaplane\Integrations\Wordpress\OptionActionsTrait;
 use Zaplane\Integrations\Wordpress\MediaActionsTrait;
 use Zaplane\Integrations\Wordpress\CommentActionsTrait;
+use Zaplane\Integrations\Wordpress\SiteActionsTrait;
 use Zaplane\Integrations\Wordpress\QueryTrait;
 use Zaplane\Integrations\Wordpress\Helper;
 
@@ -31,6 +32,7 @@ class Wordpress extends IntegrationBase {
 	use OptionActionsTrait;
 	use MediaActionsTrait;
 	use CommentActionsTrait;
+	use SiteActionsTrait;
 	use QueryTrait;
 	use Helper;
 
@@ -485,6 +487,13 @@ class Wordpress extends IntegrationBase {
 			'comment_type'         => 'comment',
 			'comment_parent'       => 0,
 			'user_id'              => 5,
+			'post_title'           => 'Hello world!',
+			'post_type'            => 'post',
+			'post_url'             => 'https://example.com/hello-world/',
+			'comment_url'          => 'https://example.com/hello-world/#comment-55',
+			'thread_id'            => 55,
+			'is_reply'             => false,
+			'author_is_team'       => false,
 		];
 
 		$term_sample = [
@@ -1098,7 +1107,44 @@ class Wordpress extends IntegrationBase {
 			return false;
 		}
 
-		return $comment->toArray();
+		return array_merge( $comment->toArray(), self::comment_context( $comment_id ) );
+	}
+
+	/**
+	 * What a comment is on and where it sits, so a workflow can file it
+	 * without extra lookups: the post, links, the thread's first comment,
+	 * and whether someone on the site's team wrote it.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private static function comment_context( int $comment_id ): array {
+		$wp_comment = get_comment( $comment_id );
+		if ( ! $wp_comment instanceof \WP_Comment ) {
+			return [];
+		}
+
+		// The first comment of the thread: replies share it.
+		$root  = $wp_comment;
+		$guard = 0;
+		while ( (int) $root->comment_parent && $guard++ < 50 ) {
+			$parent = get_comment( (int) $root->comment_parent );
+			if ( ! $parent instanceof \WP_Comment ) {
+				break;
+			}
+			$root = $parent;
+		}
+
+		$user_id = (int) $wp_comment->user_id;
+
+		return [
+			'post_title'     => html_entity_decode( get_the_title( (int) $wp_comment->comment_post_ID ), ENT_QUOTES, 'UTF-8' ),
+			'post_type'      => (string) get_post_type( (int) $wp_comment->comment_post_ID ),
+			'post_url'       => (string) get_permalink( (int) $wp_comment->comment_post_ID ),
+			'comment_url'    => (string) get_comment_link( $wp_comment ),
+			'thread_id'      => (int) $root->comment_ID,
+			'is_reply'       => (int) $wp_comment->comment_parent > 0,
+			'author_is_team' => $user_id > 0 && user_can( $user_id, 'moderate_comments' ),
+		];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
@@ -1776,6 +1822,28 @@ class Wordpress extends IntegrationBase {
 					],
 				],
 			],
+		];
+	}
+
+	private static function field_tag_id(): array {
+		return [
+			[
+				'key' => 'tag_id',
+				'label' => 'Tag ID',
+				'type' => 'expression',
+				'required' => true
+			]
+		];
+	}
+
+	private static function field_site_id(): array {
+		return [
+			[
+				'key' => 'site_id',
+				'label' => 'Site ID',
+				'type' => 'expression',
+				'required' => true
+			]
 		];
 	}
 
@@ -2671,6 +2739,13 @@ class Wordpress extends IntegrationBase {
 					'type' => 'textarea',
 					'required' => true
 				],
+				[
+					'key'      => 'user_id',
+					'label'    => 'Reply as user (ID)',
+					'type'     => 'expression',
+					'required' => false,
+					'help'     => 'Posts the reply as this WordPress user, with their name and avatar.',
+				],
 			],
 
 			'create_user' => [
@@ -3229,6 +3304,144 @@ class Wordpress extends IntegrationBase {
 					'label' => 'Value',
 					'type' => 'expression'
 				],
+			],
+
+			'update_option' => [
+				[
+					'key' => 'option_name',
+					'label' => 'Option Name',
+					'type' => 'text',
+					'required' => true
+				],
+				[
+					'key' => 'value',
+					'label' => 'New Value',
+					'type' => 'expression'
+				],
+			],
+
+			'create_post_tag' => [
+				[
+					'key' => 'name',
+					'label' => 'Tag Name',
+					'type' => 'expression',
+					'required' => true
+				],
+				[
+					'key' => 'slug',
+					'label' => 'Slug',
+					'type' => 'expression'
+				],
+				[
+					'key' => 'description',
+					'label' => 'Description',
+					'type' => 'expression'
+				],
+			],
+
+			'update_post_tag' => [
+				...self::field_tag_id(),
+				[
+					'key' => 'name',
+					'label' => 'Tag Name',
+					'type' => 'expression'
+				],
+				[
+					'key' => 'slug',
+					'label' => 'Slug',
+					'type' => 'expression'
+				],
+				[
+					'key' => 'description',
+					'label' => 'Description',
+					'type' => 'expression'
+				],
+			],
+
+			'delete_post_tag' => self::field_tag_id(),
+			'get_post_tag'    => self::field_tag_id(),
+
+			'get_post_tags' => [
+				[
+					'key' => 'search',
+					'label' => 'Search',
+					'type' => 'expression'
+				],
+				[
+					'key' => 'limit',
+					'label' => 'How many',
+					'type' => 'number',
+					'default' => 20
+				],
+				[
+					'key' => 'hide_empty',
+					'label' => 'Only tags in use',
+					'type' => 'checkbox',
+					'default' => false
+				],
+			],
+
+			'get_post_comments_all' => [
+				[
+					'key' => 'status',
+					'label' => 'Status',
+					'type' => 'select',
+					'default' => 'approve',
+					'options' => [
+						[ 'label' => 'Approved', 'value' => 'approve' ],
+						[ 'label' => 'Pending', 'value' => 'hold' ],
+						[ 'label' => 'Spam', 'value' => 'spam' ],
+						[ 'label' => 'All', 'value' => 'all' ],
+					],
+				],
+				[
+					'key' => 'limit',
+					'label' => 'How many',
+					'type' => 'number',
+					'default' => 20
+				],
+			],
+
+			'get_user_comments' => self::field_user_id(),
+
+			'create_site' => [
+				[
+					'key' => 'domain',
+					'label' => 'Domain',
+					'type' => 'expression',
+					'required' => true
+				],
+				[
+					'key' => 'path',
+					'label' => 'Path',
+					'type' => 'expression',
+					'default' => '/'
+				],
+				[
+					'key' => 'title',
+					'label' => 'Site Title',
+					'type' => 'expression',
+					'required' => true
+				],
+				...self::field_user_id(),
+			],
+
+			'delete_site'           => self::field_site_id(),
+
+			'add_user_to_site' => [
+				...self::field_site_id(),
+				...self::field_user_id(),
+				[
+					'key' => 'role',
+					'label' => 'Role',
+					'type' => 'expression',
+					'default' => 'subscriber'
+				],
+			],
+
+			'remove_user_from_site' => [
+				...self::field_site_id(),
+				...self::field_user_id(),
 			],
 
 			'update_option_advanced' => [

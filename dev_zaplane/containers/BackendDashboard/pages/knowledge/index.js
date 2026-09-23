@@ -249,6 +249,12 @@ const KnowledgePage = () => {
   };
   const closeEmbed = () => setEmbed(null);
 
+  // "?settings=1" (the gear on the Modules screen) opens the search settings.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("settings")) openEmbed();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Persists the drawer's current picks to the server. Shared by Save (which
   // then closes the drawer) and Backfill (which must run against saved config,
   // not whatever's still sitting unsaved in local state).

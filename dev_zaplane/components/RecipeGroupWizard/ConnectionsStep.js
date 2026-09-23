@@ -70,8 +70,10 @@ const ConnectionCard = ({ app, value, onChange, usedBy }) => {
       />
 
       {!value && (
-        <p className="zgs-hint">
-          {__("You can skip this. The workflows that need it stay drafts until you link one.", "zaplane")}
+        <p className="zgs-hint is-required">
+          {connections.length
+            ? __("Required: choose the account these workflows use.", "zaplane")
+            : __("Required: you don't have one yet. Use “Add connection” (it opens in a new tab), then come back here and pick it.", "zaplane")}
         </p>
       )}
     </div>
@@ -82,7 +84,7 @@ const ConnectionsStep = ({ apps, connections, onChange, usedBy }) => (
   <div className="zgs-stack">
     <Intro
       title={__("Connect your accounts", "zaplane")}
-      text={__("Pick the account each app should use. A connection added in another tab shows up here when you come back.", "zaplane")}
+      text={__("Each app needs an account before the workflows can be created. A connection added in another tab shows up here when you come back.", "zaplane")}
     />
 
     {apps.map(app => (

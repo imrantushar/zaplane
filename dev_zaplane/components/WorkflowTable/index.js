@@ -18,6 +18,7 @@ import OptionMenu from "@ZAPComponents/OptionMenu";
 import FolderCell from "@ZAPComponents/FolderCell";
 import SubTopBar from "@ZAPComponents/SubTopBar";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
+import WorkflowFilters, { readFilters, writeFilters } from "./WorkflowFilters";
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LiaEditSolid } from "react-icons/lia";
@@ -60,7 +61,10 @@ const WorkflowTable = ({
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [recipeModalOpen, setRecipeModalOpen] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
-  const handleRefresh = useCallback(async (page = 1, per_page = activePerPage ?? 10) => {
+  // Status / folder / search, for the all-workflows list (a folder's own
+  // page is already one folder).
+  const [filters, setFilters] = useState(() => (isFolder ? { status: "", folder: "", search: "" } : readFilters(["status", "folder", "search"])));
+  const handleRefresh = useCallback(async (page = 1, per_page = activePerPage ?? 10, withFilters = filters) => {
     setLoading(true);
     if (isFolder) {
       await dispatch(getFolderWorkflows({
@@ -71,11 +75,17 @@ const WorkflowTable = ({
     } else {
       await dispatch(getWorkFlow({
         page,
-        per_page
+        per_page,
+        ...withFilters
       }));
     }
     setLoading(false);
-  }, [dispatch, folderId, isFolder, activePerPage]);
+  }, [dispatch, folderId, isFolder, activePerPage, filters]);
+  const changeFilters = next => {
+    setFilters(next);
+    writeFilters(next);
+    handleRefresh(1, activePerPage, next);
+  };
   useEffect(() => {
     handleRefresh();
   }, []);
@@ -126,12 +136,14 @@ const WorkflowTable = ({
       console.error("Failed to delete selected workflows:", e);
     }
   };
-  const handleStatusChange = (row, newStatus) => {
+  const handleStatusChange = async (row, newStatus) => {
     if (!row?.id || !newStatus) return;
-    dispatch(updateWorkFlowStatus({
+    await dispatch(updateWorkFlowStatus({
       id: row.id,
       status: newStatus
     }));
+    // The tab counts (and a status filter) depend on it.
+    if (!isFolder) handleRefresh(activePage, activePerPage);
   };
   const handleOpenRecipe = row => {
     setSelectedWorkflow(row);
@@ -165,7 +177,7 @@ const WorkflowTable = ({
     columnWidth: "120px"
   }, {
     name: <span>{__("Title", "zaplane")}</span>,
-    cell: row => <span textOverflow="ellipsis" onClick={() => navigateToEdit(row.id)} className="zaplane-label font-[400] text-[14px] cursor-pointer">
+    cell: row => <span onClick={() => navigateToEdit(row.id)} className="zaplane-label truncate font-[400] text-[14px] cursor-pointer">
           {row.title}
         </span>,
     textAlign: "start",
@@ -240,12 +252,14 @@ const WorkflowTable = ({
           </button>
         </SubTopBar>}
 
+ {!isFolder && <WorkflowFilters filters={filters} counts={globalState.counts} onChange={changeFilters} />}
+
       <ListTable 
       columns={columns} 
       data={workflows} 
       isRowSelectable 
       getSelectRowValue={rows => setSelection(rows || [])} 
-      showPagination={totalCount > 0} noDataText={__("No workflows found", "zaplane")}
+      showPagination={totalCount > 0} noDataText={filters.status || filters.folder || filters.search ? __("No workflows match these filters", "zaplane") : __("No workflows found", "zaplane")}
       dataFetchingStatus={loading} 
       totalItems={totalCount} 
       currentPageNumber={activePage} 

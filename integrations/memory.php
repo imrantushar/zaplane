@@ -68,6 +68,24 @@ class Memory extends IntegrationBase {
 				return [
 					$key_field,
 					[
+						'key'      => 'source',
+						'label'    => 'History from',
+						'type'     => 'select',
+						'required' => false,
+						'default'  => 'memory',
+						'options'  => [
+							[
+								'value' => 'memory',
+								'label' => 'Saved turns (this Memory)',
+							],
+							[
+								'value' => 'inbox',
+								'label' => 'The Inbox conversation (includes your team\'s replies)',
+							],
+						],
+						'help'     => 'With the Inbox, use a key like messenger:{{trigger.sender_id}} or whatsapp:{{trigger.from}}. The history is the real conversation (customer, assistant, team and workflow replies; never private notes), so turns aren\'t saved separately. If the Inbox is off or doesn\'t know this customer yet, saved turns are used.',
+					],
+					[
 						'key'      => 'limit',
 						'label'    => 'Max Messages',
 						'type'     => 'number',
@@ -151,6 +169,16 @@ class Memory extends IntegrationBase {
 			$limit = self::DEFAULT_LIMIT;
 		}
 
+		$inbox = self::inbox_history( $key, $config, $limit );
+		if ( null !== $inbox ) {
+			return self::respond( array_merge( $input, [
+				'success' => true,
+				'history' => $inbox,
+				'count'   => count( $inbox ),
+				'source'  => 'inbox',
+			] ) );
+		}
+
 		$table = Conversation::getTable();
 
 		// Newest first for the LIMIT, then reverse to chronological order so the
@@ -175,7 +203,40 @@ class Memory extends IntegrationBase {
 		] ) );
 	}
 
+	/**
+	 * The Inbox's record of this conversation as chat turns, when the step
+	 * reads from the Inbox and the Inbox knows the customer; null otherwise.
+	 *
+	 * @param array<string,mixed> $config
+	 * @return array<int,array{role:string,content:string}>|null
+	 */
+	private static function inbox_history( string $key, array $config, int $limit ): ?array {
+		if ( 'inbox' !== ( $config['source'] ?? '' ) ) {
+			return null;
+		}
+
+		/**
+		 * Supply a conversation's history from the Inbox.
+		 *
+		 * @param array|null $history Null when the Inbox can't answer.
+		 * @param string     $key     "channel:customer id".
+		 * @param int        $limit   Most recent turns wanted.
+		 */
+		$history = apply_filters( 'zaplane/memory/inbox_history', null, $key, $limit );
+		return is_array( $history ) ? $history : null;
+	}
+
 	private static function action_append( string $key, array $config, array $input ): array {
+		// Reading from the Inbox means the Inbox already holds every turn;
+		// saving them here too would only drift out of step with it.
+		if ( null !== self::inbox_history( $key, $config, 1 ) ) {
+			return self::respond( array_merge( $input, [
+				'success' => true,
+				'skipped' => true,
+				'reason'  => 'The Inbox already records this conversation.',
+			] ) );
+		}
+
 		$role    = ( 'assistant' === ( $config['role'] ?? 'user' ) ) ? 'assistant' : 'user';
 		$content = (string) ( $config['content'] ?? '' );
 

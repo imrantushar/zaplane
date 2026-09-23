@@ -254,9 +254,10 @@ class WorkflowAuthor {
 
 			$report = GraphValidator::check( $version->getGraph() );
 			if ( ! $report['valid'] ) {
-				throw new \InvalidArgumentException(
-					'Workflow ' . (int) $workflow_id . ' cannot go live: ' . esc_html( self::format_errors( $report['errors'] ) )
-				);
+				// Not HTML: it's returned as JSON and shown as text, so escaping
+				// here only turned quotes into &quot; on screen.
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+				throw new \InvalidArgumentException( 'Workflow ' . (int) $workflow_id . ' cannot go live: ' . self::format_errors( $report['errors'] ) );
 			}
 
 			// A node whose app needs credentials is only a warning while the graph
@@ -271,9 +272,8 @@ class WorkflowAuthor {
 			);
 
 			if ( $blocking ) {
-				throw new \InvalidArgumentException(
-					'Workflow ' . (int) $workflow_id . ' cannot go live: ' . esc_html( self::format_errors( $blocking ) )
-				);
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Plain text, see above.
+				throw new \InvalidArgumentException( self::connection_message( $version->getGraph(), $blocking ) );
 			}
 		}
 
@@ -431,6 +431,51 @@ class WorkflowAuthor {
 	/**
 	 * @param array<int,array<string,string>> $errors
 	 */
+	/**
+	 * "Link a Facebook Messenger account to “Send Inbox Reply” before turning
+	 * this workflow on." Names the steps and apps as the editor shows them,
+	 * not node ids and slugs.
+	 *
+	 * @param array<string,mixed>              $graph
+	 * @param array<int,array<string,string>> $warnings missing_connection warnings.
+	 */
+	private static function connection_message( array $graph, array $warnings ): string {
+		$nodes = [];
+		foreach ( (array) ( $graph['nodes'] ?? [] ) as $node ) {
+			$nodes[ (string) ( $node['id'] ?? '' ) ] = (array) ( $node['data'] ?? [] );
+		}
+
+		$steps = [];
+		foreach ( $warnings as $warning ) {
+			$data = $nodes[ preg_replace( '/^node\s+/', '', (string) ( $warning['where'] ?? '' ) ) ] ?? [];
+			$app  = (string) ( $data['app'] ?? '' );
+			$name = trim( (string) ( $data['name'] ?? $data['label'] ?? '' ) );
+			if ( '' === $name ) {
+				$name = ucwords( str_replace( '_', ' ', (string) ( $data['event'] ?? __( 'a step', 'zaplane' ) ) ) );
+			}
+			$entry   = '' !== $app ? Catalog::entry( $app ) : null;
+			$steps[] = [
+				'name' => $name,
+				'app'  => (string) ( $entry['name'] ?? ( '' !== $app ? $app : __( 'an app', 'zaplane' ) ) ),
+			];
+		}
+
+		if ( 1 === count( $steps ) ) {
+			return sprintf(
+				/* translators: 1: app name, e.g. Facebook Messenger, 2: step name. */
+				__( 'Link a %1$s account to “%2$s” before turning this workflow on.', 'zaplane' ),
+				$steps[0]['app'],
+				$steps[0]['name']
+			);
+		}
+
+		return sprintf(
+			/* translators: %s: list of steps, e.g. “Send Reply” (Facebook Messenger), “Write the Reply” (AI). */
+			__( 'Link an account to each of these steps before turning this workflow on: %s.', 'zaplane' ),
+			implode( ', ', array_map( static fn( $s ) => sprintf( '“%s” (%s)', $s['name'], $s['app'] ), $steps ) )
+		);
+	}
+
 	private static function format_errors( array $errors ): string {
 		$lines = [];
 

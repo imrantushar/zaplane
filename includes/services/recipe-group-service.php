@@ -114,6 +114,12 @@ class RecipeGroupService {
 		$built       = RecipeGroupBuilder::build( $group, $answers );
 		$connections = $this->connections( $given['connections'] ?? [] );
 
+		// The setup wizard: every app that needs an account gets one, or
+		// nothing is created (a workflow without it can't be turned on).
+		if ( ! empty( $given['require_connections'] ) ) {
+			$this->require_connections( $built, $connections );
+		}
+
 		$title = '';
 		foreach ( $single ? [ 'title', 'folder_title' ] : [ 'folder_title' ] as $field ) {
 			if ( '' === $title && is_scalar( $given[ $field ] ?? null ) ) {
@@ -371,6 +377,33 @@ class RecipeGroupService {
 		}
 
 		return $connections;
+	}
+
+	/**
+	 * @param array<int,array<string,mixed>> $built
+	 * @param array<string,int>              $connections
+	 * @throws \InvalidArgumentException Naming the apps still missing one.
+	 */
+	private function require_connections( array $built, array $connections ): void {
+		$missing = [];
+		foreach ( $built as $item ) {
+			foreach ( (array) ( $item['graph']['nodes'] ?? [] ) as $node ) {
+				$app   = (string) ( $node['data']['app'] ?? '' );
+				$entry = '' !== $app ? Catalog::entry( $app ) : null;
+				if ( ! empty( $entry['requires_connection'] ) && empty( $connections[ $app ] ) && empty( $node['data']['connection_id'] ) ) {
+					$missing[ $app ] = (string) ( $entry['name'] ?? $app );
+				}
+			}
+		}
+		if ( $missing ) {
+			throw new \InvalidArgumentException(
+				esc_html( sprintf(
+					/* translators: %s: app names, e.g. Messenger. */
+					__( 'Link a connection for %s before creating these workflows.', 'zaplane' ),
+					implode( ', ', $missing )
+				) )
+			);
+		}
 	}
 
 	/**

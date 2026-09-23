@@ -246,6 +246,19 @@ class Automation {
 				continue;
 			}
 
+			/**
+			 * Whether this trigger event should start a run of this workflow.
+			 * The Inbox uses it so a workflow that replies to customers doesn't
+			 * run for a conversation the AI assistant or the team is answering.
+			 *
+			 * @param bool                $start
+			 * @param array<string,mixed> $trigger workflow_id, workflow_version_id, app, graph_node…
+			 * @param array<string,mixed> $payload The resolved trigger data.
+			 */
+			if ( ! apply_filters( 'zaplane/trigger/should_start', true, $trigger, $payload ) ) {
+				continue;
+			}
+
 			$this->start_trigger_run( $trigger, $payload );
 		}
 	}

@@ -1,6 +1,6 @@
 {
-    "version": "1.3.2",
-    "generated_at": "2026-09-23 15:12:44",
+    "version": "1.3.1",
+    "generated_at": "2026-09-23 16:45:32",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -14492,8 +14492,8 @@
             "triggers": {
                 "run_manually": {
                     "label": "Run Manually",
-                    "key": "run_manually",
                     "hook": "",
+                    "key": "run_manually",
                     "schema": [
                         {
                             "key": "note",
@@ -15870,6 +15870,15 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "webhook_received": {
+                    "label": "Webhook Received (every event)",
+                    "hook": "zaplane/messenger/webhook_received",
+                    "key": "webhook_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {
@@ -15891,6 +15900,58 @@
                             "type": "textarea",
                             "required": true,
                             "placeholder": "Type your reply... use {{variable}} for dynamic values"
+                        },
+                        {
+                            "key": "inbox_mode",
+                            "label": "If this customer is in the Inbox",
+                            "type": "select",
+                            "required": false,
+                            "default": "respect",
+                            "options": [
+                                {
+                                    "value": "respect",
+                                    "label": "Send only when workflows answer them (avoids double replies)"
+                                },
+                                {
+                                    "value": "always",
+                                    "label": "Always send (order updates and other notifications)"
+                                }
+                            ],
+                            "help": "The Inbox decides who answers each conversation: the AI assistant, your team, or workflows. With the first option, a workflow started by a customer message doesn't run for customers someone else is answering, and any other reply that isn't its turn is saved in the conversation as a private note instead of being sent."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "inbox_receive": {
+                    "label": "Add Event to Inbox",
+                    "key": "inbox_receive",
+                    "schema": [
+                        {
+                            "key": "body",
+                            "label": "Webhook body",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.body}}",
+                            "help": "Leave empty right after the \"Webhook Received\" trigger: it passes the delivery on."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "inbox_send": {
+                    "label": "Send Inbox Reply",
+                    "key": "inbox_send",
+                    "schema": [
+                        {
+                            "key": "message_id",
+                            "label": "Inbox message ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.message_id}}",
+                            "help": "From the Inbox \"Reply to Deliver\" trigger."
                         }
                     ],
                     "outputs": [
@@ -21390,6 +21451,15 @@
                     "outputs": [
                         "main"
                     ]
+                },
+                "webhook_received": {
+                    "label": "Webhook Received (every event)",
+                    "hook": "zaplane/whatsapp/webhook_received",
+                    "key": "webhook_received",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
                 }
             },
             "actions": {
@@ -21411,6 +21481,58 @@
                             "label": "Message Body",
                             "placeholder": "Enter your message... Use {{variable}} for dynamic values",
                             "required": true
+                        },
+                        {
+                            "key": "inbox_mode",
+                            "label": "If this customer is in the Inbox",
+                            "type": "select",
+                            "required": false,
+                            "default": "respect",
+                            "options": [
+                                {
+                                    "value": "respect",
+                                    "label": "Send only when workflows answer them (avoids double replies)"
+                                },
+                                {
+                                    "value": "always",
+                                    "label": "Always send (order updates and other notifications)"
+                                }
+                            ],
+                            "help": "The Inbox decides who answers each conversation: the AI assistant, your team, or workflows. With the first option, a workflow started by a customer message doesn't run for customers someone else is answering, and any other reply that isn't its turn is saved in the conversation as a private note instead of being sent."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "inbox_receive": {
+                    "label": "Add Event to Inbox",
+                    "key": "inbox_receive",
+                    "schema": [
+                        {
+                            "key": "body",
+                            "label": "Webhook body",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.body}}",
+                            "help": "Leave empty right after the \"Webhook Received\" trigger: it passes the delivery on."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "inbox_send": {
+                    "label": "Send Inbox Reply",
+                    "key": "inbox_send",
+                    "schema": [
+                        {
+                            "key": "message_id",
+                            "label": "Inbox message ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.message_id}}",
+                            "help": "From the Inbox \"Reply to Deliver\" trigger."
                         }
                     ],
                     "outputs": [
@@ -21484,6 +21606,24 @@
                             "label": "Caption",
                             "placeholder": "Optional caption text",
                             "required": false
+                        },
+                        {
+                            "key": "inbox_mode",
+                            "label": "If this customer is in the Inbox",
+                            "type": "select",
+                            "required": false,
+                            "default": "respect",
+                            "options": [
+                                {
+                                    "value": "respect",
+                                    "label": "Send only when workflows answer them (avoids double replies)"
+                                },
+                                {
+                                    "value": "always",
+                                    "label": "Always send (order updates and other notifications)"
+                                }
+                            ],
+                            "help": "The Inbox decides who answers each conversation: the AI assistant, your team, or workflows. With the first option, a workflow started by a customer message doesn't run for customers someone else is answering, and any other reply that isn't its turn is saved in the conversation as a private note instead of being sent."
                         }
                     ],
                     "outputs": [
@@ -21524,6 +21664,24 @@
                             "label": "Caption",
                             "placeholder": "Optional caption text",
                             "required": false
+                        },
+                        {
+                            "key": "inbox_mode",
+                            "label": "If this customer is in the Inbox",
+                            "type": "select",
+                            "required": false,
+                            "default": "respect",
+                            "options": [
+                                {
+                                    "value": "respect",
+                                    "label": "Send only when workflows answer them (avoids double replies)"
+                                },
+                                {
+                                    "value": "always",
+                                    "label": "Always send (order updates and other notifications)"
+                                }
+                            ],
+                            "help": "The Inbox decides who answers each conversation: the AI assistant, your team, or workflows. With the first option, a workflow started by a customer message doesn't run for customers someone else is answering, and any other reply that isn't its turn is saved in the conversation as a private note instead of being sent."
                         }
                     ],
                     "outputs": [
@@ -21556,6 +21714,24 @@
                             "label": "Caption",
                             "placeholder": "Optional caption text",
                             "required": false
+                        },
+                        {
+                            "key": "inbox_mode",
+                            "label": "If this customer is in the Inbox",
+                            "type": "select",
+                            "required": false,
+                            "default": "respect",
+                            "options": [
+                                {
+                                    "value": "respect",
+                                    "label": "Send only when workflows answer them (avoids double replies)"
+                                },
+                                {
+                                    "value": "always",
+                                    "label": "Always send (order updates and other notifications)"
+                                }
+                            ],
+                            "help": "The Inbox decides who answers each conversation: the AI assistant, your team, or workflows. With the first option, a workflow started by a customer message doesn't run for customers someone else is answering, and any other reply that isn't its turn is saved in the conversation as a private note instead of being sent."
                         }
                     ],
                     "outputs": [
@@ -21581,6 +21757,24 @@
                             "placeholder": "https://example.com/audio.mp3",
                             "required": true,
                             "help": "Publicly accessible URL to the audio file (MP3 or OGG)."
+                        },
+                        {
+                            "key": "inbox_mode",
+                            "label": "If this customer is in the Inbox",
+                            "type": "select",
+                            "required": false,
+                            "default": "respect",
+                            "options": [
+                                {
+                                    "value": "respect",
+                                    "label": "Send only when workflows answer them (avoids double replies)"
+                                },
+                                {
+                                    "value": "always",
+                                    "label": "Always send (order updates and other notifications)"
+                                }
+                            ],
+                            "help": "The Inbox decides who answers each conversation: the AI assistant, your team, or workflows. With the first option, a workflow started by a customer message doesn't run for customers someone else is answering, and any other reply that isn't its turn is saved in the conversation as a private note instead of being sent."
                         }
                     ],
                     "outputs": [
@@ -21626,6 +21820,24 @@
                             "label": "Address",
                             "placeholder": "123 Main St, City, Country",
                             "required": false
+                        },
+                        {
+                            "key": "inbox_mode",
+                            "label": "If this customer is in the Inbox",
+                            "type": "select",
+                            "required": false,
+                            "default": "respect",
+                            "options": [
+                                {
+                                    "value": "respect",
+                                    "label": "Send only when workflows answer them (avoids double replies)"
+                                },
+                                {
+                                    "value": "always",
+                                    "label": "Always send (order updates and other notifications)"
+                                }
+                            ],
+                            "help": "The Inbox decides who answers each conversation: the AI assistant, your team, or workflows. With the first option, a workflow started by a customer message doesn't run for customers someone else is answering, and any other reply that isn't its turn is saved in the conversation as a private note instead of being sent."
                         }
                     ],
                     "outputs": [
@@ -26545,7 +26757,19 @@
                 "update_option": {
                     "label": "Update Option",
                     "key": "update_option",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "option_name",
+                            "label": "Option Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "New Value",
+                            "type": "expression"
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28082,7 +28306,24 @@
                 "create_post_tag": {
                     "label": "Create Post Tag",
                     "key": "create_post_tag",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Tag Name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "expression"
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28091,7 +28332,29 @@
                 "update_post_tag": {
                     "label": "Update Post Tag",
                     "key": "update_post_tag",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Tag Name",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "expression"
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28100,7 +28363,14 @@
                 "delete_post_tag": {
                     "label": "Delete Post Tag",
                     "key": "delete_post_tag",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28127,7 +28397,25 @@
                 "get_post_tags": {
                     "label": "Get Post Tag (All)",
                     "key": "get_post_tags",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "limit",
+                            "label": "How many",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "hide_empty",
+                            "label": "Only tags in use",
+                            "type": "checkbox",
+                            "default": false
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28136,7 +28424,14 @@
                 "get_post_tag": {
                     "label": "Get Post Tag (Single)",
                     "key": "get_post_tag",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28145,7 +28440,40 @@
                 "create_site": {
                     "label": "Create New Site",
                     "key": "create_site",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "domain",
+                            "label": "Domain",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "path",
+                            "label": "Path",
+                            "type": "expression",
+                            "default": "/"
+                        },
+                        {
+                            "key": "title",
+                            "label": "Site Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28154,7 +28482,14 @@
                 "delete_site": {
                     "label": "Delete Site",
                     "key": "delete_site",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "site_id",
+                            "label": "Site ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28163,7 +28498,34 @@
                 "add_user_to_site": {
                     "label": "Add User to Site",
                     "key": "add_user_to_site",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "site_id",
+                            "label": "Site ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "expression",
+                            "default": "subscriber"
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28172,7 +28534,28 @@
                 "remove_user_from_site": {
                     "label": "Remove User from Site",
                     "key": "remove_user_from_site",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "site_id",
+                            "label": "Site ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28269,7 +28652,38 @@
                 "get_post_comments_all": {
                     "label": "Get Post Comments (All)",
                     "key": "get_post_comments_all",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "default": "approve",
+                            "options": [
+                                {
+                                    "label": "Approved",
+                                    "value": "approve"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "hold"
+                                },
+                                {
+                                    "label": "Spam",
+                                    "value": "spam"
+                                },
+                                {
+                                    "label": "All",
+                                    "value": "all"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "limit",
+                            "label": "How many",
+                            "type": "number",
+                            "default": 20
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28294,7 +28708,22 @@
                 "get_user_comments": {
                     "label": "Get User Comments",
                     "key": "get_user_comments",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28415,6 +28844,13 @@
                             "label": "Reply Content",
                             "type": "textarea",
                             "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "Reply as user (ID)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Posts the reply as this WordPress user, with their name and avatar."
                         }
                     ],
                     "outputs": [
@@ -32798,7 +33234,7 @@
                     "schema": [
                         {
                             "key": "source",
-                            "label": "Image (URL, path, or attachment ID)",
+                            "label": "Image (URL, attachment ID, or path in uploads)",
                             "type": "expression",
                             "required": true
                         }
@@ -32813,7 +33249,7 @@
                     "schema": [
                         {
                             "key": "source",
-                            "label": "Image (URL, path, or attachment ID)",
+                            "label": "Image (URL, attachment ID, or path in uploads)",
                             "type": "expression",
                             "required": true
                         },
@@ -32832,6 +33268,613 @@
                             "label": "Crop to exact size",
                             "type": "checkbox",
                             "default": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "inbox": {
+            "slug": "inbox",
+            "name": "Inbox",
+            "icon": "inbox.svg",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "triggers": {
+                "message_received": {
+                    "label": "Customer Message Received",
+                    "hook": "zaplane/inbox/message_received",
+                    "key": "message_received",
+                    "schema": [
+                        {
+                            "key": "channel",
+                            "label": "Channel",
+                            "type": "select",
+                            "default": "",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Any channel"
+                                },
+                                {
+                                    "value": "web",
+                                    "label": "Website chat"
+                                },
+                                {
+                                    "value": "messenger",
+                                    "label": "Messenger"
+                                },
+                                {
+                                    "value": "whatsapp",
+                                    "label": "WhatsApp"
+                                }
+                            ],
+                            "help": "Run only for conversations on this channel."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "conversation_created": {
+                    "label": "Conversation Started",
+                    "hook": "zaplane/inbox/conversation_created",
+                    "key": "conversation_created",
+                    "schema": [
+                        {
+                            "key": "channel",
+                            "label": "Channel",
+                            "type": "select",
+                            "default": "",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Any channel"
+                                },
+                                {
+                                    "value": "web",
+                                    "label": "Website chat"
+                                },
+                                {
+                                    "value": "messenger",
+                                    "label": "Messenger"
+                                },
+                                {
+                                    "value": "whatsapp",
+                                    "label": "WhatsApp"
+                                }
+                            ],
+                            "help": "Run only for conversations on this channel."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "conversation_closed": {
+                    "label": "Conversation Closed",
+                    "hook": "zaplane/inbox/conversation_closed",
+                    "key": "conversation_closed",
+                    "schema": [
+                        {
+                            "key": "channel",
+                            "label": "Channel",
+                            "type": "select",
+                            "default": "",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Any channel"
+                                },
+                                {
+                                    "value": "web",
+                                    "label": "Website chat"
+                                },
+                                {
+                                    "value": "messenger",
+                                    "label": "Messenger"
+                                },
+                                {
+                                    "value": "whatsapp",
+                                    "label": "WhatsApp"
+                                }
+                            ],
+                            "help": "Run only for conversations on this channel."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "handed_to_human": {
+                    "label": "Assistant Handed Over to the Team",
+                    "hook": "zaplane/inbox/handed_to_human",
+                    "key": "handed_to_human",
+                    "schema": [
+                        {
+                            "key": "channel",
+                            "label": "Channel",
+                            "type": "select",
+                            "default": "",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Any channel"
+                                },
+                                {
+                                    "value": "web",
+                                    "label": "Website chat"
+                                },
+                                {
+                                    "value": "messenger",
+                                    "label": "Messenger"
+                                },
+                                {
+                                    "value": "whatsapp",
+                                    "label": "WhatsApp"
+                                }
+                            ],
+                            "help": "Run only for conversations on this channel."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reply_requested": {
+                    "label": "Reply to Deliver (workflow source)",
+                    "hook": "zaplane/inbox/reply_requested",
+                    "key": "reply_requested",
+                    "schema": [
+                        {
+                            "key": "source",
+                            "label": "Source",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "wp_comments",
+                            "help": "The source name used in \"Add Incoming Message\". Runs when someone replies in one of its conversations; this workflow then posts the reply where it belongs."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "order_created": {
+                    "label": "Order Placed from a Conversation",
+                    "hook": "zaplane/inbox/order_created",
+                    "key": "order_created",
+                    "schema": [
+                        {
+                            "key": "channel",
+                            "label": "Channel",
+                            "type": "select",
+                            "default": "",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Any channel"
+                                },
+                                {
+                                    "value": "web",
+                                    "label": "Website chat"
+                                },
+                                {
+                                    "value": "messenger",
+                                    "label": "Messenger"
+                                },
+                                {
+                                    "value": "whatsapp",
+                                    "label": "WhatsApp"
+                                }
+                            ],
+                            "help": "Run only for conversations on this channel."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "receive_message": {
+                    "label": "Add Incoming Message",
+                    "key": "receive_message",
+                    "schema": [
+                        {
+                            "key": "source",
+                            "label": "Source",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "wp_comments",
+                            "help": "A short name for where these messages come from. Conversations are filed under it, and replies go out through \"Reply to Deliver\" with the same source."
+                        },
+                        {
+                            "key": "source_label",
+                            "label": "Source name shown in the inbox",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "Comments"
+                        },
+                        {
+                            "key": "thread_id",
+                            "label": "Thread ID",
+                            "type": "expression",
+                            "required": true,
+                            "help": "Messages with the same thread ID are one conversation (a comment thread, a ticket number\u2026)."
+                        },
+                        {
+                            "key": "message_id",
+                            "label": "Message ID",
+                            "type": "expression",
+                            "required": false,
+                            "help": "The ID of this message where it came from. A reply is posted under it, and the same ID twice is only added once."
+                        },
+                        {
+                            "key": "text",
+                            "label": "Message",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "link_url",
+                            "label": "Link (what it is about)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Shown at the top of the conversation, e.g. the page a comment is on."
+                        },
+                        {
+                            "key": "link_title",
+                            "label": "Link title",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "from_team",
+                            "label": "Written by your team",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Anything true (\"1\", \"yes\") records it as your team's reply, e.g. a comment answered in wp-admin."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "confirm_delivery": {
+                    "label": "Confirm Reply Delivered",
+                    "key": "confirm_delivery",
+                    "schema": [
+                        {
+                            "key": "message_id",
+                            "label": "Inbox message ID",
+                            "type": "expression",
+                            "required": true,
+                            "help": "From the \"Reply to Deliver\" trigger: {{trigger.message_id}}."
+                        },
+                        {
+                            "key": "external_id",
+                            "label": "ID where it was posted",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "error",
+                            "label": "Error (marks it failed)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_reply": {
+                    "label": "Send Reply",
+                    "key": "send_reply",
+                    "schema": [
+                        {
+                            "key": "conversation_id",
+                            "label": "Conversation ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.conversation_id}}"
+                        },
+                        {
+                            "key": "message",
+                            "label": "Reply",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_note": {
+                    "label": "Add Private Note",
+                    "key": "add_note",
+                    "schema": [
+                        {
+                            "key": "conversation_id",
+                            "label": "Conversation ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.conversation_id}}"
+                        },
+                        {
+                            "key": "message",
+                            "label": "Note",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assign": {
+                    "label": "Assign Conversation",
+                    "key": "assign",
+                    "schema": [
+                        {
+                            "key": "conversation_id",
+                            "label": "Conversation ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.conversation_id}}"
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "Team member (WordPress user ID)",
+                            "type": "expression",
+                            "required": true,
+                            "help": "Use 0 to unassign."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_tag": {
+                    "label": "Add Tag",
+                    "key": "add_tag",
+                    "schema": [
+                        {
+                            "key": "conversation_id",
+                            "label": "Conversation ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.conversation_id}}"
+                        },
+                        {
+                            "key": "tag",
+                            "label": "Tag",
+                            "type": "expression",
+                            "required": true,
+                            "help": "Separate several tags with commas."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_status": {
+                    "label": "Change Status",
+                    "key": "set_status",
+                    "schema": [
+                        {
+                            "key": "conversation_id",
+                            "label": "Conversation ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.conversation_id}}"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "default": "closed",
+                            "options": [
+                                {
+                                    "value": "open",
+                                    "label": "Open"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending"
+                                },
+                                {
+                                    "value": "snoozed",
+                                    "label": "Snoozed"
+                                },
+                                {
+                                    "value": "closed",
+                                    "label": "Closed"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_ai": {
+                    "label": "Turn Assistant On or Off",
+                    "key": "set_ai",
+                    "schema": [
+                        {
+                            "key": "conversation_id",
+                            "label": "Conversation ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.conversation_id}}"
+                        },
+                        {
+                            "key": "enabled",
+                            "label": "Assistant",
+                            "type": "select",
+                            "required": true,
+                            "default": "no",
+                            "options": [
+                                {
+                                    "value": "yes",
+                                    "label": "On \u2014 the assistant answers"
+                                },
+                                {
+                                    "value": "no",
+                                    "label": "Off \u2014 the team answers"
+                                },
+                                {
+                                    "value": "workflow",
+                                    "label": "Off \u2014 workflows answer"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "forward_to_human": {
+                    "label": "Hand Over to the Team",
+                    "key": "forward_to_human",
+                    "schema": [
+                        {
+                            "key": "conversation_id",
+                            "label": "Conversation ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.conversation_id}}"
+                        },
+                        {
+                            "key": "reason",
+                            "label": "Reason",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_products": {
+                    "label": "Find Products",
+                    "key": "search_products",
+                    "schema": [
+                        {
+                            "key": "query",
+                            "label": "What the customer is looking for",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "blue kurta"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_product": {
+                    "label": "Send Product Card",
+                    "key": "send_product",
+                    "schema": [
+                        {
+                            "key": "conversation_id",
+                            "label": "Conversation ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.conversation_id}}"
+                        },
+                        {
+                            "key": "product_id",
+                            "label": "Product ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "option_id",
+                            "label": "Price option / variation ID",
+                            "type": "expression",
+                            "required": false,
+                            "help": "For products with several prices or variations. Leave empty for the first one."
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message with the card",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_order": {
+                    "label": "Place Cash-on-Delivery Order",
+                    "key": "create_order",
+                    "schema": [
+                        {
+                            "key": "conversation_id",
+                            "label": "Conversation ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.conversation_id}}"
+                        },
+                        {
+                            "key": "items",
+                            "label": "Products as id:quantity, comma separated",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "1575:1, 1652/88:2",
+                            "help": "Add a price option / variation ID after a slash: 1652/88:2."
+                        },
+                        {
+                            "key": "name",
+                            "label": "Customer name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone number",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "address",
+                            "label": "Delivery address",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "note",
+                            "label": "Delivery note",
+                            "type": "expression",
+                            "required": false
                         }
                     ],
                     "outputs": [
@@ -33306,6 +34349,24 @@
                             "required": true,
                             "placeholder": "whatsapp:{{trigger.from}}",
                             "help": "Unique per-conversation bucket \u2014 typically channel + sender id."
+                        },
+                        {
+                            "key": "source",
+                            "label": "History from",
+                            "type": "select",
+                            "required": false,
+                            "default": "memory",
+                            "options": [
+                                {
+                                    "value": "memory",
+                                    "label": "Saved turns (this Memory)"
+                                },
+                                {
+                                    "value": "inbox",
+                                    "label": "The Inbox conversation (includes your team's replies)"
+                                }
+                            ],
+                            "help": "With the Inbox, use a key like messenger:{{trigger.sender_id}} or whatsapp:{{trigger.from}}. The history is the real conversation (customer, assistant, team and workflow replies; never private notes), so turns aren't saved separately. If the Inbox is off or doesn't know this customer yet, saved turns are used."
                         },
                         {
                             "key": "limit",

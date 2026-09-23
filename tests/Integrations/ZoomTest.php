@@ -65,7 +65,7 @@ class ZoomTest extends IntegrationTestCase {
 
 	public function test_create_meeting_throws_without_topic(): void {
 		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/topic/' );
+		$this->expectExceptionMessageMatches( '/topic/i' );
 
 		$node = $this->makeActionNode( 'create_meeting', [
 			'start_time' => '2026-05-01T10:00:00',
@@ -75,7 +75,7 @@ class ZoomTest extends IntegrationTestCase {
 
 	public function test_create_meeting_throws_without_start_time(): void {
 		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/start time/' );
+		$this->expectExceptionMessageMatches( '/start time/i' );
 
 		$node = $this->makeActionNode( 'create_meeting', [
 			'topic' => 'Test Meeting',
@@ -146,7 +146,7 @@ class ZoomTest extends IntegrationTestCase {
 
 	public function test_update_meeting_throws_without_meeting_id(): void {
 		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/meeting_id/' );
+		$this->expectExceptionMessageMatches( '/meeting id/i' );
 
 		$node = $this->makeActionNode( 'update_meeting', [
 			'topic' => 'New Title',
@@ -189,7 +189,7 @@ class ZoomTest extends IntegrationTestCase {
 
 	public function test_delete_meeting_throws_without_meeting_id(): void {
 		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/meeting_id/' );
+		$this->expectExceptionMessageMatches( '/meeting id/i' );
 
 		$node = $this->makeActionNode( 'delete_meeting', [], $this->credentials );
 		Zoom::execute_node( $node, [] );
@@ -239,7 +239,7 @@ class ZoomTest extends IntegrationTestCase {
 
 	public function test_add_registrant_throws_without_meeting_id(): void {
 		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/meeting_id/' );
+		$this->expectExceptionMessageMatches( '/meeting id/i' );
 
 		$node = $this->makeActionNode( 'add_registrant', [
 			'email'      => 'alice@example.com',
@@ -250,7 +250,7 @@ class ZoomTest extends IntegrationTestCase {
 
 	public function test_add_registrant_throws_without_email(): void {
 		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/email/' );
+		$this->expectExceptionMessageMatches( '/email/i' );
 
 		$node = $this->makeActionNode( 'add_registrant', [
 			'meeting_id' => '87654321',
@@ -261,7 +261,7 @@ class ZoomTest extends IntegrationTestCase {
 
 	public function test_add_registrant_throws_without_first_name(): void {
 		$this->expectException( \Exception::class );
-		$this->expectExceptionMessageMatches( '/first name/' );
+		$this->expectExceptionMessageMatches( '/first name/i' );
 
 		$node = $this->makeActionNode( 'add_registrant', [
 			'meeting_id' => '87654321',
@@ -398,12 +398,13 @@ class ZoomTest extends IntegrationTestCase {
 		Zoom::execute_node( $node, [] );
 	}
 
-	public function test_unknown_action_returns_passthrough(): void {
-		$node   = $this->makeActionNode( 'nonexistent_action', [], $this->credentials );
-		$result = Zoom::execute_node( $node, [ 'foo' => 'bar' ] );
-
-		$this->assertEquals( 'main', $result['port'] );
-		$this->assertEquals( [ 'foo' => 'bar' ], $result['data'] );
+	public function test_unknown_action_fails_loudly(): void {
+		// A step naming an action Zoom doesn't have is a broken workflow: the
+		// run fails with the reason instead of silently passing through.
+		$node = $this->makeActionNode( 'nonexistent_action', [], $this->credentials );
+		$this->expectException( \Exception::class );
+		$this->expectExceptionMessageMatches( '/unknown action/i' );
+		Zoom::execute_node( $node, [ 'foo' => 'bar' ] );
 	}
 
 	// =========================================================

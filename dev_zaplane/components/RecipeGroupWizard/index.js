@@ -104,6 +104,9 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
   const connectionApps = selectedApps.filter(app => app.requires_connection);
   const inactiveApps = selectedApps.filter(app => !app.plugin_active);
   const usedByApp = app => app.workflows.filter(key => workflows[key]).map(titleOf);
+  // Every app that needs an account must have one: a workflow without its
+  // connection can't be turned on, so it isn't created half set up.
+  const connectionsLinked = connectionApps.every(app => !!connections[app.slug]);
 
   const steps = [
     ...(!single
@@ -140,11 +143,14 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
           {
             key: "connections",
             label: __("Connections", "zaplane"),
-            hint: sprintf(
-              __("%1$d of %2$d linked", "zaplane"),
-              connectionApps.filter(app => connections[app.slug]).length,
-              connectionApps.length
-            ),
+            hint: connectionsLinked
+              ? sprintf(
+                  __("%1$d of %2$d linked", "zaplane"),
+                  connectionApps.filter(app => connections[app.slug]).length,
+                  connectionApps.length
+                )
+              : __("Link each account to continue", "zaplane"),
+            alert: !connectionsLinked,
           },
         ]
       : []),
@@ -160,7 +166,8 @@ const RecipeGroupWizard = ({ recipe, isOpen, onClose }) => {
   const valid = key => {
     if (key === "workflows") return chosen.length > 0;
     if (key === "settings") return settingsValid;
-    if (key === "review") return chosen.length > 0 && folderTitle.trim() !== "";
+    if (key === "connections") return connectionsLinked;
+    if (key === "review") return chosen.length > 0 && folderTitle.trim() !== "" && connectionsLinked;
     return true;
   };
   const canContinue = valid(current);

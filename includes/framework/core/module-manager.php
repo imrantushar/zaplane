@@ -35,6 +35,7 @@ class ModuleManager {
 			\Zaplane\Modules\AbandonedCart\AbandonedCartModule::class,
 			\Zaplane\Modules\BirthdayCron\BirthdayCronModule::class,
 			\Zaplane\Modules\InactiveCustomer\InactiveCustomerModule::class,
+			\Zaplane\Modules\Inbox\InboxModule::class,
 			\Zaplane\Modules\KnowledgeAutomation\KnowledgeAutomationModule::class,
 		];
 

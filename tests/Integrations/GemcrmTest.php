@@ -882,8 +882,10 @@ class GemcrmTest extends IntegrationTestCase {
 		$emailField = array_values( array_filter( $schema, fn( $f ) => $f['key'] === 'email' ) )[0];
 
 		$this->assertTrue( $emailField['required'] );
-		$this->assertEquals( 'expression', $emailField['type'] );
-		$this->assertEquals( 'email',      $emailField['subtype'] );
+		// An email field (validated when it's a literal) that still takes
+		// dynamic data like {{trigger.email}}.
+		$this->assertEquals( 'email',      $emailField['type'] );
+		$this->assertEquals( 'expression', $emailField['subtype'] );
 	}
 
 	public function test_action_schema_create_contact_has_gemcrm_status_not_status(): void {

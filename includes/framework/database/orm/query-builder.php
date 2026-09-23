@@ -111,7 +111,10 @@ class QueryBuilder {
 	}
 
 	public function where( $column, $operator = null, $value = null ): self {
-		if ( is_callable( $column ) ) {
+		// Only a closure is a nested group. A column name can also be the
+		// name of a function ("comment_ID" is a WordPress template tag), and
+		// is_callable() would call it instead of filtering on the column.
+		if ( $column instanceof \Closure ) {
 			return $this->whereNested( $column );
 		}
 

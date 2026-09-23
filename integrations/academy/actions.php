@@ -172,7 +172,7 @@ trait AcademyActions {
         foreach ( $courses as $course_id ) {
             $p = get_post( $course_id );
             if ( ! $p || 'academy_courses' !== $p->post_type || in_array( $p->post_status, [ 'trash', 'auto-draft' ], true ) ) {
-                throw new \InvalidArgumentException( 'Selected Academy course unavailable: ' . $course_id );
+                throw new \InvalidArgumentException( 'Selected Academy course unavailable: ' . (int) $course_id );
             }
             if ( 'enroll-course' === $action && ! in_array( $p->post_status, [ 'publish', 'private' ], true ) ) {
                 throw new \InvalidArgumentException( 'Enrollment requires a published or private course.' );

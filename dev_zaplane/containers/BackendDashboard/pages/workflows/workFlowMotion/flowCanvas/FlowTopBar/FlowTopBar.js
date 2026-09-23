@@ -71,10 +71,14 @@ export default function FlowTopBar({
     const updateStatusAndTitle = async () => {
       try {
         if (values?.status && values.status !== workFlow.workflow.status) {
-          await dispatch(updateWorkFlowStatus({
+          const result = await dispatch(updateWorkFlowStatus({
             id,
             status: values.status
           }));
+          // Refused (it can't go live yet): show the status it still has.
+          if (updateWorkFlowStatus.rejected.match(result)) {
+            setFieldValue("status", workFlow.workflow.status);
+          }
         }
         if (values?.title && values.title !== workFlow.workflow.title) {
           await dispatch(updateWorkFlowTitle({
@@ -339,19 +343,22 @@ export default function FlowTopBar({
       {isEditingTitle ? (
         <input
           ref={titleInputRef}
-          height="28px"
           value={currentTitle}
           onChange={e => setFieldValue("title", e.target.value)}
           onBlur={() => setIsEditingTitle(false)}
           onKeyDown={e => {
             if (e.key === "Enter" || e.key === "Escape") setIsEditingTitle(false);
           }}
-          className="text-[14px] font-semibold border-b-2 border-primary-500 focus:outline-none bg-transparent px-1 w-auto max-w-[200px]"
+          aria-label={__("Workflow name", "zaplane")}
+          // Grows with the name, so it's never cut off while typing.
+          style={{ width: `calc(${Math.min(Math.max((currentTitle || "").length, 14), 60)}ch + 24px)` }}
+          className="zaplane-title-input"
         />
       ) : (
         <span
           onClick={() => setIsEditingTitle(true)}
-          className="m-0 text-[14px] font-semibold text-[var(--zaplane-font-color)] truncate cursor-pointer max-w-[240px] hover:bg-[var(--zaplane-secondary-color)] px-2 py-1 rounded transition-colors"
+          title={__("Click to rename", "zaplane")}
+          className="zaplane-title-text m-0 text-[14px] font-semibold text-[var(--zaplane-font-color)] truncate cursor-text max-w-[360px] hover:bg-[var(--zaplane-secondary-color)] px-2 py-1 rounded transition-colors"
         >
           {currentTitle}
         </span>

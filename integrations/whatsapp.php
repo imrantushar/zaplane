@@ -1,6 +1,7 @@
 <?php
 namespace Zaplane\Integrations;
 
+use Zaplane\Framework\Classes\ChannelSend;
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Classes\MetaGraph;
 
@@ -28,12 +29,18 @@ class Whatsapp extends IntegrationBase {
 				'label' => 'Message Received',
 				'hook'  => 'zaplane/whatsapp/message_received',
 			],
+			'webhook_received' => [
+				'label' => 'Webhook Received (every event)',
+				'hook'  => 'zaplane/whatsapp/webhook_received',
+			],
 		];
 	}
 
 	public static function get_actions(): array {
 		return [
 			'send_text'     => [ 'label' => 'Send Text Message' ],
+			'inbox_receive' => [ 'label' => 'Add Event to Inbox' ],
+			'inbox_send'    => [ 'label' => 'Send Inbox Reply' ],
 			'send_template' => [ 'label' => 'Send Template Message' ],
 			'send_image'    => [ 'label' => 'Send Image' ],
 			'send_document' => [ 'label' => 'Send Document' ],
@@ -44,6 +51,45 @@ class Whatsapp extends IntegrationBase {
 	}
 
 	public static function get_action_config_schema( string $action ): array {
+		if ( 'inbox_receive' === $action ) {
+			return [
+				[
+					'key'         => 'body',
+					'label'       => 'Webhook body',
+					'type'        => 'expression',
+					'required'    => false,
+					'placeholder' => '{{trigger.body}}',
+					'help'        => 'Leave empty right after the "Webhook Received" trigger: it passes the delivery on.',
+				],
+			];
+		}
+		if ( 'inbox_send' === $action ) {
+			return [
+				[
+					'key'         => 'message_id',
+					'label'       => 'Inbox message ID',
+					'type'        => 'expression',
+					'required'    => true,
+					'placeholder' => '{{trigger.message_id}}',
+					'help'        => 'From the Inbox "Reply to Deliver" trigger.',
+				],
+			];
+		}
+		$fields = self::action_fields( $action );
+
+		// Every send except a template can answer a customer, so it gets the
+		// Inbox setting too (templates start conversations and are never held).
+		if ( $fields && 0 === strpos( $action, 'send_' ) && 'send_template' !== $action ) {
+			$fields[] = ChannelSend::mode_field();
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function action_fields( string $action ): array {
 		$to_field = [
 			'key'         => 'to',
 			'type'        => 'text',
@@ -221,6 +267,11 @@ class Whatsapp extends IntegrationBase {
 	public static function resolve_trigger( array $node, array $args ) {
 		$event = $node['event'] ?? '';
 
+		if ( 'webhook_received' === $event ) {
+			$payload = $args[0] ?? [];
+			return is_array( $payload ) && ! empty( $payload['body'] ) ? $payload : false;
+		}
+
 		if ( 'message_received' === $event ) {
 			// The incoming-webhook controller fires the hook with the parsed
 			// payload as the single argument.
@@ -243,6 +294,15 @@ class Whatsapp extends IntegrationBase {
 	}
 
 	public static function get_trigger_sample_output( string $trigger ): array {
+		if ( 'webhook_received' === $trigger ) {
+			return [
+				'object'    => 'whatsapp_business_account',
+				'body'      => '{"object":"whatsapp_business_account","entry":[{"changes":[{"field":"messages","value":{"messages":[{"id":"wamid.1","from":"8801700000000","type":"text","text":{"body":"Hi"}}]}}]}]}',
+				'signature' => 'sha256=…',
+				'events'    => 1,
+			];
+		}
+
 		if ( 'message_received' === $trigger ) {
 			return [
 				'message_id'      => 'wamid.HBgLMTU1NTEyMzQ1NjcVAgARGBI...',
@@ -280,6 +340,64 @@ class Whatsapp extends IntegrationBase {
 		return hash_equals( $expected, $signature );
 	}
 
+	/**
+	 * "Add Event to Inbox" and "Send Inbox Reply": the workflow side of the
+	 * Inbox's WhatsApp channel. The channel is on while these are active.
+	 *
+	 * @param array<string,mixed> $node
+	 * @param array<string,mixed> $input
+	 */
+	private static function inbox_step( string $action, array $node, array $input ): array {
+		$channel = '\\Zaplane\\Modules\\Inbox\\Channels\\Whatsapp';
+		if ( ! class_exists( $channel ) || ! \Zaplane\Settings::feature_enabled( 'inbox' ) ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [ 'success' => false, 'error' => 'The Inbox module is off.' ] ),
+			];
+		}
+		$config      = (array) ( $node['data']['config'] ?? [] );
+		$credentials = (array) ( $node['_connection_credentials'] ?? [] );
+
+		if ( 'inbox_receive' === $action ) {
+			$body   = trim( (string) ( $config['body'] ?? '' ) );
+			$result = $channel::receive_from_workflow(
+				'' !== $body ? $body : (string) ( $input['body'] ?? '' ),
+				(string) ( $input['signature'] ?? '' ),
+				$credentials
+			);
+		} else {
+			$result = $channel::send_from_workflow( (int) ( $config['message_id'] ?? 0 ), $credentials );
+		}
+
+		return [
+			'port' => 'main',
+			'data' => array_merge( $input, [ 'success' => (bool) $result['ok'] ], $result ),
+		];
+	}
+
+	/**
+	 * The whole delivery as one "Webhook Received" event: the raw body and
+	 * Meta's signature, so the Inbox can check it and read every event in it.
+	 *
+	 * @param array<string,mixed> $data The decoded body.
+	 * @return array{event:string,payload:array<string,mixed>}
+	 */
+	private static function delivery_event( \WP_REST_Request $request, array $data, string $key ): array {
+		$count = 0;
+		foreach ( (array) ( $data['entry'] ?? [] ) as $entry ) {
+			$count += count( (array) ( $entry[ $key ] ?? [] ) );
+		}
+		return [
+			'event'   => 'webhook_received',
+			'payload' => [
+				'object'    => (string) ( $data['object'] ?? '' ),
+				'body'      => (string) $request->get_body(),
+				'signature' => (string) $request->get_header( 'x_hub_signature_256' ),
+				'events'    => $count,
+			],
+		];
+	}
+
 	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
 		$data = json_decode( $request->get_body(), true );
 
@@ -287,14 +405,30 @@ class Whatsapp extends IntegrationBase {
 			return null;
 		}
 
-		$value   = $data['entry'][0]['changes'][0]['value'] ?? [];
-		$message = $value['messages'][0] ?? null;
-
-		// No inbound message (status update, template event, etc.) → skip.
-		if ( ! is_array( $message ) ) {
-			return null;
+		// Meta batches: several entries and changes, each with several messages.
+		// "Webhook Received" gets the whole delivery, statuses included (the
+		// Inbox reads all of it); "Message Received" one event per message.
+		$events = [ self::delivery_event( $request, $data, 'changes' ) ];
+		foreach ( (array) ( $data['entry'] ?? [] ) as $entry ) {
+			foreach ( (array) ( $entry['changes'] ?? [] ) as $change ) {
+				$value = (array) ( $change['value'] ?? [] );
+				foreach ( (array) ( $value['messages'] ?? [] ) as $message ) {
+					$event = self::message_event( $value, is_array( $message ) ? $message : [] );
+					if ( null !== $event ) {
+						$events[] = $event;
+					}
+				}
+			}
 		}
 
+		return [ 'events' => $events ];
+	}
+
+	/**
+	 * @param array<string,mixed> $value   The change's value block.
+	 * @param array<string,mixed> $message One message from it.
+	 */
+	private static function message_event( array $value, array $message ): ?array {
 		// Idempotency: Meta retries webhooks until it gets a 200, so the same
 		// message id can arrive several times. Skip any id we've already seen
 		// within the dedup window to avoid firing the workflow (and replying)
@@ -308,18 +442,19 @@ class Whatsapp extends IntegrationBase {
 			set_transient( $seen_key, 1, 5 * MINUTE_IN_SECONDS );
 		}
 
-		$contact = $value['contacts'][0] ?? [];
-		$type    = $message['type'] ?? '';
-
-		$text = '';
-		if ( 'text' === $type ) {
-			$text = $message['text']['body'] ?? '';
-		} elseif ( 'button' === $type ) {
-			$text = $message['button']['text'] ?? '';
-		} elseif ( 'interactive' === $type ) {
-			$text = $message['interactive']['button_reply']['title']
-				?? ( $message['interactive']['list_reply']['title'] ?? '' );
+		// The contact block for this sender, not simply the first one.
+		$contact = [];
+		foreach ( (array) ( $value['contacts'] ?? [] ) as $candidate ) {
+			if ( ( $candidate['wa_id'] ?? '' ) === ( $message['from'] ?? '' ) ) {
+				$contact = $candidate;
+				break;
+			}
 		}
+		if ( empty( $contact ) ) {
+			$contact = $value['contacts'][0] ?? [];
+		}
+
+		$type = $message['type'] ?? '';
 
 		return [
 			'event'   => 'message_received',
@@ -328,11 +463,37 @@ class Whatsapp extends IntegrationBase {
 				'from'            => $message['from'] ?? '',
 				'sender_name'     => $contact['profile']['name'] ?? '',
 				'type'            => $type,
-				'text'            => $text,
+				'text'            => self::message_text( $message ),
 				'timestamp'       => $message['timestamp'] ?? '',
 				'phone_number_id' => $value['metadata']['phone_number_id'] ?? '',
 			],
 		];
+	}
+
+	/**
+	 * The readable text of an inbound message: the body, a button or list
+	 * choice, or a media caption.
+	 *
+	 * @param array<string,mixed> $message
+	 */
+	public static function message_text( array $message ): string {
+		$type = (string) ( $message['type'] ?? '' );
+
+		if ( 'text' === $type ) {
+			return (string) ( $message['text']['body'] ?? '' );
+		}
+		if ( 'button' === $type ) {
+			return (string) ( $message['button']['text'] ?? '' );
+		}
+		if ( 'interactive' === $type ) {
+			return (string) ( $message['interactive']['button_reply']['title']
+				?? ( $message['interactive']['list_reply']['title'] ?? '' ) );
+		}
+		if ( in_array( $type, [ 'image', 'video', 'document' ], true ) ) {
+			return (string) ( $message[ $type ]['caption'] ?? '' );
+		}
+
+		return '';
 	}
 
 	public static function get_webhook_setup_fields(): array {
@@ -365,6 +526,12 @@ class Whatsapp extends IntegrationBase {
 		$action      = $node['data']['event'] ?? '';
 		$credentials = $node['_connection_credentials'] ?? null;
 
+		// The Inbox's own steps: everything WhatsApp can carry (pictures, taps,
+		// replies sent from the app…) goes through the Inbox's WhatsApp code.
+		if ( 'inbox_receive' === $action || 'inbox_send' === $action ) {
+			return self::inbox_step( $action, $node, $input );
+		}
+
 		if ( ! $credentials ) {
 			throw new \Exception( 'No connection credentials available for WhatsApp' );
 		}
@@ -377,32 +544,33 @@ class Whatsapp extends IntegrationBase {
 			throw new \Exception( 'WhatsApp credentials (access_token and phone_number_id) are required' );
 		}
 
+		// Workflows messaging a customer the Inbox also handles: see ChannelSend.
+		$context = self::send_context( (string) $action, $node, (string) $phone_number_id );
+		if ( $context && 'send_template' !== $action ) {
+			// Templates are the business starting a conversation (order updates,
+			// reminders), never an answer, so they are not held.
+			$reason = ChannelSend::check( $context );
+			if ( '' !== $reason ) {
+				return ChannelSend::held( $context, $reason, $input );
+			}
+		}
+
+		$out = null;
 		if ( 'send_text' === $action ) {
-			return self::action_send_text( $node, $input, $token, $phone_number_id, $api_version );
+			$out = self::action_send_text( $node, $input, $token, $phone_number_id, $api_version );
+		} elseif ( 'send_template' === $action ) {
+			$out = self::action_send_template( $node, $input, $token, $phone_number_id, $api_version );
+		} elseif ( in_array( $action, [ 'send_image', 'send_document', 'send_video', 'send_audio' ], true ) ) {
+			$out = self::action_send_media( $node, $input, $token, $phone_number_id, $api_version, substr( (string) $action, 5 ) );
+		} elseif ( 'send_location' === $action ) {
+			$out = self::action_send_location( $node, $input, $token, $phone_number_id, $api_version );
 		}
 
-		if ( 'send_template' === $action ) {
-			return self::action_send_template( $node, $input, $token, $phone_number_id, $api_version );
-		}
-
-		if ( 'send_image' === $action ) {
-			return self::action_send_media( $node, $input, $token, $phone_number_id, $api_version, 'image' );
-		}
-
-		if ( 'send_document' === $action ) {
-			return self::action_send_media( $node, $input, $token, $phone_number_id, $api_version, 'document' );
-		}
-
-		if ( 'send_video' === $action ) {
-			return self::action_send_media( $node, $input, $token, $phone_number_id, $api_version, 'video' );
-		}
-
-		if ( 'send_audio' === $action ) {
-			return self::action_send_media( $node, $input, $token, $phone_number_id, $api_version, 'audio' );
-		}
-
-		if ( 'send_location' === $action ) {
-			return self::action_send_location( $node, $input, $token, $phone_number_id, $api_version );
+		if ( null !== $out ) {
+			if ( $context ) {
+				ChannelSend::sent( array_merge( $context, [ 'message_id' => (string) ( $out['data']['whatsapp_message_id'] ?? '' ) ] ) );
+			}
+			return $out;
 		}
 
 		return [
@@ -503,6 +671,51 @@ class Whatsapp extends IntegrationBase {
 				'verified_name'        => $body['verified_name'] ?? '',
 			],
 		];
+	}
+
+	/**
+	 * What a send step is about to deliver, in ChannelSend's shape; null for
+	 * steps that don't message a customer.
+	 *
+	 * @param array<string,mixed> $node
+	 * @return array<string,mixed>|null
+	 */
+	private static function send_context( string $action, array $node, string $phone_number_id ): ?array {
+		$config = (array) ( $node['data']['config'] ?? [] );
+		$to     = preg_replace( '/\D+/', '', (string) ( $config['to'] ?? '' ) );
+		if ( '' === $to || 0 !== strpos( $action, 'send_' ) ) {
+			return null;
+		}
+
+		$body        = '';
+		$attachments = [];
+		switch ( $action ) {
+			case 'send_text':
+				$body = (string) ( $config['body'] ?? '' );
+				break;
+			case 'send_template':
+				/* translators: %s: WhatsApp template name. */
+				$body = sprintf( __( 'Template: %s', 'zaplane' ), (string) ( $config['template_name'] ?? '' ) );
+				break;
+			case 'send_location':
+				$body = trim( implode( ', ', array_filter( [ (string) ( $config['name'] ?? '' ), (string) ( $config['address'] ?? '' ) ] ) ) );
+				$body = '📍 ' . ( '' !== $body ? $body : ( $config['latitude'] ?? '' ) . ', ' . ( $config['longitude'] ?? '' ) );
+				break;
+			default:
+				$type          = substr( $action, 5 );
+				$body          = (string) ( $config['caption'] ?? '' );
+				$attachments[] = [
+					'type'     => 'image' === $type ? 'image' : 'file',
+					'url'      => (string) ( $config['link'] ?? '' ),
+					'filename' => (string) ( $config['filename'] ?? $type ),
+				];
+		}
+
+		return ChannelSend::context( 'whatsapp', $to, $node, [
+			'account_id'  => $phone_number_id,
+			'body'        => $body,
+			'attachments' => $attachments,
+		] );
 	}
 
 	private static function action_send_text( array $node, array $input, string $token, string $phone_number_id, string $api_version ): array {

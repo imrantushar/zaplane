@@ -84,6 +84,9 @@ return [
 				'name'   => 'Memory',
 				'config' => [
 					'conversation_key' => $conversation_key,
+					// The real conversation, team replies included, when the
+					// Inbox receives Messenger; saved turns otherwise.
+					'source'           => 'inbox',
 					'limit'            => 10,
 				],
 			],

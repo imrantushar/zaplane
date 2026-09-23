@@ -19,6 +19,26 @@ class Menu {
 		foreach ( Helper::get_admin_menu_list() as $item_key => $item ) {
 			add_submenu_page( $item['parent_slug'], $item['title'], $item['title'], $item['capability'], $item_key, [ $this, 'load_main_template' ] );
 		}
+		$this->agent_menu();
+	}
+
+	/**
+	 * A chat agent who can't manage the site (a shop manager, say) sees just
+	 * the inbox, under a menu of its own.
+	 */
+	private function agent_menu(): void {
+		if ( current_user_can( 'manage_options' ) || ! self::is_agent() ) {
+			return;
+		}
+		$title = __( 'Chat Inbox', 'zaplane' );
+		add_menu_page( $title, $title, \Zaplane\Modules\Inbox\Services\Agents::CAP, ZAPLANE_PLUGIN_SLUG . '-inbox', [ $this, 'load_main_template' ], 'dashicons-format-chat', 26 );
+	}
+
+	/** Picked to answer the chat (and the inbox is on). */
+	public static function is_agent(): bool {
+		return class_exists( \Zaplane\Modules\Inbox\Services\Agents::class )
+			&& \Zaplane\Settings::feature_enabled( 'inbox' )
+			&& current_user_can( \Zaplane\Modules\Inbox\Services\Agents::CAP );
 	}
 	/**
 	 * The icon beside "Zaplane" in the admin menu.

@@ -49,6 +49,7 @@
         }
         &__item-active {
             background: var(--zaplane-primary);
+            border-color: var(--zaplane-primary);
             color: #fff;
             cursor: default;
             &:hover {

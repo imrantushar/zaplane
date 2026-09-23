@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Zaplane\Framework\Classes\ChannelSend;
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Classes\MetaGraph;
 
@@ -28,10 +29,19 @@ class Messenger extends IntegrationBase {
 				'label' => 'Message Received',
 				'hook'  => 'zaplane/messenger/message_received',
 			],
+			'webhook_received' => [
+				'label' => 'Webhook Received (every event)',
+				'hook'  => 'zaplane/messenger/webhook_received',
+			],
 		];
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
+		if ( 'webhook_received' === ( $node['event'] ?? '' ) ) {
+			$payload = $args[0] ?? [];
+			return is_array( $payload ) && ! empty( $payload['body'] ) ? $payload : false;
+		}
+
 		if ( 'message_received' === ( $node['event'] ?? '' ) ) {
 			$payload = $args[0] ?? [];
 
@@ -50,6 +60,15 @@ class Messenger extends IntegrationBase {
 	}
 
 	public static function get_trigger_sample_output( string $trigger ): array {
+		if ( 'webhook_received' === $trigger ) {
+			return [
+				'object'    => 'page',
+				'body'      => '{"object":"page","entry":[{"id":"102990988765432","messaging":[{"sender":{"id":"24607896878972"},"message":{"mid":"m_abc123","text":"Hi"}}]}]}',
+				'signature' => 'sha256=…',
+				'events'    => 1,
+			];
+		}
+
 		if ( 'message_received' === $trigger ) {
 			return [
 				'message_id'   => 'm_abc123',
@@ -84,6 +103,29 @@ class Messenger extends IntegrationBase {
 		return hash_equals( $expected, $signature );
 	}
 
+	/**
+	 * The whole delivery as one "Webhook Received" event: the raw body and
+	 * Meta's signature, so the Inbox can check it and read every event in it.
+	 *
+	 * @param array<string,mixed> $data The decoded body.
+	 * @return array{event:string,payload:array<string,mixed>}
+	 */
+	private static function delivery_event( \WP_REST_Request $request, array $data, string $key ): array {
+		$count = 0;
+		foreach ( (array) ( $data['entry'] ?? [] ) as $entry ) {
+			$count += count( (array) ( $entry[ $key ] ?? [] ) );
+		}
+		return [
+			'event'   => 'webhook_received',
+			'payload' => [
+				'object'    => (string) ( $data['object'] ?? '' ),
+				'body'      => (string) $request->get_body(),
+				'signature' => (string) $request->get_header( 'x_hub_signature_256' ),
+				'events'    => $count,
+			],
+		];
+	}
+
 	public static function parse_webhook_event( \WP_REST_Request $request ): ?array {
 		$data = json_decode( $request->get_body(), true );
 
@@ -91,11 +133,28 @@ class Messenger extends IntegrationBase {
 			return null;
 		}
 
-		$messaging = $data['entry'][0]['messaging'][0] ?? null;
-		if ( ! is_array( $messaging ) ) {
-			return null;
+		// Meta batches: several entries, each with several messaging events.
+		// "Webhook Received" gets the whole delivery (the Inbox reads all of
+		// it); "Message Received" one event per inbound text.
+		$events = [ self::delivery_event( $request, $data, 'messaging' ) ];
+		foreach ( (array) ( $data['entry'] ?? [] ) as $entry ) {
+			foreach ( (array) ( $entry['messaging'] ?? [] ) as $messaging ) {
+				$event = self::message_event( is_array( $messaging ) ? $messaging : [] );
+				if ( null !== $event ) {
+					$events[] = $event;
+				}
+			}
 		}
 
+		return [ 'events' => $events ];
+	}
+
+	/**
+	 * One inbound text message as a trigger event, or null for anything else.
+	 *
+	 * @param array<string,mixed> $messaging
+	 */
+	private static function message_event( array $messaging ): ?array {
 		$message = $messaging['message'] ?? null;
 
 		// Only react to inbound user text — skip delivery/read receipts,
@@ -128,6 +187,41 @@ class Messenger extends IntegrationBase {
 				'text'         => $text,
 				'timestamp'    => $messaging['timestamp'] ?? '',
 			],
+		];
+	}
+
+	/**
+	 * "Add Event to Inbox" and "Send Inbox Reply": the workflow side of the
+	 * Inbox's Messenger channel. The channel is on while these are active.
+	 *
+	 * @param array<string,mixed> $node
+	 * @param array<string,mixed> $input
+	 */
+	private static function inbox_step( string $action, array $node, array $input ): array {
+		$channel = '\\Zaplane\\Modules\\Inbox\\Channels\\Messenger';
+		if ( ! class_exists( $channel ) || ! \Zaplane\Settings::feature_enabled( 'inbox' ) ) {
+			return [
+				'port' => 'main',
+				'data' => array_merge( $input, [ 'success' => false, 'error' => 'The Inbox module is off.' ] ),
+			];
+		}
+		$config      = (array) ( $node['data']['config'] ?? [] );
+		$credentials = (array) ( $node['_connection_credentials'] ?? [] );
+
+		if ( 'inbox_receive' === $action ) {
+			$body   = trim( (string) ( $config['body'] ?? '' ) );
+			$result = $channel::receive_from_workflow(
+				'' !== $body ? $body : (string) ( $input['body'] ?? '' ),
+				(string) ( $input['signature'] ?? '' ),
+				$credentials
+			);
+		} else {
+			$result = $channel::send_from_workflow( (int) ( $config['message_id'] ?? 0 ), $credentials );
+		}
+
+		return [
+			'port' => 'main',
+			'data' => array_merge( $input, [ 'success' => (bool) $result['ok'] ], $result ),
 		];
 	}
 
@@ -241,11 +335,37 @@ class Messenger extends IntegrationBase {
 
 	public static function get_actions(): array {
 		return [
-			'send_text' => [ 'label' => 'Send Message' ],
+			'send_text'     => [ 'label' => 'Send Message' ],
+			'inbox_receive' => [ 'label' => 'Add Event to Inbox' ],
+			'inbox_send'    => [ 'label' => 'Send Inbox Reply' ],
 		];
 	}
 
 	public static function get_action_config_schema( string $action ): array {
+		if ( 'inbox_receive' === $action ) {
+			return [
+				[
+					'key'         => 'body',
+					'label'       => 'Webhook body',
+					'type'        => 'expression',
+					'required'    => false,
+					'placeholder' => '{{trigger.body}}',
+					'help'        => 'Leave empty right after the "Webhook Received" trigger: it passes the delivery on.',
+				],
+			];
+		}
+		if ( 'inbox_send' === $action ) {
+			return [
+				[
+					'key'         => 'message_id',
+					'label'       => 'Inbox message ID',
+					'type'        => 'expression',
+					'required'    => true,
+					'placeholder' => '{{trigger.message_id}}',
+					'help'        => 'From the Inbox "Reply to Deliver" trigger.',
+				],
+			];
+		}
 		if ( 'send_text' === $action ) {
 			return [
 				[
@@ -263,6 +383,7 @@ class Messenger extends IntegrationBase {
 					'required'    => true,
 					'placeholder' => 'Type your reply... use {{variable}} for dynamic values',
 				],
+				ChannelSend::mode_field(),
 			];
 		}
 
@@ -272,6 +393,12 @@ class Messenger extends IntegrationBase {
 	public static function execute_node( array $node, array $input ): array {
 		$action      = $node['data']['event'] ?? '';
 		$credentials = $node['_connection_credentials'] ?? null;
+
+		// The Inbox's own steps: everything Messenger can carry (pictures, taps,
+		// replies sent from the app…) goes through the Inbox's Messenger code.
+		if ( 'inbox_receive' === $action || 'inbox_send' === $action ) {
+			return self::inbox_step( $action, $node, $input );
+		}
 
 		if ( ! $credentials || empty( $credentials['page_access_token'] ) ) {
 			throw new \Exception( 'No connection credentials available for Messenger' );
@@ -300,16 +427,29 @@ class Messenger extends IntegrationBase {
 			throw new \Exception( 'Messenger: message text is required' );
 		}
 
+		$context = ChannelSend::context( 'messenger', (string) $recipient, $node, [ 'body' => (string) $text ] );
+		$reason  = ChannelSend::check( $context );
+		if ( '' !== $reason ) {
+			return ChannelSend::held( $context, $reason, $input );
+		}
+
 		$payload = [
 			'messaging_type' => 'RESPONSE',
 			'recipient'      => [ 'id' => $recipient ],
-			'message'        => [ 'text' => $text ],
+			'message'        => [
+				'text'     => $text,
+				// The Inbox records this send itself, so it skips Meta's echo of it.
+				'metadata' => 'zaplane_inbox',
+			],
 		];
 
-		$url = MetaGraph::url( 'me/messages', $credentials['api_version'] ?? null ) . '?access_token=' . rawurlencode( $token );
+		$url = MetaGraph::url( 'me/messages', $credentials['api_version'] ?? null );
 
 		$response = wp_remote_post( $url, [
-			'headers' => [ 'Content-Type' => 'application/json' ],
+			'headers' => [
+				'Content-Type'  => 'application/json',
+				'Authorization' => 'Bearer ' . $token,
+			],
 			'body'    => wp_json_encode( $payload ),
 			'timeout' => 60,
 		] );
@@ -323,6 +463,8 @@ class Messenger extends IntegrationBase {
 		if ( isset( $data['error'] ) ) {
 			throw new \Exception( 'Messenger API error: ' . esc_html( $data['error']['message'] ?? 'Unknown error' ) );
 		}
+
+		ChannelSend::sent( array_merge( $context, [ 'message_id' => (string) ( $data['message_id'] ?? '' ) ] ) );
 
 		return [
 			'port' => 'main',

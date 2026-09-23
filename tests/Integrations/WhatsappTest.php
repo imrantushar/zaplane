@@ -311,8 +311,9 @@ class WhatsappTest extends IntegrationTestCase {
 
 	// ========== get_triggers returns empty (actions-only integration) ==========
 
-	public function test_has_no_triggers(): void {
-		$this->assertEmpty( Whatsapp::get_triggers() );
+	public function test_triggers_are_message_received_and_webhook_received(): void {
+		// One event per inbound message, and the whole signed delivery (for the Inbox).
+		$this->assertSame( [ 'message_received', 'webhook_received' ], array_keys( Whatsapp::get_triggers() ) );
 	}
 
 	// ========== Schema coverage for all 7 actions ==========
@@ -320,6 +321,10 @@ class WhatsappTest extends IntegrationTestCase {
 	public function test_all_action_schemas_have_to_field(): void {
 		$actions = Whatsapp::get_actions();
 		foreach ( array_keys( $actions ) as $action ) {
+			// The Inbox steps work from an Inbox message, not a number.
+			if ( 0 === strpos( $action, 'inbox_' ) ) {
+				continue;
+			}
 			$schema = Whatsapp::get_action_config_schema( $action );
 			$keys   = array_column( $schema, 'key' );
 			$this->assertContains( 'to', $keys, "Action '{$action}' schema is missing the 'to' field" );

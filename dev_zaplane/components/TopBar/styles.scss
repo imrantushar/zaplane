@@ -3,3 +3,11 @@
     padding: 6px;
     border-radius: 50%;
 }
+
+// A WordPress modal sets overflow: hidden on <body>, which makes <body> the
+// sticky bar's scroll container: its top: 32px then counts from below the
+// admin bar and the bar drops 32px behind the modal. Nothing scrolls while a
+// modal is open, so it can stay where it is.
+body.modal-open .zaplane-topbar {
+	top: 0 !important;
+}

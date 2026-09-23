@@ -56,6 +56,19 @@ trait ProductActionsTrait {
 		] );
 	}
 
+	/** Create a product from a JSON body, for fields the manual form doesn't cover. */
+	protected static function action_create_product( array $config, array $input ): array {
+		$data = self::parse_json_array( $config['data'] ?? [] );
+		if ( empty( $data ) ) {
+			return self::error( 'Product data (JSON) is required', [ 'field' => 'data' ] );
+		}
+		if ( empty( $data['name'] ) ) {
+			return self::error( 'The product data needs a "name"', [ 'field' => 'data' ] );
+		}
+
+		return self::create_model( \SureCart\Models\Product::class, $config, $data, 'product' );
+	}
+
 	protected static function action_update_product( array $config, array $input ): array {
 		$data = [];
 

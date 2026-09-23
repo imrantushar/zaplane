@@ -1,0 +1,707 @@
+<?php
+namespace Zaplane\Integrations;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Modules\Inbox\Commerce\Commerce;
+use Zaplane\Modules\Inbox\Services\AiResponder;
+use Zaplane\Modules\Inbox\Services\Conversations;
+use Zaplane\Modules\Inbox\Services\Outbound;
+
+/**
+ * Workflow triggers and actions for the Inbox module: react to customer
+ * messages and conversation changes, and reply, assign, tag or hand over from
+ * a workflow. The assistant uses `forward_to_human` as a tool.
+ */
+class Inbox extends IntegrationBase {
+
+	public static function get_slug(): string {
+		return 'inbox';
+	}
+
+	public static function get_name(): string {
+		return 'Inbox';
+	}
+
+	public static function get_icon(): string {
+		return 'inbox.svg';
+	}
+
+	public static function get_category(): string {
+		return 'tool';
+	}
+
+	public static function requires_connection(): bool {
+		return false;
+	}
+
+	public static function get_triggers(): array {
+		return [
+			'message_received'     => [
+				'label' => 'Customer Message Received',
+				'hook'  => 'zaplane/inbox/message_received',
+			],
+			'conversation_created' => [
+				'label' => 'Conversation Started',
+				'hook'  => 'zaplane/inbox/conversation_created',
+			],
+			'conversation_closed'  => [
+				'label' => 'Conversation Closed',
+				'hook'  => 'zaplane/inbox/conversation_closed',
+			],
+			'handed_to_human'      => [
+				'label' => 'Assistant Handed Over to the Team',
+				'hook'  => 'zaplane/inbox/handed_to_human',
+			],
+			'reply_requested'      => [
+				'label' => 'Reply to Deliver (workflow source)',
+				'hook'  => 'zaplane/inbox/reply_requested',
+			],
+			'order_created'        => [
+				'label' => 'Order Placed from a Conversation',
+				'hook'  => 'zaplane/inbox/order_created',
+			],
+		];
+	}
+
+	public static function get_trigger_config_schema( string $trigger ): array {
+		if ( 'reply_requested' === $trigger ) {
+			return [
+				[
+					'key'         => 'source',
+					'label'       => 'Source',
+					'type'        => 'text',
+					'required'    => true,
+					'placeholder' => 'wp_comments',
+					'help'        => 'The source name used in "Add Incoming Message". Runs when someone replies in one of its conversations; this workflow then posts the reply where it belongs.',
+				],
+			];
+		}
+		return [
+			[
+				'key'     => 'channel',
+				'label'   => 'Channel',
+				'type'    => 'select',
+				'default' => '',
+				'options' => self::channel_options(),
+				'help'    => 'Run only for conversations on this channel.',
+			],
+		];
+	}
+
+	public static function resolve_trigger( array $node, array $args ) {
+		$payload = $args[0] ?? [];
+		if ( ! is_array( $payload ) || empty( $payload['conversation_id'] ) ) {
+			return false;
+		}
+
+		if ( 'reply_requested' === ( $node['event'] ?? '' ) ) {
+			$source = \Zaplane\Modules\Inbox\Services\Sources::key( (string) ( $node['config']['source'] ?? '' ) );
+			return '' !== $source && $source === ( $payload['source'] ?? '' ) ? $payload : false;
+		}
+
+		$channel = (string) ( $node['config']['channel'] ?? '' );
+		if ( '' !== $channel && $channel !== ( $payload['channel'] ?? '' ) ) {
+			return false;
+		}
+
+		return $payload;
+	}
+
+	public static function get_trigger_sample_output( string $trigger ): array {
+		$base = [
+			'conversation_id' => 42,
+			'channel'         => 'web',
+			'status'          => 'open',
+			'handler'         => 'bot',
+			'assignee_id'     => 0,
+			'contact_id'      => 7,
+			'contact_name'    => 'Jane Doe',
+			'contact_email'   => 'jane@example.com',
+			'contact_phone'   => '',
+		];
+
+		if ( in_array( $trigger, [ 'message_received', 'conversation_created' ], true ) ) {
+			return $base + [
+				'message_id' => 314,
+				'text'       => 'Hi, is the blue one in stock?',
+				'sender_id'  => 'v_3f2a9c',
+			];
+		}
+
+		if ( 'reply_requested' === $trigger ) {
+			return array_merge( $base, [
+				'channel'        => 'wp_comments',
+				'handler'        => 'human',
+				'message_id'     => 316,
+				'text'           => 'Thanks Jane! Yes, it ships worldwide.',
+				'source'         => 'wp_comments',
+				'thread_id'      => 'comment-55',
+				'reply_to'       => '58',
+				'link_url'       => home_url( '/hello-world/' ),
+				'link_title'     => 'Hello world!',
+				'sender_type'    => 'agent',
+				'sender_user_id' => 1,
+				'sender_name'    => 'Tushar',
+				'sender_email'   => 'team@example.com',
+			] );
+		}
+
+		if ( 'handed_to_human' === $trigger ) {
+			return $base + [ 'reason' => 'The customer asked for a refund.' ];
+		}
+
+		if ( 'order_created' === $trigger ) {
+			return $base + [
+				'order_id'     => 1024,
+				'order_number' => '1024',
+				'order_total'  => '৳1,250.00',
+				'store'        => 'storeengine',
+				'placed_by'    => 'ai',
+			];
+		}
+
+		return $base;
+	}
+
+	public static function get_actions(): array {
+		return [
+			'receive_message'   => [ 'label' => 'Add Incoming Message' ],
+			'confirm_delivery'  => [ 'label' => 'Confirm Reply Delivered' ],
+			'send_reply'       => [ 'label' => 'Send Reply' ],
+			'add_note'         => [ 'label' => 'Add Private Note' ],
+			'assign'           => [ 'label' => 'Assign Conversation' ],
+			'add_tag'          => [ 'label' => 'Add Tag' ],
+			'set_status'       => [ 'label' => 'Change Status' ],
+			'set_ai'           => [ 'label' => 'Turn Assistant On or Off' ],
+			'forward_to_human' => [ 'label' => 'Hand Over to the Team' ],
+			'search_products'  => [ 'label' => 'Find Products' ],
+			'send_product'     => [ 'label' => 'Send Product Card' ],
+			'create_order'     => [ 'label' => 'Place Cash-on-Delivery Order' ],
+		];
+	}
+
+	public static function get_action_config_schema( string $action ): array {
+		$conversation = [
+			'key'         => 'conversation_id',
+			'label'       => 'Conversation ID',
+			'type'        => 'expression',
+			'required'    => true,
+			'placeholder' => '{{trigger.conversation_id}}',
+		];
+
+		switch ( $action ) {
+			case 'send_reply':
+			case 'add_note':
+				return [
+					$conversation,
+					[
+						'key'      => 'message',
+						'label'    => 'send_reply' === $action ? 'Reply' : 'Note',
+						'type'     => 'textarea',
+						'required' => true,
+					],
+				];
+			case 'assign':
+				return [
+					$conversation,
+					[
+						'key'      => 'user_id',
+						'label'    => 'Team member (WordPress user ID)',
+						'type'     => 'expression',
+						'required' => true,
+						'help'     => 'Use 0 to unassign.',
+					],
+				];
+			case 'add_tag':
+				return [
+					$conversation,
+					[
+						'key'      => 'tag',
+						'label'    => 'Tag',
+						'type'     => 'expression',
+						'required' => true,
+						'help'     => 'Separate several tags with commas.',
+					],
+				];
+			case 'set_status':
+				return [
+					$conversation,
+					[
+						'key'      => 'status',
+						'label'    => 'Status',
+						'type'     => 'select',
+						'required' => true,
+						'default'  => 'closed',
+						'options'  => [
+							[
+								'value' => 'open',
+								'label' => 'Open',
+							],
+							[
+								'value' => 'pending',
+								'label' => 'Pending',
+							],
+							[
+								'value' => 'snoozed',
+								'label' => 'Snoozed',
+							],
+							[
+								'value' => 'closed',
+								'label' => 'Closed',
+							],
+						],
+					],
+				];
+			case 'set_ai':
+				return [
+					$conversation,
+					[
+						'key'      => 'enabled',
+						'label'    => 'Assistant',
+						'type'     => 'select',
+						'required' => true,
+						'default'  => 'no',
+						'options'  => [
+							[
+								'value' => 'yes',
+								'label' => 'On — the assistant answers',
+							],
+							[
+								'value' => 'no',
+								'label' => 'Off — the team answers',
+							],
+							[
+								'value' => 'workflow',
+								'label' => 'Off — workflows answer',
+							],
+						],
+					],
+				];
+			case 'forward_to_human':
+				return [
+					$conversation,
+					[
+						'key'      => 'reason',
+						'label'    => 'Reason',
+						'type'     => 'text',
+						'required' => false,
+					],
+				];
+			case 'receive_message':
+				return [
+					[
+						'key'         => 'source',
+						'label'       => 'Source',
+						'type'        => 'text',
+						'required'    => true,
+						'placeholder' => 'wp_comments',
+						'help'        => 'A short name for where these messages come from. Conversations are filed under it, and replies go out through "Reply to Deliver" with the same source.',
+					],
+					[
+						'key'         => 'source_label',
+						'label'       => 'Source name shown in the inbox',
+						'type'        => 'text',
+						'required'    => false,
+						'placeholder' => 'Comments',
+					],
+					[
+						'key'         => 'thread_id',
+						'label'       => 'Thread ID',
+						'type'        => 'expression',
+						'required'    => true,
+						'help'        => 'Messages with the same thread ID are one conversation (a comment thread, a ticket number…).',
+					],
+					[
+						'key'      => 'message_id',
+						'label'    => 'Message ID',
+						'type'     => 'expression',
+						'required' => false,
+						'help'     => 'The ID of this message where it came from. A reply is posted under it, and the same ID twice is only added once.',
+					],
+					[
+						'key'      => 'text',
+						'label'    => 'Message',
+						'type'     => 'expression',
+						'required' => true,
+					],
+					[
+						'key'      => 'name',
+						'label'    => 'Name',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'email',
+						'label'    => 'Email',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'link_url',
+						'label'    => 'Link (what it is about)',
+						'type'     => 'expression',
+						'required' => false,
+						'help'     => 'Shown at the top of the conversation, e.g. the page a comment is on.',
+					],
+					[
+						'key'      => 'link_title',
+						'label'    => 'Link title',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'from_team',
+						'label'    => 'Written by your team',
+						'type'     => 'expression',
+						'required' => false,
+						'help'     => 'Anything true ("1", "yes") records it as your team\'s reply, e.g. a comment answered in wp-admin.',
+					],
+				];
+			case 'confirm_delivery':
+				return [
+					[
+						'key'      => 'message_id',
+						'label'    => 'Inbox message ID',
+						'type'     => 'expression',
+						'required' => true,
+						'help'     => 'From the "Reply to Deliver" trigger: {{trigger.message_id}}.',
+					],
+					[
+						'key'      => 'external_id',
+						'label'    => 'ID where it was posted',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'error',
+						'label'    => 'Error (marks it failed)',
+						'type'     => 'expression',
+						'required' => false,
+					],
+				];
+			case 'search_products':
+				return [
+					[
+						'key'         => 'query',
+						'label'       => 'What the customer is looking for',
+						'type'        => 'expression',
+						'required'    => true,
+						'placeholder' => 'blue kurta',
+					],
+				];
+			case 'send_product':
+				return [
+					$conversation,
+					[
+						'key'      => 'product_id',
+						'label'    => 'Product ID',
+						'type'     => 'expression',
+						'required' => true,
+					],
+					[
+						'key'         => 'option_id',
+						'label'       => 'Price option / variation ID',
+						'type'        => 'expression',
+						'required'    => false,
+						'help'        => 'For products with several prices or variations. Leave empty for the first one.',
+					],
+					[
+						'key'      => 'message',
+						'label'    => 'Message with the card',
+						'type'     => 'text',
+						'required' => false,
+					],
+				];
+			case 'create_order':
+				return [
+					$conversation,
+					[
+						'key'         => 'items',
+						'label'       => 'Products as id:quantity, comma separated',
+						'type'        => 'expression',
+						'required'    => true,
+						'placeholder' => '1575:1, 1652/88:2',
+						'help'        => 'Add a price option / variation ID after a slash: 1652/88:2.',
+					],
+					[
+						'key'      => 'name',
+						'label'    => 'Customer name',
+						'type'     => 'expression',
+						'required' => true,
+					],
+					[
+						'key'      => 'phone',
+						'label'    => 'Phone number',
+						'type'     => 'expression',
+						'required' => true,
+					],
+					[
+						'key'      => 'address',
+						'label'    => 'Delivery address',
+						'type'     => 'expression',
+						'required' => true,
+					],
+					[
+						'key'      => 'city',
+						'label'    => 'City',
+						'type'     => 'expression',
+						'required' => false,
+					],
+					[
+						'key'      => 'note',
+						'label'    => 'Delivery note',
+						'type'     => 'expression',
+						'required' => false,
+					],
+				];
+		}
+
+		return [];
+	}
+
+	public static function execute_node( array $node, array $input ): array {
+		$event  = (string) ( $node['data']['event'] ?? '' );
+		$config = (array) ( $node['data']['config'] ?? [] );
+
+		if ( ! class_exists( Conversations::class ) ) {
+			return self::err( 'The Inbox module is not available.', $input );
+		}
+
+		if ( 'receive_message' === $event ) {
+			return self::receive_message( $config, $input );
+		}
+		if ( 'confirm_delivery' === $event ) {
+			$message = \Zaplane\Modules\Inbox\Models\Message::where( 'id', (int) ( $config['message_id'] ?? 0 ) )->where( 'direction', 'out' )->fresh()->first();
+			if ( ! $message ) {
+				return self::err( 'Inbox message not found.', $input );
+			}
+			$error = trim( (string) ( $config['error'] ?? '' ) );
+			$message->delivery_status = '' === $error ? 'sent' : 'failed';
+			$message->error           = '' === $error ? null : mb_substr( $error, 0, 500 );
+			$external                 = trim( (string) ( $config['external_id'] ?? '' ) );
+			if ( '' !== $external ) {
+				// Stored as source:id, like incoming ones, so the same item
+				// arriving back through the source isn't added twice.
+				$message->external_id = mb_substr( $message->channel . ':' . $external, 0, 191 );
+			}
+			try {
+				$message->save();
+			} catch ( \Throwable $e ) {
+				$message->external_id = null;
+				$message->save();
+			}
+			return self::ok( $input, [ 'status' => (string) $message->delivery_status ] );
+		}
+
+		// The only action that needs no conversation.
+		if ( 'search_products' === $event ) {
+			$store = Commerce::store();
+			if ( ! $store ) {
+				return self::err( 'No shop is active on this site.', $input );
+			}
+			$products = $store::search( (string) ( $config['query'] ?? '' ), 6 );
+			return self::ok( $input, [
+				'count'    => count( $products ),
+				'products' => array_map( static function ( $p ) {
+					unset( $p['price_id'] );
+					return $p;
+				}, $products ),
+			] );
+		}
+
+		$conversation = Conversations::find( (int) ( $config['conversation_id'] ?? 0 ) );
+		if ( ! $conversation ) {
+			return self::err( 'Conversation not found.', $input );
+		}
+
+		// Set only when the assistant runs this as a tool.
+		$by_ai = ! empty( $node['data']['config']['_by_ai'] );
+
+		switch ( $event ) {
+			case 'send_reply':
+			case 'add_note':
+				$text = trim( (string) ( $config['message'] ?? '' ) );
+				if ( '' === $text ) {
+					return self::err( 'A message is required.', $input );
+				}
+				$message = Outbound::send( $conversation, $text, [
+					'sender_type' => 'workflow',
+					'is_note'     => 'add_note' === $event,
+				] );
+				return self::ok( $input, [
+					'message_id' => (int) $message->id,
+					'status'     => (string) $message->delivery_status,
+					'error'      => (string) $message->error,
+				] );
+
+			case 'assign':
+				Conversations::assign( $conversation, (int) ( $config['user_id'] ?? 0 ) );
+				return self::ok( $input, [ 'assignee_id' => (int) $conversation->assignee_id ] );
+
+			case 'add_tag':
+				Conversations::add_tags( $conversation, explode( ',', (string) ( $config['tag'] ?? '' ) ) );
+				return self::ok( $input, [ 'tags' => Conversations::tags( (int) $conversation->id ) ] );
+
+			case 'set_status':
+				Conversations::set_status( $conversation, (string) ( $config['status'] ?? '' ) );
+				return self::ok( $input, [ 'status' => (string) $conversation->status ] );
+
+			case 'set_ai':
+				$mode = (string) ( $config['enabled'] ?? 'no' );
+				Conversations::set_handler( $conversation, 'yes' === $mode ? 'bot' : ( 'workflow' === $mode ? 'workflow' : 'human' ) );
+				return self::ok( $input, [ 'handler' => (string) $conversation->handler ] );
+
+			case 'send_product':
+				$sent = Commerce::send_product(
+					$conversation,
+					(int) ( $config['product_id'] ?? 0 ),
+					$by_ai ? 'ai' : 'workflow',
+					0,
+					(string) ( $config['message'] ?? '' ),
+					(int) ( $config['option_id'] ?? 0 )
+				);
+				if ( is_wp_error( $sent ) ) {
+					return self::err( $sent->get_error_message(), $input );
+				}
+				return self::ok( $input, [ 'message_id' => (int) $sent->id ] );
+
+			case 'create_order':
+				$items = Commerce::parse_items( (string) ( $config['items'] ?? '' ) );
+				$order = Commerce::place_order(
+					$conversation,
+					$items,
+					[
+						'name'    => (string) ( $config['name'] ?? '' ),
+						'phone'   => (string) ( $config['phone'] ?? '' ),
+						'address' => (string) ( $config['address'] ?? '' ),
+						'city'    => (string) ( $config['city'] ?? '' ),
+						'note'    => (string) ( $config['note'] ?? '' ),
+					],
+					$by_ai ? 'ai' : 'workflow'
+				);
+				if ( is_wp_error( $order ) ) {
+					return self::err( $order->get_error_message(), $input );
+				}
+				return self::ok( $input, [
+					'order_id'     => (int) $order['id'],
+					'order_number' => (string) $order['number'],
+					'order_total'  => (string) $order['total_text'],
+				] );
+
+			case 'forward_to_human':
+				AiResponder::note_handover( (int) $conversation->id );
+				Conversations::hand_to_human( $conversation, sanitize_text_field( (string) ( $config['reason'] ?? '' ) ) );
+				return self::ok( $input, [ 'handler' => 'human' ] );
+		}
+
+		return self::err( 'Unknown action: ' . $event, $input );
+	}
+
+	/**
+	 * @return array<int,array{value:string,label:string}>
+	 */
+	private static function channel_options(): array {
+		$options = [
+			[
+				'value' => '',
+				'label' => 'Any channel',
+			],
+		];
+		if ( class_exists( '\Zaplane\Modules\Inbox\Channels\Registry' ) ) {
+			foreach ( \Zaplane\Modules\Inbox\Channels\Registry::all() as $slug => $class ) {
+				$options[] = [
+					'value' => $slug,
+					'label' => $class::label(),
+				];
+			}
+		}
+		return $options;
+	}
+
+	/**
+	 * A message from a workflow source: filed as a conversation per thread,
+	 * answered by whoever answers that source (the team by default).
+	 *
+	 * @param array<string,mixed> $config
+	 * @param array<string,mixed> $input
+	 */
+	private static function receive_message( array $config, array $input ): array {
+		$source = \Zaplane\Modules\Inbox\Services\Sources::slug( (string) ( $config['source'] ?? '' ) );
+		$thread = mb_substr( trim( (string) ( $config['thread_id'] ?? '' ) ), 0, 180 );
+		$text   = trim( wp_strip_all_tags( (string) ( $config['text'] ?? '' ) ) );
+		if ( '' === $source ) {
+			return self::err( 'Give the source a short name (not web, messenger or whatsapp).', $input );
+		}
+		if ( '' === $thread || '' === $text ) {
+			return self::err( 'A thread ID and a message are required.', $input );
+		}
+		\Zaplane\Modules\Inbox\Services\Sources::remember( $source, (string) ( $config['source_label'] ?? '' ) );
+
+		$message_id = mb_substr( trim( (string) ( $config['message_id'] ?? '' ) ), 0, 150 );
+		$external   = '' !== $message_id ? $source . ':' . $message_id : '';
+		$contact    = [
+			'name'  => (string) ( $config['name'] ?? '' ),
+			'email' => (string) ( $config['email'] ?? '' ),
+		];
+		$link = [
+			'link_url'   => esc_url_raw( (string) ( $config['link_url'] ?? '' ) ),
+			'link_title' => mb_substr( sanitize_text_field( (string) ( $config['link_title'] ?? '' ) ), 0, 200 ),
+		];
+
+		if ( rest_sanitize_boolean( $config['from_team'] ?? false ) ) {
+			$conversation = \Zaplane\Modules\Inbox\Services\Ingest::open( $source, '', $thread, $contact );
+			$message      = \Zaplane\Modules\Inbox\Services\Ingest::external_reply( $source, '', $thread, $external, $text );
+		} else {
+			$message = \Zaplane\Modules\Inbox\Services\Ingest::inbound( [
+				'channel'     => $source,
+				'external_id' => $thread,
+				'message_id'  => $external,
+				'body'        => $text,
+				'contact'     => $contact,
+				'meta'        => array_filter( $link ),
+			] );
+			$conversation = $message ? Conversations::find( (int) $message->conversation_id ) : null;
+		}
+
+		if ( ! $message || ! $conversation ) {
+			// Already there (the same message ID again).
+			return self::ok( $input, [ 'duplicate' => true ] );
+		}
+		if ( '' !== $link['link_url'] ) {
+			Conversations::set_meta( $conversation, $link );
+		}
+
+		return self::ok( $input, [
+			'conversation_id' => (int) $conversation->id,
+			'message_id'      => (int) $message->id,
+		] );
+	}
+
+	/**
+	 * @param array<string,mixed> $input
+	 * @param array<string,mixed> $data
+	 */
+	private static function ok( array $input, array $data ): array {
+		return [
+			'port' => 'main',
+			'data' => array_merge( $input, [ 'success' => true ], $data ),
+		];
+	}
+
+	/**
+	 * @param array<string,mixed> $input
+	 */
+	private static function err( string $message, array $input ): array {
+		return [
+			'port' => 'main',
+			'data' => array_merge( $input, [
+				'success' => false,
+				'error'   => $message,
+			] ),
+		];
+	}
+}

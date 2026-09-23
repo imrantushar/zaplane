@@ -30,7 +30,7 @@ $zaplane_registry = [
 		'class' => \Zaplane\Integrations\Csv::class,
 	],
 	'datetime'            => [
-		'file'  => 'datetime.php',
+		'file'  => 'date-time-tool.php',
 		'class' => \Zaplane\Integrations\DateTime_Tool::class,
 	],
 	'image_helper'        => [
@@ -112,6 +112,10 @@ $zaplane_registry = [
 	'memory'              => [
 		'file'  => 'memory.php',
 		'class' => \Zaplane\Integrations\Memory::class,
+	],
+	'inbox'               => [
+		'file'  => 'inbox.php',
+		'class' => \Zaplane\Integrations\Inbox::class,
 	],
 	'knowledge'           => [
 		'file'  => 'knowledge.php',

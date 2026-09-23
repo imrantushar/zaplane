@@ -68,6 +68,15 @@ class Recipe extends Model {
 	// Serialization helper (used by controllers)
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Where else the recipe is offered ("inbox"…), from its blueprint.
+	 *
+	 * @return array<int,string>
+	 */
+	public function tags(): array {
+		return \Zaplane\Recipes\RecipeCompiler::tags( $this->getBlueprint()['tags'] ?? [] );
+	}
+
 	public function toResponse(): array {
 		$response = [
 			'id'                => $this->id,
@@ -78,6 +87,7 @@ class Recipe extends Model {
 			'thumbnail_id'      => $this->thumbnail_id,
 			'thumbnail_url'     => $this->thumbnailUrl(),
 			'integration_icons' => $this->integration_icons ?? [],
+			'tags'              => $this->tags(),
 			'created_by'        => $this->created_by,
 			'created_at'        => $this->created_at,
 			'updated_at'        => $this->updated_at,

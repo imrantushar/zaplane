@@ -6,16 +6,20 @@ import { showNotification } from '../notificationSlice/notificationSlice';
 
 export const fetchConnections = createAsyncThunk(
   'connections/fetchConnections',
-  async ({ app, page = 1, per_page = 20 } = {}, thunkAPI) => {
+  async ({ app, page = 1, per_page = 20, status = '', search = '' } = {}, thunkAPI) => {
     try {
-      const res = await API.get(namespace + 'connections', {
-        params: { app, page, per_page },
-      });
+      const params = { app, page, per_page };
+      // Filters are sent only when set.
+      if (status) params.status = status;
+      if (search) params.search = search;
+      const res = await API.get(namespace + 'connections', { params });
 
-      const { data, pagination } = res.data;
+      const { data, pagination, counts, apps } = res.data;
 
       return {
         data: data || [],
+        counts: counts || null,
+        apps: apps || [],
         currentPage: pagination.page ,
         itemPerPage: pagination.per_page ,
         totalItems: pagination.total ,
@@ -163,6 +167,9 @@ const connectionsSlice = createSlice({
   name: 'connections',
   initialState: {
     allConnection: [],
+    // For the list's filters: per-status totals and the apps in use.
+    counts: null,
+    apps: [],
     authFields: {},
     oauthData: null,
     loading: true,
@@ -184,8 +191,10 @@ const connectionsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchConnections.fulfilled, (state, action) => {
-       const { data, currentPage, itemPerPage, totalItems, totalPages } = action.payload;
+       const { data, currentPage, itemPerPage, totalItems, totalPages, counts, apps } = action.payload;
         state.allConnection = data;
+        state.counts = counts;
+        state.apps = apps;
         state.currentPage = currentPage;
         state.itemPerPage = itemPerPage;
         state.totalItems = totalItems;

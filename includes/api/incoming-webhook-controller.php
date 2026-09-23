@@ -234,6 +234,16 @@ class IncomingWebhookController extends WP_REST_Controller {
 			$this->send_raw( (string) ( $handshake['body'] ?? '' ), (string) ( $handshake['content_type'] ?? 'text/plain' ) );
 		}
 
+		/**
+		 * A verified delivery arrived for an integration, before it is parsed
+		 * into a workflow event. Lets other parts of Zaplane (the Inbox) read
+		 * the whole delivery, including events no trigger handles.
+		 *
+		 * @param string           $slug    Integration slug.
+		 * @param \WP_REST_Request $request The delivery.
+		 */
+		do_action( 'zaplane/incoming_webhook', (string) $slug, $request );
+
 		$parsed = $integration::parse_webhook_event( $request );
 
 		if ( null === $parsed ) {
@@ -243,19 +253,12 @@ class IncomingWebhookController extends WP_REST_Controller {
 			]);
 		}
 
-		$event   = $parsed['event'] ?? '';
-		$payload = $parsed['payload'] ?? [];
-
+		// Providers batch several events into one delivery. An integration that
+		// understands batches returns them all under `events`; the rest return
+		// a single event.
+		$events   = isset( $parsed['events'] ) && is_array( $parsed['events'] ) ? $parsed['events'] : [ $parsed ];
 		$triggers = $integration::get_triggers();
-		if ( empty( $triggers[ $event ]['hook'] ) ) {
-			return new WP_Error(
-				'unknown_event',
-				'Unknown event type: ' . $event,
-				[ 'status' => 400 ]
-			);
-		}
-
-		$hook = $triggers[ $event ]['hook'];
+		$fired    = [];
 
 		// REST requests can reach this endpoint before the normal init hook has
 		// registered the active workflow listeners. Refresh the map and register
@@ -263,13 +266,36 @@ class IncomingWebhookController extends WP_REST_Controller {
 		Query::flush_trigger_map();
 		$this->container->get( 'automation' )->dispatch_active_triggers();
 
-		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Dynamic hook dispatched from integration config.
-		do_action( $hook, $payload );
+		foreach ( $events as $one ) {
+			$event = (string) ( $one['event'] ?? '' );
+			if ( empty( $triggers[ $event ]['hook'] ) ) {
+				if ( 1 === count( $events ) ) {
+					return new WP_Error(
+						'unknown_event',
+						'Unknown event type: ' . $event,
+						[ 'status' => 400 ]
+					);
+				}
+				continue;
+			}
+
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Dynamic hook dispatched from integration config.
+			do_action( $triggers[ $event ]['hook'], $one['payload'] ?? [] );
+			$fired[] = $event;
+		}
+
+		if ( empty( $fired ) ) {
+			return rest_ensure_response([
+				'received' => true,
+				'action'   => 'skipped',
+			]);
+		}
 
 		return rest_ensure_response([
 			'received' => true,
 			'action'   => 'triggered',
-			'event'    => $event,
+			'event'    => $fired[0],
+			'count'    => count( $fired ),
 		]);
 	}
 

@@ -54,6 +54,14 @@ final class RecipeCompiler {
 	 * @return array{folder:string,values:array<int,array<string,mixed>>,workflows:array<int,array<string,mixed>>}
 	 * @throws \InvalidArgumentException When the recipe can't be built.
 	 */
+	/**
+	 * @param mixed $tags
+	 * @return array<int,string>
+	 */
+	public static function tags( $tags ): array {
+		return array_values( array_unique( array_filter( array_map( 'sanitize_key', (array) $tags ) ) ) );
+	}
+
 	public static function blueprint( array $recipe ): array {
 		$title = trim( (string) ( $recipe['title'] ?? '' ) );
 		if ( '' === $title ) {
@@ -83,6 +91,10 @@ final class RecipeCompiler {
 			'folder'    => (string) ( $recipe['folder'] ?? $title ),
 			'values'    => array_values( (array) ( $recipe['values'] ?? [] ) ),
 			'workflows' => array_values( $compiled ),
+			// Where else it's offered, e.g. "inbox": the Inbox lists those.
+			'tags'      => self::tags( $recipe['tags'] ?? [] ),
+			// For the Inbox: the channel or source these workflows connect.
+			'inbox'     => array_map( 'sanitize_key', array_intersect_key( (array) ( $recipe['inbox'] ?? [] ), [ 'channel' => 1, 'source' => 1 ] ) ),
 		];
 	}
 

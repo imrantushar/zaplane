@@ -191,10 +191,41 @@ class WorkflowsController extends WP_REST_Controller {
 		$page = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
 		$perPage = max( 1, min( 100, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
 
-		$total = Workflow::count();
-		$workflows = Workflow::orderBy( 'id', 'desc' )
+		// Filters: status (active | paused | draft), folder (an id, or "none"
+		// for workflows in no folder) and a search on the title.
+		$status = sanitize_key( (string) ( $request->get_param( 'status' ) ?? '' ) );
+		$status = in_array( $status, [ 'active', 'paused', 'draft' ], true ) ? $status : '';
+		$folder = (string) ( $request->get_param( 'folder' ) ?? '' );
+		$search = trim( sanitize_text_field( (string) ( $request->get_param( 'search' ) ?? '' ) ) );
+
+		// A fresh query each time: count() rewrites the one it runs on.
+		$query = static function ( bool $with_status = true ) use ( $status, $folder, $search ) {
+			$q = Workflow::query();
+			if ( 'none' === $folder ) {
+				$q->whereRaw( '(folder_id IS NULL OR folder_id = 0)' );
+			} elseif ( '' !== $folder && (int) $folder > 0 ) {
+				$q->where( 'folder_id', (int) $folder );
+			}
+			if ( '' !== $search ) {
+				global $wpdb;
+				$q->where( 'title', 'LIKE', '%' . $wpdb->esc_like( $search ) . '%' );
+			}
+			if ( $with_status && '' !== $status ) {
+				$q->where( 'status', $status );
+			}
+			return $q;
+		};
+
+		$total     = $query()->count();
+		$workflows = $query()->orderBy( 'id', 'desc' )
 			->forPage( $page, $perPage )
 			->get();
+
+		// For the status tabs: how many match the other filters, per status.
+		$counts = [ 'all' => $query( false )->count() ];
+		foreach ( [ 'active', 'paused', 'draft' ] as $one ) {
+			$counts[ $one ] = $query( false )->where( 'status', $one )->count();
+		}
 
 		$data = [];
 		foreach ( $workflows as $workflow ) {
@@ -220,6 +251,7 @@ class WorkflowsController extends WP_REST_Controller {
 
 		return rest_ensure_response([
 			'data' => $data,
+			'counts' => $counts,
 			'pagination' => [
 				'page' => $page,
 				'per_page' => $perPage,

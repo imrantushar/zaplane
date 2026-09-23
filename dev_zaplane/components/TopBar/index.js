@@ -47,6 +47,8 @@ const TopBar = ({
 	</div>,
 	middleContent = () => null,
 	leftContent = () => null,
+	// Page-specific buttons placed before the default theme/help controls.
+	rightExtra = null,
 	topBarStyles = {}
 }) => {
 	// if (!is_admin) return null;
@@ -61,6 +63,7 @@ const TopBar = ({
 			{middleContent()}
 
 			<div className="flex items-center gap-2">
+				{rightExtra}
 				{rightContent()}
 			</div>
 		</div>

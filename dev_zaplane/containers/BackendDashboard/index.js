@@ -16,6 +16,7 @@ import Folder from './pages/Folders/Folder';
 import EmailTemplatesPage from './pages/email-templates';
 import EmailTemplateEditor from './pages/email-templates/Editor';
 import CustomApps from './pages/custom-apps';
+import InboxPage from './pages/inbox';
 
 
 
@@ -42,6 +43,9 @@ const renderSwitch = (page, id, action, path) => {
 				return <Workflows id={id} />;
 			}
 			return <CreateWorkflows />;
+		case 'zaplane-inbox':
+			if (!featureEnabled('inbox')) return <FeatureDisabled name={__('Inbox', 'zaplane')} />;
+			return <InboxPage />;
 		case 'zaplane-logs':
 			return <Logs />;
 		case 'zaplane-connections':

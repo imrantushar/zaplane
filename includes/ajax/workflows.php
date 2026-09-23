@@ -69,9 +69,16 @@ class Workflows extends AbstractAjaxHandler {
 			return new \WP_Error( 'not_found', __( 'Workflow not found', 'zaplane' ), [ 'code' => 404 ] );
 		}
 
-		$previousStatus  = $workflow->status;
-		$workflow->status = $status;
-		$workflow->save();
+		$previousStatus = $workflow->status;
+
+		// The same checks as the editor and "Turn all on": a workflow that
+		// can't run (an invalid step, an app with no connection) doesn't go live.
+		try {
+			\Zaplane\Authoring\WorkflowAuthor::set_status( $id, $status );
+		} catch ( \InvalidArgumentException $e ) {
+			return new \WP_Error( 'cannot_activate', $e->getMessage(), [ 'code' => 400 ] );
+		}
+		$workflow = Workflow::find( $id );
 
 		if ( 'draft' === $previousStatus && 'active' === $status ) {
 			$draftVersion = WorkflowVersion::where( 'workflow_id', $id )->where( 'is_active', 1 )->first();

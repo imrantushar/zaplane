@@ -1,7 +1,9 @@
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import Search from "@ZAPComponents/Search";
+import ListFilters, { readFilters, writeFilters } from "@ZAPComponents/ListFilters";
+import { FiGrid } from "react-icons/fi";
+import { integrations } from "@ZAPUtils/helper";
 import ListTable from "@ZAPComponents/ListTable";
 import OptionMenu from "@ZAPComponents/OptionMenu";
 import StatusOptions from "@ZAPComponents/StatusOptions";
@@ -23,22 +25,31 @@ const ConnectionTable = ({ onEdit }) => {
     connection,
     currentPage,
     itemPerPage,
-    totalItems
+    totalItems,
+    counts,
+    apps = []
   } = useSelector(state => state.connections);
   const [selection, setSelection] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(allConnection.length === 0);
-  const filteredConnections = searchTerm
-    ? allConnection.filter(c => c.name?.toLowerCase().includes(searchTerm.toLowerCase()))
-    : allConnection;
-  const handleRefresh = async (page = 1, per_page = 10) => {
+  // Status / app / search, done by the server so every page is searched.
+  const [filters, setFilters] = useState(() => readFilters(["status", "app", "search"]));
+  const handleRefresh = async (page = 1, per_page = itemPerPage || 10, withFilters = filters) => {
     setLoading(true);
     await dispatch(fetchConnections({
       page,
-      per_page
+      per_page,
+      status: withFilters.status,
+      search: withFilters.search,
+      app: withFilters.app || undefined
     }));
     setLoading(false);
   };
+  const changeFilters = next => {
+    setFilters(next);
+    writeFilters(next);
+    handleRefresh(1, itemPerPage || 10, next);
+  };
+  const appName = slug => (integrations?.apps?.[slug] || integrations?.tools?.[slug])?.name || slug;
   useEffect(() => {
     handleRefresh();
   }, []);
@@ -48,14 +59,16 @@ const ConnectionTable = ({ onEdit }) => {
   const handlePerPageChange = itemsPerPage => {
     handleRefresh(1, itemsPerPage);
   };
-  const handleStatusChange = (row, newStatus) => {
+  const handleStatusChange = async (row, newStatus) => {
     if (!row?.id || !newStatus) return;
-    dispatch(updateConnection({
+    await dispatch(updateConnection({
       id: row.id,
       payload: {
         status: newStatus
       }
     }));
+    // The tab counts (and a status filter) depend on it.
+    handleRefresh(currentPage, itemPerPage);
   };
   const openDetails = row => {
     dispatch(fetchSingleConnection(row.id));
@@ -66,10 +79,7 @@ const ConnectionTable = ({ onEdit }) => {
     try {
       await Promise.all(selection.map(row => row?.id).filter(Boolean).map(id => dispatch(deleteConnection(id))));
       setSelection([]);
-      dispatch(fetchConnections({
-        page: currentPage,
-        per_page: itemPerPage
-      }));
+      handleRefresh(currentPage, itemPerPage);
     } catch (e) {
       console.error("Failed to delete selected team members", e);
     }
@@ -81,7 +91,7 @@ const ConnectionTable = ({ onEdit }) => {
     cell: row => {
       return <div className="flex items-center gap-3">
                     <ZAPIconGroup icons={[row?.icon || row?.app]} />
-                    <span textOverflow="ellipsis" className="zaplane-label font-[400]">
+                    <span className="zaplane-label truncate font-[400]">
                         {row.name}
                     </span>
                 </div>;
@@ -181,7 +191,24 @@ const ConnectionTable = ({ onEdit }) => {
     textAlign: "center"
   }];
   return <>
-            <ListTable columns={columns} data={filteredConnections} isRowSelectable={true} showSubHeader={true} subHeaderComponent={<Search placeholder={__("Search connections...", "zaplane")} onSearchHandler={setSearchTerm} />} showColumnFilter={false} showPagination={totalItems > 0} noDataText={__("No connections found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="connection-table" currentPageNumber={currentPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} getSelectRowValue={rows => {
+            <ListFilters
+              tabs={[
+                { key: "", label: __("All", "zaplane") },
+                { key: "active", label: __("Active", "zaplane"), tone: "active" },
+                { key: "inactive", label: __("Inactive", "zaplane"), tone: "muted" }
+              ]}
+              counts={counts}
+              filters={filters}
+              onChange={changeFilters}
+              searchPlaceholder={__("Search connections…", "zaplane")}
+              group={{
+                key: "app",
+                icon: FiGrid,
+                placeholder: __("All apps", "zaplane"),
+                options: apps.map(slug => ({ value: slug, label: appName(slug) })).sort((x, y) => x.label.localeCompare(y.label))
+              }}
+            />
+            <ListTable columns={columns} data={allConnection} isRowSelectable={true} showColumnFilter={false} showPagination={totalItems > 0} noDataText={filters.status || filters.app || filters.search ? __("No connections match these filters", "zaplane") : __("No connections found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="connection-table" currentPageNumber={currentPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} getSelectRowValue={rows => {
       setSelection(rows || []);
     }} />
             <ZAPActionBar selection={selection} onDelete={handleDeleteSelected} onClose={() => setSelection([])} />

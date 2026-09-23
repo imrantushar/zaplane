@@ -1,0 +1,217 @@
+<?php
+
+namespace Zaplane\Modules\Inbox\Services;
+
+use Zaplane\Modules\Inbox\Models\Contact;
+use Zaplane\Modules\Inbox\Models\Conversation;
+use Zaplane\Modules\Inbox\Models\Message;
+use Zaplane\Modules\Inbox\Settings as InboxSettings;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * The JSON shapes the inbox screen and the widget read. Times go out as UTC
+ * ISO 8601 so the browser can show them in the viewer's own zone.
+ */
+class Presenter {
+
+	/** @var array<int,array<string,mixed>> */
+	private static array $users = [];
+
+	public static function time( $mysql ): ?string {
+		if ( empty( $mysql ) || '0000-00-00 00:00:00' === $mysql ) {
+			return null;
+		}
+		return get_gmt_from_date( (string) $mysql, 'Y-m-d\TH:i:s\Z' );
+	}
+
+	/**
+	 * @return array<string,mixed>
+	 */
+	public static function contact( ?Contact $contact ): array {
+		if ( ! $contact ) {
+			return [
+				'id'   => 0,
+				'name' => __( 'Visitor', 'zaplane' ),
+			];
+		}
+
+		return [
+			'id'         => (int) $contact->id,
+			'name'       => '' !== (string) $contact->name ? (string) $contact->name : self::fallback_name( $contact ),
+			'email'      => (string) $contact->email,
+			'phone'      => (string) $contact->phone,
+			'avatar_url' => (string) $contact->avatar_url,
+			'wp_user_id' => (int) $contact->wp_user_id,
+			'email_verified' => VisitorContact::verified( $contact ),
+		];
+	}
+
+	private static function fallback_name( Contact $contact ): string {
+		if ( '' !== (string) $contact->email ) {
+			return (string) strstr( (string) $contact->email, '@', true );
+		}
+		/* translators: %d: contact id. */
+		return sprintf( __( 'Visitor #%d', 'zaplane' ), (int) $contact->id );
+	}
+
+	/**
+	 * @param array<int,Contact> $contacts Contacts keyed by id, preloaded by the caller.
+	 * @param array<int,array<int,string>> $tags Tags keyed by conversation id.
+	 * @return array<string,mixed>
+	 */
+	public static function conversation( Conversation $conversation, array $contacts = [], array $tags = [] ): array {
+		$contact = $contacts[ (int) $conversation->contact_id ]
+			?? Contact::where( 'id', (int) $conversation->contact_id )->fresh()->first();
+
+		return [
+			'id'                   => (int) $conversation->id,
+			'channel'              => (string) $conversation->channel,
+			// A workflow source is named by its workflow ("Comments").
+			'channel_label'        => Sources::is( (string) $conversation->channel ) ? Sources::label( (string) $conversation->channel ) : '',
+			'link'                 => self::link( $conversation ),
+			'status'               => (string) $conversation->status,
+			'handler'              => (string) $conversation->handler,
+			'ai_enabled'           => (bool) $conversation->ai_enabled,
+			'assignee'             => self::user( (int) $conversation->assignee_id ),
+			'unread_count'         => (int) $conversation->unread_count,
+			'last_message_preview' => (string) $conversation->last_message_preview,
+			'last_message_at'      => self::time( $conversation->last_message_at ),
+			'last_customer_at'     => self::time( $conversation->last_customer_at ),
+			'created_at'           => self::time( $conversation->created_at ),
+			'updated_at'           => self::time( $conversation->updated_at ),
+			'contact'              => self::contact( $contact ),
+			'tags'                 => $tags[ (int) $conversation->id ] ?? Conversations::tags( (int) $conversation->id ),
+			'revision'             => MessageActions::revision( $conversation ),
+			'orders'               => array_values( (array) ( ( is_array( $conversation->meta ) ? $conversation->meta : [] )['orders'] ?? [] ) ),
+		];
+	}
+
+	/**
+	 * What the conversation is about, when its source said (the page a
+	 * comment is on, say).
+	 *
+	 * @return array{url:string,title:string}|null
+	 */
+	private static function link( Conversation $conversation ): ?array {
+		$meta = is_array( $conversation->meta ) ? $conversation->meta : [];
+		$url  = esc_url_raw( (string) ( $meta['link_url'] ?? '' ) );
+		if ( '' === $url ) {
+			return null;
+		}
+		return [
+			'url'   => $url,
+			'title' => (string) ( $meta['link_title'] ?? '' ),
+		];
+	}
+
+	/**
+	 * @return array<string,mixed>
+	 */
+	public static function message( Message $message, bool $for_visitor = false ): array {
+		$meta  = is_array( $message->meta ) ? $message->meta : [];
+		$quote = is_array( $meta['reply_to'] ?? null ) ? $meta['reply_to'] : null;
+		$out   = [
+			'id'          => (int) $message->id,
+			'direction'   => (string) $message->direction,
+			'sender_type' => (string) $message->sender_type,
+			'sender_name' => self::sender_name( $message ),
+			// Who the visitor sees replying: their picture, and what kind of
+			// sender it is so the chat can mark an assistant reply as one.
+			'sender_avatar' => self::sender_avatar( $message ),
+			'sender_kind'   => (string) $message->sender_type,
+			'body'        => (string) $message->body,
+			'attachments' => is_array( $message->attachments ) ? $message->attachments : [],
+			'created_at'  => self::time( $message->created_at ),
+			'edited'      => ! empty( $meta['edited_at'] ),
+			'deleted'     => ! empty( $meta['deleted_at'] ),
+			// Buttons offered under an automatic answer ("Did this answer…?").
+			'quick_replies' => array_values( array_filter( array_map( 'strval', (array) ( $meta['quick_replies'] ?? [] ) ) ) ),
+			'quick_prompt'  => (string) ( $meta['quick_prompt'] ?? '' ),
+			'reply_to'    => $quote ? [
+				'id'          => (int) ( $quote['id'] ?? 0 ),
+				'sender_name' => (string) ( $quote['sender_name'] ?? '' ),
+				'direction'   => (string) ( $quote['direction'] ?? '' ),
+				'excerpt'     => (string) ( $quote['excerpt'] ?? '' ),
+			] : null,
+		];
+
+		if ( $for_visitor ) {
+			return $out;
+		}
+
+		$change = MessageActions::can_change( $message );
+
+		return $out + [
+			'can_change'      => $change['ok'],
+			'change_note'     => $change['reason'],
+			'sender_id'       => (int) $message->sender_id,
+			'is_note'         => (bool) $message->is_note,
+			'is_ai_generated' => (bool) $message->is_ai_generated,
+			'delivery_status' => (string) $message->delivery_status,
+			'error'           => (string) $message->error,
+			'meta'            => is_array( $message->meta ) ? $message->meta : [],
+		];
+	}
+
+	/** The picture shown beside a reply, or '' when there is none. */
+	private static function sender_avatar( Message $message ): string {
+		switch ( $message->sender_type ) {
+			case 'ai':
+				return (string) ( InboxSettings::get()['ai']['avatar'] ?? '' );
+			case 'agent':
+				$id = (int) $message->sender_id;
+				return $id > 0 ? Agents::signature( $id )['avatar'] : '';
+		}
+
+		return '';
+	}
+
+	private static function sender_name( Message $message ): string {
+		switch ( $message->sender_type ) {
+			case 'ai':
+				$name = (string) InboxSettings::get()['ai']['agent_name'];
+				/* translators: %s: assistant name. The label keeps the AI disclosure visible on every reply. */
+				return sprintf( __( '%s · AI assistant', 'zaplane' ), '' !== $name ? $name : 'Ava' );
+			case 'agent':
+				// The chat name the agent chose, falling back to their account.
+				$id = (int) $message->sender_id;
+				if ( $id > 0 ) {
+					return Agents::signature( $id )['name'];
+				}
+				return __( 'Team', 'zaplane' );
+			case 'auto':
+				return __( 'Automatic answer', 'zaplane' );
+			case 'workflow':
+				$meta = is_array( $message->meta ) ? $message->meta : [];
+				if ( ! empty( $meta['workflow_name'] ) ) {
+					/* translators: %s: workflow name. */
+					return sprintf( __( 'Workflow · %s', 'zaplane' ), (string) $meta['workflow_name'] );
+				}
+				return __( 'Workflow', 'zaplane' );
+			case 'system':
+				return __( 'Team', 'zaplane' );
+		}
+		return '';
+	}
+
+	/**
+	 * @return array<string,mixed>|null
+	 */
+	public static function user( int $user_id ): ?array {
+		if ( $user_id <= 0 ) {
+			return null;
+		}
+		if ( ! isset( self::$users[ $user_id ] ) ) {
+			$user                   = get_userdata( $user_id );
+			self::$users[ $user_id ] = $user ? [
+				'id'         => $user_id,
+				'name'       => (string) $user->display_name,
+				'avatar_url' => (string) get_avatar_url( $user_id, [ 'size' => 64 ] ),
+			] : [];
+		}
+		return self::$users[ $user_id ] ?: null;
+	}
+}

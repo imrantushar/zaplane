@@ -12,3 +12,4 @@ assets/js/*.txt
 assets/css/backend-dist.css
 assets/css/frontend-dist.css
 .build-cache/
+.phpunit.result.cache

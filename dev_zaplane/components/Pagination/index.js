@@ -109,18 +109,14 @@ const Pagination = ({
   };
   return <div className="zaplane-pagination">
 			{pageNumbers.length > 0 && <>
-					<button disabled={!canGoPrev} aria-label="First page" borderWidth="1px" _hover={{
-        bg: 'var(--zaplane-secondary-color)'
-      }} height="auto" minWidth="auto" padding="6px" onClick={() => {
+					<button disabled={!canGoPrev} aria-label="First page" onClick={() => {
         handlePageChange(1);
-      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent disabled:opacity-40 disabled:cursor-not-allowed">
+      }} className="h-auto min-w-0 border p-[6px] text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent hover:bg-[var(--zaplane-secondary-color)] disabled:opacity-40 disabled:cursor-not-allowed">
 						<IoIosArrowBack style={{width:"16px", height:"16px"}} />
 					</button>
-					<button disabled={!canGoPrev} aria-label="Previous page" borderWidth="1px" _hover={{
-        bg: 'var(--zaplane-secondary-color)'
-      }} height="auto" minWidth="auto" padding="6px" onClick={() => {
+					<button disabled={!canGoPrev} aria-label="Previous page" onClick={() => {
         handlePageChange(page - 1);
-      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent disabled:opacity-40 disabled:cursor-not-allowed">
+      }} className="h-auto min-w-0 border p-[6px] text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent hover:bg-[var(--zaplane-secondary-color)] disabled:opacity-40 disabled:cursor-not-allowed">
 						<HiChevronDoubleLeft style={{width:"16px", height:"16px"}} />
 					</button>
 				</>}
@@ -128,18 +124,14 @@ const Pagination = ({
 					{renderPageNumbers()}
 				</ul>}
 			{pageNumbers.length > 0 && <>
-					<button disabled={!canGoNext} aria-label="Next page" borderWidth="1px" _hover={{
-        bg: 'var(--zaplane-secondary-color)'
-      }} height="auto" minWidth="auto" padding="6px" onClick={() => {
+					<button disabled={!canGoNext} aria-label="Next page" onClick={() => {
         handlePageChange(page + 1);
-      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent disabled:opacity-40 disabled:cursor-not-allowed">
+      }} className="h-auto min-w-0 border p-[6px] text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent hover:bg-[var(--zaplane-secondary-color)] disabled:opacity-40 disabled:cursor-not-allowed">
 						<IoIosArrowForward style={{width:"16px", height:"16px"}} />
 					</button>
-					<button disabled={!canGoNext} aria-label="Last page" borderWidth="1px" _hover={{
-        bg: 'var(--zaplane-secondary-color)'
-      }} height="auto" minWidth="auto" padding="6px" onClick={() => {
+					<button disabled={!canGoNext} aria-label="Last page" onClick={() => {
         handlePageChange(pageNumbers.length);
-      }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent disabled:opacity-40 disabled:cursor-not-allowed">
+      }} className="h-auto min-w-0 border p-[6px] text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent hover:bg-[var(--zaplane-secondary-color)] disabled:opacity-40 disabled:cursor-not-allowed">
 						<HiChevronDoubleRight style={{width:"16px", height:"16px"}} />
 					</button>
 				</>}

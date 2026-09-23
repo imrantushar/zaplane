@@ -34,11 +34,12 @@ class GemcrmSendEmailTest extends IntegrationTestCase {
 	public function test_template_select_is_always_visible_and_optional(): void {
 		$fields = $this->sendEmailFields();
 
-		// The template selector is a directly-visible (no depends_on) optional
-		// dropdown wired to the Zaplane email-template query.
+		// "Content source" picks the body: a template (this optional dropdown,
+		// wired to the Zaplane email-template query) or the inline editor.
+		$this->assertSame( [ 'custom', 'template' ], array_column( $fields['content_source']['options'], 'value' ) );
 		$this->assertArrayHasKey( 'template_id', $fields );
 		$this->assertSame( 'select', $fields['template_id']['type'] );
-		$this->assertArrayNotHasKey( 'depends_on', $fields['template_id'] );
+		$this->assertSame( [ 'content_source' => 'template' ], $fields['template_id']['depends_on'] );
 		$this->assertFalse( $fields['template_id']['required'] );
 		$this->assertSame( 'gemcrm_email_template_query', $fields['template_id']['dynamic']['query'] );
 
@@ -50,10 +51,9 @@ class GemcrmSendEmailTest extends IntegrationTestCase {
 		$fields = $this->sendEmailFields();
 
 		$this->assertArrayHasKey( 'body', $fields );
-		// Inline body is the simple rich-text editor, always visible, optional
-		// (a selected template takes precedence).
+		// Inline body is the simple rich-text editor, shown for a custom body.
 		$this->assertSame( 'richtext', $fields['body']['type'] );
-		$this->assertArrayNotHasKey( 'depends_on', $fields['body'] );
+		$this->assertSame( [ 'content_source' => 'custom' ], $fields['body']['depends_on'] );
 		$this->assertFalse( $fields['body']['required'] );
 		$this->assertNotEmpty( $fields['body']['merge_tags'] );
 

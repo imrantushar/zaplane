@@ -165,3 +165,278 @@
   pointer-events: none;
   z-index: 20;
 }
+
+/* Steps that need a connection: a card floating over the canvas. */
+.zaplane-needs-connection {
+	--znc-accent: #dc6803;
+	--znc-soft: #fffaeb;
+	--znc-line: #fedf89;
+	position: absolute;
+	top: 16px;
+	left: 64px;
+	right: 16px;
+	z-index: 6;
+	max-width: 820px;
+	padding: 14px 16px 16px;
+	border: 1px solid var(--znc-line);
+	border-radius: 14px;
+	background: var(--znc-soft);
+	box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08), 0 2px 6px rgba(16, 24, 40, 0.04);
+	color: var(--zaplane-font-color);
+	font-size: 13px;
+
+	&.is-live {
+		--znc-accent: #d92d20;
+		--znc-soft: #fef3f2;
+		--znc-line: #fecdca;
+	}
+
+	// Two classes: the scoped reset (.zaplane-scope button) would win otherwise.
+	&.is-folded.is-folded {
+		right: auto;
+		background: var(--znc-soft);
+		color: var(--zaplane-font-color);
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 14px;
+		border-radius: 999px;
+		font: inherit;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+
+		svg {
+			color: var(--znc-accent);
+		}
+
+		&:hover {
+			border-color: var(--znc-accent);
+		}
+	}
+}
+
+.zaplane-needs-connection__head {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+}
+
+.zaplane-needs-connection__badge {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 10px;
+	background: color-mix(in srgb, var(--znc-accent) 14%, #fff);
+	color: var(--znc-accent);
+	font-size: 17px;
+}
+
+.zaplane-needs-connection__titles {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+
+	strong {
+		font-size: 14px;
+		line-height: 1.35;
+	}
+
+	span {
+		color: var(--zaplane-font-secondary-color);
+		line-height: 1.45;
+	}
+}
+
+.zaplane-needs-connection .zaplane-needs-connection__add {
+	font-family: inherit;
+	cursor: pointer;
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	gap: 6px;
+	padding: 7px 12px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 8px;
+	background: var(--zaplane-background, #fff);
+	color: var(--zaplane-font-color);
+	font-size: 13px;
+	font-weight: 600;
+	text-decoration: none;
+	transition: border-color 0.15s, color 0.15s;
+
+	&:hover,
+	&:focus {
+		border-color: var(--zaplane-primary);
+		color: var(--zaplane-primary);
+	}
+}
+
+.zaplane-needs-connection .zaplane-needs-connection__fold {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	color: var(--zaplane-font-secondary-color);
+	cursor: pointer;
+
+	&:hover {
+		background: color-mix(in srgb, var(--znc-accent) 10%, transparent);
+		color: var(--zaplane-font-color);
+	}
+}
+
+.zaplane-needs-connection .zaplane-needs-connection__steps {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 8px;
+	margin: 12px 0 0 46px;
+	padding: 0;
+	list-style: none;
+
+	button {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		width: 100%;
+		padding: 8px 10px;
+		border: 1px solid var(--zaplane-border-color);
+		border-radius: 10px;
+		background: var(--zaplane-background, #fff);
+		box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+		color: var(--zaplane-font-color);
+		font: inherit;
+		text-align: left;
+		cursor: pointer;
+		transition: border-color 0.15s, box-shadow 0.15s;
+
+		&:hover,
+		&:focus-visible {
+			border-color: var(--zaplane-primary);
+			box-shadow: 0 0 0 3px color-mix(in srgb, var(--zaplane-primary) 14%, transparent);
+			outline: none;
+
+			.zaplane-needs-connection__choose {
+				color: var(--zaplane-primary);
+			}
+		}
+	}
+}
+
+.zaplane-needs-connection__mark {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 8px;
+	background: var(--zaplane-secondary-color, #f6f7f8);
+
+	img {
+		width: 18px;
+		height: 18px;
+		object-fit: contain;
+	}
+
+	span {
+		color: var(--zaplane-font-secondary-color);
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+}
+
+.zaplane-needs-connection__step {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-width: 0;
+
+	strong,
+	em {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	strong {
+		font-size: 13px;
+		font-weight: 600;
+	}
+
+	em {
+		color: var(--zaplane-font-secondary-color);
+		font-size: 12px;
+		font-style: normal;
+	}
+}
+
+.zaplane-needs-connection__choose {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	gap: 4px;
+	color: var(--znc-accent);
+	font-size: 12px;
+	font-weight: 600;
+	transition: color 0.15s;
+}
+
+@media (max-width: 782px) {
+	.zaplane-needs-connection {
+		left: 12px;
+		right: 12px;
+	}
+
+	.zaplane-needs-connection__head {
+		flex-wrap: wrap;
+	}
+
+	.zaplane-needs-connection .zaplane-needs-connection__steps {
+		margin-left: 0;
+	}
+}
+
+// The shared top bar keeps 32px below itself on ordinary pages; on the
+// canvas that was a bare strip between the bar and the grid.
+.zaplane-scope .zaplane_flowcanvas > .zaplane-topbar {
+	margin-bottom: 0;
+}
+
+// Renaming the workflow in the top bar: a real text field while editing.
+.zaplane-topbar .zaplane-title-input {
+	max-width: min(520px, 45vw);
+	height: 34px;
+	margin: 0;
+	padding: 0 10px;
+	border: 1px solid var(--zaplane-border-color);
+	border-radius: 8px;
+	background: var(--zaplane-background, #fff);
+	box-shadow: none;
+	color: var(--zaplane-font-color);
+	font: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 32px;
+	transition: border-color 0.15s, box-shadow 0.15s;
+
+	&:hover {
+		border-color: color-mix(in srgb, var(--zaplane-primary) 45%, var(--zaplane-border-color));
+	}
+
+	&:focus {
+		border-color: var(--zaplane-primary);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--zaplane-primary) 18%, transparent);
+		outline: none;
+	}
+}

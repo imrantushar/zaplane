@@ -21,7 +21,14 @@ const INITIAL_STATE = {
     editingConnectionId: null,
 };
 
-const useConnection = () => {
+/**
+ * The create / edit connection drawer's state.
+ *
+ * @param {Object}   options
+ * @param {Function} options.onSaved  Called with { id, app } once a connection is saved.
+ * @param {string[]} options.onlyApps Offer only these apps in the app list.
+ */
+const useConnection = ({ onSaved, onlyApps } = {}) => {
     const dispatch = useDispatch();
     const { authFields, loading } = useSelector((state) => state.connections || []);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -42,17 +49,19 @@ const useConnection = () => {
 
 
 
+    const onlyKey = (onlyApps || []).join(",");
     const appList = useMemo(
         () =>
             Object.values(integrations.apps)
                 .filter((app) => app.requires_connection === true)
+                .filter((app) => !onlyKey || onlyKey.split(",").includes(app.slug))
                 .map((app) => ({
                     id: app.slug,
                     name: app.name,
                     icon: app.icon ?? null,
                     type: "app",
                 })),
-        []
+        [onlyKey]
     );
 
     const searchList = useMemo(() => {
@@ -131,6 +140,20 @@ const useConnection = () => {
         [resetDrawer, patchState]
     );
 
+    // Straight to the form for one app (e.g. from a step that needs it).
+    const openForApp = useCallback(
+        (slug) => {
+            const app = integrations.apps?.[slug] || integrations.tools?.[slug];
+            resetDrawer();
+            setIsDrawerOpen(true);
+            patchState({
+                drawerStep: "configure",
+                selectedApp: { id: slug, name: app?.name || slug, icon: app?.icon || null },
+            });
+        },
+        [resetDrawer, patchState]
+    );
+
     const goBack = useCallback(() => resetDrawer(), [resetDrawer]);
 
     const selectAuthType = useCallback(
@@ -197,9 +220,10 @@ const useConnection = () => {
                     })
                 ).unwrap();
 
-                await openOAuthPopup(res.auth_url);
+                const done = await openOAuthPopup(res.auth_url);
                 dispatch(fetchConnections());
                 closeDrawer();
+                if (done?.connection_id) onSaved?.({ id: done.connection_id, app: selectedApp.id });
             } catch (e) {
                 console.error("OAuth error:", e);
                 dispatch(
@@ -222,6 +246,7 @@ const useConnection = () => {
             if (result.type === "connections/updateConnection/fulfilled") {
                 dispatch(fetchConnections());
                 closeDrawer();
+                onSaved?.({ id: editingConnectionId, app: selectedApp.id });
             }
         } else {
             const result = await dispatch(
@@ -236,9 +261,10 @@ const useConnection = () => {
             if (result.type === "connections/createTokenConnection/fulfilled") {
                 dispatch(fetchConnections());
                 closeDrawer();
+                if (result.payload?.id) onSaved?.({ id: result.payload.id, app: selectedApp.id, name: result.payload.name });
             }
         }
-    }, [selectedApp, selectedAuthType, credentials, editingConnectionId, dispatch, openOAuthPopup, closeDrawer, loadingOAuth]);
+    }, [selectedApp, selectedAuthType, credentials, editingConnectionId, dispatch, openOAuthPopup, closeDrawer, loadingOAuth, onSaved]);
 
 
     const authTypes = authFields?.available_auth_types || {};
@@ -264,6 +290,7 @@ const useConnection = () => {
         loading,
         editingConnectionId,
         openDrawer,
+        openForApp,
         closeDrawer,
         selectApp,
         startEdit,

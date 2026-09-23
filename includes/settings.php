@@ -134,6 +134,8 @@ class Settings {
 	 *
 	 * - `menu`  — submenu slug suffix hidden while the module is off.
 	 * - `panel` — a settings tab that configures this module, shown once it is on.
+	 * - `settings` — admin URL (relative to wp-admin) of the module's own
+	 *   settings, for the gear button on the Modules screen. Unused with `panel`.
 	 * - `since` — the version that introduced it, used to badge it as new.
 	 *
 	 * @return array<string,array<string,mixed>>
@@ -147,6 +149,7 @@ class Settings {
 				'default'     => false,
 				'menu'        => 'custom-apps',
 				'panel'       => '',
+				'settings'    => 'admin.php?page=zaplane-custom-apps',
 				// Custom apps are user-defined, so the slugs are resolved at runtime
 				// rather than listed here.
 				'apps'        => [],
@@ -160,8 +163,20 @@ class Settings {
 				'default'     => false,
 				'menu'        => 'knowledge',
 				'panel'       => '',
+				'settings'    => 'admin.php?page=zaplane-knowledge&settings=1',
 				'apps'        => [ 'knowledge' ],
 				'since'       => '1.1.0',
+			],
+			'inbox'       => [
+				'key'         => 'inbox',
+				'title'       => __( 'Inbox', 'zaplane' ),
+				'description' => __( 'One inbox for every customer conversation, starting with a chat widget for your website. An AI assistant answers from your Business Knowledge and hands over to your team when needed. When off, nothing is added to your site.', 'zaplane' ),
+				'default'     => false,
+				'menu'        => 'inbox',
+				'panel'       => '',
+				'settings'    => 'admin.php?page=zaplane-inbox&view=settings',
+				'apps'        => [ 'inbox' ],
+				'since'       => '1.4.0',
 			],
 			'mcp_server'  => [
 				'key'         => 'mcp_server',

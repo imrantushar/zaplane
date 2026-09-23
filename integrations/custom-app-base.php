@@ -513,7 +513,7 @@ abstract class CustomAppBase extends IntegrationBase {
 				? (string) $response['error']
 				: 'HTTP ' . (int) $response['status'];
 			throw new \RuntimeException(
-				'Custom app "' . static::get_slug() . '" action "' . $event . '" request failed: ' . $reason
+				esc_html( 'Custom app "' . static::get_slug() . '" action "' . $event . '" request failed: ' . $reason )
 			);
 		}
 

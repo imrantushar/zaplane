@@ -29,9 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			root.render(
 				<Provider store={store}>
 						<Router>
-							<MenuPortal>
-								<AdminMenu />
-							</MenuPortal>
+							{/* A chat agent's page has no Zaplane menu to fill. */}
+							{menuPage && (
+								<MenuPortal>
+									<AdminMenu />
+								</MenuPortal>
+							)}
 							<BackendDashboard />
 						</Router>
 				</Provider>
