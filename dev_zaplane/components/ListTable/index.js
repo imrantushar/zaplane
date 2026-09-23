@@ -35,8 +35,6 @@ const ListTable = props => {
   } = props;
   const bodyRef = useRef(null);
 
-  // eslint-disable-next-line
-  const [isRowsPerPage, setIsRowsPerPage] = useState('10');
   const [loadingHeight, setLoadingHeight] = useState('0px');
   const [copyDataArr, setCopyDataArr] = useState([]);
   const [copyColumns, setCopyColumns] = useState(columns?.map((copyColumn, index) => ({
@@ -92,9 +90,8 @@ const ListTable = props => {
     setTempCopyColumns(updatedColumns);
   };
   const paginationPerPageChange = option => {
-    setIsRowsPerPage(option.value);
     setLoadingHeight(`${bodyRef.current.offsetHeight}px`);
-    onChangeItemsPerPage(Number(option.value), Number(currentPageNumber));
+    onChangeItemsPerPage(Number(option.value), 1);
   };
 
   // Reset copyDataArr if shouldRerender is false

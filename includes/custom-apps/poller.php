@@ -39,10 +39,29 @@ class Poller {
 	public static function boot(): void {
 		add_action( self::HOOK, [ self::class, 'run' ] );
 		add_action( 'init', [ self::class, 'schedule' ] );
+		add_action( 'zaplane_customapp_wpcron', [ self::class, 'run' ] );
+		add_filter( 'cron_schedules', [ self::class, 'cron_schedules' ] );
+	}
+
+	/**
+	 * Provide the fallback interval when Action Scheduler is unavailable.
+	 *
+	 * @param array<string,array<string,int|string>> $schedules
+	 * @return array<string,array<string,int|string>>
+	 */
+	public static function cron_schedules( array $schedules ): array {
+		$schedules['zaplane_customapp_interval'] = [
+			'interval' => self::INTERVAL,
+			'display'  => 'Zaplane Custom App polling',
+		];
+		return $schedules;
 	}
 
 	public static function schedule(): void {
 		if ( ! function_exists( 'as_schedule_recurring_action' ) || ! function_exists( 'as_next_scheduled_action' ) ) {
+			if ( function_exists( 'wp_next_scheduled' ) && ! wp_next_scheduled( 'zaplane_customapp_wpcron' ) ) {
+				wp_schedule_event( time() + self::INTERVAL, 'zaplane_customapp_interval', 'zaplane_customapp_wpcron' );
+			}
 			return;
 		}
 		if ( as_next_scheduled_action( self::HOOK, [], self::GROUP ) ) {
@@ -54,6 +73,10 @@ class Poller {
 	public static function unschedule(): void {
 		if ( function_exists( 'as_unschedule_all_actions' ) ) {
 			as_unschedule_all_actions( self::HOOK, [], self::GROUP );
+		}
+		$timestamp = wp_next_scheduled( 'zaplane_customapp_wpcron' );
+		if ( $timestamp ) {
+			wp_unschedule_event( $timestamp, 'zaplane_customapp_wpcron' );
 		}
 	}
 
@@ -78,7 +101,15 @@ class Poller {
 				if ( ( $node['type'] ?? '' ) !== 'trigger' ) {
 					continue;
 				}
-				self::poll_node( (int) $workflow->id, $node );
+				try {
+					self::poll_node( (int) $workflow->id, $node );
+				} catch ( \Throwable $e ) {
+					// One unavailable API or malformed node must not prevent every
+					// other active workflow from being polled.
+					if ( function_exists( 'do_action' ) ) {
+						do_action( 'zaplane_customapp_poll_error', $e, $workflow, $node );
+					}
+				}
 			}
 		}
 	}

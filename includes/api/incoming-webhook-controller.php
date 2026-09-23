@@ -5,6 +5,7 @@ use WP_REST_Controller;
 use WP_REST_Server;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Classes\Query;
 use Zaplane\Framework\Core\IntegrationLoader;
 use Zaplane\Framework\Classes\TriggerNodes;
 
@@ -179,6 +180,12 @@ class IncomingWebhookController extends WP_REST_Controller {
 		}
 
 		$hook = $triggers[ $event ]['hook'];
+
+		// REST requests can reach this endpoint before the normal init hook has
+		// registered the active workflow listeners. Refresh the map and register
+		// them here so provider webhooks cannot be accepted without starting runs.
+		Query::flush_trigger_map();
+		$this->container->get( 'automation' )->dispatch_active_triggers();
 
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Dynamic hook dispatched from integration config.
 		do_action( $hook, $payload );

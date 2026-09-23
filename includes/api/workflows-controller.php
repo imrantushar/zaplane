@@ -240,9 +240,27 @@ class WorkflowsController extends WP_REST_Controller {
 	}
 
 	public function create_item( $request ) {
+		$userId = get_current_user_id();
+		$title  = sanitize_text_field( $request['title'] ?? '' );
+
+		if ( empty( $title ) ) {
+			return new WP_Error( 'missing_title', 'Workflow title is required', [ 'status' => 400 ] );
+		}
+
+		// Prevent rapid duplicate creation (within 2 seconds for same title and user)
+		$existing = Workflow::where( 'title', $title )
+			->where( 'user_id', $userId )
+			->where( 'created_at', '>=', gmdate( 'Y-m-d H:i:s', time() - 2 ) )
+			->orderBy( 'id', 'desc' )
+			->first();
+
+		if ( $existing ) {
+			return rest_ensure_response( [ 'id' => $existing->id ] );
+		}
+
 		$workflow = Workflow::create([
-			'user_id' => get_current_user_id(),
-			'title'   => sanitize_text_field( $request['title'] ),
+			'user_id' => $userId,
+			'title'   => $title,
 			'status'  => 'draft',
 		]);
 
@@ -591,20 +609,40 @@ class WorkflowsController extends WP_REST_Controller {
 		$runs = Run::where( 'workflow_version_id', $version->id )
 			->orderBy( 'id', 'desc' )
 			->forPage( $page, $perPage )
-			->get()
-			->map(fn( $r) => [
-				'id' => $r->id,
-				'status' => $r->status,
-				'started_at' => $r->started_at,
-				'finished_at' => $r->finished_at,
-				'last_error' => $r->last_error,
-				'node_runs_count' => NodeRun::where( 'run_id', $r->id )->count(),
-				'trigger' => self::run_trigger( $graph, $r->start_node_key ),
-			])
-			->toArray();
+			->get();
+
+		// A run must keep the trigger metadata it started with. Resolving the
+		// label only from the current graph makes historical rows all show the
+		// current trigger after a workflow is edited.
+		$run_ids           = $runs->map( fn( $run ) => (int) $run->id )->toArray();
+		$trigger_by_run    = [];
+		$node_count_by_run = [];
+		if ( $run_ids ) {
+			foreach ( NodeRun::whereIn( 'run_id', $run_ids )->orderBy( 'id', 'asc' )->get() as $node_run ) {
+				$run_id = (int) $node_run->run_id;
+				$node_count_by_run[ $run_id ] = ( $node_count_by_run[ $run_id ] ?? 0 ) + 1;
+				if ( ! isset( $trigger_by_run[ $run_id ] ) && is_array( $node_run->node_meta_json ) ) {
+					$trigger_by_run[ $run_id ] = $node_run->node_meta_json;
+				}
+			}
+		}
+
+		$data = $runs->map(function ( $run ) use ( $graph, $trigger_by_run, $node_count_by_run ) {
+			return [
+				'id' => $run->id,
+				'status' => $run->status,
+				'started_at' => $run->started_at,
+				'finished_at' => $run->finished_at,
+				'last_error' => $run->last_error,
+				'node_runs_count' => $node_count_by_run[ (int) $run->id ] ?? 0,
+				'trigger' => isset( $trigger_by_run[ (int) $run->id ] )
+					? self::run_trigger_from_meta( $graph, $trigger_by_run[ (int) $run->id ], $run->start_node_key, $run->trigger_data )
+					: self::run_trigger( $graph, $run->start_node_key ),
+			];
+		})->toArray();
 
 		return rest_ensure_response([
-			'data' => $runs,
+			'data' => $data,
 			'pagination' => [
 				'page' => $page,
 				'per_page' => $perPage,
@@ -892,6 +930,42 @@ class WorkflowsController extends WP_REST_Controller {
 			'event'   => $node['data']['event'] ?? null,
 			'icon'    => $node['data']['icon'] ?? null,
 			'label'   => TriggerNodes::label( $node ),
+		];
+	}
+
+	/**
+	 * Build a historical trigger label from the metadata captured with its run.
+	 *
+	 * @param array<string,mixed> $graph
+	 * @param array<string,mixed> $meta
+	 * @param int|null             $startNodeKey
+	 * @param array<string,mixed>  $triggerData
+	 * @return array<string,mixed>|null
+	 */
+	private static function run_trigger_from_meta( array $graph, array $meta, $startNodeKey, $triggerData = [] ): ?array {
+		$nodeId = null === $startNodeKey ? null : (string) $startNodeKey;
+		$event  = is_array( $triggerData ) ? (string) ( $triggerData['mailchimp_event_name'] ?? '' ) : '';
+		$label  = $meta['label'] ?? null;
+
+		if ( 'mailchimp' === strtolower( (string) ( $meta['app'] ?? '' ) ) && '' !== $event ) {
+			$labels = [
+				'subscribed'     => 'Subscribed',
+				'unsubscribed'   => 'Unsubscribed',
+				'profile_updated' => 'Profile Updated',
+				'cleaned'        => 'Cleaned',
+				'email_changed'  => 'Subscriber Email Changed',
+				'campaign_sent'  => 'Campaign Sent',
+			];
+			$label = $labels[ $event ] ?? ucwords( str_replace( '_', ' ', $event ) );
+		}
+
+		return [
+			'node_id' => $nodeId,
+			'number'  => null === $nodeId ? null : TriggerNodes::number( $graph, $nodeId ),
+			'app'     => $meta['app'] ?? null,
+			'event'   => $meta['event'] ?? null,
+			'icon'    => $meta['icon'] ?? null,
+			'label'   => $label,
 		];
 	}
 

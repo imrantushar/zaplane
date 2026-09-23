@@ -91,11 +91,9 @@ return [
 	// --- Community / events / gamification ---
 	'ultimatemember'      => [ 'ultimate-member/ultimate-member.php' ],
 	'buddyboss'           => [ 'buddyboss-platform/bp-loader.php' ],
-	// Every eventscalendar trigger is an Event Tickets hook (event_tickets_*,
-	// tribe_tickets_*), which ships in the separate Event Tickets plugin — not
-	// in The Events Calendar. Declaring only the latter meant the dependency
-	// check passed while none of the hooks existed.
-	'eventscalendar'      => [ 'event-tickets/event-tickets.php', 'the-events-calendar/the-events-calendar.php' ],
+	// Core events/venues/organizers require TEC; legacy ticket hooks additionally
+	// check for Event Tickets at runtime, without blocking core functionality.
+	'eventscalendar'      => [ 'the-events-calendar/the-events-calendar.php' ],
 	'gamipress'           => [ 'gamipress/gamipress.php' ],
 
 	/*
