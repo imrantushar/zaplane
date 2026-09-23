@@ -177,7 +177,7 @@ const WorkflowTable = ({
     columnWidth: "120px"
   }, {
     name: <span>{__("Title", "zaplane")}</span>,
-    cell: row => <span textOverflow="ellipsis" onClick={() => navigateToEdit(row.id)} className="zaplane-label font-[400] text-[14px] cursor-pointer">
+    cell: row => <span onClick={() => navigateToEdit(row.id)} className="zaplane-label truncate font-[400] text-[14px] cursor-pointer">
           {row.title}
         </span>,
     textAlign: "start",

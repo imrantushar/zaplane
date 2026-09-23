@@ -91,7 +91,7 @@ const ConnectionTable = ({ onEdit }) => {
     cell: row => {
       return <div className="flex items-center gap-3">
                     <ZAPIconGroup icons={[row?.icon || row?.app]} />
-                    <span textOverflow="ellipsis" className="zaplane-label font-[400]">
+                    <span className="zaplane-label truncate font-[400]">
                         {row.name}
                     </span>
                 </div>;

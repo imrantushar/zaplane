@@ -106,8 +106,14 @@ export default function FlowCanvas({
   });
   const activeVersionId = versions?.find(v => v.is_active)?.id;
   useEffect(() => {
+    // A workflow being created has no id yet: there is nothing to load.
+    const workflowId = parseInt(id, 10);
+    if (!workflowId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    dispatch(getSingleWorkFlow(id)).finally(() => setLoading(false));
+    dispatch(getSingleWorkFlow(workflowId)).finally(() => setLoading(false));
   }, [id, activeVersionId]);
   const {
     updateNodeData,

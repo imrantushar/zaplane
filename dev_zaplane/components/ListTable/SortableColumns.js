@@ -74,9 +74,7 @@ const SortableColumns = ({
   };
   return <React.Fragment>
 			<div className="zaplane-table__sub-header-filter-icon">
-				<button borderWidth="1px" onClick={handleToggle} _hover={{
-        bg: 'var(--zaplane-secondary-color)'
-      }} className="text-var(--zaplane-font-color) border-var(--zaplane-border-color) bg-transparent">
+				<button onClick={handleToggle} className="border text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent hover:bg-[var(--zaplane-secondary-color)]">
 					<span className="zaplane-icon zaplane-icon--columns" />
 					{__('Columns', 'zaplane')}
 				</button>
