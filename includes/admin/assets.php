@@ -60,8 +60,11 @@ class Assets {
 				'admin_url'             => admin_url(),
 				'route_path'            => wp_parse_url( admin_url(), PHP_URL_PATH ),
 				'plugin_root_url'       => ZAPLANE_PLUGIN_ROOT_URI,
-				'menu'                  => wp_json_encode( Helper::get_admin_menu_list() ),
-				'settings'              => Settings::get(),
+				// A chat agent who isn't a manager gets the inbox, and nothing
+				// of the rest of the settings.
+				'menu'                  => wp_json_encode( current_user_can( 'manage_options' ) ? Helper::get_admin_menu_list() : [] ),
+				'settings'              => current_user_can( 'manage_options' ) ? Settings::get() : [ 'features' => Settings::get()['features'] ?? [] ],
+				'inbox_manager'         => current_user_can( \Zaplane\Modules\Inbox\Api\AdminController::capability() ),
 			]);
 			// The integrations catalogue is ~1.2 MB. Inject it as a raw JSON string
 			// rather than through wp_localize_script, which would PHP-decode the

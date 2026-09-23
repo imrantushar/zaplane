@@ -49,25 +49,33 @@ class AdminController {
 		return current_user_can( self::capability() );
 	}
 
+	/**
+	 * Works in the inbox: a manager, or someone picked as a chat agent. They
+	 * answer conversations; settings stay with the managers.
+	 */
+	public function can_work(): bool {
+		return current_user_can( Agents::CAP );
+	}
+
 	public function register_routes(): void {
 		$id = '(?P<id>\d+)';
 
 		register_rest_route( self::NS, '/inbox/conversations', [
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => [ $this, 'list_conversations' ],
-			'permission_callback' => [ $this, 'can_manage' ],
+			'permission_callback' => [ $this, 'can_work' ],
 		] );
 
 		register_rest_route( self::NS, "/inbox/conversations/{$id}", [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_conversation' ],
-				'permission_callback' => [ $this, 'can_manage' ],
+				'permission_callback' => [ $this, 'can_work' ],
 			],
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'update_conversation' ],
-				'permission_callback' => [ $this, 'can_manage' ],
+				'permission_callback' => [ $this, 'can_work' ],
 			],
 		] );
 
@@ -75,12 +83,12 @@ class AdminController {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_messages' ],
-				'permission_callback' => [ $this, 'can_manage' ],
+				'permission_callback' => [ $this, 'can_work' ],
 			],
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'send_message' ],
-				'permission_callback' => [ $this, 'can_manage' ],
+				'permission_callback' => [ $this, 'can_work' ],
 			],
 		] );
 
@@ -88,25 +96,25 @@ class AdminController {
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [ $this, 'edit_message' ],
-				'permission_callback' => [ $this, 'can_manage' ],
+				'permission_callback' => [ $this, 'can_work' ],
 			],
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'delete_message' ],
-				'permission_callback' => [ $this, 'can_manage' ],
+				'permission_callback' => [ $this, 'can_work' ],
 			],
 		] );
 
 		register_rest_route( self::NS, "/inbox/conversations/{$id}/read", [
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => [ $this, 'mark_read' ],
-			'permission_callback' => [ $this, 'can_manage' ],
+			'permission_callback' => [ $this, 'can_work' ],
 		] );
 
 		register_rest_route( self::NS, "/inbox/conversations/{$id}/product", [
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => [ $this, 'send_product' ],
-			'permission_callback' => [ $this, 'can_manage' ],
+			'permission_callback' => [ $this, 'can_work' ],
 		] );
 
 		register_rest_route( self::NS, "/inbox/conversations/{$id}/order", [
@@ -124,30 +132,49 @@ class AdminController {
 		register_rest_route( self::NS, '/inbox/visitors', [
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => [ $this, 'visitors' ],
-			'permission_callback' => [ $this, 'can_manage' ],
+			'permission_callback' => [ $this, 'can_work' ],
 		] );
 
 		register_rest_route( self::NS, '/inbox/visitors/(?P<visitor>v_[a-f0-9]{24}|u_\d+)/message', [
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => [ $this, 'message_visitor' ],
-			'permission_callback' => [ $this, 'can_manage' ],
+			'permission_callback' => [ $this, 'can_work' ],
 		] );
 
 		register_rest_route( self::NS, '/inbox/products', [
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => [ $this, 'search_products' ],
-			'permission_callback' => [ $this, 'can_manage' ],
+			'permission_callback' => [ $this, 'can_work' ],
 		] );
 
 		register_rest_route( self::NS, '/inbox/agents', [
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => [ $this, 'list_agents' ],
-			'permission_callback' => [ $this, 'can_manage' ],
+			'permission_callback' => [ $this, 'can_work' ],
 		] );
 
 		register_rest_route( self::NS, '/inbox/agents/(?P<id>\d+)', [
+			[
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'save_agent' ],
+				'permission_callback' => [ $this, 'can_manage' ],
+			],
+			[
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => [ $this, 'remove_agent' ],
+				'permission_callback' => [ $this, 'can_manage' ],
+			],
+		] );
+
+		// Pick who answers: search the site's users, add one.
+		register_rest_route( self::NS, '/inbox/agents/candidates', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => fn( WP_REST_Request $r ) => rest_ensure_response( [ 'users' => Agents::candidates( sanitize_text_field( (string) $r->get_param( 'search' ) ) ) ] ),
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+		register_rest_route( self::NS, '/inbox/agents/add', [
 			'methods'             => WP_REST_Server::CREATABLE,
-			'callback'            => [ $this, 'save_agent' ],
+			'callback'            => [ $this, 'add_agent' ],
 			'permission_callback' => [ $this, 'can_manage' ],
 		] );
 
@@ -156,14 +183,14 @@ class AdminController {
 		register_rest_route( self::NS, '/inbox/me', [
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => [ $this, 'update_me' ],
-			'permission_callback' => [ $this, 'can_manage' ],
+			'permission_callback' => [ $this, 'can_work' ],
 		] );
 
 		register_rest_route( self::NS, '/inbox/settings', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_settings' ],
-				'permission_callback' => [ $this, 'can_manage' ],
+				'permission_callback' => [ $this, 'can_work' ],
 			],
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -200,7 +227,7 @@ class AdminController {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'list_canned' ],
-				'permission_callback' => [ $this, 'can_manage' ],
+				'permission_callback' => [ $this, 'can_work' ],
 			],
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -681,10 +708,33 @@ class AdminController {
 		}
 
 		$params = $request->get_json_params() ?: [];
-		$agent  = Agents::save_identity( $user_id, is_array( $params ) ? $params : [] );
+		$params = is_array( $params ) ? $params : [];
+		if ( isset( $params['schedule'] ) && is_array( $params['schedule'] ) ) {
+			Agents::save_schedule( $user_id, $params['schedule'] );
+		}
+		$agent = Agents::save_identity( $user_id, $params );
 		Availability::forget();
 
 		return rest_ensure_response( [ 'agent' => $agent ] );
+	}
+
+	public function add_agent( WP_REST_Request $request ) {
+		$user_id = absint( $request->get_param( 'user_id' ) );
+		if ( ! $user_id || ! get_userdata( $user_id ) ) {
+			return new WP_Error( 'zaplane_inbox_agent', __( 'That person no longer has an account here.', 'zaplane' ), [ 'status' => 404 ] );
+		}
+		Agents::set_member( $user_id, true );
+		return rest_ensure_response( [ 'agents' => Agents::roster() ] );
+	}
+
+	public function remove_agent( WP_REST_Request $request ) {
+		$user_id = (int) $request->get_param( 'id' );
+		$ids     = Agents::member_ids();
+		if ( in_array( $user_id, $ids, true ) && 1 === count( $ids ) ) {
+			return new WP_Error( 'zaplane_inbox_agent_last', __( 'Someone has to answer the chat. Add another person before removing the last one.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+		Agents::set_member( $user_id, false );
+		return rest_ensure_response( [ 'agents' => Agents::roster() ] );
 	}
 
 	/**
@@ -711,7 +761,49 @@ class AdminController {
 	}
 
 	public function get_settings() {
-		return rest_ensure_response( $this->settings_payload() );
+		// An agent who isn't a manager gets what the inbox needs to work, not
+		// the settings (connections, credentials, the assistant's setup).
+		if ( ! $this->can_manage() ) {
+			$all = InboxSettings::get();
+			return rest_ensure_response( [
+				'settings'   => [
+					'widget' => [ 'enabled' => ! empty( $all['widget']['enabled'] ) ],
+					'ai'     => [
+						'enabled'       => ! empty( $all['ai']['enabled'] ),
+						'connection_id' => (int) $all['ai']['connection_id'],
+					],
+				],
+				'team'       => self::team_list(),
+				'agents'     => Agents::roster(),
+				'store'      => Commerce::store(),
+				'connectors' => [],
+				'can_manage' => false,
+			] );
+		}
+		return rest_ensure_response( $this->settings_payload() + [ 'can_manage' => true ] );
+	}
+
+	/**
+	 * Everyone a conversation can be assigned to: the agents, and the managers.
+	 *
+	 * @return array<int,array{id:int,name:string}>
+	 */
+	private static function team_list(): array {
+		$ids = Agents::member_ids();
+		foreach ( get_users( [ 'capability' => self::capability(), 'fields' => 'ID', 'number' => 100 ] ) as $id ) {
+			$ids[] = (int) $id;
+		}
+		$team = [];
+		foreach ( array_unique( $ids ) as $id ) {
+			$user = get_userdata( $id );
+			if ( $user ) {
+				$team[] = [
+					'id'   => (int) $id,
+					'name' => (string) $user->display_name,
+				];
+			}
+		}
+		return $team;
 	}
 
 	public function save_settings( WP_REST_Request $request ) {
@@ -749,17 +841,7 @@ class AdminController {
 			];
 		}
 
-		$team = [];
-		foreach ( get_users( [
-			'capability' => self::capability(),
-			'fields'     => [ 'ID', 'display_name' ],
-			'number'     => 100,
-		] ) as $user ) {
-			$team[] = [
-				'id'   => (int) $user->ID,
-				'name' => (string) $user->display_name,
-			];
-		}
+		$team = self::team_list();
 
 		$channels = [];
 		foreach ( Registry::all() as $slug => $class ) {

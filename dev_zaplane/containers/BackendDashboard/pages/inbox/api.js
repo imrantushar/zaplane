@@ -18,6 +18,9 @@ export const inboxApi = {
   settings: () => API.get(base + "settings").then((r) => r.data),
   agents: () => API.get(base + "agents").then((r) => r.data),
   saveAgent: (id, data) => API.post(base + "agents/" + id, data).then((r) => r.data),
+  agentCandidates: (search) => API.get(base + "agents/candidates", { params: { search } }).then((r) => r.data),
+  addAgent: (userId) => API.post(base + "agents/add", { user_id: userId }).then((r) => r.data),
+  removeAgent: (id) => API.delete(base + "agents/" + id).then((r) => r.data),
   // The agent's own away switch, and the sign of life that keeps them online.
   me: (data) => API.post(base + "me", data || {}).then((r) => r.data),
   saveSettings: (data) => API.post(base + "settings", data).then((r) => r.data),

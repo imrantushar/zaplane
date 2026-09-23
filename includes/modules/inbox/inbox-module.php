@@ -60,6 +60,7 @@ class InboxModule implements ModuleInterface {
 		Services\WorkflowSends::register();
 		Services\Realtime::register();
 		Services\VisitorContact::register();
+		Services\Agents::register();
 		add_action( Services\KnowledgeAnswer::HOOK, [ Services\KnowledgeAnswer::class, 'handle' ], 10, 2 );
 	}
 
@@ -151,6 +152,19 @@ class InboxModule implements ModuleInterface {
 				'commonQuestions' => __( 'Common questions', 'zaplane' ),
 				'talkToPerson'    => Services\KnowledgeAnswer::person_label(),
 				'allTopics'       => Services\AnswerMenu::topics_label(),
+				// A message waiting for name + email.
+				'heldNote'        => __( 'Not sent yet', 'zaplane' ),
+				'heldTitle'       => __( 'Where should we reply?', 'zaplane' ),
+				'heldHint'        => __( 'Add your name and email and your message goes straight to our team.', 'zaplane' ),
+				'heldSend'        => __( 'Send message', 'zaplane' ),
+				'heldCodeHint'    => __( 'Your message is sent as soon as you confirm.', 'zaplane' ),
+				'heldConfirm'     => __( 'Confirm & send', 'zaplane' ),
+				'nameRequired'    => __( 'Please enter your name.', 'zaplane' ),
+				'emailInvalid'    => __( 'Please enter a valid email address.', 'zaplane' ),
+				'emailLabel'      => __( 'Your email', 'zaplane' ),
+				'emailShort'      => __( 'you@example.com', 'zaplane' ),
+				/* translators: %s: a corrected email address. */
+				'useSuggestion'   => __( 'Use %s', 'zaplane' ),
 				'contactTitle'    => __( 'How can we reach you?', 'zaplane' ),
 				'contactHint'     => __( "If you leave the page, we'll email you our reply.", 'zaplane' ),
 				'contactSave'     => __( 'Save', 'zaplane' ),

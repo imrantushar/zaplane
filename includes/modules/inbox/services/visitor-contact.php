@@ -108,11 +108,11 @@ class VisitorContact {
 	 * @return array{status:string,email:string}|WP_Error status: saved | code_sent
 	 */
 	public static function submit( Conversation $conversation, string $name, string $email ) {
-		$email = strtolower( sanitize_email( $email ) );
-		$name  = mb_substr( sanitize_text_field( $name ), 0, 191 );
-		if ( ! is_email( $email ) ) {
-			return new WP_Error( 'zaplane_inbox_email', __( 'Please enter a valid email address.', 'zaplane' ), [ 'status' => 400 ] );
+		$email = self::valid_email( $email );
+		if ( is_wp_error( $email ) ) {
+			return $email;
 		}
+		$name = mb_substr( sanitize_text_field( $name ), 0, 191 );
 
 		$contact = Contact::where( 'id', (int) $conversation->contact_id )->fresh()->first();
 		if ( ! $contact ) {
@@ -133,28 +133,14 @@ class VisitorContact {
 
 		// Codes on: hold the address until they prove it's theirs.
 		$meta = is_array( $conversation->meta ) ? $conversation->meta : [];
-		$log  = array_values( array_filter( (array) ( $meta['contact_codes'] ?? [] ), static fn( $t ) => (int) $t > time() - HOUR_IN_SECONDS ) );
-		if ( $log && max( $log ) > time() - self::RESEND_AFTER ) {
-			return new WP_Error( 'zaplane_inbox_code_wait', __( 'We just sent a code. Please wait a few seconds before asking for another.', 'zaplane' ), [ 'status' => 429 ] );
-		}
-		if ( count( $log ) >= self::CODES_PER_HOUR ) {
-			return new WP_Error( 'zaplane_inbox_code_limit', __( 'Too many codes requested. Please try again later.', 'zaplane' ), [ 'status' => 429 ] );
+		$log  = self::code_log( (array) ( $meta['contact_codes'] ?? [] ) );
+		if ( is_wp_error( $log ) ) {
+			return $log;
 		}
 
-		$code = (string) wp_rand( 100000, 999999 );
-		$sent = wp_mail(
-			$email,
-			/* translators: %s: site name. */
-			sprintf( __( 'Your code for chatting with %s', 'zaplane' ), wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) ),
-			sprintf(
-				/* translators: 1: the code, 2: minutes it is valid. */
-				__( "Your verification code is: %1\$s\n\nEnter it in the chat window to confirm your email. It expires in %2\$d minutes.\n\nIf you didn't ask for this, you can ignore this email.", 'zaplane' ),
-				$code,
-				(int) ( self::CODE_TTL / MINUTE_IN_SECONDS )
-			)
-		);
-		if ( ! $sent ) {
-			return new WP_Error( 'zaplane_inbox_mail', __( "We couldn't send the code. Please check the address and try again.", 'zaplane' ), [ 'status' => 500 ] );
+		$code = self::send_code( $email );
+		if ( is_wp_error( $code ) ) {
+			return $code;
 		}
 
 		$log[] = time();
@@ -205,6 +191,198 @@ class VisitorContact {
 			'status' => 'verified',
 			'email'  => (string) $pending['email'],
 		];
+	}
+
+	/**
+	 * A cleaned address we can reply to, or why not. With the check on, a
+	 * typo in a big provider, a throwaway inbox or a domain without mail is
+	 * turned back here; `suggestion` carries the likely fix.
+	 *
+	 * @return string|WP_Error
+	 */
+	public static function valid_email( string $email ) {
+		$widget = InboxSettings::get()['widget'];
+		if ( empty( $widget['check_email'] ) && empty( $widget['verify_email'] ) ) {
+			$email = strtolower( sanitize_email( $email ) );
+			return is_email( $email )
+				? $email
+				: new WP_Error( 'zaplane_inbox_email', __( 'Please enter a valid email address.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+
+		$check = EmailCheck::check( $email );
+		if ( $check['ok'] ) {
+			return $check['email'];
+		}
+		return new WP_Error( 'zaplane_inbox_email', $check['message'], array_filter( [
+			'status'     => 400,
+			'reason'     => $check['code'],
+			'suggestion' => $check['suggestion'] ?? '',
+		] ) );
+	}
+
+	/**
+	 * Sends in the last hour, if another is allowed now.
+	 *
+	 * @param array<int,mixed> $log
+	 * @return array<int,int>|WP_Error
+	 */
+	private static function code_log( array $log ) {
+		$log = array_values( array_map( 'intval', array_filter( $log, static fn( $t ) => (int) $t > time() - HOUR_IN_SECONDS ) ) );
+		if ( $log && max( $log ) > time() - self::RESEND_AFTER ) {
+			return new WP_Error( 'zaplane_inbox_code_wait', __( 'We just sent a code. Please wait a few seconds before asking for another.', 'zaplane' ), [ 'status' => 429 ] );
+		}
+		if ( count( $log ) >= self::CODES_PER_HOUR ) {
+			return new WP_Error( 'zaplane_inbox_code_limit', __( 'Too many codes requested. Please try again later.', 'zaplane' ), [ 'status' => 429 ] );
+		}
+		return $log;
+	}
+
+	/**
+	 * Email a fresh code.
+	 *
+	 * @return string|WP_Error The code.
+	 */
+	private static function send_code( string $email ) {
+		$code = (string) wp_rand( 100000, 999999 );
+		$sent = wp_mail(
+			$email,
+			/* translators: %s: site name. */
+			sprintf( __( 'Your code for chatting with %s', 'zaplane' ), wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) ),
+			sprintf(
+				/* translators: 1: the code, 2: minutes it is valid. */
+				__( "Your verification code is: %1\$s\n\nEnter it in the chat window to confirm your email. It expires in %2\$d minutes.\n\nIf you didn't ask for this, you can ignore this email.", 'zaplane' ),
+				$code,
+				(int) ( self::CODE_TTL / MINUTE_IN_SECONDS )
+			)
+		);
+		if ( ! $sent ) {
+			return new WP_Error( 'zaplane_inbox_mail', __( "We couldn't send the code. Please check the address and try again.", 'zaplane' ), [ 'status' => 500 ] );
+		}
+		return $code;
+	}
+
+	/* Before the first message ----------------------------------------- */
+
+	/**
+	 * What a website visitor still has to give before their message goes
+	 * out: 'details' (name + email) or null. A signed-in visitor, or one whose
+	 * conversation already has the email (confirmed, when codes are on), is
+	 * never asked.
+	 */
+	public static function needs_details( string $visitor_id, ?Conversation $conversation ): ?string {
+		$widget = InboxSettings::get()['widget'];
+		if ( empty( $widget['ask_email'] ) || 0 === strpos( $visitor_id, 'u_' ) ) {
+			return null;
+		}
+		if ( $conversation ) {
+			$contact = Contact::where( 'id', (int) $conversation->contact_id )->fresh()->first();
+			if ( $contact && ( (int) $contact->wp_user_id > 0 || ( '' !== (string) $contact->email && ( empty( $widget['verify_email'] ) || self::verified( $contact ) ) ) ) ) {
+				return null;
+			}
+		}
+		return 'details';
+	}
+
+	/**
+	 * The visitor gave their details for a message they are holding. Checked
+	 * now; with codes on, a code is emailed and the message waits for it.
+	 * Nothing lands in the inbox until the message itself is sent.
+	 *
+	 * @return array{status:string,email:string}|WP_Error status: ok | code_sent
+	 */
+	public static function prechat( string $visitor_id, string $name, string $email ) {
+		if ( '' === trim( sanitize_text_field( $name ) ) ) {
+			return new WP_Error( 'zaplane_inbox_name', __( 'Please enter your name.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+		$email = self::valid_email( $email );
+		if ( is_wp_error( $email ) ) {
+			return $email;
+		}
+		if ( empty( InboxSettings::get()['widget']['verify_email'] ) ) {
+			return [
+				'status' => 'ok',
+				'email'  => $email,
+			];
+		}
+
+		$key  = self::prechat_key( $visitor_id );
+		$held = get_transient( $key );
+		$log  = self::code_log( is_array( $held ) ? (array) ( $held['codes'] ?? [] ) : [] );
+		if ( is_wp_error( $log ) ) {
+			return $log;
+		}
+		$code = self::send_code( $email );
+		if ( is_wp_error( $code ) ) {
+			return $code;
+		}
+		$log[] = time();
+		set_transient( $key, [
+			'email'   => $email,
+			'hash'    => self::hash( $code, self::prechat_scope( $visitor_id ) ),
+			'expires' => time() + self::CODE_TTL,
+			'tries'   => 0,
+			'codes'   => $log,
+		], HOUR_IN_SECONDS );
+
+		return [
+			'status' => 'code_sent',
+			'email'  => $email,
+		];
+	}
+
+	/**
+	 * The emailed code matches the address it was sent to.
+	 *
+	 * @return true|WP_Error
+	 */
+	public static function prechat_confirm( string $visitor_id, string $email, string $code ) {
+		$key  = self::prechat_key( $visitor_id );
+		$held = get_transient( $key );
+		if ( ! is_array( $held ) || (int) $held['expires'] < time() || strtolower( (string) $held['email'] ) !== strtolower( $email ) ) {
+			return new WP_Error( 'zaplane_inbox_code_expired', __( 'That code has expired. Ask for a new one.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+		if ( (int) $held['tries'] >= self::CODE_TRIES ) {
+			return new WP_Error( 'zaplane_inbox_code_tries', __( 'Too many wrong codes. Ask for a new one.', 'zaplane' ), [ 'status' => 429 ] );
+		}
+		$code = (string) preg_replace( '/\D/', '', $code );
+		if ( ! hash_equals( (string) $held['hash'], self::hash( $code, self::prechat_scope( $visitor_id ) ) ) ) {
+			$held['tries'] = (int) $held['tries'] + 1;
+			set_transient( $key, $held, HOUR_IN_SECONDS );
+			return new WP_Error( 'zaplane_inbox_code_wrong', __( "That code isn't right. Check the email and try again.", 'zaplane' ), [ 'status' => 400 ] );
+		}
+		// Spent: the code can't confirm a second address.
+		$held['hash'] = '';
+		set_transient( $key, $held, HOUR_IN_SECONDS );
+		return true;
+	}
+
+	/**
+	 * The held message went out with these details: make sure the
+	 * conversation's contact carries them, confirmed when a code proved it.
+	 */
+	public static function after_first_message( Conversation $conversation, string $name, string $email, bool $verified ): void {
+		$contact = Contact::where( 'id', (int) $conversation->contact_id )->fresh()->first();
+		if ( ! $contact ) {
+			return;
+		}
+		$name = mb_substr( sanitize_text_field( $name ), 0, 191 );
+		if ( '' !== $name && '' === (string) $contact->name ) {
+			$contact->name = $name;
+			$contact->save();
+		}
+		if ( strtolower( (string) $contact->email ) === $email && ( ! $verified || self::verified( $contact ) ) ) {
+			return;
+		}
+		self::set_email( $conversation, $contact, $email, $verified );
+	}
+
+	private static function prechat_key( string $visitor_id ): string {
+		return 'zaplane_inbox_pre_' . md5( $visitor_id );
+	}
+
+	/** Codes are bound to the visitor, so one can't be replayed for another. */
+	private static function prechat_scope( string $visitor_id ): int {
+		return (int) hexdec( substr( md5( $visitor_id ), 0, 7 ) );
 	}
 
 	public static function skip( Conversation $conversation ): void {

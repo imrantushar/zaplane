@@ -262,6 +262,8 @@ class WidgetController {
 		return rest_ensure_response( [
 			'token'   => self::sign( $visitor_id ),
 			'visitor' => $known,
+			// Name + email before the first message goes out.
+			'needs_contact' => null !== VisitorContact::needs_details( $visitor_id, $this->conversation_for( $visitor_id ) ),
 			'team'    => Availability::team(),
 		] );
 	}
@@ -271,9 +273,10 @@ class WidgetController {
 		$conversation = $this->conversation_for( $visitor_id );
 		if ( ! $conversation ) {
 			return rest_ensure_response( [
-				'messages' => [],
-				'status'   => null,
-				'waiting'  => false,
+				'messages'      => [],
+				'status'        => null,
+				'waiting'       => false,
+				'needs_contact' => null !== VisitorContact::needs_details( $visitor_id, null ),
 			] );
 		}
 
@@ -297,6 +300,8 @@ class WidgetController {
 			'read_upto'   => $this->read_upto( $conversation ),
 			// A person is answering and we have no (confirmed) email: ask in the chat.
 			'ask_contact' => VisitorContact::ask( $conversation ),
+			// The next message waits for name + email.
+			'needs_contact' => null !== VisitorContact::needs_details( $visitor_id, $conversation ),
 			'waiting'  => $this->assistant_is_typing( $conversation ),
 			// Bumped on every edit or delete; the widget reloads when it changes.
 			'revision' => \Zaplane\Modules\Inbox\Services\MessageActions::revision( $conversation ),
@@ -329,6 +334,18 @@ class WidgetController {
 			];
 		}
 
+		// Name and email first, when the site asks for them: the message waits
+		// in the chat until they're given (and, with codes on, confirmed).
+		$held = null;
+		if ( VisitorContact::needs_details( $visitor_id, $this->conversation_for( $visitor_id ) ) ) {
+			$held = $this->held_details( $visitor_id, $request );
+			if ( is_wp_error( $held ) ) {
+				return $held;
+			}
+			$contact['name']  = $held['name'];
+			$contact['email'] = $held['email'];
+		}
+
 		$message = Ingest::inbound( [
 			'channel'     => 'web',
 			'external_id' => $visitor_id,
@@ -341,7 +358,60 @@ class WidgetController {
 			return new WP_Error( 'zaplane_inbox_rejected', __( 'Your message could not be sent.', 'zaplane' ), [ 'status' => 400 ] );
 		}
 
+		if ( $held ) {
+			$conversation = $this->conversation_for( $visitor_id );
+			if ( $conversation ) {
+				VisitorContact::after_first_message( $conversation, $held['name'], $held['email'], $held['verified'] );
+			}
+		}
+
 		return rest_ensure_response( [ 'message' => Presenter::message( $message, true ) ] );
+	}
+
+	/**
+	 * The details sent with a held message, checked — or what is missing, as
+	 * an error whose `need` tells the widget which step to show.
+	 *
+	 * @return array{name:string,email:string,verified:bool}|WP_Error
+	 */
+	private function held_details( string $visitor_id, WP_REST_Request $request ) {
+		$name  = mb_substr( trim( sanitize_text_field( (string) $request->get_param( 'name' ) ) ), 0, 191 );
+		$email = (string) $request->get_param( 'email' );
+		if ( '' === $name || '' === trim( $email ) ) {
+			return new WP_Error( 'zaplane_inbox_need_contact', __( 'Please tell us your name and email so we can reply.', 'zaplane' ), [
+				'status' => 400,
+				'need'   => 'details',
+			] );
+		}
+
+		$email = VisitorContact::valid_email( $email );
+		if ( is_wp_error( $email ) ) {
+			$email->add_data( array_merge( (array) $email->get_error_data(), [ 'need' => 'details' ] ) );
+			return $email;
+		}
+
+		$verified = false;
+		if ( ! empty( InboxSettings::get()['widget']['verify_email'] ) ) {
+			$code = (string) $request->get_param( 'code' );
+			if ( '' === $code ) {
+				return new WP_Error( 'zaplane_inbox_need_code', __( 'Enter the code we emailed you to send your message.', 'zaplane' ), [
+					'status' => 400,
+					'need'   => 'code',
+				] );
+			}
+			$ok = VisitorContact::prechat_confirm( $visitor_id, $email, $code );
+			if ( is_wp_error( $ok ) ) {
+				$ok->add_data( array_merge( (array) $ok->get_error_data(), [ 'need' => 'code' ] ) );
+				return $ok;
+			}
+			$verified = true;
+		}
+
+		return [
+			'name'     => $name,
+			'email'    => $email,
+			'verified' => $verified,
+		];
 	}
 
 	/**
@@ -378,7 +448,16 @@ class WidgetController {
 	 * Name and email from the chat, a code to confirm it, or "not now".
 	 */
 	public function contact( WP_REST_Request $request ) {
-		$conversation = $this->conversation_for( (string) self::visitor_from( $request ) );
+		$visitor_id   = (string) self::visitor_from( $request );
+		$conversation = $this->conversation_for( $visitor_id );
+
+		// Details for a message the visitor is holding: check them (and send
+		// the code) before the message goes out.
+		if ( rest_sanitize_boolean( $request->get_param( 'prechat' ) ) ) {
+			$out = VisitorContact::prechat( $visitor_id, (string) $request->get_param( 'name' ), (string) $request->get_param( 'email' ) );
+			return is_wp_error( $out ) ? $out : rest_ensure_response( $out );
+		}
+
 		if ( ! $conversation ) {
 			return new WP_Error( 'zaplane_inbox_contact', __( 'Start the chat first.', 'zaplane' ), [ 'status' => 400 ] );
 		}

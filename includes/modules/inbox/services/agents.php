@@ -13,7 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The people who answer the inbox: who they are to a visitor, and whether
  * any of them is at their desk right now.
  *
- * An agent is any user who may work in the inbox. What the visitor sees is
+ * An agent is a user the team picked (any role — a shop manager, a
+ * contributor). Until anyone is picked, everyone who may manage the inbox
+ * answers, as before. What the visitor sees is
  * their WordPress name and avatar unless the team gives them a chat name and
  * picture of their own — "tusharimran" rarely reads well in a chat window.
  */
@@ -28,6 +30,146 @@ class Agents {
 	/** '1' while they have marked themselves away. */
 	public const META_AWAY = 'zaplane_inbox_away';
 
+	/** Granted to the picked agents (and managers): work in the inbox. */
+	public const CAP = 'zaplane_inbox_agent';
+
+	/** User meta: when this agent answers — the company's hours or their own. */
+	public const META_SCHEDULE = 'zaplane_inbox_schedule';
+
+	/** Picked agents, cached for the request. */
+	private static ?array $members = null;
+
+	public static function register(): void {
+		add_filter( 'user_has_cap', [ self::class, 'grant' ], 10, 4 );
+	}
+
+	/**
+	 * Picked agents (and managers) may work in the inbox. Decided from the
+	 * caps already in hand, never by asking current_user_can() again.
+	 *
+	 * @param array<string,bool> $allcaps
+	 * @param string[]           $caps
+	 * @param array<int,mixed>   $args
+	 * @param \WP_User           $user
+	 * @return array<string,bool>
+	 */
+	public static function grant( $allcaps, $caps, $args, $user ) {
+		if ( ! in_array( self::CAP, (array) $caps, true ) || ! empty( $allcaps[ self::CAP ] ) ) {
+			return $allcaps;
+		}
+		if ( ! empty( $allcaps[ AdminController::capability() ] ) || ( $user instanceof \WP_User && in_array( (int) $user->ID, self::picked(), true ) ) ) {
+			$allcaps[ self::CAP ] = true;
+		}
+		return $allcaps;
+	}
+
+	/**
+	 * The ids the team picked, as stored (still existing users only).
+	 *
+	 * @return int[]
+	 */
+	public static function picked(): array {
+		if ( null === self::$members ) {
+			$ids           = array_map( 'absint', (array) ( InboxSettings::get()['team']['members'] ?? [] ) );
+			self::$members = array_values( array_unique( array_filter( $ids ) ) );
+		}
+		return self::$members;
+	}
+
+	/**
+	 * Who answers: the picked agents, or — until anyone is picked — the
+	 * inbox's managers.
+	 *
+	 * @return int[]
+	 */
+	public static function member_ids(): array {
+		$picked = self::picked();
+		if ( $picked ) {
+			return array_values( array_filter( $picked, static fn( $id ) => (bool) get_userdata( $id ) ) );
+		}
+		return array_map( 'intval', get_users( [
+			'capability' => AdminController::capability(),
+			'number'     => 50,
+			'fields'     => 'ID',
+		] ) );
+	}
+
+	/**
+	 * Add or remove one agent. The first pick keeps whoever answered until
+	 * now, so nobody disappears from the chat by surprise.
+	 */
+	public static function set_member( int $user_id, bool $on ): void {
+		$ids = self::picked() ?: self::member_ids();
+		$ids = $on ? array_merge( $ids, [ $user_id ] ) : array_diff( $ids, [ $user_id ] );
+		$ids = array_values( array_unique( array_map( 'intval', $ids ) ) );
+		InboxSettings::save( [ 'team' => [ 'members' => $ids ] ] );
+		self::$members = null;
+		Availability::forget();
+	}
+
+	/**
+	 * Users who could be picked, for the search box.
+	 *
+	 * @return array<int,array{id:int,name:string,email:string,avatar:string,role:string,member:bool}>
+	 */
+	public static function candidates( string $search ): array {
+		$args = [
+			'number'  => 20,
+			'orderby' => 'display_name',
+			'fields'  => [ 'ID', 'display_name', 'user_email' ],
+		];
+		$search = trim( $search );
+		if ( '' !== $search ) {
+			$args['search']         = '*' . $search . '*';
+			$args['search_columns'] = [ 'user_login', 'user_email', 'display_name', 'user_nicename' ];
+		}
+		$members = self::member_ids();
+		$roles   = wp_roles()->get_names();
+		$out     = [];
+		foreach ( get_users( $args ) as $user ) {
+			$wp_user = get_userdata( (int) $user->ID );
+			$role    = $wp_user && $wp_user->roles ? (string) reset( $wp_user->roles ) : '';
+			$out[]   = [
+				'id'     => (int) $user->ID,
+				'name'   => (string) $user->display_name,
+				'email'  => (string) $user->user_email,
+				'avatar' => (string) get_avatar_url( (int) $user->ID, [ 'size' => 64 ] ),
+				'role'   => isset( $roles[ $role ] ) ? translate_user_role( $roles[ $role ] ) : $role,
+				'member' => in_array( (int) $user->ID, $members, true ),
+			];
+		}
+		return $out;
+	}
+
+	/* ---------------------------------------------------------------- *
+	 * When they answer
+	 * ---------------------------------------------------------------- */
+
+	/**
+	 * @return array{mode:string,days:array<string,array{closed:bool,open:string,close:string}>}
+	 *               mode: 'company' (the company's hours) or 'custom'.
+	 */
+	public static function schedule( int $user_id ): array {
+		$saved = get_user_meta( $user_id, self::META_SCHEDULE, true );
+		$saved = is_array( $saved ) ? $saved : [];
+		return [
+			'mode' => 'custom' === ( $saved['mode'] ?? '' ) ? 'custom' : 'company',
+			'days' => InboxSettings::clean_days( is_array( $saved['days'] ?? null ) ? $saved['days'] : [] ),
+		];
+	}
+
+	/**
+	 * @param array<string,mixed> $input
+	 */
+	public static function save_schedule( int $user_id, array $input ): void {
+		$current = self::schedule( $user_id );
+		update_user_meta( $user_id, self::META_SCHEDULE, [
+			'mode' => isset( $input['mode'] ) ? ( 'custom' === $input['mode'] ? 'custom' : 'company' ) : $current['mode'],
+			'days' => isset( $input['days'] ) && is_array( $input['days'] ) ? InboxSettings::clean_days( $input['days'] ) : $current['days'],
+		] );
+		Availability::forget();
+	}
+
 	/** An agent counts as online for this long after their last sign of life. */
 	public const ONLINE_WINDOW = 90;
 
@@ -40,16 +182,9 @@ class Agents {
 	 * @return array<int,array<string,mixed>>
 	 */
 	public static function roster(): array {
-		$users = get_users( [
-			'capability' => AdminController::capability(),
-			'number'     => 50,
-			'orderby'    => 'display_name',
-			'fields'     => [ 'ID', 'display_name' ],
-		] );
-
 		$out = [];
-		foreach ( $users as $user ) {
-			$out[] = self::agent( (int) $user->ID );
+		foreach ( self::member_ids() as $user_id ) {
+			$out[] = self::agent( $user_id );
 		}
 
 		usort( $out, static fn( $a, $b ) => ( $b['online'] <=> $a['online'] ) ?: strcasecmp( $a['name'], $b['name'] ) );
@@ -75,7 +210,13 @@ class Agents {
 			'avatar'     => '' !== $identity['avatar'] ? $identity['avatar'] : (string) get_avatar_url( $user_id, [ 'size' => 96 ] ),
 			'avatar_id'  => $identity['avatar_id'],
 			'hidden'     => $identity['hidden'],
-			'online'     => self::is_online( $user_id ),
+			'email'      => $user ? (string) $user->user_email : '',
+			// At their desk *and* within their hours.
+			'online'     => self::is_online( $user_id ) && Availability::on_duty( $user_id ),
+			'at_desk'    => self::is_online( $user_id ),
+			'on_duty'    => Availability::on_duty( $user_id ),
+			'schedule'   => self::schedule( $user_id ),
+			'implicit'   => ! self::picked(),
 			'away'       => '1' === (string) get_user_meta( $user_id, self::META_AWAY, true ),
 			'last_seen'  => (int) get_user_meta( $user_id, self::META_SEEN, true ),
 		];

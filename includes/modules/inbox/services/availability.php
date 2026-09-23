@@ -12,10 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Whether the chat is staffed right now, and what to tell the visitor when
  * it is not.
  *
- * Two things decide it, and both have to agree: the opening hours (if the
- * team keeps any) and whether an agent has the inbox open. Outside the hours
- * nobody is online however many inboxes are open — that is the point of
- * having hours.
+ * Two things decide it, and both have to agree: hours and presence. Each
+ * agent works the company's opening hours or hours of their own; the chat is
+ * open while anyone is on duty, and online while someone on duty has the
+ * inbox open. Off duty, nobody is online however many inboxes are open — that
+ * is the point of having hours.
  */
 class Availability {
 
@@ -58,7 +59,11 @@ class Availability {
 	 */
 	public static function state(): array {
 		$hours = self::hours();
-		$open  = ! $hours['enabled'] || self::within_hours( $hours );
+		$team  = self::visible_agents();
+		// Nobody to go by: the company's hours alone decide.
+		$open = $team
+			? (bool) array_filter( $team, [ self::class, 'on_duty' ] )
+			: ( ! $hours['enabled'] || self::within_hours( $hours['days'] ) );
 
 		if ( ! $open ) {
 			return [
@@ -66,7 +71,7 @@ class Availability {
 				'reason'     => 'closed',
 				'message'    => '' !== $hours['away_message'] ? $hours['away_message'] : __( "We're closed right now. Leave a message and we'll reply when we're back.", 'zaplane' ),
 				'reply_time' => $hours['reply_time'],
-				'opens_at'   => self::next_opening( $hours ),
+				'opens_at'   => self::opens_at( $hours, $team ),
 			];
 		}
 
@@ -90,11 +95,57 @@ class Availability {
 	}
 
 	/**
-	 * @param array<string,mixed> $hours
+	 * Within this agent's hours right now: their own, or the company's.
 	 */
-	private static function within_hours( array $hours ): bool {
+	public static function on_duty( int $user_id ): bool {
+		$schedule = Agents::schedule( $user_id );
+		if ( 'custom' === $schedule['mode'] ) {
+			return self::within_hours( $schedule['days'] );
+		}
+		$hours = self::hours();
+		return ! $hours['enabled'] || self::within_hours( $hours['days'] );
+	}
+
+	/**
+	 * Agents a visitor can be answered by (not hidden from the chat).
+	 *
+	 * @return int[]
+	 */
+	private static function visible_agents(): array {
+		return array_values( array_filter( Agents::member_ids(), static fn( $id ) => ! Agents::identity( $id )['hidden'] ) );
+	}
+
+	/**
+	 * The soonest anyone comes on duty.
+	 *
+	 * @param array<string,mixed> $hours
+	 * @param int[]               $team
+	 */
+	private static function opens_at( array $hours, array $team ): string {
+		if ( ! $team ) {
+			return self::next_opening( $hours['days'] );
+		}
+		$soonest = '';
+		foreach ( $team as $user_id ) {
+			$schedule = Agents::schedule( $user_id );
+			$days     = 'custom' === $schedule['mode'] ? $schedule['days'] : ( $hours['enabled'] ? $hours['days'] : null );
+			if ( null === $days ) {
+				continue;
+			}
+			$at = self::next_opening( $days );
+			if ( '' !== $at && ( '' === $soonest || strtotime( $at ) < strtotime( $soonest ) ) ) {
+				$soonest = $at;
+			}
+		}
+		return $soonest;
+	}
+
+	/**
+	 * @param array<string,array{closed:bool,open:string,close:string}> $days
+	 */
+	private static function within_hours( array $days ): bool {
 		$now  = self::now();
-		$day  = $hours['days'][ self::DAYS[ (int) $now->format( 'N' ) - 1 ] ];
+		$day  = $days[ self::DAYS[ (int) $now->format( 'N' ) - 1 ] ] ?? [ 'closed' => true, 'open' => '00:00', 'close' => '00:00' ];
 		if ( $day['closed'] ) {
 			return false;
 		}
@@ -113,15 +164,15 @@ class Availability {
 	 * When the chat opens again, as an ISO time in the site's zone. Empty when
 	 * it is open, or when every day is closed.
 	 *
-	 * @param array<string,mixed> $hours
+	 * @param array<string,array{closed:bool,open:string,close:string}> $days
 	 */
-	private static function next_opening( array $hours ): string {
+	private static function next_opening( array $days ): string {
 		$now = self::now();
 
 		for ( $ahead = 0; $ahead <= 7; $ahead++ ) {
 			$day  = $now->modify( sprintf( '+%d days', $ahead ) );
-			$spec = $hours['days'][ self::DAYS[ (int) $day->format( 'N' ) - 1 ] ];
-			if ( $spec['closed'] ) {
+			$spec = $days[ self::DAYS[ (int) $day->format( 'N' ) - 1 ] ] ?? null;
+			if ( ! $spec || $spec['closed'] ) {
 				continue;
 			}
 			$opens = $day->setTime( (int) substr( $spec['open'], 0, 2 ), (int) substr( $spec['open'], 3, 2 ) );

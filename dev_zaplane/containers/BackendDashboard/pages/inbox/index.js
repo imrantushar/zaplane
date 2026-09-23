@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { __, sprintf } from "@wordpress/i18n";
-import { FiSettings, FiArrowLeft, FiInfo, FiUsers, FiCoffee, FiCheckCircle } from "react-icons/fi";
+import { FiSettings, FiArrowLeft, FiInfo, FiUsers, FiCoffee, FiCheckCircle, FiClock } from "react-icons/fi";
 import PageLayout from "@ZAPComponents/PageLayout";
 import { outlineBtn } from "../../../../../assets/scss/chakra/recipe";
 import ConversationList from "./ConversationList";
 import Thread from "./Thread";
 import Details from "./Details";
-import Settings from "./Settings";
+import Settings, { SECTIONS } from "./Settings";
 import Visitors from "./Visitors";
 import { inboxApi, visiblePoll } from "./api";
 import "./styles.scss";
@@ -64,12 +65,27 @@ const useFillHeight = (ref, deps) => {
   }, deps);
 };
 
+// A picked chat agent who isn't a manager answers chats; settings aren't theirs.
+// wp_localize_script sends true as "1" and false as "".
+const isManager = !!window.ZaplaneGlobal?.inbox_manager && window.ZaplaneGlobal.inbox_manager !== "0";
+
 const InboxPage = () => {
-  // "?view=settings" (the gear on the Modules screen) opens Settings.
-  const [view, setView] = useState(() => {
-    const asked = new URLSearchParams(window.location.search).get("view");
-    return ["settings", "visitors"].includes(asked) ? asked : "inbox";
-  });
+  // Where you are lives in the address: ?page=zaplane-inbox&view=settings&section=team,
+  // &view=visitors, or &conversation=12. Links can be shared and Back works.
+  const [params, setParams] = useSearchParams();
+  const asked = params.get("view");
+  const view = (isManager ? ["settings", "visitors"] : ["visitors"]).includes(asked) ? asked : "inbox";
+  const setView = useCallback(
+    (next) =>
+      setParams((p) => {
+        const q = new URLSearchParams(p);
+        if (next === "inbox") q.delete("view");
+        else q.set("view", next);
+        if (next !== "settings") q.delete("section");
+        return q;
+      }),
+    [setParams]
+  );
   const [online, setOnline] = useState(0);
   const [filters, setFilters] = useState({ status: "open", assignee: "any", search: "" });
   const [list, setList] = useState({ items: [], counts: {}, loading: true });
@@ -124,6 +140,7 @@ const InboxPage = () => {
 
   const openConversation = useCallback(async (id) => {
     setActiveId(id);
+    activeIdRef.current = id;
     if (!id) {
       setThread({ conversation: null, messages: [], other: [] });
       return;
@@ -167,17 +184,41 @@ const InboxPage = () => {
     if (view === "inbox") loadMeta();
   }, [loadMeta, view]);
 
-  // "?page=zaplane-inbox&conversation=12" (e.g. "View chat" in settings)
-  // opens that conversation, whatever its status.
+  // The open conversation is part of the address — replaced, not pushed, so
+  // clicking through the list doesn't fill the Back button. Done after the
+  // render, so it builds on any view change made in the same click.
+  const syncedId = useRef(0);
   useEffect(() => {
-    const id = parseInt(new URLSearchParams(window.location.search).get("conversation") || "0", 10);
-    if (id > 0) {
+    const inUrl = parseInt(params.get("conversation") || "0", 10);
+    // Only when the open conversation changed here, not on first load (the
+    // address may be about to open one).
+    if (view !== "inbox" || activeId === syncedId.current) return;
+    syncedId.current = activeId;
+    if (inUrl === activeId) return;
+    setParams(
+      (p) => {
+        const q = new URLSearchParams(p);
+        if (activeId) q.set("conversation", String(activeId));
+        else q.delete("conversation");
+        return q;
+      },
+      { replace: true }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeId, view]);
+
+  // "?page=zaplane-inbox&conversation=12" (a shared link, "View chat" in
+  // settings, Back/Forward) opens that conversation, whatever its status.
+  const urlConversation = parseInt(params.get("conversation") || "0", 10);
+  useEffect(() => {
+    if (urlConversation > 0 && urlConversation !== activeIdRef.current) {
+      syncedId.current = urlConversation;
       setFilters((f) => ({ ...f, status: "all" }));
       setPane("thread");
-      openConversation(id);
+      openConversation(urlConversation);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [urlConversation]);
 
   useEffect(() => {
     if (view !== "inbox") return undefined;
@@ -350,18 +391,20 @@ const InboxPage = () => {
           <button
             type="button"
             style={outlineBtn}
-            className={"zaplane-inbox-head-btn" + (me.away ? " is-away" : " is-online")}
+            className={"zaplane-inbox-head-btn" + (me.away || me.on_duty === false ? " is-away" : " is-online")}
             onClick={toggleAway}
             title={me.away ? __("Visitors are told nobody is about. Click to come back.", "zaplane") : __("Visitors can see someone is here. Click to step away.", "zaplane")}
           >
-            {me.away ? <FiCoffee /> : <FiCheckCircle />}
-            <span>{me.away ? __("Away", "zaplane") : __("Available", "zaplane")}</span>
+            {me.away ? <FiCoffee /> : me.on_duty === false ? <FiClock /> : <FiCheckCircle />}
+            <span>{me.away ? __("Away", "zaplane") : me.on_duty === false ? __("Off hours", "zaplane") : __("Available", "zaplane")}</span>
           </button>
         )}
-        <button type="button" style={outlineBtn} className="zaplane-inbox-head-btn" onClick={() => setView("settings")}>
-          <FiSettings />
-          <span>{__("Settings", "zaplane")}</span>
-        </button>
+        {isManager && (
+          <button type="button" style={outlineBtn} className="zaplane-inbox-head-btn" onClick={() => setView("settings")}>
+            <FiSettings />
+            <span>{__("Settings", "zaplane")}</span>
+          </button>
+        )}
       </>
     ) : (
       <button type="button" style={outlineBtn} className="zaplane-inbox-head-btn" onClick={() => setView("inbox")}>
@@ -379,7 +422,13 @@ const InboxPage = () => {
         breadcrumbs={
           view === "inbox"
             ? [{ label: __("Inbox", "zaplane") }]
-            : [{ label: __("Inbox", "zaplane") }, { label: view === "visitors" ? __("Visitors", "zaplane") : __("Settings", "zaplane") }]
+            : view === "visitors"
+              ? [{ label: __("Inbox", "zaplane") }, { label: __("Visitors", "zaplane") }]
+              : [
+                  { label: __("Inbox", "zaplane") },
+                  { label: __("Settings", "zaplane") },
+                  { label: (SECTIONS.find((x) => x.id === params.get("section")) || SECTIONS[0]).label },
+                ]
         }
         topBarActions={topBarActions}
         hideHeading
@@ -387,7 +436,7 @@ const InboxPage = () => {
         {view === "settings" ? (
           <Settings onSaved={loadMeta} />
         ) : view === "visitors" ? (
-          <Visitors onOpenConversation={openFromVisitors} onCount={setOnline} onOpenSettings={() => setView("settings")} />
+          <Visitors onOpenConversation={openFromVisitors} onCount={setOnline} onOpenSettings={isManager ? () => setView("settings") : undefined} />
         ) : (
           <>
             {showSetup && (

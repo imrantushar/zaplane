@@ -1403,7 +1403,7 @@ kbd {
 
 .zaplane-inbox-settings {
 	display: grid;
-	grid-template-columns: 240px minmax(0, 1fr);
+	grid-template-columns: 256px minmax(0, 1fr);
 	align-items: start;
 	gap: 24px;
 	width: 100%;
@@ -1445,12 +1445,23 @@ $settings-sticky: 124px;
 		cursor: pointer;
 
 		> svg {
+			flex: none;
 			color: var(--zaplane-font-secondary-color);
 			font-size: 16px;
 		}
 
+		// The label gives way (ellipsis) before the badge is pushed out.
 		> span:first-of-type {
 			flex: 1;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		> .zaplane-inbox-badge {
+			flex: none;
+			margin-left: auto;
 		}
 
 		&:hover {
@@ -1474,6 +1485,23 @@ $settings-sticky: 124px;
 	gap: 20px;
 	min-width: 0;
 	padding-bottom: 8px;
+
+	// One section at a time: the one named in the address (&section=…).
+	// The others stay mounted, so unsaved edits survive switching sections.
+	@each $section in widget, team, hours, realtime, knowledge, ai, channels, sources, replies {
+		&[data-active="#{$section}"] > [data-section]:not([data-section="#{$section}"]) {
+			display: none;
+		}
+	}
+
+	> [data-section] {
+		animation: zaplane-inbox-section-in 0.18s ease-out;
+	}
+}
+
+@keyframes zaplane-inbox-section-in {
+	from { opacity: 0; transform: translateY(4px); }
+	to { opacity: 1; transform: none; }
 }
 
 .zaplane-inbox-badge {
@@ -3524,6 +3552,102 @@ em.zaplane-inbox-hint {
   @media (max-width: 880px) {
     .zaplane-inbox-agent-row { grid-template-columns: 1fr; }
   }
+}
+
+/* Picking who answers: a search box with the site's users under it. */
+.zaplane-inbox-picker {
+  position: relative;
+  margin-bottom: 12px;
+
+  .zaplane-inbox-picker-field {
+    position: relative;
+    display: block;
+
+    svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--zaplane-font-secondary-color); pointer-events: none; }
+    // The shared input sets its own padding; the icon needs room.
+    .zaplane-inbox-input { width: 100%; padding-left: 38px !important; }
+  }
+
+  .zaplane-inbox-picker-list {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    max-height: 320px;
+    overflow: auto;
+    padding: 6px;
+    border: 1px solid var(--zaplane-border-color);
+    border-radius: 10px;
+    background: var(--zaplane-background);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+  }
+
+  .zaplane-inbox-picker-empty { padding: 12px; color: var(--zaplane-font-secondary-color); font-size: 13px; }
+
+  .zaplane-inbox-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover:not(:disabled), &:focus-visible { background: var(--zaplane-secondary); }
+    &.is-member { cursor: default; opacity: 0.6; }
+
+    .zaplane-inbox-face { width: 32px; height: 32px; }
+  }
+
+  .zaplane-inbox-picker-who {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+
+    strong { font-weight: 600; font-size: 13px; }
+    em { font-style: normal; font-size: 12px; color: var(--zaplane-font-secondary-color); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  }
+
+  .zaplane-inbox-picker-action { color: var(--zaplane-primary, #006bff); font-size: 12px; display: grid; place-items: center; }
+}
+
+.zaplane-inbox-team-note { margin: 0 0 12px; }
+
+.zaplane-inbox-agent {
+  .zaplane-inbox-agent-who {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    strong { font-weight: 600; }
+    em { font-style: normal; font-size: 12px; color: var(--zaplane-font-secondary-color); }
+  }
+
+  .zaplane-inbox-agent-hours {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    .zaplane-inbox-segment button { white-space: nowrap; padding-left: 12px; padding-right: 12px; }
+  }
+
+  .zaplane-inbox-agent-hours-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .zaplane-inbox-hours { margin-top: 0; }
 }
 
 /* The same round face the chat shows, with a dot when they are at their desk. */

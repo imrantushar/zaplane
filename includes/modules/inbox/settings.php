@@ -28,6 +28,8 @@ class Settings {
 				'greeting'        => __( 'Hi! How can we help you today?', 'zaplane' ),
 				'color'           => '#006BFF',
 				'position'        => 'right',
+				// Name + email before the first message goes out; it waits in
+				// the chat until they're given.
 				'ask_email'       => true,
 				// Live visitors list: the widget reports the page it is on.
 				'visitors'        => true,
@@ -36,7 +38,10 @@ class Settings {
 				'sound'           => true,
 				// Ask for name + email in the chat once a person will answer.
 				'ask_contact'     => true,
-				// Confirm that email with a one-time code.
+				// Check an email can receive mail (typos, throwaway inboxes, no
+				// mail server) — no code needed.
+				'check_email'     => true,
+				// Also confirm it with a one-time code: proof it's theirs.
 				'verify_email'    => false,
 				// Email a reply the visitor didn't see in the chat.
 				'notify_email'    => true,
@@ -56,6 +61,10 @@ class Settings {
 				],
 			],
 			// Opening hours: outside them the chat says so, whoever is logged in.
+			// Who answers the chat. Empty: everyone who manages the inbox.
+			'team' => [
+				'members' => [],
+			],
 			'hours' => [
 				'enabled'      => false,
 				'days'         => [],
@@ -158,7 +167,7 @@ class Settings {
 			if ( array_key_exists( 'enabled', $w ) ) {
 				$c['enabled'] = (bool) $w['enabled'];
 			}
-			foreach ( [ 'ask_email', 'visitors', 'auto_open', 'sound', 'ask_contact', 'verify_email', 'notify_email', 'show_team' ] as $k ) {
+			foreach ( [ 'ask_email', 'visitors', 'auto_open', 'sound', 'ask_contact', 'check_email', 'verify_email', 'notify_email', 'show_team' ] as $k ) {
 				if ( array_key_exists( $k, $w ) ) {
 					$c[ $k ] = (bool) $w[ $k ];
 				}
@@ -222,6 +231,11 @@ class Settings {
 				// The menu replaces the older flat list.
 				$current['answers']['common_questions'] = [];
 			}
+		}
+
+		if ( isset( $input['team']['members'] ) && is_array( $input['team']['members'] ) ) {
+			$ids                           = array_values( array_unique( array_filter( array_map( 'absint', $input['team']['members'] ) ) ) );
+			$current['team']['members'] = array_values( array_filter( $ids, static fn( $id ) => (bool) get_userdata( $id ) ) );
 		}
 
 		if ( isset( $input['hours'] ) && is_array( $input['hours'] ) ) {
@@ -319,19 +333,31 @@ class Settings {
 		];
 
 		if ( isset( $input['days'] ) && is_array( $input['days'] ) ) {
-			$days = [];
-			foreach ( Services\Availability::DAYS as $day ) {
-				$in           = is_array( $input['days'][ $day ] ?? null ) ? $input['days'][ $day ] : [];
-				$days[ $day ] = [
-					'closed' => ! empty( $in['closed'] ),
-					'open'   => self::clean_clock( (string) ( $in['open'] ?? '' ), '09:00' ),
-					'close'  => self::clean_clock( (string) ( $in['close'] ?? '' ), '17:00' ),
-				];
-			}
-			$out['days'] = $days;
+			$out['days'] = self::clean_days( $input['days'] );
 		}
 
 		return $out;
+	}
+
+	/**
+	 * A week of opening times, every day present (the company's, or one
+	 * agent's own).
+	 *
+	 * @param array<string,mixed> $input
+	 * @return array<string,array{closed:bool,open:string,close:string}>
+	 */
+	public static function clean_days( array $input ): array {
+		$days = [];
+		foreach ( Services\Availability::DAYS as $day ) {
+			$in           = is_array( $input[ $day ] ?? null ) ? $input[ $day ] : [];
+			$days[ $day ] = [
+				// A weekend is closed unless said otherwise.
+				'closed' => array_key_exists( 'closed', $in ) ? ! empty( $in['closed'] ) : ( [] === $input && in_array( $day, [ 'sat', 'sun' ], true ) ),
+				'open'   => self::clean_clock( (string) ( $in['open'] ?? '' ), '09:00' ),
+				'close'  => self::clean_clock( (string) ( $in['close'] ?? '' ), '17:00' ),
+			];
+		}
+		return $days;
 	}
 
 	private static function clean_clock( string $value, string $fallback ): string {

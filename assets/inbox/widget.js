@@ -24,6 +24,9 @@
 	var t = cfg.i18n || {};
 
 	var TEASER_KEY = 'zaplane_inbox_teaser';
+	// Messages written before the visitor gave their name and email; kept for
+	// the tab so a reload doesn't lose them.
+	var HELD_KEY = 'zaplane_inbox_held';
 
 	var state = {
 		token: read( STORE_KEY ),
@@ -49,6 +52,10 @@
 		loaded: false,
 		presenceTimer: null,
 		ask: null,
+		// Does the next message wait for name + email? null until the site says.
+		needsContact: null,
+		// Those waiting messages: [{ body, row }].
+		held: [],
 		readUpto: 0,
 		fresh: 0,
 	};
@@ -164,6 +171,9 @@
 			}
 			state.token = res.data.token;
 			state.known = res.data.visitor || null;
+			if ( typeof res.data.needs_contact === 'boolean' ) {
+				state.needsContact = res.data.needs_contact;
+			}
 			state.started = true;
 			write( STORE_KEY, state.token );
 			applyTeam( res.data.team );
@@ -218,7 +228,13 @@
 				announce( state.fresh );
 			}
 			setWaiting( !! res.data.waiting );
-			showContact( res.data.ask_contact || null );
+			if ( typeof res.data.needs_contact === 'boolean' ) {
+				state.needsContact = res.data.needs_contact;
+			}
+			// While a message waits for details, that card is the one shown.
+			if ( ! state.held.length ) {
+				showContact( res.data.ask_contact || null );
+			}
 		} );
 	}
 
@@ -590,24 +606,18 @@
 	}
 
 	var typing = el( 'div', 'zpi-msg zpi-them zpi-typing' );
-	typing.appendChild( el( 'div', 'zpi-bubble', t.typing || '…' ) );
+	var typingBubble = el( 'div', 'zpi-bubble' );
+	typingBubble.setAttribute( 'role', 'status' );
+	typingBubble.setAttribute( 'aria-label', t.typing || 'Typing…' );
+	for ( var d = 0; d < 3; d++ ) {
+		typingBubble.appendChild( el( 'span', 'zpi-dot' ) );
+	}
+	typing.appendChild( typingBubble );
 	typing.hidden = true;
 
 	var form = el( 'form', 'zpi-form' );
-	var details = el( 'div', 'zpi-details' );
-	var nameInput = el( 'input', 'zpi-input' );
-	nameInput.type = 'text';
-	nameInput.placeholder = t.name || 'Your name';
-	nameInput.setAttribute( 'aria-label', t.name || 'Your name' );
-	nameInput.autocomplete = 'name';
-	var emailInput = el( 'input', 'zpi-input' );
-	emailInput.type = 'email';
-	emailInput.placeholder = t.email || 'Your email';
-	emailInput.setAttribute( 'aria-label', t.email || 'Your email' );
-	emailInput.autocomplete = 'email';
-	details.appendChild( nameInput );
-	details.appendChild( emailInput );
-	details.hidden = true;
+	// What the visitor typed into the details card, reused if it's shown again.
+	var given = { name: '', email: '' };
 
 	var row = el( 'div', 'zpi-row' );
 	var text = el( 'textarea', 'zpi-text' );
@@ -659,7 +669,6 @@
 	var contactCard = el( 'div', 'zpi-contact' );
 	contactCard.hidden = true;
 	form.appendChild( contactCard );
-	form.appendChild( details );
 	if ( askMenu ) {
 		form.appendChild( askMenu );
 	}
@@ -815,7 +824,7 @@
 	}
 
 	function clearMessages() {
-		Array.prototype.slice.call( list.querySelectorAll( '.zpi-msg:not(.zpi-typing)' ) ).forEach( function ( node ) {
+		Array.prototype.slice.call( list.querySelectorAll( '.zpi-msg:not(.zpi-typing):not(.zpi-held)' ) ).forEach( function ( node ) {
 			if ( node !== typing ) {
 				node.parentNode.removeChild( node );
 			}
@@ -908,7 +917,7 @@
 			item.appendChild( qr );
 		}
 		item.appendChild( el( 'div', 'zpi-time', time( m.created_at ) + ( m.edited && ! m.deleted ? ' · ' + ( t.edited || 'edited' ) : '' ) ) );
-		list.insertBefore( row, typing );
+		list.insertBefore( row, state.held.length ? state.held[0].row : typing );
 
 		// Something new from the business (not history, not a redraw): the
 		// poll that brought it announces it once.
@@ -1047,12 +1056,15 @@
 		return b;
 	}
 
-	function contactRequest( body, btn ) {
+	function contactRequest( body, btn, onError ) {
 		btn.disabled = true;
 		return request( 'POST', 'contact', body ).then( function ( res ) {
 			btn.disabled = false;
 			if ( ! res.ok ) {
 				cardError( res.data && res.data.message );
+				if ( onError ) {
+					onError( res.data );
+				}
 				return null;
 			}
 			return res.data;
@@ -1073,7 +1085,7 @@
 			name.autocomplete = 'name';
 			name.placeholder = t.name || 'Your name';
 			name.setAttribute( 'aria-label', t.name || 'Your name' );
-			name.value = nameInput.value;
+			name.value = given.name;
 			contactCard.appendChild( name );
 		}
 		var email = el( 'input', 'zpi-input' );
@@ -1082,7 +1094,7 @@
 		email.required = true;
 		email.placeholder = 'you@example.com';
 		email.setAttribute( 'aria-label', t.email || 'Your email' );
-		email.value = ask.email || emailInput.value;
+		email.value = ask.email || given.email;
 		contactCard.appendChild( email );
 		var err = el( 'div', 'zpi-contact-error' );
 		err.hidden = true;
@@ -1232,7 +1244,6 @@
 		if ( open ) {
 			state.unread = 0;
 			badge.hidden = true;
-			details.hidden = ! ( cfg.askEmail && ! state.lastId && ! ( state.known && state.known.email ) );
 			poll().then( schedule, schedule );
 			// Opened by a new message: don't pull the keyboard up on a phone.
 			if ( ! byMessage ) {
@@ -1264,9 +1275,14 @@
 			form.requestSubmit ? form.requestSubmit() : form.dispatchEvent( new Event( 'submit', { cancelable: true } ) );
 		}
 	} );
+	/** The send arrow lights up once there is something to send. */
+	function syncSend() {
+		root.classList.toggle( 'zpi-has-text', !! text.value.trim() );
+	}
 	text.addEventListener( 'input', function () {
 		text.style.height = 'auto';
 		text.style.height = Math.min( text.scrollHeight, 120 ) + 'px';
+		syncSend();
 	} );
 
 	form.addEventListener( 'submit', function ( e ) {
@@ -1275,30 +1291,70 @@
 		if ( ! body || state.busy ) {
 			return;
 		}
+		error.hidden = true;
+		text.value = '';
+		text.style.height = 'auto';
+		syncSend();
+
+		// Name and email first: the message waits in the chat until then.
+		if ( needsDetails() ) {
+			hold( body );
+			return;
+		}
+		deliver( body, null );
+	} );
+
+	function needsDetails() {
+		if ( state.held.length ) {
+			return true;
+		}
+		if ( typeof state.needsContact === 'boolean' ) {
+			return state.needsContact;
+		}
+		return !! cfg.askEmail && ! ( state.known && state.known.email );
+	}
+
+	/**
+	 * Send one message. `details` ({ name, email, code? }) goes with the
+	 * first held message. Resolves true once it's in, false if it wasn't
+	 * (the message is then held, or the error shown).
+	 */
+	function deliver( body, details ) {
 		state.busy = true;
 		send.disabled = true;
-		error.hidden = true;
 
-		ensureSession()
+		return ensureSession()
 			.then( function ( ok ) {
 				if ( ! ok ) {
 					throw new Error();
 				}
-				return request( 'POST', 'messages', {
-					body: body,
-					name: nameInput.value.trim(),
-					email: emailInput.value.trim(),
-					page_url: window.location.href,
-				} );
+				var payload = { body: body, page_url: window.location.href };
+				if ( details ) {
+					payload.name = details.name;
+					payload.email = details.email;
+					if ( details.code ) {
+						payload.code = details.code;
+					}
+				}
+				return request( 'POST', 'messages', payload );
 			} )
 			.then( function ( res ) {
 				if ( ! res.ok ) {
+					var need = res.data && res.data.data && res.data.data.need;
+					if ( need && ! details ) {
+						// The site wants details after all: hold it and ask.
+						state.needsContact = true;
+						hold( body );
+						return false;
+					}
+					if ( details ) {
+						return res;
+					}
+					text.value = body;
+					syncSend();
 					showError( res.data && res.data.message );
-					return;
+					return false;
 				}
-				text.value = '';
-				text.style.height = 'auto';
-				details.hidden = true;
 				addMessage( res.data.message );
 				if ( ! state.presenceTimer ) {
 					schedulePresence();
@@ -1309,15 +1365,293 @@
 					setWaiting( true );
 				}
 				schedule();
+				return true;
 			} )
 			.catch( function () {
+				if ( details ) {
+					return { ok: false, data: {} };
+				}
+				text.value = body;
+				syncSend();
 				showError();
+				return false;
 			} )
-			.then( function () {
+			.then( function ( out ) {
 				state.busy = false;
 				send.disabled = false;
+				return out;
 			} );
-	} );
+	}
+
+	/* ---------------------------------------------------------------- *
+	 * Messages waiting for name + email
+	 * ---------------------------------------------------------------- */
+
+	function hold( body, restoring ) {
+		if ( starters && starters.parentNode ) {
+			starters.parentNode.removeChild( starters );
+		}
+		var row = el( 'div', 'zpi-msg zpi-me zpi-held' );
+		row.appendChild( el( 'div', 'zpi-bubble', body ) );
+		row.appendChild( el( 'div', 'zpi-time zpi-held-note', t.heldNote || 'Not sent yet' ) );
+		list.insertBefore( row, typing );
+		state.held.push( { body: body, row: row } );
+		if ( ! restoring ) {
+			saveHeld();
+		}
+		scrollDown();
+		if ( state.held.length === 1 || contactCard.hidden ) {
+			detailsForHeld();
+		}
+	}
+
+	function saveHeld() {
+		try {
+			window.sessionStorage.setItem( HELD_KEY, JSON.stringify( state.held.map( function ( h ) {
+				return h.body;
+			} ) ) );
+		} catch ( e ) {}
+	}
+
+	function restoreHeld() {
+		var bodies = [];
+		try {
+			bodies = JSON.parse( window.sessionStorage.getItem( HELD_KEY ) || '[]' ) || [];
+		} catch ( e ) {}
+		if ( ! bodies.length ) {
+			return;
+		}
+		// The site may no longer need details (they gave them in another tab).
+		if ( state.needsContact === false ) {
+			bodies.forEach( function ( b ) {
+				deliverQueued( b );
+			} );
+			saveHeldBodies( [] );
+			return;
+		}
+		bodies.forEach( function ( b ) {
+			hold( b, true );
+		} );
+	}
+
+	function saveHeldBodies( bodies ) {
+		try {
+			window.sessionStorage.setItem( HELD_KEY, JSON.stringify( bodies ) );
+		} catch ( e ) {}
+	}
+
+	var queue = Promise.resolve();
+	function deliverQueued( body ) {
+		queue = queue.then( function () {
+			return deliver( body, null );
+		} );
+		return queue;
+	}
+
+	function holdCard() {
+		state.ask = 'held';
+		contactCard.textContent = '';
+		contactCard.hidden = false;
+		contactCard.classList.add( 'is-held' );
+	}
+
+	/** "Where should we reply?" — name and email for the waiting message. */
+	function detailsForHeld( prefill, message ) {
+		holdCard();
+		contactCard.appendChild( el( 'div', 'zpi-contact-title', t.heldTitle || 'Where should we reply?' ) );
+		contactCard.appendChild( el( 'div', 'zpi-contact-hint', t.heldHint || 'Add your name and email and your message goes straight to our team.' ) );
+		var name = el( 'input', 'zpi-input' );
+		name.type = 'text';
+		name.autocomplete = 'name';
+		name.required = true;
+		name.placeholder = t.name || 'Your name';
+		name.setAttribute( 'aria-label', t.name || 'Your name' );
+		name.value = ( prefill && prefill.name ) || given.name || ( state.known && state.known.name ) || '';
+		var email = el( 'input', 'zpi-input' );
+		email.type = 'email';
+		email.autocomplete = 'email';
+		email.required = true;
+		email.placeholder = t.emailShort || 'you@example.com';
+		email.setAttribute( 'aria-label', t.emailLabel || 'Your email' );
+		email.value = ( prefill && prefill.email ) || given.email || '';
+		contactCard.appendChild( name );
+		contactCard.appendChild( email );
+		var err = el( 'div', 'zpi-contact-error' );
+		err.hidden = true;
+		contactCard.appendChild( err );
+		var fix = el( 'div', 'zpi-contact-links' );
+		fix.hidden = true;
+		contactCard.appendChild( fix );
+
+		var actions = el( 'div', 'zpi-contact-actions' );
+		var go = cardButton( t.heldSend || 'Send message', 'zpi-contact-save', function () {
+			given.name = name.value.trim();
+			given.email = email.value.trim();
+			if ( ! given.name ) {
+				cardError( t.nameRequired || 'Please enter your name.' );
+				name.focus();
+				return;
+			}
+			if ( ! given.email || ! email.checkValidity() ) {
+				cardError( t.emailInvalid || 'Please enter a valid email address.' );
+				email.focus();
+				return;
+			}
+			err.hidden = true;
+			fix.hidden = true;
+			ensureSession().then( function ( ok ) {
+				if ( ! ok ) {
+					cardError();
+					return null;
+				}
+				return contactRequest( { prechat: true, name: given.name, email: given.email }, go, function ( data ) {
+					// "Did you mean …@gmail.com?" — one tap to use it.
+					var suggestion = data && data.data && data.data.suggestion;
+					if ( suggestion ) {
+						fix.textContent = '';
+						fix.appendChild( cardButton( ( t.useSuggestion || 'Use %s' ).replace( '%s', suggestion ), 'zpi-contact-link', function () {
+							email.value = suggestion;
+							err.hidden = true;
+							fix.hidden = true;
+							go.click();
+						} ) );
+						fix.hidden = false;
+					}
+				} );
+			} ).then( function ( data ) {
+				if ( ! data ) {
+					return;
+				}
+				var details = { name: given.name, email: data.email || given.email };
+				if ( data.status === 'code_sent' ) {
+					codeForHeld( details );
+				} else {
+					sendHeld( details );
+				}
+			} );
+		} );
+		actions.appendChild( go );
+		contactCard.appendChild( actions );
+		[ name, email ].forEach( function ( input ) {
+			input.addEventListener( 'keydown', function ( e ) {
+				if ( e.key === 'Enter' ) {
+					e.preventDefault();
+					go.click();
+				}
+			} );
+		} );
+		if ( message ) {
+			cardError( message );
+		}
+		scrollDown();
+		window.setTimeout( function () {
+			( name.value ? email : name ).focus();
+		}, 50 );
+	}
+
+	/** Two-step: the code we emailed, then the message goes. */
+	function codeForHeld( details, message ) {
+		holdCard();
+		contactCard.appendChild( el( 'div', 'zpi-contact-title', ( t.codeTitle || 'Enter the code we sent to %s' ).replace( '%s', details.email ) ) );
+		contactCard.appendChild( el( 'div', 'zpi-contact-hint', t.heldCodeHint || 'Your message is sent as soon as you confirm.' ) );
+		var code = el( 'input', 'zpi-input zpi-code' );
+		code.type = 'text';
+		code.inputMode = 'numeric';
+		code.autocomplete = 'one-time-code';
+		code.maxLength = 6;
+		code.placeholder = '••••••';
+		code.setAttribute( 'aria-label', t.codeLabel || 'Verification code' );
+		contactCard.appendChild( code );
+		var err = el( 'div', 'zpi-contact-error' );
+		err.hidden = true;
+		contactCard.appendChild( err );
+
+		var actions = el( 'div', 'zpi-contact-actions' );
+		var links = el( 'div', 'zpi-contact-links' );
+		var resend = cardButton( t.codeResend || 'Send a new code', 'zpi-contact-link', function () {
+			contactRequest( { prechat: true, name: details.name, email: details.email }, resend ).then( function ( data ) {
+				if ( data ) {
+					err.hidden = true;
+					code.value = '';
+					code.focus();
+				}
+			} );
+		} );
+		var change = cardButton( t.codeChange || 'Change email', 'zpi-contact-link', function () {
+			detailsForHeld( details );
+		} );
+		links.appendChild( resend );
+		links.appendChild( change );
+		var verify = cardButton( t.heldConfirm || 'Confirm & send', 'zpi-contact-save', function () {
+			if ( code.value.replace( /\D/g, '' ).length !== 6 ) {
+				code.focus();
+				return;
+			}
+			verify.disabled = true;
+			sendHeld( { name: details.name, email: details.email, code: code.value } ).then( function () {
+				verify.disabled = false;
+			} );
+		} );
+		actions.appendChild( links );
+		actions.appendChild( verify );
+		contactCard.appendChild( actions );
+		code.addEventListener( 'input', function () {
+			code.value = code.value.replace( /\D/g, '' ).slice( 0, 6 );
+			if ( code.value.length === 6 && ! verify.disabled ) {
+				verify.click();
+			}
+		} );
+		if ( message ) {
+			cardError( message );
+		}
+		scrollDown();
+		window.setTimeout( function () {
+			code.focus();
+		}, 50 );
+	}
+
+	/**
+	 * Send what was held: the first message carries the details (and code),
+	 * the rest follow in order.
+	 */
+	function sendHeld( details ) {
+		var first = state.held[0];
+		if ( ! first ) {
+			return Promise.resolve();
+		}
+		return deliver( first.body, details ).then( function ( out ) {
+			if ( out !== true ) {
+				var data = ( out && out.data ) || {};
+				var need = data.data && data.data.need;
+				if ( need === 'code' && details && details.code ) {
+					codeForHeld( details, data.message );
+				} else {
+					detailsForHeld( details, data.message || t.error );
+				}
+				return;
+			}
+			removeHeld( first );
+			state.needsContact = false;
+			state.known = { name: details ? details.name : '', email: details ? details.email : '' };
+			contactCard.classList.remove( 'is-held' );
+			done();
+			var rest = state.held.slice();
+			rest.forEach( function ( h ) {
+				removeHeld( h );
+				deliverQueued( h.body );
+			} );
+			saveHeld();
+		} );
+	}
+
+	function removeHeld( h ) {
+		if ( h.row.parentNode ) {
+			h.row.parentNode.removeChild( h.row );
+		}
+		state.held = state.held.filter( function ( x ) {
+			return x !== h;
+		} );
+	}
 
 	document.addEventListener( 'visibilitychange', function () {
 		if ( document.visibilityState === 'visible' ) {
@@ -1355,7 +1689,12 @@
 			poll().then( function () {
 				schedule();
 				startPresence();
+				restoreHeld();
 			}, startPresence );
+		} ).then( function () {
+			if ( ! state.token ) {
+				restoreHeld();
+			}
 		} );
 		// A "continue the chat" link from an email lands with #zaplane-chat.
 		if ( window.location.hash === '#zaplane-chat' ) {

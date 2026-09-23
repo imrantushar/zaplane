@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { __, _n, sprintf } from "@wordpress/i18n";
 import { FiMessageCircle, FiCpu, FiShare2, FiZap, FiCopy, FiCheck, FiTrash2, FiExternalLink, FiX, FiUsers, FiGitBranch, FiBookOpen, FiClock, FiWifi } from "react-icons/fi";
 import ZAPToggle from "@ZAPComponents/ZAPToggle";
@@ -17,7 +18,7 @@ const Field = ({ label, help, children, wide }) => (
   </label>
 );
 
-const SECTIONS = [
+export const SECTIONS = [
   { id: "widget", label: __("Website chat", "zaplane"), Icon: FiMessageCircle },
   { id: "team", label: __("Who answers", "zaplane"), Icon: FiUsers },
   { id: "hours", label: __("Opening hours", "zaplane"), Icon: FiClock },
@@ -122,7 +123,9 @@ const Settings = ({ onSaved }) => {
   const [canned, setCanned] = useState([]);
   const [draft, setDraft] = useState({ title: "", shortcut: "", body: "" });
   const [secrets, setSecrets] = useState({});
-  const [active, setActive] = useState("widget");
+  // One section at a time, named in the address: &section=team.
+  const [params, setParams] = useSearchParams();
+  const active = SECTIONS.some((x) => x.id === params.get("section")) ? params.get("section") : "widget";
   const [removedSources, setRemovedSources] = useState([]);
   const [connectors, setConnectors] = useState([]);
 
@@ -144,7 +147,6 @@ const Settings = ({ onSaved }) => {
       document.removeEventListener("visibilitychange", onFocus);
     };
   }, []);
-  const pinnedUntil = useRef(0); // a nav click wins over the scroll spy for a moment
   const setSecret = (slug, key, v) => setSecrets({ ...secrets, [slug]: { ...(secrets[slug] || {}), [key]: v } });
 
   useEffect(() => {
@@ -169,19 +171,10 @@ const Settings = ({ onSaved }) => {
     return () => window.clearTimeout(t);
   }, [notice]);
 
-  // Keep the section nav in step with scrolling.
+  // A new section starts at the top.
   useEffect(() => {
-    if (!form || typeof IntersectionObserver === "undefined") return undefined;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (hit && Date.now() > pinnedUntil.current) setActive(hit.target.dataset.section);
-      },
-      { rootMargin: "-120px 0px -55% 0px" }
-    );
-    document.querySelectorAll("[data-section]").forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [!!form]);
+    window.scrollTo({ top: 0 });
+  }, [active]);
 
   if (!form) {
     return (
@@ -252,11 +245,13 @@ const Settings = ({ onSaved }) => {
     setDraft({ title: "", shortcut: "", body: "" });
   };
 
-  const jump = (id) => {
-    pinnedUntil.current = Date.now() + 1200;
-    setActive(id);
-    document.getElementById("zaplane-inbox-" + id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  const jump = (id) =>
+    setParams((p) => {
+      const q = new URLSearchParams(p);
+      q.set("view", "settings");
+      q.set("section", id);
+      return q;
+    });
 
   const connections = data?.ai_connections || [];
   const knowledgeKeys = data?.knowledge_keys || [];
@@ -299,7 +294,7 @@ const Settings = ({ onSaved }) => {
         ))}
       </nav>
 
-      <div className="zaplane-inbox-settings-body">
+      <div className="zaplane-inbox-settings-body" data-active={active}>
         <section className="zaplane-inbox-card" id="zaplane-inbox-widget" data-section="widget">
           <div className="zaplane-inbox-card-head">
             <div>
@@ -344,7 +339,10 @@ const Settings = ({ onSaved }) => {
                 <AnsweredBy value={form.widget.answered_by || "assistant"} onChange={(v) => setWidget("answered_by", v)} aiReady={!!aiReady} />
               </div>
               <div className="zaplane-inbox-field is-row is-wide">
-                <span>{__("Ask visitors for their name and email before the first message", "zaplane")}</span>
+                <span>
+                  {__("Ask for name and email to send the first message", "zaplane")}
+                  <em className="zaplane-inbox-hint">{__("The visitor writes first; their message waits in the chat (“Not sent yet”) and goes to your team as soon as they add their name and email.", "zaplane")}</em>
+                </span>
                 <ZAPToggle checked={!!form.widget.ask_email} onChange={(v) => setWidget("ask_email", v)} size="sm" />
               </div>
               <div className="zaplane-inbox-field is-row is-wide">
@@ -354,12 +352,38 @@ const Settings = ({ onSaved }) => {
                 </span>
                 <ZAPToggle checked={!!form.widget.ask_contact} onChange={(v) => setWidget("ask_contact", v)} size="sm" />
               </div>
-              <div className="zaplane-inbox-field is-row is-wide">
+              <div className="zaplane-inbox-field is-wide">
                 <span>
-                  {__("Verify emails with a 6-digit code", "zaplane")}
-                  <em className="zaplane-inbox-hint">{__("Two steps: the visitor enters a code we email them. Stops typos and made-up addresses. Needs working email on this site.", "zaplane")}</em>
+                  {__("Check the email", "zaplane")}
+                  <em className="zaplane-inbox-hint">
+                    {form.widget.verify_email
+                      ? __("Two steps: we email a 6-digit code and the message is sent once they enter it. Proves the inbox is theirs. Needs working email on this site.", "zaplane")
+                      : form.widget.check_email === false
+                        ? __("Any address that looks like an email is accepted.", "zaplane")
+                        : __("No code needed: catches typos (gmial.com → gmail.com), throwaway inboxes and domains that can't receive mail, instantly.", "zaplane")}
+                  </em>
                 </span>
-                <ZAPToggle checked={!!form.widget.verify_email} onChange={(v) => setWidget("verify_email", v)} size="sm" />
+                <span className="zaplane-inbox-segment" role="radiogroup">
+                  {[
+                    ["real", __("Is it real? (recommended)", "zaplane")],
+                    ["code", __("Send a code", "zaplane")],
+                    ["off", __("Don't check", "zaplane")],
+                  ].map(([value, label]) => {
+                    const current = form.widget.verify_email ? "code" : form.widget.check_email === false ? "off" : "real";
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        role="radio"
+                        aria-checked={current === value}
+                        className={current === value ? "is-active" : ""}
+                        onClick={() => setForm({ ...form, widget: { ...form.widget, check_email: value !== "off", verify_email: value === "code" } })}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </span>
               </div>
               <div className="zaplane-inbox-field is-row is-wide">
                 <span>
@@ -467,7 +491,7 @@ const Settings = ({ onSaved }) => {
             <div>
               <h3>{__("AI assistant", "zaplane")}</h3>
               <p>
-                {__("Answers what automatic answers can't, using the knowledge chosen above, and hands conversations to your team when it can't help. It stops for good in a conversation as soon as someone on your team replies.", "zaplane")}
+                {__("Answers what automatic answers can't, using the knowledge chosen under “Knowledge & answers”, and hands conversations to your team when it can't help. It stops for good in a conversation as soon as someone on your team replies.", "zaplane")}
               </p>
             </div>
             <ZAPToggle checked={!!form.ai.enabled} onChange={(v) => setAi("enabled", v)} label={__("Let the assistant answer", "zaplane")} />

@@ -104,9 +104,11 @@ const Visitors = ({ onOpenConversation, onCount, onOpenSettings }) => {
         <FiUsers />
         <strong>{__("Live visitors are off", "zaplane")}</strong>
         <p>{__("Turn on “Show live visitors” in the website chat settings to see who is on your site.", "zaplane")}</p>
-        <button type="button" className="zaplane-inbox-small is-primary" onClick={onOpenSettings}>
-          {__("Open settings", "zaplane")}
-        </button>
+        {onOpenSettings && (
+          <button type="button" className="zaplane-inbox-small is-primary" onClick={onOpenSettings}>
+            {__("Open settings", "zaplane")}
+          </button>
+        )}
       </div>
     );
   }

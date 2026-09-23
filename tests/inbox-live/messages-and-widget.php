@@ -50,6 +50,9 @@ zt_run( function () {
 		$r = new WP_REST_Request( 'POST', '/zaplane/v1/inbox/widget/messages' );
 		$r->set_header( 'X-Zaplane-Visitor', $tok );
 		$r->set_param( 'body', "rate test $i" );
+		// The first message may wait for name + email; give them every time.
+		$r->set_param( 'name', 'Rate Test' );
+		$r->set_param( 'email', 'rate.test@gmail.com' );
 		return rest_do_request( $r );
 	};
 	$a     = $token();
