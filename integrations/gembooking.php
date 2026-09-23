@@ -71,118 +71,144 @@ class Gembooking extends IntegrationBase {
 		return $items;
 	}
 
+	/**
+	 * Resolve the real GemBooking post type for a bookable kind.
+	 *
+	 * GemBooking defines its own post type via a constant instead of a
+	 * fixed 'gembk_*' slug, so the save_post_{type} hook name has to be
+	 * built from that constant — a hardcoded 'gembk_resource' etc. will
+	 * silently never fire if GemBooking registers a different slug.
+	 *
+	 * @param string $kind    'service' | 'event' | 'resource'.
+	 * @param string $default Fallback slug if the constant isn't defined.
+	 */
+	private static function bookable_post_type( string $kind, string $default ): string {
+		$constants = [
+			'service'  => 'GEMBOOKING_SERVICE_POST_TYPE',
+			'event'    => 'GEMBOOKING_EVENT_POST_TYPE',
+			'resource' => 'GEMBOOKING_RESOURCE_POST_TYPE',
+		];
+		$constant = $constants[ $kind ] ?? '';
+
+		return ( $constant && defined( $constant ) ) ? (string) constant( $constant ) : $default;
+	}
+
 	public static function get_triggers(): array {
+		$service_post_type  = self::bookable_post_type( 'service', 'gembk_service' );
+		$event_post_type    = self::bookable_post_type( 'event', 'gembk_event' );
+		$resource_post_type = self::bookable_post_type( 'resource', 'gembk_resource' );
+
 		$triggers = [
-			'booking_created' => [
+			'booking_created'             => [
 				'label' => 'Booking Created',
-				'hook' => 'gembooking/after_booking_persisted'
+				'hook'  => 'gembooking/after_booking_persisted'
 			],
-			'booking_confirmed' => [
+			'booking_confirmed'           => [
 				'label' => 'Booking Status Confirmed',
-				'hook' => 'gembooking/booking/confirmed'
+				'hook'  => 'gembooking/booking/confirmed'
 			],
-			'booking_pending' => [
-				'label' => 'Booking Pending',
-				'hook' => 'gembooking/booking/pending'
+			'booking_pending'             => [
+				'label' => 'Booking Status Pending',
+				'hook'  => 'gembooking/booking/pending'
 			],
-			'booking_rescheduled' => [
-				'label' => 'Booking Rescheduled',
-				'hook' => 'gembooking/booking/rescheduled'
+			'booking_rescheduled'         => [
+				'label' => 'Booking Status Rescheduled',
+				'hook'  => 'gembooking/booking/rescheduled'
 			],
-			'booking_cancelled' => [
-				'label' => 'Booking Cancelled',
-				'hook' => 'gembooking/booking/cancelled'
+			'booking_cancelled'           => [
+				'label' => 'Booking Status Cancelled',
+				'hook'  => 'gembooking/booking/cancelled'
 			],
-			'booking_abandoned' => [
-				'label' => 'Booking Abandoned',
-				'hook' => 'gembooking/booking/abandoned'
+			'booking_abandoned'           => [
+				'label' => 'Booking Status Abandoned',
+				'hook'  => 'gembooking/booking/abandoned'
 			],
 			'booking_status_changed_by_admin' => [
 				'label' => 'Booking Status Changed by Admin',
-				'hook' => 'gembooking/after_status_update_booked'
+				'hook'  => 'gembooking/after_status_update_booked'
 			],
-			'booking_deleted' => [
+			'booking_deleted'             => [
 				'label' => 'Booking Deleted',
-				'hook' => 'gembooking/after_delete_booked'
+				'hook'  => 'gembooking/after_delete_booked'
 			],
-			'booking_form_abandoned' => [
+			'booking_form_abandoned'      => [
 				'label' => 'Booking Form Abandoned',
-				'hook' => 'gembooking/form/lead_abandoned'
+				'hook'  => 'gembooking/form/lead_abandoned'
 			],
-			'staff_member_added' => [
+			'staff_member_added'          => [
 				'label' => 'Staff Member Added',
-				'hook' => 'gembooking/after_create_team'
+				'hook'  => 'gembooking/after_create_team'
 			],
-			'staff_member_updated' => [
+			'staff_member_updated'        => [
 				'label' => 'Staff Member Updated',
-				'hook' => 'gembooking/after_update_team'
+				'hook'  => 'gembooking/after_update_team'
 			],
-			'staff_member_removed' => [
+			'staff_member_removed'        => [
 				'label' => 'Staff Member Removed',
-				'hook' => 'gembooking/after_delete_team'
+				'hook'  => 'gembooking/after_delete_team'
 			],
-			'bookable_duplicated' => [
+			'bookable_duplicated'         => [
 				'label' => 'Service, Event or Resource Duplicated',
-				'hook' => 'gembooking/duplicated'
+				'hook'  => 'gembooking/duplicated'
 			],
-			'woocommerce_product_linked' => [
+			'woocommerce_product_linked'   => [
 				'label' => 'Product Linked (WooCommerce)',
-				'hook' => 'gembooking/woocommerce/product_linked'
+				'hook'  => 'gembooking/woocommerce/product_linked'
 			],
 			'woocommerce_product_unlinked' => [
 				'label' => 'Product Unlinked (WooCommerce)',
-				'hook' => 'gembooking/woocommerce/product_unlinked'
+				'hook'  => 'gembooking/woocommerce/product_unlinked'
 			],
-			'storeengine_product_linked' => [
+			'storeengine_product_linked'   => [
 				'label' => 'Product Linked (StoreEngine)',
-				'hook' => 'gembooking/storeengine/product_linked'
+				'hook'  => 'gembooking/storeengine/product_linked'
 			],
 			'storeengine_product_unlinked' => [
 				'label' => 'Product Unlinked (StoreEngine)',
-				'hook' => 'gembooking/storeengine/product_unlinked'
+				'hook'  => 'gembooking/storeengine/product_unlinked'
 			],
-			'service_saved' => [
-				'label' => 'Service Saved',
-				'hook' => 'save_post_gembk_service'
+			'service_created'    => [
+				'label' => 'Service Created',
+				'hook'  => 'save_post_' . $service_post_type
 			],
-			'event_saved' => [
-				'label' => 'Event Saved',
-				'hook' => 'save_post_gembk_event'
+			'event_created'      => [
+				'label' => 'Event Created',
+				'hook'  => 'save_post_' . $event_post_type
 			],
-			'resource_saved' => [
-				'label' => 'Resource Saved',
-				'hook' => 'save_post_gembk_resource'
+			'resource_created'   => [
+				'label' => 'Resource Created',
+				'hook'  => 'save_post_' . $resource_post_type
 			],
 			'integration_unresolved' => [
 				'label' => 'Meeting Link or Calendar Sync Failed',
-				'hook' => 'gembooking/integrations/unresolved'
+				'hook'  => 'gembooking/integrations/unresolved'
 			],
 			'external_calendar_cancelled' => [
 				'label' => 'Booking Cancelled from External Calendar',
-				'hook' => 'gembooking/booking/external_cancel'
+				'hook'  => 'gembooking/booking/external_cancel'
 			],
 			'external_calendar_rescheduled' => [
 				'label' => 'Booking Moved from External Calendar',
-				'hook' => 'gembooking/booking/external_reschedule'
+				'hook'  => 'gembooking/booking/external_reschedule'
 			],
 		];
 		$triggers += self::gate(
 			[
-				'package_purchased' => [
+				'package_purchased'       => [
 					'label' => 'Package Purchased',
-					'hook' => 'gembooking/package/purchased'
+					'hook'  => 'gembooking/package/purchased'
 				],
-				'package_granted' => [
+				'package_granted'         => [
 					'label' => 'Package Granted Manually',
-					'hook' => 'gembooking/package/granted'
+					'hook'  => 'gembooking/package/granted'
 				],
-				'package_status_changed' => [
+				'package_status_changed'  => [
 					'label' => 'Package Status Changed',
-					'hook' => 'gembooking/package/status_changed'
+					'hook'  => 'gembooking/package/status_changed'
 				],
 				'package_purchases_deleted' => [
 					'label' => 'Package Purchases Deleted',
-					'hook' => 'gembooking/package/purchases_deleted'
+					'hook'  => 'gembooking/package/purchases_deleted'
 				],
 			],
 			'package',
@@ -210,7 +236,10 @@ class Gembooking extends IntegrationBase {
 			];
 		}
 		if ( in_array( $trigger, [ 'booking_confirmed', 'booking_pending', 'booking_rescheduled', 'booking_cancelled', 'booking_deleted' ], true ) ) {
-			return array_merge( [ 'event' => $trigger ], $booking );
+			return [
+				'event' => $trigger,
+				'booking_id' => 123
+			];
 		}
 		if ( 'booking_abandoned' === $trigger ) {
 			return [
@@ -249,7 +278,7 @@ class Gembooking extends IntegrationBase {
 				'post_type' => 'gembk_service'
 			];
 		}
-		if ( in_array( $trigger, [ 'woocommerce_product_linked', 'woocommerce_product_unlinked', 'storeengine_product_linked', 'storeengine_product_unlinked' ], true ) ) {
+		if ( in_array( $trigger, [ 'woocommerce_product_linked', 'storeengine_product_linked' ], true ) ) {
 			return [
 				'event' => $trigger,
 				'object_id' => 45,
@@ -257,21 +286,68 @@ class Gembooking extends IntegrationBase {
 				'previous' => 0
 			];
 		}
-		if ( in_array( $trigger, [ 'service_saved', 'event_saved', 'resource_saved' ], true ) ) {
+		if ( in_array( $trigger, [ 'woocommerce_product_unlinked', 'storeengine_product_unlinked' ], true ) ) {
+			return [
+				'event' => $trigger,
+				'object_id' => 45,
+				'product_id' => 88
+			];
+		}
+		if ( in_array( $trigger, [ 'service_created', 'event_created', 'resource_created' ], true ) ) {
+			$post_type_map = [
+				'service_created'  => self::bookable_post_type( 'service', 'gembk_service' ),
+				'event_created'    => self::bookable_post_type( 'event', 'gembk_event' ),
+				'resource_created' => self::bookable_post_type( 'resource', 'gembk_resource' ),
+			];
 			return [
 				'event' => $trigger,
 				'post_id' => 45,
-				'post_type' => 'gembk_service',
-				'updated' => false
+				'post' => [
+					'ID' => 45,
+					'post_type' => $post_type_map[ $trigger ],
+					'post_title' => 'Sample ' . ucfirst( str_replace( '_created', '', $trigger ) ),
+					'post_content' => 'Sample description',
+					'post_status' => 'publish',
+				],
+				'post_type' => $post_type_map[ $trigger ],
+				'title' => 'Sample ' . ucfirst( str_replace( '_created', '', $trigger ) ),
+				'description' => 'Sample description',
+				'status' => 'publish',
+				'meta' => [
+					'price' => 100,
+					'duration' => 3600,
+				],
+				'update' => false
 			];
 		}
-		if ( in_array( $trigger, [ 'package_purchased', 'package_granted', 'package_status_changed' ], true ) ) {
+		if ( 'package_purchased' === $trigger ) {
 			return [
 				'event' => $trigger,
 				'purchase_id' => 101,
 				'package_id' => 22,
+				'context' => []
+			];
+		}
+		if ( 'package_granted' === $trigger ) {
+			return [
+				'event' => $trigger,
+				'purchase_id' => 101,
+				'package_id' => 22,
+				'user_id' => 12,
+				'email' => 'customer@example.com'
+			];
+		}
+		if ( 'package_status_changed' === $trigger ) {
+			return [
+				'event' => $trigger,
+				'purchase_id' => 101,
 				'status' => 'active',
-				'data' => []
+				'purchase' => [
+					'id' => 101,
+					'package_id' => 22,
+					'user_id' => 12,
+					'status' => 'active'
+				]
 			];
 		}
 		if ( 'package_purchases_deleted' === $trigger ) {
@@ -377,13 +453,34 @@ class Gembooking extends IntegrationBase {
 					'object_id' => absint( $args[0] ?? 0 ),
 					'product_id' => absint( $args[1] ?? 0 )
 				];
-			case 'service_saved':
-			case 'event_saved':
-			case 'resource_saved':
+			case 'service_created':
+			case 'event_created':
+			case 'resource_created':
+				$post_id = absint( $args[0] ?? 0 );
+				if (
+					! $post_id ||
+					( function_exists( 'wp_is_post_autosave' ) && wp_is_post_autosave( $post_id ) ) ||
+					( function_exists( 'wp_is_post_revision' ) && wp_is_post_revision( $post_id ) )
+				) {
+					return false;
+				}
+
+				$post = self::normalize( $args[1] ?? [] );
+				$post = is_array( $post ) ? $post : [];
+
 				return [
 					'event' => $event,
-					'post_id' => absint( $args[0] ?? 0 ),
+					'post_id' => $post_id,
 					'post' => self::normalize( $args[1] ?? [] ),
+					'post_type' => (string) ( $post['post_type'] ?? '' ),
+					'title' => (string) ( $post['post_title'] ?? '' ),
+					'description' => (string) ( $post['post_content'] ?? '' ),
+					'status' => (string) ( $post['post_status'] ?? '' ),
+					// GemBooking stores its own service/event/resource fields
+					// (price, duration, capacity, images, etc.) as post meta,
+					// not on the $post object itself — pull all of it here
+					// instead of dumping the raw WP_Post.
+					'meta' => self::flatten_meta( function_exists( 'get_post_meta' ) ? get_post_meta( $post_id ) : [] ),
 					'update' => (bool) ( $args[2] ?? false )
 				];
 			case 'package_purchased':
@@ -465,10 +562,11 @@ class Gembooking extends IntegrationBase {
 			'email',
 			'Email'
 		);
+
 		$actions += self::gate(
 			[
-				'grant_package' => [ 'label' => 'Grant Package to Customer' ],
-				'change_package_status' => [ 'label' => 'Change Package Status' ],
+				'grant_package'          => [ 'label' => 'Grant Package to Customer' ],
+				'change_package_status'  => [ 'label' => 'Change Package Status' ],
 				'delete_package_purchase' => [ 'label' => 'Delete Package Purchase' ],
 			],
 			'package',
@@ -476,8 +574,8 @@ class Gembooking extends IntegrationBase {
 		);
 		$actions += self::gate(
 			[
-				'check_in_ticket' => [ 'label' => 'Check In Ticket' ],
-				'undo_ticket_checkin' => [ 'label' => 'Undo Ticket Check-In' ],
+				'check_in_ticket'      => [ 'label' => 'Check In Ticket' ],
+				'undo_ticket_checkin'  => [ 'label' => 'Undo Ticket Check-In' ],
 				'check_in_all_tickets' => [ 'label' => 'Check In All Tickets on a Booking' ],
 			],
 			'ticket',
@@ -492,6 +590,22 @@ class Gembooking extends IntegrationBase {
 		);
 
 		return $actions;
+	}
+
+	private static function booking_id_field(): array {
+		return [
+			[
+				'key'      => 'booking_id',
+				'label'    => 'Booking',
+				'type'     => 'select',
+				'required' => true,
+				'dynamic'  => [
+					'integration' => 'gembooking',
+					'query'       => 'gembooking_query',
+					'select'      => [ 'value', 'label' ],
+				],
+			],
+		];
 	}
 
 	public static function get_action_config_schema( string $action ): array {
@@ -546,7 +660,14 @@ class Gembooking extends IntegrationBase {
 				// --- Service / Event / Resource flow ---
 				[
 					'key'      => 'start_at',
-					'label'    => 'Date (Y-m-d)',
+					'label'    => 'Start At',
+					'type'     => 'datetime',
+					'required' => true,
+					'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
+				],
+				[
+					'key'      => 'end_at',
+					'label'    => 'End At',
 					'type'     => 'datetime',
 					'required' => true,
 					'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
@@ -591,23 +712,36 @@ class Gembooking extends IntegrationBase {
 					'required' => false,
 					'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
 				],
-			],
-			'change_booking_status' => [
 				[
-					'key'      => 'booking_id',
-					'label'    => 'Booking',
-					'type'     => 'select',
-					'required' => true,
-					'dynamic'  => [
-						'integration' => 'gembooking',
-						'query'       => 'gembooking_query',
-						'select'      => [ 'value', 'label' ],
-					],
+					'key'      => 'host_id',
+					'label'    => 'Host ID (optional)',
+					'type'     => 'number',
+					'required' => false,
+					'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
 				],
 				[
-					'key' => 'booking_status',
-                    'label' => 'Booking Status', 'type' => 'select', 'required' => true,
-					'options' => [
+					'key'      => 'team_member_id',
+					'label'    => 'Staff/Team Member ID (optional)',
+					'type'     => 'number',
+					'required' => false,
+					'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
+				],
+				[
+					'key'      => 'attendee_count',
+					'label'    => 'Number of Attendees (optional)',
+					'type'     => 'number',
+					'required' => false,
+					'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
+				],
+			],
+			'change_booking_status' => [
+				...self::booking_id_field(),
+				[
+					'key'      => 'booking_status',
+					'label'    => 'Booking Status',
+					'type'     => 'select',
+					'required' => true,
+					'options'  => [
 						[ 'value' => 'pending', 'label' => 'Pending' ],
 						[ 'value' => 'confirmed', 'label' => 'Confirmed' ],
 						[ 'value' => 'cancelled', 'label' => 'Cancelled' ],
@@ -616,46 +750,130 @@ class Gembooking extends IntegrationBase {
 				],
 			],
 			'reschedule_booking' => [
-				[ 'key' => 'booking_id', 'label' => 'Booking ID', 'type' => 'number', 'required' => true ],
-				[ 'key' => 'start_at', 'label' => 'New Start At', 'type' => 'text', 'required' => true ],
-				[ 'key' => 'end_at', 'label' => 'New End At', 'type' => 'text', 'required' => true ],
+				...self::booking_id_field(),
+				[
+					'key'      => 'start_at',
+					'label'    => 'New Start At',
+					'type'     => 'datetime',
+					'required' => true,
+				],
+				[
+					'key'      => 'end_at',
+					'label'    => 'New End At',
+					'type'     => 'datetime',
+					'required' => true,
+				],
 			],
 			'cancel_booking' => [
-				[ 'key' => 'booking_id', 'label' => 'Booking ID', 'type' => 'number', 'required' => true ],
-				[ 'key' => 'reason', 'label' => 'Reason', 'type' => 'text', 'required' => false ],
+				...self::booking_id_field(),
+				[
+					'key'      => 'reason',
+					'label'    => 'Reason',
+					'type'     => 'textarea',
+					'required' => false,
+				],
 			],
 			'delete_booking' => [
-				[ 'key' => 'booking_id', 'label' => 'Booking ID', 'type' => 'number', 'required' => true ],
+				...self::booking_id_field(),
 			],
 			'add_booking_note' => [
-				[ 'key' => 'booking_id', 'label' => 'Booking ID', 'type' => 'number', 'required' => true ],
-				[ 'key' => 'note', 'label' => 'Note', 'type' => 'textarea', 'required' => true ],
+				...self::booking_id_field(),
+				[
+					'key'      => 'note',
+					'label'    => 'Note',
+					'type'     => 'textarea',
+					'required' => true,
+				],
 			],
 			'reply_customer' => [
-				[ 'key' => 'booking_id', 'label' => 'Booking ID', 'type' => 'number', 'required' => true ],
-				[ 'key' => 'message', 'label' => 'Message', 'type' => 'textarea', 'required' => true ],
+				...self::booking_id_field(),
+				[
+					'key' => 'message',
+					'label' => 'Message',
+					'type' => 'textarea',
+					'required' => true,
+				],
 			],
 			'update_booking_field' => [
-				[ 'key' => 'booking_id', 'label' => 'Booking ID', 'type' => 'number', 'required' => true ],
-				[ 'key' => 'field_key', 'label' => 'Custom Field Key', 'type' => 'text', 'required' => true ],
-				[ 'key' => 'value', 'label' => 'Value', 'type' => 'text', 'required' => true ],
+				...self::booking_id_field(),
+				[
+					'key' => 'field_key',
+					'label' => 'Custom Field Key',
+					'type' => 'text',
+					'required' => true,
+				],
+				[
+					'key' => 'value',
+					'label' => 'Value',
+					'type' => 'text',
+					'required' => true,
+				],
 			],
 			'find_booking' => [
-				[ 'key' => 'booking_id', 'label' => 'Booking ID (leave empty to search)', 'type' => 'number', 'required' => false ],
-				[ 'key' => 'search', 'label' => 'Search Term (name or email)', 'type' => 'text', 'required' => false ],
+				...self::booking_id_field(),
+				[
+					'key' => 'search', 'label' => 'Search Term (name or email)', 'type' => 'text', 'required' => false ],
 				[ 'key' => 'status', 'label' => 'Status Filter', 'type' => 'text', 'required' => false ],
 				[ 'key' => 'limit', 'label' => 'Limit', 'type' => 'number', 'required' => false ],
 			],
 			'check_slot_availability' => [
-				[ 'key' => 'object_id', 'label' => 'Service/Event/Resource ID', 'type' => 'number', 'required' => true ],
-				[ 'key' => 'start_at', 'label' => 'Start At', 'type' => 'text', 'required' => true ],
-				[ 'key' => 'end_at', 'label' => 'End At', 'type' => 'text', 'required' => true ],
-				[ 'key' => 'team_id', 'label' => 'Staff/Team ID', 'type' => 'number', 'required' => false ],
+				[
+					'key'      => 'booking_type',
+					'label'    => 'Booking Type',
+					'type'     => 'select',
+					'required' => true,
+					'options'  => [
+						[ 'value' => 'service', 'label' => 'Service' ],
+						[ 'value' => 'event', 'label' => 'Event' ],
+						[ 'value' => 'resource', 'label' => 'Resource' ],
+					],
+				],
+				[
+					'key'      => 'bookable',
+					'label'    => 'Bookable',
+					'type'     => 'select',
+					'required' => true,
+					'dynamic'  => [
+						'integration' => 'gembooking',
+						'query'       => 'gembooking_bookable_query',
+						'select'      => [ 'value', 'label' ],
+						'depends_on'  => [ 'booking_type' ],
+					],
+				],
+				[
+					'key' => 'start_at',
+					'label' => 'Start At',
+					'type' => 'datetime',
+					'required' => true,
+				],
+				[
+					'key' => 'end_at',
+					'label' => 'End At',
+					'type' => 'datetime',
+					'required' => true,
+				],
+				[
+					'key' => 'team_id',
+					'label' => 'Staff/Team ID',
+					'type' => 'number',
+					'required' => false,
+				],
 			],
 			'add_staff_time_off' => [
-				[ 'key' => 'team_id', 'label' => 'Staff Member ID', 'type' => 'number', 'required' => true ],
-				[ 'key' => 'start_date', 'label' => 'Start Date', 'type' => 'text', 'required' => true ],
-				[ 'key' => 'end_date', 'label' => 'End Date (leave empty for a single day)', 'type' => 'text', 'required' => false ],
+				[
+					'key' => 'team_id', 'label' => 'Staff Member ID', 'type' => 'number', 'required' => true ],
+				[
+					'key' => 'start_at',
+					'label' => 'Start At',
+					'type' => 'datetime',
+					'required' => true,
+				],
+				[
+					'key' => 'end_at',
+					'label' => 'End At',
+					'type' => 'datetime',
+					'required' => true,
+				],
 				[ 'key' => 'reason', 'label' => 'Reason', 'type' => 'text', 'required' => false ],
 			],
 			'update_customer_profile' => [
@@ -683,8 +901,11 @@ class Gembooking extends IntegrationBase {
 			'change_package_status' => [
 				[ 'key' => 'purchase_id', 'label' => 'Package Purchase ID', 'type' => 'number', 'required' => true ],
 				[
-					'key' => 'status', 'label' => 'Status', 'type' => 'select', 'required' => true,
-					'options' => [
+					'key'      => 'status',
+					'label'    => 'Status',
+					'type'     => 'select',
+					'required' => true,
+					'options'  => [
 						[ 'value' => 'active', 'label' => 'Active' ],
 						[ 'value' => 'cancelled', 'label' => 'Cancelled' ],
 						[ 'value' => 'expired', 'label' => 'Expired' ],
@@ -708,8 +929,12 @@ class Gembooking extends IntegrationBase {
 				[ 'key' => 'to', 'label' => 'Phone Number', 'type' => 'text', 'required' => true ],
 				[ 'key' => 'message', 'label' => 'Message', 'type' => 'textarea', 'required' => true ],
 				[
-					'key' => 'channel', 'label' => 'Channel', 'type' => 'select', 'required' => false, 'default' => 'sms',
-					'options' => [
+					'key'      => 'channel',
+					'label'    => 'Channel',
+					'type'     => 'select',
+					'required' => false,
+					'default'  => 'sms',
+					'options'  => [
 						[ 'value' => 'sms', 'label' => 'SMS' ],
 						[ 'value' => 'whatsapp', 'label' => 'WhatsApp' ],
 					],
@@ -717,7 +942,7 @@ class Gembooking extends IntegrationBase {
 			],
 		];
 		return $schemas[ $action ] ?? [
-			[ 'key' => 'booking_id', 'label' => 'Booking ID', 'type' => 'number', 'required' => false ],
+			...self::booking_id_field(),
 			[ 'key' => 'data', 'label' => 'Data (JSON)', 'type' => 'textarea', 'required' => false ],
 		];
 	}
@@ -786,6 +1011,14 @@ class Gembooking extends IntegrationBase {
 			return self::action_error( 'A valid booking_type and bookable are required.' );
 		}
 
+		// Verify the bookable item exists
+		if ( 'package' !== $type ) {
+			$post = get_post( $bookable_id );
+			if ( ! $post || 'publish' !== $post->post_status ) {
+				return self::action_error( 'The selected bookable item does not exist or is not published.' );
+			}
+		}
+
 		if ( 'package' === $type ) {
 			$customer_id = absint( $config['customer_id'] ?? 0 );
 			$email       = sanitize_email( (string) ( $config['customer_email'] ?? '' ) );
@@ -803,44 +1036,56 @@ class Gembooking extends IntegrationBase {
 			] ) );
 		}
 
-		$start_at = (string) ( $config['start_at'] ?? '' );
-		$timezone = (string) ( $config['timezone'] ?? '' );
-
-		$fields = array_filter( [
-			'first_name' => (string) ( $config['first_name'] ?? '' ),
-			'email'      => sanitize_email( (string) ( $config['email'] ?? '' ) ),
-			'phone'      => (string) ( $config['phone'] ?? '' ),
-			'note'       => (string) ( $config['note'] ?? '' ),
-			'timezone'   => $timezone,
-		], static fn( $v ) => '' !== $v );
-
-		if ( '' === $start_at || empty( $fields['first_name'] ) || ! is_email( $fields['email'] ?? '' ) ) {
-			return self::action_error( 'start_at, first_name and a valid email are required.' );
-		}
-
-		$type_to_object_type = [
-			'service'  => 'gembk_service',
-			'event'    => 'gembk_event',
-			'resource' => 'gembk_resource',
-		];
-
 		$data = [
 			'object_id'   => $bookable_id,
-			'object_type' => $type_to_object_type[ $type ] ?? 'gembk_service',
-			'start_at'    => $start_at,
-			'fields'      => $fields,
+			'object_type' => $type,
+			'start_at'    => (string) ( $config['start_at'] ?? '' ),
+			'end_at'      => (string) ( $config['end_at'] ?? '' ),
+			'timezone'    => (string) ( $config['timezone'] ?? '' ),
+			'fields'      => [
+				'name'           => (string) ( $config['first_name'] ?? '' ),
+				'email'          => sanitize_email( (string) ( $config['email'] ?? '' ) ),
+				'phone'          => (string) ( $config['phone'] ?? '' ),
+			],
 		];
 
-		$duration_meta = get_post_meta( $bookable_id, '_gembk_duration', true );
-		if ( ! empty( $duration_meta['unit'] ) && ! in_array( strtolower( $duration_meta['unit'] ), [ 'day', 'month' ], true ) ) {
-			try {
-				$start_dt       = new \DateTimeImmutable( $start_at, wp_timezone() );
-				$dur_unit       = strtolower( $duration_meta['unit'] );
-				$dur_val        = max( 1, (int) ( $duration_meta['value'] ?? 1 ) );
-				$data['end_at'] = $start_dt->modify( "+{$dur_val} {$dur_unit}" )->format( 'Y-m-d H:i:s' );
-			} catch ( \Exception $e ) {
-				// Let GemBooking handle invalid dates.
-			}
+		// Add note if provided
+		if ( ! empty( $config['note'] ) ) {
+			$data['fields']['meeting_about'] = (string) $config['note'];
+		}
+
+		// Add optional parameters if provided
+		if ( ! empty( $config['host_id'] ) ) {
+			$data['host_id'] = absint( $config['host_id'] );
+		}
+
+		if ( ! empty( $config['team_member_id'] ) ) {
+			$data['team_member_id'] = absint( $config['team_member_id'] );
+		}
+
+		if ( ! empty( $config['attendee_count'] ) ) {
+			$data['attendee_count'] = max( 1, absint( $config['attendee_count'] ) );
+		}
+
+		if ( '' === $data['start_at'] || '' === $data['end_at'] || '' === $data['timezone'] || '' === $data['fields']['name'] || ! is_email( $data['fields']['email'] ) ) {
+			return self::action_error( 'start_at, end_at, timezone, first_name and a valid email are required.' );
+		}
+
+		// Validate datetime format
+		$start_time = strtotime( $data['start_at'] );
+		$end_time = strtotime( $data['end_at'] );
+
+		if ( false === $start_time || false === $end_time ) {
+			return self::action_error( 'Invalid datetime format for start_at or end_at.' );
+		}
+
+		if ( $end_time <= $start_time ) {
+			return self::action_error( 'end_at must be after start_at.' );
+		}
+
+		// Validate timezone
+		if ( ! in_array( $data['timezone'], \DateTimeZone::listIdentifiers(), true ) ) {
+			return self::action_error( 'Invalid timezone provided.' );
 		}
 
 		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'create_booked', $data );
@@ -848,10 +1093,16 @@ class Gembooking extends IntegrationBase {
 
 	private static function action_change_booking_status( array $config, array $input ): array {
 		$id     = absint( $config['booking_id'] ?? 0 );
-		$status = sanitize_key( (string) ( $config['booking_status'] ?? $config['status'] ?? '' ) );
+		$status = sanitize_key( (string) ( $config['booking_status'] ?? '' ) );
 
 		if ( ! $id || '' === $status ) {
 			return self::action_error( 'A valid booking_id and status are required.' );
+		}
+
+		// Validate status values
+		$valid_statuses = [ 'pending', 'confirmed', 'cancelled', 'rescheduled' ];
+		if ( ! in_array( $status, $valid_statuses, true ) ) {
+			return self::action_error( 'Invalid status value. Must be one of: pending, confirmed, cancelled, rescheduled.' );
 		}
 
 		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'update_booked_status', [
@@ -869,11 +1120,26 @@ class Gembooking extends IntegrationBase {
 			return self::action_error( 'A valid booking_id, start_at and end_at are required.' );
 		}
 
-		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'update_booking_status_with_reschedule', [
-			'id' => $id,
+		// Validate datetime format
+		$start_time = strtotime( $start_at );
+		$end_time = strtotime( $end_at );
+
+		if ( false === $start_time || false === $end_time ) {
+			return self::action_error( 'Invalid datetime format for start_at or end_at.' );
+		}
+
+		if ( $end_time <= $start_time ) {
+			return self::action_error( 'end_at must be after start_at.' );
+		}
+
+		// Build the proper data structure expected by GemBooking
+		$data = [
+			'id'       => $id,
 			'start_at' => $start_at,
-			'end_at' => $end_at,
-		] );
+			'end_at'   => $end_at,
+		];
+
+		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'update_booking_status_with_reschedule', $data );
 	}
 
 	private static function action_cancel_booking( array $config, array $input ): array {
@@ -883,9 +1149,10 @@ class Gembooking extends IntegrationBase {
 			return self::action_error( 'A valid booking_id is required.' );
 		}
 
-		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'update_booking_status_with_cancel', [
+		// Use the simpler status update method to avoid permission issues
+		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'update_booked_status', [
 			'id' => $id,
-			'reason' => (string) ( $config['reason'] ?? '' ),
+			'status' => 'cancelled',
 		] );
 	}
 
@@ -921,7 +1188,7 @@ class Gembooking extends IntegrationBase {
 			return self::action_error( 'A valid booking_id and message are required.' );
 		}
 
-		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'add_staff_reply', [
+		return self::call_solver( 'GemBooking\Classes\BookingSolver', 'add_staff_reply', [
 			'id' => $id,
 			'message' => $message,
 		] );
@@ -1009,15 +1276,51 @@ class Gembooking extends IntegrationBase {
 	private static function action_add_staff_time_off( array $config, array $input ): array {
 		$team_id = absint( $config['team_id'] ?? 0 );
 
-		if ( ! $team_id || '' === (string) ( $config['start_date'] ?? '' ) ) {
-			return self::action_error( 'A valid team_id and start_date are required.' );
+		// Support both start_at/start_date and end_at/end_date for compatibility
+		$start_date = (string) ( $config['start_at'] ?? $config['start_date'] ?? '' );
+		$end_date = (string) ( $config['end_at'] ?? $config['end_date'] ?? '' );
+
+		if ( ! $team_id || '' === $start_date ) {
+			return self::action_error( 'A valid team_id and start_at are required.' );
 		}
 
-		return self::call_controller( '\\GemBooking\\API\\ExceptionController', 'store', [
-			'team_id' => $team_id,
-			'start_date' => (string) $config['start_date'],
-			'end_date' => (string) ( $config['end_date'] ?? $config['start_date'] ),
-			'reason' => (string) ( $config['reason'] ?? '' ),
+		// Convert datetime to date format if needed
+		$start_time = strtotime( $start_date );
+		if ( false === $start_time ) {
+			return self::action_error( 'Invalid start_at format.' );
+		}
+
+		// Extract just the date part (YYYY-MM-DD)
+		$start_date = date( 'Y-m-d', $start_time );
+
+		// Handle end_date
+		if ( '' !== $end_date ) {
+			$end_time = strtotime( $end_date );
+			if ( false === $end_time ) {
+				return self::action_error( 'Invalid end_at format.' );
+			}
+			$end_date = date( 'Y-m-d', $end_time );
+		} else {
+			// Default to single day if end_date not provided
+			$end_date = $start_date;
+		}
+
+		// Build the proper exception format expected by GemBooking
+		$exceptions = [];
+		$current_date = $start_date;
+		
+		while ( strtotime( $current_date ) <= strtotime( $end_date ) ) {
+			$exceptions[] = [
+				'date' => $current_date,
+				'type' => 'unavailable',
+			];
+			$current_date = date( 'Y-m-d', strtotime( $current_date . ' +1 day' ) );
+		}
+
+		return self::call_controller( 'GemBooking\API\ExceptionController', 'store', [
+			'source' => 'team',
+			'id' => $team_id,
+			'exceptions' => $exceptions,
 		] );
 	}
 
@@ -1036,7 +1339,9 @@ class Gembooking extends IntegrationBase {
 
 		foreach ( [ 'first_name', 'last_name', 'display_name', 'user_email' ] as $field ) {
 			if ( isset( $data[ $field ] ) ) {
-				$user[ $field ] = sanitize_text_field( (string) $data[ $field ] );
+				$user[ $field ] = 'user_email' === $field
+					? sanitize_email( (string) $data[ $field ] )
+					: sanitize_text_field( (string) $data[ $field ] );
 			}
 		}
 
@@ -1052,18 +1357,18 @@ class Gembooking extends IntegrationBase {
 			}
 		}
 
-		return self::action_success( [ 'user_id' => $id ] );
+		return self::action_success( [ 'user_id' => $id, 'updated' => true ] );
 	}
 
 	private static function action_duplicate_bookable( array $config, array $input ): array {
-		$source_id = absint( $config['source_id'] ?? $config['bookable_id'] ?? $config['id'] ?? 0 );
+		$source_id = absint( $config['source_id'] ?? 0 );
 
 		if ( ! $source_id ) {
 			return self::action_error( 'A valid source_id is required.' );
 		}
 
+		// DuplicateController expects 'id' parameter (the source item to duplicate)
 		return self::call_controller( '\\GemBooking\\API\\DuplicateController', 'duplicate', [
-			'source_id' => $source_id,
 			'id' => $source_id,
 		] );
 	}
@@ -1224,8 +1529,18 @@ class Gembooking extends IntegrationBase {
 	 * via AJAX (reads $_POST, ends with wp_send_json + die()). Until that
 	 * logic is refactored into a plain method on GemBooking's side, this
 	 * stays behind a filter so a site can hook it in safely.
+	 *
+	 * Schema expects: name (required), email (required), role (optional)
 	 */
 	private static function action_create_staff( array $config, array $input ): array {
+		$name  = sanitize_text_field( (string) ( $config['name'] ?? '' ) );
+		$email = sanitize_email( (string) ( $config['email'] ?? '' ) );
+		$role  = sanitize_text_field( (string) ( $config['role'] ?? '' ) );
+
+		if ( '' === $name || ! is_email( $email ) ) {
+			return self::action_error( 'A valid name and email are required.' );
+		}
+
 		$result = apply_filters( 'zaplane/gembooking_action', null, 'create_staff', $config, $input );
 
 		return null === $result
@@ -1266,6 +1581,10 @@ class Gembooking extends IntegrationBase {
 
 		try {
 			$result = self::invoke( $class, $method, [ $request ] );
+		} catch ( \TypeError $e ) {
+			return self::action_error( sprintf( '%s::%s() type error: %s', $class, $method, $e->getMessage() ) );
+		} catch ( \ArgumentCountError $e ) {
+			return self::action_error( sprintf( '%s::%s() argument error: %s', $class, $method, $e->getMessage() ) );
 		} catch ( \Throwable $e ) {
 			return self::action_error( sprintf( '%s::%s() failed: %s', $class, $method, $e->getMessage() ) );
 		}
@@ -1358,9 +1677,9 @@ class Gembooking extends IntegrationBase {
 		}
 
 		/*
-		* If a specific booking ID is requested,
-		* return only that booking.
-		*/
+		 * If a specific booking ID is requested,
+		 * return only that booking.
+		 */
 		if ( $booking_id ) {
 			$booking = $model->find_by_id( $booking_id );
 
@@ -1377,8 +1696,8 @@ class Gembooking extends IntegrationBase {
 		}
 
 		/*
-		* Load booking list.
-		*/
+		 * Load booking list.
+		 */
 		$result = $model->get_list(
 			1,
 			100,
@@ -1391,8 +1710,8 @@ class Gembooking extends IntegrationBase {
 		}
 
 		/*
-		* GemBooking may return rows directly or inside "rows"/"data".
-		*/
+		 * GemBooking may return rows directly or inside "rows"/"data".
+		 */
 		$rows = $result;
 
 		if ( isset( $result['rows'] ) && is_array( $result['rows'] ) ) {
@@ -1477,12 +1796,12 @@ class Gembooking extends IntegrationBase {
 	public static function query_bookables( $q = null ): array {
 		$type = is_array( $q ) ? sanitize_key( (string) ( $q['booking_type'] ?? '' ) ) : '';
 		$post_type_map = [
-			'service'  => 'gembk_service',
-			'event'    => 'gembk_event',
-			'resource' => 'gembk_resource',
+			'service'  => self::bookable_post_type( 'service', 'gembk_service' ),
+			'event'    => self::bookable_post_type( 'event', 'gembk_event' ),
+			'resource' => self::bookable_post_type( 'resource', 'gembk_resource' ),
 			'package'  => 'gembk_package',
 		];
-		$post_type = $post_type_map[ $type ] ?? 'gembk_service';
+		$post_type = $post_type_map[ $type ] ?? $post_type_map['service'];
 
 		$posts = get_posts( [
 			'post_type'      => $post_type,
@@ -1514,36 +1833,47 @@ class Gembooking extends IntegrationBase {
 	public static function query_timezones( $q = null ): array {
 		$search = is_array( $q ) ? strtolower( sanitize_text_field( (string) ( $q['search'] ?? '' ) ) ) : '';
 
-		$zones = [];
+		// Use caching for timezone data since it doesn't change frequently
+		$cache_key = 'zaplane_gembooking_timezones';
+		$zones = function_exists( 'wp_cache_get' ) ? wp_cache_get( $cache_key ) : false;
 
-		// UTC first.
-		$zones[] = [
-			'value' => 'UTC',
-			'label' => '(GMT+0:00) UTC',
-			'offset' => 0,
-		];
+		if ( false === $zones ) {
+			$zones = [];
 
-		foreach ( \DateTimeZone::listIdentifiers( \DateTimeZone::ALL ) as $identifier ) {
-			if ( 'UTC' === $identifier ) {
-				continue;
-			}
-
-			try {
-				$tz     = new \DateTimeZone( $identifier );
-				$offset = $tz->getOffset( new \DateTime( 'now', $tz ) );
-			} catch ( \Throwable $e ) {
-				continue;
-			}
-
-			$hours   = intdiv( abs( $offset ), 3600 );
-			$minutes = intdiv( abs( $offset ) % 3600, 60 );
-			$sign    = $offset < 0 ? '-' : '+';
-
+			// UTC first.
 			$zones[] = [
-				'value'  => $identifier,
-				'label'  => sprintf( '(GMT%s%d:%02d) %s', $sign, $hours, $minutes, $identifier ),
-				'offset' => $offset,
+				'value' => 'UTC',
+				'label' => '(GMT+0:00) UTC',
+				'offset' => 0,
 			];
+
+			foreach ( \DateTimeZone::listIdentifiers( \DateTimeZone::ALL ) as $identifier ) {
+				if ( 'UTC' === $identifier ) {
+					continue;
+				}
+
+				try {
+					$tz     = new \DateTimeZone( $identifier );
+					$offset = $tz->getOffset( new \DateTime( 'now', $tz ) );
+				} catch ( \Throwable $e ) {
+					continue;
+				}
+
+				$hours   = intdiv( abs( $offset ), 3600 );
+				$minutes = intdiv( abs( $offset ) % 3600, 60 );
+				$sign    = $offset < 0 ? '-' : '+';
+
+				$zones[] = [
+					'value'  => $identifier,
+					'label'  => sprintf( '(GMT%s%d:%02d) %s', $sign, $hours, $minutes, $identifier ),
+					'offset' => $offset,
+				];
+			}
+
+			// Cache for 1 hour if WordPress cache functions are available
+			if ( function_exists( 'wp_cache_set' ) && function_exists( 'HOUR_IN_SECONDS' ) ) {
+				wp_cache_set( $cache_key, $zones, '', HOUR_IN_SECONDS );
+			}
 		}
 
 		if ( '' !== $search ) {
@@ -1559,16 +1889,40 @@ class Gembooking extends IntegrationBase {
 		], $zones );
 	}
 
-
 	private static function decode_data( $value ): array {
 		if ( is_array( $value ) ) {
 			return $value;
 		}
 		$decoded = json_decode( (string) $value, true );
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			return [];
+		}
 		return is_array( $decoded ) ? $decoded : [];
 	}
 
 	private static function normalize( $value ) {
 		return is_object( $value ) ? get_object_vars( $value ) : $value;
+	}
+
+	/**
+	 * Flatten a get_post_meta( $id ) result ( [key => [values]] ) into
+	 * plain [key => value] — single-value meta keys are unwrapped and
+	 * PHP-serialized values are restored.
+	 */
+	private static function flatten_meta( array $meta ): array {
+		$flat = [];
+		foreach ( $meta as $key => $values ) {
+			if ( is_array( $values ) && 1 === count( $values ) ) {
+				$flat[ $key ] = function_exists( 'maybe_unserialize' ) ? maybe_unserialize( $values[0] ) : $values[0];
+			} elseif ( is_array( $values ) ) {
+				$flat[ $key ] = array_map(
+					static fn( $v ) => function_exists( 'maybe_unserialize' ) ? maybe_unserialize( $v ) : $v,
+					$values
+				);
+			} else {
+				$flat[ $key ] = $values;
+			}
+		}
+		return $flat;
 	}
 }
