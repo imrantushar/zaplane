@@ -23,8 +23,18 @@
 	var PRESENCE_EVERY = 20000;
 	var t = cfg.i18n || {};
 
+	var TEASER_KEY = 'zaplane_inbox_teaser';
+
 	var state = {
 		token: read( STORE_KEY ),
+		// Who is answering right now: names, pictures, online or away.
+		team: cfg.team || null,
+		teaserTimer: null,
+		teaserShown: false,
+		socket: null,
+		socketOk: false,
+		socketTries: 0,
+		socketTimer: null,
 		open: false,
 		lastId: 0,
 		unread: 0,
@@ -70,6 +80,34 @@
 			node.textContent = text;
 		}
 		return node;
+	}
+
+	/** The first agent shown, or the assistant: whoever fronts the chat. */
+	function face() {
+		var team = state.team || {};
+		var agent = ( team.agents || [] )[ 0 ];
+		if ( agent ) {
+			return agent;
+		}
+		if ( team.assistant ) {
+			return team.assistant;
+		}
+		return cfg.aiName ? { name: cfg.aiName, avatar: cfg.aiAvatar || '', title: t.aiAssistant || '' } : null;
+	}
+
+	/** A round picture, or the sender's initial when there is none. */
+	function avatar( person, cls ) {
+		var name = ( person && person.name ) || '';
+		var url = person && person.avatar;
+		if ( url && /^https?:\/\//i.test( url ) ) {
+			var img = el( 'img', cls || 'zpi-avatar' );
+			img.src = url;
+			img.alt = '';
+			img.loading = 'lazy';
+			return img;
+		}
+		var initial = el( 'span', ( cls || 'zpi-avatar' ) + ' is-letter', ( name || '?' ).charAt( 0 ).toUpperCase() );
+		return initial;
 	}
 
 	/* ---------------------------------------------------------------- *
@@ -128,6 +166,8 @@
 			state.known = res.data.visitor || null;
 			state.started = true;
 			write( STORE_KEY, state.token );
+			applyTeam( res.data.team );
+			connectSocket();
 			return true;
 		} );
 	}
@@ -195,7 +235,11 @@
 			page_title: document.title,
 			referrer: document.referrer,
 		} ).then( function ( res ) {
-			if ( res.ok && res.data.latest_id > state.lastId ) {
+			if ( ! res.ok ) {
+				return;
+			}
+			applyTeam( res.data.team );
+			if ( res.data.latest_id > state.lastId ) {
 				return poll();
 			}
 		} );
@@ -284,9 +328,99 @@
 		if ( ! state.open ) {
 			return;
 		}
+		// While the socket is up a reply arrives the moment it is written, so
+		// the poll drops back to a slow safety net: a connection can die
+		// quietly, and a missed message is worse than a wasted request.
+		var every = state.waiting ? WAITING_POLL : OPEN_POLL;
+		if ( state.socketOk && ! state.waiting ) {
+			every = ( cfg.socket && cfg.socket.fallbackPoll ) || 30000;
+		}
 		state.timer = window.setTimeout( function () {
 			poll().then( schedule, schedule );
-		}, state.waiting ? WAITING_POLL : OPEN_POLL );
+		}, every );
+	}
+
+	/* ---------------------------------------------------------------- *
+	 * Realtime
+	 *
+	 * The socket only ever says "there is something new"; the chat then reads
+	 * it the usual way. So a dropped connection costs a few seconds, never a
+	 * message, and a site with no server running behaves exactly as before.
+	 * ---------------------------------------------------------------- */
+
+	function connectSocket() {
+		if ( ! cfg.socket || ! cfg.socket.url || ! state.token || state.socket || ! window.WebSocket ) {
+			return;
+		}
+
+		var url = cfg.socket.url + ( cfg.socket.url.indexOf( '?' ) === -1 ? '?' : '&' ) + 'visitor=' + encodeURIComponent( state.token );
+		var socket;
+		try {
+			socket = new window.WebSocket( url );
+		} catch ( e ) {
+			return;
+		}
+		state.socket = socket;
+
+		socket.onopen = function () {
+			state.socketOk = true;
+			state.socketTries = 0;
+			schedule();
+		};
+
+		socket.onmessage = function ( event ) {
+			var data;
+			try {
+				data = JSON.parse( event.data );
+			} catch ( e ) {
+				return;
+			}
+			if ( ! data || 'event' !== data.type ) {
+				return;
+			}
+			if ( 'message' === data.event ) {
+				poll().then( schedule, schedule );
+			} else if ( 'team' === data.event ) {
+				presence();
+			}
+		};
+
+		socket.onclose = function () {
+			state.socket = null;
+			state.socketOk = false;
+			// Back to polling at the usual pace while we try again.
+			schedule();
+			retrySocket();
+		};
+
+		socket.onerror = function () {
+			// onclose follows, which is where the retry lives.
+			state.socketOk = false;
+		};
+	}
+
+	/** Try again, slower each time, and give up after a few minutes of failure. */
+	function retrySocket() {
+		if ( state.socketTries >= 6 ) {
+			return;
+		}
+		window.clearTimeout( state.socketTimer );
+		var wait = Math.min( 30000, 1000 * Math.pow( 2, state.socketTries ) );
+		state.socketTries++;
+		state.socketTimer = window.setTimeout( connectSocket, wait );
+	}
+
+	function closeSocket() {
+		window.clearTimeout( state.socketTimer );
+		if ( state.socket ) {
+			var socket = state.socket;
+			state.socket = null;
+			state.socketOk = false;
+			socket.onclose = null;
+			try {
+				socket.close();
+			} catch ( e ) {}
+		}
 	}
 
 	/* ---------------------------------------------------------------- *
@@ -314,23 +448,88 @@
 	panel.hidden = true;
 
 	var header = el( 'div', 'zpi-header' );
+	// The faces of whoever is answering, so the chat has someone in it before
+	// a word is said.
+	var faces = el( 'div', 'zpi-faces' );
 	var titleWrap = el( 'div', 'zpi-titles' );
 	titleWrap.appendChild( el( 'div', 'zpi-title', cfg.title || '' ) );
-	if ( cfg.aiLabel ) {
-		titleWrap.appendChild( el( 'div', 'zpi-subtitle', cfg.aiLabel ) );
-	}
+	var statusLine = el( 'div', 'zpi-status' );
+	var statusDot = el( 'span', 'zpi-status-dot' );
+	var statusText = el( 'span', 'zpi-status-text' );
+	statusLine.appendChild( statusDot );
+	statusLine.appendChild( statusText );
+	titleWrap.appendChild( statusLine );
 	var closeBtn = el( 'button', 'zpi-close' );
 	closeBtn.type = 'button';
 	closeBtn.setAttribute( 'aria-label', t.close || 'Close chat' );
 	closeBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+	header.appendChild( faces );
 	header.appendChild( titleWrap );
 	header.appendChild( closeBtn );
+
+	/**
+	 * Redraw the header from what the server last said about the team: who is
+	 * there, and whether anyone is.
+	 */
+	function applyTeam( team ) {
+		if ( team ) {
+			state.team = team;
+		}
+		var current = state.team || {};
+		var people = ( current.agents || [] ).slice( 0, 3 );
+		if ( ! people.length && current.assistant ) {
+			people = [ current.assistant ];
+		}
+
+		faces.textContent = '';
+		if ( cfg.showTeam !== false ) {
+			people.forEach( function ( person ) {
+				var wrap = el( 'span', 'zpi-face' + ( person.online ? ' is-online' : '' ) );
+				wrap.title = person.title ? person.name + ' · ' + person.title : person.name;
+				wrap.appendChild( avatar( person, 'zpi-face-img' ) );
+				faces.appendChild( wrap );
+			} );
+		}
+		faces.hidden = ! faces.childNodes.length;
+
+		var online = !! current.online;
+		var label = online ? ( t.online || "We're online" ) : ( current.message || t.offline || 'Away' );
+		// An assistant that answers on its own is never "away", whatever the
+		// team is doing.
+		if ( ! online && ( cfg.aiName || cfg.autoAnswers ) ) {
+			label = current.message || ( t.offline || 'Away' );
+		}
+		if ( online && current.reply_time ) {
+			label = ( t.replyTime || 'Typically replies %s' ).replace( '%s', current.reply_time );
+		}
+		dressGreeting();
+		statusText.textContent = label;
+		statusLine.classList.toggle( 'is-online', online );
+		statusDot.hidden = false;
+		root.classList.toggle( 'zpi-team-offline', ! online );
+	}
 
 	var list = el( 'div', 'zpi-messages' );
 	list.setAttribute( 'aria-live', 'polite' );
 
+	// The opening line, signed like any other message from the team.
 	var greeting = el( 'div', 'zpi-msg zpi-them' );
-	greeting.appendChild( el( 'div', 'zpi-bubble', cfg.greeting || '' ) );
+	var greetingFace = el( 'span', 'zpi-avatar is-spacer' );
+	var greetingBody = el( 'div', 'zpi-msg-body' );
+	greetingBody.appendChild( el( 'div', 'zpi-bubble', cfg.greeting || '' ) );
+	greeting.appendChild( greetingFace );
+	greeting.appendChild( greetingBody );
+
+	/** Put whoever fronts the chat beside the greeting, once we know them. */
+	function dressGreeting() {
+		var person = face();
+		if ( ! person ) {
+			return;
+		}
+		var picture = avatar( person );
+		greeting.replaceChild( picture, greetingFace );
+		greetingFace = picture;
+	}
 
 	// Quick answers: tap instead of typing. Grouped menus show categories
 	// first; a category opens its questions in place, without a message.
@@ -383,7 +582,7 @@
 	if ( hasMenu ) {
 		starters = el( 'div', 'zpi-starters' );
 		renderMenu( starters, 'zpi-starter', askText, [], null );
-		greeting.appendChild( starters );
+		greetingBody.appendChild( starters );
 	}
 
 	if ( cfg.greeting || starters ) {
@@ -472,6 +671,138 @@
 	list.appendChild( typing );
 	panel.appendChild( form );
 
+	/* ---------------------------------------------------------------- *
+	 * The message that opens by itself
+	 * ---------------------------------------------------------------- */
+
+	// A small card above the launcher after a while on the page: the way a
+	// person in a shop looks up when you have been browsing a minute. It is
+	// not a message — nothing is stored, and the team never sees it — until
+	// the visitor answers.
+	var teaser = el( 'div', 'zpi-teaser' );
+	teaser.hidden = true;
+	var teaserBody = el( 'button', 'zpi-teaser-open' );
+	teaserBody.type = 'button';
+	var teaserClose = el( 'button', 'zpi-teaser-close' );
+	teaserClose.type = 'button';
+	teaserClose.setAttribute( 'aria-label', t.dismiss || 'Dismiss' );
+	teaserClose.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
+	teaser.appendChild( teaserBody );
+	teaser.appendChild( teaserClose );
+
+	/** Has this visitor already been greeted, as often as the settings allow? */
+	function teaserSeen() {
+		var repeat = ( cfg.proactive && cfg.proactive.repeat ) || 'session';
+		if ( 'always' === repeat ) {
+			return false;
+		}
+		if ( 'session' === repeat ) {
+			try {
+				return '1' === window.sessionStorage.getItem( TEASER_KEY );
+			} catch ( e ) {
+				return false;
+			}
+		}
+		var last = parseInt( read( TEASER_KEY ), 10 );
+		return !! last && Date.now() - last < 86400000;
+	}
+
+	function rememberTeaser() {
+		var repeat = ( cfg.proactive && cfg.proactive.repeat ) || 'session';
+		try {
+			if ( 'session' === repeat ) {
+				window.sessionStorage.setItem( TEASER_KEY, '1' );
+			} else if ( 'day' === repeat ) {
+				write( TEASER_KEY, String( Date.now() ) );
+			}
+		} catch ( e ) {
+			// Remembering is a nicety; showing it twice is not a fault.
+		}
+	}
+
+	function showTeaser() {
+		if ( state.open || state.teaserShown || state.lastId ) {
+			return;
+		}
+		// "Only when somebody can answer" means exactly that: no cheerful
+		// hello at 3am when the reply will not come until Monday.
+		if ( cfg.proactive.whenOnline && ! ( state.team && state.team.online ) ) {
+			return;
+		}
+
+		var person = face();
+		state.teaserShown = true;
+		rememberTeaser();
+
+		teaserBody.textContent = '';
+		if ( person ) {
+			teaserBody.appendChild( avatar( person, 'zpi-teaser-avatar' ) );
+		}
+		var lines = el( 'span', 'zpi-teaser-lines' );
+		if ( person && person.name ) {
+			lines.appendChild( el( 'span', 'zpi-teaser-name', person.name ) );
+		}
+		lines.appendChild( el( 'span', 'zpi-teaser-text', cfg.proactive.message ) );
+		teaserBody.appendChild( lines );
+
+		teaser.hidden = false;
+		root.classList.add( 'zpi-has-teaser' );
+		// Requesting the frame first lets the entry animation run.
+		window.requestAnimationFrame( function () {
+			teaser.classList.add( 'is-in' );
+		} );
+		chime();
+	}
+
+	function hideTeaser() {
+		teaser.classList.remove( 'is-in' );
+		root.classList.remove( 'zpi-has-teaser' );
+		window.setTimeout( function () {
+			teaser.hidden = true;
+		}, 200 );
+	}
+
+	teaserClose.addEventListener( 'click', function ( e ) {
+		e.stopPropagation();
+		hideTeaser();
+	} );
+
+	teaserBody.addEventListener( 'click', function () {
+		hideTeaser();
+		toggle( true );
+		// The greeting they were shown becomes the first thing in the thread,
+		// so opening the chat doesn't lose what drew them in.
+		seedGreeting( cfg.proactive.message );
+	} );
+
+	/** Put a message in the thread that only this browser has seen. */
+	function seedGreeting( body ) {
+		if ( ! body || state.lastId || list.querySelector( '.zpi-seeded' ) ) {
+			return;
+		}
+		var person = face() || {};
+		var row = el( 'div', 'zpi-msg zpi-them zpi-seeded' );
+		row.appendChild( avatar( person ) );
+		var col = el( 'div', 'zpi-msg-body' );
+		if ( person.name ) {
+			col.appendChild( el( 'div', 'zpi-name', person.name ) );
+		}
+		col.appendChild( el( 'div', 'zpi-bubble', body ) );
+		row.appendChild( col );
+		list.insertBefore( row, typing );
+		state.lastSender = '';
+		scrollDown();
+	}
+
+	function startTeaser() {
+		if ( ! cfg.proactive || ! cfg.proactive.message || teaserSeen() ) {
+			return;
+		}
+		window.clearTimeout( state.teaserTimer );
+		state.teaserTimer = window.setTimeout( showTeaser, Math.max( 1, cfg.proactive.delay ) * 1000 );
+	}
+
+	root.appendChild( teaser );
 	root.appendChild( panel );
 	root.appendChild( launcher );
 
@@ -490,6 +821,12 @@
 			}
 		} );
 		state.lastId = 0;
+		state.lastSender = '';
+	}
+
+	/** What marks one run of messages from the same sender. */
+	function senderKey( m ) {
+		return ( m.sender_kind || m.sender_type || '' ) + '|' + ( m.sender_name || '' );
 	}
 
 	function addMessage( m ) {
@@ -502,10 +839,36 @@
 		state.lastId = m.id;
 
 		var mine = m.sender_type === 'contact';
-		var item = el( 'div', 'zpi-msg ' + ( mine ? 'zpi-me' : 'zpi-them' ) );
-		if ( ! mine && m.sender_name ) {
-			item.appendChild( el( 'div', 'zpi-name', m.sender_name ) );
+		var row = el( 'div', 'zpi-msg ' + ( mine ? 'zpi-me' : 'zpi-them' ) );
+		// Everything after the picture goes in this column.
+		var item = row;
+
+		if ( ! mine ) {
+			// The sender is named and pictured once at the top of their run,
+			// not over every bubble.
+			var grouped = state.lastSender === senderKey( m );
+			if ( grouped ) {
+				row.className += ' is-grouped';
+				row.appendChild( el( 'span', 'zpi-avatar is-spacer' ) );
+			} else {
+				row.appendChild( avatar( { name: m.sender_name || '', avatar: m.sender_avatar || '' } ) );
+			}
+
+			item = el( 'div', 'zpi-msg-body' );
+			row.appendChild( item );
+
+			if ( ! grouped && m.sender_name ) {
+				var who = el( 'div', 'zpi-name', m.sender_name );
+				if ( 'ai' === m.sender_kind ) {
+					who.appendChild( el( 'span', 'zpi-tag', t.aiTag || 'AI' ) );
+				}
+				item.appendChild( who );
+			}
+			state.lastSender = senderKey( m );
+		} else {
+			state.lastSender = 'me';
 		}
+
 		if ( m.reply_to && ! m.deleted ) {
 			var quote = el( 'div', 'zpi-quote' );
 			quote.appendChild( el( 'strong', '', m.reply_to.sender_name || '' ) );
@@ -545,7 +908,7 @@
 			item.appendChild( qr );
 		}
 		item.appendChild( el( 'div', 'zpi-time', time( m.created_at ) + ( m.edited && ! m.deleted ? ' · ' + ( t.edited || 'edited' ) : '' ) ) );
-		list.insertBefore( item, typing );
+		list.insertBefore( row, typing );
 
 		// Something new from the business (not history, not a redraw): the
 		// poll that brought it announces it once.
@@ -856,6 +1219,12 @@
 	function toggle( open, byMessage ) {
 		state.open = open;
 		launcher.classList.remove( 'zpi-ping' );
+		if ( open ) {
+			window.clearTimeout( state.teaserTimer );
+			if ( ! teaser.hidden ) {
+				hideTeaser();
+			}
+		}
 		panel.hidden = ! open;
 		root.classList.toggle( 'zpi-is-open', open );
 		launcher.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
@@ -954,11 +1323,18 @@
 		if ( document.visibilityState === 'visible' ) {
 			poll().then( schedule, schedule );
 			presence().then( schedulePresence, schedulePresence );
+			connectSocket();
 		} else {
 			window.clearTimeout( state.timer );
 			window.clearTimeout( state.presenceTimer );
+			window.clearTimeout( state.teaserTimer );
+			// A backgrounded tab holding a socket open helps nobody; the next
+			// poll catches up when they come back.
+			closeSocket();
 		}
 	} );
+
+	window.addEventListener( 'pagehide', closeSocket );
 
 	function startPresence() {
 		presence().then( schedulePresence, schedulePresence );
@@ -966,11 +1342,16 @@
 
 	function mount() {
 		document.body.appendChild( root );
+		applyTeam( cfg.team );
+		if ( cfg.proactive ) {
+			startTeaser();
+		}
 		var start = state.token ? Promise.resolve( ( state.started = true ) ) : cfg.visitors ? ensureSession() : Promise.resolve( false );
 		start.then( function () {
 			if ( ! state.token ) {
 				return;
 			}
+			connectSocket();
 			poll().then( function () {
 				schedule();
 				startPresence();

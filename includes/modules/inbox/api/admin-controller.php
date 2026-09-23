@@ -14,6 +14,8 @@ use Zaplane\Modules\Inbox\Models\Contact;
 use Zaplane\Modules\Inbox\Models\Conversation;
 use Zaplane\Modules\Inbox\Models\Message;
 use Zaplane\Modules\Inbox\Models\Tag;
+use Zaplane\Modules\Inbox\Services\Agents;
+use Zaplane\Modules\Inbox\Services\Availability;
 use Zaplane\Modules\Inbox\Services\CommonQuestions;
 use Zaplane\Modules\Inbox\Services\Conversations;
 use Zaplane\Modules\Inbox\Services\KnowledgeAnswer;
@@ -137,6 +139,26 @@ class AdminController {
 			'permission_callback' => [ $this, 'can_manage' ],
 		] );
 
+		register_rest_route( self::NS, '/inbox/agents', [
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => [ $this, 'list_agents' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
+		register_rest_route( self::NS, '/inbox/agents/(?P<id>\d+)', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'save_agent' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
+		// The signed-in agent: their own away switch, and the sign of life that
+		// makes them "online" to visitors.
+		register_rest_route( self::NS, '/inbox/me', [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'update_me' ],
+			'permission_callback' => [ $this, 'can_manage' ],
+		] );
+
 		register_rest_route( self::NS, '/inbox/settings', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -199,6 +221,9 @@ class AdminController {
 	 * The screen polls this, so it also carries the server time to poll from.
 	 */
 	public function list_conversations( WP_REST_Request $request ) {
+		// Having the inbox open is what makes an agent look online to visitors.
+		Agents::touch();
+
 		$status   = sanitize_key( (string) ( $request->get_param( 'status' ) ?? 'open' ) );
 		$assignee = sanitize_key( (string) ( $request->get_param( 'assignee' ) ?? 'any' ) );
 		$search   = trim( sanitize_text_field( (string) ( $request->get_param( 'search' ) ?? '' ) ) );
@@ -641,6 +666,50 @@ class AdminController {
 		return rest_ensure_response( [ 'ok' => true ] );
 	}
 
+	public function list_agents() {
+		return rest_ensure_response( [
+			'agents' => Agents::roster(),
+			'team'   => Availability::team(),
+			'me'     => Agents::agent( get_current_user_id() ),
+		] );
+	}
+
+	public function save_agent( WP_REST_Request $request ) {
+		$user_id = (int) $request->get_param( 'id' );
+		if ( ! get_userdata( $user_id ) ) {
+			return new WP_Error( 'zaplane_inbox_agent', __( 'That person no longer has an account here.', 'zaplane' ), [ 'status' => 404 ] );
+		}
+
+		$params = $request->get_json_params() ?: [];
+		$agent  = Agents::save_identity( $user_id, is_array( $params ) ? $params : [] );
+		Availability::forget();
+
+		return rest_ensure_response( [ 'agent' => $agent ] );
+	}
+
+	/**
+	 * A heartbeat from the open inbox, and the away switch. Sent on a timer, so
+	 * it does as little as possible.
+	 */
+	public function update_me( WP_REST_Request $request ) {
+		$user_id = get_current_user_id();
+		$params  = $request->get_json_params() ?: [];
+
+		if ( is_array( $params ) && array_key_exists( 'away', $params ) ) {
+			Agents::set_away( $user_id, (bool) $params['away'] );
+			Availability::forget();
+		} else {
+			Agents::touch( $user_id );
+		}
+
+		return rest_ensure_response( [
+			'me'     => Agents::agent( $user_id ),
+			'team'   => Availability::team(),
+			// How this screen can hear about new messages as they land.
+			'socket' => self::agent_socket( $user_id ),
+		] );
+	}
+
 	public function get_settings() {
 		return rest_ensure_response( $this->settings_payload() );
 	}
@@ -730,6 +799,10 @@ class AdminController {
 				'menu'       => \Zaplane\Modules\Inbox\Services\AnswerMenu::for_admin(),
 			],
 			'team'           => $team,
+			// The same people, with their chat identity and whether they are at
+			// their desk.
+			'agents'         => Agents::roster(),
+			'availability'   => Availability::team(),
 			'site_origin'    => untrailingslashit( home_url() ),
 			'channels'       => $channels,
 			// Sources workflows bring in (comments, forms…), see Services\Sources.
@@ -737,6 +810,45 @@ class AdminController {
 			// Inbox recipes: what connects each channel and source, and if it's live.
 			'connectors'     => \Zaplane\Modules\Inbox\Services\Connectors::catalog(),
 			'store'          => $store ? $store::label() : null,
+			// Whether the realtime server is actually up, and why a push failed.
+			'realtime'       => self::realtime_status(),
+		];
+	}
+
+	/**
+	 * Where the inbox screen connects for realtime updates, and the token that
+	 * proves who it is. Null when there is nothing to connect to.
+	 *
+	 * @return array<string,string>|null
+	 */
+	private static function agent_socket( int $user_id ): ?array {
+		$config = \Zaplane\Socket\Client::widget_config();
+		if ( null === $config || $user_id <= 0 ) {
+			return null;
+		}
+
+		return [
+			'url'   => (string) $config['url'],
+			'token' => \Zaplane\Socket\Client::agent_token( $user_id ),
+		];
+	}
+
+	/**
+	 * @return array<string,mixed>
+	 */
+	private static function realtime_status(): array {
+		$error = get_option( \Zaplane\Socket\Client::OPT_LAST_ERROR );
+
+		return [
+			'running'    => \Zaplane\Socket\Client::is_live(),
+			'address'    => sprintf(
+				'ws://%s:%d%s',
+				(string) get_option( \Zaplane\Socket\Client::OPT_HOST, '127.0.0.1' ),
+				absint( get_option( \Zaplane\Socket\Client::OPT_PORT, 0 ) ),
+				\Zaplane\Socket\Client::PATH
+			),
+			'in_browser' => null !== \Zaplane\Socket\Client::widget_config(),
+			'last_error' => is_array( $error ) && ! empty( $error['error'] ) ? (string) $error['error'] : '',
 		];
 	}
 

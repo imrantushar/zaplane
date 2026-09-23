@@ -118,6 +118,10 @@ class Presenter {
 			'direction'   => (string) $message->direction,
 			'sender_type' => (string) $message->sender_type,
 			'sender_name' => self::sender_name( $message ),
+			// Who the visitor sees replying: their picture, and what kind of
+			// sender it is so the chat can mark an assistant reply as one.
+			'sender_avatar' => self::sender_avatar( $message ),
+			'sender_kind'   => (string) $message->sender_type,
 			'body'        => (string) $message->body,
 			'attachments' => is_array( $message->attachments ) ? $message->attachments : [],
 			'created_at'  => self::time( $message->created_at ),
@@ -152,6 +156,19 @@ class Presenter {
 		];
 	}
 
+	/** The picture shown beside a reply, or '' when there is none. */
+	private static function sender_avatar( Message $message ): string {
+		switch ( $message->sender_type ) {
+			case 'ai':
+				return (string) ( InboxSettings::get()['ai']['avatar'] ?? '' );
+			case 'agent':
+				$id = (int) $message->sender_id;
+				return $id > 0 ? Agents::signature( $id )['avatar'] : '';
+		}
+
+		return '';
+	}
+
 	private static function sender_name( Message $message ): string {
 		switch ( $message->sender_type ) {
 			case 'ai':
@@ -159,8 +176,12 @@ class Presenter {
 				/* translators: %s: assistant name. The label keeps the AI disclosure visible on every reply. */
 				return sprintf( __( '%s · AI assistant', 'zaplane' ), '' !== $name ? $name : 'Ava' );
 			case 'agent':
-				$user = self::user( (int) $message->sender_id );
-				return $user ? (string) $user['name'] : __( 'Team', 'zaplane' );
+				// The chat name the agent chose, falling back to their account.
+				$id = (int) $message->sender_id;
+				if ( $id > 0 ) {
+					return Agents::signature( $id )['name'];
+				}
+				return __( 'Team', 'zaplane' );
 			case 'auto':
 				return __( 'Automatic answer', 'zaplane' );
 			case 'workflow':

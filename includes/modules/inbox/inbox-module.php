@@ -58,6 +58,7 @@ class InboxModule implements ModuleInterface {
 		add_action( Router::AI_HOOK, [ AiResponder::class, 'handle' ], 10, 2 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_widget' ] );
 		Services\WorkflowSends::register();
+		Services\Realtime::register();
 		Services\VisitorContact::register();
 		add_action( Services\KnowledgeAnswer::HOOK, [ Services\KnowledgeAnswer::class, 'handle' ], 10, 2 );
 	}
@@ -115,6 +116,21 @@ class InboxModule implements ModuleInterface {
 			'aiName'   => $ai_on ? $agent : '',
 			/* translators: %s: assistant name. */
 			'aiLabel'  => $ai_on ? sprintf( __( '%s · AI assistant', 'zaplane' ), $agent ) : '',
+			'aiAvatar' => $ai_on ? esc_url_raw( (string) $settings['ai']['avatar'] ) : '',
+			// Who is answering: names, pictures, and whether anyone is about.
+			'showTeam' => (bool) $widget['show_team'],
+			'team'     => Services\Availability::team(),
+			// A message that opens by itself after a while on the page.
+			'proactive' => $widget['proactive']['enabled'] ? [
+				'delay'   => (int) $widget['proactive']['delay'],
+				'message' => (string) $widget['proactive']['message'] !== ''
+					? (string) $widget['proactive']['message']
+					: (string) $widget['greeting'],
+				'repeat'      => (string) $widget['proactive']['repeat'],
+				'whenOnline'  => (bool) $widget['proactive']['when_online'],
+			] : null,
+			// Realtime delivery; the chat polls when this is absent or fails.
+			'socket'   => \Zaplane\Socket\Client::widget_config(),
 			'i18n'     => [
 				'placeholder' => __( 'Type your message…', 'zaplane' ),
 				'send'        => __( 'Send', 'zaplane' ),
@@ -147,6 +163,16 @@ class InboxModule implements ModuleInterface {
 				'codeChange'      => __( 'Change email', 'zaplane' ),
 				'codeLabel'       => __( 'Verification code', 'zaplane' ),
 				'newMessage'      => __( 'New message', 'zaplane' ),
+				'aiTag'           => __( 'AI', 'zaplane' ),
+				'aiAssistant'     => __( 'AI assistant', 'zaplane' ),
+				'online'          => __( "We're online", 'zaplane' ),
+				'offline'         => __( 'Away', 'zaplane' ),
+				'dismiss'         => __( 'Dismiss', 'zaplane' ),
+				'replyTime'       => __( 'Typically replies %s', 'zaplane' ),
+				/* translators: %s: a day and time, e.g. "Monday at 9:00". */
+				'opensAt'         => __( 'Back %s', 'zaplane' ),
+				'today'           => __( 'Today', 'zaplane' ),
+				'yesterday'       => __( 'Yesterday', 'zaplane' ),
 			],
 		] );
 	}

@@ -42,6 +42,30 @@ class Settings {
 				'notify_email'    => true,
 				'allowed_origins' => [],
 				'answered_by'     => 'assistant',
+				// Show who is answering (team avatars, online dot) in the header.
+				'show_team'       => true,
+				// A message that opens by itself after a while on the page.
+				'proactive'       => [
+					'enabled' => false,
+					'delay'   => 30,
+					'message' => '',
+					// once per 'session', once per 'day', or 'always'.
+					'repeat'  => 'session',
+					// Only when somebody can actually answer.
+					'when_online' => false,
+				],
+			],
+			// Opening hours: outside them the chat says so, whoever is logged in.
+			'hours' => [
+				'enabled'      => false,
+				'days'         => [],
+				'away_message' => '',
+				'reply_time'   => '',
+			],
+			// Realtime delivery through the socket server, see Zaplane\Socket.
+			'realtime' => [
+				'enabled'    => false,
+				'public_url' => '',
 			],
 			'channels' => [
 				'messenger' => [
@@ -71,6 +95,8 @@ class Settings {
 				'connection_id' => 0,
 				'business_key'  => 'default',
 				'agent_name'    => 'Ava',
+				'avatar'        => '',
+				'avatar_id'     => 0,
 				'business_name' => '',
 				'instructions'  => '',
 				'max_steps'     => 4,
@@ -112,6 +138,10 @@ class Settings {
 			$stored                     = $saved['channels'][ $slug ] ?? [];
 			$out['channels'][ $slug ] = array_merge( $values, is_array( $stored ) ? array_intersect_key( $stored, $values ) : [] );
 		}
+		// A section stored before these keys existed would otherwise be missing
+		// them: the merge above replaces a nested array whole.
+		$out['widget']['proactive'] = self::clean_proactive( is_array( $out['widget']['proactive'] ?? null ) ? $out['widget']['proactive'] : [] );
+
 		return $out;
 	}
 
@@ -128,7 +158,7 @@ class Settings {
 			if ( array_key_exists( 'enabled', $w ) ) {
 				$c['enabled'] = (bool) $w['enabled'];
 			}
-			foreach ( [ 'ask_email', 'visitors', 'auto_open', 'sound', 'ask_contact', 'verify_email', 'notify_email' ] as $k ) {
+			foreach ( [ 'ask_email', 'visitors', 'auto_open', 'sound', 'ask_contact', 'verify_email', 'notify_email', 'show_team' ] as $k ) {
 				if ( array_key_exists( $k, $w ) ) {
 					$c[ $k ] = (bool) $w[ $k ];
 				}
@@ -149,6 +179,9 @@ class Settings {
 			}
 			if ( isset( $w['allowed_origins'] ) ) {
 				$c['allowed_origins'] = self::clean_origins( (array) $w['allowed_origins'] );
+			}
+			if ( isset( $w['proactive'] ) && is_array( $w['proactive'] ) ) {
+				$c['proactive'] = self::clean_proactive( $w['proactive'] );
 			}
 			unset( $c );
 		}
@@ -191,6 +224,19 @@ class Settings {
 			}
 		}
 
+		if ( isset( $input['hours'] ) && is_array( $input['hours'] ) ) {
+			$current['hours'] = self::clean_hours( $input['hours'], $current['hours'] );
+		}
+
+		if ( isset( $input['realtime'] ) && is_array( $input['realtime'] ) ) {
+			if ( array_key_exists( 'enabled', $input['realtime'] ) ) {
+				$current['realtime']['enabled'] = (bool) $input['realtime']['enabled'];
+			}
+			if ( isset( $input['realtime']['public_url'] ) ) {
+				$current['realtime']['public_url'] = self::clean_socket_url( (string) $input['realtime']['public_url'] );
+			}
+		}
+
 		if ( isset( $input['ai'] ) && is_array( $input['ai'] ) ) {
 			$a = $input['ai'];
 			$c = &$current['ai'];
@@ -216,6 +262,15 @@ class Settings {
 					$c[ $k ] = sanitize_text_field( (string) $a[ $k ] );
 				}
 			}
+			// The assistant's picture: a library image wins, so moving the file
+			// (or a CDN rewrite) can't leave a dead URL behind.
+			if ( array_key_exists( 'avatar_id', $a ) ) {
+				$c['avatar_id'] = absint( $a['avatar_id'] );
+				$c['avatar']    = $c['avatar_id'] > 0 ? (string) wp_get_attachment_image_url( $c['avatar_id'], 'thumbnail' ) : '';
+			}
+			if ( isset( $a['avatar'] ) && ! isset( $a['avatar_id'] ) ) {
+				$c['avatar'] = esc_url_raw( (string) $a['avatar'] );
+			}
 			if ( isset( $a['instructions'] ) ) {
 				$c['instructions'] = sanitize_textarea_field( (string) $a['instructions'] );
 			}
@@ -223,7 +278,75 @@ class Settings {
 		}
 
 		update_option( self::OPTION, $current, false );
+		// Opening hours and the team card are cached for the widget.
+		Services\Availability::forget();
+
 		return $current;
+	}
+
+	/**
+	 * The proactive message, with every key present and sane.
+	 *
+	 * @param array<string,mixed> $input
+	 * @return array<string,mixed>
+	 */
+	public static function clean_proactive( array $input ): array {
+		$repeat = (string) ( $input['repeat'] ?? 'session' );
+
+		return [
+			'enabled'     => ! empty( $input['enabled'] ),
+			// Under five seconds reads as a pop-up, over ten minutes never shows.
+			'delay'       => min( 600, max( 5, absint( $input['delay'] ?? 30 ) ) ),
+			'message'     => sanitize_text_field( (string) ( $input['message'] ?? '' ) ),
+			'repeat'      => in_array( $repeat, [ 'session', 'day', 'always' ], true ) ? $repeat : 'session',
+			'when_online' => ! empty( $input['when_online'] ),
+		];
+	}
+
+	/**
+	 * Opening hours as stored: seven days, each with a clock or closed.
+	 *
+	 * @param array<string,mixed> $input
+	 * @param array<string,mixed> $current
+	 * @return array<string,mixed>
+	 */
+	private static function clean_hours( array $input, array $current ): array {
+		$out = [
+			'enabled'      => array_key_exists( 'enabled', $input ) ? (bool) $input['enabled'] : ! empty( $current['enabled'] ),
+			'days'         => is_array( $current['days'] ?? null ) ? $current['days'] : [],
+			'away_message' => isset( $input['away_message'] ) ? sanitize_text_field( (string) $input['away_message'] ) : (string) ( $current['away_message'] ?? '' ),
+			'reply_time'   => isset( $input['reply_time'] ) ? sanitize_text_field( (string) $input['reply_time'] ) : (string) ( $current['reply_time'] ?? '' ),
+		];
+
+		if ( isset( $input['days'] ) && is_array( $input['days'] ) ) {
+			$days = [];
+			foreach ( Services\Availability::DAYS as $day ) {
+				$in           = is_array( $input['days'][ $day ] ?? null ) ? $input['days'][ $day ] : [];
+				$days[ $day ] = [
+					'closed' => ! empty( $in['closed'] ),
+					'open'   => self::clean_clock( (string) ( $in['open'] ?? '' ), '09:00' ),
+					'close'  => self::clean_clock( (string) ( $in['close'] ?? '' ), '17:00' ),
+				];
+			}
+			$out['days'] = $days;
+		}
+
+		return $out;
+	}
+
+	private static function clean_clock( string $value, string $fallback ): string {
+		return preg_match( '/^([01]\d|2[0-3]):[0-5]\d$/', $value ) ? $value : $fallback;
+	}
+
+	/** A ws:// or wss:// address, or empty. */
+	private static function clean_socket_url( string $url ): string {
+		$url = trim( $url );
+		if ( '' === $url ) {
+			return '';
+		}
+		$scheme = strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) );
+
+		return in_array( $scheme, [ 'ws', 'wss' ], true ) ? esc_url_raw( $url, [ 'ws', 'wss' ] ) : '';
 	}
 
 	/** Messenger and WhatsApp allow four starters of up to 80 characters. */

@@ -8,6 +8,7 @@ use WP_REST_Server;
 use Zaplane\Modules\Inbox\Models\Conversation;
 use Zaplane\Modules\Inbox\Models\Identity;
 use Zaplane\Modules\Inbox\Models\Message;
+use Zaplane\Modules\Inbox\Services\Availability;
 use Zaplane\Modules\Inbox\Services\Ingest;
 use Zaplane\Modules\Inbox\Services\Presenter;
 use Zaplane\Modules\Inbox\Services\VisitorContact;
@@ -261,6 +262,7 @@ class WidgetController {
 		return rest_ensure_response( [
 			'token'   => self::sign( $visitor_id ),
 			'visitor' => $known,
+			'team'    => Availability::team(),
 		] );
 	}
 
@@ -364,7 +366,12 @@ class WidgetController {
 			? Message::where( 'conversation_id', (int) $conversation->id )->where( 'is_note', 0 )->orderBy( 'id', 'desc' )->fresh()->first()
 			: null;
 
-		return rest_ensure_response( [ 'latest_id' => $latest ? (int) $latest->id : 0 ] );
+		return rest_ensure_response( [
+			'latest_id' => $latest ? (int) $latest->id : 0,
+			// Who is answering right now, so the header can say so without a
+			// request of its own.
+			'team'      => Availability::team(),
+		] );
 	}
 
 	/**

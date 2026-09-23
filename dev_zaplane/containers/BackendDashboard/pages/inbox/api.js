@@ -16,6 +16,10 @@ export const inboxApi = {
   update: (id, data) => API.post(base + "conversations/" + id, data).then((r) => r.data),
   markRead: (id) => API.post(base + "conversations/" + id + "/read").then((r) => r.data),
   settings: () => API.get(base + "settings").then((r) => r.data),
+  agents: () => API.get(base + "agents").then((r) => r.data),
+  saveAgent: (id, data) => API.post(base + "agents/" + id, data).then((r) => r.data),
+  // The agent's own away switch, and the sign of life that keeps them online.
+  me: (data) => API.post(base + "me", data || {}).then((r) => r.data),
   saveSettings: (data) => API.post(base + "settings", data).then((r) => r.data),
   connectors: () => API.get(base + "connectors").then((r) => r.data),
   visitors: (countOnly = false) => API.get(base + "visitors" + (countOnly ? "?count_only=1" : "")).then((r) => r.data),

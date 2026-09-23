@@ -89,15 +89,28 @@
 #zpi-root .zpi-panel {
 	position: absolute;
 	bottom: 72px;
-	width: 370px;
-	height: min(600px, calc(100vh - 110px));
+	width: 380px;
+	height: min(620px, calc(100vh - 110px));
 	display: flex;
 	flex-direction: column;
 	background: var(--zpi-bg);
-	border-radius: 16px;
-	box-shadow: 0 16px 48px rgba(16, 24, 40, 0.24);
+	border-radius: 18px;
+	box-shadow: 0 24px 60px rgba(16, 24, 40, 0.26), 0 2px 8px rgba(16, 24, 40, 0.08);
 	overflow: hidden;
+	transform-origin: bottom var(--zpi-origin, right);
+	animation: zpi-panel-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.1);
 }
+
+@keyframes zpi-panel-in {
+	from { opacity: 0; transform: translateY(12px) scale(0.97); }
+	to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#zpi-root .zpi-panel { animation: none; }
+}
+
+#zpi-root.zpi-left .zpi-panel { --zpi-origin: left; }
 
 #zpi-root.zpi-right .zpi-panel { right: 0; }
 #zpi-root.zpi-left .zpi-panel { left: 0; }
@@ -106,14 +119,48 @@
 	display: flex;
 	align-items: center;
 	gap: 12px;
-	padding: 16px 16px 16px 20px;
-	background: var(--zpi-color);
+	padding: 16px 14px 16px 18px;
+	background: linear-gradient(140deg, var(--zpi-color), color-mix(in srgb, var(--zpi-color) 78%, #000 22%));
 	color: #fff;
+}
+
+/* The faces overlap a little, the way a team photo strip does. */
+#zpi-root .zpi-faces { display: flex; flex: none; }
+#zpi-root .zpi-face { position: relative; display: block; width: 38px; height: 38px; }
+#zpi-root .zpi-face + .zpi-face { margin-left: -12px; }
+#zpi-root .zpi-face-img {
+	display: block;
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid rgba(255, 255, 255, 0.9);
+	background: rgba(255, 255, 255, 0.25);
+	color: #fff;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 34px;
+	text-align: center;
+}
+/* A green dot on the picture of whoever is actually there. */
+#zpi-root .zpi-face.is-online::after {
+	content: "";
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 11px;
+	height: 11px;
+	border-radius: 50%;
+	background: #2fd47a;
+	border: 2px solid var(--zpi-color);
 }
 
 #zpi-root .zpi-titles { flex: 1; min-width: 0; }
 #zpi-root .zpi-title { font-size: 16px; font-weight: 600; line-height: 1.3; }
-#zpi-root .zpi-subtitle { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+#zpi-root .zpi-status { display: flex; align-items: center; gap: 6px; margin-top: 3px; font-size: 12px; opacity: 0.9; }
+#zpi-root .zpi-status-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, 0.55); }
+#zpi-root .zpi-status.is-online .zpi-status-dot { background: #2fd47a; box-shadow: 0 0 0 3px rgba(47, 212, 122, 0.25); }
+#zpi-root .zpi-status-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 #zpi-root .zpi-close {
 	width: 32px;
@@ -136,11 +183,40 @@
 	overscroll-behavior: contain;
 }
 
-#zpi-root .zpi-msg { display: flex; flex-direction: column; max-width: 82%; }
+#zpi-root .zpi-msg { display: flex; max-width: 86%; gap: 8px; align-items: flex-end; }
 #zpi-root .zpi-them { align-self: flex-start; }
-#zpi-root .zpi-me { align-self: flex-end; align-items: flex-end; }
+#zpi-root .zpi-me { align-self: flex-end; flex-direction: column; align-items: flex-end; }
+#zpi-root .zpi-msg-body { display: flex; flex-direction: column; min-width: 0; }
+/* Consecutive messages from the same person sit closer together. */
+#zpi-root .zpi-msg.is-grouped { margin-top: -6px; }
 
-#zpi-root .zpi-name { font-size: 12px; color: var(--zpi-muted); margin: 0 0 3px 4px; }
+#zpi-root .zpi-avatar {
+	flex: none;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	object-fit: cover;
+	background: var(--zpi-color);
+	color: #fff;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 28px;
+	text-align: center;
+	display: block;
+}
+#zpi-root .zpi-avatar.is-spacer { background: none; visibility: hidden; }
+
+#zpi-root .zpi-name { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--zpi-muted); margin: 0 0 3px 4px; }
+#zpi-root .zpi-tag {
+	padding: 0 5px;
+	border-radius: 4px;
+	background: color-mix(in srgb, var(--zpi-color) 14%, transparent);
+	color: var(--zpi-color);
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	line-height: 15px;
+}
 
 #zpi-root .zpi-bubble {
 	padding: 9px 13px;
@@ -344,4 +420,82 @@
 }
 @media (prefers-reduced-motion: reduce) {
 	#zpi-root .zpi-launcher.zpi-ping { animation: none; }
+}
+
+/* The message that opens by itself: a card above the launcher, not a pop-up
+   over the page. Tapping it opens the chat; the × sends it away. */
+#zpi-root .zpi-teaser {
+	position: absolute;
+	bottom: 72px;
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+	width: max-content;
+	max-width: min(300px, calc(100vw - 48px));
+	padding: 12px 12px 12px 14px;
+	border-radius: 16px;
+	background: var(--zpi-bg);
+	border: 1px solid var(--zpi-border);
+	box-shadow: 0 14px 34px rgba(16, 24, 40, 0.2);
+	opacity: 0;
+	transform: translateY(10px);
+	transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+#zpi-root.zpi-right .zpi-teaser { right: 0; }
+#zpi-root.zpi-left .zpi-teaser { left: 0; }
+#zpi-root .zpi-teaser.is-in { opacity: 1; transform: none; }
+
+#zpi-root .zpi-teaser-open {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	flex: 1;
+	min-width: 0;
+	text-align: left;
+	color: inherit;
+	line-height: 1.45;
+}
+
+#zpi-root .zpi-teaser-avatar {
+	flex: none;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	object-fit: cover;
+	background: var(--zpi-color);
+	color: #fff;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 34px;
+	text-align: center;
+	display: block;
+}
+
+#zpi-root .zpi-teaser-lines { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+#zpi-root .zpi-teaser-name { font-size: 12px; font-weight: 600; color: var(--zpi-muted); }
+#zpi-root .zpi-teaser-text { color: var(--zpi-text); overflow-wrap: anywhere; }
+
+#zpi-root .zpi-teaser-close {
+	flex: none;
+	width: 22px;
+	height: 22px;
+	padding: 5px;
+	margin: -4px -4px 0 0;
+	border-radius: 50%;
+	color: var(--zpi-muted);
+}
+#zpi-root .zpi-teaser-close:hover { background: var(--zpi-surface); color: var(--zpi-text); }
+
+/* An open chat covers the whole phone screen, so the card has nowhere to be. */
+@media (max-width: 480px) {
+	#zpi-root.zpi-is-open .zpi-teaser { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#zpi-root .zpi-teaser { transition: none; }
+}
+
+@media (prefers-color-scheme: dark) {
+	#zpi-root .zpi-face-img { border-color: rgba(255, 255, 255, 0.5); }
 }

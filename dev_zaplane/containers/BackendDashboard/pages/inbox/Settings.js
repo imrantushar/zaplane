@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { __, _n, sprintf } from "@wordpress/i18n";
-import { FiMessageCircle, FiCpu, FiShare2, FiZap, FiCopy, FiCheck, FiTrash2, FiExternalLink, FiX, FiUsers, FiGitBranch, FiBookOpen } from "react-icons/fi";
+import { FiMessageCircle, FiCpu, FiShare2, FiZap, FiCopy, FiCheck, FiTrash2, FiExternalLink, FiX, FiUsers, FiGitBranch, FiBookOpen, FiClock, FiWifi } from "react-icons/fi";
 import ZAPToggle from "@ZAPComponents/ZAPToggle";
 import { inboxApi } from "./api";
 import { channelOf } from "./channels";
 import KnowledgeSettings from "./KnowledgeSettings";
 import SourcesSettings from "./SourcesSettings";
 import ConnectorCard, { connectorState } from "./ConnectorCard";
+import TeamSettings, { PicturePicker } from "./TeamSettings";
 
 const Field = ({ label, help, children, wide }) => (
   <label className={"zaplane-inbox-field" + (wide ? " is-wide" : "")}>
@@ -18,6 +19,9 @@ const Field = ({ label, help, children, wide }) => (
 
 const SECTIONS = [
   { id: "widget", label: __("Website chat", "zaplane"), Icon: FiMessageCircle },
+  { id: "team", label: __("Who answers", "zaplane"), Icon: FiUsers },
+  { id: "hours", label: __("Opening hours", "zaplane"), Icon: FiClock },
+  { id: "realtime", label: __("Instant delivery", "zaplane"), Icon: FiWifi },
   { id: "knowledge", label: __("Knowledge & answers", "zaplane"), Icon: FiBookOpen },
   { id: "ai", label: __("AI assistant", "zaplane"), Icon: FiCpu },
   { id: "channels", label: __("Social channels", "zaplane"), Icon: FiShare2 },
@@ -189,6 +193,9 @@ const Settings = ({ onSaved }) => {
   }
 
   const setWidget = (k, v) => setForm({ ...form, widget: { ...form.widget, [k]: v } });
+  const setProactive = (k, v) => setWidget("proactive", { ...(form.widget.proactive || {}), [k]: v });
+  const setHours = (k, v) => setForm({ ...form, hours: { ...(form.hours || {}), [k]: v } });
+  const setRealtime = (k, v) => setForm({ ...form, realtime: { ...(form.realtime || {}), [k]: v } });
   const setAi = (k, v) => setForm({ ...form, ai: { ...form.ai, [k]: v } });
   const setAnswers = (k, v) => setForm({ ...form, answers: { ...(form.answers || {}), [k]: v } });
   const setChannel = (slug, k, v) =>
@@ -204,6 +211,8 @@ const Settings = ({ onSaved }) => {
           allowed_origins: form.widget.allowed_origins.split(/\s+/).filter(Boolean),
         },
         ai: form.ai,
+        hours: form.hours,
+        realtime: form.realtime,
         answers: form.answers,
         channels: form.channels,
         sources: form.sources.map(({ slug, answered_by }) => ({ slug, answered_by })),
@@ -268,6 +277,13 @@ const Settings = ({ onSaved }) => {
     sources: form.sources.length
       ? { tone: "success", text: String(form.sources.length) }
       : { tone: "muted", text: __("None", "zaplane") },
+    team: form.widget.show_team ? { tone: "success", text: __("Shown", "zaplane") } : { tone: "muted", text: __("Hidden", "zaplane") },
+    hours: form.hours?.enabled ? { tone: "success", text: __("Set", "zaplane") } : { tone: "muted", text: __("Always open", "zaplane") },
+    realtime: form.realtime?.enabled
+      ? data?.realtime?.running
+        ? { tone: "success", text: __("Live", "zaplane") }
+        : { tone: "warning", text: __("No server", "zaplane") }
+      : { tone: "muted", text: __("Off", "zaplane") },
     replies: { tone: "muted", text: String(canned.length) },
   };
 
@@ -372,6 +388,49 @@ const Settings = ({ onSaved }) => {
                 </span>
                 <ZAPToggle checked={!!form.widget.visitors} onChange={(v) => setWidget("visitors", v)} size="sm" />
               </div>
+              <div className="zaplane-inbox-field is-row is-wide">
+                <span>
+                  {__("Say hello by itself", "zaplane")}
+                  <em className="zaplane-inbox-hint">{__("After a while on the page, the chat offers a message with a chime — the way someone in a shop looks up when you've been browsing. Nothing is sent to the inbox unless the visitor answers.", "zaplane")}</em>
+                </span>
+                <ZAPToggle checked={!!form.widget.proactive?.enabled} onChange={(v) => setProactive("enabled", v)} size="sm" />
+              </div>
+              {form.widget.proactive?.enabled && (
+                <>
+                  <Field wide label={__("What it says", "zaplane")} help={__("Left empty, it repeats the greeting above.", "zaplane")}>
+                    <input
+                      className="zaplane-inbox-input"
+                      value={form.widget.proactive?.message || ""}
+                      onChange={(e) => setProactive("message", e.target.value)}
+                      placeholder={__("Looking for something? I can help you find it.", "zaplane")}
+                    />
+                  </Field>
+                  <Field label={__("After how long", "zaplane")} help={__("Seconds on the page.", "zaplane")}>
+                    <input
+                      type="number"
+                      min={5}
+                      max={600}
+                      className="zaplane-inbox-input"
+                      value={form.widget.proactive?.delay ?? 30}
+                      onChange={(e) => setProactive("delay", parseInt(e.target.value, 10) || 30)}
+                    />
+                  </Field>
+                  <Field label={__("How often", "zaplane")}>
+                    <select className="zaplane-inbox-input" value={form.widget.proactive?.repeat || "session"} onChange={(e) => setProactive("repeat", e.target.value)}>
+                      <option value="session">{__("Once a visit", "zaplane")}</option>
+                      <option value="day">{__("Once a day", "zaplane")}</option>
+                      <option value="always">{__("Every page", "zaplane")}</option>
+                    </select>
+                  </Field>
+                  <div className="zaplane-inbox-field is-row is-wide">
+                    <span>
+                      {__("Only when someone can answer", "zaplane")}
+                      <em className="zaplane-inbox-hint">{__("No cheerful hello at 3am when the reply won't come until Monday.", "zaplane")}</em>
+                    </span>
+                    <ZAPToggle checked={!!form.widget.proactive?.when_online} onChange={(v) => setProactive("when_online", v)} size="sm" />
+                  </div>
+                </>
+              )}
               <Field wide label={__("Other websites allowed to use this chat", "zaplane")} help={__("One address per line, like https://shop.example.com. Your own site is always allowed.", "zaplane")}>
                 <textarea className="zaplane-inbox-input" rows={3} value={form.widget.allowed_origins} onChange={(e) => setWidget("allowed_origins", e.target.value)} />
               </Field>
@@ -382,6 +441,15 @@ const Settings = ({ onSaved }) => {
             </div>
           </div>
         </section>
+
+        <TeamSettings
+          form={form}
+          setWidget={setWidget}
+          setHours={setHours}
+          setRealtime={setRealtime}
+          Field={Field}
+          realtimeStatus={data?.realtime}
+        />
 
         <KnowledgeSettings
           form={form}
@@ -432,6 +500,13 @@ const Settings = ({ onSaved }) => {
             </Field>
             <Field label={__("Assistant name", "zaplane")}>
               <input className="zaplane-inbox-input" value={form.ai.agent_name} onChange={(e) => setAi("agent_name", e.target.value)} />
+            </Field>
+            <Field label={__("Assistant picture", "zaplane")} help={__("Shown beside its replies, next to the AI label.", "zaplane")}>
+              <PicturePicker
+                value={form.ai.avatar}
+                label={__("Choose a picture", "zaplane")}
+                onChange={({ url, id }) => setForm({ ...form, ai: { ...form.ai, avatar: url, avatar_id: id } })}
+              />
             </Field>
             <Field label={__("Business name", "zaplane")} help={__("Leave empty to use your site title.", "zaplane")}>
               <input className="zaplane-inbox-input" value={form.ai.business_name} onChange={(e) => setAi("business_name", e.target.value)} />

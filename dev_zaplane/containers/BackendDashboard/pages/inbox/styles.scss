@@ -3498,3 +3498,105 @@ em.zaplane-inbox-hint {
 		margin-left: 0;
 	}
 }
+
+/* Who answers: one row per person, with their chat name, role and picture. */
+.zaplane-inbox-agents {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.zaplane-inbox-agent {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--zaplane-border-color);
+  border-radius: 10px;
+  background: var(--zaplane-background);
+
+  &.is-busy { opacity: 0.6; }
+
+  .zaplane-inbox-agent-fields { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  .zaplane-inbox-agent-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .zaplane-inbox-agent-state { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; white-space: nowrap; }
+
+  @media (max-width: 880px) {
+    .zaplane-inbox-agent-row { grid-template-columns: 1fr; }
+  }
+}
+
+/* The same round face the chat shows, with a dot when they are at their desk. */
+.zaplane-inbox-face {
+  position: relative;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--zaplane-secondary);
+  display: grid;
+  place-items: center;
+
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .zaplane-inbox-face-letter { font-weight: 600; color: var(--zaplane-font-secondary-color); }
+
+  &.is-online::after {
+    content: "";
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--zaplane-success);
+    border: 2px solid var(--zaplane-background);
+  }
+}
+
+.zaplane-inbox-picture {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .zaplane-inbox-input { flex: 1; min-width: 0; }
+}
+
+/* Opening hours: a row a week. */
+.zaplane-inbox-hours {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.zaplane-inbox-hours-row {
+  display: grid;
+  grid-template-columns: 120px 110px 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+
+  .zaplane-inbox-hours-day { font-weight: 500; }
+  .zaplane-inbox-hours-to { color: var(--zaplane-text-muted); }
+  &.is-closed .zaplane-inbox-input { opacity: 0.45; }
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr 1fr;
+    .zaplane-inbox-hours-day { grid-column: 1 / -1; }
+    .zaplane-inbox-hours-to { display: none; }
+  }
+}
+
+.zaplane-inbox-realtime {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+/* The agent's own switch in the inbox header. */
+.zaplane-inbox-head-btn {
+  &.is-online svg { color: var(--zaplane-success); }
+  &.is-away svg { color: var(--zaplane-warning); }
+}

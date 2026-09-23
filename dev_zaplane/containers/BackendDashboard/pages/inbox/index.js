@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { __, sprintf } from "@wordpress/i18n";
-import { FiSettings, FiArrowLeft, FiInfo, FiUsers } from "react-icons/fi";
+import { FiSettings, FiArrowLeft, FiInfo, FiUsers, FiCoffee, FiCheckCircle } from "react-icons/fi";
 import PageLayout from "@ZAPComponents/PageLayout";
 import { outlineBtn } from "../../../../../assets/scss/chakra/recipe";
 import ConversationList from "./ConversationList";
@@ -86,6 +86,9 @@ const InboxPage = () => {
       return !c;
     });
   const lastIdRef = useRef(0);
+  // Which conversation is open, readable from callbacks that outlive a render
+  // (the realtime listener below is set up once, not per conversation).
+  const activeIdRef = useRef(0);
   const revisionRef = useRef(0); // bumped by the server on every edit/delete
   const inboxRef = useRef(null);
 
@@ -184,6 +187,10 @@ const InboxPage = () => {
   }, [loadList, view]);
 
   useEffect(() => {
+    activeIdRef.current = activeId;
+  }, [activeId]);
+
+  useEffect(() => {
     if (view !== "inbox" || !activeId) return undefined;
     return visiblePoll(pollThread, THREAD_POLL);
   }, [pollThread, activeId, view]);
@@ -262,6 +269,68 @@ const InboxPage = () => {
     openConversation(id);
   };
 
+  // Visitors are told whether anyone is about. Having the inbox open is the
+  // signal; this keeps it fresh while the screen sits idle, and lets the
+  // person say they have stepped away.
+  const [me, setMe] = useState(null);
+  useEffect(() => {
+    let live = true;
+    const beat = () => inboxApi.me().then((res) => live && setMe(res.me)).catch(() => {});
+    beat();
+    return visiblePoll(beat, 30000);
+  }, []);
+
+  // A new message reaches this screen the moment it is saved, when the
+  // realtime server is running. The polling above stays as it is: a socket
+  // can die quietly, and a missed message is worse than a spare request.
+  const socketRef = useRef(null);
+  useEffect(() => {
+    const config = me?.socket;
+    if (!config?.url || !config.token || !window.WebSocket || socketRef.current) return undefined;
+
+    let socket;
+    try {
+      socket = new window.WebSocket(config.url + (config.url.includes("?") ? "&" : "?") + "agent=" + encodeURIComponent(config.token));
+    } catch (e) {
+      return undefined;
+    }
+    socketRef.current = socket;
+
+    socket.onmessage = (event) => {
+      let data;
+      try {
+        data = JSON.parse(event.data);
+      } catch (e) {
+        return;
+      }
+      if (data?.type !== "event" || data.event !== "message") return;
+      loadList();
+      if (activeIdRef.current && Number(data.data?.conversation_id) === Number(activeIdRef.current)) pollThread();
+    };
+    socket.onclose = () => {
+      socketRef.current = null;
+    };
+
+    return () => {
+      socketRef.current = null;
+      socket.onclose = null;
+      try {
+        socket.close();
+      } catch (e) {}
+    };
+  }, [me?.socket?.url, me?.socket?.token, loadList, pollThread]);
+
+  const toggleAway = async () => {
+    const away = !me?.away;
+    setMe((m) => ({ ...m, away, online: !away }));
+    try {
+      const res = await inboxApi.me({ away });
+      setMe(res.me);
+    } catch (e) {
+      setMe((m) => ({ ...m, away: !away }));
+    }
+  };
+
   const topBarActions =
     view === "inbox" ? (
       <>
@@ -275,6 +344,18 @@ const InboxPage = () => {
                 {online}
               </span>
             )}
+          </button>
+        )}
+        {me && (
+          <button
+            type="button"
+            style={outlineBtn}
+            className={"zaplane-inbox-head-btn" + (me.away ? " is-away" : " is-online")}
+            onClick={toggleAway}
+            title={me.away ? __("Visitors are told nobody is about. Click to come back.", "zaplane") : __("Visitors can see someone is here. Click to step away.", "zaplane")}
+          >
+            {me.away ? <FiCoffee /> : <FiCheckCircle />}
+            <span>{me.away ? __("Away", "zaplane") : __("Available", "zaplane")}</span>
           </button>
         )}
         <button type="button" style={outlineBtn} className="zaplane-inbox-head-btn" onClick={() => setView("settings")}>
