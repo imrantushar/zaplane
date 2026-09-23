@@ -104,7 +104,7 @@ class Assets {
 				// a comment, or pull in something from elsewhere. Colour functions
 				// such as rgba() and color-mix() still pass.
 				if ( '' === $value
-					|| preg_match( '/[;{}<>\\]/', $value )
+					|| preg_match( '/[;{}<>\\\\]/', $value )
 					|| preg_match( '#/\*|url\s*\(|expression\s*\(|@import#i', $value )
 				) {
 					continue;

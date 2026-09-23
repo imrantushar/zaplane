@@ -46,6 +46,11 @@ class Automation {
 	}
 
 	public function boot(): void {
+		// Steps run from Action Scheduler, which many hosts drive from WP-CLI
+		// (`wp action-scheduler run` on a system cron). Without these handlers
+		// every queued step there fails with "no callbacks are registered".
+		add_action( 'zaplane_execute_node_run', [ $this, 'dispatch_node_run' ], 10, 1 );
+		add_action( 'zaplane_resume_delayed_run', [ $this, 'resume_delayed_run' ], 10, 4 );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			return;
@@ -53,9 +58,7 @@ class Automation {
 
 		add_action( 'init', [ $this, 'dispatch_active_triggers' ] );
 		add_action( 'init', [ $this, 'dispatch_active_listeners' ] );
-		add_action( 'zaplane_execute_node_run', [ $this, 'dispatch_node_run' ], 10, 1 );
 		add_action( 'zaplane_workflow_updated', [ $this, 'reload_triggers' ] );
-		add_action( 'zaplane_resume_delayed_run', [ $this, 'resume_delayed_run' ], 10, 4 );
 	}
 
 	public function reload_triggers() {
