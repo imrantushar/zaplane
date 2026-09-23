@@ -37,8 +37,15 @@ class StoreEngineTest extends IntegrationTestCase
 
     public function test_order_status_triggers(): void
     {
+        // storeengine/order/status_changed: ( $order_id, $old_status, $new_status, $order ).
+        new \Storeengine_Order( 102, [ 'status' => 'processing' ] );
+        $result = Storeengine::resolve_trigger( $this->makeTriggerNode( 'order_status_update' ), [ 102, 'pending', 'processing' ] );
+        $this->assertIsArray( $result );
+        $this->assertEquals( 'pending', $result['old_status'] );
+        $this->assertEquals( 'processing', $result['new_status'] );
+
+        // storeengine/order_status_{status}: ( $order_id, $order, $status_transition ).
         $statuses = [
-            'order_status_update',
             'order_status_on_hold',
             'order_status_pending_payment',
             'order_status_processing',
@@ -52,7 +59,7 @@ class StoreEngineTest extends IntegrationTestCase
             $node       = $this->makeTriggerNode( $status );
             $order      = new \Storeengine_Order(102, ['status' => 'processing'] );
             $transition = ['from' => 'pending', 'to' => 'processing'];
-            $result     = Storeengine::resolve_trigger( $node, [ null, $order, $transition ] );
+            $result     = Storeengine::resolve_trigger( $node, [ 102, $order, $transition ] );
 
             $this->assertIsArray( $result );
             $this->assertEquals( 'pending', $result['old_status'] );

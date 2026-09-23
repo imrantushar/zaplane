@@ -8,10 +8,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Zaplane\Framework\Classes\IntegrationBase;
 
 /**
- * Formatter — data-transform utilities (text, number, list, date), the way
- * Zapier's Formatter / n8n's Edit Fields work. Pure PHP, no connection.
+ * Formatter — data-transform utilities (text, number, list, date).
+ * Pure PHP, no connection.
  */
 class Formatter extends IntegrationBase {
+
+	/** Longest text Repeat / Pad may produce (bytes), so a big count can't exhaust memory. */
+	private const MAX_OUTPUT = 1048576;
 
 	public static function get_slug(): string {
 		return 'formatter';
@@ -452,17 +455,22 @@ class Formatter extends IntegrationBase {
 			case 'regex_replace':
 				return self::safe_pcre( (string) ( $c['pattern'] ?? '' ), (string) ( $c['replace'] ?? '' ), $in );
 			case 'truncate':
-				$len = (int) ( $c['length'] ?? 100 );
-				return ( strlen( $in ) > $len ) ? ( substr( $in, 0, $len ) . '…' ) : $in;
+				// Count characters, not bytes, so a multibyte letter is never cut in half.
+				$len = max( 0, (int) ( $c['length'] ?? 100 ) );
+				return ( self::strlen( $in ) > $len ) ? ( self::substr( $in, 0, $len ) . '…' ) : $in;
 			case 'substring':
 				$sub_start = (int) ( $c['start'] ?? 0 );
 				return ( isset( $c['length'] ) && '' !== $c['length'] )
-					? (string) substr( $in, $sub_start, (int) $c['length'] )
-					: (string) substr( $in, $sub_start );
+					? self::substr( $in, $sub_start, (int) $c['length'] )
+					: self::substr( $in, $sub_start );
 			case 'pad':
 				return self::pad( $in, $c );
 			case 'repeat':
-				return str_repeat( $in, max( 0, (int) ( $c['times'] ?? 2 ) ) );
+				$times = max( 0, (int) ( $c['times'] ?? 2 ) );
+				if ( '' !== $in ) {
+					$times = min( $times, intdiv( self::MAX_OUTPUT, strlen( $in ) ) );
+				}
+				return str_repeat( $in, $times );
 			case 'reverse':
 				return strrev( $in );
 			case 'slug':
@@ -488,7 +496,7 @@ class Formatter extends IntegrationBase {
 			case 'extract':
 				return self::extract( (string) ( $c['pattern'] ?? '' ), $in );
 			case 'length':
-				return function_exists( 'mb_strlen' ) ? mb_strlen( $in ) : strlen( $in );
+				return self::strlen( $in );
 			case 'word_count':
 				return str_word_count( $in );
 			case 'default':
@@ -586,6 +594,14 @@ class Formatter extends IntegrationBase {
 
 	// ── helpers ──────────────────────────────────────────────────────────────
 
+	private static function strlen( string $s ): int {
+		return function_exists( 'mb_strlen' ) ? mb_strlen( $s, 'UTF-8' ) : strlen( $s );
+	}
+
+	private static function substr( string $s, int $start, ?int $length = null ): string {
+		return function_exists( 'mb_substr' ) ? mb_substr( $s, $start, $length, 'UTF-8' ) : (string) substr( $s, $start, $length );
+	}
+
 	private static function to_camel( string $s ): string {
 		$s = str_replace( [ '-', '_' ], ' ', $s );
 		$s = ucwords( strtolower( $s ) );
@@ -600,7 +616,7 @@ class Formatter extends IntegrationBase {
 	}
 
 	private static function pad( string $in, array $c ): string {
-		$len  = (int) ( $c['length'] ?? 0 );
+		$len  = min( self::MAX_OUTPUT, (int) ( $c['length'] ?? 0 ) );
 		$char = (string) ( $c['pad_char'] ?? ' ' );
 		$char = '' === $char ? ' ' : $char;
 		$side = $c['pad_side'] ?? 'left';
@@ -759,10 +775,10 @@ class Formatter extends IntegrationBase {
 					$stack[] = $a * $b;
 					break;
 				case '/':
-					$stack[] = 0.0 !== $b ? $a / $b : 0;
+					$stack[] = 0.0 !== (float) $b ? $a / $b : 0;
 					break;
 				case '%':
-					$stack[] = 0.0 !== $b ? fmod( $a, $b ) : 0;
+					$stack[] = 0.0 !== (float) $b ? fmod( $a, $b ) : 0;
 					break;
 			}
 		}//end foreach

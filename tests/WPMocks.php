@@ -131,6 +131,15 @@ namespace Zaplane\Tests {
 			];
 		}
 
+		/** Queue a response whose body is sent as-is (not JSON-encoded), e.g. an event stream. */
+		public static function setHttpRawResponse( string $body, int $status = 200, array $headers = [] ): void {
+			self::$httpResponses[] = [
+				'body'    => $body,
+				'status'  => $status,
+				'headers' => array_change_key_case( $headers ),
+			];
+		}
+
 		public static function nextHttpResponse(): ?array {
 			return array_shift( self::$httpResponses );
 		}
@@ -437,6 +446,24 @@ namespace Zaplane\Tests {
 }
 
 namespace {
+	// WordPress (5.9+, and Zaplane needs 6.8) provides these on PHP 7.4 in
+	// wp-includes/compat.php; the unit tests don't load WordPress.
+	if ( ! function_exists( 'str_contains' ) ) {
+		function str_contains( $haystack, $needle ) {
+			return '' === $needle || false !== strpos( $haystack, $needle );
+		}
+	}
+	if ( ! function_exists( 'str_starts_with' ) ) {
+		function str_starts_with( $haystack, $needle ) {
+			return 0 === strncmp( $haystack, $needle, strlen( $needle ) );
+		}
+	}
+	if ( ! function_exists( 'str_ends_with' ) ) {
+		function str_ends_with( $haystack, $needle ) {
+			return '' === $needle || ( '' !== $haystack && substr_compare( $haystack, $needle, -strlen( $needle ) ) === 0 );
+		}
+	}
+
 	if ( ! function_exists( 'wp_rand' ) ) {
 		function wp_rand( $min = 0, $max = 0 ) {
 			return random_int( (int) $min, (int) ( $max ? $max : 2147483647 ) );
@@ -912,7 +939,7 @@ namespace {
 			if ( $next === null ) {
 				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
 			}
-			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'] ];
+			return [ 'response' => [ 'code' => $next['status'], 'message' => 'OK' ], 'body' => $next['body'], 'headers' => $next['headers'] ?? [] ];
 		}
 	}
 
@@ -1944,4 +1971,52 @@ namespace {
 	if ( ! defined( 'MINUTE_IN_SECONDS' ) )  define( 'MINUTE_IN_SECONDS',  60 );
 	if ( ! defined( 'HOUR_IN_SECONDS' ) )    define( 'HOUR_IN_SECONDS',    3600 );
 	if ( ! defined( 'DAY_IN_SECONDS' ) )     define( 'DAY_IN_SECONDS',     86400 );
+	if ( ! defined( 'WEEK_IN_SECONDS' ) )    define( 'WEEK_IN_SECONDS',    604800 );
+	if ( ! defined( 'MONTH_IN_SECONDS' ) )   define( 'MONTH_IN_SECONDS',   2592000 );
+	if ( ! defined( 'YEAR_IN_SECONDS' ) )    define( 'YEAR_IN_SECONDS',    31536000 );
+
+	if ( ! function_exists( 'wp_timezone' ) ) {
+		function wp_timezone(): \DateTimeZone {
+			return new \DateTimeZone( 'UTC' );
+		}
+	}
+
+	if ( ! function_exists( 'wp_update_comment_count' ) ) {
+		function wp_update_comment_count( $post_id, $do_deferred = false ) {
+			return true;
+		}
+	}
+
+	if ( ! function_exists( 'get_comments_number' ) ) {
+		function get_comments_number( $post_id = 0 ) {
+			return 0;
+		}
+	}
+
+	if ( ! function_exists( 'wp_generate_uuid4' ) ) {
+		function wp_generate_uuid4() {
+			$b = random_bytes( 16 );
+			$b[6] = chr( ord( $b[6] ) & 0x0f | 0x40 );
+			$b[8] = chr( ord( $b[8] ) & 0x3f | 0x80 );
+			return vsprintf( '%s%s-%s-%s-%s-%s%s%s', str_split( bin2hex( $b ), 4 ) );
+		}
+	}
+
+	if ( ! function_exists( 'wp_date' ) ) {
+		function wp_date( $format, $timestamp = null, $timezone = null ) {
+			return ( new \DateTimeImmutable( '@' . ( null === $timestamp ? time() : (int) $timestamp ) ) )
+				->setTimezone( $timezone ?: wp_timezone() )
+				->format( $format );
+		}
+	}
+
+	if ( ! function_exists( 'wp_upload_dir' ) ) {
+		function wp_upload_dir() {
+			$dir = sys_get_temp_dir() . '/zaplane-test-uploads';
+			if ( ! is_dir( $dir ) ) {
+				mkdir( $dir, 0777, true );
+			}
+			return [ 'basedir' => $dir, 'path' => $dir, 'baseurl' => 'https://example.test/uploads', 'url' => 'https://example.test/uploads', 'error' => false ];
+		}
+	}
 }

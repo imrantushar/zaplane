@@ -1,6 +1,6 @@
 {
     "version": "1.3.1",
-    "generated_at": "2026-09-22 13:55:34",
+    "generated_at": "2026-09-23 03:31:05",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -14492,8 +14492,8 @@
             "triggers": {
                 "run_manually": {
                     "label": "Run Manually",
-                    "key": "run_manually",
                     "hook": "",
+                    "key": "run_manually",
                     "schema": [
                         {
                             "key": "note",
@@ -26757,7 +26757,19 @@
                 "update_option": {
                     "label": "Update Option",
                     "key": "update_option",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "option_name",
+                            "label": "Option Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "value",
+                            "label": "New Value",
+                            "type": "expression"
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28294,7 +28306,24 @@
                 "create_post_tag": {
                     "label": "Create Post Tag",
                     "key": "create_post_tag",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Tag Name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "expression"
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28303,7 +28332,29 @@
                 "update_post_tag": {
                     "label": "Update Post Tag",
                     "key": "update_post_tag",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Tag Name",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "expression"
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28312,7 +28363,14 @@
                 "delete_post_tag": {
                     "label": "Delete Post Tag",
                     "key": "delete_post_tag",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28339,7 +28397,25 @@
                 "get_post_tags": {
                     "label": "Get Post Tag (All)",
                     "key": "get_post_tags",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search",
+                            "type": "expression"
+                        },
+                        {
+                            "key": "limit",
+                            "label": "How many",
+                            "type": "number",
+                            "default": 20
+                        },
+                        {
+                            "key": "hide_empty",
+                            "label": "Only tags in use",
+                            "type": "checkbox",
+                            "default": false
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28348,7 +28424,14 @@
                 "get_post_tag": {
                     "label": "Get Post Tag (Single)",
                     "key": "get_post_tag",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "tag_id",
+                            "label": "Tag ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28357,7 +28440,40 @@
                 "create_site": {
                     "label": "Create New Site",
                     "key": "create_site",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "domain",
+                            "label": "Domain",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "path",
+                            "label": "Path",
+                            "type": "expression",
+                            "default": "/"
+                        },
+                        {
+                            "key": "title",
+                            "label": "Site Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28366,7 +28482,14 @@
                 "delete_site": {
                     "label": "Delete Site",
                     "key": "delete_site",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "site_id",
+                            "label": "Site ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28375,7 +28498,34 @@
                 "add_user_to_site": {
                     "label": "Add User to Site",
                     "key": "add_user_to_site",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "site_id",
+                            "label": "Site ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "expression",
+                            "default": "subscriber"
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28384,7 +28534,28 @@
                 "remove_user_from_site": {
                     "label": "Remove User from Site",
                     "key": "remove_user_from_site",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "site_id",
+                            "label": "Site ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28481,7 +28652,38 @@
                 "get_post_comments_all": {
                     "label": "Get Post Comments (All)",
                     "key": "get_post_comments_all",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "default": "approve",
+                            "options": [
+                                {
+                                    "label": "Approved",
+                                    "value": "approve"
+                                },
+                                {
+                                    "label": "Pending",
+                                    "value": "hold"
+                                },
+                                {
+                                    "label": "Spam",
+                                    "value": "spam"
+                                },
+                                {
+                                    "label": "All",
+                                    "value": "all"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "limit",
+                            "label": "How many",
+                            "type": "number",
+                            "default": 20
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -28506,7 +28708,22 @@
                 "get_user_comments": {
                     "label": "Get User Comments",
                     "key": "get_user_comments",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "wordpress",
+                                "query": "users",
+                                "select": [
+                                    "ID",
+                                    "name"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -33017,7 +33234,7 @@
                     "schema": [
                         {
                             "key": "source",
-                            "label": "Image (URL, path, or attachment ID)",
+                            "label": "Image (URL, attachment ID, or path in uploads)",
                             "type": "expression",
                             "required": true
                         }
@@ -33032,7 +33249,7 @@
                     "schema": [
                         {
                             "key": "source",
-                            "label": "Image (URL, path, or attachment ID)",
+                            "label": "Image (URL, attachment ID, or path in uploads)",
                             "type": "expression",
                             "required": true
                         },

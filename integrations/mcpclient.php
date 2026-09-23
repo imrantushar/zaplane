@@ -272,6 +272,14 @@ class Mcpclient extends IntegrationBase {
 
 		$data = self::decode_body( $body );
 
+		if ( ! array_key_exists( 'result', $data ) && ! isset( $data['error'] ) ) {
+			$code = (int) wp_remote_retrieve_response_code( $response );
+			return [
+				'error'   => $code >= 400 ? sprintf( 'The MCP server answered with HTTP %d.', $code ) : 'The MCP server sent a reply that could not be read.',
+				'session' => $new_session ? $new_session : $session,
+			];
+		}
+
 		if ( isset( $data['error'] ) ) {
 			$msg = is_array( $data['error'] ) ? ( $data['error']['message'] ?? 'RPC error' ) : (string) $data['error'];
 			return [
@@ -294,17 +302,27 @@ class Mcpclient extends IntegrationBase {
 			return is_array( $json ) ? $json : [];
 		}
 
-		// SSE: collect "data:" lines and parse the JSON payload.
-		$data_lines = [];
-		foreach ( preg_split( '/\r\n|\n|\r/', $body ) as $line ) {
-			if ( 0 === strpos( $line, 'data:' ) ) {
-				$data_lines[] = trim( substr( $line, 5 ) );
+		// SSE: each event is a block of "data:" lines ended by a blank line. A
+		// server may stream notifications before the reply, so read each event
+		// on its own and keep the one that answers (a result or an error).
+		$found = [];
+		foreach ( preg_split( '/(?:\r\n|\n|\r){2,}/', $body ) as $event ) {
+			$data_lines = [];
+			foreach ( preg_split( '/\r\n|\n|\r/', $event ) as $line ) {
+				if ( 0 === strpos( $line, 'data:' ) ) {
+					$data_lines[] = ltrim( substr( $line, 5 ) );
+				}
+			}
+			$json = json_decode( implode( "\n", $data_lines ), true );
+			if ( is_array( $json ) ) {
+				$found = $json;
+				if ( array_key_exists( 'result', $json ) || array_key_exists( 'error', $json ) ) {
+					return $json;
+				}
 			}
 		}
-		$joined = implode( '', $data_lines );
-		$json   = json_decode( $joined, true );
 
-		return is_array( $json ) ? $json : [];
+		return $found;
 	}
 
 	private static function extract_text( array $result ): string {

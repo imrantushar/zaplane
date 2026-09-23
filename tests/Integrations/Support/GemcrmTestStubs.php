@@ -185,3 +185,63 @@ namespace GemCrm\Classes {
 		}
 	}
 }
+
+namespace GemCrm\Database\Utils {
+
+	if ( ! class_exists( 'GemCrm\Database\Utils\QueryBuilder' ) ) {
+		/**
+		 * Fluent stand-in for GemCRM's query builder: every call returns
+		 * itself, and get() returns the list members set in $rows (after the
+		 * `c.id > n` cursor, so paging ends).
+		 */
+		class QueryBuilder {
+			/** @var array<int,array<string,mixed>> The same two contacts as Contact::index(). */
+			public static $rows = [
+				[ 'id' => 1, 'email' => 'john@example.com', 'status' => 'subscribed' ],
+				[ 'id' => 2, 'email' => 'jane@example.com', 'status' => 'subscribed' ],
+			];
+
+			/** @var int */
+			private $after = 0;
+
+			/** @var array<string,mixed> Equality filters, e.g. id => 1. */
+			private $equals = [];
+
+			public static function ins(): self {
+				return new self();
+			}
+
+			public function where( $column, $operator = null, $value = null ): self {
+				if ( 'c.id' === $column && '>' === $operator ) {
+					$this->after = (int) $value;
+				} elseif ( '=' === $operator && in_array( $column, [ 'id', 'email' ], true ) ) {
+					$this->equals[ $column ] = $value;
+				}
+				return $this;
+			}
+
+			/** One column of the first contact matching the equality filters. */
+			public function value( string $column ) {
+				foreach ( self::$rows as $row ) {
+					$match = true;
+					foreach ( $this->equals as $key => $value ) {
+						$match = $match && (string) $row[ $key ] === (string) $value;
+					}
+					if ( $match ) {
+						return $row[ $column ] ?? null;
+					}
+				}
+				return null;
+			}
+
+			public function get(): array {
+				$after = $this->after;
+				return array_values( array_filter( self::$rows, static fn( $row ) => (int) $row['id'] > $after ) );
+			}
+
+			public function __call( $name, $args ) {
+				return $this;
+			}
+		}
+	}
+}

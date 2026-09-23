@@ -415,4 +415,15 @@ trait PostActionsTrait {
 		);
 		return static::success( [ 'removed' => $removed ] );
 	}
+
+	protected static function action_get_posts_metadata_all( array $config ): array {
+		$post_id = (int) ( $config['post_id'] ?? 0 );
+		if ( ! $post_id ) {
+			return static::error( 'Post ID is required' );
+		}
+		return static::success( [
+			'post_id' => $post_id,
+			'meta'    => get_post_meta( $post_id ),
+		] );
+	}
 }

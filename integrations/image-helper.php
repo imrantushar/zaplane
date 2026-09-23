@@ -35,7 +35,7 @@ class ImageHelper extends IntegrationBase {
 	public static function get_action_config_schema( string $action ): array {
 		$source = [
 			'key' => 'source',
-			'label' => 'Image (URL, path, or attachment ID)',
+			'label' => 'Image (URL, attachment ID, or path in uploads)',
 			'type' => 'expression',
 			'required' => true
 		];
@@ -187,8 +187,25 @@ class ImageHelper extends IntegrationBase {
 			return [ $tmp, true ];
 		}
 
-		// Local path.
-		return [ file_exists( $source ) ? $source : null, false ];
+		// Local path: only files inside the uploads folder, so a step can't
+		// read (or copy a resized version of) anything else on the server.
+		return [ self::inside_uploads( $source ), false ];
+	}
+
+	/**
+	 * The real path of $source when it is a file under the uploads folder;
+	 * null for anything else, including stream wrappers (phar://, php://…).
+	 */
+	protected static function inside_uploads( string $source ): ?string {
+		if ( preg_match( '#^[a-z][a-z0-9+.-]*://#i', $source ) ) {
+			return null;
+		}
+		$real = realpath( $source );
+		$base = realpath( (string) ( wp_upload_dir()['basedir'] ?? '' ) );
+		if ( ! $real || ! $base || ! is_file( $real ) ) {
+			return null;
+		}
+		return 0 === strpos( $real, rtrim( $base, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR ) ? $real : null;
 	}
 
 	protected static function error( string $message ): array {

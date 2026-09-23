@@ -60,4 +60,17 @@ trait OptionActionsTrait {
 		}
 		return static::success( [ 'option_name' => $config['option_name'] ] );
 	}
+
+	protected static function action_update_option( array $config ): array {
+		$name = (string) ( $config['option_name'] ?? '' );
+		if ( '' === $name ) {
+			return static::error( 'Option name is required' );
+		}
+		update_option( $name, $config['value'] ?? '' );
+
+		return static::success( [
+			'option_name' => $name,
+			'value'       => get_option( $name ),
+		] );
+	}
 }

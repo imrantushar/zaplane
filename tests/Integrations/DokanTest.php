@@ -86,9 +86,12 @@ class DokanTest extends IntegrationTestCase {
 	}
 
 	/**
-	 * These hook names could not be corroborated against Dokan's source or any
-	 * reference integration. A wrong name is a silent no-op, so verify them
-	 * against an installed Dokan before relying on them.
+	 * Hook names checked against Dokan's source (getdokan/dokan, 2026-09-22).
+	 * A wrong name is a silent no-op, so a change here must be re-checked.
+	 * - withdraw_request_approved / _cancelled: fired as
+	 *   "dokan_withdraw_request_{status name}" (Withdraw::save()).
+	 * - product_deleted: dokan_product_delete runs before the product is
+	 *   deleted (its data is still readable); dokan_product_deleted after.
 	 *
 	 * @see https://github.com/getdokan/dokan
 	 */
@@ -96,14 +99,13 @@ class DokanTest extends IntegrationTestCase {
 		$unverified = [
 			'store_profile_saved'        => 'dokan_store_profile_saved',
 			'withdraw_created'           => 'dokan_withdraw_created',
-			'withdraw_request_pending'   => 'dokan_withdraw_request_pending',
 			'withdraw_request_approved'  => 'dokan_withdraw_request_approved',
 			'withdraw_request_cancelled' => 'dokan_withdraw_request_cancelled',
 			'withdraw_status_updated'    => 'dokan_withdraw_status_updated',
 			'vendor_enabled'             => 'dokan_vendor_enabled',
 			'vendor_disabled'            => 'dokan_vendor_disabled',
 			'product_updated'            => 'dokan_product_updated',
-			'product_deleted'            => 'dokan_product_deleted',
+			'product_deleted'            => 'dokan_product_delete',
 		];
 
 		$triggers = Dokan::get_triggers();

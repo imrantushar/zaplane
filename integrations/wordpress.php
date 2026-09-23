@@ -17,6 +17,7 @@ use Zaplane\Integrations\Wordpress\RoleActionsTrait;
 use Zaplane\Integrations\Wordpress\OptionActionsTrait;
 use Zaplane\Integrations\Wordpress\MediaActionsTrait;
 use Zaplane\Integrations\Wordpress\CommentActionsTrait;
+use Zaplane\Integrations\Wordpress\SiteActionsTrait;
 use Zaplane\Integrations\Wordpress\QueryTrait;
 use Zaplane\Integrations\Wordpress\Helper;
 
@@ -31,6 +32,7 @@ class Wordpress extends IntegrationBase {
 	use OptionActionsTrait;
 	use MediaActionsTrait;
 	use CommentActionsTrait;
+	use SiteActionsTrait;
 	use QueryTrait;
 	use Helper;
 
@@ -1823,6 +1825,28 @@ class Wordpress extends IntegrationBase {
 		];
 	}
 
+	private static function field_tag_id(): array {
+		return [
+			[
+				'key' => 'tag_id',
+				'label' => 'Tag ID',
+				'type' => 'expression',
+				'required' => true
+			]
+		];
+	}
+
+	private static function field_site_id(): array {
+		return [
+			[
+				'key' => 'site_id',
+				'label' => 'Site ID',
+				'type' => 'expression',
+				'required' => true
+			]
+		];
+	}
+
 	private static function field_comment_id(): array {
 		return [
 			[
@@ -3280,6 +3304,144 @@ class Wordpress extends IntegrationBase {
 					'label' => 'Value',
 					'type' => 'expression'
 				],
+			],
+
+			'update_option' => [
+				[
+					'key' => 'option_name',
+					'label' => 'Option Name',
+					'type' => 'text',
+					'required' => true
+				],
+				[
+					'key' => 'value',
+					'label' => 'New Value',
+					'type' => 'expression'
+				],
+			],
+
+			'create_post_tag' => [
+				[
+					'key' => 'name',
+					'label' => 'Tag Name',
+					'type' => 'expression',
+					'required' => true
+				],
+				[
+					'key' => 'slug',
+					'label' => 'Slug',
+					'type' => 'expression'
+				],
+				[
+					'key' => 'description',
+					'label' => 'Description',
+					'type' => 'expression'
+				],
+			],
+
+			'update_post_tag' => [
+				...self::field_tag_id(),
+				[
+					'key' => 'name',
+					'label' => 'Tag Name',
+					'type' => 'expression'
+				],
+				[
+					'key' => 'slug',
+					'label' => 'Slug',
+					'type' => 'expression'
+				],
+				[
+					'key' => 'description',
+					'label' => 'Description',
+					'type' => 'expression'
+				],
+			],
+
+			'delete_post_tag' => self::field_tag_id(),
+			'get_post_tag'    => self::field_tag_id(),
+
+			'get_post_tags' => [
+				[
+					'key' => 'search',
+					'label' => 'Search',
+					'type' => 'expression'
+				],
+				[
+					'key' => 'limit',
+					'label' => 'How many',
+					'type' => 'number',
+					'default' => 20
+				],
+				[
+					'key' => 'hide_empty',
+					'label' => 'Only tags in use',
+					'type' => 'checkbox',
+					'default' => false
+				],
+			],
+
+			'get_post_comments_all' => [
+				[
+					'key' => 'status',
+					'label' => 'Status',
+					'type' => 'select',
+					'default' => 'approve',
+					'options' => [
+						[ 'label' => 'Approved', 'value' => 'approve' ],
+						[ 'label' => 'Pending', 'value' => 'hold' ],
+						[ 'label' => 'Spam', 'value' => 'spam' ],
+						[ 'label' => 'All', 'value' => 'all' ],
+					],
+				],
+				[
+					'key' => 'limit',
+					'label' => 'How many',
+					'type' => 'number',
+					'default' => 20
+				],
+			],
+
+			'get_user_comments' => self::field_user_id(),
+
+			'create_site' => [
+				[
+					'key' => 'domain',
+					'label' => 'Domain',
+					'type' => 'expression',
+					'required' => true
+				],
+				[
+					'key' => 'path',
+					'label' => 'Path',
+					'type' => 'expression',
+					'default' => '/'
+				],
+				[
+					'key' => 'title',
+					'label' => 'Site Title',
+					'type' => 'expression',
+					'required' => true
+				],
+				...self::field_user_id(),
+			],
+
+			'delete_site'           => self::field_site_id(),
+
+			'add_user_to_site' => [
+				...self::field_site_id(),
+				...self::field_user_id(),
+				[
+					'key' => 'role',
+					'label' => 'Role',
+					'type' => 'expression',
+					'default' => 'subscriber'
+				],
+			],
+
+			'remove_user_from_site' => [
+				...self::field_site_id(),
+				...self::field_user_id(),
 			],
 
 			'update_option_advanced' => [

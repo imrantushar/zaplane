@@ -35,7 +35,12 @@ class Manual extends IntegrationBase {
 
 	public static function get_triggers(): array {
 		return [
-			'run_manually' => [ 'label' => 'Run Manually' ],
+			// No WP hook: this one is started by the Run button, or by
+			// zaplane_run_workflow(), not by something happening on the site.
+			'run_manually' => [
+				'label' => 'Run Manually',
+				'hook'  => '',
+			],
 		];
 	}
 

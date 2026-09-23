@@ -44,6 +44,17 @@ class Aiagent extends IntegrationBase {
 		return 'api_key';
 	}
 
+	/**
+	 * The same providers and keys as the AI integration, so the same check:
+	 * a wrong key is caught when the connection is saved, not on the first run.
+	 *
+	 * @param array<string,mixed> $credentials
+	 * @return array{success:bool,message:string,details:array<string,mixed>}
+	 */
+	public static function test_connection( array $credentials ): array {
+		return Ai::test_connection( $credentials );
+	}
+
 	public static function get_auth_fields( ?string $auth_type = null ): array {
 		return [
 			'provider' => [

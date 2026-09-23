@@ -278,6 +278,7 @@ class ServerTest extends TestCase {
 		$_POST['scope'] = [ 'read' ];
 
 		$reflection = new \ReflectionMethod( Server::class, 'ticked' );
+		$reflection->setAccessible( true ); // Needed on PHP < 8.1 (CI runs 7.4).
 
 		$this->assertSame( [ 'read' ], $reflection->invoke( null, [ 'read', 'write', 'run' ] ) );
 

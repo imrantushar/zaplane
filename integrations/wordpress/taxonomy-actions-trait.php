@@ -298,4 +298,38 @@ trait TaxonomyActionsTrait {
 
 		return static::success( [ 'category' => self::normalize_term_payload( $category ) ] );
 	}
+
+	// ── Post tags ────────────────────────────────────────────────────────────
+	// The tag actions are the term actions with the taxonomy fixed to post_tag.
+
+	protected static function action_create_post_tag( array $config ): array {
+		return static::action_create_term( array_merge( $config, [ 'taxonomy' => 'post_tag' ] ) );
+	}
+
+	protected static function action_update_post_tag( array $config ): array {
+		return static::action_update_term( array_merge( $config, [ 'taxonomy' => 'post_tag' ], [ 'term_id' => (int) ( $config['tag_id'] ?? $config['term_id'] ?? 0 ) ] ) );
+	}
+
+	protected static function action_delete_post_tag( array $config ): array {
+		return static::action_delete_term( array_merge( $config, [ 'taxonomy' => 'post_tag' ], [ 'term_id' => (int) ( $config['tag_id'] ?? $config['term_id'] ?? 0 ) ] ) );
+	}
+
+	protected static function action_get_post_tags( array $config ): array {
+		return static::action_get_terms_by_taxonomy( array_merge( $config, [ 'taxonomy' => 'post_tag' ] ) );
+	}
+
+	protected static function action_get_post_tag( array $config ): array {
+		$tag_id = (int) ( $config['tag_id'] ?? $config['term_id'] ?? 0 );
+		if ( ! $tag_id ) {
+			return static::error( 'Tag ID is required' );
+		}
+		$term = get_term( $tag_id, 'post_tag' );
+		if ( is_wp_error( $term ) || ! $term ) {
+			return static::error( "Tag ID {$tag_id} not found" );
+		}
+		return static::success( [
+			'tag_id' => $tag_id,
+			'tag'    => self::normalize_term_payload( $term ),
+		] );
+	}
 }

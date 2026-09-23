@@ -1,4 +1,9 @@
 <?php
+/**
+ * PENDING: abandoned carts moved to GemCRM (74a93bb0). The integration now
+ * loads only when GemCRM's AbandonedCart model exists, and these tests still
+ * target the old Zaplane model. Rewrite them against a GemCRM stub.
+ */
 
 namespace Zaplane\Tests\Integrations;
 
@@ -18,6 +23,7 @@ class AbandonedCartTest extends IntegrationTestCase {
 		// Clear the static ORM query cache between tests.
 		$reflector = new \ReflectionClass( \Zaplane\Framework\Database\ORM\QueryBuilder::class );
 		$cacheProp = $reflector->getProperty( 'queryCache' );
+		$cacheProp->setAccessible( true ); // Needed on PHP < 8.1 (CI runs 7.4).
 		$cacheProp->setValue( null, [] );
 	}
 

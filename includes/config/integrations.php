@@ -30,7 +30,7 @@ $zaplane_registry = [
 		'class' => \Zaplane\Integrations\Csv::class,
 	],
 	'datetime'            => [
-		'file'  => 'datetime.php',
+		'file'  => 'date-time-tool.php',
 		'class' => \Zaplane\Integrations\DateTime_Tool::class,
 	],
 	'image_helper'        => [

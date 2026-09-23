@@ -19,7 +19,8 @@ class WebhookTest extends IntegrationTestCase {
 
 	protected function getTriggerTests(): array {
 		return [
-			'incoming' => [ [ 'payload' => 'sample', 'event' => 'order.created' ] ],
+			// "Catch Webhook": the posted body as the trigger data.
+			'catch_hook' => [ [ 'payload' => 'sample', 'event' => 'order.created' ] ],
 		];
 	}
 }

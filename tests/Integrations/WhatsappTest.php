@@ -311,8 +311,9 @@ class WhatsappTest extends IntegrationTestCase {
 
 	// ========== get_triggers returns empty (actions-only integration) ==========
 
-	public function test_has_no_triggers(): void {
-		$this->assertEmpty( Whatsapp::get_triggers() );
+	public function test_triggers_are_message_received_and_webhook_received(): void {
+		// One event per inbound message, and the whole signed delivery (for the Inbox).
+		$this->assertSame( [ 'message_received', 'webhook_received' ], array_keys( Whatsapp::get_triggers() ) );
 	}
 
 	// ========== Schema coverage for all 7 actions ==========

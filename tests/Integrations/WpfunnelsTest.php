@@ -52,9 +52,6 @@ class WpfunnelsTest extends IntegrationTestCase {
 
 	protected function getTriggerTests(): array {
 		return [
-			'loaded'                 => [],
-			'init'                   => [],
-			'pro_init'               => [],
 			'import_complete'        => [],
 			'after_funnel_creation'  => [ 601 ],
 			'after_step_creation'    => [ 701 ],
