@@ -22,6 +22,14 @@ class Divi extends IntegrationBase {
 		return 'divi.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/divi-builder/',
+			'action'  => 'https://zaplane.app/docs/divi-builder/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'contact_form_submit' => [

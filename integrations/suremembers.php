@@ -26,6 +26,14 @@ class Suremembers extends IntegrationBase {
 		return 'suremembers.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/suremembers/',
+			'action'  => 'https://zaplane.app/docs/action-suremembers/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'access_group' => [

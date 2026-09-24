@@ -46,6 +46,14 @@ class Wordpress extends IntegrationBase {
 		return 'wordpress.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/wordpress/',
+			'action'  => 'https://zaplane.app/docs/wordpress/',
+		];
+	}
+
 	/** Trigger events the recipe tester can self-seed with real WordPress data. */
 	public static function get_seedable_triggers(): array {
 		return [

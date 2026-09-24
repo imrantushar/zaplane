@@ -35,6 +35,14 @@ class Webhook extends IntegrationBase {
 		return 'webhook.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/webhook/',
+			'action'  => 'https://zaplane.app/docs/webhook/',
+		];
+	}
+
 	/*
 	 ---------------------------------------------------------------------
 	 * Incoming — Catch Webhook trigger

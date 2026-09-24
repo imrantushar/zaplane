@@ -26,6 +26,14 @@ class Wpfunnels extends IntegrationBase {
 		return 'wpfunnels.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/wpfunnels/',
+			'action'  => 'https://zaplane.app/docs/wpfunnels/',
+		];
+	}
+
 	public static function get_introduction(): string {
 		return self::INTRODUCTION;
 	}

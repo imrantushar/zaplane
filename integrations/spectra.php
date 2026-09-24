@@ -20,6 +20,13 @@ class Spectra extends IntegrationBase {
 	public static function get_icon(): string {
 		return 'spectra.svg';
 	}
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/spectra-legacy/',
+			'action'  => 'https://zaplane.app/docs/spectra-legacy/',
+		];
+	}
 	public static function get_triggers(): array {
 		return [
 			'uagb_form_success' => [

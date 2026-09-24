@@ -26,6 +26,14 @@ class Funnelkit extends IntegrationBase {
 		return 'funnelkit.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/funnelkit/',
+			'action'  => 'https://zaplane.app/docs/actions-funnelkit/',
+		];
+	}
+
 	public static function get_introduction(): string {
 		return self::INTRODUCTION;
 	}

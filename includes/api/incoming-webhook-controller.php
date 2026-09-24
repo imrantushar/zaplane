@@ -60,6 +60,41 @@ class IncomingWebhookController extends WP_REST_Controller {
 			]
 		);
 
+		// Per-connection webhook: .../incoming/<slug>/<connection_id>. Lets an
+		// integration with multiple connections (e.g. several Telegram bots)
+		// tell them apart — handle_incoming() passes connection_id through to
+		// the trigger dispatcher so only that connection's trigger nodes fire.
+		// Same handlers as the route above; the only difference is this one
+		// additionally captures which connection the delivery is for.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<slug>[a-z0-9_-]+)/(?P<connection_id>\d+)',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'handle_incoming' ],
+					'permission_callback' => '__return_true',
+				],
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'verify_subscription' ],
+					'permission_callback' => '__return_true',
+				],
+				'args' => [
+					'slug'          => [
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_key',
+					],
+					'connection_id' => [
+						'required'          => true,
+						'type'              => 'integer',
+						'sanitize_callback' => 'absint',
+					],
+				],
+			]
+		);
+
 		// Generic per-workflow catch-all webhook: /wp-json/zaplane/v1/hook/<workflow_id>
 		register_rest_route(
 			$this->namespace,
@@ -131,14 +166,15 @@ class IncomingWebhookController extends WP_REST_Controller {
 		return current_user_can( 'manage_options' );
 	}
 
-	/**
-	 * The integration named in the URL exists and accepts incoming webhooks.
-	 *
-	 * @param \WP_REST_Request $request The incoming request.
-	 * @return true|WP_Error
-	 */
-	public function webhook_integration_check( \WP_REST_Request $request ) {
-		$slug        = $request->get_param( 'slug' );
+	public function handle_incoming( \WP_REST_Request $request ) {
+		$slug = $request->get_param( 'slug' );
+
+		// Present only on the per-connection route (…/incoming/<slug>/<id>).
+		// Null on the shared/legacy route — integrations treat that as "source
+		// unknown", not "no connections configured".
+		$connection_id = $request->get_param( 'connection_id' );
+		$connection_id = ( null !== $connection_id && '' !== $connection_id ) ? (int) $connection_id : null;
+
 		$integration = IntegrationLoader::get( $slug );
 
 		if ( ! $integration ) {
@@ -264,12 +300,23 @@ class IncomingWebhookController extends WP_REST_Controller {
 		$this->container->get( 'automation' )->dispatch_active_triggers();
 
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Dynamic hook dispatched from integration config.
-		do_action( $hook, $payload );
+		do_action( $hook, $payload, $connection_id );
+
+		// Integrations that expose an "All Updates"-style catch-all trigger
+		// (event key 'all_updates') get it fired on every delivery too, in
+		// addition to the specific-type hook above — so a single node can
+		// watch every event type without this dispatcher needing to know each
+		// integration's individual event names.
+		if ( isset( $triggers['all_updates']['hook'] ) && $triggers['all_updates']['hook'] !== $hook ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Dynamic hook dispatched from integration config.
+			do_action( $triggers['all_updates']['hook'], $payload, $connection_id );
+		}
 
 		return rest_ensure_response([
-			'received' => true,
-			'action'   => 'triggered',
-			'event'    => $event,
+			'received'      => true,
+			'action'        => 'triggered',
+			'event'         => $event,
+			'connection_id' => $connection_id,
 		]);
 	}
 
@@ -472,6 +519,12 @@ class IncomingWebhookController extends WP_REST_Controller {
 	/**
 	 * Save the Webhook Setup panel's values. Only keys the integration declares
 	 * are accepted; an empty submitted value clears that key.
+	 *
+	 * After persisting, on_webhook_config_saved() gives the integration a
+	 * chance to push the new settings to the provider's own API — e.g.
+	 * Telegram's setWebhook — so Save actually (re)registers the webhook
+	 * instead of only storing it locally. No-op for integrations that don't
+	 * override it.
 	 */
 	public function update_webhook_config( \WP_REST_Request $request ) {
 		$slug        = $request->get_param( 'slug' );
@@ -516,6 +569,15 @@ class IncomingWebhookController extends WP_REST_Controller {
 		}
 
 		update_option( 'zaplane_webhook_config', $config, false );
+
+		try {
+			$integration::on_webhook_config_saved( $bucket );
+		} catch ( \Throwable $e ) {
+			// The local config is already saved either way — a failed provider
+			// registration call (e.g. bad bot token, network error) shouldn't
+			// block that or surface as a 500 on an otherwise-successful Save.
+			// The panel re-reads 'configured' below regardless.
+		}
 
 		return $this->get_webhook_config( $request );
 	}

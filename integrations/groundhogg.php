@@ -23,6 +23,14 @@ class Groundhogg extends IntegrationBase {
 		return 'groundhogg-icon.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/groundhogg/',
+			'action'  => 'https://zaplane.app/docs/groundhogg/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'created_contact' => [

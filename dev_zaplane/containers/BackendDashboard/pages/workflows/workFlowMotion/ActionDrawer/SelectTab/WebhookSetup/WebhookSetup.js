@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { __, sprintf } from "@wordpress/i18n";
-import { AlertTriangle, Check, RefreshCw } from "lucide-react";
+import { AlertTriangle, Check, Copy, RefreshCw } from "lucide-react";
 import { API, namespace, rest_url } from "@ZAPUtils/helper";
 import { primaryBtn } from "../../../../../../../../../assets/scss/chakra/recipe";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
@@ -67,6 +67,24 @@ const WebhookSetup = ({ appSlug, selectedIntegration }) => {
       cancelled = true;
     };
   }, [appSlug, selectedIntegration]);
+
+  // Meta (and most providers) need this value pasted into a *separate*
+  // dashboard, not read on this screen — so once it's typed or generated
+  // here, the user has to get it back out verbatim. A masked password input
+  // alone gives no way to do that short of retyping it by hand.
+  const handleCopyField = useCallback(
+    (value) => {
+      navigator.clipboard.writeText(value || "");
+      dispatch(
+        showNotification({
+          message: __("Copied to clipboard!", "zaplane"),
+          isShow: true,
+          type: "success",
+        })
+      );
+    },
+    [dispatch]
+  );
 
   const handleSave = useCallback(async () => {
     setSaving(true);
@@ -202,6 +220,16 @@ const WebhookSetup = ({ appSlug, selectedIntegration }) => {
                     className="px-3 border border-solid border-[var(--zaplane-border-color)] bg-[var(--zaplane-background)] cursor-pointer rounded-md flex items-center"
                   >
                     <RefreshCw size={14} />
+                  </button>
+                )}
+                {!!values[field.key] && (
+                  <button
+                    type="button"
+                    title={__("Copy to clipboard", "zaplane")}
+                    onClick={() => handleCopyField(values[field.key])}
+                    className="px-3 border border-solid border-[var(--zaplane-border-color)] bg-[var(--zaplane-background)] cursor-pointer rounded-md flex items-center"
+                  >
+                    <Copy size={14} />
                   </button>
                 )}
               </div>

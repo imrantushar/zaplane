@@ -22,6 +22,14 @@ class Suremail extends IntegrationBase {
 		return 'suremail.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/suremail/',
+			'action'  => 'https://zaplane.app/docs/suremail/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'email_sent_successfully' => [

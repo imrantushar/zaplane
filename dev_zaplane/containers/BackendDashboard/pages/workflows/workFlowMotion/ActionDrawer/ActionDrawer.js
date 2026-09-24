@@ -263,13 +263,13 @@ const {
       {!selectedItem && (
         <>
           <Search placeholder={__("Search apps or tools...", "zaplane")} defaultValue={search} onSearchHandler={value => setSearch(value)} />
-          {search && <DrawerSearchList searchList={searchList} setMode={setMode} setSelectedItem={setSelectedItem} setSearch={setSearch} />}
+          {search && <DrawerSearchList searchList={searchList} isTrigger={isTrigger} setMode={setMode} setSelectedItem={setSelectedItem} setSearch={setSearch} />}
         </>
       )}
 
       {!mode && !search && !selectedItem && <DrawerModeList setMode={setMode} setSelectedItem={setSelectedItem} isTrigger={isTrigger} source={source} TOOLS={TOOLS} port={port} />}
 
-      {mode && !selectedItem && !search && <DrawerItemList list={list} setSelectedItem={(item) => setSelectedItem(mode === "tools" ? { ...item, mode: "tools" } : item)} setMode={setMode} />}
+      {mode && !selectedItem && !search && <DrawerItemList list={list} isTrigger={isTrigger} setSelectedItem={(item) => setSelectedItem(mode === "tools" ? { ...item, mode: "tools" } : item)} setMode={setMode} />}
 
       {/* The picked node's module may not be switched on. Nodes stay usable
           either way, so this is the only place that says so — and it offers to

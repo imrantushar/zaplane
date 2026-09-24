@@ -21,6 +21,14 @@ class Paymattic extends IntegrationBase {
 		return 'paymattic.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/paymattic-integration/',
+			'action'  => 'https://zaplane.app/docs/paymattic-integration/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

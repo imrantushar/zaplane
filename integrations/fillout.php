@@ -30,6 +30,14 @@ class Fillout extends IntegrationBase {
 		return 'fillout.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/fillout/',
+			'action'  => 'https://zaplane.app/docs/fillout/',
+		];
+	}
+
 	public static function requires_connection(): bool {
 		return true;
 	}

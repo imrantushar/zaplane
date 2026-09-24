@@ -4,14 +4,16 @@ import { integrations } from "@ZAPUtils/helper";
 export const APPS = Object.entries(integrations?.apps || {}).map(([key, value]) => ({
   id: value.slug || key,
   name: value.name,
-  icon:value.icon
+  icon:value.icon,
+  docs_url: value.docs_url
 }));
 
 // Preprocess tools
 export const TOOLS = Object.entries(integrations?.tools || {}).map(([key, value]) => ({
   id: value.slug || key,
   name: value.name,
-  icon:value.icon
+  icon:value.icon,
+  docs_url: value.docs_url
 }));
 
 const hasEntries = (obj) => obj && Object.keys(obj).length > 0;

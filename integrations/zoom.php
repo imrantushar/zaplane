@@ -25,6 +25,14 @@ class Zoom extends IntegrationBase {
 		return 'zoom.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/zoom/',
+			'action'  => 'https://zaplane.app/docs/zoom/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'meeting_started'    => [

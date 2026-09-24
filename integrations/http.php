@@ -26,6 +26,14 @@ class Http extends IntegrationBase {
 		return 'http-request';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/webhooks-api-requests-guide/',
+			'action'  => 'https://zaplane.app/docs/webhooks-api-requests-guide/',
+		];
+	}
+
 	public static function get_actions(): array {
 		return [
 			'request' => [ 'label' => 'Send HTTP Request' ]

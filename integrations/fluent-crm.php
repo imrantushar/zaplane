@@ -37,6 +37,14 @@ class FluentCrm extends IntegrationBase {
 		return 'fluentcrm-logo-icon.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/fluentcrm/',
+			'action'  => 'https://zaplane.app/docs/action-fluentcrm/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'added_tag' => [

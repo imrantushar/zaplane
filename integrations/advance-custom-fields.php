@@ -24,6 +24,14 @@ class AdvanceCustomFields extends IntegrationBase {
 		return 'acf.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => '',
+			'action'  => 'https://zaplane.app/docs/action-advanced-custom-fields/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'acf_save_post' => [

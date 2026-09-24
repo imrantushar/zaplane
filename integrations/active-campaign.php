@@ -28,6 +28,14 @@ class ActiveCampaign extends IntegrationBase {
 		return 'activecampaign.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => '',
+			'action'  => 'https://zaplane.app/docs/action-activecampaign/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

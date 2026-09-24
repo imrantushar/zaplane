@@ -22,6 +22,14 @@ class Elementor extends IntegrationBase {
 		return 'elementor.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/elementor/',
+			'action'  => 'https://zaplane.app/docs/elementor/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'elementor_pro/forms/new_record' => [
