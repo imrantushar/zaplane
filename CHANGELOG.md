@@ -5,6 +5,50 @@ All notable changes to Zaplane are documented here. This project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Resolved the duplicate `handle_incoming()` method that caused a PHP critical error.
+- Fixed the dashboard login/reload flow so it loads normally again.
+- Corrected the Log History horizontal scrollbar and responsive layout issues.
+- Fixed the shared modal/overflow behavior so opening Create Workflow no longer causes the right-side scrollbar to disappear or the UI to shift across Zaplane tabs.
+- Fixed the Dashboard recent workflow data rendering, empty-state messaging and heading output.
+- Improved Log History UX with responsive table behavior, accessibility labels and consistent duration text formatting.
+- Cleaned up workflow UI issues including unused code, missing labels, keyboard access and related lint-level problems.
+- Reduced the `react-datepicker` build warning by switching to a stable CommonJS entry.
+- Rebuilt the production frontend assets successfully and verified the build remains healthy.
+- Fixed the Import button icon issue in the workflow UI.
+- Fixed pagination issues across the Zaplane admin interface.
+- Fixed Mailchimp trigger and action issues for more reliable workflow execution.
+- Fixed Custom App REST API issues affecting REST API requests and responses.
+- Fixed FunnelKit trigger and action issues.
+- Fixed SureMark trigger and action issues.
+
+### Changed
+- Updated the shared modal and drawer overflow handling to preserve layout stability when a panel opens.
+- Improved the overall admin UI consistency for logs and recent-run views across narrower screens.
+- Normalized project lint configuration and cleaned up repeated styling issues to keep the release baseline healthy.
+
+### Added
+- Added ZenCommunity Core + Pro integration with 32 triggers and 34 actions.
+- Added automation support for community members, profiles, spaces, posts, comments, reactions, polls, and events.
+- Added ZenCommunity Pro support for private messaging, group messaging, and support ticket workflows.
+- Added dynamic field selectors for spaces, users, roles, events, posts, and ticket settings.
+- Added cURL support to Custom Apps, allowing users to create Custom App requests directly from cURL configurations.
+- Added a new GemBooking integration with trigger and action support.
+- Added new Telegram triggers and actions for Telegram-based workflow automation.
+
+### Improved
+- Improved permission handling for member-triggered, admin-owned workflows.
+- Improved action error handling to stop downstream steps when an action fails.
+- Improved compatibility with background workflow execution.
+
+### Fixed
+- Fixed trigger detection and payload handling across supported ZenCommunity events.
+- Fixed action failure states being incorrectly treated as successful workflow runs.
+- Fixed sender identity handling in automated messaging.
+
+### Testing
+- Validated all 32 triggers and 34 actions, including destructive operations using database transactions and rollbacks to preserve test data.
+
 ## [1.3.1] - 2026-09-20
 
 ### Removed
