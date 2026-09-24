@@ -64,6 +64,14 @@ const config = {
 	resolve: {
 		alias: {
 			...defaultConfig.resolve.alias,
+			// The package's ESM build pulls in an optional date-fns locale module
+			// dynamically, which produces a production-build warning. The CommonJS
+			// entry has the same public API and keeps that optional dependency out of
+			// the bundle graph.
+			'react-datepicker$': path.resolve(
+				__dirname,
+				'node_modules/react-datepicker/dist/index.js'
+			),
 			'@ZAPComponents': path.resolve( __dirname, 'dev_zaplane/components/' ),
 			'@ZAPContainers': path.resolve( __dirname, 'dev_zaplane/containers/' ),
 			'@ZAPPages': path.resolve( __dirname, 'dev_zaplane/containers/pages/' ),

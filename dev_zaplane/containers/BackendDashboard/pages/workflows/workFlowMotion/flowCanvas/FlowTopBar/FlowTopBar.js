@@ -9,7 +9,7 @@ import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import RunsTable from "../RunsTable/RunsTable";
 import VersionHistoryTable from "../VersionHistoryTable/VersionHistoryTable";
-import { outlineBtn, primaryBtn, secondPrimaryBtn } from "../../../../../../../../assets/scss/chakra/recipe";
+import { outlineBtn } from "../../../../../../../../assets/scss/chakra/recipe";
 import { getRunWorkFlow } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowRuns";
 import { useDispatch, useSelector } from "react-redux";
 import { formatTime } from "../helper";
@@ -22,7 +22,6 @@ import '../styles.scss';
 import { LiaStopCircleSolid } from "react-icons/lia";
 import { CiPlay1 } from "react-icons/ci";
 import { updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
-import { useNavigate } from "react-router-dom";
 import { plugin_root_url, route_path } from "@ZAPUtils/helper";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
 import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
@@ -55,7 +54,6 @@ export default function FlowTopBar({
   // They describe the workflow as last saved, and are checked again on every save.
   const warnings = Array.isArray(workFlow?.warnings) ? workFlow.warnings : [];
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
   useApiCountdown();
@@ -67,7 +65,7 @@ export default function FlowTopBar({
   }, [isEditingTitle]);
   useApiCountdown();
   useEffect(() => {
-    if (!workFlow?.workflow) return;
+    if (!workFlow?.workflow) {return;}
     const updateStatusAndTitle = async () => {
       try {
         if (values?.status && values.status !== workFlow.workflow.status) {
@@ -83,6 +81,7 @@ export default function FlowTopBar({
           }));
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Failed to update status or title:", error);
       }
     };
@@ -111,6 +110,7 @@ export default function FlowTopBar({
       }));
       downloadJSON(res?.payload, values?.title || "workflow");
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Export failed:", err);
     }
   };
@@ -171,7 +171,7 @@ export default function FlowTopBar({
     {apiRequestRunning && (
       <div className="flex items-center gap-2">
         <span className="text-[13px] font-medium text-[var(--zaplane-font-secondary-color)]">
-          {__("Listening...", "zaplane")}
+          {__("Listening…", "zaplane")}
         </span>
         <span className="text-[13px] font-bold text-[var(--zaplane-primary)]">
           {formatTime(apiCountdown)}
@@ -351,17 +351,18 @@ export default function FlowTopBar({
           onChange={e => setFieldValue("title", e.target.value)}
           onBlur={() => setIsEditingTitle(false)}
           onKeyDown={e => {
-            if (e.key === "Enter" || e.key === "Escape") setIsEditingTitle(false);
+            if (e.key === "Enter" || e.key === "Escape") {setIsEditingTitle(false);}
           }}
           className="text-[14px] font-semibold border-b-2 border-primary-500 focus:outline-none bg-transparent px-1 w-auto max-w-[200px]"
         />
       ) : (
-        <span
+        <button
+          type="button"
           onClick={() => setIsEditingTitle(true)}
           className="m-0 text-[14px] font-semibold text-[var(--zaplane-font-color)] truncate cursor-pointer max-w-[240px] hover:bg-[var(--zaplane-secondary-color)] px-2 py-1 rounded transition-colors"
         >
           {currentTitle}
-        </span>
+        </button>
       )}
     </div>
   )} rightContent={() => rightActions} />;

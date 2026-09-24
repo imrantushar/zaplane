@@ -14,7 +14,7 @@ const RecentLogs = ({
       return <div>
             <ZAPLabel label={row?.node?.app} type={"simple"} />
             <span className="zaplane-sub-title text-var(--zaplane-text-muted)">
-              {__(formatLabel(row?.node?.event), 'zaplane')}
+              {formatLabel(row?.node?.event)}
             </span>
           </div>;
     },
@@ -32,7 +32,7 @@ const RecentLogs = ({
       return <div>
             <ZAPLabel label={date} type={"simple"} />
             <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
-              {__(time, 'zaplane')}
+              {time}
             </span>
           </div>;
     }
@@ -49,7 +49,7 @@ const RecentLogs = ({
       return <div className="text-center">
             <ZAPLabel label={date} type={"simple"} />
             <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
-              {__(time, 'zaplane')}
+              {time}
             </span>
           </div>;
     },
@@ -66,7 +66,10 @@ const RecentLogs = ({
           {__("STATUS", "zaplane")}
         </span>,
     cell: row => <div className="flex flex-row items-center gap-2 justify-center">
-          <div bg={isSuccess(row.status) ? "green.500" : "red.500"} className="w-[8px] h-[8px] rounded-full" />
+          <div
+            className="w-[8px] h-[8px] rounded-full"
+            style={{ backgroundColor: isSuccess(row.status) ? 'var(--zaplane-success)' : 'var(--zaplane-danger)' }}
+          />
           <ZAPLabel label={isSuccess(row.status) ? __("Success", "zaplane") : __("Failed", "zaplane")} type={"simple"} />
         </div>
     // columnWidth: "160px",
@@ -95,18 +98,18 @@ const RecentLogs = ({
           <rect x="200" y="95" width="20" height="4" rx="2" fill="var(--zaplane-secondary-color)" />
         </svg>
       </div>
-      <h3 className="text-[var(--zaplane-font-color)] text-[20px] font-[600] mb-2">{__("No Data Available!!!", "zaplane")}</h3>
-      <p className="text-[var(--zaplane-text-muted)] text-[14px]">{__("Please, create data to see the available list here.", "zaplane")}</p>
+      <h3 className="text-[var(--zaplane-font-color)] text-[20px] font-[600] mb-2">{__("No workflow runs yet", "zaplane")}</h3>
+      <p className="text-[var(--zaplane-text-muted)] text-[14px]">{__("Run a workflow to see its recent activity here.", "zaplane")}</p>
     </div>
   );
 
-  const tableData = Array.isArray(data.runs) ? data.runs.slice(0, 5) : [];
+  const tableData = Array.isArray(data) ? data.slice(0, 5) : [];
 
   return (
     <div className="bg-[var(--zaplane-background)] rounded-[8px] border border-[var(--zaplane-border-color)] w-full min-h-[400px] flex flex-col">
       <div className="p-6">
         <span className="text-[var(--zaplane-font-secondary-color)] text-[16px] font-[500]">
-          {__("Recently Created Flow", "zaplane")}
+          {__("Recent Workflow Runs", "zaplane")}
         </span>
       </div>
 
@@ -118,7 +121,7 @@ const RecentLogs = ({
             isRowSelectable={false} 
             showSubHeader={false} 
             showColumnFilter={false} 
-            totalItems={data?.runs?.length || 0} 
+            totalItems={tableData.length}
             dataFetchingStatus={false} 
             suffix="recent-logs-table" 
           />

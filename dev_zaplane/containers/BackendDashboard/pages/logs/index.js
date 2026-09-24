@@ -39,7 +39,7 @@ const Logs = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const goEditWorkflow = workflowId => {
-    if (!workflowId) return;
+    if (!workflowId) {return;}
     navigate(`${route_path}admin.php?page=zaplane-workflows&action=edit&id=${workflowId}`);
   };
   const [activeRunId, setActiveRunId] = useState(null);
@@ -54,7 +54,7 @@ const Logs = () => {
 
   const handleClearAudit = async () => {
     // eslint-disable-next-line no-alert
-    if (!window.confirm(__("Clear the AI access log? This cannot be undone.", "zaplane"))) return;
+    if (!window.confirm(__("Clear the AI access log? This cannot be undone.", "zaplane"))) {return;}
     await API.delete(`${namespace}mcp/audit`);
     setAuditVersion(v => v + 1);
   };
@@ -111,7 +111,7 @@ const Logs = () => {
     }
   };
   const handleDeleteRow = async row => {
-    if (!row?.id) return;
+    if (!row?.id) {return;}
     // eslint-disable-next-line no-alert
     if (!window.confirm(__("Are you sure you want to delete this log?", "zaplane"))) {
       return;
@@ -122,7 +122,7 @@ const Logs = () => {
     }
   };
   const handleDeleteSelected = async () => {
-    if (!selection.length) return;
+    if (!selection.length) {return;}
     await Promise.all(
       selection.map(row => row?.id).filter(Boolean).map(id => dispatch(deleteRun(id)))
     );
@@ -145,7 +145,7 @@ const Logs = () => {
     name: <span>
       {__("Action", "zaplane")}
     </span>,
-    cell: row => <ZAPLabel label={__(formatLabel(row?.node?.event), 'zaplane')} type={"simple"} />,
+    cell: row => <ZAPLabel label={formatLabel(row?.node?.event)} type={"simple"} />,
     textAlign: "start"
   }, {
     name: <span>
@@ -167,7 +167,7 @@ const Logs = () => {
       return <div className="flex flex-col">
         <ZAPLabel label={date} type={"simple"} />
         <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
-          {__(time, 'zaplane')}
+          {time}
         </span>
       </div>;
     },
@@ -175,7 +175,7 @@ const Logs = () => {
     textAlign: "center"
   }, {
     name: <span>
-      {__("DURATION", "zaplane")}
+      {__("Duration", "zaplane")}
     </span>,
     cell: row => <ZAPLabel label={getDuration(row.started_at, row.finished_at)} type={"simple"} />
     // columnWidth: "150px",
@@ -191,7 +191,12 @@ const Logs = () => {
     </span>,
     cell: row => {
       const style = statusStyle(row.status);
-      const label = row.status === 'completed' ? __("Success", "zaplane") : row.status === 'failed' ? __("Failed", "zaplane") : formatLabel(row.status);
+      let label = formatLabel(row.status);
+      if (row.status === 'completed') {
+        label = __("Success", "zaplane");
+      } else if (row.status === 'failed') {
+        label = __("Failed", "zaplane");
+      }
       return <div className="flex justify-center">
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium capitalize" style={style}>
           <span className="w-[6px] h-[6px] rounded-full" style={{ background: style.color }} />
