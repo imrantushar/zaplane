@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-23T15:32:44+00:00\n"
+"POT-Creation-Date: 2026-09-24T10:01:23+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: zaplane\n"
@@ -657,7 +657,7 @@ msgstr ""
 msgid "AI access"
 msgstr ""
 
-#: integrations/ablocks.php:162
+#: integrations/ablocks.php:170
 msgid "Untitled form"
 msgstr ""
 
@@ -693,21 +693,27 @@ msgstr ""
 msgid "User not found."
 msgstr ""
 
+#. translators: %s: GemBooking add-on name.
+#: integrations/gembooking.php:65
+#, php-format
+msgid "Requires the GemBooking %s add-on to be active."
+msgstr ""
+
 #: integrations/human-approval.php:217
 msgid "Approval required"
 msgstr ""
 
 #. translators: %s: StoreEngine addon name.
-#: integrations/storeengine.php:45
+#: integrations/storeengine.php:53
 #, php-format
 msgid "Requires the StoreEngine %s addon to be active."
 msgstr ""
 
-#: integrations/suremembers.php:254
+#: integrations/suremembers.php:262
 msgid "User email and group are required."
 msgstr ""
 
-#: integrations/suremembers.php:260
+#: integrations/suremembers.php:268
 msgid "User not found with the provided email."
 msgstr ""
 
@@ -795,15 +801,15 @@ msgstr ""
 msgid "Trello: card_id and item_id are required."
 msgstr ""
 
-#: integrations/typeform.php:241
+#: integrations/typeform.php:249
 msgid "Typeform access_token is required."
 msgstr ""
 
-#: integrations/typeform.php:251
+#: integrations/typeform.php:259
 msgid "Typeform: form title is required."
 msgstr ""
 
-#: integrations/typeform.php:283
+#: integrations/typeform.php:291
 msgid "Typeform: form_id is required to delete a form."
 msgstr ""
 
@@ -943,8 +949,8 @@ msgstr ""
 
 #: dev_zaplane/components/LogDetails/index.js:36
 #: dev_zaplane/components/LogDetails/index.js:39
-#: dev_zaplane/components/SearchableDrawerList/DrawerItemList/DrawerItemButton.js:19
-#: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:32
+#: dev_zaplane/components/SearchableDrawerList/DrawerItemList/DrawerItemButton.js:26
+#: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:36
 #: dev_zaplane/components/ZapMenu/index.js:60
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:216
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:229
@@ -1296,19 +1302,24 @@ msgstr ""
 msgid "Create Recipe"
 msgstr ""
 
-#: dev_zaplane/components/SearchableDrawerList/DrawerItemList/DrawerItemButton.js:27
-#: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:39
+#: dev_zaplane/components/SearchableDrawerList/DrawerItemList/DrawerItemButton.js:36
+#: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:46
+msgid "View docs"
+msgstr ""
+
+#: dev_zaplane/components/SearchableDrawerList/DrawerItemList/DrawerItemButton.js:46
+#: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:55
 #: dev_zaplane/containers/BackendDashboard/pages/logs/AiAccessLog.js:73
 msgid "Tool"
 msgstr ""
 
-#: dev_zaplane/components/SearchableDrawerList/DrawerItemList/DrawerItemButton.js:27
-#: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:40
+#: dev_zaplane/components/SearchableDrawerList/DrawerItemList/DrawerItemButton.js:46
+#: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:56
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:244
 msgid "App"
 msgstr ""
 
-#: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:13
+#: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:15
 msgid "No results found"
 msgstr ""
 
@@ -1814,7 +1825,7 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:84
 #: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:226
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:225
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:253
 msgid "Saving…"
 msgstr ""
 
@@ -2439,7 +2450,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:469
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:693
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:258
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:225
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:253
 msgid "Save"
 msgstr ""
 
@@ -3249,6 +3260,7 @@ msgid "Upload or select a file"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/CopyInput.js:35
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:80
 msgid "Copied to clipboard!"
 msgstr ""
 
@@ -3257,6 +3269,7 @@ msgid "Copy failed. Please select and copy the URL manually."
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/CopyInput.js:68
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:228
 msgid "Copy to clipboard"
 msgstr ""
 
@@ -3289,67 +3302,75 @@ msgstr ""
 msgid "Select Connection"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:20
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:29
 msgid "Trigger Type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:21
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:30
 msgid "Action Type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:29
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:38
 msgid "Select Action Type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:79
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:53
+msgid "View trigger docs"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:54
+msgid "View action docs"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:97
 msgid "Webhook settings saved."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:89
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:107
 msgid "Could not save the webhook settings."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:109
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:127
 msgid "Paste this URL into Mailchimp → Audience → Audience settings → Webhooks so it can deliver events here. This trigger cannot fire until the webhook is saved."
 msgstr ""
 
 #. translators: %s: integration name, e.g. Slack.
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:115
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:133
 #, js-format
 msgid "Paste this into %s so it delivers events here. This trigger cannot fire until it does."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:130
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:148
 msgid "Webhook Setup"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:142
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:160
 msgid "Hide"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:142
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:160
 msgid "Show"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:150
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:168
 msgid "Callback URL"
 msgstr ""
 
 #. translators: %s: comma-separated list of setting names.
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:159
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:177
 #, js-format
 msgid "Set %s below before registering the URL — until then the provider's verification is rejected and deliveries are not authenticated."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:177
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:195
 msgid "saved"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:188
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:206
 msgid "••••••••  (leave blank to keep)"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:198
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:216
 msgid "Generate a value"
 msgstr ""
 
