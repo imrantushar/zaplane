@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-24T11:04:26+00:00\n"
+"POT-Creation-Date: 2026-09-24T13:31:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: zaplane\n"
@@ -290,7 +290,6 @@ msgstr ""
 #: includes/authoring/trigger-advisor.php:219
 #: includes/authoring/trigger-advisor.php:366
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:182
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:62
 #, php-format,js-format
 msgid "Trigger %d"
 msgstr ""
@@ -653,7 +652,7 @@ msgid "Let Claude, Cursor or any Model Context Protocol client read your automat
 msgstr ""
 
 #: includes/settings.php:175
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:263
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:268
 msgid "AI access"
 msgstr ""
 
@@ -898,13 +897,11 @@ msgstr ""
 
 #: dev_zaplane/components/ListTable/index.js:24
 #: dev_zaplane/components/Table/index.js:15
-#: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:99
 msgid "Please, create data to see the available list here."
 msgstr ""
 
 #: dev_zaplane/components/ListTable/index.js:212
 #: dev_zaplane/components/Table/index.js:54
-#: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:98
 msgid "No Data Available!!!"
 msgstr ""
 
@@ -1355,7 +1352,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/CustomAppList.js:99
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:20
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:182
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:205
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:210
 msgid "Actions"
 msgstr ""
 
@@ -1521,7 +1518,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/email-templates/EmailTemplateCard.js:33
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/FolderCard.js:59
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:378
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:223
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:228
 #: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:58
 msgid "Delete"
 msgstr ""
@@ -1529,7 +1526,7 @@ msgstr ""
 #: dev_zaplane/components/WorkflowTable/index.js:216
 #: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:159
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:18
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:209
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:214
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:86
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:61
 msgid "Details"
@@ -2038,6 +2035,7 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/TriggersEditor.js:26
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:60
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:62
 msgid "Trigger"
 msgstr ""
 
@@ -2131,22 +2129,30 @@ msgstr ""
 msgid "STATUS"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:70
+#: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:73
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:88
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:194
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:196
 msgid "Success"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:70
+#: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:73
 #: dev_zaplane/containers/BackendDashboard/pages/logs/AiAccessLog.js:18
 #: dev_zaplane/containers/BackendDashboard/pages/logs/AiAccessLog.js:25
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:91
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:194
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:198
 msgid "Failed"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:109
-msgid "Recently Created Flow"
+#: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:101
+msgid "No workflow runs yet"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:102
+msgid "Run a workflow to see its recent activity here."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:112
+msgid "Recent Workflow Runs"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/dashboard/TotalExecutions.js:14
@@ -2652,35 +2658,37 @@ msgid "Workflow"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:154
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:217
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:222
 msgid "Edit workflow"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:178
-msgid "DURATION"
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:72
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:51
+msgid "Duration"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:184
 msgid "Node Count"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:243
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:248
 msgid "Clear logs"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:252
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:257
 msgid "Clear activity"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:262
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:267
 msgid "Workflow runs"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:299
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:304
 msgid "No logs found"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:320
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:325
 msgid "Run Details"
 msgstr ""
 
@@ -3504,7 +3512,7 @@ msgid "Stop"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:174
-msgid "Listening..."
+msgid "Listening…"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:193
@@ -3532,19 +3540,13 @@ msgstr ""
 msgid "Run ID"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:72
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:51
-msgid "Duration"
-msgstr ""
-
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:78
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:56
 msgid "Node Run"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:87
-#, js-format
-msgid "View details for run %s"
+msgid "View details"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:95
@@ -3553,8 +3555,7 @@ msgid "Re-Try"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:96
-#, js-format
-msgid "Retry run %s"
+msgid "Retry run"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:115
