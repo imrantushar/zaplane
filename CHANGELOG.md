@@ -15,6 +15,12 @@ All notable changes to Zaplane are documented here. This project adheres to
 - Cleaned up workflow UI issues including unused code, missing labels, keyboard access and related lint-level problems.
 - Reduced the `react-datepicker` build warning by switching to a stable CommonJS entry.
 - Rebuilt the production frontend assets successfully and verified the build remains healthy.
+- Fixed the Import button icon issue in the workflow UI.
+- Fixed pagination issues across the Zaplane admin interface.
+- Fixed Mailchimp trigger and action issues for more reliable workflow execution.
+- Fixed Custom App REST API issues affecting REST API requests and responses.
+- Fixed FunnelKit trigger and action issues.
+- Fixed SureMark trigger and action issues.
 
 ### Changed
 - Updated the shared modal and drawer overflow handling to preserve layout stability when a panel opens.
@@ -26,6 +32,9 @@ All notable changes to Zaplane are documented here. This project adheres to
 - Added automation support for community members, profiles, spaces, posts, comments, reactions, polls, and events.
 - Added ZenCommunity Pro support for private messaging, group messaging, and support ticket workflows.
 - Added dynamic field selectors for spaces, users, roles, events, posts, and ticket settings.
+- Added cURL support to Custom Apps, allowing users to create Custom App requests directly from cURL configurations.
+- Added a new GemBooking integration with trigger and action support.
+- Added new Telegram triggers and actions for Telegram-based workflow automation.
 
 ### Improved
 - Improved permission handling for member-triggered, admin-owned workflows.
