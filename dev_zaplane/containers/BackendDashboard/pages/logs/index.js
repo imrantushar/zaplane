@@ -11,12 +11,13 @@ import LogDetails from "@ZAPComponents/LogDetails";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
-import { formatDateTime, formatLabel, getDuration, plugin_root_url, route_path } from "@ZAPUtils/helper";
+import { API, formatDateTime, formatLabel, getDuration, namespace, plugin_root_url, route_path } from "@ZAPUtils/helper";
 import { isAbsoluteIcon, resolveIconFilename } from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
 import { statusStyle } from "../workflows/helper";
 import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import PageLayout from "@ZAPComponents/PageLayout";
+import AiAccessLog from "./AiAccessLog";
 
 const FALLBACK_APP_ICON = `${plugin_root_url}assets/images/button.svg`;
 
@@ -45,10 +46,21 @@ const Logs = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selection, setSelection] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
+  // Workflow runs and AI client activity are both history, and both belong on
+  // the page people already open to find out what happened.
+  const [view, setView] = useState('runs');
+  // Bumped after clearing, so the child reloads without owning the button.
+  const [auditVersion, setAuditVersion] = useState(0);
+
+  const handleClearAudit = async () => {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(__("Clear the AI access log? This cannot be undone.", "zaplane"))) return;
+    await API.delete(`${namespace}mcp/audit`);
+    setAuditVersion(v => v + 1);
+  };
   const {
     data = [],
     currentPage,
-    perPage,
     itemPerPage,
     totalItems
   } = useSelector(state => state.logs || {});
@@ -67,7 +79,7 @@ const Logs = () => {
   }, []);
   const handleStatusFilter = status => {
     setStatusFilter(status);
-    handleRefresh(1, perPage, status);
+    handleRefresh(1, itemPerPage, status);
   };
   const statusFilterOptions = [{
     label: __("All statuses", "zaplane"),
@@ -83,10 +95,10 @@ const Logs = () => {
     value: "running"
   }];
   const handlePageChange = newPage => {
-    handleRefresh(newPage, perPage);
+    handleRefresh(newPage, itemPerPage);
   };
   const handlePerPageChange = itemsPerPage => {
-    handleRefresh(currentPage, itemsPerPage);
+    handleRefresh(1, itemsPerPage);
   };
   const handleClearLogs = async () => {
     // eslint-disable-next-line no-alert
@@ -95,7 +107,7 @@ const Logs = () => {
     }
     const result = await dispatch(clearRuns());
     if (!result?.error) {
-      handleRefresh(1, perPage);
+      handleRefresh(1, itemPerPage);
     }
   };
   const handleDeleteRow = async row => {
@@ -106,7 +118,7 @@ const Logs = () => {
     }
     const result = await dispatch(deleteRun(row.id));
     if (!result?.error) {
-      handleRefresh(currentPage, perPage);
+      handleRefresh(currentPage, itemPerPage);
     }
   };
   const handleDeleteSelected = async () => {
@@ -115,7 +127,7 @@ const Logs = () => {
       selection.map(row => row?.id).filter(Boolean).map(id => dispatch(deleteRun(id)))
     );
     setSelection([]);
-    handleRefresh(currentPage, perPage);
+    handleRefresh(currentPage, itemPerPage);
   };
   const columns = [{
     name: <span>
@@ -226,15 +238,43 @@ const Logs = () => {
       title="Logs" 
       heading="Logs" 
       actions={
-        <Button 
-          label={__("Clear logs", "zaplane")} 
-          size="sm" 
-          suffix=" p-[8px]" 
-          preset="transparent"
-          border='gray'
-          onClick={handleClearLogs} 
-          isDisabled={loading || data.length === 0} />
+        view === 'runs' ? (
+          <Button 
+            label={__("Clear logs", "zaplane")} 
+            size="sm" 
+            suffix=" p-[8px]" 
+            preset="transparent"
+            border='gray'
+            onClick={handleClearLogs} 
+            isDisabled={loading || data.length === 0} />
+        ) : (
+          <Button
+            label={__("Clear activity", "zaplane")}
+            size="sm"
+            suffix=" p-[8px]"
+            preset="transparent"
+            border='gray'
+            onClick={handleClearAudit} />
+        )
       }>
+        <div className="zaplane-table-sub-header-tabs mb-4">
+          {[
+            { value: 'runs', label: __("Workflow runs", "zaplane") },
+            { value: 'ai', label: __("AI access", "zaplane") },
+          ].map(opt => (
+            <span
+              key={opt.value}
+              role="presentation"
+              className={`tab ${opt.value === view ? 'is-active' : ''}`}
+              onClick={() => setView(opt.value)}
+            >
+              {opt.label}
+            </span>
+          ))}
+        </div>
+
+        {view === 'ai' ? <AiAccessLog reloadKey={auditVersion} /> : (
+        <>
         <ListTable
           columns={columns}
           isRowSelectable={true}
@@ -255,19 +295,20 @@ const Logs = () => {
             </div>
           }
           showColumnFilter={false}
-          showPagination={totalItems > itemPerPage}
+          showPagination={totalItems > 0}
           noDataText={__("No logs found", "zaplane")} 
           totalItems={totalItems} 
           dataFetchingStatus={loading} 
           suffix="logs-table" 
           currentPageNumber={currentPage} 
-          perPage={perPage} 
           rowsPerPage={itemPerPage} 
           onChangePage={handlePageChange}
           onChangeItemsPerPage={handlePerPageChange}
           getSelectRowValue={rows => setSelection(rows || [])}
         />
         <ZAPActionBar selection={selection} onDelete={handleDeleteSelected} onClose={() => setSelection([])} />
+        </>
+        )}
         <ZAPDrawer
           open={drawerOpen} 
           arrowClose 

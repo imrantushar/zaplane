@@ -3,9 +3,6 @@ import { __ } from '@wordpress/i18n';
 
 import {
 	API,
-	current_user_can,
-	current_user_id,
-	is_admin,
 	handleSliceSuccess,
 	handleSliceError,
 	namespace,
@@ -40,11 +37,14 @@ export const getSingleRun = createAsyncThunk(
 	'zaplane/getSingleRun',
 	async (runId, thunkAPI) => {
 		try {
+			// Run it again from the same trigger with the same data. This used to
+			// post the run's id to the node-run retry endpoint, which retried
+			// whichever node run happened to have that id.
 			const res = await API.post(
-				namespace + `node-runs/${parseInt(runId)}/retry`
+				namespace + `runs/${parseInt(runId)}/replay`
 			);
 
-			handleSliceSuccess(thunkAPI, __('Run fetched successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI, __('Run started again.', 'zaplane'));
 
 			return res.data;
 

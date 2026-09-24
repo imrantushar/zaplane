@@ -7,6 +7,7 @@ use WP_Error;
 use Zaplane\Framework\Classes\Container;
 use Zaplane\Framework\Classes\Expression;
 use Zaplane\Framework\Classes\GlobalContext;
+use Zaplane\Framework\Classes\TriggerNodes;
 use Zaplane\Framework\Core\Automation;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
@@ -390,14 +391,10 @@ class RunController extends WP_REST_Controller {
 		}
 
 		$graph = $version->getGraph();
-		$trigger = null;
-
-		foreach ( $graph['nodes'] as $node ) {
-			if ( 'trigger' === $node['type'] ) {
-				$trigger = $node;
-				break;
-			}
-		}
+		// For a workflow with several triggers, the one to start from. Without it
+		// the run starts from the Manual trigger, or else the first trigger.
+		$nodeId  = isset( $req['node_id'] ) && '' !== (string) $req['node_id'] ? (string) $req['node_id'] : null;
+		$trigger = TriggerNodes::resolve( $graph, $nodeId );
 
 		if ( ! $trigger ) {
 			return new WP_Error( 'no_trigger', 'No trigger node found', [ 'status' => 400 ] );
@@ -485,20 +482,51 @@ class RunController extends WP_REST_Controller {
 			}
 		}
 
-		$testContext = [];
+		$testContext   = [];
+		$latestTrigger = null;
+		$latestRunId   = 0;
+		$versionGraph  = $version->getGraph();
+		$upstream      = TriggerNodes::upstream_ids( $versionGraph, (string) $targetNode['id'] );
+
 		foreach ( Run::latestTestNodeRunsByWorkflow( $version->workflow_id ) as $nodeKey => $prevNodeRun ) {
 			$out = $prevNodeRun->getOutput();
+
+			// Match Automation::buildNodeContext()'s unwrapping — a real run only
+			// ever exposes a node's inner ['data'=>..] payload to expressions, so
+			// a Test Action must resolve the same {{node.field}} paths, not the
+			// raw ['port'=>..,'data'=>..] the integration returned.
+			if ( is_array( $out ) && isset( $out['port'], $out['data'] ) ) {
+				$out = $out['data'];
+			}
+
 			$testContext[ (string) $nodeKey ] = is_array( $out ) ? $out : [ 'value' => $out ];
+
+			// Of the triggers leading here, the one tested most recently stands in
+			// for "whichever fired", so {{trigger.…}} resolves in a test as well.
+			if ( in_array( (string) $nodeKey, $upstream, true ) && (int) $prevNodeRun->id > $latestRunId ) {
+				$latestTrigger = (string) $nodeKey;
+				$latestRunId   = (int) $prevNodeRun->id;
+			}
+		}
+
+		if ( null !== $latestTrigger ) {
+			$testContext = TriggerNodes::with_aliases( $testContext, $versionGraph, $latestTrigger );
 		}
 
 		// Only inject global context groups that this node's config actually references.
 		// Test execution: $run = null so GlobalContext falls back to wp_get_current_user() (admin).
+		// A union, not array_merge(): outputs are keyed by numeric node id, and
+		// array_merge() renumbers numeric keys.
 		$prefixes = GlobalContext::detect_prefixes( $targetNode['data']['config'] ?? [] );
 		if ( $prefixes ) {
-			$testContext = array_merge( $testContext, GlobalContext::build( $prefixes ) );
+			$testContext = $testContext + GlobalContext::build( $prefixes );
 		}
 
 		$effectiveInput = $input + $testContext;
+
+		if ( array_key_exists( 'trigger', $testContext ) ) {
+			$effectiveInput['trigger'] = $testContext['trigger'];
+		}
 
 		try {
 			if ( 'trigger' === $targetNode['type'] ) {
@@ -512,7 +540,7 @@ class RunController extends WP_REST_Controller {
 				// $input is the simulated hook args (positional array from the frontend).
 				// resolve_trigger() returns the structured payload or false when filtered.
 				$resolved = $integration::resolve_trigger( $targetNode['data'], array_values( $input ) );
-				$output   = ( false !== $resolved ) ? $resolved : [];
+				$output   = ( false !== $resolved ) ? TriggerNodes::apply_field_map( $targetNode, (array) $resolved ) : [];
 			} else {
 				$integration = $this->container->get( 'integrations' )->get( strtolower( $targetNode['data']['app'] ) );
 

@@ -95,19 +95,108 @@ class MailchimpTest extends IntegrationTestCase {
 		$this->assertNull( Mailchimp::parse_webhook_event( $request ) );
 	}
 
+	public function test_email_changed_webhook_resolves_the_selected_trigger(): void {
+		$request = new WP_REST_Request( 'POST', '/zaplane/v1/incoming/mailchimp' );
+		$request->set_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				[
+					'type' => 'upemail',
+					'data' => [
+						'list_id'   => 'a6b5da1054',
+						'new_id'    => 'newid789',
+						'new_email' => 'jane.new@example.com',
+						'old_email' => 'jane@example.com',
+					],
+				]
+			)
+		);
+
+		$parsed = Mailchimp::parse_webhook_event( $request );
+
+		$this->assertSame( 'email_changed', $parsed['event'] );
+		$this->assertSame( 'jane@example.com', $parsed['payload']['mailchimp_old_email'] );
+		$this->assertSame( 'jane.new@example.com', $parsed['payload']['mailchimp_new_email'] );
+		$this->assertSame( 'newid789', $parsed['payload']['mailchimp_member_id'] );
+		$this->assertIsArray(
+			Mailchimp::resolve_trigger(
+				$this->makeTriggerNode( 'email_changed' ),
+				[ $parsed['payload'] ]
+			)
+		);
+	}
+
+	public function test_campaign_webhook_resolves_without_an_audience_filter(): void {
+		$request = new WP_REST_Request( 'POST', '/zaplane/v1/incoming/mailchimp' );
+		$request->set_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				[
+					'type' => 'campaign',
+					'data' => [
+						'id'     => 'campaign_abc123',
+						'subject' => 'Our July Newsletter',
+						'status' => 'sent',
+					],
+				]
+			)
+		);
+
+		$parsed = Mailchimp::parse_webhook_event( $request );
+
+		$this->assertSame( 'campaign_sent', $parsed['event'] );
+		$this->assertSame( 'campaign_abc123', $parsed['payload']['mailchimp_campaign_id'] );
+		$this->assertIsArray(
+			Mailchimp::resolve_trigger(
+				$this->makeTriggerNode( 'campaign_sent' ),
+				[ $parsed['payload'] ]
+			)
+		);
+	}
+
+	public function test_all_mailchimp_webhook_types_resolve_to_triggers(): void {
+		$types = [
+			'subscribe'   => 'subscribed',
+			'unsubscribe' => 'unsubscribed',
+			'profile'     => 'profile_updated',
+			'cleaned'     => 'cleaned',
+			'upemail'     => 'email_changed',
+			'campaign'    => 'campaign_sent',
+		];
+
+		foreach ( $types as $type => $event ) {
+			$request = new WP_REST_Request( 'POST', '/zaplane/v1/incoming/mailchimp' );
+			$request->set_body( http_build_query( [
+				'type' => $type,
+				'data' => [ 'list_id' => 'a6b5da1054' ],
+			] ) );
+
+			$parsed = Mailchimp::parse_webhook_event( $request );
+
+			$this->assertSame( $event, $parsed['event'], $type );
+			$this->assertIsArray(
+				Mailchimp::resolve_trigger(
+					$this->makeTriggerNode( $event ),
+					[ $parsed['payload'] ]
+				)
+			);
+		}
+	}
+
 	// ========== TRIGGER ==========
 
-	public function test_trigger_applies_the_audience_filter(): void {
+	public function test_trigger_does_not_require_an_audience_filter(): void {
 		$payload = [
 			'mailchimp_list_id' => 'a6b5da1054',
 			'mailchimp_email'   => 'jane@example.com',
 		];
 
-		$match = $this->makeTriggerNode( 'subscribed', [ 'list_id' => 'a6b5da1054' ] );
-		$this->assertIsArray( Mailchimp::resolve_trigger( $match, [ $payload ] ) );
-
-		$other = $this->makeTriggerNode( 'subscribed', [ 'list_id' => 'zzzzzzzzzz' ] );
-		$this->assertFalse( Mailchimp::resolve_trigger( $other, [ $payload ] ) );
+		$this->assertIsArray(
+			Mailchimp::resolve_trigger(
+				$this->makeTriggerNode( 'subscribed' ),
+				[ $payload ]
+			)
+		);
 	}
 
 	public function test_trigger_rejects_empty_payload(): void {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PHPUnit">
+    <option name="directories">
+      <list>
+        <option value="$PROJECT_DIR$/tests/Integrations" />
+        <option value="$PROJECT_DIR$/tests/Authoring" />
+        <option value="$PROJECT_DIR$/tests/Mcp" />
+        <option value="$PROJECT_DIR$/tests/Features" />
+        <option value="$PROJECT_DIR$/tests/Utils" />
+        <option value="$PROJECT_DIR$/tests/Testing" />
+      </list>
+    </option>
+  </component>
+</project>

@@ -1,8 +1,7 @@
 {
   "name": "zaplane",
-  "version": "1.2.0",
-  "description": "A Simple WordPress Automation Plugin",
-  "main": "index.js",
+  "version": "1.3.2",
+  "description": "No-code workflow automation for WordPress.",
   "scripts": {
     "build": "wp-scripts build",
     "dist": "node build-tools/build.mjs",
@@ -23,16 +22,9 @@
     "test:unit": "wp-scripts test-unit-js",
     "generate-icons": "fantasticon --normalize"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/imrantushar/quizpress.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/imrantushar/quizpress/issues"
-  },
-  "homepage": "https://github.com/imrantushar/quizpress#readme",
+  "author": "Kodezen",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://zaplane.app/",
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@dnd-kit/core": "^6.3.1",

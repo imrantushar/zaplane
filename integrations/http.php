@@ -3,6 +3,10 @@ namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class Http extends IntegrationBase {
 
 
@@ -262,7 +266,7 @@ class Http extends IntegrationBase {
 			$headers['Content-Type'] = 'application/json';
 		}
 
-		$response = wp_remote_request($url, [
+		$response = \Zaplane\HttpGuard::request( $url, [
 			'method'  => $c['method'] ?? 'GET',
 			'headers' => $headers,
 			'body'    => $body,

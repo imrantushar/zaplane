@@ -242,9 +242,10 @@ class HumanApproval extends IntegrationBase {
 			if ( $allow_reject ) {
 				$text .= "\n" . $reject_label . ': ' . $reject_url;
 			}
-			wp_remote_post(
+			\Zaplane\HttpGuard::request(
 				$slack,
 				[
+					'method'  => 'POST',
 					'headers' => [ 'Content-Type' => 'application/json' ],
 					'body'    => wp_json_encode( [ 'text' => $text ] ),
 					'timeout' => 15,

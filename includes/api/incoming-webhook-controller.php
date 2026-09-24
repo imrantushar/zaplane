@@ -5,7 +5,9 @@ use WP_REST_Controller;
 use WP_REST_Server;
 use WP_Error;
 use Zaplane\Framework\Classes\Container;
+use Zaplane\Framework\Classes\Query;
 use Zaplane\Framework\Core\IntegrationLoader;
+use Zaplane\Framework\Classes\TriggerNodes;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,6 +25,16 @@ class IncomingWebhookController extends WP_REST_Controller {
 	}
 
 	public function register_routes(): void {
+		// The four routes below are reached by another service, not by a person
+		// signed in to this site: Slack delivering an event, Meta verifying a
+		// callback URL, whatever the site owner pointed at a Catch Webhook
+		// trigger. None of them can present a WordPress capability or a nonce, so
+		// none can be answered with current_user_can(). They are public in the
+		// sense the handbook means — and what stands in for a capability is a
+		// per-request check in the permission callback itself: the provider's own
+		// signature over the body, or the shared secret the owner set on that
+		// trigger. A request that fails it is refused before the callback runs,
+		// and nothing about the site is disclosed either way.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<slug>[a-z0-9_-]+)',
@@ -30,13 +42,13 @@ class IncomingWebhookController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'handle_incoming' ],
-					'permission_callback' => '__return_true',
+					'permission_callback' => [ $this, 'incoming_signature_check' ],
 				],
 				[
 					// Meta (WhatsApp/Messenger) subscription verification handshake.
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'verify_subscription' ],
-					'permission_callback' => '__return_true',
+					'permission_callback' => [ $this, 'webhook_integration_check' ],
 				],
 				'args' => [
 					'slug' => [
@@ -91,7 +103,21 @@ class IncomingWebhookController extends WP_REST_Controller {
 				[
 					'methods'             => [ WP_REST_Server::CREATABLE, WP_REST_Server::READABLE ],
 					'callback'            => [ $this, 'handle_workflow_hook' ],
-					'permission_callback' => '__return_true',
+					'permission_callback' => [ $this, 'workflow_hook_check' ],
+				],
+			]
+		);
+
+		// One Catch Webhook trigger, for a workflow that can have several:
+		// /wp-json/zaplane/v1/hook/<workflow_id>/<trigger_node_id>
+		register_rest_route(
+			$this->namespace,
+			'/hook/(?P<id>\d+)/(?P<node>\d+)',
+			[
+				[
+					'methods'             => [ WP_REST_Server::CREATABLE, WP_REST_Server::READABLE ],
+					'callback'            => [ $this, 'handle_workflow_hook' ],
+					'permission_callback' => [ $this, 'workflow_hook_check' ],
 				],
 			]
 		);
@@ -150,6 +176,7 @@ class IncomingWebhookController extends WP_REST_Controller {
 		$connection_id = ( null !== $connection_id && '' !== $connection_id ) ? (int) $connection_id : null;
 
 		$integration = IntegrationLoader::get( $slug );
+
 		if ( ! $integration ) {
 			return new WP_Error(
 				'not_found',
@@ -166,6 +193,29 @@ class IncomingWebhookController extends WP_REST_Controller {
 			);
 		}
 
+		return true;
+	}
+
+	/**
+	 * What takes the place of a capability on a delivery from a provider.
+	 *
+	 * Each integration verifies the signature its own provider sends — Slack's
+	 * HMAC over the timestamp and body, Meta's app-secret signature, the shared
+	 * secret for those with none of their own. Checking it here rather than in
+	 * the handler means an unsigned request never reaches the code that would
+	 * dispatch a workflow.
+	 *
+	 * @param \WP_REST_Request $request The incoming request.
+	 * @return true|WP_Error
+	 */
+	public function incoming_signature_check( \WP_REST_Request $request ) {
+		$allowed = $this->webhook_integration_check( $request );
+		if ( is_wp_error( $allowed ) ) {
+			return $allowed;
+		}
+
+		$integration = IntegrationLoader::get( $request->get_param( 'slug' ) );
+
 		if ( ! $integration::verify_webhook_signature( $request ) ) {
 			return new WP_Error(
 				'invalid_signature',
@@ -173,6 +223,43 @@ class IncomingWebhookController extends WP_REST_Controller {
 				[ 'status' => 401 ]
 			);
 		}
+
+		return true;
+	}
+
+	/**
+	 * What takes the place of a capability on a Catch Webhook URL.
+	 *
+	 * The workflow must exist, be active, and — when its trigger carries a shared
+	 * secret — the request must present that secret. The URL alone is not treated
+	 * as the credential when the owner has set one.
+	 *
+	 * @param \WP_REST_Request $request The incoming request.
+	 * @return true|WP_Error
+	 */
+	public function workflow_hook_check( \WP_REST_Request $request ) {
+		$trigger = $this->resolve_hook_trigger( $request );
+
+		if ( is_wp_error( $trigger ) ) {
+			return $trigger;
+		}
+
+		$secret = (string) ( $trigger['data']['config']['secret'] ?? '' );
+
+		if ( '' !== $secret ) {
+			$provided = (string) ( $request->get_param( 'secret' ) ?: $request->get_header( 'x_zaplane_secret' ) );
+
+			if ( ! hash_equals( $secret, $provided ) ) {
+				return new WP_Error( 'forbidden', 'Invalid or missing secret.', [ 'status' => 403 ] );
+			}
+		}
+
+		return true;
+	}
+
+	public function handle_incoming( \WP_REST_Request $request ) {
+		$slug        = $request->get_param( 'slug' );
+		$integration = IntegrationLoader::get( $slug );
 
 		// Some providers verify the callback URL over this same POST endpoint and
 		// require their challenge echoed back verbatim (Slack's url_verification).
@@ -206,12 +293,12 @@ class IncomingWebhookController extends WP_REST_Controller {
 
 		$hook = $triggers[ $event ]['hook'];
 
-		// $connection_id is passed as a trailing hook arg (registered with
-		// accepted_args=99 in Automation::dispatch_active_triggers()) so an
-		// integration's resolve_trigger() can filter out trigger nodes
-		// configured for a different connection — critical once a site has
-		// more than one connection of the same integration (e.g. two Telegram
-		// bots), so one bot's update can't fire another bot's workflow.
+		// REST requests can reach this endpoint before the normal init hook has
+		// registered the active workflow listeners. Refresh the map and register
+		// them here so provider webhooks cannot be accepted without starting runs.
+		Query::flush_trigger_map();
+		$this->container->get( 'automation' )->dispatch_active_triggers();
+
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Dynamic hook dispatched from integration config.
 		do_action( $hook, $payload, $connection_id );
 
@@ -272,32 +359,58 @@ class IncomingWebhookController extends WP_REST_Controller {
 	}
 
 	/**
-	 * Echo a provider handshake response verbatim and stop.
+	 * Echo a provider handshake response and stop.
 	 *
 	 * Providers compare the body byte-for-byte against the challenge they sent,
-	 * so it must not go through WP's REST JSON envelope.
+	 * so it must not go through WP's REST JSON envelope and cannot be entity
+	 * encoded. Instead the body is reduced to the characters a challenge is made
+	 * of — Meta sends digits, Slack a random alphanumeric string — which leaves
+	 * nothing that could be read as markup, and it is then escaped anyway and
+	 * served as text/plain with nosniff, so no browser will try.
 	 */
 	private function send_raw( string $body, string $content_type = 'text/plain' ): void {
+		$content_type = 'application/json' === $content_type ? 'application/json' : 'text/plain';
+		$body         = (string) preg_replace( '/[^A-Za-z0-9._~:-]/', '', $body );
+
 		if ( ! headers_sent() ) {
 			header( 'Content-Type: ' . $content_type . '; charset=utf-8' );
+			header( 'X-Content-Type-Options: nosniff' );
 			header( 'Cache-Control: no-store' );
 			status_header( 200 );
 		}
-		echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Verbatim echo required by the provider handshake.
+
+		echo esc_html( $body );
 		exit;
 	}
 
 	/**
-	 * Generic catch-all webhook for a single workflow. Verifies the workflow is
-	 * active and uses the Webhook trigger, checks an optional secret, then runs
-	 * it with the request payload (JSON body + query params).
+	 * Generic catch-all webhook for a single workflow. Finds its Catch Webhook
+	 * trigger (the one in the URL, or the first one when the URL names none),
+	 * checks that trigger's optional secret, then runs the workflow from that
+	 * trigger with the request payload (JSON body + query params).
 	 */
-	public function handle_workflow_hook( \WP_REST_Request $request ) {
+	/**
+	 * The Catch Webhook trigger this URL addresses: the node named in the URL, or
+	 * the workflow's first one when the URL names none.
+	 *
+	 * Shared by the permission callback and the handler, so both answer from the
+	 * same workflow and the same trigger.
+	 *
+	 * @param \WP_REST_Request $request The incoming request.
+	 * @return array<string,mixed>|WP_Error
+	 */
+	private function resolve_hook_trigger( \WP_REST_Request $request ) {
 		$id       = (int) $request->get_param( 'id' );
 		$workflow = \Zaplane\Models\Workflow::find( $id );
 
 		if ( ! $workflow ) {
 			return new WP_Error( 'not_found', 'Workflow not found.', [ 'status' => 404 ] );
+		}
+
+		// A paused or draft workflow still has an active version, so that alone does
+		// not say its owner wants anyone able to start it from outside.
+		if ( ! $workflow->isActive() ) {
+			return new WP_Error( 'inactive', 'Workflow is not active.', [ 'status' => 403 ] );
 		}
 
 		$version = method_exists( $workflow, 'activeVersion' ) ? $workflow->activeVersion() : null;
@@ -306,25 +419,30 @@ class IncomingWebhookController extends WP_REST_Controller {
 		}
 
 		$graph   = $version->getGraph();
-		$trigger = null;
-		foreach ( $graph['nodes'] ?? [] as $n ) {
-			if ( ( $n['type'] ?? '' ) === 'trigger' ) {
-				$trigger = $n;
+		$hooks   = TriggerNodes::of_app( $graph, 'webhook' );
+		$node_id = (string) ( $request->get_param( 'node' ) ?? '' );
+		$trigger = '' === $node_id ? ( $hooks[0] ?? null ) : null;
+
+		foreach ( '' === $node_id ? [] : $hooks as $hook ) {
+			if ( (string) $hook['id'] === $node_id ) {
+				$trigger = $hook;
 				break;
 			}
 		}
 
-		if ( ! $trigger || ( $trigger['data']['app'] ?? '' ) !== 'webhook' ) {
+		if ( ! $trigger ) {
 			return new WP_Error( 'no_webhook', 'This workflow does not use the Webhook trigger.', [ 'status' => 400 ] );
 		}
 
-		// Optional shared secret.
-		$secret = (string) ( $trigger['data']['config']['secret'] ?? '' );
-		if ( '' !== $secret ) {
-			$provided = (string) ( $request->get_param( 'secret' ) ?: $request->get_header( 'x_zaplane_secret' ) );
-			if ( ! hash_equals( $secret, $provided ) ) {
-				return new WP_Error( 'forbidden', 'Invalid or missing secret.', [ 'status' => 403 ] );
-			}
+		return $trigger;
+	}
+
+	public function handle_workflow_hook( \WP_REST_Request $request ) {
+		$id      = (int) $request->get_param( 'id' );
+		$trigger = $this->resolve_hook_trigger( $request );
+
+		if ( is_wp_error( $trigger ) ) {
+			return $trigger;
 		}
 
 		// Build payload: JSON body merged over query params (minus secret).
@@ -334,14 +452,14 @@ class IncomingWebhookController extends WP_REST_Controller {
 			$body = is_array( $body ) ? $body : [];
 		}
 		$query = (array) $request->get_query_params();
-		unset( $query['secret'], $query['id'] );
+		unset( $query['secret'], $query['id'], $query['node'], $query['rest_route'] );
 		$payload = array_merge( $query, $body );
 
 		if ( ! function_exists( 'zaplane_run_workflow' ) ) {
 			return new WP_Error( 'engine', 'Run engine unavailable.', [ 'status' => 500 ] );
 		}
 
-		$run_id = zaplane_run_workflow( $id, $payload );
+		$run_id = zaplane_run_workflow( $id, $payload, (string) $trigger['id'] );
 
 		return rest_ensure_response( [
 			'received' => true,

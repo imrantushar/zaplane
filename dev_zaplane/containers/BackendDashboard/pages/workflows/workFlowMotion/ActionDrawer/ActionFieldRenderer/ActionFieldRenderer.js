@@ -6,7 +6,7 @@ import ZAPSelect from "@ZAPComponents/ZAPSelect";
 import ZAPDatePicker from "@ZAPComponents/ZAPDatePicker";
 import ZAPCheckbox from "@ZAPComponents/ZAPCheckbox";
 import ConditionGroupField from "../ConditionGroupField/ConditionGroupField";
-import RepeaterField from "../../actionDrawer/RepeaterField/RepeaterField";
+import RepeaterField from "../RepeaterField/RepeaterField";
 import './styles.scss'
 import { __ } from "@wordpress/i18n";
 import VariableEditor from "@ZAPComponents/VariableEditor/index.js";
@@ -28,6 +28,7 @@ const ActionFieldRenderer = ({
   loadingFields,
   fetchDynamicOptions,
   workFlow,
+  nodeId,
 }) => {
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -77,6 +78,14 @@ const ActionFieldRenderer = ({
           );
         }
         displayValue = displayValue.replace("{workflow_id}", workflowId);
+      }
+
+      // `{node_id}` is the trigger this field belongs to: each Catch Webhook
+      // trigger has its own URL.
+      if (typeof displayValue === "string" && displayValue.includes("{node_id}")) {
+        displayValue = nodeId != null
+          ? displayValue.replace("{node_id}", nodeId)
+          : displayValue.replace("/{node_id}", "");
       }
 
       if (typeof displayValue === "string" && displayValue) {

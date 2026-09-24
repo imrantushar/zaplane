@@ -185,7 +185,7 @@ class GraphValidatorTest extends TestCase {
 	/**
 	 * @test
 	 */
-	public function it_requires_exactly_one_trigger(): void {
+	public function it_requires_at_least_one_trigger(): void {
 		$noTrigger                    = $this->validGraph();
 		$noTrigger['nodes'][0]['type'] = 'action';
 		$noTrigger['nodes'][0]['data']['event'] = 'update_order_status';
@@ -197,14 +197,41 @@ class GraphValidatorTest extends TestCase {
 		$report = GraphValidator::check( $noTrigger );
 		$this->assertFalse( $report['valid'] );
 		$this->assertReportMentions( $report, 'no trigger node' );
+	}
 
-		$twoTriggers                     = $this->validGraph();
-		$twoTriggers['nodes'][1]['type'] = 'trigger';
-		$twoTriggers['nodes'][1]['data']['event'] = 'product_purchased';
+	/**
+	 * @test
+	 */
+	public function it_accepts_a_workflow_that_starts_from_several_triggers(): void {
+		$graph            = $this->validGraph();
+		$graph['nodes'][] = [
+			'id'       => '3',
+			'type'     => 'trigger',
+			'position' => [
+				'x' => 80,
+				'y' => 360,
+			],
+			'data'     => [
+				'app'    => 'storeengine',
+				'event'  => 'product_purchased',
+				'config' => [],
+			],
+		];
+		$graph['edges'][] = [
+			'id'     => 'e3-2',
+			'source' => '3',
+			'target' => '2',
+		];
 
-		$report = GraphValidator::check( $twoTriggers );
-		$this->assertFalse( $report['valid'] );
-		$this->assertReportMentions( $report, 'only one is allowed' );
+		$report = GraphValidator::check( $graph );
+
+		$this->assertTrue( $report['valid'], implode( ' | ', $this->messages( $report ) ) );
+
+		// Advisory, not blocking: the two triggers are identical, and the step reads
+		// {{1.order_id}}, which trigger 3 does not match to trigger 1.
+		$codes = array_column( $report['warnings'], 'code' );
+		$this->assertContains( 'trigger_duplicate', $codes );
+		$this->assertContains( 'trigger_field_gap', $codes );
 	}
 
 	/**
@@ -280,6 +307,61 @@ class GraphValidatorTest extends TestCase {
 			'Expected valid, got: ' . implode( ' || ', $this->messages( $report ) )
 		);
 		$this->assertReportMentions( $report, 'needs a connection', 'warnings' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function findings_carry_a_machine_readable_code(): void {
+		$graph            = $this->validGraph();
+		$graph['nodes'][] = [
+			'id'       => '3',
+			'type'     => 'action',
+			'position' => [
+				'x' => 760,
+				'y' => 200,
+			],
+			'data'     => [
+				'app'    => 'slack',
+				'event'  => 'send_message',
+				'config' => [
+					'channel' => 'general',
+					'text'    => 'hi',
+				],
+			],
+		];
+		$graph['edges'][] = [
+			'id'     => 'e2-3',
+			'source' => '2',
+			'target' => '3',
+		];
+
+		$report = GraphValidator::check( $graph );
+
+		// set_status() singles this one out to block activation, so it has to be
+		// identifiable without matching on the message text.
+		$this->assertContains( 'missing_connection', array_column( $report['warnings'], 'code' ) );
+
+		foreach ( array_merge( $report['errors'], $report['warnings'] ) as $finding ) {
+			$this->assertArrayHasKey( 'code', $finding );
+			$this->assertNotEmpty( $finding['code'] );
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function a_broken_graph_still_reports_a_code_on_every_error(): void {
+		$graph = $this->validGraph();
+		$graph['nodes'][0]['id']     = 'trigger_1';
+		$graph['edges'][0]['source'] = 'trigger_1';
+
+		$report = GraphValidator::check( $graph );
+
+		$this->assertFalse( $report['valid'] );
+		foreach ( $report['errors'] as $error ) {
+			$this->assertNotEmpty( $error['code'] );
+		}
 	}
 
 	/**

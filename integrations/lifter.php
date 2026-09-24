@@ -336,6 +336,28 @@ class Lifter extends IntegrationBase {
 		];
 	}
 
+	/**
+	 * Published posts of a type, for the builder's select fields.
+	 *
+	 * get_posts() runs this through WP_Query, so the lists below assemble no
+	 * SQL of their own and read no table directly.
+	 *
+	 * @param string $post_type Post type to list.
+	 * @return array<int,\WP_Post>
+	 */
+	private static function published_posts( string $post_type ): array {
+		return get_posts(
+			[
+				'post_type'        => $post_type,
+				'post_status'      => 'publish',
+				'numberposts'      => -1,
+				'orderby'          => 'title',
+				'order'            => 'ASC',
+				'suppress_filters' => false,
+			]
+		);
+	}
+
 	public static function query_courses() {
 		$options = [
 			[
@@ -344,16 +366,7 @@ class Lifter extends IntegrationBase {
 			]
 		];
 
-		global $wpdb;
-		// No placeholders, so prepare() would only earn a _doing_it_wrong notice
-		// from core. The only interpolation is $wpdb->posts.
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$courses = $wpdb->get_results(
-			"SELECT ID, post_title FROM {$wpdb->posts}
-                    WHERE {$wpdb->posts}.post_status = 'publish'
-                    AND {$wpdb->posts}.post_type = 'course'
-                    ORDER BY post_title"
-		);
+		$courses = self::published_posts( 'course' );
 
 		if ( ! empty( $courses ) ) {
 			foreach ( $courses as $course ) {
@@ -374,14 +387,7 @@ class Lifter extends IntegrationBase {
 			]
 		];
 
-		global $wpdb;
-		$quizzes = $wpdb->get_results(
-			"SELECT ID, post_title
-                FROM {$wpdb->posts}
-                WHERE post_status = 'publish'
-                AND post_type = 'llms_quiz'
-                ORDER BY post_title ASC"
-		);
+		$quizzes = self::published_posts( 'llms_quiz' );
 
 		if ( ! empty( $quizzes ) ) {
 			foreach ( $quizzes as $quiz ) {
@@ -401,14 +407,7 @@ class Lifter extends IntegrationBase {
 			]
 		];
 
-		global $wpdb;
-		$lessons = $wpdb->get_results(
-			"SELECT ID, post_title
-                FROM {$wpdb->posts}
-                WHERE post_status = 'publish'
-                AND post_type = 'lesson'
-                ORDER BY post_title ASC"
-		);
+		$lessons = self::published_posts( 'lesson' );
 
 		if ( ! empty( $lessons ) ) {
 			foreach ( $lessons as $lesson ) {

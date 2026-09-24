@@ -20,6 +20,18 @@ abstract class CustomAppBase extends IntegrationBase {
 		return static::$slug;
 	}
 
+	/**
+	 * Pin a pooled slot class to the custom app it stands for.
+	 *
+	 * Every slot redeclares $slug, so this writes that slot's own copy, and only
+	 * once: a slot does not change apps within a request.
+	 */
+	public static function bind_slug( string $slug ): void {
+		if ( self::class !== static::class && '' === static::$slug ) {
+			static::$slug = $slug;
+		}
+	}
+
 	protected static function manifest(): array {
 		$manifest = ManifestStore::get( static::get_slug() );
 		return is_array( $manifest ) ? $manifest : [];
@@ -182,7 +194,7 @@ abstract class CustomAppBase extends IntegrationBase {
 		return $payload;
 	}
 
-	protected static function execute_local_action( array $action, string $event, array $config, array $credentials ): array {
+	protected static function execute_local_action( array $action, string $event, array $config, array $credentials, array $input = [] ): array {
 		$handler = is_array( $action['handler'] ?? null ) ? $action['handler'] : [];
 		$type    = (string) ( $handler['type'] ?? '' );
 
@@ -190,7 +202,7 @@ abstract class CustomAppBase extends IntegrationBase {
 			throw new \Exception( 'Unknown local action "' . esc_html( $event ) . '" for custom app "' . esc_html( static::get_slug() ) . '".' );
 		}
 
-		$context   = Template::build_context( $config, $credentials );
+		$context   = Template::build_context( $config, $credentials, $input );
 		$arg_specs = is_array( $handler['args'] ?? null ) ? $handler['args'] : [];
 		$args      = array_map(
 			static function ( $spec ) use ( $context ) {
@@ -268,6 +280,25 @@ abstract class CustomAppBase extends IntegrationBase {
 	protected static function callable_error( string $callable ): ?string {
 		if ( '' === $callable ) {
 			return 'No function name was provided.';
+		}
+
+		/**
+		 * PHP functions a local Custom App may call.
+		 *
+		 * A manifest is data saved from an admin screen, and a function named there
+		 * runs with whatever arguments the workflow resolves — for a webhook trigger,
+		 * values a stranger posted. So nothing is callable by being typed in: a
+		 * function runs only after code on this site has listed it here.
+		 *
+		 * @param string[] $callables Function names, or "Class::method" strings.
+		 * @param string   $slug      The custom app asking.
+		 */
+		$allowed = array_map(
+			'strtolower',
+			array_map( 'strval', (array) apply_filters( 'zaplane_custom_app_callables', [], static::get_slug() ) )
+		);
+		if ( ! in_array( strtolower( $callable ), $allowed, true ) ) {
+			return sprintf( 'The function "%s" has not been allowed. Site code can allow it with the zaplane_custom_app_callables filter.', $callable );
 		}
 
 		$blocked = array_map(
@@ -458,27 +489,32 @@ abstract class CustomAppBase extends IntegrationBase {
 		$credentials = isset( $node['_connection_credentials'] ) && is_array( $node['_connection_credentials'] ) ? $node['_connection_credentials'] : [];
 
 		if ( 'local' === self::kind() ) {
-			return self::execute_local_action( $action, $event, $config, $credentials );
+			return self::execute_local_action( $action, $event, $config, $credentials, $input );
 		}
 
 		if ( empty( $action ) || empty( $action['request'] ) ) {
 			throw new \Exception( 'Unknown action "' . esc_html( $event ) . '" for custom app "' . esc_html( static::get_slug() ) . '".' );
 		}
 
-		$context = Template::build_context( $config, $credentials );
+		// Keep config fields available at the top level for existing manifests,
+		// while exposing upstream data explicitly under {{ input.* }}.
+		$context = Template::build_context( $config, $credentials, $input );
 		$request = RequestBuilder::build( $action['request'], $manifest, $context );
 
 		$response = HttpClient::request( $request['method'], $request['url'], $request['headers'], $request['body'] );
 
-		if ( ! empty( $response['error'] ) ) {
-			return [
-				'port' => 'main',
-				'data' => [
-					'success' => false,
-					'status'  => $response['status'],
-					'error'   => $response['error'],
-				],
-			];
+		// A failed external request must fail the node, not send empty mapped
+		// values into downstream actions or mark the entire workflow completed.
+		// The automation engine catches this exception, records a failed node/run,
+		// and does not spawn children. The builder's test-request preview still
+		// returns the raw HTTP response so users can inspect error bodies.
+		if ( ! empty( $response['error'] ) || $response['status'] < 200 || $response['status'] >= 300 ) {
+			$reason = ! empty( $response['error'] )
+				? (string) $response['error']
+				: 'HTTP ' . (int) $response['status'];
+			throw new \RuntimeException(
+				esc_html( 'Custom app "' . static::get_slug() . '" action "' . $event . '" request failed: ' . $reason )
+			);
 		}
 
 		$outputs = ResponseMapper::map_outputs( $response['body'], is_array( $action['output'] ?? null ) ? $action['output'] : [] );

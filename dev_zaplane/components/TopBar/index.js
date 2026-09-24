@@ -42,7 +42,7 @@ const TopBar = ({
 			window.open('https://zaplane.app/docs/', '_blank');
 		}}>
 			<FiHelpCircle color='var(--zaplane-font-color)' />
-			{__("Help")}
+			{__("Help", "zaplane")}
 		</button>
 	</div>,
 	middleContent = () => null,

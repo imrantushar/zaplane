@@ -18,7 +18,12 @@ class Assets {
 		// stylesheet (and a filemtime stat) on every public page view.
 	}
 
-	public function enqueue_icons(): void {
+	public function enqueue_icons( $hook ): void {
+		// Only Zaplane's own screens use the icon font; the admin menu icon is an SVG.
+		if ( false === strpos( (string) $hook, '_page_' . ZAPLANE_PLUGIN_SLUG ) ) {
+			return;
+		}
+
 		wp_enqueue_style(
 			'zaplane-icons',
 			ZAPLANE_ASSETS_URI . 'library/icons/zaplane-icons.css',
@@ -81,10 +86,31 @@ class Assets {
 		$light = isset( $theme['light'] ) && is_array( $theme['light'] ) ? $theme['light'] : [];
 		$dark  = isset( $theme['dark'] ) && is_array( $theme['dark'] ) ? $theme['dark'] : [];
 
+		// The palette is saved by an administrator, but it is still stored data on
+		// its way into a stylesheet, so each declaration is checked as it is
+		// written rather than trusted: only custom properties, and only values
+		// that cannot close the rule or open a tag. Anything else is dropped.
 		$to_block = static function ( array $palette ): string {
 			$decls = '';
 			foreach ( $palette as $var => $value ) {
-				$decls .= sprintf( '%s:%s;', $var, $value );
+				$var   = (string) $var;
+				$value = trim( wp_strip_all_tags( (string) $value ) );
+
+				if ( ! preg_match( '/^--[A-Za-z0-9_-]+$/', $var ) ) {
+					continue;
+				}
+
+				// Nothing that could end the declaration or the rule, open a tag or
+				// a comment, or pull in something from elsewhere. Colour functions
+				// such as rgba() and color-mix() still pass.
+				if ( '' === $value
+					|| preg_match( '/[;{}<>\\\\]/', $value )
+					|| preg_match( '#/\*|url\s*\(|expression\s*\(|@import#i', $value )
+				) {
+					continue;
+				}
+
+				$decls .= $var . ':' . $value . ';';
 			}
 			return $decls;
 		};
@@ -115,10 +141,30 @@ class Assets {
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 			$raw = is_readable( $file ) ? (string) file_get_contents( $file ) : '';
 			$raw = str_replace( \Zaplane\Framework\Core\IntegrationManifest::REST_URL_TOKEN, rest_url(), $raw );
-			return '' !== trim( $raw ) ? $raw : '{"apps":{},"tools":{}}';
+
+			return '' !== trim( $raw ) ? self::escape_for_script( $raw ) : '{"apps":{},"tools":{}}';
 		}
 
-		return (string) wp_json_encode( $this->get_frontend_integrations() );
+		return self::escape_for_script( (string) wp_json_encode( $this->get_frontend_integrations() ) );
+	}
+
+	/**
+	 * Make a JSON document safe to sit inside a `<script>` element.
+	 *
+	 * In JSON these three characters can only ever appear inside a string, and
+	 * `\uXXXX` is how a string spells them, so replacing them changes nothing
+	 * a parser will read back — but it means no value in the catalogue can close
+	 * the script element or be taken for markup, and the two Unicode line
+	 * separators stop being line breaks that would end a JavaScript statement.
+	 *
+	 * @param string $json Encoded JSON.
+	 */
+	private static function escape_for_script( string $json ): string {
+		return str_replace(
+			[ '<', '>', '&', "\u{2028}", "\u{2029}" ],
+			[ '\u003C', '\u003E', '\u0026', '\u2028', '\u2029' ],
+			$json
+		);
 	}
 
 	/**

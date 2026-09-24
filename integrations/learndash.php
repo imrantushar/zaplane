@@ -497,7 +497,7 @@ class Learndash extends IntegrationBase {
 			'user_email'   => 'jane.doe@example.com',
 			'nickname'     => 'janedoe',
 			'display_name' => 'Jane Doe',
-			'avatar_url'   => 'https://www.gravatar.com/avatar/a1b2c3d4',
+			'avatar_url'   => 'https://example.com/avatar.png',
 			'user_roles'   => [ 'subscriber' ],
 		];
 

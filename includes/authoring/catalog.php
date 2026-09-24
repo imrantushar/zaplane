@@ -140,6 +140,26 @@ class Catalog {
 	 *
 	 * @return array<string,mixed>|null
 	 */
+	/**
+	 * The hook a trigger is listed under.
+	 *
+	 * A few triggers declare several — ACF's user-field update listens on both
+	 * added_ and updated_user_meta — and casting that array to a string produced
+	 * a PHP warning and the literal text "Array" where a hook name belonged.
+	 * One node carries one hook, so the first is the one that describes it.
+	 *
+	 * @param array<string,mixed> $cap
+	 */
+	public static function primary_hook( array $cap ): string {
+		$hook = $cap['hook'] ?? '';
+
+		if ( is_array( $hook ) ) {
+			$hook = reset( $hook );
+		}
+
+		return is_scalar( $hook ) ? (string) $hook : '';
+	}
+
 	public static function describe_app( string $slug ): ?array {
 		$entry = self::entry( $slug );
 		if ( null === $entry ) {
@@ -179,6 +199,146 @@ class Catalog {
 		}
 
 		return self::shape_capability( $slug, $type, $key, $raw );
+	}
+
+	/**
+	 * One trigger or action found by app and event, whichever bucket holds it.
+	 *
+	 * A caller working from a node has an app and an event but not necessarily
+	 * which kind it is, and the two namespaces do not overlap for a given app.
+	 *
+	 * @return array<string,mixed>|null
+	 */
+	public static function find_capability( string $slug, string $event ): ?array {
+		foreach ( [ 'trigger', 'action' ] as $type ) {
+			$capability = self::describe_capability( $slug, $type, $event );
+			if ( null !== $capability ) {
+				return $capability;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Resolve one config field's allowed values.
+	 *
+	 * A `select` whose options live on the site — a course, a product, a form —
+	 * carries a `dynamic` descriptor naming the integration and lookup that can
+	 * answer for it, and which keys of each row are the value and the label. This
+	 * runs that lookup, which is the same registry the editor's own pickers use.
+	 *
+	 * `resolved` says whether the lookup actually ran: a lookup can fail because
+	 * the companion plugin is inactive, and a caller must be able to tell that
+	 * apart from "there is nothing to choose from".
+	 *
+	 * @param array<string,mixed> $config The node's config so far — some lookups
+	 *                                    depend on an earlier choice.
+	 * @return array{field:?array<string,mixed>,dynamic:bool,resolved:bool,options:array<int,array<string,mixed>>,error:?string}|null
+	 *         Null when the field is not part of that capability.
+	 */
+	public static function field_options( string $slug, string $event, string $field_key, array $config = [] ): ?array {
+		$capability = self::find_capability( $slug, $event );
+		if ( null === $capability ) {
+			return null;
+		}
+
+		$field = null;
+		foreach ( (array) $capability['schema'] as $candidate ) {
+			if ( is_array( $candidate ) && ( $candidate['key'] ?? '' ) === $field_key ) {
+				$field = $candidate;
+				break;
+			}
+		}
+
+		if ( null === $field ) {
+			return null;
+		}
+
+		$base = [
+			'field'    => $field,
+			'dynamic'  => false,
+			'resolved' => true,
+			'options'  => [],
+			'error'    => null,
+		];
+
+		// A fixed list ships with the app and needs no lookup.
+		if ( empty( $field['dynamic'] ) || ! is_array( $field['dynamic'] ) ) {
+			$options = [];
+			foreach ( (array) ( $field['options'] ?? [] ) as $option ) {
+				if ( is_array( $option ) && array_key_exists( 'value', $option ) ) {
+					$options[] = [
+						'value' => $option['value'],
+						'label' => (string) ( $option['label'] ?? $option['value'] ),
+					];
+				} elseif ( is_scalar( $option ) ) {
+					$options[] = [
+						'value' => $option,
+						'label' => (string) $option,
+					];
+				}
+			}
+
+			return array_merge( $base, [ 'options' => $options ] );
+		}
+
+		$dynamic = $field['dynamic'];
+		// The lookup can belong to another integration — a user picker reused
+		// across apps — so the field names its own source.
+		$source  = (string) ( $dynamic['integration'] ?? $slug );
+		$query   = (string) ( $dynamic['query'] ?? '' );
+
+		$integration = IntegrationLoader::get( $source );
+		if ( ! $integration || ! method_exists( $integration, 'get_dynamic_queries' ) ) {
+			return array_merge( $base, [
+				'dynamic'  => true,
+				'resolved' => false,
+				'error'    => sprintf( 'App "%s" provides no option lookups; is its plugin active?', $source ),
+			] );
+		}
+
+		$queries = $integration::get_dynamic_queries();
+		if ( ! isset( $queries[ $query ] ) || ! is_callable( $queries[ $query ] ) ) {
+			return array_merge( $base, [
+				'dynamic'  => true,
+				'resolved' => false,
+				'error'    => sprintf( 'Lookup "%s" is not registered by app "%s".', $query, $source ),
+			] );
+		}
+
+		try {
+			$raw = call_user_func( $queries[ $query ], $config );
+		} catch ( \Throwable $e ) {
+			return array_merge( $base, [
+				'dynamic'  => true,
+				'resolved' => false,
+				'error'    => sprintf( 'Lookup "%s" failed: %s', $query, $e->getMessage() ),
+			] );
+		}
+
+		// `select` names which keys carry the value and the label; integrations
+		// differ (`name`/`label` in one, `value`/`label` in another).
+		$select    = array_values( (array) ( $dynamic['select'] ?? [] ) );
+		$value_key = (string) ( $select[0] ?? 'value' );
+		$label_key = (string) ( $select[1] ?? 'label' );
+
+		$options = [];
+		foreach ( (array) $raw as $row ) {
+			$row = (array) $row;
+			if ( ! array_key_exists( $value_key, $row ) ) {
+				continue;
+			}
+			$options[] = [
+				'value' => $row[ $value_key ],
+				'label' => (string) ( $row[ $label_key ] ?? $row[ $value_key ] ),
+			];
+		}
+
+		return array_merge( $base, [
+			'dynamic' => true,
+			'options' => $options,
+		] );
 	}
 
 	/**
@@ -271,7 +431,7 @@ class Catalog {
 		];
 
 		if ( 'trigger' === $type ) {
-			$shaped['hook'] = (string) ( $cap['hook'] ?? '' );
+			$shaped['hook'] = self::primary_hook( $cap );
 		}
 
 		// Optional flags an integration may set (disabled, requires_addon, …) are

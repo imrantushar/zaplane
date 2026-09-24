@@ -5,7 +5,7 @@ import Search from "@ZAPComponents/Search";
 import ListTable from "@ZAPComponents/ListTable";
 import OptionMenu from "@ZAPComponents/OptionMenu";
 import StatusOptions from "@ZAPComponents/StatusOptions";
-import { FiTrash2, FiRefreshCw, FiEye } from "react-icons/fi";
+import { FiTrash2, FiRefreshCw, FiEye, FiEdit2 } from "react-icons/fi";
 import { deleteConnection, testConnection, fetchSingleConnection, updateConnection, fetchConnections } from "@ZAPRedux/Slices/connectionsSlice/connectionsSlice";
 import ConnectionDetails from "./ConnectionDetails/ConnectionDetails";
 import { formatDateTime } from "@ZAPUtils/helper";
@@ -14,7 +14,7 @@ import { TableArrow } from "@ZAPUtils/icons";
 import ZAPActionBar from "@ZAPComponents/ZAPActionBar";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
 import ZAPIconGroup from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
-const ConnectionTable = () => {
+const ConnectionTable = ({ onEdit }) => {
   const dispatch = useDispatch();
   const [detailsOpen, setDetailsOpen] = useState(false);
   const {
@@ -22,7 +22,7 @@ const ConnectionTable = () => {
     isLoading,
     connection,
     currentPage,
-    perPage,
+    itemPerPage,
     totalItems
   } = useSelector(state => state.connections);
   const [selection, setSelection] = useState([]);
@@ -43,10 +43,10 @@ const ConnectionTable = () => {
     handleRefresh();
   }, []);
   const handlePageChange = newPage => {
-    handleRefresh(newPage, perPage);
+    handleRefresh(newPage, itemPerPage);
   };
   const handlePerPageChange = itemsPerPage => {
-    handleRefresh(currentPage, itemsPerPage);
+    handleRefresh(1, itemsPerPage);
   };
   const handleStatusChange = (row, newStatus) => {
     if (!row?.id || !newStatus) return;
@@ -68,7 +68,7 @@ const ConnectionTable = () => {
       setSelection([]);
       dispatch(fetchConnections({
         page: currentPage,
-        per_page: perPage
+        per_page: itemPerPage
       }));
     } catch (e) {
       console.error("Failed to delete selected team members", e);
@@ -160,7 +160,12 @@ const ConnectionTable = () => {
       icon: <FiEye />,
       type: "button",
       onClick: () => openDetails(row)
-    }, {
+    }, ...(row.auth_type !== "oauth2" ? [{
+      label: __("Edit credentials", "zaplane"),
+      icon: <FiEdit2 />,
+      type: "button",
+      onClick: () => onEdit?.(row)
+    }] : []), {
       label: __("Delete", "zaplane"),
       icon: <FiTrash2 />,
       type: "button",
@@ -176,7 +181,7 @@ const ConnectionTable = () => {
     textAlign: "center"
   }];
   return <>
-            <ListTable columns={columns} data={filteredConnections} isRowSelectable={true} showSubHeader={true} subHeaderComponent={<Search placeholder={__("Search connections...", "zaplane")} onSearchHandler={setSearchTerm} />} showColumnFilter={false} showPagination={totalItems >= 10} noDataText={__("No connections found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="connection-table" currentPageNumber={currentPage} perPage={perPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} getSelectRowValue={rows => {
+            <ListTable columns={columns} data={filteredConnections} isRowSelectable={true} showSubHeader={true} subHeaderComponent={<Search placeholder={__("Search connections...", "zaplane")} onSearchHandler={setSearchTerm} />} showColumnFilter={false} showPagination={totalItems > 0} noDataText={__("No connections found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="connection-table" currentPageNumber={currentPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} getSelectRowValue={rows => {
       setSelection(rows || []);
     }} />
             <ZAPActionBar selection={selection} onDelete={handleDeleteSelected} onClose={() => setSelection([])} />

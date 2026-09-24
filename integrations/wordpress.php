@@ -1609,7 +1609,6 @@ class Wordpress extends IntegrationBase {
 			'get_user_meta_single'          => [ 'label' => 'Get User Metadata (Single)' ],
 			'update_user_meta'              => [ 'label' => 'Update User Metadata' ],
 			'send_password_reset_email'     => [ 'label' => 'Send Password Reset Email' ],
-			'authenticate_user'             => [ 'label' => 'Authenticate User' ],
 			'logout_user'                   => [ 'label' => 'Logout User' ],
 			'activate_user'                 => [ 'label' => 'Activate User' ],
 			'deactivate_user'               => [ 'label' => 'Deactivate User' ],
@@ -1712,7 +1711,6 @@ class Wordpress extends IntegrationBase {
 			'delete_trash_comment'          => [ 'label' => 'Delete Trash Comment' ],
 			'activate_plugin'               => [ 'label' => 'Activate Plugin' ],
 			'deactivate_plugin'             => [ 'label' => 'Deactivate Plugin' ],
-			'switch_theme'                  => [ 'label' => 'Theme Switch' ],
 			'add_media_image'               => [ 'label' => 'Add New Image' ],
 			'delete_media'                  => [ 'label' => 'Delete Media' ],
 			'rename_media'                  => [ 'label' => 'Rename Media' ],
@@ -3352,45 +3350,6 @@ class Wordpress extends IntegrationBase {
 						'select'      => [ 'file', 'name' ],
 					],
 					'required' => true,
-				],
-			],
-
-			'switch_theme' => [
-				[
-					'key' => 'theme',
-					'label' => 'Theme Switch',
-					'type' => 'select',
-					'dynamic' => [
-						'integration' => 'wordpress',
-						'query'       => 'deactivate_theme',
-						'select'      => [ 'file', 'name' ],
-					],
-					'required' => true,
-				],
-			],
-
-			'authenticate_user' => [
-				[
-					'key' => 'user_login',
-					'label' => 'Username or Email',
-					'type' => 'email',
-					'required' => true
-				],
-				[
-					'key' => 'user_password',
-					'label' => 'Password',
-					'type' => 'text',
-					'required' => true
-				],
-				[
-					'key' => 'remember',
-					'label' => 'Remember',
-					'type' => 'boolean'
-				],
-				[
-					'key' => 'secure_cookie',
-					'label' => 'Secure Cookie',
-					'type' => 'boolean'
 				],
 			],
 

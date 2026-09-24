@@ -106,7 +106,7 @@ class WorkflowAuthor {
 		$report = GraphValidator::check( $graph );
 
 		if ( ! $report['valid'] ) {
-			throw new \InvalidArgumentException( self::format_errors( $report['errors'] ) );
+			throw new \InvalidArgumentException( esc_html( self::format_errors( $report['errors'] ) ) );
 		}
 
 		$status = (string) ( $opts['status'] ?? 'draft' );
@@ -162,14 +162,14 @@ class WorkflowAuthor {
 	public static function save( int $workflow_id, array $graph ): array {
 		$workflow = Workflow::find( $workflow_id );
 		if ( ! $workflow ) {
-			throw new \InvalidArgumentException( 'Workflow ' . $workflow_id . ' not found.' );
+			throw new \InvalidArgumentException( 'Workflow ' . (int) $workflow_id . ' not found.' );
 		}
 
 		$graph  = self::normalize( $graph );
 		$report = GraphValidator::check( $graph );
 
 		if ( ! $report['valid'] ) {
-			throw new \InvalidArgumentException( self::format_errors( $report['errors'] ) );
+			throw new \InvalidArgumentException( esc_html( self::format_errors( $report['errors'] ) ) );
 		}
 
 		$hash    = hash( 'sha256', (string) wp_json_encode( $graph ) );
@@ -243,19 +243,36 @@ class WorkflowAuthor {
 
 		$workflow = Workflow::find( $workflow_id );
 		if ( ! $workflow ) {
-			throw new \InvalidArgumentException( 'Workflow ' . $workflow_id . ' not found.' );
+			throw new \InvalidArgumentException( 'Workflow ' . (int) $workflow_id . ' not found.' );
 		}
 
 		if ( 'active' === $status ) {
 			$version = $workflow->activeVersion();
 			if ( ! $version ) {
-				throw new \InvalidArgumentException( 'Workflow ' . $workflow_id . ' has no active version to run.' );
+				throw new \InvalidArgumentException( 'Workflow ' . (int) $workflow_id . ' has no active version to run.' );
 			}
 
 			$report = GraphValidator::check( $version->getGraph() );
 			if ( ! $report['valid'] ) {
 				throw new \InvalidArgumentException(
-					'Workflow ' . $workflow_id . ' cannot go live: ' . self::format_errors( $report['errors'] )
+					'Workflow ' . (int) $workflow_id . ' cannot go live: ' . esc_html( self::format_errors( $report['errors'] ) )
+				);
+			}
+
+			// A node whose app needs credentials is only a warning while the graph
+			// is a draft — the author links the account afterwards. Going live is a
+			// different bar: the step cannot run at all without one, so activating
+			// would produce a workflow that fires and silently does nothing.
+			$blocking = array_values(
+				array_filter(
+					$report['warnings'],
+					static fn( $w ) => 'missing_connection' === ( $w['code'] ?? '' )
+				)
+			);
+
+			if ( $blocking ) {
+				throw new \InvalidArgumentException(
+					'Workflow ' . (int) $workflow_id . ' cannot go live: ' . esc_html( self::format_errors( $blocking ) )
 				);
 			}
 		}
@@ -341,7 +358,7 @@ class WorkflowAuthor {
 		// The engine matches a fired WordPress hook back to the trigger node, so
 		// this has to be the manifest's hook, not whatever the caller guessed.
 		if ( 'trigger' === $type && ! empty( $capability['hook'] ) ) {
-			$data['hook'] = (string) $capability['hook'];
+			$data['hook'] = Catalog::primary_hook( $capability );
 		}
 
 		return $data;

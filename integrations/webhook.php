@@ -11,7 +11,7 @@ use Zaplane\Framework\Classes\IntegrationBase;
  * Webhook — a dedicated integration for both directions:
  *
  *  • Incoming ("Catch Webhook" trigger): any service can POST/GET to the
- *    workflow's webhook URL (/wp-json/zaplane/v1/hook/<workflow_id>) and the
+ *    trigger's webhook URL (/wp-json/zaplane/v1/hook/<workflow_id>/<node_id>) and the
  *    whole payload becomes the trigger output. An optional secret can be
  *    required. Fired by IncomingWebhookController::handle_workflow_hook() via
  *    run_workflow — the hook name only marks it as an active trigger.
@@ -64,14 +64,16 @@ class Webhook extends IntegrationBase {
 
 		return [
 			[
-				// Read-only URL to POST to. The `{workflow_id}` token is resolved
-				// on the client from the open workflow, then prefixed with the
-				// site's REST base (the CopyInput renderer handles both).
+				// Read-only URL to POST to. The `{workflow_id}` and `{node_id}` tokens
+				// are resolved on the client from the open workflow and this trigger,
+				// then prefixed with the site's REST base (the CopyInput renderer
+				// handles both). Each Catch Webhook trigger has its own URL, so a
+				// workflow can have more than one.
 				'key'   => 'webhook_url',
 				'label' => 'Webhook URL',
 				'type'  => 'copy',
-				'value' => 'zaplane/v1/hook/{workflow_id}',
-				'help'  => 'Send a GET or POST request (JSON body and/or query params) to this URL to trigger the workflow. Available after the workflow is saved.',
+				'value' => 'zaplane/v1/hook/{workflow_id}/{node_id}',
+				'help'  => 'Send a GET or POST request (JSON body and/or query params) to this URL to start the workflow from this trigger. Accepted while the workflow is active.',
 			],
 			[
 				'key'      => 'secret',
@@ -303,7 +305,7 @@ class Webhook extends IntegrationBase {
 			}
 		}
 
-		$response = wp_remote_request( $url, [
+		$response = \Zaplane\HttpGuard::request( $url, [
 			'method'  => $method,
 			'headers' => $headers,
 			'body'    => $body,

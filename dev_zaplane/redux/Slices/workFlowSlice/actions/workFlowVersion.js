@@ -4,9 +4,6 @@ import { __ } from '@wordpress/i18n';
 
 import {
 	API,
-	current_user_can,
-	current_user_id,
-	is_admin,
 	handleSliceSuccess,
 	handleSliceError,
 	namespace,
@@ -57,7 +54,7 @@ export const getPreviewOldVersion = createAsyncThunk(
 				namespace + `workflows/${id}/versions/${parseInt(versionID)}`
 			);
 
-			handleSliceSuccess(thunkAPI, __(' fetched prevews version successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI, __(' fetched prevews version successfully', 'zaplane'));
 
 			return res.data;
 
@@ -73,7 +70,7 @@ export const versionActive = createAsyncThunk(
 			const res = await API.post(
 				namespace + `workflows/${id}/versions/${parseInt(versionID)}/activate`
 			);
-			handleSliceSuccess(thunkAPI, __('version active successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI, __('version active successfully', 'zaplane'));
 
 			return res.data;
 

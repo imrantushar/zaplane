@@ -119,7 +119,7 @@ class AdvanceCustomFields extends IntegrationBase {
 				}
 
 				// Only handle ACF-managed keys (skip internal _ prefixed keys)
-				if ( str_starts_with( $meta_key, '_' ) ) {
+				if ( \Zaplane\Utils\Helper::starts_with( (string) $meta_key, '_' ) ) {
 					return false;
 				}
 
@@ -146,7 +146,7 @@ class AdvanceCustomFields extends IntegrationBase {
 					return false;
 				}
 
-				if ( str_starts_with( $meta_key, '_' ) ) {
+				if ( \Zaplane\Utils\Helper::starts_with( (string) $meta_key, '_' ) ) {
 					return false;
 				}
 

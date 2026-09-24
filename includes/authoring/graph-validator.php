@@ -75,6 +75,10 @@ class GraphValidator {
 		$this->validate_edges( $edges, $ids );
 		$this->validate_reachability( $nodes, $edges, $ids );
 
+		foreach ( TriggerAdvisor::warnings( $graph ) as $warning ) {
+			$this->warn( $warning['where'], $warning['message'], $warning['code'] );
+		}
+
 		return $this->result();
 	}
 
@@ -178,17 +182,21 @@ class GraphValidator {
 		}
 
 		if ( ! empty( $entry['requires_connection'] ) && empty( $data['connection_id'] ) ) {
-			$this->warn( $where, sprintf( 'App "%s" needs a connection; none is linked yet.', $app ) );
+			$this->warn(
+				$where,
+				sprintf( 'App "%s" needs a connection; none is linked yet.', $app ),
+				'missing_connection'
+			);
 		}
 
-		$this->validate_config( $where, (array) $capability['schema'], (array) ( $data['config'] ?? [] ) );
+		$this->validate_config( $where, (array) $capability['schema'], (array) ( $data['config'] ?? [] ), $app, $event );
 	}
 
 	/**
 	 * @param array<int,mixed>    $schema
 	 * @param array<string,mixed> $config
 	 */
-	private function validate_config( string $where, array $schema, array $config ): void {
+	private function validate_config( string $where, array $schema, array $config, string $app = '', string $event = '' ): void {
 		foreach ( $schema as $field ) {
 			if ( ! is_array( $field ) || empty( $field['key'] ) ) {
 				continue;
@@ -215,7 +223,7 @@ class GraphValidator {
 				continue;
 			}
 
-			$this->validate_field_value( $where, $field, $value );
+			$this->validate_field_value( $where, $field, $value, $app, $event, $config );
 		}
 
 		// Surface stray keys — usually a guessed field name that will be ignored.
@@ -261,7 +269,7 @@ class GraphValidator {
 	 * @param array<string,mixed> $field
 	 * @param mixed               $value
 	 */
-	private function validate_field_value( string $where, array $field, $value ): void {
+	private function validate_field_value( string $where, array $field, $value, string $app = '', string $event = '', array $config = [] ): void {
 		$key  = (string) $field['key'];
 		$type = (string) ( $field['type'] ?? 'text' );
 
@@ -269,6 +277,16 @@ class GraphValidator {
 		// marked dynamic are populated at edit time from the live site, so there is
 		// nothing here to check them against.
 		$options = ( isset( $field['options'] ) && is_array( $field['options'] ) ) ? $field['options'] : [];
+
+		// A dynamic select's options live on this site. They used to be skipped
+		// entirely, so a guessed id — a course that does not exist — saved clean
+		// and the workflow then never matched anything. The same lookup the
+		// editor's picker uses can answer here, so use it.
+		if ( ! empty( $field['dynamic'] ) && '' !== $app && '' !== $event
+			&& in_array( $type, [ 'select', 'multi-select', 'multiselect' ], true ) ) {
+			$this->validate_dynamic_value( $where, $field, $value, $app, $event, $config );
+			return;
+		}
 
 		if ( $options && empty( $field['dynamic'] ) && in_array( $type, [ 'select', 'multi-select', 'multiselect' ], true ) ) {
 			$allowed = [];
@@ -313,6 +331,66 @@ class GraphValidator {
 		}
 	}
 
+	/**
+	 * Check a value against the options this site can actually offer.
+	 *
+	 * Deliberately conservative. The check only runs when the lookup succeeded
+	 * and returned something: a failed lookup usually means the companion plugin
+	 * is inactive on the machine doing the authoring, and an empty list means the
+	 * site has no courses or products yet — neither is a reason to refuse a graph
+	 * someone is building ahead of the content.
+	 *
+	 * @param mixed               $value
+	 * @param array<string,mixed> $field
+	 * @param array<string,mixed> $config
+	 */
+	private function validate_dynamic_value( string $where, array $field, $value, string $app, string $event, array $config ): void {
+		$key = (string) $field['key'];
+
+		$resolved = Catalog::field_options( $app, $event, $key, $config );
+
+		if ( null === $resolved || ! $resolved['resolved'] ) {
+			$this->warn(
+				$where,
+				sprintf( 'Could not check "%s" against this site\'s options: %s', $key, $resolved['error'] ?? 'field not found' ),
+				'options_unavailable'
+			);
+			return;
+		}
+
+		if ( empty( $resolved['options'] ) ) {
+			$this->warn(
+				$where,
+				sprintf( 'Field "%s" has no options on this site yet, so its value cannot be checked.', $key ),
+				'options_empty'
+			);
+			return;
+		}
+
+		$allowed = array_map( 'strval', array_column( $resolved['options'], 'value' ) );
+
+		foreach ( (array) $value as $single ) {
+			if ( ! is_scalar( $single ) || $this->is_expression( (string) $single ) ) {
+				continue;
+			}
+
+			if ( ! in_array( (string) $single, $allowed, true ) ) {
+				$this->error(
+					$where,
+					sprintf(
+						'Field "%s" got "%s", which does not exist on this site. Call list_field_options for %s/%s and use one of: %s',
+						$key,
+						(string) $single,
+						$app,
+						$event,
+						implode( ', ', array_slice( $allowed, 0, 15 ) )
+					),
+					'unknown_option'
+				);
+			}
+		}
+	}
+
 	/** Values carrying a {{…}} token are resolved from upstream output at run time. */
 	private function is_expression( string $value ): bool {
 		return false !== strpos( $value, '{{' );
@@ -330,13 +408,10 @@ class GraphValidator {
 			}
 		}
 
+		// A workflow can start from several triggers: whichever one fires starts a
+		// run from itself. It needs at least one.
 		if ( empty( $triggers ) ) {
-			$this->error( '', 'Graph has no trigger node. Every workflow starts with exactly one.' );
-			return;
-		}
-
-		if ( count( $triggers ) > 1 ) {
-			$this->error( '', 'Graph has ' . count( $triggers ) . ' trigger nodes (' . implode( ', ', $triggers ) . '); only one is allowed.' );
+			$this->error( '', 'Graph has no trigger node. Every workflow starts from at least one.' );
 		}
 	}
 
@@ -446,15 +521,22 @@ class GraphValidator {
 
 	/* --------------------------------------------------------------------- */
 
-	private function error( string $where, string $message ): void {
+	private function error( string $where, string $message, string $code = 'invalid' ): void {
 		$this->errors[] = [
+			'code'    => $code,
 			'where'   => $where,
 			'message' => $message,
 		];
 	}
 
-	private function warn( string $where, string $message ): void {
+	/**
+	 * A code is carried so a caller can single one finding out without matching
+	 * on message text — set_status() blocks activation on `missing_connection`,
+	 * which is only advisory while the graph is still a draft.
+	 */
+	private function warn( string $where, string $message, string $code = 'advisory' ): void {
 		$this->warnings[] = [
+			'code'    => $code,
 			'where'   => $where,
 			'message' => $message,
 		];

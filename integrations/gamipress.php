@@ -286,7 +286,7 @@ class Gamipress extends IntegrationBase {
 			'user_email'   => 'jane.doe@example.com',
 			'nickname'     => 'jane',
 			'display_name' => 'Jane Doe',
-			'avatar_url'   => 'https://secure.gravatar.com/avatar/0123456789abcdef?s=96&d=mm&r=g',
+			'avatar_url'   => 'https://example.com/avatar.png',
 			'user_roles'   => [ 'subscriber' ],
 			'completed_at' => current_time( 'mysql' ),
 		];
@@ -377,9 +377,35 @@ class Gamipress extends IntegrationBase {
 		return $query[ $key ] ?? '';
 	}
 
-	public static function query_rank_type( $query ): array {
-		global $wpdb;
+	/**
+	 * Published posts of a type, newest API rather than a direct table read.
+	 *
+	 * These lists feed select fields in the workflow builder. get_posts() runs
+	 * the same query through WP_Query, so there is no SQL to assemble here and
+	 * the post type — which arrives from the field above — never reaches a
+	 * statement as text.
+	 *
+	 * @param string $post_type Post type to list.
+	 * @return array<int,\WP_Post>
+	 */
+	private static function published_posts( string $post_type ): array {
+		if ( '' === $post_type ) {
+			return [];
+		}
 
+		return get_posts(
+			[
+				'post_type'        => $post_type,
+				'post_status'      => 'publish',
+				'numberposts'      => -1,
+				'orderby'          => 'title',
+				'order'            => 'ASC',
+				'suppress_filters' => false,
+			]
+		);
+	}
+
+	public static function query_rank_type( $query ): array {
 		$all_rank_type = [
 			[
 				'value' => 'any',
@@ -387,14 +413,7 @@ class Gamipress extends IntegrationBase {
 			],
 		];
 
-		$rank_types = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT ID, post_name, post_title, post_type FROM {$wpdb->posts} where post_type like %s AND post_status = %s",
-				[ 'rank_type', 'publish' ]
-			)
-		);
-
-		foreach ( $rank_types as $rank_type ) {
+		foreach ( self::published_posts( 'rank_type' ) as $rank_type ) {
 			$all_rank_type[] = [
 				'value' => $rank_type->post_name,
 				'label' => $rank_type->post_title,
@@ -405,54 +424,26 @@ class Gamipress extends IntegrationBase {
 	}
 
 	public static function query_rank( $query ): array {
-		global $wpdb;
-
 		$rank_type = sanitize_text_field( self::get_value( $query, 'rank_type' ) );
 		$all_rank  = [];
 
-		if ( empty( $rank_type ) || 'any' === $rank_type ) {
-			$all_rank_types = $wpdb->get_results(
-				"SELECT post_name FROM {$wpdb->posts} WHERE post_type = 'rank_type' AND post_status = 'publish'"
-			);
+		$types = ( empty( $rank_type ) || 'any' === $rank_type )
+			? wp_list_pluck( self::published_posts( 'rank_type' ), 'post_name' )
+			: [ $rank_type ];
 
-			foreach ( $all_rank_types as $all_rank_type ) {
-				$ranks = $wpdb->get_results(
-					$wpdb->prepare(
-						"SELECT post_name, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' ORDER BY post_title ASC",
-						$all_rank_type->post_name
-					)
-				);
-				foreach ( $ranks as $rank ) {
-					$all_rank[] = [
-						'value' => $rank->post_name,
-						'label' => $rank->post_title,
-					];
-				}
+		foreach ( $types as $type ) {
+			foreach ( self::published_posts( (string) $type ) as $rank ) {
+				$all_rank[] = [
+					'value' => $rank->post_name,
+					'label' => $rank->post_title,
+				];
 			}
-
-			return $all_rank;
-		}//end if
-
-		$ranks = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT post_name, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' ORDER BY post_title ASC",
-				$rank_type
-			)
-		);
-
-		foreach ( $ranks as $rank ) {
-			$all_rank[] = [
-				'value' => $rank->post_name,
-				'label' => $rank->post_title,
-			];
 		}
 
 		return $all_rank;
 	}
 
 	public static function query_achievement_type( $query ): array {
-		global $wpdb;
-
 		$all_achievement_type = [
 			[
 				'value' => 'any',
@@ -460,14 +451,7 @@ class Gamipress extends IntegrationBase {
 			],
 		];
 
-		$achievement_types = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT post_name, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s ORDER BY post_title ASC",
-				[ 'achievement-type', 'publish' ]
-			)
-		);
-
-		foreach ( $achievement_types as $achievement_type ) {
+		foreach ( self::published_posts( 'achievement-type' ) as $achievement_type ) {
 			$all_achievement_type[] = [
 				'value' => $achievement_type->post_name,
 				'label' => $achievement_type->post_title,
@@ -478,51 +462,25 @@ class Gamipress extends IntegrationBase {
 	}
 
 	public static function query_achievement( $query ): array {
-		global $wpdb;
-
 		$achievement_type = sanitize_text_field( self::get_value( $query, 'achievement_type' ) );
 		$all_achievement  = [];
 
-		if ( empty( $achievement_type ) || 'any' === $achievement_type ) {
-			$all_types = $wpdb->get_results(
-				"SELECT post_name FROM {$wpdb->posts} WHERE post_type = 'achievement-type' AND post_status = 'publish'"
-			);
+		$types = ( empty( $achievement_type ) || 'any' === $achievement_type )
+			? wp_list_pluck( self::published_posts( 'achievement-type' ), 'post_name' )
+			: [ $achievement_type ];
 
-			foreach ( $all_types as $type ) {
-				$achievements = $wpdb->get_results(
-					$wpdb->prepare(
-						"SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' ORDER BY post_title ASC",
-						$type->post_name
-					)
-				);
-
-				foreach ( $achievements as $achievement ) {
-					$all_achievement[] = [
-						'value' => (string) $achievement->ID,
-						'label' => $achievement->post_title,
-					];
-				}
+		foreach ( $types as $type ) {
+			foreach ( self::published_posts( (string) $type ) as $achievement ) {
+				$all_achievement[] = [
+					'value' => (string) $achievement->ID,
+					'label' => $achievement->post_title,
+				];
 			}
-
-			return $all_achievement;
-		}//end if
-
-		$achievements = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' ORDER BY post_title ASC",
-				$achievement_type
-			)
-		);
-
-		foreach ( $achievements as $achievement ) {
-			$all_achievement[] = [
-				'value' => (string) $achievement->ID,
-				'label' => $achievement->post_title,
-			];
 		}
 
 		return $all_achievement;
 	}
+
 
 	public static function resolve_user_payload( $user_id ) {
 		$user = get_userdata( (int) $user_id );

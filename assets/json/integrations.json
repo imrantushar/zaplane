@@ -1,6 +1,6 @@
 {
-    "version": "1.2.0",
-    "generated_at": "2026-09-13 08:47:20",
+    "version": "1.3.2",
+    "generated_at": "2026-09-23 15:32:13",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -12,13 +12,9 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/academy-lms/",
-                "action": "https://zaplane.app/docs/action-academy-lms/"
-            },
             "triggers": {
                 "user_enroll_course": {
-                    "label": "User enrolled in a course",
+                    "label": "User Enrolled in Course",
                     "hook": "academy/course/after_enroll",
                     "key": "user_enroll_course",
                     "schema": [
@@ -26,6 +22,8 @@
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
+                            "required": true,
+                            "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
                                 "query": "acourse",
@@ -33,32 +31,7 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "academy_quiz_course_attempt": {
-                    "label": "User attempted (submitted) a quiz",
-                    "hook": "academy_quizzes/api/after_quiz_attempt_finished",
-                    "key": "academy_quiz_course_attempt",
-                    "schema": [
-                        {
-                            "key": "quiz_id",
-                            "label": "Quiz",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "academy",
-                                "query": "quiz",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            },
-                            "required": true
+                            }
                         }
                     ],
                     "outputs": [
@@ -66,7 +39,7 @@
                     ]
                 },
                 "lesson_complete": {
-                    "label": "User completed a lesson",
+                    "label": "Lesson Completed",
                     "hook": "academy/frontend/after_mark_topic_complete",
                     "key": "lesson_complete",
                     "schema": [
@@ -74,6 +47,8 @@
                             "key": "lesson_id",
                             "label": "Lesson",
                             "type": "select",
+                            "required": true,
+                            "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
                                 "query": "lesson",
@@ -81,23 +56,14 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "course_complete": {
-                    "label": "User completed a course",
-                    "hook": "academy/admin/course_complete_after",
-                    "key": "course_complete",
-                    "schema": [
+                            }
+                        },
                         {
                             "key": "course_id",
                             "label": "Course",
                             "type": "select",
+                            "required": true,
+                            "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
                                 "query": "acourse",
@@ -105,23 +71,49 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "quiz_target": {
-                    "label": "User achieved target percentage on a quiz",
+                "course_complete": {
+                    "label": "Course Completed",
+                    "hook": "academy/admin/course_complete_after",
+                    "key": "course_complete",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_attempt_submitted": {
+                    "label": "Quiz Attempt Submitted",
                     "hook": "academy_quizzes/api/after_quiz_attempt_finished",
-                    "key": "quiz_target",
+                    "key": "quiz_attempt_submitted",
                     "schema": [
                         {
                             "key": "quiz_id",
                             "label": "Quiz",
                             "type": "select",
+                            "required": true,
+                            "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
                                 "query": "quiz",
@@ -129,16 +121,525 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_passed": {
+                    "label": "Quiz Passed",
+                    "hook": [
+                        "academy_quizzes/api/after_quiz_attempt_finished",
+                        "academy_quizzes/after_quiz_attempt_manual_review"
+                    ],
+                    "key": "quiz_passed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_failed": {
+                    "label": "Quiz Failed",
+                    "hook": [
+                        "academy_quizzes/api/after_quiz_attempt_finished",
+                        "academy_quizzes/after_quiz_attempt_manual_review"
+                    ],
+                    "key": "quiz_failed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_target": {
+                    "label": "Quiz Score Threshold Reached",
+                    "hook": [
+                        "academy_quizzes/api/after_quiz_attempt_finished",
+                        "academy_quizzes/after_quiz_attempt_manual_review"
+                    ],
+                    "key": "quiz_target",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "quiz",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "target_percentage",
-                            "label": "Target Percentage (%)",
+                            "label": "Minimum percentage (0-100)",
                             "type": "number",
                             "required": true
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_published": {
+                    "label": "Course Published",
+                    "hook": "transition_post_status",
+                    "key": "course_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lesson_published": {
+                    "label": "Lesson Published",
+                    "hook": "academy_new_lesson_published",
+                    "key": "lesson_published",
+                    "schema": [
+                        {
+                            "key": "lesson_id",
+                            "label": "Lesson",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "lesson",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_published": {
+                    "label": "Quiz Published",
+                    "hook": "transition_post_status",
+                    "key": "quiz_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "student_registered": {
+                    "label": "Student Registered",
+                    "hook": [
+                        "academy/admin/after_register_student",
+                        "academy/api/auth/after_student_registration",
+                        "academy/shortcode/after_student_registration",
+                        "academy/admin/after_student_registration"
+                    ],
+                    "key": "student_registered",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "instructor_registered": {
+                    "label": "Instructor Registered",
+                    "hook": [
+                        "academy/admin/after_register_instructor",
+                        "academy/api/auth/after_instructor_registration",
+                        "academy/shortcode/after_instructor_registration"
+                    ],
+                    "key": "instructor_registered",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_review_submitted": {
+                    "label": "Course Review Submitted",
+                    "hook": "academy/frontend/after_course_rating",
+                    "key": "course_review_submitted",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_question_asked": {
+                    "label": "Course Question Asked",
+                    "hook": "academy/frontend/insert_course_qa",
+                    "key": "course_question_asked",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_question_replied": {
+                    "label": "Course Question Replied",
+                    "hook": "academy/frontend/insert_course_qa_answered",
+                    "key": "course_question_replied",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "announcement_published": {
+                    "label": "Announcement Published",
+                    "hook": "transition_post_status",
+                    "key": "announcement_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assignment_published": {
+                    "label": "Assignment Published",
+                    "hook": "transition_post_status",
+                    "key": "assignment_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assignment_submitted": {
+                    "label": "Assignment Submitted",
+                    "hook": "academy_pro/frontend/submitted_assignment",
+                    "key": "assignment_submitted",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assignment_evaluated": {
+                    "label": "Assignment Evaluated",
+                    "hook": "academy_pro/frontend/evaluate_submitted_assignment",
+                    "key": "assignment_evaluated",
+                    "schema": [
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assignment_completed": {
+                    "label": "Assignment Completed",
+                    "hook": "academy/frontend/after_mark_topic_complete",
+                    "key": "assignment_completed",
+                    "schema": [
+                        {
+                            "key": "topic_id",
+                            "label": "Topic ID (optional; empty means any)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_booking_published": {
+                    "label": "Tutor Booking Published",
+                    "hook": "transition_post_status",
+                    "key": "tutor_booking_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_booking_booked": {
+                    "label": "Tutor Booking Booked",
+                    "hook": "academy_pro/booking/after_booked",
+                    "key": "tutor_booking_booked",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_booking_completed": {
+                    "label": "Tutor Booking Completed",
+                    "hook": "academy/frontend/after_mark_topic_complete",
+                    "key": "tutor_booking_completed",
+                    "schema": [
+                        {
+                            "key": "topic_id",
+                            "label": "Topic ID (optional; empty means any)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "tutor_booking_review_submitted": {
+                    "label": "Tutor Booking Review Submitted",
+                    "hook": "academy_pro/fronted/academy_booking_review",
+                    "key": "tutor_booking_review_submitted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "zoom_meeting_published": {
+                    "label": "Zoom Meeting Published",
+                    "hook": "academy_pro/frontend/after_zoom_publish",
+                    "key": "zoom_meeting_published",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "zoom_meeting_completed": {
+                    "label": "Zoom Meeting Completed",
+                    "hook": "academy/frontend/after_mark_topic_complete",
+                    "key": "zoom_meeting_completed",
+                    "schema": [
+                        {
+                            "key": "topic_id",
+                            "label": "Topic ID (optional; empty means any)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "course_id",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "course_bundle_published": {
+                    "label": "Course Bundle Published",
+                    "hook": "transition_post_status",
+                    "key": "course_bundle_published",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -146,21 +647,22 @@
             },
             "actions": {
                 "enroll-course": {
-                    "label": "Enroll in Course",
-                    "description": "Enroll a user in one or more courses.",
+                    "label": "Enroll User in Course",
+                    "description": "Enroll an existing WordPress user in a course.",
                     "key": "enroll-course",
                     "schema": [
                         {
                             "key": "user_id",
-                            "label": "User Email",
-                            "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
-                            "required": false
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
                         },
                         {
                             "key": "selectedCourse",
                             "label": "Courses",
                             "type": "select",
+                            "required": false,
                             "multiple": true,
                             "dynamic": {
                                 "integration": "academy",
@@ -169,14 +671,14 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "all_courses",
-                            "label": "Enroll in all courses",
+                            "label": "All courses",
                             "type": "checkbox",
-                            "help": "If checked, all published courses will be enrolled, ignoring the selection above."
+                            "required": false,
+                            "help": "Enroll in all published courses or cancel all active enrollments for this user."
                         }
                     ],
                     "outputs": [
@@ -184,21 +686,22 @@
                     ]
                 },
                 "unenroll-course": {
-                    "label": "Unenroll from Course",
-                    "description": "Unenroll a user from one or more courses.",
+                    "label": "Unenroll User from Course",
+                    "description": "Cancel the selected enrollment.",
                     "key": "unenroll-course",
                     "schema": [
                         {
                             "key": "user_id",
-                            "label": "User Email",
-                            "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
-                            "required": false
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
                         },
                         {
                             "key": "selectedCourse",
                             "label": "Courses",
                             "type": "select",
+                            "required": false,
                             "multiple": true,
                             "dynamic": {
                                 "integration": "academy",
@@ -207,36 +710,37 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         },
                         {
                             "key": "all_courses",
-                            "label": "Unenroll from all courses",
+                            "label": "All courses",
                             "type": "checkbox",
-                            "help": "If checked, all courses will be unenrolled, ignoring the selection above."
+                            "required": false,
+                            "help": "Enroll in all published courses or cancel all active enrollments for this user."
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "complete-lesson": {
-                    "label": "Complete Lesson",
-                    "description": "Mark a specific lesson as complete for the user.",
-                    "key": "complete-lesson",
+                "complete-course": {
+                    "label": "Mark Course Complete for User",
+                    "description": "Record Academy course completion.",
+                    "key": "complete-course",
                     "schema": [
                         {
                             "key": "user_id",
-                            "label": "User Email",
-                            "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
-                            "required": false
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
                         },
                         {
                             "key": "selectedCourse",
                             "label": "Course",
                             "type": "select",
+                            "required": true,
                             "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
@@ -245,13 +749,51 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
+                        },
+                        {
+                            "key": "force_completion",
+                            "label": "Allow completion with unfinished topics",
+                            "type": "checkbox",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "complete-lesson": {
+                    "label": "Mark Lesson Complete for User",
+                    "description": "Mark a course curriculum lesson complete.",
+                    "key": "complete-lesson",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Course",
+                            "type": "select",
+                            "required": true,
+                            "multiple": false,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
                         },
                         {
                             "key": "selectedLesson",
                             "label": "Lesson",
                             "type": "select",
+                            "required": true,
                             "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
@@ -260,30 +802,30 @@
                                     "name",
                                     "label"
                                 ]
-                            },
-                            "required": true
+                            }
                         }
                     ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "complete-course": {
-                    "label": "Complete Course",
-                    "description": "Mark an entire course as completed for the user.",
-                    "key": "complete-course",
+                "reset-course-progress": {
+                    "label": "Reset User Course Progress",
+                    "description": "Remove completed-topic progress and course-completion record without cancelling enrollment or deleting quiz attempt history.",
+                    "key": "reset-course-progress",
                     "schema": [
                         {
                             "key": "user_id",
-                            "label": "User Email",
-                            "type": "email",
-                            "help": "Enter the email address of the user. If left empty, the system will try to use the user from the trigger data, otherwise the currently logged\u2011in user.",
-                            "required": false
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
                         },
                         {
                             "key": "selectedCourse",
                             "label": "Course",
                             "type": "select",
+                            "required": true,
                             "multiple": false,
                             "dynamic": {
                                 "integration": "academy",
@@ -292,8 +834,141 @@
                                     "name",
                                     "label"
                                 ]
-                            },
+                            }
+                        },
+                        {
+                            "key": "confirm_reset",
+                            "label": "I understand completed topics and course completion will be deleted",
+                            "type": "checkbox",
                             "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add-to-wishlist": {
+                    "label": "Add Course to Wishlist",
+                    "description": "Add selected courses to Academy wishlist.",
+                    "key": "add-to-wishlist",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Courses",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove-from-wishlist": {
+                    "label": "Remove Course from Wishlist",
+                    "description": "Remove selected courses from Academy wishlist.",
+                    "key": "remove-from-wishlist",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Courses",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assign-instructor": {
+                    "label": "Assign Instructor to Course",
+                    "description": "Assign approved instructor to selected courses.",
+                    "key": "assign-instructor",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Courses",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove-instructor": {
+                    "label": "Remove Instructor from Course",
+                    "description": "Remove an instructor assignment; cannot remove the author.",
+                    "key": "remove-instructor",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID or email",
+                            "type": "text",
+                            "required": false,
+                            "help": "If blank, uses user_id or user_email from the trigger. Enter an explicit user for scheduled workflows."
+                        },
+                        {
+                            "key": "selectedCourse",
+                            "label": "Courses",
+                            "type": "select",
+                            "required": true,
+                            "multiple": true,
+                            "dynamic": {
+                                "integration": "academy",
+                                "query": "acourse_no_any",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [
@@ -312,10 +987,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/ablocks/",
-                "action": "https://zaplane.app/docs/ablocks/"
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -354,10 +1025,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/gemcrm/",
-                "action": "https://zaplane.app/docs/action-gemcrm/"
-            },
             "triggers": {
                 "contact_created": {
                     "label": "Contact Created",
@@ -1274,10 +1941,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/storeengine/",
-                "action": "https://zaplane.app/docs/action-storeengine/"
-            },
             "triggers": {
                 "product_purchased": {
                     "label": "Product Purchased",
@@ -1684,6 +2347,16 @@
                     "hook": "storeengine/subscription/failed_to_create_renewal_order",
                     "requires_addon": "subscription",
                     "key": "subscription_renewal_failed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscription_renewal_payment_failed": {
+                    "label": "Subscription Renewal Payment Failed",
+                    "hook": "storeengine/subscription/renewal_payment_failed",
+                    "requires_addon": "subscription",
+                    "key": "subscription_renewal_payment_failed",
                     "schema": [],
                     "outputs": [
                         "main"
@@ -2176,6 +2849,37 @@
                             "label": "Usage Limit (total)",
                             "type": "expression",
                             "required": false
+                        },
+                        {
+                            "key": "random_suffix",
+                            "label": "Add a random ending to the code",
+                            "type": "boolean",
+                            "required": false,
+                            "help": "Makes a code built from an order or customer number impossible to guess."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_product": {
+                    "label": "Get Product (search by name/SKU)",
+                    "key": "get_product",
+                    "schema": [
+                        {
+                            "key": "query",
+                            "label": "Product Name or Keyword",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.text}}",
+                            "help": "Searched against the product title. Returns the closest live match(es) with current price and stock \u2014 use this (wired as an Agent tool) for exact, up-to-date pricing rather than a cached knowledge snippet."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Max Matches",
+                            "type": "number",
+                            "required": false,
+                            "default": 1
                         }
                     ],
                     "outputs": [
@@ -2483,10 +3187,6 @@
                     "help": "Optional. When set, append ?secret=<value> to the callback URL you register in ActiveCampaign; requests without it are rejected."
                 }
             ],
-            "docs_url": {
-                "trigger": "",
-                "action": "https://zaplane.app/docs/action-activecampaign/"
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -2792,10 +3492,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": "https://zaplane.app/docs/action-advanced-custom-fields/"
-            },
             "triggers": {
                 "acf_save_post": {
                     "label": "ACF Fields Saved",
@@ -3048,10 +3744,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/ai-openai/",
-                "action": "https://zaplane.app/docs/ai-openai/"
-            },
             "triggers": [],
             "actions": {
                 "generate_response": {
@@ -3082,7 +3774,7 @@
                             "type": "expression",
                             "required": false,
                             "placeholder": "https://example.com/photo.jpg",
-                            "help": "Attach an image for the model to analyze. Supported on OpenAI, Anthropic, and Gemini vision models."
+                            "help": "Attach an image for the model to analyze. Supported on WordPress AI, OpenAI, Anthropic, and Gemini vision models."
                         },
                         {
                             "key": "system_prompt",
@@ -3159,7 +3851,7 @@
                             "type": "expression",
                             "required": false,
                             "placeholder": "gpt-image-1",
-                            "help": "OpenAI image model (e.g. gpt-image-1 or dall-e-3). Requires an OpenAI connection."
+                            "help": "OpenAI image model (e.g. gpt-image-1 or dall-e-3). Used with an OpenAI connection; a WordPress AI connection uses the image model configured in WordPress."
                         },
                         {
                             "key": "size",
@@ -3230,10 +3922,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit (Lite)",
@@ -3298,10 +3986,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -3340,10 +4024,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
                 "contact_form_submission": {
                     "label": "Contact Form Submission",
@@ -3385,10 +4065,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/bit-form/",
-                "action": "https://zaplane.app/docs/bit-form/"
-            },
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -3427,10 +4103,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/booking-calendar/",
-                "action": "https://zaplane.app/docs/booking-calendar/"
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -3454,10 +4126,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "create_contact": {
@@ -3587,10 +4255,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/buddyboss/",
-                "action": "https://zaplane.app/docs/action-buddyboss/"
-            },
             "triggers": {
                 "account_activated": {
                     "label": "Account Activated",
@@ -4436,10 +5100,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/coblocks/",
-                "action": "https://zaplane.app/docs/coblocks/"
-            },
             "triggers": {
                 "coblocks_form_submit": {
                     "label": "Form Submission",
@@ -4463,10 +5123,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/contact-form/",
-                "action": "https://zaplane.app/docs/contact-form/"
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -4523,10 +5179,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "create_channel": {
@@ -5280,10 +5932,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/divi-builder/",
-                "action": "https://zaplane.app/docs/divi-builder/"
-            },
             "triggers": {
                 "contact_form_submit": {
                     "label": "Contact Form Submitted",
@@ -5307,10 +5955,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
                 "new_seller_created": {
                     "label": "New Seller Created",
@@ -5734,10 +6378,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/easy-digital-downloads/",
-                "action": "https://zaplane.app/docs/easy-digital-downloads/"
-            },
             "triggers": {
                 "purchase_product": {
                     "label": "Product Purchased",
@@ -6209,10 +6849,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/elementor/",
-                "action": "https://zaplane.app/docs/elementor/"
-            },
             "triggers": {
                 "elementor_pro/forms/new_record": {
                     "label": "Form New Record",
@@ -6236,10 +6872,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/essential-blocks/",
-                "action": "https://zaplane.app/docs/essential-blocks/"
-            },
             "triggers": {
                 "eb_form_submit_before_email": {
                     "label": "Form Submission",
@@ -6263,49 +6895,812 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
-                "attendEvent": {
-                    "label": "User attended an event",
-                    "hook": "event_tickets_checkin",
-                    "key": "attendEvent",
-                    "schema": [],
+                "event_created": {
+                    "label": "Event Created",
+                    "hook": [
+                        "wp_after_insert_post",
+                        "tribe_events_update_meta"
+                    ],
+                    "key": "event_created",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "attendeeRegistered": {
-                    "label": "Attendee registered for an event",
-                    "hook": "event_tickets_rsvp_attendee_created",
-                    "key": "attendeeRegistered",
-                    "schema": [],
+                "event_published": {
+                    "label": "Event Published",
+                    "hook": "transition_post_status",
+                    "key": "event_published",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "new_status",
+                            "label": "Only new status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "newAttendee": {
-                    "label": "New attendee registered",
-                    "hook": "event_tickets_rsvp_tickets_generated_for_product",
-                    "key": "newAttendee",
-                    "schema": [],
+                "event_updated": {
+                    "label": "Event Updated",
+                    "hook": "wp_after_insert_post",
+                    "key": "event_updated",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 },
-                "attendeeRegisteredWc": {
-                    "label": "Attendee registered via WooCommerce",
-                    "hook": "tribe_tickets_attendee_repository_create_attendee_for_ticket_after_create",
-                    "key": "attendeeRegisteredWc",
-                    "schema": [],
+                "event_deleted": {
+                    "label": "Event Deleted",
+                    "hook": "before_delete_post",
+                    "key": "event_deleted",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "event_status_changed": {
+                    "label": "Event Status Changed",
+                    "hook": "transition_post_status",
+                    "key": "event_status_changed",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "new_status",
+                            "label": "Only new status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "venue_created": {
+                    "label": "Venue Created",
+                    "hook": "wp_after_insert_post",
+                    "key": "venue_created",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Only venue ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "venue_status",
+                            "label": "Only venue status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "venue_updated": {
+                    "label": "Venue Updated",
+                    "hook": "wp_after_insert_post",
+                    "key": "venue_updated",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Only venue ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "venue_status",
+                            "label": "Only venue status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "venue_deleted": {
+                    "label": "Venue Deleted",
+                    "hook": "before_delete_post",
+                    "key": "venue_deleted",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Only venue ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "venue_status",
+                            "label": "Only venue status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "organizer_created": {
+                    "label": "Organizer Created",
+                    "hook": "wp_after_insert_post",
+                    "key": "organizer_created",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Only organizer ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "organizer_status",
+                            "label": "Only organizer status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "organizer_updated": {
+                    "label": "Organizer Updated",
+                    "hook": "wp_after_insert_post",
+                    "key": "organizer_updated",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Only organizer ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "organizer_status",
+                            "label": "Only organizer status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "organizer_deleted": {
+                    "label": "Organizer Deleted",
+                    "hook": "before_delete_post",
+                    "key": "organizer_deleted",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Only organizer ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "organizer_status",
+                            "label": "Only organizer status (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "event_linked_related_post": {
+                    "label": "Event Linked to Related Post",
+                    "hook": [
+                        "added_post_meta",
+                        "updated_post_meta"
+                    ],
+                    "key": "event_linked_related_post",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "related_type",
+                            "label": "Only venue or organizer (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "related_post_id",
+                            "label": "Only related post ID (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "event_unlinked_related_post": {
+                    "label": "Event Unlinked from Related Post",
+                    "hook": [
+                        "deleted_post_meta",
+                        "updated_post_meta"
+                    ],
+                    "key": "event_unlinked_related_post",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Only event ID (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "event_status",
+                            "label": "Only event status (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "related_type",
+                            "label": "Only venue or organizer (optional)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "related_post_id",
+                            "label": "Only related post ID (optional)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 }
             },
-            "actions": []
+            "actions": {
+                "create_event": {
+                    "label": "Create Event",
+                    "key": "create_event",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Event Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "start",
+                            "label": "Start (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "end",
+                            "label": "End (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status: draft or publish",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_event": {
+                    "label": "Update Event",
+                    "key": "update_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Event Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "start",
+                            "label": "Start (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "end",
+                            "label": "End (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "content",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status: draft, publish, pending or private",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_event": {
+                    "label": "Delete Event",
+                    "key": "delete_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_event_details": {
+                    "label": "Get Event Details",
+                    "key": "get_event_details",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_events": {
+                    "label": "Search Events",
+                    "key": "search_events",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search text",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_venue": {
+                    "label": "Create Venue",
+                    "key": "create_venue",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Venue Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "address",
+                            "label": "Address",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "country",
+                            "label": "Country",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "zip",
+                            "label": "Zip",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_venue": {
+                    "label": "Update Venue",
+                    "key": "update_venue",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Venue ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Venue Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "address",
+                            "label": "Address",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "city",
+                            "label": "City",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "country",
+                            "label": "Country",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "zip",
+                            "label": "Zip",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_venue": {
+                    "label": "Delete Venue",
+                    "key": "delete_venue",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Venue ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_venue_details": {
+                    "label": "Get Venue Details",
+                    "key": "get_venue_details",
+                    "schema": [
+                        {
+                            "key": "venue_id",
+                            "label": "Venue ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_venues": {
+                    "label": "Search Venues",
+                    "key": "search_venues",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search text",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_organizer": {
+                    "label": "Create Organizer",
+                    "key": "create_organizer",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Organizer Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "website",
+                            "label": "Website",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_organizer": {
+                    "label": "Update Organizer",
+                    "key": "update_organizer",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Organizer ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Organizer Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "phone",
+                            "label": "Phone",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "website",
+                            "label": "Website",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_organizer": {
+                    "label": "Delete Organizer",
+                    "key": "delete_organizer",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Organizer ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_organizer_details": {
+                    "label": "Get Organizer Details",
+                    "key": "get_organizer_details",
+                    "schema": [
+                        {
+                            "key": "organizer_id",
+                            "label": "Organizer ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_organizers": {
+                    "label": "Search Organizers",
+                    "key": "search_organizers",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search text",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_venue_to_event": {
+                    "label": "Add Venue to Event",
+                    "key": "add_venue_to_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "venue_id",
+                            "label": "Venue ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_venue_from_event": {
+                    "label": "Remove Venue from Event",
+                    "key": "remove_venue_from_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "venue_id",
+                            "label": "Venue ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_organizer_to_event": {
+                    "label": "Add Organizer to Event",
+                    "key": "add_organizer_to_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "organizer_id",
+                            "label": "Organizer ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_organizer_from_event": {
+                    "label": "Remove Organizer from Event",
+                    "key": "remove_organizer_from_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event ID",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "organizer_id",
+                            "label": "Organizer ID",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
         },
         "fillout": {
             "slug": "fillout",
@@ -6317,10 +7712,6 @@
             "supports_webhook": true,
             "webhook_route": "zaplane/v1/incoming/fillout",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/fillout/",
-                "action": "https://zaplane.app/docs/fillout/"
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -6367,10 +7758,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/fluentcart/",
-                "action": "https://zaplane.app/docs/action-fluentcart/"
-            },
             "triggers": {
                 "product_purchased": {
                     "label": "Product Purchased",
@@ -9563,10 +10950,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/fluentcrm/",
-                "action": "https://zaplane.app/docs/action-fluentcrm/"
-            },
             "triggers": {
                 "added_tag": {
                     "label": "Tag Added To Contact",
@@ -10538,10 +11921,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/fluent-forms/",
-                "action": "https://zaplane.app/docs/fluent-forms/"
-            },
             "triggers": {
                 "submission_inserted": {
                     "label": "Form Submitted",
@@ -10580,10 +11959,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/fluentsmtp/",
-                "action": "https://zaplane.app/docs/action-fluentsmtp/"
-            },
             "triggers": {
                 "email_sent": {
                     "label": "Email Sent",
@@ -10728,10 +12103,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/formidable-forms/",
-                "action": "https://zaplane.app/docs/formidable-forms/"
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -10770,45 +12141,21 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/funnelkit/",
-                "action": "https://zaplane.app/docs/actions-funnelkit/"
-            },
             "triggers": {
-                "woofunnels_loaded": {
-                    "label": "WooFunnels Loaded",
-                    "hook": "woofunnels_loaded",
-                    "key": "woofunnels_loaded",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "core_modules_loaded": {
-                    "label": "Core Modules Loaded",
-                    "hook": "wffn_core_modules_loaded",
-                    "key": "core_modules_loaded",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "loaded": {
-                    "label": "FunnelKit Loaded",
-                    "hook": "wffn_loaded",
-                    "key": "loaded",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
                 "funnel_created": {
                     "label": "Funnel Created",
                     "hook": "wffn_funnel_created",
                     "key": "funnel_created",
+                    "schema": [],
+                    "outputs": [
+                        "main",
+                        "error"
+                    ]
+                },
+                "funnel_updated": {
+                    "label": "Funnel Updated",
+                    "hook": "wffn_funnel_update",
+                    "key": "funnel_updated",
                     "schema": [
                         {
                             "key": "funnel_id",
@@ -10859,47 +12206,7 @@
                     "label": "Funnel Imported",
                     "hook": "wffn_funnel_imported",
                     "key": "funnel_imported",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "funnel_updated": {
-                    "label": "Funnel Updated",
-                    "hook": "wffn_funnel_update",
-                    "key": "funnel_updated",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -10909,22 +12216,7 @@
                     "label": "Step Duplicated",
                     "hook": "wffn_step_duplicated",
                     "key": "step_duplicated",
-                    "schema": [
-                        {
-                            "key": "step_id",
-                            "label": "Step",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "steps",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -10934,22 +12226,7 @@
                     "label": "Step Viewed",
                     "hook": "wffn_event_step_viewed",
                     "key": "step_viewed",
-                    "schema": [
-                        {
-                            "key": "step_id",
-                            "label": "Step",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "steps",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -10959,22 +12236,7 @@
                     "label": "Step Converted",
                     "hook": "wffn_event_step_converted",
                     "key": "step_converted",
-                    "schema": [
-                        {
-                            "key": "step_id",
-                            "label": "Step",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "steps",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -10984,22 +12246,7 @@
                     "label": "Funnel Ended",
                     "hook": "wffn_funnel_ended_event",
                     "key": "funnel_ended",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -11009,56 +12256,6 @@
                     "label": "Thank You Funnel Ended",
                     "hook": "wffn_ty_funnel_ended_event",
                     "key": "ty_funnel_ended",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "import_completed": {
-                    "label": "Import Completed",
-                    "hook": "wffn_import_completed",
-                    "key": "import_completed",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "importing_completed": {
-                    "label": "Background Import Completed",
-                    "hook": "wffn_importing_completed",
-                    "key": "importing_completed",
                     "schema": [],
                     "outputs": [
                         "main",
@@ -11069,22 +12266,7 @@
                     "label": "Template Import Remote",
                     "hook": "wffn_template_import_remote",
                     "key": "template_import_remote",
-                    "schema": [
-                        {
-                            "key": "funnel_id",
-                            "label": "Funnel",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "funnelkit",
-                                "query": "funnels",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main",
                         "error"
@@ -11124,16 +12306,6 @@
                     "label": "WooFunnels Footer",
                     "hook": "woofunnels_wp_footer",
                     "key": "wp_footer",
-                    "schema": [],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "checkout_loaded": {
-                    "label": "Checkout Module Loaded",
-                    "hook": "wfacp_loaded",
-                    "key": "checkout_loaded",
                     "schema": [],
                     "outputs": [
                         "main",
@@ -11393,7 +12565,14 @@
                 "current_filter": {
                     "label": "Get Current Filter",
                     "key": "current_filter",
-                    "schema": [],
+                    "schema": [
+                        {
+                            "key": "hook_name",
+                            "label": "Hook Name",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main",
                         "error"
@@ -11411,10 +12590,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/gamipress/",
-                "action": "https://zaplane.app/docs/gamipress/"
-            },
             "triggers": {
                 "user_earns_rank": {
                     "label": "User Earns Rank",
@@ -11568,10 +12743,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "send_email": {
@@ -11851,10 +13022,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "create_meeting": {
@@ -12130,10 +13297,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/gravity-forms/",
-                "action": "https://zaplane.app/docs/gravity-forms/"
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -12172,10 +13335,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/groundhogg/",
-                "action": "https://zaplane.app/docs/groundhogg/"
-            },
             "triggers": {
                 "created_contact": {
                     "label": "Created Contact",
@@ -12247,10 +13406,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/jetengine/",
-                "action": "https://zaplane.app/docs/jetengine/"
-            },
             "triggers": {
                 "post_type_field_update": {
                     "label": "Updated JetEngine field on post type",
@@ -12289,10 +13444,6 @@
             "supports_webhook": true,
             "webhook_route": "zaplane/v1/incoming/jotform",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/jotform/",
-                "action": "https://zaplane.app/docs/action-jotform/"
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -12621,10 +13772,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/kadence-blocks/",
-                "action": "https://zaplane.app/docs/kadence-blocks/"
-            },
             "triggers": {
                 "kadence_blocks_advanced_form_submission": {
                     "label": "Form Submission",
@@ -12648,10 +13795,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/learndash/",
-                "action": "https://zaplane.app/docs/learndash/"
-            },
             "triggers": {
                 "user_enroll_course": {
                     "label": "User Is Enrolled In A Course",
@@ -12914,10 +14057,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/lifterlms/",
-                "action": "https://zaplane.app/docs/lifterlms/"
-            },
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -13036,24 +14175,12 @@
                     "help": "Optional. When set, append ?secret=<value> to the callback URL you paste into Mailchimp; requests without it are rejected."
                 }
             ],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
                 "subscribed": {
                     "label": "Subscriber Added",
                     "hook": "mailchimp_webhook_subscribed",
                     "key": "subscribed",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -13062,15 +14189,7 @@
                     "label": "Subscriber Unsubscribed",
                     "hook": "mailchimp_webhook_unsubscribed",
                     "key": "unsubscribed",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -13079,15 +14198,7 @@
                     "label": "Subscriber Profile Updated",
                     "hook": "mailchimp_webhook_profile_updated",
                     "key": "profile_updated",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -13096,15 +14207,7 @@
                     "label": "Email Cleaned",
                     "hook": "mailchimp_webhook_cleaned",
                     "key": "cleaned",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -13113,15 +14216,7 @@
                     "label": "Subscriber Email Changed",
                     "hook": "mailchimp_webhook_email_changed",
                     "key": "email_changed",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -13130,15 +14225,7 @@
                     "label": "Campaign Sent",
                     "hook": "mailchimp_webhook_campaign_sent",
                     "key": "campaign_sent",
-                    "schema": [
-                        {
-                            "key": "list_id",
-                            "label": "Audience/List ID",
-                            "type": "text",
-                            "placeholder": "a6b5da1054",
-                            "help": "Optional. Only continue if the webhook came from this Mailchimp audience."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -13402,10 +14489,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/manual/",
-                "action": "https://zaplane.app/docs/manual/"
-            },
             "triggers": {
                 "run_manually": {
                     "label": "Run Manually",
@@ -13436,10 +14519,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/masterstudy-lms/",
-                "action": "https://zaplane.app/docs/masterstudy-lms/"
-            },
             "triggers": {
                 "user_enroll_course": {
                     "label": "User Is Enrolled In A Course",
@@ -13588,10 +14667,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/memberpress-2/",
-                "action": "https://zaplane.app/docs/action-memberpress/"
-            },
             "triggers": {
                 "member_added": {
                     "label": "Member Added",
@@ -14786,10 +15861,6 @@
                     "help": "Meta app \u2192 Settings \u2192 Basic \u2192 App Secret. Used to check the X-Hub-Signature-256 on every delivery."
                 }
             ],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -14838,10 +15909,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/meta-box/",
-                "action": "https://zaplane.app/docs/meta-box/"
-            },
             "triggers": {
                 "form_submission": {
                     "label": "Form Submission",
@@ -14880,10 +15947,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/metform/",
-                "action": "https://zaplane.app/docs/metform/"
-            },
             "triggers": {
                 "metform_after_store_form_data": {
                     "label": "Form Submitted",
@@ -14907,10 +15970,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/ninja-forms/",
-                "action": "https://zaplane.app/docs/ninja-forms/"
-            },
             "triggers": {
                 "process_ninja_form": {
                     "label": "Form Submit",
@@ -14949,10 +16008,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/paid-memberships-pro/",
-                "action": "https://zaplane.app/docs/action-memberships-pro/"
-            },
             "triggers": {
                 "admin_assigns_membership": {
                     "label": "Admin Assigns a Membership Level to a User",
@@ -15187,10 +16242,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/paymattic-integration/",
-                "action": "https://zaplane.app/docs/paymattic-integration/"
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -15553,10 +16604,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/profile-builder/",
-                "action": "https://zaplane.app/docs/profile-builder/"
-            },
             "triggers": {
                 "user_registration": {
                     "label": "User Registration",
@@ -15633,10 +16680,6 @@
                     "help": "Slack app \u2192 Basic Information \u2192 App Credentials \u2192 Signing Secret. Without it this endpoint accepts unsigned requests from anyone."
                 }
             ],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -15902,10 +16945,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/spectra-legacy/",
-                "action": "https://zaplane.app/docs/spectra-legacy/"
-            },
             "triggers": {
                 "uagb_form_success": {
                     "label": "Form Submission",
@@ -15929,10 +16968,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/surecart/",
-                "action": "https://zaplane.app/docs/action-surecart/"
-            },
             "triggers": {
                 "purchase_created": {
                     "label": "Purchase Created",
@@ -17480,10 +18515,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/sure-form/",
-                "action": "https://zaplane.app/docs/sure-form/"
-            },
             "triggers": {
                 "submit_form": {
                     "label": "Form Submit",
@@ -17522,10 +18553,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/suremail/",
-                "action": "https://zaplane.app/docs/suremail/"
-            },
             "triggers": {
                 "email_sent_successfully": {
                     "label": "Email Sent Successfully",
@@ -17558,10 +18585,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/suremembers/",
-                "action": "https://zaplane.app/docs/action-suremembers/"
-            },
             "triggers": {
                 "access_group": {
                     "label": "User Added To Access Group",
@@ -17712,13 +18735,9 @@
                     "label": "Secret Token",
                     "type": "password",
                     "generate": true,
-                    "help": "Telegram sends this back on every request, which is how this endpoint tells real deliveries from forged ones. Saving this automatically calls setWebhook for every connected bot, each on its own callback URL \u2014 no manual API call needed."
+                    "help": "Pass the same value as secret_token when you call setWebhook. Telegram then sends it back on every request, which is how this endpoint tells real deliveries from forged ones."
                 }
             ],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -17737,92 +18756,11 @@
                     "outputs": [
                         "main"
                     ]
-                },
-                "edited_message_received": {
-                    "label": "Edited Message",
-                    "hook": "telegram_webhook_edited_message",
-                    "key": "edited_message_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "channel_post_received": {
-                    "label": "Channel Post",
-                    "hook": "telegram_webhook_channel_post",
-                    "key": "channel_post_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "edited_channel_post_received": {
-                    "label": "Edited Channel Post",
-                    "hook": "telegram_webhook_edited_channel_post",
-                    "key": "edited_channel_post_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "callback_query_received": {
-                    "label": "Callback Query",
-                    "hook": "telegram_webhook_callback_query",
-                    "key": "callback_query_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "inline_query_received": {
-                    "label": "Inline Query",
-                    "hook": "telegram_webhook_inline_query",
-                    "key": "inline_query_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "poll_received": {
-                    "label": "Poll",
-                    "hook": "telegram_webhook_poll",
-                    "key": "poll_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "pre_checkout_query_received": {
-                    "label": "Pre-Checkout Query",
-                    "hook": "telegram_webhook_pre_checkout_query",
-                    "key": "pre_checkout_query_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "shipping_query_received": {
-                    "label": "Shipping Query",
-                    "hook": "telegram_webhook_shipping_query",
-                    "key": "shipping_query_received",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "all_updates": {
-                    "label": "All Updates",
-                    "hook": "telegram_webhook_all_updates",
-                    "key": "all_updates",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
                 }
             },
             "actions": {
                 "send_message": {
-                    "label": "Send Text Message or a Reply",
+                    "label": "Send Text Message",
                     "key": "send_message",
                     "schema": [
                         {
@@ -17839,14 +18777,6 @@
                             "label": "Message Text",
                             "placeholder": "Enter your message... Use {{variable}} for dynamic values",
                             "required": true
-                        },
-                        {
-                            "key": "reply_to_message_id",
-                            "type": "text",
-                            "label": "Reply To Message ID",
-                            "placeholder": "{{telegram_message_id}}",
-                            "required": false,
-                            "help": "Leave blank to send as a new message, or provide a message_id to send as a reply."
                         },
                         {
                             "key": "parse_mode",
@@ -17877,79 +18807,6 @@
                             "key": "disable_notification",
                             "type": "select",
                             "label": "Silent Message",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "false",
-                                    "label": "No (with notification)"
-                                },
-                                {
-                                    "value": "true",
-                                    "label": "Yes (silent)"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "send_post": {
-                    "label": "Post",
-                    "key": "send_post",
-                    "schema": [
-                        {
-                            "key": "chat_id",
-                            "type": "text",
-                            "label": "Chat ID",
-                            "placeholder": "987654321 or @channelname",
-                            "required": true,
-                            "help": "Telegram chat/user ID or @username for public channels."
-                        },
-                        {
-                            "key": "text",
-                            "type": "textarea",
-                            "label": "Post Text",
-                            "placeholder": "Enter your post content... Use {{variable}} for dynamic values",
-                            "required": true
-                        },
-                        {
-                            "key": "inline_buttons",
-                            "type": "textarea",
-                            "label": "Inline Buttons",
-                            "placeholder": "Approve:approve_order_88, Reject:reject_order_88\nView Details:view_88",
-                            "required": false,
-                            "help": "Optional. Each line = one row of buttons. Multiple buttons in a row separated by comma. Each button format: Label:callback_data"
-                        },
-                        {
-                            "key": "parse_mode",
-                            "type": "select",
-                            "label": "Parse Mode",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "",
-                                    "label": "None"
-                                },
-                                {
-                                    "value": "HTML",
-                                    "label": "HTML"
-                                },
-                                {
-                                    "value": "Markdown",
-                                    "label": "Markdown"
-                                },
-                                {
-                                    "value": "MarkdownV2",
-                                    "label": "MarkdownV2"
-                                }
-                            ],
-                            "help": "Formatting mode for the post text."
-                        },
-                        {
-                            "key": "disable_notification",
-                            "type": "select",
-                            "label": "Silent Post",
                             "required": false,
                             "options": [
                                 {
@@ -18095,62 +18952,6 @@
                         "main"
                     ]
                 },
-                "send_media": {
-                    "label": "Send Media",
-                    "key": "send_media",
-                    "schema": [
-                        {
-                            "key": "chat_id",
-                            "type": "text",
-                            "label": "Chat ID",
-                            "placeholder": "987654321 or @channelname",
-                            "required": true,
-                            "help": "Telegram chat/user ID or @username for public channels."
-                        },
-                        {
-                            "key": "media_type",
-                            "type": "select",
-                            "label": "Media Type",
-                            "required": true,
-                            "options": [
-                                {
-                                    "value": "photo",
-                                    "label": "Photo"
-                                },
-                                {
-                                    "value": "document",
-                                    "label": "Document"
-                                },
-                                {
-                                    "value": "video",
-                                    "label": "Video"
-                                },
-                                {
-                                    "value": "audio",
-                                    "label": "Audio"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "media",
-                            "type": "text",
-                            "label": "Media URL",
-                            "placeholder": "https://example.com/file.jpg",
-                            "required": true,
-                            "help": "Publicly accessible URL \u2014 must match the selected Media Type."
-                        },
-                        {
-                            "key": "caption",
-                            "type": "text",
-                            "label": "Caption",
-                            "placeholder": "Optional caption",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
                 "send_location": {
                     "label": "Send Location",
                     "key": "send_location",
@@ -18271,260 +19072,6 @@
                     "outputs": [
                         "main"
                     ]
-                },
-                "get_updates": {
-                    "label": "Fetch Updates from Bot",
-                    "key": "get_updates",
-                    "schema": [
-                        {
-                            "key": "offset",
-                            "type": "text",
-                            "label": "Offset",
-                            "placeholder": "{{telegram_last_update_id}}",
-                            "required": false,
-                            "help": "Identifier of the first update to return. Pass the last processed update_id + 1 to avoid re-fetching old updates."
-                        },
-                        {
-                            "key": "limit",
-                            "type": "text",
-                            "label": "Limit",
-                            "placeholder": "100",
-                            "required": false,
-                            "help": "Number of updates to fetch per call (1\u2013100). Defaults to 100."
-                        },
-                        {
-                            "key": "timeout",
-                            "type": "text",
-                            "label": "Timeout (seconds)",
-                            "placeholder": "0",
-                            "required": false,
-                            "help": "Long-polling timeout in seconds. Leave at 0 for short polling. Note: Telegram rejects getUpdates while a webhook is active \u2014 delete the webhook first."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "send_contact": {
-                    "label": "Send Contact",
-                    "key": "send_contact",
-                    "schema": [
-                        {
-                            "key": "chat_id",
-                            "type": "text",
-                            "label": "Chat ID",
-                            "placeholder": "987654321 or @channelname",
-                            "required": true,
-                            "help": "Telegram chat/user ID or @username for public channels."
-                        },
-                        {
-                            "key": "phone_number",
-                            "type": "text",
-                            "label": "Phone Number",
-                            "placeholder": "+15551234567",
-                            "required": true,
-                            "help": "Contact phone number, in international format."
-                        },
-                        {
-                            "key": "first_name",
-                            "type": "text",
-                            "label": "First Name",
-                            "placeholder": "John",
-                            "required": true
-                        },
-                        {
-                            "key": "last_name",
-                            "type": "text",
-                            "label": "Last Name",
-                            "placeholder": "Doe",
-                            "required": false
-                        },
-                        {
-                            "key": "vcard",
-                            "type": "textarea",
-                            "label": "vCard",
-                            "placeholder": "Optional vCard-formatted additional data",
-                            "required": false,
-                            "help": "Additional contact data in vCard format (0\u20132048 bytes)."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_invite_link": {
-                    "label": "Create Invite Link",
-                    "key": "create_invite_link",
-                    "schema": [
-                        {
-                            "key": "chat_id",
-                            "type": "text",
-                            "label": "Chat ID",
-                            "placeholder": "987654321 or @channelname",
-                            "required": true,
-                            "help": "Telegram chat/user ID or @username for public channels."
-                        },
-                        {
-                            "key": "name",
-                            "type": "text",
-                            "label": "Link Name",
-                            "placeholder": "Optional invite link name",
-                            "required": false,
-                            "help": "0\u201332 characters, shown to admins in the chat \u2014 not to invited users."
-                        },
-                        {
-                            "key": "expire_date",
-                            "type": "text",
-                            "label": "Expire Date (Unix timestamp)",
-                            "placeholder": "1782633600",
-                            "required": false,
-                            "help": "When the link stops working. Leave blank for no expiry."
-                        },
-                        {
-                            "key": "member_limit",
-                            "type": "text",
-                            "label": "Member Limit",
-                            "placeholder": "50",
-                            "required": false,
-                            "help": "Max number of users who can join via this link (1\u201399999). Ignored if join requests are required."
-                        },
-                        {
-                            "key": "creates_join_request",
-                            "type": "select",
-                            "label": "Requires Admin Approval",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "false",
-                                    "label": "No"
-                                },
-                                {
-                                    "value": "true",
-                                    "label": "Yes (join requests)"
-                                }
-                            ],
-                            "help": "If enabled, Member Limit cannot also be set."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "revoke_invite_link": {
-                    "label": "Revoke Invite Link",
-                    "key": "revoke_invite_link",
-                    "schema": [
-                        {
-                            "key": "chat_id",
-                            "type": "text",
-                            "label": "Chat ID",
-                            "placeholder": "987654321 or @channelname",
-                            "required": true,
-                            "help": "Telegram chat/user ID or @username for public channels."
-                        },
-                        {
-                            "key": "invite_link",
-                            "type": "text",
-                            "label": "Invite Link",
-                            "placeholder": "https://t.me/+AbCdEfGhIjK",
-                            "required": true,
-                            "help": "The invite link to revoke. Use {{telegram_invite_link}} from a previous Create Invite Link node."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "ban_user": {
-                    "label": "Ban User",
-                    "key": "ban_user",
-                    "schema": [
-                        {
-                            "key": "chat_id",
-                            "type": "text",
-                            "label": "Chat ID",
-                            "placeholder": "987654321 or @channelname",
-                            "required": true,
-                            "help": "Telegram chat/user ID or @username for public channels."
-                        },
-                        {
-                            "key": "user_id",
-                            "type": "text",
-                            "label": "User ID",
-                            "placeholder": "123456789",
-                            "required": true,
-                            "help": "Telegram numeric user ID of the member to ban."
-                        },
-                        {
-                            "key": "until_date",
-                            "type": "text",
-                            "label": "Until Date (Unix timestamp)",
-                            "placeholder": "1782633600",
-                            "required": false,
-                            "help": "When the ban lifts. Must be 30 seconds to 366 days out, otherwise treated as a permanent ban. Leave blank to ban permanently."
-                        },
-                        {
-                            "key": "revoke_messages",
-                            "type": "select",
-                            "label": "Delete Their Messages",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "false",
-                                    "label": "No"
-                                },
-                                {
-                                    "value": "true",
-                                    "label": "Yes, delete all recent messages"
-                                }
-                            ]
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "unban_user": {
-                    "label": "Unban User",
-                    "key": "unban_user",
-                    "schema": [
-                        {
-                            "key": "chat_id",
-                            "type": "text",
-                            "label": "Chat ID",
-                            "placeholder": "987654321 or @channelname",
-                            "required": true,
-                            "help": "Telegram chat/user ID or @username for public channels."
-                        },
-                        {
-                            "key": "user_id",
-                            "type": "text",
-                            "label": "User ID",
-                            "placeholder": "123456789",
-                            "required": true,
-                            "help": "Telegram numeric user ID of the member to unban."
-                        },
-                        {
-                            "key": "only_if_banned",
-                            "type": "select",
-                            "label": "Only If Currently Banned",
-                            "required": false,
-                            "options": [
-                                {
-                                    "value": "true",
-                                    "label": "Yes"
-                                },
-                                {
-                                    "value": "false",
-                                    "label": "No, always unban"
-                                }
-                            ],
-                            "help": "Do nothing if the user is already not banned, instead of erroring."
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
                 }
             }
         },
@@ -18538,10 +19085,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "create_card": {
@@ -20270,10 +20813,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/tutor-lms/",
-                "action": "https://zaplane.app/docs/tutor-lms/"
-            },
             "triggers": {
                 "user_enroll_course": {
                     "label": "User enrolled in a course",
@@ -20390,10 +20929,6 @@
             "supports_webhook": true,
             "webhook_route": "zaplane/v1/incoming/typeform",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/typeform/",
-                "action": "https://zaplane.app/docs/typeform/"
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -20494,10 +21029,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/ultimate-member/",
-                "action": "https://zaplane.app/docs/action-ultimate-member/"
-            },
             "triggers": {
                 "user_login": {
                     "label": "User Login",
@@ -20586,10 +21117,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/webhook/",
-                "action": "https://zaplane.app/docs/webhook/"
-            },
             "triggers": {
                 "catch_hook": {
                     "label": "Catch Webhook",
@@ -20600,8 +21127,8 @@
                             "key": "webhook_url",
                             "label": "Webhook URL",
                             "type": "copy",
-                            "value": "zaplane/v1/hook/{workflow_id}",
-                            "help": "Send a GET or POST request (JSON body and/or query params) to this URL to trigger the workflow. Available after the workflow is saved."
+                            "value": "zaplane/v1/hook/{workflow_id}/{node_id}",
+                            "help": "Send a GET or POST request (JSON body and/or query params) to this URL to start the workflow from this trigger. Accepted while the workflow is active."
                         },
                         {
                             "key": "secret",
@@ -20800,10 +21327,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/weforms/",
-                "action": "https://zaplane.app/docs/weforms/"
-            },
             "triggers": {
                 "weforms_entry_submission": {
                     "label": "Form Submission",
@@ -20858,10 +21381,6 @@
                     "help": "Meta app \u2192 Settings \u2192 Basic \u2192 App Secret. Used to check the X-Hub-Signature-256 on every delivery."
                 }
             ],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
                 "message_received": {
                     "label": "Message Received",
@@ -21125,10 +21644,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/woocommerce-bookings/",
-                "action": "https://zaplane.app/docs/woocommerce-bookings/"
-            },
             "triggers": {
                 "booking_created": {
                     "label": "Booking Created",
@@ -21391,10 +21906,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/woocommerce/",
-                "action": "https://zaplane.app/docs/woocommerce/"
-            },
             "triggers": {
                 "new_order": {
                     "label": "New Order Created",
@@ -23028,6 +23539,30 @@
                         "main"
                     ]
                 },
+                "get_product": {
+                    "label": "Get Product (search by name/SKU)",
+                    "key": "get_product",
+                    "schema": [
+                        {
+                            "key": "query",
+                            "label": "Product Name or Keyword",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "{{trigger.text}}",
+                            "help": "Searched against the product title/SKU. Returns the closest live match(es) with current price and stock \u2014 wire this onto an AI Agent's Tools handle for exact, up-to-date pricing rather than a cached knowledge snippet."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Max Matches",
+                            "type": "number",
+                            "required": false,
+                            "default": 1
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
                 "get_products_totals": {
                     "label": "Get Products Totals",
                     "key": "get_products_totals",
@@ -24609,10 +25144,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/wordpress/",
-                "action": "https://zaplane.app/docs/wordpress/"
-            },
             "triggers": {
                 "publish_post": {
                     "label": "Post Published",
@@ -26387,38 +26918,6 @@
                             "label": "Username or Email",
                             "type": "email",
                             "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
-                "authenticate_user": {
-                    "label": "Authenticate User",
-                    "key": "authenticate_user",
-                    "schema": [
-                        {
-                            "key": "user_login",
-                            "label": "Username or Email",
-                            "type": "email",
-                            "required": true
-                        },
-                        {
-                            "key": "user_password",
-                            "label": "Password",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "remember",
-                            "label": "Remember",
-                            "type": "boolean"
-                        },
-                        {
-                            "key": "secure_cookie",
-                            "label": "Secure Cookie",
-                            "type": "boolean"
                         }
                     ],
                     "outputs": [
@@ -29198,30 +29697,6 @@
                         "error"
                     ]
                 },
-                "switch_theme": {
-                    "label": "Theme Switch",
-                    "key": "switch_theme",
-                    "schema": [
-                        {
-                            "key": "theme",
-                            "label": "Theme Switch",
-                            "type": "select",
-                            "dynamic": {
-                                "integration": "wordpress",
-                                "query": "deactivate_theme",
-                                "select": [
-                                    "file",
-                                    "name"
-                                ]
-                            },
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main",
-                        "error"
-                    ]
-                },
                 "add_media_image": {
                     "label": "Add New Image",
                     "key": "add_media_image",
@@ -29360,10 +29835,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/triggers-wpforms/",
-                "action": ""
-            },
             "triggers": {
                 "form_submitted": {
                     "label": "Form Submitted",
@@ -29402,10 +29873,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/wpfunnels/",
-                "action": "https://zaplane.app/docs/wpfunnels/"
-            },
             "triggers": {
                 "import_complete": {
                     "label": "Import Complete",
@@ -29979,10 +30446,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/wp-user-frontend/",
-                "action": "https://zaplane.app/docs/wp-user-frontend/"
-            },
             "triggers": {
                 "post_form_submission": {
                     "label": "Post Form Submission",
@@ -30060,10 +30523,6 @@
             "supports_webhook": true,
             "webhook_route": "zaplane/v1/incoming/zoom",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/zoom/",
-                "action": "https://zaplane.app/docs/zoom/"
-            },
             "triggers": {
                 "meeting_started": {
                     "label": "Meeting Started",
@@ -30494,10 +30953,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "run_agent": {
@@ -30577,10 +31032,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/conditions-filters/",
-                "action": "https://zaplane.app/docs/conditions-filters/"
-            },
             "triggers": [],
             "actions": {
                 "if": {
@@ -30734,10 +31185,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "parse": {
@@ -30863,10 +31310,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "now": {
@@ -31202,10 +31645,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "wait": {
@@ -31297,10 +31736,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/conditions-filters/",
-                "action": "https://zaplane.app/docs/conditions-filters/"
-            },
             "triggers": [],
             "actions": {
                 "filter": {
@@ -31453,10 +31888,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "format_text": {
@@ -32044,10 +32475,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "https://zaplane.app/docs/webhooks-api-requests-guide/",
-                "action": "https://zaplane.app/docs/webhooks-api-requests-guide/"
-            },
             "triggers": [],
             "actions": {
                 "request": {
@@ -32257,10 +32684,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "request_approval": {
@@ -32367,10 +32790,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "info": {
@@ -32431,10 +32850,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "iterator": {
@@ -32481,10 +32896,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "parse": {
@@ -32535,10 +32946,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "retrieve": {
@@ -32815,10 +33222,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "list_tools": {
@@ -32890,10 +33293,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "get_history": {
@@ -32997,10 +33396,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "repeat": {
@@ -33078,10 +33473,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "route": {
@@ -33203,10 +33594,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": {
                 "interval": {
                     "label": "On a Schedule",
@@ -33272,10 +33659,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "note": {
@@ -33329,10 +33712,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "set": {
@@ -33395,10 +33774,6 @@
             "supports_webhook": false,
             "webhook_route": "",
             "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
             "triggers": [],
             "actions": {
                 "parse": {

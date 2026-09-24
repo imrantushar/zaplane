@@ -17,7 +17,6 @@ const VersionHistoryTable = ({
   const {
     isLoading,
     currentPage,
-    perPage,
     itemPerPage,
     totalItems
   } = useSelector(state => state.workflows);
@@ -35,10 +34,10 @@ const VersionHistoryTable = ({
     handleRefresh();
   }, []);
   const handlePageChange = newPage => {
-    handleRefresh(newPage, perPage);
+    handleRefresh(newPage, itemPerPage);
   };
   const handlePerPageChange = itemsPerPage => {
-    handleRefresh(currentPage, itemsPerPage);
+    handleRefresh(1, itemsPerPage);
   };
   const columns = [{
     name: __('ID', 'zaplane'),
@@ -95,6 +94,6 @@ const VersionHistoryTable = ({
     // columnWidth: "100px",
     textAlign: "center"
   }];
-  return <ListTable columns={columns} isRowSelectable={false} data={versions} showSubHeader={false} showColumnFilter={false} showPagination={totalItems >= 10} noDataText={__("No history found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="version-table" currentPageNumber={currentPage} perPage={perPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} />;
+  return <ListTable columns={columns} isRowSelectable={false} data={versions} showSubHeader={false} showColumnFilter={false} showPagination={totalItems > 0} noDataText={__("No history found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="version-table" currentPageNumber={currentPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} />;
 };
 export default VersionHistoryTable;

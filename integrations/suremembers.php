@@ -151,7 +151,7 @@ class Suremembers extends IntegrationBase {
 			'user_email'   => 'jane.doe@example.com',
 			'nickname'     => 'jane',
 			'display_name' => 'Jane Doe',
-			'avatar_url'   => 'https://secure.gravatar.com/avatar/0123456789abcdef?s=96&d=mm&r=g',
+			'avatar_url'   => 'https://example.com/avatar.png',
 			'user_roles'   => [ 'subscriber' ],
 			'completed_at' => current_time( 'mysql' ),
 		];

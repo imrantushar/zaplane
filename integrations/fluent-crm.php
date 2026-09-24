@@ -314,12 +314,12 @@ class FluentCrm extends IntegrationBase {
 			'status'          => 'subscribed',
 			'contact_type'    => 'lead',
 			'source'          => 'website',
-			'avatar'          => 'https://www.gravatar.com/avatar/a1b2c3d4',
+			'avatar'          => 'https://example.com/avatar.png',
 			'date_of_birth'   => '1990-05-14',
 			'created_at'      => '2026-01-10 09:30:00',
 			'last_activity'   => '2026-07-08 14:12:00',
 			'updated_at'      => '2026-07-09 08:00:00',
-			'photo'           => 'https://www.gravatar.com/avatar/a1b2c3d4',
+			'photo'           => 'https://example.com/avatar.png',
 		];
 
 		$company = [
@@ -342,9 +342,9 @@ class FluentCrm extends IntegrationBase {
 			'type'             => 'customer',
 			'logo'             => 'https://example.com/logo.png',
 			'website'          => 'https://acme.example.com',
-			'linkedin_url'     => 'https://linkedin.com/company/acme',
+			'linkedin_url'     => 'https://example.com/linkedin',
 			'facebook_url'     => 'https://facebook.com/acme',
-			'twitter_url'      => 'https://twitter.com/acme',
+			'twitter_url'      => 'https://example.com/twitter',
 			'date_of_start'    => '2015-03-01',
 			'meta'             => [ 'custom_values' => [] ],
 			'created_at'       => '2026-01-05 10:00:00',

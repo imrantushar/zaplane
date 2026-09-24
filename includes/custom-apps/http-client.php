@@ -53,7 +53,7 @@ class HttpClient {
 			$request_args['body'] = $body;
 		}
 
-		$response = wp_remote_request( $url, $request_args );
+		$response = \Zaplane\HttpGuard::request( $url, $request_args );
 
 		if ( is_wp_error( $response ) ) {
 			return [

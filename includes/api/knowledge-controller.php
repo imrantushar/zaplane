@@ -48,6 +48,14 @@ class KnowledgeController extends WP_REST_Controller {
 			],
 		] );
 
+		register_rest_route( $this->namespace, '/knowledge/sources', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_sources' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		] );
+
 		register_rest_route( $this->namespace, '/knowledge/post-types', [
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -73,6 +81,14 @@ class KnowledgeController extends WP_REST_Controller {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'save_embeddings_config' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			],
+		] );
+
+		register_rest_route( $this->namespace, '/knowledge/embeddings/connections', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_embeddings_connections' ],
 				'permission_callback' => [ $this, 'permissions_check' ],
 			],
 		] );
@@ -120,41 +136,58 @@ class KnowledgeController extends WP_REST_Controller {
 	}
 
 	/**
-	 * List entries, optionally filtered by business_key and a search term.
+	 * List entries, optionally filtered by business_key, source (e.g. "faq" to
+	 * see just what the FAQ Builder produced for a business), and a search term.
 	 */
 	public function get_items( $request ) {
 		global $wpdb;
 
 		$business = sanitize_text_field( (string) $request->get_param( 'business_key' ) );
 		$search   = trim( (string) $request->get_param( 'search' ) );
+		$source   = sanitize_key( (string) $request->get_param( 'source' ) );
 		$page     = max( 1, (int) ( $request->get_param( 'page' ) ?: 1 ) );
 		$per_page = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?: 20 ) ) );
 		$offset   = ( $page - 1 ) * $per_page;
 
-		$table  = Knowledge::getTable();
-		$where  = '1=1';
-		$params = [];
+		$table = Knowledge::getTable();
+		$like  = '%' . $wpdb->esc_like( $search ) . '%';
 
-		if ( '' !== $business ) {
-			$where   .= ' AND business_key = %s';
-			$params[] = $business;
-		}
-		if ( '' !== $search ) {
-			$where   .= ' AND (title LIKE %s OR content LIKE %s)';
-			$like     = '%' . $wpdb->esc_like( $search ) . '%';
-			$params[] = $like;
-			$params[] = $like;
-		}
+		// Each filter is optional. Rather than assembling the WHERE clause, every
+		// filter sits in one literal statement as "(%s = '' OR column = %s)": an
+		// empty value switches that filter off. Nothing about the query is built
+		// from the request — $business, $search and $source only arrive as values.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM %i WHERE (%s = '' OR business_key = %s) AND (%s = '' OR title LIKE %s OR content LIKE %s) AND (%s = '' OR source = %s)",
+				$table,
+				$business,
+				$business,
+				$search,
+				$like,
+				$like,
+				$source,
+				$source
+			)
+		);
 
-		// Total count.
-		$count_sql = "SELECT COUNT(*) FROM {$table} WHERE {$where}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-		$total = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
-
-		$list_sql        = "SELECT id, business_key, title, content, source, ref_id, updated_at FROM {$table} WHERE {$where} ORDER BY id DESC LIMIT %d OFFSET %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$list_params     = array_merge( $params, [ $per_page, $offset ] );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-		$rows = $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Literal statement, prepared here.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, business_key, title, content, source, ref_id, updated_at FROM %i WHERE (%s = '' OR business_key = %s) AND (%s = '' OR title LIKE %s OR content LIKE %s) AND (%s = '' OR source = %s) ORDER BY id DESC LIMIT %d OFFSET %d",
+				$table,
+				$business,
+				$business,
+				$search,
+				$like,
+				$like,
+				$source,
+				$source,
+				$per_page,
+				$offset
+			),
+			ARRAY_A
+		);
 
 		return rest_ensure_response( [
 			'items'    => is_array( $rows ) ? $rows : [],
@@ -168,10 +201,28 @@ class KnowledgeController extends WP_REST_Controller {
 	public function get_businesses() {
 		global $wpdb;
 		$table = Knowledge::getTable();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$keys = $wpdb->get_col( "SELECT business_key, COUNT(*) AS c FROM {$table} GROUP BY business_key ORDER BY business_key ASC" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$keys = $wpdb->get_col( $wpdb->prepare( 'SELECT business_key, COUNT(*) AS c FROM %i GROUP BY business_key ORDER BY business_key ASC', $table ) );
 
 		return rest_ensure_response( [ 'businesses' => array_values( array_filter( (array) $keys ) ) ] );
+	}
+
+	/**
+	 * Distinct `source` values actually present in the table — "faq" and
+	 * "manual" are always offered even with zero rows yet (so the filter is
+	 * discoverable before you've built anything), everything else (synced post
+	 * types) only appears once it has entries.
+	 */
+	public function get_sources() {
+		global $wpdb;
+		$table = Knowledge::getTable();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$found = (array) $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT source FROM %i ORDER BY source ASC', $table ) );
+
+		$sources = array_values( array_unique( array_filter( array_merge( [ 'faq', 'manual' ], $found ) ) ) );
+		sort( $sources );
+
+		return rest_ensure_response( [ 'sources' => $sources ] );
 	}
 
 	/**
@@ -233,31 +284,79 @@ class KnowledgeController extends WP_REST_Controller {
 	public function get_embeddings_config() {
 		$cfg = KnowledgeEmbeddings::config();
 		return rest_ensure_response( [
-			'enabled'  => ! empty( $cfg['enabled'] ),
-			'provider' => (string) $cfg['provider'],
-			'model'    => (string) $cfg['model'],
-			'has_key'  => '' !== (string) $cfg['api_key'],
+			'enabled'       => ! empty( $cfg['enabled'] ),
+			'connection_id' => (int) $cfg['connection_id'],
+			'provider'      => (string) $cfg['provider'],
+			'model'         => (string) $cfg['model'],
+			'has_key'       => '' !== (string) $cfg['api_key'],
 		] );
 	}
 
-	/** Save semantic-search config. The key is encrypted at rest; a blank api_key keeps the stored one. */
+	/** Save semantic-search config: which AI Connection to embed with, and an optional model override. */
 	public function save_embeddings_config( $request ) {
+		$connection_id = (int) $request->get_param( 'connection_id' );
+
+		// Only a connection the picker offers this user can be newly linked. The
+		// one already saved stays accepted, so another admin can still toggle
+		// the setting without owning that connection.
+		$current = (int) KnowledgeEmbeddings::config()['connection_id'];
+		if ( $connection_id > 0 && $connection_id !== $current && ! $this->is_embeddings_connection( $connection_id ) ) {
+			return new WP_Error( 'zaplane_invalid_connection', __( 'Pick one of your OpenAI, Gemini, or OpenAI-compatible AI connections.', 'zaplane' ), [ 'status' => 400 ] );
+		}
+
 		KnowledgeEmbeddings::save( [
-			'enabled'  => (bool) $request->get_param( 'enabled' ),
-			'provider' => (string) ( $request->get_param( 'provider' ) ?: 'openai' ),
-			'model'    => (string) $request->get_param( 'model' ),
-			'api_key'  => (string) $request->get_param( 'api_key' ),
+			'enabled'       => (bool) $request->get_param( 'enabled' ),
+			'connection_id' => $connection_id,
+			'model'         => (string) $request->get_param( 'model' ),
 		] );
 
-		// Reflect the effective (decrypted) state back, without exposing the key.
 		$cfg = KnowledgeEmbeddings::config();
 		return rest_ensure_response( [
-			'success'  => true,
-			'enabled'  => ! empty( $cfg['enabled'] ),
-			'provider' => (string) $cfg['provider'],
-			'model'    => (string) $cfg['model'],
-			'has_key'  => '' !== (string) $cfg['api_key'],
+			'success'       => true,
+			'enabled'       => ! empty( $cfg['enabled'] ),
+			'connection_id' => (int) $cfg['connection_id'],
+			'provider'      => (string) $cfg['provider'],
+			'model'         => (string) $cfg['model'],
+			'has_key'       => '' !== (string) $cfg['api_key'],
 		] );
+	}
+
+	/**
+	 * AI Connections usable for embeddings: app "ai", and a provider that
+	 * actually has an embeddings endpoint (Anthropic and WordPress Core AI
+	 * don't, so connections using them are left out).
+	 */
+	public function get_embeddings_connections() {
+		$connections = \Zaplane\Models\Connection::where( 'user_id', get_current_user_id() )
+			->where( 'app', 'ai' )
+			->orderBy( 'name', 'asc' )
+			->get();
+
+		$out = [];
+		foreach ( $connections as $connection ) {
+			$creds    = $connection->getCredentials();
+			$provider = strtolower( (string) ( $creds['provider'] ?? '' ) );
+			if ( ! in_array( $provider, KnowledgeEmbeddings::SUPPORTED_PROVIDERS, true ) ) {
+				continue;
+			}
+			$out[] = [
+				'id'       => (int) $connection->id,
+				'name'     => (string) $connection->name,
+				'provider' => $provider,
+			];
+		}
+
+		return rest_ensure_response( [ 'connections' => $out ] );
+	}
+
+	/** Whether $id is an AI connection of the current user whose provider can embed. */
+	private function is_embeddings_connection( int $id ): bool {
+		$connection = \Zaplane\Models\Connection::find( $id );
+		if ( ! $connection || 'ai' !== $connection->app || (int) $connection->user_id !== get_current_user_id() ) {
+			return false;
+		}
+		$provider = strtolower( (string) ( $connection->getCredentials()['provider'] ?? '' ) );
+		return in_array( $provider, KnowledgeEmbeddings::SUPPORTED_PROVIDERS, true );
 	}
 
 	/** Embed entries missing a vector (admin button; loop until remaining = 0). */
@@ -381,6 +480,13 @@ class KnowledgeController extends WP_REST_Controller {
 				'updated_at'   => current_time( 'mysql' ),
 			] );
 			++$created;
+		}
+
+		// FAQ rows (and any other bulk-created source) start with no embedding —
+		// queue a background batch so semantic search picks them up without a
+		// manual "Backfill now" click.
+		if ( $created > 0 && KnowledgeEmbeddings::enabled() ) {
+			\Zaplane\Modules\KnowledgeAutomation\KnowledgeAutomationModule::queue_embedding( $business );
 		}
 
 		return rest_ensure_response( [

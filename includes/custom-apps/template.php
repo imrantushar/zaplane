@@ -19,7 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Resolution rules mirror the HTTP integration: when a placeholder is the ENTIRE
  * string, the raw resolved value is returned (so an array/number survives as-is
  * and can be JSON-encoded downstream). When embedded in surrounding text, the
- * value is stringified.
+ * value is stringified. Runtime input from an upstream node is available under
+ * `input` (for example `{{ input.order_id }}`).
  */
 class Template {
 
@@ -114,14 +115,16 @@ class Template {
 	 *
 	 * @param array<string,mixed> $config      Resolved node field values.
 	 * @param array<string,mixed> $credentials Decrypted connection credentials.
+	 * @param array<string,mixed> $input       Upstream node output / trigger data.
 	 * @return array<string,mixed>
 	 */
-	public static function build_context( array $config, array $credentials = [] ): array {
+	public static function build_context( array $config, array $credentials = [], array $input = [] ): array {
 		return array_merge(
 			$config,
 			[
 				'config' => $config,
 				'creds'  => $credentials,
+				'input'  => $input,
 			]
 		);
 	}

@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$registry = [
+$zaplane_registry = [
 	'condition'           => [
 		'file'  => 'condition.php',
 		'class' => \Zaplane\Integrations\Condition::class,
@@ -187,7 +187,7 @@ $registry = [
 	],
 	'jotform'        => [
 		'file'  => 'jotform.php',
-		'class' => \Zaplane\Integrations\Jotform::class
+		'class' => \Zaplane\Integrations\Jotform::class,
 	],
 	'contact-form-7'      => [
 		'file'  => 'contact-form.php',
@@ -289,6 +289,10 @@ $registry = [
 		'file'  => 'buddyboss.php',
 		'class' => \Zaplane\Integrations\Buddyboss::class,
 	],
+	'zencommunity'       => [
+		'file'  => 'zencommunity.php',
+		'class' => \Zaplane\Integrations\Zencommunity::class,
+	],
 	'ultimatemember'      => [
 		'file'  => 'ultimatemember.php',
 		'class' => \Zaplane\Integrations\Ultimatemember::class,
@@ -371,34 +375,39 @@ $registry = [
 	],
 	'brevo'        => [
 		'file'  => 'brevo.php',
-		'class' => \Zaplane\Integrations\Brevo::class
+		'class' => \Zaplane\Integrations\Brevo::class,
 	],
 	'trello'        => [
 		'file'  => 'trello.php',
-		'class' => \Zaplane\Integrations\Trello::class
+		'class' => \Zaplane\Integrations\Trello::class,
+	],
+	'gembooking'              => [
+		'file'  => 'gembooking.php',
+		'class' => \Zaplane\Integrations\Gembooking::class,
 	],
 ];
 
-$priority = [
+$zaplane_priority = [
 	'academy',
-	'ablocks',
-	'gemcrm',
 	'storeengine',
+	'gemcrm',
+	'ablocks',
+	'gembooking',
 ];
 
-$priorityItems = [];
-foreach ( $priority as $key ) {
-	if ( isset( $registry[ $key ] ) ) {
-		$priorityItems[ $key ] = $registry[ $key ];
+$zaplane_priority_items = [];
+foreach ( $zaplane_priority as $zaplane_key ) {
+	if ( isset( $zaplane_registry[ $zaplane_key ] ) ) {
+		$zaplane_priority_items[ $zaplane_key ] = $zaplane_registry[ $zaplane_key ];
 	}
 }
 
-$remaining = array_diff_key( $registry, $priorityItems );
+$zaplane_remaining = array_diff_key( $zaplane_registry, $zaplane_priority_items );
 
-uksort( $remaining, function ( $a, $b ) {
+uksort( $zaplane_remaining, function ( $a, $b ) {
 	return strcasecmp( $a, $b );
 } );
 
-$finalRegistry = array_merge( $priorityItems, $remaining );
+$zaplane_final_registry = array_merge( $zaplane_priority_items, $zaplane_remaining );
 
-return [ 'registry' => $finalRegistry ];
+return [ 'registry' => $zaplane_final_registry ];

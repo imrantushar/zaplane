@@ -44,21 +44,13 @@ class Funnelkit extends IntegrationBase {
 
 	public static function get_triggers(): array {
 		return [
-			'woofunnels_loaded' => [
-				'label' => 'WooFunnels Loaded',
-				'hook'  => 'woofunnels_loaded',
-			],
-			'core_modules_loaded' => [
-				'label' => 'Core Modules Loaded',
-				'hook'  => 'wffn_core_modules_loaded',
-			],
-			'loaded' => [
-				'label' => 'FunnelKit Loaded',
-				'hook'  => 'wffn_loaded',
-			],
 			'funnel_created' => [
 				'label' => 'Funnel Created',
 				'hook'  => 'wffn_funnel_created',
+			],
+			'funnel_updated' => [
+				'label' => 'Funnel Updated',
+				'hook'  => 'wffn_funnel_update',
 			],
 			'duplicate_funnel' => [
 				'label' => 'Funnel Duplicated',
@@ -67,10 +59,6 @@ class Funnelkit extends IntegrationBase {
 			'funnel_imported' => [
 				'label' => 'Funnel Imported',
 				'hook'  => 'wffn_funnel_imported',
-			],
-			'funnel_updated' => [
-				'label' => 'Funnel Updated',
-				'hook'  => 'wffn_funnel_update',
 			],
 			'step_duplicated' => [
 				'label' => 'Step Duplicated',
@@ -92,14 +80,6 @@ class Funnelkit extends IntegrationBase {
 				'label' => 'Thank You Funnel Ended',
 				'hook'  => 'wffn_ty_funnel_ended_event',
 			],
-			'import_completed' => [
-				'label' => 'Import Completed',
-				'hook'  => 'wffn_import_completed',
-			],
-			'importing_completed' => [
-				'label' => 'Background Import Completed',
-				'hook'  => 'wffn_importing_completed',
-			],
 			'template_import_remote' => [
 				'label' => 'Template Import Remote',
 				'hook'  => 'wffn_template_import_remote',
@@ -119,10 +99,6 @@ class Funnelkit extends IntegrationBase {
 			'wp_footer' => [
 				'label' => 'WooFunnels Footer',
 				'hook'  => 'woofunnels_wp_footer',
-			],
-			'checkout_loaded' => [
-				'label' => 'Checkout Module Loaded',
-				'hook'  => 'wfacp_loaded',
 			],
 			'template_body_top' => [
 				'label' => 'Template Body Top',
@@ -144,37 +120,10 @@ class Funnelkit extends IntegrationBase {
 	}
 
 	public static function get_trigger_config_schema( string $trigger ): array {
-		$step_triggers = [
-			'step_duplicated',
-			'step_viewed',
-			'step_converted',
-		];
-
-		if ( in_array( $trigger, $step_triggers, true ) ) {
-			return [
-				[
-					'key'      => 'step_id',
-					'label'    => 'Step',
-					'type'     => 'select',
-					'required' => true,
-					'dynamic'  => [
-						'integration' => 'funnelkit',
-						'query'       => 'steps',
-						'select'      => [ 'name', 'label' ],
-					],
-				],
-			];
-		}
 
 		$funnel_triggers = [
-			'funnel_created',
 			'duplicate_funnel',
-			'funnel_imported',
 			'funnel_updated',
-			'funnel_ended',
-			'ty_funnel_ended',
-			'import_completed',
-			'template_import_remote',
 		];
 
 		if ( in_array( $trigger, $funnel_triggers, true ) ) {
@@ -232,8 +181,6 @@ class Funnelkit extends IntegrationBase {
 		];
 
 		$samples = [
-			'woofunnels_loaded' => array_merge( $base, [ 'path' => '/plugins/funnelkit' ] ),
-
 			'funnel_created'    => array_merge(
 				$base,
 				[
@@ -330,18 +277,6 @@ class Funnelkit extends IntegrationBase {
 					'funnel_id' => 21,
 					'funnel'    => $funnel,
 					'order_id'  => 501,
-				]
-			),
-
-			'import_completed'  => array_merge(
-				$base,
-				[
-					'module_id' => 21,
-					'step'      => $step,
-					'builder'   => 'gutenberg',
-					'slug'      => 'sales-page',
-					'funnel_id' => 21,
-					'funnel'    => $funnel,
 				]
 			),
 
@@ -562,6 +497,7 @@ class Funnelkit extends IntegrationBase {
 
 			case 'remove_action':
 			case 'has_action':
+			case 'current_filter':
 				return [ $hook_field ];
 		}//end switch
 
@@ -574,7 +510,7 @@ class Funnelkit extends IntegrationBase {
 		}
 
 		$event = (string) ( $node['data']['event'] ?? ( $node['event'] ?? ( $node['config']['action'] ?? '' ) ) );
-		$config = $node['data']['config'] ?? ( $node['config']['data'] ?? [] );
+		$config = $node['data']['config'] ?? ( $node['config']['data'] ?? ( $node['config'] ?? [] ) );
 		if ( ! is_array( $config ) ) {
 			$config = [];
 		}
@@ -599,7 +535,7 @@ class Funnelkit extends IntegrationBase {
 			case 'has_action':
 				return self::action_has_action( $config, $input );
 			case 'current_filter':
-				return self::action_current_filter( $input );
+				return self::action_current_filter( $config, $input );
 		}//end switch
 
 		return [

@@ -4,6 +4,10 @@ namespace Zaplane\Integrations;
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Classes\Expression;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class Filter extends IntegrationBase {
 
 
@@ -443,13 +447,13 @@ class Filter extends IntegrationBase {
 			case '>=':
 				return $left >= $right;
 			case 'contains':
-				return str_contains( (string) $left, (string) $right );
+				return \Zaplane\Utils\Helper::contains( (string) $left, (string) $right );
 			case 'not_contains':
-				return ! str_contains( (string) $left, (string) $right );
+				return ! \Zaplane\Utils\Helper::contains( (string) $left, (string) $right );
 			case 'starts_with':
-				return str_starts_with( (string) $left, (string) $right );
+				return \Zaplane\Utils\Helper::starts_with( (string) $left, (string) $right );
 			case 'ends_with':
-				return str_ends_with( (string) $left, (string) $right );
+				return \Zaplane\Utils\Helper::ends_with( (string) $left, (string) $right );
 			case 'is_empty':
 				return empty( $left );
 			case 'is_not_empty':
@@ -459,9 +463,9 @@ class Filter extends IntegrationBase {
 			case 'contains_ci':
 				return false !== stripos( (string) $left, (string) $right );
 			case 'not_starts_with':
-				return ! str_starts_with( (string) $left, (string) $right );
+				return ! \Zaplane\Utils\Helper::starts_with( (string) $left, (string) $right );
 			case 'not_ends_with':
-				return ! str_ends_with( (string) $left, (string) $right );
+				return ! \Zaplane\Utils\Helper::ends_with( (string) $left, (string) $right );
 			case 'matches_regex':
 				// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- a bad user regex must not fatal the run.
 				return '' !== (string) $right && 1 === @preg_match( (string) $right, (string) $left );

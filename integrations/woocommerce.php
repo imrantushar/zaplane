@@ -438,6 +438,7 @@ class Woocommerce extends IntegrationBase {
 			'get_products_subscription'       => [ 'label' => 'Get Subscription Products' ],
 			'get_product_by_id'               => [ 'label' => 'Get Product by ID' ],
 			'get_product_by_sku'              => [ 'label' => 'Get Product by SKU' ],
+			'get_product'                     => [ 'label' => 'Get Product (search by name/SKU)' ],
 			'get_products_totals'             => [ 'label' => 'Get Products Totals' ],
 			'get_product_sales_count_by_id'   => [ 'label' => 'Get Product Sales Count by ID' ],
 			'create_product_category'         => [ 'label' => 'Create Product Category' ],
@@ -961,6 +962,23 @@ class Woocommerce extends IntegrationBase {
 					'label' => 'SKU',
 					'type' => 'text',
 					'required' => true
+				],
+			],
+			'get_product' => [
+				[
+					'key'         => 'query',
+					'label'       => 'Product Name or Keyword',
+					'type'        => 'expression',
+					'required'    => true,
+					'placeholder' => '{{trigger.text}}',
+					'help'        => 'Searched against the product title/SKU. Returns the closest live match(es) with current price and stock — wire this onto an AI Agent\'s Tools handle for exact, up-to-date pricing rather than a cached knowledge snippet.',
+				],
+				[
+					'key'      => 'limit',
+					'label'    => 'Max Matches',
+					'type'     => 'number',
+					'required' => false,
+					'default'  => 1,
 				],
 			],
 			'update_product_stock' => [
