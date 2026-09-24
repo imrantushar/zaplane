@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-24T10:01:23+00:00\n"
+"POT-Creation-Date: 2026-09-24T11:04:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: zaplane\n"
@@ -290,7 +290,7 @@ msgstr ""
 #: includes/authoring/trigger-advisor.php:219
 #: includes/authoring/trigger-advisor.php:366
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:182
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:61
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:62
 #, php-format,js-format
 msgid "Trigger %d"
 msgstr ""
@@ -1496,7 +1496,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/CustomAppList.js:109
 #: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:367
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:146
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:85
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:84
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:74
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:59
 msgid "Action"
@@ -1530,7 +1530,7 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:159
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:18
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:209
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:87
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:86
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:61
 msgid "Details"
 msgstr ""
@@ -1545,7 +1545,7 @@ msgid "No workflows found"
 msgstr ""
 
 #: dev_zaplane/components/WorkflowTable/index.js:258
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:126
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:127
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:83
 msgid "Log Details"
 msgstr ""
@@ -2037,7 +2037,7 @@ msgid "Webhook"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/TriggersEditor.js:26
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:59
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:60
 msgid "Trigger"
 msgstr ""
 
@@ -2279,7 +2279,7 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/FolderCard.js:98
 #: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:124
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:280
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:287
 msgid "Update"
 msgstr ""
 
@@ -2657,7 +2657,6 @@ msgid "Edit workflow"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:178
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:73
 msgid "DURATION"
 msgstr ""
 
@@ -3512,35 +3511,50 @@ msgstr ""
 msgid "Log History"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:217
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:224
 msgid "Refresh"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:227
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:234
 msgid "Replay"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:234
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:241
 msgid "Version History"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:333
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:340
 msgid "Flows"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:54
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:55
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:41
 msgid "Run ID"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:79
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:72
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:51
+msgid "Duration"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:78
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:56
 msgid "Node Run"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:96
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:87
+#, js-format
+msgid "View details for run %s"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:95
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:70
 msgid "Re-Try"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:96
+#, js-format
+msgid "Retry run %s"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:115
@@ -3571,10 +3585,6 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ImportWorkflow/index.js:35
 msgid "Import Workflow"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:51
-msgid "Duration"
 msgstr ""
 
 #: dev_zaplane/redux/Slices/connectionsSlice/connectionsSlice.js:78
