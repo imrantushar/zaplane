@@ -5,6 +5,22 @@ All notable changes to Zaplane are documented here. This project adheres to
 
 ## [Unreleased]
 
+### Fixed
+- Resolved the duplicate `handle_incoming()` method that caused a PHP critical error.
+- Fixed the dashboard login/reload flow so it loads normally again.
+- Corrected the Log History horizontal scrollbar and responsive layout issues.
+- Fixed the shared modal/overflow behavior so opening Create Workflow no longer causes the right-side scrollbar to disappear or the UI to shift across Zaplane tabs.
+- Fixed the Dashboard recent workflow data rendering, empty-state messaging and heading output.
+- Improved Log History UX with responsive table behavior, accessibility labels and consistent duration text formatting.
+- Cleaned up workflow UI issues including unused code, missing labels, keyboard access and related lint-level problems.
+- Reduced the `react-datepicker` build warning by switching to a stable CommonJS entry.
+- Rebuilt the production frontend assets successfully and verified the build remains healthy.
+
+### Changed
+- Updated the shared modal and drawer overflow handling to preserve layout stability when a panel opens.
+- Improved the overall admin UI consistency for logs and recent-run views across narrower screens.
+- Normalized project lint configuration and cleaned up repeated styling issues to keep the release baseline healthy.
+
 ## [1.3.1] - 2026-09-20
 
 ### Removed
