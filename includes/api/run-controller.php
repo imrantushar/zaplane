@@ -490,6 +490,15 @@ class RunController extends WP_REST_Controller {
 
 		foreach ( Run::latestTestNodeRunsByWorkflow( $version->workflow_id ) as $nodeKey => $prevNodeRun ) {
 			$out = $prevNodeRun->getOutput();
+
+			// Match Automation::buildNodeContext()'s unwrapping — a real run only
+			// ever exposes a node's inner ['data'=>..] payload to expressions, so
+			// a Test Action must resolve the same {{node.field}} paths, not the
+			// raw ['port'=>..,'data'=>..] the integration returned.
+			if ( is_array( $out ) && isset( $out['port'], $out['data'] ) ) {
+				$out = $out['data'];
+			}
+
 			$testContext[ (string) $nodeKey ] = is_array( $out ) ? $out : [ 'value' => $out ];
 
 			// Of the triggers leading here, the one tested most recently stands in

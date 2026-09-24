@@ -544,6 +544,41 @@ class Server {
 		self::page( __( 'Cannot connect', 'zaplane' ), '<p>' . esc_html( $message ) . '</p>' );
 	}
 
+	/**
+	 * The markup the consent, refusal and failure pages are built from.
+	 *
+	 * Every page here is assembled from escaped parts, but the body is run
+	 * through wp_kses() on the way out anyway, so that what can reach the
+	 * browser is fixed by this list rather than by each caller getting it right.
+	 */
+	private const PAGE_HTML = [
+		'p'      => [ 'class' => true ],
+		'strong' => [],
+		'em'     => [],
+		'br'     => [],
+		'ul'     => [ 'class' => true ],
+		'li'     => [ 'class' => true ],
+		'label'  => [ 'for' => true ],
+		'code'   => [],
+		'form'   => [
+			'method' => true,
+			'action' => true,
+		],
+		'input'  => [
+			'type'    => true,
+			'name'    => true,
+			'value'   => true,
+			'checked' => true,
+			'id'      => true,
+		],
+		'button' => [
+			'type'  => true,
+			'name'  => true,
+			'value' => true,
+			'class' => true,
+		],
+	];
+
 	private static function page( string $title, string $body ): void {
 		if ( ! headers_sent() ) {
 			header( 'Content-Type: text/html; charset=utf-8' );
@@ -572,7 +607,7 @@ class Server {
 		echo '><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . esc_html( $title ) . '</title>';
 		wp_print_styles( 'zaplane-oauth' );
 		echo '</head><body><div class="card"><h1>' . esc_html( $title ) . '</h1>'
-			. $body // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Composed from escaped parts by the callers.
+			. wp_kses( $body, self::PAGE_HTML )
 			. '</div></body></html>';
 		exit;
 	}
@@ -612,19 +647,28 @@ class Server {
 	/**
 	 * One authorization-request parameter, scrubbed.
 	 *
-	 * These arrive on the query string of a GET the client constructed, before
-	 * anyone has consented to anything, so there is no nonce to check yet — the
-	 * one branch that changes state, approval, checks its own.
+	 * There is deliberately no nonce check here, and there cannot be one: these
+	 * parameters arrive on the query string of a GET that an AI client
+	 * constructed on another machine, before this site has met it and before
+	 * anyone has agreed to anything. A nonce is issued by this site to a person
+	 * already on it, so the client has none to send.
+	 *
+	 * Nothing read here changes anything either. Everything this method feeds is
+	 * a decision about what to show: which client is asking, where the answer
+	 * goes, which scopes to offer. The one branch that does change state —
+	 * approval, which issues a credential — is a POST from the consent form on
+	 * this site, and {@see self::authorize()} checks both `manage_options` and
+	 * check_admin_referer( 'zaplane_mcp_consent' ) before it runs.
 	 *
 	 * @param string $key Parameter name.
 	 */
 	private static function query( string $key ): string {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- See above.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No nonce can exist on this request; see the note above.
 		if ( ! isset( $_GET[ $key ] ) || ! is_scalar( $_GET[ $key ] ) ) {
 			return '';
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- scrub() is the sanitizer; see its note.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- No nonce can exist on this request (see the note above); scrub() is the sanitizer.
 		return self::scrub( wp_unslash( (string) $_GET[ $key ] ) );
 	}
 

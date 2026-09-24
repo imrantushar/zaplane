@@ -466,6 +466,12 @@ class WorkflowsController extends WP_REST_Controller {
 			foreach ( $nodeRuns as $nodeKey => $nodeRun ) {
 				$output = $nodeRun->getOutput();
 
+				// Match Automation::buildNodeContext()'s unwrapping — see the same
+				// fix in get_condition_variables() and execute_single_node().
+				if ( is_array( $output ) && isset( $output['port'], $output['data'] ) ) {
+					$output = $output['data'];
+				}
+
 				if ( ! is_array( $output ) ) {
 					$output = [ 'value' => $output ];
 				}
@@ -700,6 +706,14 @@ class WorkflowsController extends WP_REST_Controller {
 
 			if ( $nodeRun ) {
 				$output = $nodeRun->getOutput();
+
+				// Match Automation::buildNodeContext()'s unwrapping exactly — that's
+				// the shape expressions actually resolve against at runtime, so the
+				// "@" picker must offer the same paths it inserts, not the raw
+				// ['port'=>..,'data'=>..] the integration returned.
+				if ( is_array( $output ) && isset( $output['port'], $output['data'] ) ) {
+					$output = $output['data'];
+				}
 
 				if ( ! is_array( $output ) ) {
 					$output = [ 'value' => $output ];

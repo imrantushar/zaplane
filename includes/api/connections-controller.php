@@ -108,6 +108,9 @@ class ConnectionsController extends WP_REST_Controller {
 			]
 		);
 
+		// Public by necessity: the provider redirects the admin's browser here
+		// without a REST nonce. oauth_callback() refuses anything whose `state`
+		// does not match the one issued to that admin when they clicked Connect.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/oauth/callback',
@@ -256,12 +259,21 @@ class ConnectionsController extends WP_REST_Controller {
 			$manager->update( $connection_id, $update_data );
 		}
 
+		$test_result = null;
 		$credentials = $request->get_param( 'credentials' );
 		if ( is_array( $credentials ) && ! empty( $credentials ) ) {
-			$manager->update_credentials( $connection_id, $credentials );
+			try {
+				$result      = $manager->update_credentials( $connection_id, $credentials );
+				$test_result = $result['test_result'];
+			} catch ( \Zaplane\Framework\Exceptions\ConnectionException $e ) {
+				return new WP_Error( 'connection_test_failed', $e->getMessage(), [ 'status' => 400 ] );
+			}
 		}
 
-		return rest_ensure_response( $manager->get( $connection_id ) );
+		$connection                = $manager->get( $connection_id );
+		$connection['test_result'] = $test_result;
+
+		return rest_ensure_response( $connection );
 	}
 
 	public function delete_item( $request ) {

@@ -168,7 +168,7 @@ class Mailchimp extends IntegrationBase {
 			return static::$method( $node, $input );
 		}
 
-		throw new \Exception( 'Unknown Mailchimp action: ' . $action );
+		throw new \Exception( 'Unknown Mailchimp action: ' . esc_html( $action ) );
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {

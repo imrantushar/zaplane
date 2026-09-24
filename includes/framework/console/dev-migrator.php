@@ -123,8 +123,9 @@ class DevMigrator extends Migrator {
 	protected function getAllRanMigrations(): array {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema bookkeeping.
 		$results = $wpdb->get_col(
-			"SELECT migration FROM {$this->migrationsTable} ORDER BY batch DESC, migration DESC"
+			$wpdb->prepare( 'SELECT migration FROM %i ORDER BY batch DESC, migration DESC', $this->migrationsTable )
 		);
 
 		return $results ?: [];
@@ -133,9 +134,8 @@ class DevMigrator extends Migrator {
 	protected function getLastBatchMigrations( int $steps ): array {
 		global $wpdb;
 
-		$batch = $wpdb->get_var(
-			"SELECT MAX(batch) FROM {$this->migrationsTable}"
-		);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema bookkeeping.
+		$batch = $wpdb->get_var( $wpdb->prepare( 'SELECT MAX(batch) FROM %i', $this->migrationsTable ) );
 
 		if ( ! $batch ) {
 			return [];
@@ -143,8 +143,10 @@ class DevMigrator extends Migrator {
 
 		$minBatch = max( 1, $batch - $steps + 1 );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema bookkeeping.
 		$results = $wpdb->get_col( $wpdb->prepare(
-			"SELECT migration FROM {$this->migrationsTable} WHERE batch >= %d ORDER BY batch DESC, migration DESC",
+			'SELECT migration FROM %i WHERE batch >= %d ORDER BY batch DESC, migration DESC',
+			$this->migrationsTable,
 			$minBatch
 		) );
 

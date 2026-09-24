@@ -125,7 +125,7 @@ class Eventscalendar extends IntegrationBase {
 	private static function require_post_type( int $id, string $type, string $label ): \WP_Post {
 		$post = $id ? get_post( $id ) : null;
 		if ( ! $post instanceof \WP_Post || $post->post_type !== $type ) {
-			throw new \InvalidArgumentException( 'A valid ' . $label . ' ID is required.' );
+			throw new \InvalidArgumentException( 'A valid ' . esc_html( $label ) . ' ID is required.' );
 		}
 		return $post;
 	}
@@ -338,25 +338,19 @@ class Eventscalendar extends IntegrationBase {
 	}
 
 	private static function search_posts( string $type, string $search, callable $payload ): array {
-		global $wpdb;
 		$search = sanitize_text_field( $search );
-		if ( isset( $wpdb->posts ) && method_exists( $wpdb, 'prepare' ) && method_exists( $wpdb, 'get_col' ) ) {
-			if ( '' === $search ) {
-				$sql = $wpdb->prepare(
-					"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status NOT IN ('trash','auto-draft') ORDER BY post_date DESC LIMIT 50",
-					$type
-				);
-			} else {
-				$like = '%' . $wpdb->esc_like( $search ) . '%';
-				$sql = $wpdb->prepare(
-					"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status NOT IN ('trash','auto-draft') AND (post_title LIKE %s OR post_content LIKE %s) ORDER BY post_date DESC LIMIT 50",
-					$type, $like, $like
-				);
-			}
-			$posts = array_filter( array_map( 'get_post', array_map( 'intval', (array) $wpdb->get_col( $sql ) ) ) );
-		} else {
-			$posts = get_posts( [ 'post_type' => $type, 'post_status' => [ 'publish', 'draft', 'pending', 'private' ], 's' => $search, 'posts_per_page' => 50, 'orderby' => 'date', 'order' => 'DESC', 'suppress_filters' => true ] );
+		$args   = [
+			'post_type'      => $type,
+			// Everything but trash and auto-drafts, as the event lists show.
+			'post_status'    => [ 'publish', 'future', 'draft', 'pending', 'private' ],
+			'posts_per_page' => 50,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+		];
+		if ( '' !== $search ) {
+			$args['s'] = $search;
 		}
+		$posts = get_posts( $args );
 		return array_values( array_map( $payload, $posts ) );
 	}
 

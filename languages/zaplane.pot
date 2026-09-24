@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-3.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Zaplane 1.2.0\n"
+"Project-Id-Version: Zaplane 1.3.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/zaplane\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-15T08:06:56+00:00\n"
+"POT-Creation-Date: 2026-09-23T15:32:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: zaplane\n"
@@ -17,7 +17,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #: zaplane.php
 #: includes/admin/menu.php:74
-#: includes/api/mcp-controller.php:572
+#: includes/api/mcp-controller.php:576
 #: dev_zaplane/containers/BackendDashboard/AdminMenu/index.js:19
 #: dev_zaplane/containers/BackendDashboard/AdminMenu/index.js:42
 msgid "Zaplane"
@@ -85,191 +85,195 @@ msgstr ""
 msgid "Untitled template"
 msgstr ""
 
-#: includes/api/hitl-controller.php:62
+#: includes/api/hitl-controller.php:69
 msgid "Invalid approval request."
 msgstr ""
 
-#: includes/api/hitl-controller.php:67
+#: includes/api/hitl-controller.php:74
 msgid "This approval link is invalid."
 msgstr ""
 
-#: includes/api/hitl-controller.php:71
+#: includes/api/hitl-controller.php:78
 msgid "This approval link has expired."
 msgstr ""
 
-#: includes/api/hitl-controller.php:76
+#: includes/api/hitl-controller.php:83
 msgid "This request has already been handled."
 msgstr ""
 
-#: includes/api/hitl-controller.php:95
+#: includes/api/hitl-controller.php:102
 msgid "You have approved this request. The workflow will now continue."
 msgstr ""
 
-#: includes/api/hitl-controller.php:96
+#: includes/api/hitl-controller.php:103
 msgid "You have rejected this request."
 msgstr ""
 
-#: includes/api/hitl-controller.php:114
+#: includes/api/hitl-controller.php:121
 msgid "Approve this request?"
 msgstr ""
 
-#: includes/api/hitl-controller.php:114
+#: includes/api/hitl-controller.php:121
 msgid "Reject this request?"
 msgstr ""
 
-#: includes/api/hitl-controller.php:118
+#: includes/api/hitl-controller.php:125
 #: includes/mcp/oauth/server.php:493
 #: integrations/human-approval.php:222
 #: dev_zaplane/components/StatusOptions/index.js:22
 msgid "Approve"
 msgstr ""
 
-#: includes/api/hitl-controller.php:118
+#: includes/api/hitl-controller.php:125
 #: integrations/human-approval.php:225
 msgid "Reject"
 msgstr ""
 
-#: includes/api/hitl-controller.php:132
-#: includes/api/hitl-controller.php:152
+#: includes/api/hitl-controller.php:139
+#: includes/api/hitl-controller.php:159
 msgid "Zaplane Approval"
 msgstr ""
 
-#: includes/api/mcp-controller.php:316
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:156
+#: includes/api/knowledge-controller.php:304
+msgid "Pick one of your OpenAI, Gemini, or OpenAI-compatible AI connections."
+msgstr ""
+
+#: includes/api/mcp-controller.php:312
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:155
 msgid "Untitled workflow"
 msgstr ""
 
-#: includes/api/mcp-controller.php:389
+#: includes/api/mcp-controller.php:393
 msgid "This credential belongs to an account that cannot manage this site."
 msgstr ""
 
 #. translators: 1: calls allowed per minute, 2: seconds until the window resets.
-#: includes/api/mcp-controller.php:408
+#: includes/api/mcp-controller.php:412
 #, php-format
 msgid "Rate limit reached: %1$d calls per minute. Retry in %2$d seconds."
 msgstr ""
 
-#: includes/api/mcp-controller.php:453
+#: includes/api/mcp-controller.php:457
 msgid "The MCP endpoint accepts POST. It has no event stream to open and no session to end."
 msgstr ""
 
-#: includes/api/mcp-controller.php:537
+#: includes/api/mcp-controller.php:541
 msgid "That client is not registered."
 msgstr ""
 
-#: includes/api/mcp-controller.php:566
+#: includes/api/mcp-controller.php:570
 msgid "Application passwords are switched off on this site. Connect through the sign-in flow instead."
 msgstr ""
 
-#: includes/api/mcp-controller.php:587
+#: includes/api/mcp-controller.php:591
 msgid "That connection is not one made here."
 msgstr ""
 
-#: includes/api/mcp-controller.php:636
+#: includes/api/mcp-controller.php:640
 msgid "AI access module is on"
 msgstr ""
 
-#: includes/api/mcp-controller.php:639
+#: includes/api/mcp-controller.php:643
 msgid "AI access module is off"
 msgstr ""
 
-#: includes/api/mcp-controller.php:641
+#: includes/api/mcp-controller.php:645
 msgid "Every request is refused before the credential is even looked at, so any client reports a sign-in failure. Turn it on under Settings → Modules."
 msgstr ""
 
-#: includes/api/mcp-controller.php:651
+#: includes/api/mcp-controller.php:655
 msgid "Endpoint — not checked while the module is off"
 msgstr ""
 
-#: includes/api/mcp-controller.php:652
+#: includes/api/mcp-controller.php:656
 msgid "Sign-in discovery — not checked while the module is off"
 msgstr ""
 
-#: includes/api/mcp-controller.php:656
+#: includes/api/mcp-controller.php:660
 msgid "Address is reachable from the internet"
 msgstr ""
 
-#: includes/api/mcp-controller.php:659
+#: includes/api/mcp-controller.php:663
 msgid "Address cannot be reached from the internet"
 msgstr ""
 
-#: includes/api/mcp-controller.php:661
+#: includes/api/mcp-controller.php:665
 msgid "Hosted connectors such as claude.ai and ChatGPT look this address up from their own servers, so a development hostname never arrives and they report that they could not sign in. Clients running on this machine are unaffected."
 msgstr ""
 
-#: includes/api/mcp-controller.php:665
+#: includes/api/mcp-controller.php:669
 msgid "Application passwords are available"
 msgstr ""
 
-#: includes/api/mcp-controller.php:668
+#: includes/api/mcp-controller.php:672
 msgid "Application passwords are switched off"
 msgstr ""
 
-#: includes/api/mcp-controller.php:670
+#: includes/api/mcp-controller.php:674
 msgid "A security plugin or a site filter has disabled them. Connect with an issued token or through OAuth instead."
 msgstr ""
 
 #. translators: %d: number of credentials.
-#: includes/api/mcp-controller.php:676
+#: includes/api/mcp-controller.php:680
 #, php-format
 msgid "%d credential issued"
 msgid_plural "%d credentials issued"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/api/mcp-controller.php:679
+#: includes/api/mcp-controller.php:683
 msgid "No credentials issued yet"
 msgstr ""
 
-#: includes/api/mcp-controller.php:681
+#: includes/api/mcp-controller.php:685
 msgid "Nothing is connected. Issue a token below, use a WordPress application password, or let a hosted connector sign in."
 msgstr ""
 
-#: includes/api/mcp-controller.php:713
+#: includes/api/mcp-controller.php:717
 msgid "The endpoint could not be reached from this site"
 msgstr ""
 
-#: includes/api/mcp-controller.php:715
+#: includes/api/mcp-controller.php:719
 msgid "a certificate this server does not trust will also read like this. A hosted connector refuses an untrusted certificate outright."
 msgstr ""
 
 #. translators: %d: HTTP status code.
-#: includes/api/mcp-controller.php:726
+#: includes/api/mcp-controller.php:730
 #, php-format
 msgid "The endpoint answered %d, not 401"
 msgstr ""
 
-#: includes/api/mcp-controller.php:728
+#: includes/api/mcp-controller.php:732
 msgid "An unauthenticated call should be refused with 401. Another status usually means a security plugin, firewall or cache is answering before WordPress does."
 msgstr ""
 
-#: includes/api/mcp-controller.php:735
+#: includes/api/mcp-controller.php:739
 msgid "The refusal carries no pointer to the sign-in service"
 msgstr ""
 
-#: includes/api/mcp-controller.php:737
+#: includes/api/mcp-controller.php:741
 msgid "Hosted connectors follow that pointer to discover OAuth; without it they report that this server does not implement it. Something is stripping response headers."
 msgstr ""
 
-#: includes/api/mcp-controller.php:741
+#: includes/api/mcp-controller.php:745
 msgid "Endpoint answers and advertises how to sign in"
 msgstr ""
 
 #. translators: %s: the well-known document name.
-#: includes/api/mcp-controller.php:755
+#: includes/api/mcp-controller.php:759
 #, php-format
 msgid "/.well-known/%s is not being served"
 msgstr ""
 
-#: includes/api/mcp-controller.php:757
+#: includes/api/mcp-controller.php:761
 msgid "A hosted connector reads these two documents before it can sign in. Some hosts serve /.well-known/ from disk, which shadows them; a static-cache plugin can do the same."
 msgstr ""
 
-#: includes/api/mcp-controller.php:762
+#: includes/api/mcp-controller.php:766
 msgid "Sign-in discovery documents are being served"
 msgstr ""
 
-#: includes/api/mcp-controller.php:813
+#: includes/api/mcp-controller.php:817
 msgid "Application password"
 msgstr ""
 
@@ -282,16 +286,16 @@ msgid "Recipe not found."
 msgstr ""
 
 #. translators: %d: the trigger's number on the canvas
-#: includes/api/workflows-controller.php:834
+#: includes/api/workflows-controller.php:886
 #: includes/authoring/trigger-advisor.php:219
 #: includes/authoring/trigger-advisor.php:366
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:182
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:62
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:61
 #, php-format,js-format
 msgid "Trigger %d"
 msgstr ""
 
-#: includes/api/workflows-controller.php:868
+#: includes/api/workflows-controller.php:920
 msgid "Trigger (whichever fired)"
 msgstr ""
 
@@ -365,7 +369,7 @@ msgstr ""
 #: includes/config/menu.php:25
 #: includes/settings.php:145
 #: dev_zaplane/containers/BackendDashboard/index.js:50
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:151
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:152
 msgid "Custom Apps"
 msgstr ""
 
@@ -376,8 +380,8 @@ msgstr ""
 #: includes/config/menu.php:35
 #: includes/settings.php:158
 #: dev_zaplane/containers/BackendDashboard/index.js:55
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:365
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:366
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:412
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:413
 msgid "Business Knowledge"
 msgstr ""
 
@@ -554,12 +558,13 @@ msgstr ""
 
 #: includes/mcp/oauth/server.php:494
 #: dev_zaplane/components/StatusOptions/index.js:24
-#: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:69
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:410
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:456
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:528
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:634
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:251
+#: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:71
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:156
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:466
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:512
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:584
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:690
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:251
 msgid "Cancel"
 msgstr ""
 
@@ -648,7 +653,7 @@ msgid "Let Claude, Cursor or any Model Context Protocol client read your automat
 msgstr ""
 
 #: includes/settings.php:175
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:264
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:263
 msgid "AI access"
 msgstr ""
 
@@ -802,67 +807,73 @@ msgstr ""
 msgid "Typeform: form_id is required to delete a form."
 msgstr ""
 
-#: dev_zaplane/components/CreateFolderModal/index.js:28
-#: dev_zaplane/components/FolderCell/index.js:136
+#: dev_zaplane/components/CreateFolderModal/index.js:50
+#: dev_zaplane/components/FolderCell/index.js:139
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/index.js:28
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/WorkflowFolderEmptyState.js:30
 msgid "Create Folder"
 msgstr ""
 
-#: dev_zaplane/components/CreateFolderModal/index.js:30
-#: dev_zaplane/components/FolderCell/index.js:145
+#: dev_zaplane/components/CreateFolderModal/index.js:53
+#: dev_zaplane/components/FolderCell/index.js:149
 msgid "Folder Name"
 msgstr ""
 
-#: dev_zaplane/components/CreateFolderModal/index.js:30
+#: dev_zaplane/components/CreateFolderModal/index.js:54
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/FolderCard.js:92
 msgid "Enter folder name"
 msgstr ""
 
-#: dev_zaplane/components/CreateFolderModal/index.js:36
-#: dev_zaplane/components/CreateWorkflowModal/index.js:85
-#: dev_zaplane/components/FolderCell/index.js:155
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:422
+#: dev_zaplane/components/CreateFolderModal/index.js:87
+#: dev_zaplane/components/CreateWorkflowModal/index.js:136
+#: dev_zaplane/components/FolderCell/index.js:180
+msgid "Creating..."
+msgstr ""
+
+#: dev_zaplane/components/CreateFolderModal/index.js:87
+#: dev_zaplane/components/CreateWorkflowModal/index.js:136
+#: dev_zaplane/components/FolderCell/index.js:180
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:428
 msgid "Create"
 msgstr ""
 
-#: dev_zaplane/components/CreateWorkflowModal/index.js:64
+#: dev_zaplane/components/CreateWorkflowModal/index.js:86
 #: dev_zaplane/components/WorkflowTable/index.js:239
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/index.js:34
 msgid "Create Workflow"
 msgstr ""
 
-#: dev_zaplane/components/CreateWorkflowModal/index.js:66
+#: dev_zaplane/components/CreateWorkflowModal/index.js:89
 msgid "Workflow Name"
 msgstr ""
 
-#: dev_zaplane/components/CreateWorkflowModal/index.js:66
+#: dev_zaplane/components/CreateWorkflowModal/index.js:90
 msgid "Enter workflow name"
 msgstr ""
 
-#: dev_zaplane/components/CreateWorkflowModal/index.js:70
+#: dev_zaplane/components/CreateWorkflowModal/index.js:103
 msgid "Select Folder"
 msgstr ""
 
-#: dev_zaplane/components/FolderCell/index.js:97
+#: dev_zaplane/components/FolderCell/index.js:100
 msgid "Create New"
 msgstr ""
 
-#: dev_zaplane/components/FolderCell/index.js:123
+#: dev_zaplane/components/FolderCell/index.js:126
 msgid "Remove from folder"
 msgstr ""
 
-#: dev_zaplane/components/FolderCell/index.js:130
+#: dev_zaplane/components/FolderCell/index.js:133
 msgid "Add to folder"
 msgstr ""
 
-#: dev_zaplane/components/FolderCell/index.js:133
+#: dev_zaplane/components/FolderCell/index.js:136
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/parts.js:151
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ConditionGroupField/ConditionGroupField.js:62
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ConditionGroupField/ConditionGroupField.js:62
 msgid "Add"
 msgstr ""
 
-#: dev_zaplane/components/FolderCell/index.js:142
+#: dev_zaplane/components/FolderCell/index.js:146
 msgid "Streamline your workflows by organizing them into folders."
 msgstr ""
 
@@ -875,7 +886,7 @@ msgid "No results"
 msgstr ""
 
 #: dev_zaplane/components/GemCRMAsyncSelect/index.js:74
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:248
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:254
 msgid "Loading…"
 msgstr ""
 
@@ -885,7 +896,7 @@ msgstr ""
 msgid "Please, create data to see the available list here."
 msgstr ""
 
-#: dev_zaplane/components/ListTable/index.js:215
+#: dev_zaplane/components/ListTable/index.js:212
 #: dev_zaplane/components/Table/index.js:54
 #: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:98
 msgid "No Data Available!!!"
@@ -942,12 +953,12 @@ msgid "%s"
 msgstr ""
 
 #: dev_zaplane/components/LogDetails/index.js:59
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestDetails/TestDetails.js:34
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestDetails/TestDetails.js:34
 msgid "Input"
 msgstr ""
 
 #: dev_zaplane/components/LogDetails/index.js:66
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestDetails/TestDetails.js:42
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestDetails/TestDetails.js:42
 msgid "Output"
 msgstr ""
 
@@ -960,7 +971,7 @@ msgid "Add connection"
 msgstr ""
 
 #: dev_zaplane/components/RecipeGroupWizard/ConnectionsStep.js:65
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:48
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:48
 msgid "Select a connection"
 msgstr ""
 
@@ -1128,7 +1139,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: dev_zaplane/components/RecipeGroupWizard/index.js:386
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:258
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:258
 msgid "Continue"
 msgstr ""
 
@@ -1268,8 +1279,8 @@ msgstr ""
 
 #: dev_zaplane/components/SaveAsRecipeModal/index.js:57
 #: dev_zaplane/components/WorkflowTable/index.js:167
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:305
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:428
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:352
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:484
 msgid "Title"
 msgstr ""
 
@@ -1293,7 +1304,7 @@ msgstr ""
 
 #: dev_zaplane/components/SearchableDrawerList/DrawerItemList/DrawerItemButton.js:27
 #: dev_zaplane/components/SearchableDrawerList/DrawerSearchList/DrawerSearchList.js:40
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:244
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:244
 msgid "App"
 msgstr ""
 
@@ -1333,13 +1344,13 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/CustomAppList.js:99
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:20
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:182
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:206
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:205
 msgid "Actions"
 msgstr ""
 
 #: dev_zaplane/components/Teaser/index.js:50
 #: dev_zaplane/components/Teaser/index.js:51
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:357
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:363
 msgid "Dismiss"
 msgstr ""
 
@@ -1460,23 +1471,23 @@ msgstr ""
 
 #: dev_zaplane/components/WorkflowTable/index.js:192
 #: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:136
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:560
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:191
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:66
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:65
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:46
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:616
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:190
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:67
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:64
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:45
 msgid "Status"
 msgstr ""
 
 #: dev_zaplane/components/WorkflowTable/index.js:198
 #: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:151
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:70
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:73
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/CustomAppList.js:109
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:320
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:147
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:84
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:75
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:60
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:367
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:146
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:85
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:74
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:59
 msgid "Action"
 msgstr ""
 
@@ -1487,19 +1498,19 @@ msgstr ""
 #: dev_zaplane/components/WorkflowTable/index.js:205
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/CustomAppList.js:114
 #: dev_zaplane/containers/BackendDashboard/pages/email-templates/EmailTemplateCard.js:32
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:325
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:372
 msgid "Edit"
 msgstr ""
 
 #: dev_zaplane/components/WorkflowTable/index.js:210
 #: dev_zaplane/components/ZAPActionBar/index.js:10
-#: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:164
+#: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:169
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/CustomAppList.js:126
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:75
 #: dev_zaplane/containers/BackendDashboard/pages/email-templates/EmailTemplateCard.js:33
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/FolderCard.js:59
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:331
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:224
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:378
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:223
 #: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:58
 msgid "Delete"
 msgstr ""
@@ -1507,9 +1518,9 @@ msgstr ""
 #: dev_zaplane/components/WorkflowTable/index.js:216
 #: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:159
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:18
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:210
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:86
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:62
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:209
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:87
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:61
 msgid "Details"
 msgstr ""
 
@@ -1524,7 +1535,7 @@ msgstr ""
 
 #: dev_zaplane/components/WorkflowTable/index.js:258
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:126
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:84
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:83
 msgid "Log Details"
 msgstr ""
 
@@ -1575,8 +1586,8 @@ msgid "Auth Type"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:100
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:161
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:49
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:160
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:48
 msgid "Created At"
 msgstr ""
 
@@ -1586,34 +1597,46 @@ msgid "Updated At"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:154
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:112
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:115
 msgid "Test"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:170
+#: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:164
+msgid "Edit credentials"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:175
 msgid "Are you sure you want to permanently delete ?"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:179
+#: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:184
 msgid "Search connections..."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:179
+#: dev_zaplane/containers/BackendDashboard/pages/connections/ConnectionTable.js:184
 msgid "No connections found"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:46
+#: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:48
 msgid "Create credential"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:76
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:191
+#: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:79
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:191
 msgid "Connecting..."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:76
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:192
+#: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:81
+msgid "Update Connection"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:82
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:192
 msgid "Save Connection"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/connections/index.js:117
+msgid "For security, existing credentials aren't shown here. Re-enter all fields below to update this connection."
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:13
@@ -1628,40 +1651,44 @@ msgstr ""
 msgid "Response path"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:73
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:76
 msgid "Remove action"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:79
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:82
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/FieldsEditor.js:32
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/TriggersEditor.js:35
 msgid "Key"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:85
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:88
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/FieldsEditor.js:38
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/TriggersEditor.js:41
 msgid "Label"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:92
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:95
 msgid "Input fields"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:97
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:100
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/local.js:59
 msgid "Handler"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:102
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:105
 msgid "Request"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:107
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:110
 msgid "Outputs"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:158
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:119
+msgid "Authentication values (test only)"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/ActionsEditor.js:171
 msgid "Add action"
 msgstr ""
 
@@ -1709,7 +1736,7 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/AuthEditor.js:55
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:132
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:378
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:384
 msgid "Name"
 msgstr ""
 
@@ -1781,13 +1808,13 @@ msgid "No custom apps match your search"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:65
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:132
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:133
 msgid "New Custom App"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/Editor.js:84
 #: dev_zaplane/containers/BackendDashboard/pages/setting/index.js:226
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:218
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:225
 msgid "Saving…"
 msgstr ""
 
@@ -1863,28 +1890,30 @@ msgstr ""
 msgid "Required"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:83
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:84
 msgid "Save failed."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:92
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:93
 msgid "Delete this custom app? Workflows using it will stop working."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:126
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:127
 msgid "Import failed — check the file."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:132
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:133
 msgid "Edit Custom App"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:156
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:163
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:163
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ImportWorkflow/ImportJSONModal.js:51
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ImportWorkflow/index.js:38
 msgid "Import"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:159
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/index.js:166
 msgid "New app"
 msgstr ""
 
@@ -1921,34 +1950,51 @@ msgid "Hook name"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/parts.js:143
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:490
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:518
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:230
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:546
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:524
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:230
 msgid "Remove"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:44
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:51
 msgid "Invalid JSON:"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:62
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:88
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:128
+msgid "Import cURL"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:93
 msgid "Method"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:68
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:99
+msgid "Request URL"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:99
 msgid "Path"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:72
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:109
+msgid "Imported absolute URL. Use {{ field }} placeholders."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:110
 msgid "Relative to the app base URL. Use {{ field }} placeholders."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:77
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:116
 msgid "Headers (JSON)"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:83
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:122
 msgid "Body (JSON)"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/custom-apps/RequestEditor.js:136
+msgid "cURL Command"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/TestPanel.js:52
@@ -1980,7 +2026,7 @@ msgid "Webhook"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/custom-apps/TriggersEditor.js:26
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:60
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:59
 msgid "Trigger"
 msgstr ""
 
@@ -2062,7 +2108,7 @@ msgid "Create New Workflow"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:11
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:135
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:134
 msgid "App Name"
 msgstr ""
 
@@ -2075,16 +2121,16 @@ msgid "STATUS"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:70
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:89
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:195
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:88
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:194
 msgid "Success"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/dashboard/RecentLogs.js:70
 #: dev_zaplane/containers/BackendDashboard/pages/logs/AiAccessLog.js:18
 #: dev_zaplane/containers/BackendDashboard/pages/logs/AiAccessLog.js:25
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:92
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:195
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:91
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:194
 msgid "Failed"
 msgstr ""
 
@@ -2107,10 +2153,10 @@ msgid "Edit Template"
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/email-templates/Editor.js:92
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:413
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:459
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:637
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:191
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:469
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:515
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:693
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:191
 msgid "Saving..."
 msgstr ""
 
@@ -2234,279 +2280,296 @@ msgstr ""
 msgid "Create folders to categorize your workflows and easily share them with your workspace."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:94
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:107
 msgid "Business key and content are required."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:116
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:130
 msgid "Failed to save entry."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:133
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:177
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:147
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:192
 msgid "Business key is required."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:140
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:154
 msgid "Add at least one question and answer."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:150
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:164
 msgid "Added"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:150
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:164
 msgid "FAQs"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:156
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:171
 msgid "Failed to save FAQs."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:181
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:196
 msgid "Choose a post type to sync."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:199
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:214
 msgid "Synced"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:199
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:214
 msgid "items"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:200
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:215
 msgid "removed"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:200
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:215
 msgid "deleted"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:208
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:224
 msgid "Sync failed."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:241
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:268
 msgid "Semantic search settings saved."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:245
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:271
 msgid "Failed to save settings."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:252
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:278
 msgid "Backfill embeddings for which business key?"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:268
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:299
 msgid "Embedded"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:268
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:299
 msgid "entries."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:270
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:301
 msgid "Backfill failed."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:277
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:308
 msgid "Delete this entry?"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:282
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:313
 msgid "Failed to delete entry."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:300
-msgid "Business"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:310
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:435
-msgid "Content"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:348
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:627
-msgid "Semantic Search"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:352
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:693
-msgid "Working..."
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:352
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:521
-msgid "Sync Content"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:355
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:449
-msgid "FAQ Builder"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:358
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:403
-msgid "Add Entry"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:381
-msgid "All businesses"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:385
-msgid "Search knowledge..."
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:392
-msgid "Nothing matches your filter."
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:393
-msgid "Add products, prices, and FAQs so the AI can answer from your business data."
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:403
-msgid "Edit Entry"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:413
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:637
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:258
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:218
-msgid "Save"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:421
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:470
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:542
-msgid "Business Key"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:429
-msgid "e.g. Blue Widget / Returns policy"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:436
-msgid "Product name + price + details, or an FAQ/policy answer."
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:459
-msgid "Save FAQs"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:467
-msgid "Add questions and answers — each pair is saved as its own searchable entry."
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:485
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:327
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:541
 msgid "FAQ"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:498
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:328
+msgid "Manual"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:342
+msgid "Business"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:347
+msgid "Source"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:357
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:491
+msgid "Content"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:395
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:683
+msgid "Semantic Search"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:399
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:753
+msgid "Working..."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:399
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:577
+msgid "Sync Content"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:402
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:505
+msgid "FAQ Builder"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:405
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:459
+msgid "Add Entry"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:428
+msgid "All businesses"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:437
+msgid "All sources"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:441
+msgid "Search knowledge..."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:448
+msgid "Nothing matches your filter."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:449
+msgid "Add products, prices, and FAQs so the AI can answer from your business data."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:459
+msgid "Edit Entry"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:469
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:693
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:258
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:225
+msgid "Save"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:477
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:526
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:598
+msgid "Business Key"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:485
+msgid "e.g. Blue Widget / Returns policy"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:492
+msgid "Product name + price + details, or an FAQ/policy answer."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:515
+msgid "Save FAQs"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:523
+msgid "Add questions and answers — each pair is saved as its own searchable entry."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:554
 msgid "Question"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:504
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:560
 msgid "Answer"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:512
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:568
 msgid "+ Add another"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:531
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:587
 msgid "Syncing..."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:531
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:587
 msgid "Sync"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:539
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:595
 msgid "Pull any post type — posts, pages, products, docs — into this business's knowledge. Each item becomes one searchable entry. Re-syncing updates existing entries."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:549
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:605
 msgid "Post Type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:556
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:612
 msgid "Choose a post type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:565
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:621
 msgid "Choose a status"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:575
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:631
 msgid "Include body content"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:583
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:639
 msgid "Include excerpt"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:587
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:643
 msgid "Custom fields (optional)"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:593
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:649
 msgid "Taxonomies (optional)"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:596
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:652
 msgid "This post type has no taxonomies."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:606
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:662
 msgid "Select taxonomies to include"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:607
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:663
 msgid "Choose a post type first"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:618
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:674
 msgid "Remove entries whose source item was deleted"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:645
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:701
 msgid "Match knowledge by meaning, not just keywords — so \"can I get my money back?\" finds your \"Refund policy\". When off, retrieval uses keyword scoring (always works)."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:653
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:709
 msgid "Enable semantic (vector) search"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:656
-msgid "Embeddings Provider"
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:712
+msgid "AI Connection"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:668
-msgid "API Key"
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:720
+msgid "Select a connection…"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:669
-msgid "•••••••• (stored — leave blank to keep)"
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:724
+msgid "Using the API key saved by an earlier version. Pick a connection to switch to it."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:674
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:729
+msgid "No eligible connections yet. Create an OpenAI, Gemini, or OpenAI-compatible connection under Connections first (Anthropic and WordPress Core AI don't support embeddings)."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:734
 msgid "Model (optional)"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:683
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:743
 msgid "Backfill embeddings"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:685
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:745
 msgid "Synced/imported entries are embedded in the background. Run this to embed any that are still missing a vector (for the selected business)."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:693
+#: dev_zaplane/containers/BackendDashboard/pages/knowledge/index.js:753
 msgid "Backfill now"
 msgstr ""
 
@@ -2557,57 +2620,57 @@ msgstr ""
 msgid "Clear the AI access log? This cannot be undone."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:86
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:85
 msgid "All statuses"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:95
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:94
 msgid "Running"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:106
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:105
 msgid "Are you sure you want to clear all logs? This cannot be undone."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:117
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:116
 msgid "Are you sure you want to delete this log?"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:153
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:152
 msgid "Workflow"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:155
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:218
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:154
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:217
 msgid "Edit workflow"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:179
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:72
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:178
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:73
 msgid "DURATION"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:185
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:184
 msgid "Node Count"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:244
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:243
 msgid "Clear logs"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:253
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:252
 msgid "Clear activity"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:263
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:262
 msgid "Workflow runs"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:300
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:299
 msgid "No logs found"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:322
+#: dev_zaplane/containers/BackendDashboard/pages/logs/index.js:320
 msgid "Run Details"
 msgstr ""
 
@@ -2816,8 +2879,8 @@ msgstr ""
 #: dev_zaplane/containers/BackendDashboard/pages/setting/ConnectClient.js:200
 #: dev_zaplane/containers/BackendDashboard/pages/setting/ConnectClient.js:326
 #: dev_zaplane/containers/BackendDashboard/pages/setting/CopyButton.js:31
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:382
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:389
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:388
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:395
 msgid "Copy"
 msgstr ""
 
@@ -2838,7 +2901,7 @@ msgid "This client cannot sign in through a browser, so it needs a credential in
 msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/setting/ConnectClient.js:274
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:422
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:428
 msgid "Opening…"
 msgstr ""
 
@@ -2965,378 +3028,390 @@ msgstr ""
 msgid "Point an AI client — Claude, Cursor, or anything that speaks the Model Context Protocol — at the endpoint below. It can then read this site's automations and build new ones, within whatever you allow it."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:253
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:247
+msgid "It cannot administer the site: actions that manage plugins, users, roles, capabilities or site options are unavailable to it, and so is any workflow that uses one."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:259
 msgid "Endpoint URL"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:261
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:267
 msgid "Protocol"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:261
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:267
 msgid "tools"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:276
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:282
 msgid "This address is not reachable from the internet, so claude.ai and ChatGPT cannot connect to it — their servers look it up from outside your machine. Clients running on this computer, such as Claude Code or Cursor, work fine."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:300
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:306
 msgid "A client cannot connect?"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:303
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:309
 msgid "An AI client can only tell you it failed, not why. This checks the same things it does, from here."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:312
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:318
 msgid "Checking…"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:312
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:318
 msgid "Run check"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:370
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:376
 msgid "Copy this now"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:373
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:379
 msgid "WordPress shows an application password once. It is not stored here and cannot be shown again — revoke it and make another if you lose it."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:385
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:391
 msgid "Value"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:394
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:400
 msgid "Basic, not Bearer — this is a WordPress username and application password, not a token."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:402
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:408
 msgid "Create a credential to paste"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:405
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:411
 msgid "For a client that cannot sign in through a browser. WordPress asks you to approve it and hands over the credential — Zaplane never stores one. Zaplane will let it read and build, but never run a workflow for real."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:412
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:418
 msgid "What is it for? e.g. \"Claude desktop\""
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:428
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:434
 msgid "Application passwords are switched off on this site, so there is no pasteable credential to make. Clients that can sign in through a browser still work."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:439
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:445
 msgid "Activity"
 msgstr ""
 
 #. translators: %d: number of recorded calls.
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:445
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:451
 #, js-format
 msgid "%d call recorded — what each client did, and on whose account. Arguments are never recorded."
 msgid_plural "%d calls recorded — what each client did, and on whose account. Arguments are never recorded."
 msgstr[0] ""
 msgstr[1] ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:453
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:459
 msgid "Nothing recorded yet. Every tool call a client makes is logged here, arguments excluded."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:460
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:466
 msgid "View activity"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:482
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:488
 msgid "Could not change that setting."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:489
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:495
 msgid "Email me the first time a client runs a workflow for real, and if one is refused repeatedly."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:497
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:503
 msgid "Registered clients"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:500
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:506
 msgid "Apps that signed themselves up. Registering is not access on its own — approving one is. Removing a client also revokes what it holds."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:509
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:515
 msgid "connected"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:510
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:516
 msgid "registered, never approved"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:532
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:538
 msgid "Pasted credentials"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:535
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:541
 msgid "WordPress application passwords made here. They are yours — a colleague sees their own, on their profile. Each is a sign-in to your whole account, not only to Zaplane, so revoke any you have stopped using."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:550
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:609
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:556
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:615
 msgid "last used"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:551
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:610
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:557
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:616
 msgid "never used"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:558
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:617
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:564
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:623
 msgid "Revoke"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:570
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:576
 msgid "Signed-in clients"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:572
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:578
 msgid "Clients that signed in through the browser. Each acts as the person who approved it."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:575
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:581
 msgid "No tokens yet."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:590
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:596
 msgid "expires"
 msgstr ""
 
 #. translators: %d: number of workflows the token is limited to.
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:597
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:603
 #, js-format
 msgid "run limited to %d workflow"
 msgid_plural "run limited to %d workflows"
 msgstr[0] ""
 msgstr[1] ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:604
+#: dev_zaplane/containers/BackendDashboard/pages/setting/McpTab.js:610
 msgid "connected app"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:112
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:128
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:112
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:128
 msgid "This field is required"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:139
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:139
 msgid "Enter a valid email address"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:151
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:151
 msgid "A connection is required"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:244
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:244
 msgid "Add Trigger"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:244
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:244
 msgid "Add Action"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:265
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:265
 msgid "Search apps or tools..."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionDrawer.js:296
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionDrawer.js:296
 msgid "No configuration required for this action."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:75
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:75
 msgid "Save the workflow to generate its webhook URL."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:130
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:130
 msgid "name@example.com — or type \"@\" for dynamic data"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:168
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:168
 msgid "Type \"@\" here to add dynamic"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:186
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:186
 msgid "Select a file"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:187
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:187
 msgid "Use this file"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:223
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:223
 msgid "Change"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:240
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/ActionFieldRenderer.js:240
 msgid "Upload or select a file"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/CopyInput.js:15
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/CopyInput.js:35
 msgid "Copied to clipboard!"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ActionFieldRenderer/CopyInput.js:36
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/CopyInput.js:43
+msgid "Copy failed. Please select and copy the URL manually."
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ActionFieldRenderer/CopyInput.js:68
 msgid "Copy to clipboard"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ConditionGroupField/ConditionGroupField.js:29
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ConditionGroupField/ConditionGroupField.js:29
 msgid "OR"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ConditionGroupField/ConditionGroupField.js:48
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ConditionGroupField/ConditionGroupField.js:48
 msgid "Type \"@\" here to..."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/ConditionGroupField/ConditionGroupField.js:83
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/ConditionGroupField/ConditionGroupField.js:83
 msgid "OR Group"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/RepeaterField/RepeaterField.js:70
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/RepeaterField/RepeaterField.js:70
 msgid "Add Row"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:112
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:41
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:112
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:41
 msgid "Create New Connection"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:192
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionPopaver.js:192
 msgid "Connect with OAuth"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:47
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/ConnectionSelector/ConnectionSelector.js:47
 msgid "Select Connection"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/SelectTab.js:20
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:20
 msgid "Trigger Type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/SelectTab.js:21
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:21
 msgid "Action Type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/SelectTab.js:29
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/SelectTab.js:29
 msgid "Select Action Type"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:79
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:79
 msgid "Webhook settings saved."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:89
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:89
 msgid "Could not save the webhook settings."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:116
-msgid "Webhook Setup"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:128
-msgid "Hide"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:128
-msgid "Show"
-msgstr ""
-
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:136
-msgid "Callback URL"
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:109
+msgid "Paste this URL into Mailchimp → Audience → Audience settings → Webhooks so it can deliver events here. This trigger cannot fire until the webhook is saved."
 msgstr ""
 
 #. translators: %s: integration name, e.g. Slack.
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:140
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:115
 #, js-format
 msgid "Paste this into %s so it delivers events here. This trigger cannot fire until it does."
 msgstr ""
 
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:130
+msgid "Webhook Setup"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:142
+msgid "Hide"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:142
+msgid "Show"
+msgstr ""
+
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:150
+msgid "Callback URL"
+msgstr ""
+
 #. translators: %s: comma-separated list of setting names.
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:152
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:159
 #, js-format
 msgid "Set %s below before registering the URL — until then the provider's verification is rejected and deliveries are not authenticated."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:170
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:177
 msgid "saved"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:181
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:188
 msgid "••••••••  (leave blank to keep)"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:191
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/SelectTab/WebhookSetup/WebhookSetup.js:198
 msgid "Generate a value"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:105
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js:105
 msgid "Test Trigger"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:107
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js:107
 msgid "Stop Listening"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:110
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js:110
 msgid "Listening for trigger…"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:110
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js:110
 msgid "Go perform the action that fires this trigger (for example, submit the form). The captured data will appear below."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TestRun/TestRun.js:118
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TestRun/TestRun.js:118
 msgid "Test Action"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:114
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:114
 #, js-format
 msgid "Trigger %1$d · %2$s"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:136
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:136
 msgid "Match fields to another trigger"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:138
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:138
 msgid "Steps built for another trigger read its fields, such as {{1.email}}. When this trigger fires, those fields take the values you match here."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:143
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:143
 msgid "Trigger to match"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:147
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:147
 msgid "Don't match fields"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:159
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:159
 msgid "Loading fields…"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:164
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:164
 msgid "That trigger has no fields to match yet. Test it once to capture its data."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:172
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:172
 #, js-format
 msgid "%1$d of %2$d fields matched"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:179
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:179
 msgid "Match same names"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/actionDrawer/TriggerFieldMap/TriggerFieldMap.js:200
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/ActionDrawer/TriggerFieldMap/TriggerFieldMap.js:200
 msgid "Not matched"
 msgstr ""
 
@@ -3432,36 +3507,36 @@ msgstr ""
 msgid "Flows"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:55
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:42
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:54
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:41
 msgid "Run ID"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:78
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:57
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:79
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:56
 msgid "Node Run"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:95
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:71
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:96
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:70
 msgid "Re-Try"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:114
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:98
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:80
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/RunsTable/RunsTable.js:115
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:97
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:79
 msgid "No history found"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:44
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:43
 msgid "ID"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:77
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:76
 msgid "Active version"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:85
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/VersionHistoryTable/VersionHistoryTable.js:84
 msgid "Prevew Version"
 msgstr ""
 
@@ -3477,7 +3552,7 @@ msgstr ""
 msgid "Import Workflow"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:52
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/WorkflowsLogs.js:51
 msgid "Duration"
 msgstr ""
 
@@ -3513,19 +3588,19 @@ msgstr ""
 msgid "Folder created successfully"
 msgstr ""
 
-#: dev_zaplane/redux/Slices/logsSlice/logsSlice.js:24
+#: dev_zaplane/redux/Slices/logsSlice/logsSlice.js:21
 msgid "Run details fetched successfully"
 msgstr ""
 
-#: dev_zaplane/redux/Slices/logsSlice/logsSlice.js:75
+#: dev_zaplane/redux/Slices/logsSlice/logsSlice.js:72
 msgid "Node retried and queued successfully"
 msgstr ""
 
-#: dev_zaplane/redux/Slices/logsSlice/logsSlice.js:100
+#: dev_zaplane/redux/Slices/logsSlice/logsSlice.js:97
 msgid "Logs cleared successfully"
 msgstr ""
 
-#: dev_zaplane/redux/Slices/logsSlice/logsSlice.js:121
+#: dev_zaplane/redux/Slices/logsSlice/logsSlice.js:118
 msgid "Log deleted successfully"
 msgstr ""
 
@@ -3549,22 +3624,22 @@ msgstr ""
 msgid "Settings saved"
 msgstr ""
 
-#: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlow.js:62
+#: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlow.js:59
 msgid "Updated workflow Successfully"
 msgstr ""
 
-#: dev_zaplane/redux/Slices/workFlowSlice/actions/workflowExctions.js:26
+#: dev_zaplane/redux/Slices/workFlowSlice/actions/workflowExctions.js:23
 msgid "Run fetched successfully"
 msgstr ""
 
-#: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowRuns.js:50
+#: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowRuns.js:47
 msgid "Run started again."
 msgstr ""
 
-#: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowVersion.js:60
+#: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowVersion.js:57
 msgid " fetched prevews version successfully"
 msgstr ""
 
-#: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowVersion.js:76
+#: dev_zaplane/redux/Slices/workFlowSlice/actions/workFlowVersion.js:73
 msgid "version active successfully"
 msgstr ""
