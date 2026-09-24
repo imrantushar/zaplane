@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-23 12:10:16",
+    "generated_at": "2026-09-24 04:26:55",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -3507,19 +3507,19 @@
                             "label": "Timezone",
                             "type": "select",
                             "required": false,
-                            "show_if": {
-                                "booking_type": [
-                                    "service",
-                                    "event",
-                                    "resource"
-                                ]
-                            },
                             "dynamic": {
                                 "integration": "gembooking",
                                 "query": "gembooking_timezone_query",
                                 "select": [
                                     "value",
                                     "label"
+                                ]
+                            },
+                            "show_if": {
+                                "booking_type": [
+                                    "service",
+                                    "event",
+                                    "resource"
                                 ]
                             }
                         },
@@ -3686,13 +3686,13 @@
                         },
                         {
                             "key": "start_at",
-                            "label": "New Start At",
+                            "label": "Start At",
                             "type": "datetime",
                             "required": true
                         },
                         {
                             "key": "end_at",
-                            "label": "New End At",
+                            "label": "End At",
                             "type": "datetime",
                             "required": true
                         }
@@ -3854,7 +3854,7 @@
                             "key": "booking_id",
                             "label": "Booking",
                             "type": "select",
-                            "required": true,
+                            "required": false,
                             "dynamic": {
                                 "integration": "gembooking",
                                 "query": "gembooking_query",
@@ -3871,7 +3871,7 @@
                             "required": false
                         },
                         {
-                            "key": "status",
+                            "key": "filter_status",
                             "label": "Status Filter",
                             "type": "text",
                             "required": false
@@ -3932,17 +3932,31 @@
                             "key": "start_at",
                             "label": "Start At",
                             "type": "datetime",
-                            "required": true
+                            "required": true,
+                            "show_if": {
+                                "booking_type": [
+                                    "service",
+                                    "event",
+                                    "resource"
+                                ]
+                            }
                         },
                         {
                             "key": "end_at",
                             "label": "End At",
                             "type": "datetime",
-                            "required": true
+                            "required": true,
+                            "show_if": {
+                                "booking_type": [
+                                    "service",
+                                    "event",
+                                    "resource"
+                                ]
+                            }
                         },
                         {
                             "key": "team_id",
-                            "label": "Staff/Team ID",
+                            "label": "Staff Member ID",
                             "type": "number",
                             "required": false
                         }
@@ -4004,7 +4018,7 @@
                             "key": "last_name",
                             "label": "Last Name",
                             "type": "text",
-                            "required": true
+                            "required": false
                         },
                         {
                             "key": "display_name",
@@ -4013,15 +4027,15 @@
                             "required": true
                         },
                         {
-                            "key": "user_email",
-                            "label": "Customer Email",
+                            "key": "email",
+                            "label": "Email",
                             "type": "email",
                             "required": true
                         },
                         {
                             "key": "phone",
                             "label": "Phone Number",
-                            "type": "number",
+                            "type": "text",
                             "required": true
                         },
                         {
@@ -4029,13 +4043,6 @@
                             "label": "Timezone",
                             "type": "select",
                             "required": false,
-                            "show_if": {
-                                "booking_type": [
-                                    "service",
-                                    "event",
-                                    "resource"
-                                ]
-                            },
                             "dynamic": {
                                 "integration": "gembooking",
                                 "query": "gembooking_timezone_query",
@@ -4120,9 +4127,9 @@
                         },
                         {
                             "key": "phone",
-                            "label": "Phone",
-                            "type": "number",
-                            "required": false
+                            "label": "Phone Number",
+                            "type": "text",
+                            "required": true
                         }
                     ],
                     "outputs": [
@@ -4199,13 +4206,13 @@
                     "key": "change_package_status",
                     "schema": [
                         {
-                            "key": "package_id",
-                            "label": "Package",
+                            "key": "purchase_id",
+                            "label": "Package Purchase",
                             "type": "select",
                             "required": true,
                             "dynamic": {
                                 "integration": "gembooking",
-                                "query": "gembooking_package_query",
+                                "query": "gembooking_purchase_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -4214,7 +4221,7 @@
                         },
                         {
                             "key": "package_status",
-                            "label": "Status",
+                            "label": "Package Status",
                             "type": "select",
                             "required": true,
                             "options": [
@@ -4243,13 +4250,13 @@
                     "key": "delete_package_purchase",
                     "schema": [
                         {
-                            "key": "package_id",
-                            "label": "Package",
+                            "key": "purchase_id",
+                            "label": "Package Purchase",
                             "type": "select",
-                            "required": true,
+                            "required": false,
                             "dynamic": {
                                 "integration": "gembooking",
-                                "query": "gembooking_package_query",
+                                "query": "gembooking_purchase_query",
                                 "select": [
                                     "value",
                                     "label"
@@ -4259,7 +4266,7 @@
                         {
                             "key": "ids",
                             "label": "Purchase IDs (comma-separated, for bulk delete)",
-                            "type": "number",
+                            "type": "text",
                             "required": false
                         }
                     ],
@@ -4306,7 +4313,7 @@
                     "schema": [
                         {
                             "key": "ticket_code",
-                            "label": "Ticket Code (any ticket on the booking)",
+                            "label": "Ticket Code",
                             "type": "text",
                             "required": true
                         }

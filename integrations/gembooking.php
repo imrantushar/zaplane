@@ -3,12 +3,20 @@
 namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
+use Zaplane\Integrations\Gembooking\ActionsTrait;
+use Zaplane\Integrations\Gembooking\QueryTrait;
+use Zaplane\Integrations\Gembooking\Helper;
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 class Gembooking extends IntegrationBase {
+
+	use ActionsTrait;
+	use QueryTrait;
+	use Helper;
 
 	public static function get_slug(): string {
 		return 'gembooking';
@@ -44,13 +52,6 @@ class Gembooking extends IntegrationBase {
 		return (bool) apply_filters( 'zaplane/gembooking_addon_active', $active, $addon );
 	}
 
-	/**
-	 * Keep add-on nodes visible, but disable them until their add-on is active.
-	 *
-	 * @param array  $items Add-on-only triggers or actions.
-	 * @param string $addon Add-on identifier.
-	 * @param string $label Human-readable add-on name.
-	 */
 	private static function gate( array $items, string $addon, string $label ): array {
 		$active = self::addon_active( $addon );
 
@@ -79,7 +80,7 @@ class Gembooking extends IntegrationBase {
 	 * built from that constant — a hardcoded 'gembk_resource' etc. will
 	 * silently never fire if GemBooking registers a different slug.
 	 *
-	 * @param string $kind    'service' | 'event' | 'resource'.
+	 * @param string $kind    'service' | 'event' | 'resource' | 'package'.
 	 * @param string $default Fallback slug if the constant isn't defined.
 	 */
 	private static function bookable_post_type( string $kind, string $default ): string {
@@ -87,6 +88,7 @@ class Gembooking extends IntegrationBase {
 			'service'  => 'GEMBOOKING_SERVICE_POST_TYPE',
 			'event'    => 'GEMBOOKING_EVENT_POST_TYPE',
 			'resource' => 'GEMBOOKING_RESOURCE_POST_TYPE',
+			'package'  => 'GEMBOOKING_PACKAGE_POST_TYPE',
 		];
 		$constant = $constants[ $kind ] ?? '';
 
@@ -592,201 +594,6 @@ class Gembooking extends IntegrationBase {
 		return $actions;
 	}
 
-	private static function booking_id_field(): array {
-		return [
-			[
-				'key'      => 'booking_id',
-				'label'    => 'Booking',
-				'type'     => 'select',
-				'required' => true,
-				'dynamic'  => [
-					'integration' => 'gembooking',
-					'query'       => 'gembooking_query',
-					'select'      => [ 'value', 'label' ],
-				],
-			],
-		];
-	}
-
-	private static function booking_type_field(): array {
-		return [
-			[
-				'key'      => 'booking_type',
-				'label'    => 'Booking Type',
-				'type'     => 'select',
-				'required' => true,
-				'options'  => [
-					[ 'value' => 'service', 'label' => 'Service' ],
-					[ 'value' => 'event', 'label' => 'Event' ],
-					[ 'value' => 'resource', 'label' => 'Resource' ],
-					[ 'value' => 'package', 'label' => 'Package' ],
-				],
-			],
-		];
-	}
-
-	private static function bookable_field(): array {
-		return [
-			[
-				'key'      => 'bookable',
-				'label'    => 'Bookable',
-				'type'     => 'select',
-				'required' => true,
-				'dynamic'  => [
-					'integration' => 'gembooking',
-					'query'       => 'gembooking_bookable_query',
-					'select'      => [ 'value', 'label' ],
-					'depends_on'  => [ 'booking_type' ],
-				],
-			],
-		];
-	}
-
-	private static function package_id_field(): array {
-		return [
-			[
-				'key'      => 'package_id',
-				'label'    => 'Package',
-				'type'     => 'select',
-				'required' => true,
-				'dynamic'  => [
-					'integration' => 'gembooking',
-					'query'       => 'gembooking_package_query',
-					'select'      => [ 'value', 'label' ],
-				],
-			],
-		];
-	}
-
-	private static function timezone_field(): array {
-		return [
-			[
-				'key'      => 'timezone',
-				'label'    => 'Timezone',
-				'type'     => 'select',
-				'required' => false,
-				'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
-				'dynamic'  => [
-					'integration' => 'gembooking',
-					'query'       => 'gembooking_timezone_query',
-					'select'      => [ 'value', 'label' ],
-				],
-			],
-		];
-	}
-
-	private static function start_at_field(): array {
-		return [
-			[
-				'key'      => 'start_at',
-				'label'    => 'Start At',
-				'type'     => 'datetime',
-				'required' => true,
-				'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
-			],
-		];
-	}
-
-	private static function end_at_field(): array {
-		return [
-			[
-				'key'      => 'end_at',
-				'label'    => 'End At',
-				'type'     => 'datetime',
-				'required' => true,
-				'show_if'  => [ 'booking_type' => [ 'service', 'event', 'resource' ] ],
-			],
-		];
-	}
-
-	private static function first_name_field(): array {
-		return [
-			[
-				'key' => 'first_name',
-				'label' => 'First Name',
-				'type' => 'text',
-				'required' => true,
-			],
-		];
-	}
-
-	private static function last_name_field(): array {
-		return [
-			[
-				'key' => 'last_name',
-				'label' => 'Last Name',
-				'type' => 'text',
-				'required' => false,
-			],
-		];
-	}
-
-	private static function email_field(): array {
-		return [
-			[
-				'key'      => 'email',
-				'label'    => 'Email',
-				'type'     => 'email',
-				'required' => true,
-			],
-		];
-	}
-
-	private static function reason_field(): array {
-		return [
-			[
-				'key'      => 'reason',
-				'label'    => 'Reason',
-				'type'     => 'textarea',
-				'required' => false,
-			],
-		];
-	}
-
-	private static function message_field(): array {
-		return [
-			[
-				'key' => 'message',
-				'label' => 'Message',
-				'type' => 'textarea',
-				'required' => true,
-			],
-		];
-	}
-
-	private static function team_id_field(): array {
-		return [
-			[
-				'key' => 'team_id',
-				'label' => 'Staff Member ID',
-				'type' => 'number',
-				'required' => true,
-			],
-		];
-	}
-
-	private static function phone_field(): array {
-		return [
-			[
-				'key' => 'phone',
-				'label' => 'Phone Number',
-				'type' => 'number',
-				'required' => true,
-			],
-		];
-	}
-
-	private static function ticket_code_field(): array {
-		return [
-			[
-				'key' => 'ticket_code',
-				'label' => 'Ticket Code',
-				'type' => 'text',
-				'required' => true,
-			],
-		];
-	}
-
 	public static function get_action_config_schema( string $action ): array {
 		$schemas = [
 			'create_booking' => [
@@ -805,7 +612,7 @@ class Gembooking extends IntegrationBase {
 					],
 				],
 				[
-					'key'      => 'email',
+					'key'      => 'customer_email',
 					'label'    => 'Or Customer Email (no account yet)',
 					'type'     => 'email',
 					'required' => false,
@@ -881,8 +688,8 @@ class Gembooking extends IntegrationBase {
 			],
 			'reschedule_booking' => [
 				...self::booking_id_field(),
-				...self::start_at_field(),
-				...self::end_at_field(),
+				...self::start_at_field( false ),
+				...self::end_at_field( false ),
 			],
 			'cancel_booking' => [
 				...self::booking_id_field(),
@@ -920,7 +727,7 @@ class Gembooking extends IntegrationBase {
 				],
 			],
 			'find_booking' => [
-				...self::booking_id_field(),
+				...self::booking_id_field( false ),
 				[
 					'key' => 'search',
 					'label' => 'Search Term (name or email)',
@@ -941,16 +748,16 @@ class Gembooking extends IntegrationBase {
 				],
 			],
 			'check_slot_availability' => [
-				...self::booking_type_field(),
+				...self::booking_type_field( false ),
 				...self::bookable_field(),
 				...self::start_at_field(),
 				...self::end_at_field(),
-				...self::team_id_field(),
+				...self::team_id_field( false ),
 			],
 			'add_staff_time_off' => [
 				...self::team_id_field(),
-				...self::start_at_field(),
-				...self::end_at_field(),
+				...self::start_at_field( false ),
+				...self::end_at_field( false ),
 				...self::reason_field(),
 			],
 			'update_customer_profile' => [
@@ -970,10 +777,10 @@ class Gembooking extends IntegrationBase {
 				],
 				...self::email_field(),
 				...self::phone_field(),
-				...self::timezone_field(),
+				...self::timezone_field( false ),
 			],
 			'duplicate_bookable' => [
-				...self::booking_type_field(),
+				...self::booking_type_field( false ),
 				...self::bookable_field(),
 			],
 			'create_staff' => [
@@ -1004,21 +811,21 @@ class Gembooking extends IntegrationBase {
 			],
 			'grant_package' => [
 				...self::package_id_field(),
-				...self::email_field(),
-				...self::email_field(),
+				[
+					'key'      => 'user_id',
+					'label'    => 'Customer User ID (or use Email below)',
+					'type'     => 'number',
+					'required' => false,
+				],
+				[
+					'key'      => 'email',
+					'label'    => 'Customer Email (used if no User ID)',
+					'type'     => 'email',
+					'required' => false,
+				],
 			],
 			'change_package_status' => [
-				[
-					'key'      => 'purchase_id',
-					'label'    => 'Package Purchase',
-					'type'     => 'select',
-					'required' => true,
-					'dynamic'  => [
-						'integration' => 'gembooking',
-						'query'       => 'gembooking_purchase_query',
-						'select'      => [ 'value', 'label' ],
-					],
-				],
+				...self::purchase_id_field(),
 				[
 					'key'      => 'package_status',
 					'label'    => 'Package Status',
@@ -1032,11 +839,11 @@ class Gembooking extends IntegrationBase {
 				],
 			],
 			'delete_package_purchase' => [
-				...self::package_id_field(),
+				...self::purchase_id_field( false ),
 				[
 					'key' => 'ids',
 					'label' => 'Purchase IDs (comma-separated, for bulk delete)',
-					'type' => 'number',
+					'type' => 'text',
 					'required' => false,
 				],
 			],
@@ -1066,7 +873,7 @@ class Gembooking extends IntegrationBase {
 			],
 		];
 		return $schemas[ $action ] ?? [
-			...self::booking_id_field(),
+			...self::booking_id_field( false ),
 			[
 				'key' => 'data',
 				'label' => 'Data (JSON)',
@@ -1127,513 +934,6 @@ class Gembooking extends IntegrationBase {
 
 		return static::$method( $config, $input );
 	}
-
-	/* -----------------------------------------------------------------
-	 * Core booking actions — GemBooking\Classes\BookingSolver
-	 * --------------------------------------------------------------- */
-
-	private static function action_create_booking( array $config, array $input ): array {
-		$type        = sanitize_key( (string) ( $config['booking_type'] ?? '' ) );
-		$bookable_id = absint( $config['bookable'] ?? 0 );
-
-		if ( ! in_array( $type, [ 'service', 'event', 'resource', 'package' ], true ) || ! $bookable_id ) {
-			return self::action_error( 'A valid booking_type and bookable are required.' );
-		}
-
-		// Verify the bookable item exists
-		if ( 'package' !== $type ) {
-			$post = get_post( $bookable_id );
-			if ( ! $post || 'publish' !== $post->post_status ) {
-				return self::action_error( 'The selected bookable item does not exist or is not published.' );
-			}
-		}
-
-		if ( 'package' === $type ) {
-			$customer_id = absint( $config['customer_id'] ?? 0 );
-			$email       = sanitize_email( (string) ( $config['email'] ?? '' ) );
-
-			if ( ! $customer_id && ! is_email( $email ) ) {
-				return self::action_error( 'Select an existing customer or provide a customer_email.' );
-			}
-
-			// A package is granted, not "booked" — route to the grant flow,
-			// matching the "Grant package" button in the admin modal.
-			return self::call_controller( '\\GemBookingPackage\\API\\GrantController', 'grant', array_filter( [
-				'package_id' => $bookable_id,
-				'user_id'    => $customer_id ?: null,
-				'email'      => $email ?: null,
-			] ) );
-		}
-
-		$data = [
-			'object_id'   => $bookable_id,
-			'object_type' => $type,
-			'start_at'    => (string) ( $config['start_at'] ?? '' ),
-			'end_at'      => (string) ( $config['end_at'] ?? '' ),
-			'timezone'    => (string) ( $config['timezone'] ?? '' ),
-			'fields'      => [
-				'name'           => (string) ( $config['first_name'] ?? '' ),
-				'email'          => sanitize_email( (string) ( $config['email'] ?? '' ) ),
-				'phone'          => (string) ( $config['phone'] ?? '' ),
-			],
-		];
-
-		// Add note if provided
-		if ( ! empty( $config['note'] ) ) {
-			$data['fields']['meeting_about'] = (string) $config['note'];
-		}
-
-		// Add optional parameters if provided
-		if ( ! empty( $config['host_id'] ) ) {
-			$data['host_id'] = absint( $config['host_id'] );
-		}
-
-		if ( ! empty( $config['team_member_id'] ) ) {
-			$data['team_member_id'] = absint( $config['team_member_id'] );
-		}
-
-		if ( ! empty( $config['attendee_count'] ) ) {
-			$data['attendee_count'] = max( 1, absint( $config['attendee_count'] ) );
-		}
-
-		if ( '' === $data['start_at'] || '' === $data['end_at'] || '' === $data['timezone'] || '' === $data['fields']['name'] || ! is_email( $data['fields']['email'] ) ) {
-			return self::action_error( 'start_at, end_at, timezone, first_name and a valid email are required.' );
-		}
-
-		// Validate datetime format
-		$start_time = strtotime( $data['start_at'] );
-		$end_time = strtotime( $data['end_at'] );
-
-		if ( false === $start_time || false === $end_time ) {
-			return self::action_error( 'Invalid datetime format for start_at or end_at.' );
-		}
-
-		if ( $end_time <= $start_time ) {
-			return self::action_error( 'end_at must be after start_at.' );
-		}
-
-		// Validate timezone
-		if ( ! in_array( $data['timezone'], \DateTimeZone::listIdentifiers(), true ) ) {
-			return self::action_error( 'Invalid timezone provided.' );
-		}
-
-		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'create_booked', $data );
-	}
-
-	private static function action_change_booking_status( array $config, array $input ): array {
-		$id     = absint( $config['booking_id'] ?? 0 );
-		$status = sanitize_key( (string) ( $config['booking_status'] ?? '' ) );
-
-		if ( ! $id || '' === $status ) {
-			return self::action_error( 'A valid booking_id and status are required.' );
-		}
-
-		// Validate status values
-		$valid_statuses = [ 'pending', 'confirmed', 'cancelled', 'rescheduled' ];
-		if ( ! in_array( $status, $valid_statuses, true ) ) {
-			return self::action_error( 'Invalid status value. Must be one of: pending, confirmed, cancelled, rescheduled.' );
-		}
-
-		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'update_booked_status', [
-			'id' => $id,
-			'status' => $status,
-		] );
-	}
-
-	private static function action_reschedule_booking( array $config, array $input ): array {
-		$id       = absint( $config['booking_id'] ?? 0 );
-		$start_at = (string) ( $config['start_at'] ?? '' );
-		$end_at   = (string) ( $config['end_at'] ?? '' );
-
-		if ( ! $id || '' === $start_at || '' === $end_at ) {
-			return self::action_error( 'A valid booking_id, start_at and end_at are required.' );
-		}
-
-		// Validate datetime format
-		$start_time = strtotime( $start_at );
-		$end_time = strtotime( $end_at );
-
-		if ( false === $start_time || false === $end_time ) {
-			return self::action_error( 'Invalid datetime format for start_at or end_at.' );
-		}
-
-		if ( $end_time <= $start_time ) {
-			return self::action_error( 'end_at must be after start_at.' );
-		}
-
-		// Build the proper data structure expected by GemBooking
-		$data = [
-			'id'       => $id,
-			'start_at' => $start_at,
-			'end_at'   => $end_at,
-		];
-
-		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'update_booking_status_with_reschedule', $data );
-	}
-
-	private static function action_cancel_booking( array $config, array $input ): array {
-		$id = absint( $config['booking_id'] ?? 0 );
-
-		if ( ! $id ) {
-			return self::action_error( 'A valid booking_id is required.' );
-		}
-
-		// Use the simpler status update method to avoid permission issues
-		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'update_booked_status', [
-			'id' => $id,
-			'status' => 'cancelled',
-		] );
-	}
-
-	private static function action_delete_booking( array $config, array $input ): array {
-		$id = absint( $config['booking_id'] ?? 0 );
-
-		if ( ! $id ) {
-			return self::action_error( 'A valid booking_id is required.' );
-		}
-
-		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'destroy_booked', [ 'id' => $id ] );
-	}
-
-	private static function action_add_booking_note( array $config, array $input ): array {
-		$id   = absint( $config['booking_id'] ?? 0 );
-		$note = (string) ( $config['note'] ?? '' );
-
-		if ( ! $id || '' === trim( $note ) ) {
-			return self::action_error( 'A valid booking_id and note are required.' );
-		}
-
-		return self::call_solver( '\\GemBooking\\Classes\\BookingSolver', 'update_booking_note', [
-			'id' => $id,
-			'note' => $note,
-		] );
-	}
-
-	private static function action_reply_customer( array $config, array $input ): array {
-		$id      = absint( $config['booking_id'] ?? 0 );
-		$message = (string) ( $config['message'] ?? '' );
-
-		if ( ! $id || '' === trim( $message ) ) {
-			return self::action_error( 'A valid booking_id and message are required.' );
-		}
-
-		return self::call_solver( 'GemBooking\Classes\BookingSolver', 'add_staff_reply', [
-			'id' => $id,
-			'message' => $message,
-		] );
-	}
-
-	/* -----------------------------------------------------------------
-	 * Model-direct actions (no request object involved)
-	 * --------------------------------------------------------------- */
-
-	private static function action_update_booking_field( array $config, array $input ): array {
-		$id  = absint( $config['booking_id'] ?? 0 );
-		$key = sanitize_key( (string) ( $config['field_key'] ?? $config['key'] ?? '' ) );
-
-		if ( ! $id || '' === $key || ! class_exists( '\\GemBooking\\Models\\BookingMetaModel' ) || ! method_exists( '\\GemBooking\\Models\\BookingMetaModel', 'update' ) ) {
-			return self::action_error( 'A valid booking ID, custom field key, and GemBooking BookingMetaModel::update() are required.' );
-		}
-
-		$reflection = new \ReflectionMethod( '\\GemBooking\\Models\\BookingMetaModel', 'update' );
-
-		if ( $reflection->isStatic() ) {
-			$result = \GemBooking\Models\BookingMetaModel::update( $id, $key, $config['value'] ?? '' );
-		} else {
-			$model  = new \GemBooking\Models\BookingMetaModel();
-			$result = $model->update( $id, $key, $config['value'] ?? '' );
-		}
-
-		return false === $result ? self::action_error( 'GemBooking could not update the booking custom field.' ) : self::action_success( [
-			'booking_id' => $id,
-			'key' => $key,
-			'value' => $config['value'] ?? ''
-		] );
-	}
-
-	private static function action_find_booking( array $config, array $input ): array {
-		if ( ! class_exists( '\\GemBooking\\Models\\BookingModels' ) ) {
-			return self::action_error( 'GemBooking BookingModels is not available.' );
-		}
-		$model = new \GemBooking\Models\BookingModels();
-		$id    = absint( $config['booking_id'] ?? 0 );
-
-		if ( $id ) {
-			$booking = $model->find_by_id( $id );
-
-			return self::action_success( is_array( $booking ) ? $booking : [] );
-		}
-
-		return self::action_success( $model->get_list(
-			absint( $config['page'] ?? 1 ) ?: 1,
-			absint( $config['limit'] ?? 20 ) ?: 20,
-			sanitize_text_field( (string) ( $config['search'] ?? '' ) ),
-			sanitize_key( (string) ( $config['filter_status'] ?? '' ) )
-		) );
-	}
-
-	private static function action_check_slot_availability( array $config, array $input ): array {
-		if ( ! class_exists( '\\GemBooking\\Models\\BookingModels' ) ) {
-			return self::action_error( 'GemBooking BookingModels is not available.' );
-		}
-		$data  = self::decode_data( $config['data'] ?? [] );
-		$model = new \GemBooking\Models\BookingModels();
-
-		if ( ! method_exists( $model, 'is_slot_available' ) ) {
-			return self::action_error( 'GemBooking slot availability is not available in this plugin version.' );
-		}
-
-		$object_id = absint( $data['object_id'] ?? $config['object_id'] ?? 0 );
-		$start_at  = (string) ( $data['start_at'] ?? $config['start_at'] ?? '' );
-		$end_at    = (string) ( $data['end_at'] ?? $config['end_at'] ?? '' );
-
-		if ( ! $object_id || '' === $start_at || '' === $end_at ) {
-			return self::action_error( 'object_id, start_at and end_at are required.' );
-		}
-
-		$team_id   = isset( $data['team_id'] ) ? absint( $data['team_id'] ) : ( isset( $config['team_id'] ) ? absint( $config['team_id'] ) : null );
-		$available = $model->is_slot_available( $object_id, $start_at, $end_at, $team_id );
-
-		return self::action_success( [ 'available' => (bool) $available ] );
-	}
-
-	/* -----------------------------------------------------------------
-	 * Controller-direct actions — no REST routing, we call the
-	 * controller method straight with a manually built request.
-	 * --------------------------------------------------------------- */
-
-	private static function action_add_staff_time_off( array $config, array $input ): array {
-		$team_id = absint( $config['team_id'] ?? 0 );
-
-		if ( ! $team_id || '' === (string) ( $config['start_at'] ?? '' ) ) {
-			return self::action_error( 'A valid team_id and start_at are required.' );
-		}
-
-		return self::call_controller( '\\GemBooking\\API\\ExceptionController', 'store', [
-			'team_id' => $team_id,
-			'start_at' => (string) $config['start_at'],
-			'end_at' => (string) ( $config['end_at'] ?? $config['start_at'] ),
-			'reason' => (string) ( $config['reason'] ?? '' ),
-		] );
-	}
-
-	private static function action_update_customer_profile( array $config, array $input ): array {
-		// GemBooking's own controller only works for the logged-in user, so
-		// this updates the WordPress user record and GemBooking's profile
-		// meta directly, which works for any user_id.
-		$id = absint( $config['user_id'] ?? 0 );
-
-		if ( ! $id || ! get_user_by( 'id', $id ) ) {
-			return self::action_error( 'A valid customer user_id is required.' );
-		}
-
-		$data = self::decode_data( $config['data'] ?? [] );
-		$user = [ 'ID' => $id ];
-
-		foreach ( [ 'first_name', 'last_name', 'display_name', 'user_email' ] as $field ) {
-			if ( isset( $data[ $field ] ) ) {
-				$user[ $field ] = 'user_email' === $field
-					? sanitize_email( (string) $data[ $field ] )
-					: sanitize_text_field( (string) $data[ $field ] );
-			}
-		}
-
-		$result = wp_update_user( $user );
-
-		if ( is_wp_error( $result ) ) {
-			return self::action_error( $result->get_error_message() );
-		}
-
-		foreach ( [ 'phone', 'timezone' ] as $field ) {
-			if ( isset( $data[ $field ] ) ) {
-				update_user_meta( $id, $field, sanitize_text_field( (string) $data[ $field ] ) );
-			}
-		}
-
-		return self::action_success( [ 'user_id' => $id ] );
-	}
-
-	private static function action_duplicate_bookable( array $config, array $input ): array {
-		$source_id = absint( $config['booking_type'] ?? $config['bookable'] ?? $config['id'] ?? 0 );
-
-		if ( ! $source_id ) {
-			return self::action_error( 'A valid source_id is required.' );
-		}
-
-		return self::call_controller( '\\GemBooking\\API\\DuplicateController', 'duplicate', [
-			'source_id' => $source_id,
-			'id' => $source_id,
-		] );
-	}
-
-	/* -----------------------------------------------------------------
-	 * Add-on actions
-	 * --------------------------------------------------------------- */
-
-	private static function action_send_template_email( array $config, array $input ): array {
-		$to      = sanitize_email( (string) ( $config['to'] ?? '' ) );
-		$subject = (string) ( $config['subject'] ?? '' );
-		$body    = (string) ( $config['body'] ?? '' );
-
-		if ( ! is_email( $to ) || '' === $subject || '' === trim( $body ) ) {
-			return self::action_error( 'A valid recipient email, subject and body are required.' );
-		}
-
-		if ( ! class_exists( '\\GemBookingEmail\\Email\\Mail' ) || ! method_exists( '\\GemBookingEmail\\Email\\Mail', 'send_mail' ) ) {
-			return self::action_error( 'The GemBooking Email add-on is not active.' );
-		}
-
-		try {
-			$result = self::invoke( '\\GemBookingEmail\\Email\\Mail', 'send_mail', [ $to, $subject, $body, [], [] ] );
-		} catch ( \Throwable $e ) {
-			return self::action_error( 'Failed to send email: ' . $e->getMessage() );
-		}
-
-		if ( $result instanceof \WP_Error ) {
-			return self::action_error( $result->get_error_message() );
-		}
-		if ( false === $result ) {
-			return self::action_error( 'GemBooking could not send the email.' );
-		}
-
-		return self::action_success( [ 'to' => $to, 'subject' => $subject ] );
-	}
-
-	private static function action_grant_package( array $config, array $input ): array {
-		$package_id = absint( $config['package_id'] ?? 0 );
-		$user_id    = absint( $config['user_id'] ?? 0 );
-		$email      = sanitize_email( (string) ( $config['email'] ?? '' ) );
-
-		if ( ! $package_id || ( ! $user_id && ! is_email( $email ) ) ) {
-			return self::action_error( 'A valid package_id and either a user_id or email are required.' );
-		}
-
-		$params = [ 'package_id' => $package_id ];
-		if ( $user_id ) {
-			$params['user_id'] = $user_id;
-		}
-		if ( is_email( $email ) ) {
-			$params['email'] = $email;
-		}
-
-		return self::call_controller( '\\GemBookingPackage\\API\\GrantController', 'grant', $params );
-	}
-
-	private static function action_change_package_status( array $config, array $input ): array {
-		$id     = absint( $config['purchase_id'] ?? $config['id'] ?? 0 );
-		$status = sanitize_key( (string) ( $config['package_status'] ?? '' ) );
-
-		if ( ! $id || '' === $status ) {
-			return self::action_error( 'A valid purchase_id and status are required.' );
-		}
-
-		return self::call_controller( '\\GemBookingPackage\\API\\PurchasesController', 'set_status', [
-			'id' => $id,
-			'status' => $status,
-		] );
-	}
-
-	private static function action_delete_package_purchase( array $config, array $input ): array {
-		$ids_raw = (string) ( $config['ids'] ?? '' );
-		$ids     = array_filter( array_map( 'absint', array_map( 'trim', explode( ',', $ids_raw ) ) ) );
-
-		if ( ! empty( $ids ) ) {
-			return self::call_controller( '\\GemBookingPackage\\API\\PurchasesController', 'bulk_destroy', [
-				'ids' => array_values( $ids ),
-			] );
-		}
-
-		$id = absint( $config['purchase_id'] ?? $config['id'] ?? 0 );
-
-		if ( ! $id ) {
-			return self::action_error( 'A valid purchase_id (or comma-separated ids for bulk delete) is required.' );
-		}
-
-		return self::call_controller( '\\GemBookingPackage\\API\\PurchasesController', 'destroy', [ 'id' => $id ] );
-	}
-
-	private static function action_check_in_ticket( array $config, array $input ): array {
-		$code = sanitize_text_field( (string) ( $config['ticket_code'] ?? $config['code'] ?? '' ) );
-
-		if ( '' === $code ) {
-			return self::action_error( 'A valid ticket_code is required.' );
-		}
-
-		return self::call_controller( '\\GemBookingTicket\\API\\ScanController', 'redeem', [ 'code' => $code ] );
-	}
-
-	private static function action_undo_ticket_checkin( array $config, array $input ): array {
-		$code = sanitize_text_field( (string) ( $config['ticket_code'] ?? $config['code'] ?? '' ) );
-
-		if ( '' === $code ) {
-			return self::action_error( 'A valid ticket_code is required.' );
-		}
-
-		return self::call_controller( '\\GemBookingTicket\\API\\ScanController', 'unredeem', [ 'code' => $code ] );
-	}
-
-	private static function action_check_in_all_tickets( array $config, array $input ): array {
-		$code = sanitize_text_field( (string) ( $config['ticket_code'] ?? $config['code'] ?? '' ) );
-
-		if ( '' === $code ) {
-			return self::action_error( 'A valid ticket_code is required.' );
-		}
-
-		return self::call_controller( '\\GemBookingTicket\\API\\ScanController', 'redeem_all', [ 'code' => $code ] );
-	}
-
-	private static function action_send_sms_whatsapp( array $config, array $input ): array {
-		$to      = sanitize_text_field( (string) ( $config['to'] ?? '' ) );
-		$message = (string) ( $config['message'] ?? '' );
-		$channel = sanitize_key( (string) ( $config['channel'] ?? 'sms' ) );
-
-		if ( '' === $to || '' === trim( $message ) ) {
-			return self::action_error( 'A valid recipient phone number and message are required.' );
-		}
-
-		if ( ! class_exists( '\\GemBookingSms\\Sms\\Client' ) || ! method_exists( '\\GemBookingSms\\Sms\\Client', 'send' ) ) {
-			return self::action_error( 'The GemBooking SMS add-on is not active.' );
-		}
-
-		// GemBooking's own settings array format for Client::send() isn't
-		// documented; this filter lets it be supplied from GemBooking's
-		// saved options (or wherever this site keeps them) without
-		// guessing the shape here.
-		$settings = apply_filters( 'zaplane/gembooking_sms_settings', [], $channel );
-
-		try {
-			$result = self::invoke( '\\GemBookingSms\\Sms\\Client', 'send', [ $to, $message, $settings, $channel ] );
-		} catch ( \Throwable $e ) {
-			return self::action_error( 'Failed to send SMS/WhatsApp: ' . $e->getMessage() );
-		}
-
-		if ( $result instanceof \WP_Error ) {
-			return self::action_error( $result->get_error_message() );
-		}
-		if ( false === $result ) {
-			return self::action_error( 'GemBooking could not send the message.' );
-		}
-
-		return self::action_success( [ 'to' => $to, 'channel' => $channel ] );
-	}
-
-	/**
-	 * Create Staff Member has no clean callable: GemBooking only exposes it
-	 * via AJAX (reads $_POST, ends with wp_send_json + die()). Until that
-	 * logic is refactored into a plain method on GemBooking's side, this
-	 * stays behind a filter so a site can hook it in safely.
-	 */
-	private static function action_create_staff( array $config, array $input ): array {
-		$result = apply_filters( 'zaplane/gembooking_action', null, 'create_staff', $config, $input );
-
-		return null === $result
-			? self::action_error( 'Create Staff Member needs a "zaplane/gembooking_action" filter implementation — GemBooking only exposes this via AJAX.' )
-			: self::action_success( is_array( $result ) ? $result : [ 'data' => $result ] );
-	}
-
-	/* -----------------------------------------------------------------
-	 * Call helpers
-	 * --------------------------------------------------------------- */
 
 	/**
 	 * Calls a BookingSolver-style method, which expects a WP_REST_Request.
@@ -1738,302 +1038,8 @@ class Gembooking extends IntegrationBase {
 			'gembooking_timezone_query' => [ self::class, 'query_timezones' ],
 			'gembooking_query'          => [ self::class, 'query_booking' ],
 			'gembooking_package_query'  => [ self::class, 'query_packages' ],
+			'gembooking_purchase_query' => [ self::class, 'query_purchases' ],
 		];
-	}
-
-	public static function query_booking( $q = null ): array {
-		if ( ! class_exists( '\\GemBooking\\Models\\BookingModels' ) ) {
-			return [];
-		}
-
-		$model = new \GemBooking\Models\BookingModels();
-
-		$search = '';
-		$booking_id = 0;
-
-		if ( is_array( $q ) ) {
-			$search     = sanitize_text_field( (string) ( $q['search'] ?? '' ) );
-			$booking_id = absint( $q['booking_id'] ?? 0 );
-		} elseif ( is_numeric( $q ) ) {
-			$booking_id = absint( $q );
-		} elseif ( is_string( $q ) ) {
-			$search = sanitize_text_field( $q );
-		}
-
-		/*
-		 * If a specific booking ID is requested,
-		 * return only that booking.
-		 */
-		if ( $booking_id ) {
-			$booking = $model->find_by_id( $booking_id );
-
-			if ( ! is_array( $booking ) || empty( $booking ) ) {
-				return [];
-			}
-
-			return [
-				[
-					'value' => $booking_id,
-					'label' => self::booking_query_label( $booking, $booking_id ),
-				],
-			];
-		}
-
-		/*
-		 * Load booking list.
-		 */
-		$result = $model->get_list(
-			1,
-			100,
-			$search,
-			''
-		);
-
-		if ( ! is_array( $result ) ) {
-			return [];
-		}
-
-		/*
-		 * GemBooking may return rows directly or inside "rows"/"data".
-		 */
-		$rows = $result;
-
-		if ( isset( $result['rows'] ) && is_array( $result['rows'] ) ) {
-			$rows = $result['rows'];
-		} elseif ( isset( $result['data'] ) && is_array( $result['data'] ) ) {
-			$rows = $result['data'];
-
-			if ( isset( $result['data']['rows'] ) && is_array( $result['data']['rows'] ) ) {
-				$rows = $result['data']['rows'];
-			}
-		}
-
-		$options = [];
-
-		foreach ( $rows as $item ) {
-			$row = is_object( $item ) ? get_object_vars( $item ) : ( is_array( $item ) ? $item : [] );
-			if ( empty( $row ) ) {
-				continue;
-			}
-
-			$id = absint(
-				$row['id']
-				?? $row['booking_id']
-				?? $row['booked_id']
-				?? 0
-			);
-
-			if ( ! $id ) {
-				continue;
-			}
-
-			$options[] = [
-				'value' => $id,
-				'label' => self::booking_query_label( $row, $id ),
-			];
-		}
-
-		return $options;
-	}
-
-	private static function booking_query_label( array $booking, $id ): string {
-		$name = trim(
-			(string) (
-				$booking['name']
-				?? $booking['customer_name']
-				?? $booking['first_name']
-				?? ''
-			)
-		);
-
-		$email = trim(
-			(string) (
-				$booking['email']
-				?? $booking['customer_email']
-				?? ''
-			)
-		);
-
-		$status = trim(
-			(string) ( $booking['status'] ?? '' )
-		);
-
-		$label = '#' . absint( $id );
-
-		if ( '' !== $name ) {
-			$label .= ' - ' . $name;
-		} elseif ( '' !== $email ) {
-			$label .= ' - ' . $email;
-		}
-
-		if ( '' !== $email && '' !== $name ) {
-			$label .= ' (' . $email . ')';
-		}
-
-		if ( '' !== $status ) {
-			$label .= ' - ' . ucfirst( $status );
-		}
-
-		return $label;
-	}
-
-	public static function query_bookables( $q = null ): array {
-		$type = is_array( $q ) ? sanitize_key( (string) ( $q['booking_type'] ?? '' ) ) : '';
-		$post_type_map = [
-			'service'  => self::bookable_post_type( 'service', 'gembk_service' ),
-			'event'    => self::bookable_post_type( 'event', 'gembk_event' ),
-			'resource' => self::bookable_post_type( 'resource', 'gembk_resource' ),
-			'package'  => self::bookable_post_type( 'package', 'gembk_package' ),
-		];
-		$post_type = $post_type_map[ $type ] ?? $post_type_map['service'];
-
-		$posts = get_posts( [
-			'post_type'      => $post_type,
-			'post_status'    => 'publish',
-			'posts_per_page' => 100,
-			'orderby'        => 'title',
-			'order'          => 'ASC',
-		] );
-
-		return array_map( static fn( $p ) => [ 'value' => $p->ID, 'label' => $p->post_title ], $posts );
-	}
-
-	public static function query_packages( $q = null ): array {
-		$search = is_array( $q )
-			? sanitize_text_field( (string) ( $q['search'] ?? '' ) )
-			: ( is_string( $q ) ? sanitize_text_field( $q ) : '' );
-
-		$args = [
-			'post_type'      => self::bookable_post_type( 'package', 'gembk_package' ),
-			'post_status'    => 'publish',
-			'posts_per_page' => 100,
-			'orderby'        => 'title',
-			'order'          => 'ASC',
-		];
-
-		if ( '' !== $search ) {
-			$args['s'] = $search;
-		}
-
-		$posts = get_posts( $args );
-
-		return array_map( static fn( $p ) => [ 'value' => $p->ID, 'label' => $p->post_title ], $posts );
-	}
-
-	public static function query_purchases( $q = null ): array {
-		global $wpdb;
-		$search = is_array( $q )
-			? sanitize_text_field( (string) ( $q['search'] ?? '' ) )
-			: ( is_string( $q ) ? sanitize_text_field( $q ) : '' );
-
-		$table = $wpdb->prefix . 'gembk_package_purchases';
-
-		$sql = "SELECT id, package_id, user_id, email, status FROM {$table} ORDER BY id DESC LIMIT 100";
-		$rows = $wpdb->get_results( $sql, ARRAY_A );
-
-		if ( ! is_array( $rows ) ) {
-			return [];
-		}
-
-		$options = [];
-		foreach ( $rows as $row ) {
-			$label = 'Purchase #' . $row['id'];
-			if ( $row['email'] ) {
-				$label .= ' - ' . $row['email'];
-			} elseif ( $row['user_id'] ) {
-				$user = get_user_by( 'id', $row['user_id'] );
-				if ( $user ) {
-					$label .= ' - ' . $user->display_name . ' (' . $user->user_email . ')';
-				}
-			}
-			$label .= ' - Package ID: ' . $row['package_id'] . ' - Status: ' . ucfirst( $row['status'] );
-
-			if ( '' !== $search && false === stripos( $label, $search ) ) {
-				continue;
-			}
-
-			$options[] = [
-				'value' => (int) $row['id'],
-				'label' => $label,
-			];
-		}
-
-		return $options;
-	}
-
-	public static function query_customers( $q = null ): array {
-		$search = is_array( $q ) ? sanitize_text_field( (string) ( $q['search'] ?? '' ) ) : '';
-
-		$users = get_users( [
-			'search'         => $search ? '*' . $search . '*' : '',
-			'search_columns' => [ 'user_login', 'user_email', 'display_name' ],
-			'number'         => 20,
-			'role__in'       => [ 'subscriber', 'customer' ],
-		] );
-
-		return array_map( static fn( $u ) => [
-			'value' => $u->ID,
-			'label' => $u->display_name . ' (' . $u->user_email . ')',
-		], $users );
-	}
-
-	public static function query_timezones( $q = null ): array {
-		$search = is_array( $q ) ? strtolower( sanitize_text_field( (string) ( $q['search'] ?? '' ) ) ) : '';
-
-		// Use caching for timezone data since it doesn't change frequently
-		$cache_key = 'zaplane_gembooking_timezones';
-		$zones = function_exists( 'wp_cache_get' ) ? wp_cache_get( $cache_key ) : false;
-
-		if ( false === $zones ) {
-			$zones = [];
-
-			// UTC first.
-			$zones[] = [
-				'value' => 'UTC',
-				'label' => '(GMT+0:00) UTC',
-				'offset' => 0,
-			];
-
-			foreach ( \DateTimeZone::listIdentifiers( \DateTimeZone::ALL ) as $identifier ) {
-				if ( 'UTC' === $identifier ) {
-					continue;
-				}
-
-				try {
-					$tz     = new \DateTimeZone( $identifier );
-					$offset = $tz->getOffset( new \DateTime( 'now', $tz ) );
-				} catch ( \Throwable $e ) {
-					continue;
-				}
-
-				$hours   = intdiv( abs( $offset ), 3600 );
-				$minutes = intdiv( abs( $offset ) % 3600, 60 );
-				$sign    = $offset < 0 ? '-' : '+';
-
-				$zones[] = [
-					'value'  => $identifier,
-					'label'  => sprintf( '(GMT%s%d:%02d) %s', $sign, $hours, $minutes, $identifier ),
-					'offset' => $offset,
-				];
-			}
-
-			// Cache for 1 hour if WordPress cache functions are available
-			if ( function_exists( 'wp_cache_set' ) && function_exists( 'HOUR_IN_SECONDS' ) ) {
-				wp_cache_set( $cache_key, $zones, '', HOUR_IN_SECONDS );
-			}
-		}
-
-		if ( '' !== $search ) {
-			$zones = array_values( array_filter( $zones, static function ( $zone ) use ( $search ) {
-				return false !== strpos( strtolower( $zone['label'] ), $search );
-			} ) );
-		}
-
-		// Drop the internal sort key before returning.
-		return array_map( static fn( $zone ) => [
-			'value' => $zone['value'],
-			'label' => $zone['label'],
-		], $zones );
 	}
 
 	private static function decode_data( $value ): array {
