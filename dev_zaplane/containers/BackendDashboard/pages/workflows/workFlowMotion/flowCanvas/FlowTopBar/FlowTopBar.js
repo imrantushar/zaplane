@@ -191,7 +191,7 @@ export default function FlowTopBar({
 
     <ZAPDrawer
       title={__("Log History", "zaplane")}
-      maxWidth='max-w-[600px]'
+      maxWidth='max-w-[800px]'
       isFullscreen={isFullscreen}
       open={activeDrawer === "logs"}
       onClose={() => setActiveDrawer(null)}
@@ -208,9 +208,16 @@ export default function FlowTopBar({
         </button>
       }
     >
-      <div className="flex gap-[5px] mb-[12px]">
+      <div className="flex flex-wrap gap-2 mb-4 pb-4 border-b border-[var(--zaplane-border-color)]">
         <button
-          onClick={() => dispatch(getRunWorkFlow({ id }))}
+          type="button"
+          disabled={refreshing}
+          aria-busy={refreshing}
+          onClick={async () => {
+            setRefreshing(true);
+            try { await dispatch(getRunWorkFlow({ id })); }
+            finally { setRefreshing(false); }
+          }}
           className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-[var(--zaplane-font-color)] border-0 bg-transparent hover:bg-[var(--zaplane-secondary-color)] rounded"
         >
           <TfiReload className={refreshing ? "animate-spin" : ""} />

@@ -73,12 +73,12 @@ class IncomingWebhookController extends WP_REST_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'handle_incoming' ],
-					'permission_callback' => '__return_true',
+					'permission_callback' => [ $this, 'incoming_signature_check' ],
 				],
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'verify_subscription' ],
-					'permission_callback' => '__return_true',
+					'permission_callback' => [ $this, 'webhook_integration_check' ],
 				],
 				'args' => [
 					'slug'          => [
@@ -166,14 +166,8 @@ class IncomingWebhookController extends WP_REST_Controller {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function handle_incoming( \WP_REST_Request $request ) {
+	public function webhook_integration_check( \WP_REST_Request $request ) {
 		$slug = $request->get_param( 'slug' );
-
-		// Present only on the per-connection route (…/incoming/<slug>/<id>).
-		// Null on the shared/legacy route — integrations treat that as "source
-		// unknown", not "no connections configured".
-		$connection_id = $request->get_param( 'connection_id' );
-		$connection_id = ( null !== $connection_id && '' !== $connection_id ) ? (int) $connection_id : null;
 
 		$integration = IntegrationLoader::get( $slug );
 
@@ -260,6 +254,10 @@ class IncomingWebhookController extends WP_REST_Controller {
 	public function handle_incoming( \WP_REST_Request $request ) {
 		$slug        = $request->get_param( 'slug' );
 		$integration = IntegrationLoader::get( $slug );
+
+		// Preserve the originating connection when dispatching provider events.
+		$connection_id = $request->get_param( 'connection_id' );
+		$connection_id = ( null !== $connection_id && '' !== $connection_id ) ? (int) $connection_id : null;
 
 		// Some providers verify the callback URL over this same POST endpoint and
 		// require their challenge echoed back verbatim (Slack's url_verification).
