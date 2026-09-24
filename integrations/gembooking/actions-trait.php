@@ -27,7 +27,7 @@ trait ActionsTrait
 
 		if ( 'package' === $type ) {
 			$customer_id = absint( $config['customer_id'] ?? 0 );
-			$email       = sanitize_email( (string) ( $config['customer_email'] ?? '' ) );
+			$email       = sanitize_email( (string) ( $config['email'] ?? '' ) );
 
 			if ( ! $customer_id && ! is_email( $email ) ) {
 				return self::action_error( 'Select an existing customer or provide a customer_email.' );
@@ -494,5 +494,332 @@ trait ActionsTrait
 		return null === $result
 			? self::action_error( 'Create Staff Member needs a "zaplane/gembooking_action" filter implementation — GemBooking only exposes this via AJAX.' )
 			: self::action_success( is_array( $result ) ? $result : [ 'data' => $result ] );
+	}
+
+	private static function action_create_service( array $config, array $input ): array {
+		return self::bookable_create( 'service', $config, $input );
+	}
+
+	private static function action_service_status_change( array $config, array $input ): array {
+		return self::bookable_change_status( 'service', $config );
+	}
+
+	private static function action_service_trash( array $config, array $input ): array {
+		return self::bookable_remove( 'service', $config );
+	}
+
+	private static function action_create_event( array $config, array $input ): array {
+		return self::bookable_create( 'event', $config, $input );
+	}
+
+	private static function action_event_status_change( array $config, array $input ): array {
+		return self::bookable_change_status( 'event', $config );
+	}
+
+	private static function action_event_delete( array $config, array $input ): array {
+		return self::bookable_remove( 'event', $config );
+	}
+
+	private static function action_create_resource( array $config, array $input ): array {
+		return self::bookable_create( 'resource', $config, $input );
+	}
+
+	private static function action_resource_status_change( array $config, array $input ): array {
+		return self::bookable_change_status( 'resource', $config );
+	}
+
+	private static function action_resource_trash( array $config, array $input ): array {
+		return self::bookable_remove( 'resource', $config );
+	}
+
+	/**
+	 * Create a GemBooking service / event / resource.
+	 *
+	 * Meta is written through wp_insert_post()'s `meta_input`, so it already
+	 * exists when save_post_{type} fires — the "Service/Event/Resource
+	 * Created" triggers therefore see the full meta.
+	 */
+	private static function bookable_create( string $kind, array $config, array $input ): array {
+		$title = sanitize_text_field( (string) ( $config['title'] ?? '' ) );
+
+		if ( '' === $title ) {
+			return self::action_error( sprintf( 'A %s title is required.', $kind ) );
+		}
+
+		$status = self::bookable_status( $config['bookable_status'] ?? $config['status'] ?? 'publish' );
+
+		if ( null === $status ) {
+			return self::action_error( 'Invalid status. Use publish, draft, pending or private.' );
+		}
+
+		// Events need a host (the admin form marks Host as required).
+		$host_id = 0;
+		if ( 'event' === $kind ) {
+			$host_id = absint( $config['host_id'] ?? 0 );
+
+			if ( ! $host_id || ! get_user_by( 'id', $host_id ) ) {
+				return self::action_error( 'A valid host (staff user ID) is required to create an event.' );
+			}
+		}
+
+		// Custom meta: JSON object or already-decoded array.
+		$raw_extra = $config['custom_meta'] ?? '';
+		if ( is_array( $raw_extra ) ) {
+			$extra = $raw_extra;
+		} elseif ( '' === trim( (string) $raw_extra ) ) {
+			$extra = [];
+		} else {
+			$extra = json_decode( (string) $raw_extra, true );
+			if ( ! is_array( $extra ) ) {
+				return self::action_error( 'Custom Meta must be a valid JSON object, e.g. {"my_key":"value"}.' );
+			}
+		}
+
+		$map  = self::bookable_meta_map( $kind );
+		$meta = [];
+
+		// Price.
+		if ( isset( $config['price'] ) && '' !== trim( (string) $config['price'] ) ) {
+			if ( ! is_numeric( $config['price'] ) || (float) $config['price'] < 0 ) {
+				return self::action_error( 'Price must be a number, 0 or higher.' );
+			}
+			$meta[ $map['price'] ] = (float) $config['price'];
+		}
+
+		// Duration (entered in minutes, stored in seconds).
+		if ( isset( $config['duration'] ) && '' !== trim( (string) $config['duration'] ) ) {
+			if ( ! is_numeric( $config['duration'] ) || (float) $config['duration'] <= 0 ) {
+				return self::action_error( 'Duration must be a positive number of minutes.' );
+			}
+			$meta[ $map['duration'] ] = (int) round( (float) $config['duration'] * MINUTE_IN_SECONDS );
+		}
+
+		// Capacity / parallel bookings.
+		if ( isset( $config['capacity'] ) && '' !== trim( (string) $config['capacity'] ) ) {
+			$meta[ $map['capacity'] ] = max( 1, absint( $config['capacity'] ) );
+		}
+
+		if ( 'event' === $kind ) {
+			$meta[ $map['host_id'] ] = $host_id;
+
+			if ( '' !== trim( (string) ( $config['location'] ?? '' ) ) ) {
+				$meta[ $map['location'] ] = sanitize_text_field( (string) $config['location'] );
+			}
+		}
+
+		if ( 'service' === $kind && isset( $config['advance_reservation'] ) && '' !== (string) $config['advance_reservation'] ) {
+			$meta[ $map['advance_reservation'] ] = 'yes' === sanitize_key( (string) $config['advance_reservation'] ) ? 1 : 0;
+		}
+
+		// Images: first = featured image, the rest = gallery (services only).
+		$warnings  = [];
+		$raw_imgs  = (string) ( $config['images'] ?? $config['image'] ?? '' );
+		$images    = preg_split( '/[\s,]+/', trim( $raw_imgs ), -1, PREG_SPLIT_NO_EMPTY );
+		$image_ids = [];
+
+		foreach ( $images as $image ) {
+			$attachment_id = self::bookable_resolve_image( $image );
+
+			if ( $attachment_id ) {
+				$image_ids[] = $attachment_id;
+			} else {
+				$warnings[] = sprintf( 'Image "%s" could not be used (not an attachment ID or a downloadable URL).', $image );
+			}
+		}
+
+		if ( ! empty( $image_ids ) ) {
+			$meta['_thumbnail_id'] = $image_ids[0];
+
+			if ( 'service' === $kind && count( $image_ids ) > 1 ) {
+				$meta[ $map['gallery'] ] = array_slice( $image_ids, 1 );
+			}
+		}
+
+		/**
+		 * Filter the final meta array before it is saved.
+		 *
+		 * @param array  $meta   Meta to be stored (key => value).
+		 * @param string $kind   service | event | resource.
+		 * @param array  $config Raw node config.
+		 */
+		$meta = (array) apply_filters( 'zaplane/gembooking_bookable_meta', $meta, $kind, $config );
+
+		// Custom meta always wins, so a site can override any key exactly.
+		foreach ( $extra as $key => $value ) {
+			$key = preg_replace( '/[^A-Za-z0-9_\-]/', '', (string) $key );
+			if ( '' !== $key ) {
+				$meta[ $key ] = $value;
+			}
+		}
+
+		$author = get_current_user_id();
+		if ( ! $author ) {
+			$admins = get_users( [ 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ] );
+			$author = (int) ( $admins[0] ?? 0 );
+		}
+
+		$post_id = wp_insert_post(
+			wp_slash( [
+				'post_type'    => self::bookable_type_for( $kind ),
+				'post_title'   => $title,
+				'post_content' => wp_kses_post( (string) ( $config['description'] ?? '' ) ),
+				'post_status'  => $status,
+				'post_author'  => $author,
+				'meta_input'   => $meta,
+			] ),
+			true
+		);
+
+		if ( is_wp_error( $post_id ) ) {
+			return self::action_error( $post_id->get_error_message() );
+		}
+
+		if ( ! $post_id ) {
+			return self::action_error( sprintf( 'GemBooking could not create the %s.', $kind ) );
+		}
+
+		/**
+		 * Fires after a service/event/resource is created by Zaplane.
+		 * Hook here for site-specific extras (link a WooCommerce/StoreEngine
+		 * product, attach a booking form, assign team members, ...).
+		 */
+		do_action( 'zaplane/gembooking_bookable_saved', $post_id, $kind, $config, $input );
+
+		$result = self::bookable_summary( get_post( $post_id ), $kind );
+
+		if ( ! empty( $warnings ) ) {
+			$result['warnings'] = $warnings;
+		}
+
+		return self::action_success( $result );
+	}
+
+	private static function bookable_change_status( string $kind, array $config ): array {
+		$post = self::bookable_load( $kind, $config );
+
+		if ( is_array( $post ) ) {
+			return $post;
+		}
+
+		$status = self::bookable_status( $config['bookable_status'] ?? $config['status'] ?? '' );
+
+		if ( null === $status ) {
+			return self::action_error( 'Invalid status. Use publish, draft, pending or private.' );
+		}
+
+		$previous = $post->post_status;
+
+		if ( $previous === $status ) {
+			$result                    = self::bookable_summary( $post, $kind );
+			$result['previous_status'] = $previous;
+			$result['changed']         = false;
+
+			return self::action_success( $result );
+		}
+
+		// Bring it back from the trash first, then apply the target status.
+		if ( 'trash' === $previous ) {
+			if ( ! wp_untrash_post( $post->ID ) ) {
+				return self::action_error( sprintf( 'Could not restore the %s from the trash.', $kind ) );
+			}
+			$post = get_post( $post->ID );
+		}
+
+		if ( $post && $post->post_status !== $status ) {
+			$updated = wp_update_post(
+				wp_slash( [
+					'ID'          => $post->ID,
+					'post_status' => $status,
+				] ),
+				true
+			);
+
+			if ( is_wp_error( $updated ) ) {
+				return self::action_error( $updated->get_error_message() );
+			}
+
+			if ( ! $updated ) {
+				return self::action_error( sprintf( 'Could not change the %s status.', $kind ) );
+			}
+		}
+
+		$result                    = self::bookable_summary( get_post( $post->ID ), $kind );
+		$result['previous_status'] = $previous;
+		$result['changed']         = true;
+
+		return self::action_success( $result );
+	}
+
+	private static function bookable_remove( string $kind, array $config ): array {
+		$post = self::bookable_load( $kind, $config );
+
+		if ( is_array( $post ) ) {
+			return $post;
+		}
+
+		$mode = 'permanent' === sanitize_key( (string) ( $config['delete_mode'] ?? 'trash' ) ) ? 'permanent' : 'trash';
+
+		/**
+		 * Let a site veto removal (for example when the item still has
+		 * active bookings). Return true to allow, or false / WP_Error to block.
+		 *
+		 * @param bool|\WP_Error $allowed
+		 * @param \WP_Post       $post
+		 * @param string         $kind    service | event | resource.
+		 * @param string         $mode    trash | permanent.
+		 */
+		$allowed = apply_filters( 'zaplane/gembooking_can_remove_bookable', true, $post, $kind, $mode );
+
+		if ( true !== $allowed ) {
+			return self::action_error( is_wp_error( $allowed ) ? $allowed->get_error_message() : 'Removal was blocked by a filter.' );
+		}
+
+		if ( 'trash' === $mode && 'trash' === $post->post_status ) {
+			$result            = self::bookable_summary( $post, $kind );
+			$result['mode']    = $mode;
+			$result['changed'] = false;
+
+			return self::action_success( $result );
+		}
+
+		$done = 'permanent' === $mode ? wp_delete_post( $post->ID, true ) : wp_trash_post( $post->ID );
+
+		if ( ! $done ) {
+			return self::action_error( sprintf( 'GemBooking could not remove the %s.', $kind ) );
+		}
+
+		// wp_trash_post() deletes outright when EMPTY_TRASH_DAYS is 0.
+		$now = get_post_status( $post->ID );
+
+		return self::action_success( [
+			'id'      => $post->ID,
+			'kind'    => $kind,
+			'title'   => $post->post_title,
+			'mode'    => $mode,
+			'status'  => false === $now ? 'deleted' : $now,
+			'changed' => true,
+		] );
+	}
+
+	/**
+	 * Load the target post and make sure it really is that kind of
+	 * GemBooking item. Returns a WP_Post, or an action_error() array.
+	 *
+	 * @return \WP_Post|array
+	 */
+	private static function bookable_load( string $kind, array $config ) {
+		$id = absint( $config['bookable'] ?? $config['post_id'] ?? $config['id'] ?? 0 );
+
+		if ( ! $id ) {
+			return self::action_error( sprintf( 'A valid %s is required.', $kind ) );
+		}
+
+		$post = get_post( $id );
+
+		if ( ! $post || self::bookable_type_for( $kind ) !== $post->post_type ) {
+			return self::action_error( sprintf( 'The selected item is not a GemBooking %s.', $kind ) );
+		}
+
+		return $post;
 	}
 }

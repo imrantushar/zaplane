@@ -286,7 +286,8 @@ trait QueryTrait
 			}
 
 			// Cache for 1 hour if WordPress cache functions are available
-			if ( function_exists( 'wp_cache_set' ) && function_exists( 'HOUR_IN_SECONDS' ) ) {
+			// (HOUR_IN_SECONDS is a constant, so check with defined()).
+			if ( function_exists( 'wp_cache_set' ) && defined( 'HOUR_IN_SECONDS' ) ) {
 				wp_cache_set( $cache_key, $zones, '', HOUR_IN_SECONDS );
 			}
 		}
@@ -302,5 +303,64 @@ trait QueryTrait
 			'value' => $zone['value'],
 			'label' => $zone['label'],
 		], $zones );
+	}
+
+	public static function query_services( $q = null ): array {
+		return self::bookable_options( 'service', $q );
+	}
+
+	public static function query_events( $q = null ): array {
+		return self::bookable_options( 'event', $q );
+	}
+
+	public static function query_resources( $q = null ): array {
+		return self::bookable_options( 'resource', $q );
+	}
+
+	/**
+	 * Options for the service/event/resource dropdowns. Includes every
+	 * status (drafts and trash too) so items can be re-published or
+	 * restored, not just the published ones.
+	 */
+	private static function bookable_options( string $kind, $q = null ): array {
+		$search = '';
+		$id     = 0;
+
+		if ( is_array( $q ) ) {
+			$search = sanitize_text_field( (string) ( $q['search'] ?? '' ) );
+			$id     = absint( $q['bookable'] ?? 0 );
+		} elseif ( is_numeric( $q ) ) {
+			$id = absint( $q );
+		} elseif ( is_string( $q ) ) {
+			$search = sanitize_text_field( $q );
+		}
+
+		$args = [
+			'post_type'      => self::bookable_type_for( $kind ),
+			'post_status'    => [ 'publish', 'draft', 'pending', 'private', 'future', 'trash' ],
+			'posts_per_page' => 100,
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+		];
+
+		if ( $id ) {
+			$args['include'] = [ $id ];
+		} elseif ( '' !== $search ) {
+			$args['s'] = $search;
+		}
+
+		return array_map(
+			static function ( $p ) {
+				$title = '' !== trim( (string) $p->post_title ) ? $p->post_title : '(no title)';
+				$label = sprintf( '%s (#%d)', $title, $p->ID );
+
+				if ( 'publish' !== $p->post_status ) {
+					$label .= ' - ' . ucfirst( $p->post_status );
+				}
+
+				return [ 'value' => $p->ID, 'label' => $label ];
+			},
+			get_posts( $args )
+		);
 	}
 }

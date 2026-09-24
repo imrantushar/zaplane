@@ -547,6 +547,15 @@ class Gembooking extends IntegrationBase {
 			'reschedule_booking'      => [ 'label' => 'Reschedule Booking' ],
 			'cancel_booking'          => [ 'label' => 'Cancel Booking' ],
 			'delete_booking'          => [ 'label' => 'Delete Booking' ],
+			'create_service'          => [ 'label' => 'Create Service' ],
+			'service_status_change'   => [ 'label' => 'Service Status Change' ],
+			'service_trash'           => [ 'label' => 'Service Trash' ],
+			'create_event'            => [ 'label' => 'Create Event' ],
+			'event_status_change'     => [ 'label' => 'Event Status Change' ],
+			'event_delete'            => [ 'label' => 'Event Delete' ],
+			'create_resource'         => [ 'label' => 'Create Resource' ],
+			'resource_status_change'  => [ 'label' => 'Resource Status Change' ],
+			'resource_trash'          => [ 'label' => 'Resource Trash' ],
 			'add_booking_note'        => [ 'label' => 'Add Internal Note' ],
 			'reply_customer'          => [ 'label' => 'Reply to Customer' ],
 			'update_booking_field'    => [ 'label' => 'Update Booking Custom Field' ],
@@ -612,7 +621,7 @@ class Gembooking extends IntegrationBase {
 					],
 				],
 				[
-					'key'      => 'customer_email',
+					'key'      => 'email',
 					'label'    => 'Or Customer Email (no account yet)',
 					'type'     => 'email',
 					'required' => false,
@@ -697,6 +706,33 @@ class Gembooking extends IntegrationBase {
 			],
 			'delete_booking' => [
 				...self::booking_id_field(),
+			],
+			'create_service'         => self::bookable_create_fields( 'service' ),
+			'service_status_change'  => [
+				...self::bookable_target_field( 'service' ),
+				...self::bookable_status_field( false ),
+			],
+			'service_trash'          => [
+				...self::bookable_target_field( 'service' ),
+				...self::bookable_delete_mode_field(),
+			],
+			'create_event'           => self::bookable_create_fields( 'event' ),
+			'event_status_change'    => [
+				...self::bookable_target_field( 'event' ),
+				...self::bookable_status_field( false ),
+			],
+			'event_delete'           => [
+				...self::bookable_target_field( 'event' ),
+				...self::bookable_delete_mode_field()
+			],
+			'create_resource'        => self::bookable_create_fields( 'resource' ),
+			'resource_status_change' => [
+				...self::bookable_target_field( 'resource' ),
+				...self::bookable_status_field( false ),
+			],
+			'resource_trash'         => [
+				...self::bookable_target_field( 'resource' ),
+				...self::bookable_delete_mode_field()
 			],
 			'add_booking_note' => [
 				...self::booking_id_field(),
@@ -901,6 +937,10 @@ class Gembooking extends IntegrationBase {
 				'action' => $action
 			];
 		}
+		$bookable_sample = self::bookable_action_sample( $action );
+		if ( null !== $bookable_sample ) {
+			return $bookable_sample;
+		}
 		return [
 			'success' => true,
 			'data' => [
@@ -1039,6 +1079,9 @@ class Gembooking extends IntegrationBase {
 			'gembooking_query'          => [ self::class, 'query_booking' ],
 			'gembooking_package_query'  => [ self::class, 'query_packages' ],
 			'gembooking_purchase_query' => [ self::class, 'query_purchases' ],
+			'gembooking_service_query'  => [ self::class, 'query_services' ],
+			'gembooking_event_query'    => [ self::class, 'query_events' ],
+			'gembooking_resource_query' => [ self::class, 'query_resources' ],
 		];
 	}
 

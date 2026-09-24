@@ -1,6 +1,6 @@
 {
     "version": "1.2.0",
-    "generated_at": "2026-09-24 04:26:55",
+    "generated_at": "2026-09-24 07:03:26",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -3468,7 +3468,7 @@
                             }
                         },
                         {
-                            "key": "customer_email",
+                            "key": "email",
                             "label": "Or Customer Email (no account yet)",
                             "type": "email",
                             "required": false,
@@ -3747,6 +3747,524 @@
                                     "label"
                                 ]
                             }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_service": {
+                    "label": "Create Service",
+                    "key": "create_service",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Service Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "bookable_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending Review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                }
+                            ],
+                            "default": "publish"
+                        },
+                        {
+                            "key": "price",
+                            "label": "Base Price (0 = free)",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "duration",
+                            "label": "Duration (minutes)",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "capacity",
+                            "label": "Capacity",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "advance_reservation",
+                            "label": "Enable Advance Reservation",
+                            "type": "select",
+                            "required": false,
+                            "default": "no",
+                            "options": [
+                                {
+                                    "value": "no",
+                                    "label": "No"
+                                },
+                                {
+                                    "value": "yes",
+                                    "label": "Yes"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "images",
+                            "label": "Images (attachment IDs or URLs, comma-separated \u2014 first is featured)",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "custom_meta",
+                            "label": "Custom Meta (JSON, optional)",
+                            "type": "textarea",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "service_status_change": {
+                    "label": "Service Status Change",
+                    "key": "service_status_change",
+                    "schema": [
+                        {
+                            "key": "bookable",
+                            "label": "Service",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_service_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "bookable_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending Review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "service_trash": {
+                    "label": "Service Trash",
+                    "key": "service_trash",
+                    "schema": [
+                        {
+                            "key": "bookable",
+                            "label": "Service",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_service_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "delete_mode",
+                            "label": "Remove Mode",
+                            "type": "select",
+                            "required": false,
+                            "default": "trash",
+                            "options": [
+                                {
+                                    "value": "trash",
+                                    "label": "Move to Trash (can be restored)"
+                                },
+                                {
+                                    "value": "permanent",
+                                    "label": "Delete Permanently"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_event": {
+                    "label": "Create Event",
+                    "key": "create_event",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Event Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "bookable_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending Review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                }
+                            ],
+                            "default": "publish"
+                        },
+                        {
+                            "key": "host_id",
+                            "label": "Host (Staff User ID)",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "location",
+                            "label": "Location",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "price",
+                            "label": "Base Price (0 = free)",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "duration",
+                            "label": "Duration (minutes)",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "capacity",
+                            "label": "Capacity",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "image",
+                            "label": "Featured Image (attachment ID or URL)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "custom_meta",
+                            "label": "Custom Meta (JSON, optional)",
+                            "type": "textarea",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "event_status_change": {
+                    "label": "Event Status Change",
+                    "key": "event_status_change",
+                    "schema": [
+                        {
+                            "key": "bookable",
+                            "label": "Event",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_event_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "bookable_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending Review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "event_delete": {
+                    "label": "Event Delete",
+                    "key": "event_delete",
+                    "schema": [
+                        {
+                            "key": "bookable",
+                            "label": "Event",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_event_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "delete_mode",
+                            "label": "Remove Mode",
+                            "type": "select",
+                            "required": false,
+                            "default": "trash",
+                            "options": [
+                                {
+                                    "value": "trash",
+                                    "label": "Move to Trash (can be restored)"
+                                },
+                                {
+                                    "value": "permanent",
+                                    "label": "Delete Permanently"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_resource": {
+                    "label": "Create Resource",
+                    "key": "create_resource",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Resource Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "bookable_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending Review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                }
+                            ],
+                            "default": "publish"
+                        },
+                        {
+                            "key": "price",
+                            "label": "Base Price (0 = free)",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "duration",
+                            "label": "Duration (minutes)",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "capacity",
+                            "label": "Parallel-booking Capacity",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "image",
+                            "label": "Featured Image (attachment ID or URL)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "custom_meta",
+                            "label": "Custom Meta (JSON, optional)",
+                            "type": "textarea",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "resource_status_change": {
+                    "label": "Resource Status Change",
+                    "key": "resource_status_change",
+                    "schema": [
+                        {
+                            "key": "bookable",
+                            "label": "Resource",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_resource_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "bookable_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending Review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "resource_trash": {
+                    "label": "Resource Trash",
+                    "key": "resource_trash",
+                    "schema": [
+                        {
+                            "key": "bookable",
+                            "label": "Resource",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gembooking",
+                                "query": "gembooking_resource_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "delete_mode",
+                            "label": "Remove Mode",
+                            "type": "select",
+                            "required": false,
+                            "default": "trash",
+                            "options": [
+                                {
+                                    "value": "trash",
+                                    "label": "Move to Trash (can be restored)"
+                                },
+                                {
+                                    "value": "permanent",
+                                    "label": "Delete Permanently"
+                                }
+                            ]
                         }
                     ],
                     "outputs": [
