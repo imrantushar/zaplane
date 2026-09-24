@@ -28,7 +28,7 @@
 
        .components-modal__header{
               background: var(--zaplane-background);
-              border-bottom: 1px solid var(--zaplane-border-color);
+              border-bottom: none;
        }
 
        .components-modal__header-heading{
@@ -59,5 +59,10 @@
                      background: var(--zaplane-border-color);
                      color: var(--zaplane-primary);
               }
+       }
+
+       &.zaplane-wp-modal--curl-import{
+              width: min(760px, calc(100vw - 48px));
+              min-height: 340px;
        }
 }

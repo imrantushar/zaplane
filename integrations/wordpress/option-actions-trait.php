@@ -35,18 +35,13 @@ trait OptionActionsTrait {
 		]);
 	}
 
-	protected static function action_switch_theme( array $config ): array {
-		$theme = $config['theme'] ?? '';
-		$result = switch_theme( $theme );
-		if ( is_wp_error( $result ) || ! $result ) {
-			return static::error( "Failed to switch theme {$theme}" );
-		}
-
-		return static::success([
-			'theme' => $theme,
-			'status' => 'switched',
-		]);
-	}
+	/*
+	 * There is deliberately no action that switches the active theme. Changing
+	 * which theme a site runs is the site owner's decision, taken in the
+	 * Appearance screens, not something an automation should do on their behalf.
+	 * The Theme Switch *trigger* remains: it listens for the switch the owner
+	 * makes and lets a workflow react to it.
+	 */
 
 	protected static function action_add_plugin_theme_option( array $config ): array {
 		add_option( $config['option_name'] ?? '', $config['value'] ?? '' );

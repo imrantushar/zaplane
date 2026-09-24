@@ -3,7 +3,7 @@ import { ReactFlow, addEdge, Controls, Background, ControlButton, ConnectionLine
 import "@xyflow/react/dist/base.css";
 import { __ } from '@wordpress/i18n';
 import CustomEdge from "../customEdge/CustomEdge";
-import ActionDrawer from "../actionDrawer/ActionDrawer";
+import ActionDrawer from "../ActionDrawer/ActionDrawer";
 import { useFormikContext } from "formik";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";

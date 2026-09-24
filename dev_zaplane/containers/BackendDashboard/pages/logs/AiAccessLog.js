@@ -131,7 +131,7 @@ const AiAccessLog = ({ reloadKey = 0 }) => {
         </div>
       }
       showColumnFilter={false}
-      showPagination={total > perPage}
+      showPagination={total > 0}
       noDataText={__("No AI client activity yet. Connect a client under Settings → AI access.", "zaplane")}
       totalItems={total}
       dataFetchingStatus={loading}
