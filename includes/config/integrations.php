@@ -289,6 +289,10 @@ $zaplane_registry = [
 		'file'  => 'buddyboss.php',
 		'class' => \Zaplane\Integrations\Buddyboss::class,
 	],
+	'zencommunity'       => [
+		'file'  => 'zencommunity.php',
+		'class' => \Zaplane\Integrations\Zencommunity::class,
+	],
 	'ultimatemember'      => [
 		'file'  => 'ultimatemember.php',
 		'class' => \Zaplane\Integrations\Ultimatemember::class,
