@@ -4925,6 +4925,1017 @@
                 }
             }
         },
+        "zencommunity": {
+            "slug": "zencommunity",
+            "name": "ZenCommunity",
+            "icon": "",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
+            "triggers": {
+                "user_registers": {
+                    "label": "User Registers in Community",
+                    "hook": "zencommunity/profile/created",
+                    "key": "user_registers",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "profile_updated": {
+                    "label": "User Updates Profile",
+                    "hook": "zencommunity/profile/updated",
+                    "key": "profile_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "joins_space": {
+                    "label": "User Joins Space",
+                    "hook": "zencommunity/group/user_added",
+                    "key": "joins_space",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "leaves_space": {
+                    "label": "User Leaves Space",
+                    "hook": "zencommunity/group/remove_member",
+                    "key": "leaves_space",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "requests_space": {
+                    "label": "User Requests to Join Space",
+                    "hook": "zencommunity/group/user_added",
+                    "key": "requests_space",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "removed_space": {
+                    "label": "User Removed from Space",
+                    "hook": "zencommunity/group/remove_member",
+                    "key": "removed_space",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "space_role_changed": {
+                    "label": "User Role Changed in Space",
+                    "hook": "zencommunity/group/user_role_changed",
+                    "key": "space_role_changed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "space_created": {
+                    "label": "Space Created",
+                    "hook": "zencommunity/group/created",
+                    "key": "space_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "space_updated": {
+                    "label": "Space Updated",
+                    "hook": "zencommunity/group/updated",
+                    "key": "space_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "space_deleted": {
+                    "label": "Space Deleted",
+                    "hook": "zencommunity/group/deleted",
+                    "key": "space_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_created": {
+                    "label": "Post Created",
+                    "hook": "zencommunity/feed/created",
+                    "key": "post_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_in_space": {
+                    "label": "Post Created in Specific Space",
+                    "hook": "zencommunity/feed/created",
+                    "key": "post_in_space",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_updated": {
+                    "label": "Post Updated",
+                    "hook": "zencommunity/feed/updated",
+                    "key": "post_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_deleted": {
+                    "label": "Post Deleted",
+                    "hook": "zencommunity/feed/deleted",
+                    "key": "post_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_mentioned": {
+                    "label": "User Mentioned in Post",
+                    "hook": "zencommunity/feed/mentioned",
+                    "key": "post_mentioned",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "post_reacted": {
+                    "label": "Post Reaction Added",
+                    "hook": "zencommunity/feed/react",
+                    "key": "post_reacted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "comment_added": {
+                    "label": "Comment Added",
+                    "hook": "zencommunity/feed/comment_created",
+                    "key": "comment_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "comment_reply": {
+                    "label": "Comment Reply Added",
+                    "hook": "zencommunity/feed/comment_created",
+                    "key": "comment_reply",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "comment_updated": {
+                    "label": "Comment Updated",
+                    "hook": "zencommunity/feed/comment_updated",
+                    "key": "comment_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "comment_deleted": {
+                    "label": "Comment Deleted",
+                    "hook": "zencommunity/feed/comment_deleted",
+                    "key": "comment_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "comment_reacted": {
+                    "label": "Comment Reaction Added",
+                    "hook": "zencommunity/feed/react",
+                    "key": "comment_reacted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "poll_created": {
+                    "label": "Poll Created",
+                    "hook": "zencommunity/feed/created",
+                    "key": "poll_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "event_created": {
+                    "label": "Event Created",
+                    "hook": "zencommunity/event/created",
+                    "key": "event_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "add_user_space": {
+                    "label": "Add User to Space",
+                    "key": "add_user_space",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Space Role",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "group_roles",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user_space": {
+                    "label": "Remove User from Space",
+                    "key": "remove_user_space",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "approve_space_request": {
+                    "label": "Approve Space Join Request",
+                    "key": "approve_space_request",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reject_space_request": {
+                    "label": "Reject Space Join Request",
+                    "key": "reject_space_request",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "change_space_role": {
+                    "label": "Change User Role in Space",
+                    "key": "change_space_role",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Space Role",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "group_roles",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "block_space_user": {
+                    "label": "Block User from Space",
+                    "key": "block_space_user",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unblock_space_user": {
+                    "label": "Unblock User from Space",
+                    "key": "unblock_space_user",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "approve_user": {
+                    "label": "Approve Community User",
+                    "key": "approve_user",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reject_user": {
+                    "label": "Reject Community User",
+                    "key": "reject_user",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_profile": {
+                    "label": "Update Community Profile",
+                    "key": "update_profile",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "bio",
+                            "label": "Biography",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "display_name",
+                            "label": "Display Name",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "change_community_role": {
+                    "label": "Change Community Role",
+                    "key": "change_community_role",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "role",
+                            "label": "Global Community Role",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "roles",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_post": {
+                    "label": "Create Post in Space",
+                    "key": "create_post",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "content",
+                            "label": "Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_post": {
+                    "label": "Update Post",
+                    "key": "update_post",
+                    "schema": [
+                        {
+                            "key": "feed_id",
+                            "label": "Post",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "content",
+                            "label": "Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_post": {
+                    "label": "Delete Post",
+                    "key": "delete_post",
+                    "schema": [
+                        {
+                            "key": "feed_id",
+                            "label": "Post",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_comment": {
+                    "label": "Add Comment to Post",
+                    "key": "add_comment",
+                    "schema": [
+                        {
+                            "key": "feed_id",
+                            "label": "Post",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_reply": {
+                    "label": "Add Reply to Comment",
+                    "key": "add_reply",
+                    "schema": [
+                        {
+                            "key": "feed_id",
+                            "label": "Post",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Content",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_comment": {
+                    "label": "Delete Comment",
+                    "key": "delete_comment",
+                    "schema": [
+                        {
+                            "key": "feed_id",
+                            "label": "Post",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "comment_id",
+                            "label": "Comment ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_reaction": {
+                    "label": "Add Reaction to Post",
+                    "key": "add_reaction",
+                    "schema": [
+                        {
+                            "key": "feed_id",
+                            "label": "Post",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "reaction_type",
+                            "label": "Reaction (like / love / haha / wow / sad / angry / bookmark / upvote / downvote)",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_notification": {
+                    "label": "Send Community Notification",
+                    "key": "send_notification",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "notification_type",
+                            "label": "Notification Type",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_poll": {
+                    "label": "Create Poll",
+                    "key": "create_poll",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Question",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "options",
+                            "label": "Options (one per line)",
+                            "type": "textarea",
+                            "required": true
+                        },
+                        {
+                            "key": "expires_at",
+                            "label": "Expiry (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_event": {
+                    "label": "Create Event",
+                    "key": "create_event",
+                    "schema": [
+                        {
+                            "key": "group_id",
+                            "label": "Space",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "spaces",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "start_at",
+                            "label": "Start (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "end_at",
+                            "label": "End (YYYY-MM-DD HH:MM:SS)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "location",
+                            "label": "Location",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_event": {
+                    "label": "Update Event",
+                    "key": "update_event",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "events",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "start_at",
+                            "label": "Start",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "end_at",
+                            "label": "End",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "location",
+                            "label": "Location",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_rsvp": {
+                    "label": "Set User RSVP Status",
+                    "key": "set_rsvp",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "events",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "RSVP (going / interested / not_going)",
+                            "type": "text",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "cancel_rsvp": {
+                    "label": "Cancel User RSVP",
+                    "key": "cancel_rsvp",
+                    "schema": [
+                        {
+                            "key": "event_id",
+                            "label": "Event",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "zencommunity",
+                                "query": "events",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "activecampaign": {
             "slug": "activecampaign",
             "name": "ActiveCampaign",
@@ -33008,1017 +34019,6 @@
                 }
             },
             "actions": []
-        },
-        "zencommunity": {
-            "slug": "zencommunity",
-            "name": "ZenCommunity",
-            "icon": "",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_route": "",
-            "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
-            "triggers": {
-                "user_registers": {
-                    "label": "User Registers in Community",
-                    "hook": "zencommunity/profile/created",
-                    "key": "user_registers",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "profile_updated": {
-                    "label": "User Updates Profile",
-                    "hook": "zencommunity/profile/updated",
-                    "key": "profile_updated",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "joins_space": {
-                    "label": "User Joins Space",
-                    "hook": "zencommunity/group/user_added",
-                    "key": "joins_space",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "leaves_space": {
-                    "label": "User Leaves Space",
-                    "hook": "zencommunity/group/remove_member",
-                    "key": "leaves_space",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "requests_space": {
-                    "label": "User Requests to Join Space",
-                    "hook": "zencommunity/group/user_added",
-                    "key": "requests_space",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "removed_space": {
-                    "label": "User Removed from Space",
-                    "hook": "zencommunity/group/remove_member",
-                    "key": "removed_space",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "space_role_changed": {
-                    "label": "User Role Changed in Space",
-                    "hook": "zencommunity/group/user_role_changed",
-                    "key": "space_role_changed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "space_created": {
-                    "label": "Space Created",
-                    "hook": "zencommunity/group/created",
-                    "key": "space_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "space_updated": {
-                    "label": "Space Updated",
-                    "hook": "zencommunity/group/updated",
-                    "key": "space_updated",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "space_deleted": {
-                    "label": "Space Deleted",
-                    "hook": "zencommunity/group/deleted",
-                    "key": "space_deleted",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "post_created": {
-                    "label": "Post Created",
-                    "hook": "zencommunity/feed/created",
-                    "key": "post_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "post_in_space": {
-                    "label": "Post Created in Specific Space",
-                    "hook": "zencommunity/feed/created",
-                    "key": "post_in_space",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "post_updated": {
-                    "label": "Post Updated",
-                    "hook": "zencommunity/feed/updated",
-                    "key": "post_updated",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "post_deleted": {
-                    "label": "Post Deleted",
-                    "hook": "zencommunity/feed/deleted",
-                    "key": "post_deleted",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "post_mentioned": {
-                    "label": "User Mentioned in Post",
-                    "hook": "zencommunity/feed/mentioned",
-                    "key": "post_mentioned",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "post_reacted": {
-                    "label": "Post Reaction Added",
-                    "hook": "zencommunity/feed/react",
-                    "key": "post_reacted",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "comment_added": {
-                    "label": "Comment Added",
-                    "hook": "zencommunity/feed/comment_created",
-                    "key": "comment_added",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "comment_reply": {
-                    "label": "Comment Reply Added",
-                    "hook": "zencommunity/feed/comment_created",
-                    "key": "comment_reply",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "comment_updated": {
-                    "label": "Comment Updated",
-                    "hook": "zencommunity/feed/comment_updated",
-                    "key": "comment_updated",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "comment_deleted": {
-                    "label": "Comment Deleted",
-                    "hook": "zencommunity/feed/comment_deleted",
-                    "key": "comment_deleted",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "comment_reacted": {
-                    "label": "Comment Reaction Added",
-                    "hook": "zencommunity/feed/react",
-                    "key": "comment_reacted",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "poll_created": {
-                    "label": "Poll Created",
-                    "hook": "zencommunity/feed/created",
-                    "key": "poll_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "event_created": {
-                    "label": "Event Created",
-                    "hook": "zencommunity/event/created",
-                    "key": "event_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "add_user_space": {
-                    "label": "Add User to Space",
-                    "key": "add_user_space",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "role",
-                            "label": "Space Role",
-                            "type": "select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "group_roles",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "remove_user_space": {
-                    "label": "Remove User from Space",
-                    "key": "remove_user_space",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "approve_space_request": {
-                    "label": "Approve Space Join Request",
-                    "key": "approve_space_request",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "reject_space_request": {
-                    "label": "Reject Space Join Request",
-                    "key": "reject_space_request",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "change_space_role": {
-                    "label": "Change User Role in Space",
-                    "key": "change_space_role",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "role",
-                            "label": "Space Role",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "group_roles",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "block_space_user": {
-                    "label": "Block User from Space",
-                    "key": "block_space_user",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "unblock_space_user": {
-                    "label": "Unblock User from Space",
-                    "key": "unblock_space_user",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "approve_user": {
-                    "label": "Approve Community User",
-                    "key": "approve_user",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "reject_user": {
-                    "label": "Reject Community User",
-                    "key": "reject_user",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_profile": {
-                    "label": "Update Community Profile",
-                    "key": "update_profile",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "first_name",
-                            "label": "First Name",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "last_name",
-                            "label": "Last Name",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "bio",
-                            "label": "Biography",
-                            "type": "textarea",
-                            "required": false
-                        },
-                        {
-                            "key": "display_name",
-                            "label": "Display Name",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "change_community_role": {
-                    "label": "Change Community Role",
-                    "key": "change_community_role",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "role",
-                            "label": "Global Community Role",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "roles",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_post": {
-                    "label": "Create Post in Space",
-                    "key": "create_post",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "title",
-                            "label": "Title",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "content",
-                            "label": "Content",
-                            "type": "textarea",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_post": {
-                    "label": "Update Post",
-                    "key": "update_post",
-                    "schema": [
-                        {
-                            "key": "feed_id",
-                            "label": "Post",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "title",
-                            "label": "Title",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "content",
-                            "label": "Content",
-                            "type": "textarea",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_post": {
-                    "label": "Delete Post",
-                    "key": "delete_post",
-                    "schema": [
-                        {
-                            "key": "feed_id",
-                            "label": "Post",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_comment": {
-                    "label": "Add Comment to Post",
-                    "key": "add_comment",
-                    "schema": [
-                        {
-                            "key": "feed_id",
-                            "label": "Post",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "content",
-                            "label": "Content",
-                            "type": "textarea",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_reply": {
-                    "label": "Add Reply to Comment",
-                    "key": "add_reply",
-                    "schema": [
-                        {
-                            "key": "feed_id",
-                            "label": "Post",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "comment_id",
-                            "label": "Comment ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "content",
-                            "label": "Content",
-                            "type": "textarea",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_comment": {
-                    "label": "Delete Comment",
-                    "key": "delete_comment",
-                    "schema": [
-                        {
-                            "key": "feed_id",
-                            "label": "Post",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "comment_id",
-                            "label": "Comment ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "add_reaction": {
-                    "label": "Add Reaction to Post",
-                    "key": "add_reaction",
-                    "schema": [
-                        {
-                            "key": "feed_id",
-                            "label": "Post",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "reaction_type",
-                            "label": "Reaction (like / love / haha / wow / sad / angry / bookmark / upvote / downvote)",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "send_notification": {
-                    "label": "Send Community Notification",
-                    "key": "send_notification",
-                    "schema": [
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "message",
-                            "label": "Message",
-                            "type": "textarea",
-                            "required": true
-                        },
-                        {
-                            "key": "notification_type",
-                            "label": "Notification Type",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_poll": {
-                    "label": "Create Poll",
-                    "key": "create_poll",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "title",
-                            "label": "Question",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "options",
-                            "label": "Options (one per line)",
-                            "type": "textarea",
-                            "required": true
-                        },
-                        {
-                            "key": "expires_at",
-                            "label": "Expiry (YYYY-MM-DD HH:MM:SS)",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_event": {
-                    "label": "Create Event",
-                    "key": "create_event",
-                    "schema": [
-                        {
-                            "key": "group_id",
-                            "label": "Space",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "spaces",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "title",
-                            "label": "Title",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "start_at",
-                            "label": "Start (YYYY-MM-DD HH:MM:SS)",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "end_at",
-                            "label": "End (YYYY-MM-DD HH:MM:SS)",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea",
-                            "required": false
-                        },
-                        {
-                            "key": "location",
-                            "label": "Location",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_event": {
-                    "label": "Update Event",
-                    "key": "update_event",
-                    "schema": [
-                        {
-                            "key": "event_id",
-                            "label": "Event",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "events",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "title",
-                            "label": "Title",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "start_at",
-                            "label": "Start",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "end_at",
-                            "label": "End",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "textarea",
-                            "required": false
-                        },
-                        {
-                            "key": "location",
-                            "label": "Location",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "set_rsvp": {
-                    "label": "Set User RSVP Status",
-                    "key": "set_rsvp",
-                    "schema": [
-                        {
-                            "key": "event_id",
-                            "label": "Event",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "events",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "key": "status",
-                            "label": "RSVP (going / interested / not_going)",
-                            "type": "text",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "cancel_rsvp": {
-                    "label": "Cancel User RSVP",
-                    "key": "cancel_rsvp",
-                    "schema": [
-                        {
-                            "key": "event_id",
-                            "label": "Event",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "zencommunity",
-                                "query": "events",
-                                "select": [
-                                    "value",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User ID",
-                            "type": "number",
-                            "required": true
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
         },
         "zoom": {
             "slug": "zoom",

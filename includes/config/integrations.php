@@ -393,6 +393,7 @@ $zaplane_priority = [
 	'gemcrm',
 	'ablocks',
 	'gembooking',
+	'zencommunity',
 ];
 
 $zaplane_priority_items = [];

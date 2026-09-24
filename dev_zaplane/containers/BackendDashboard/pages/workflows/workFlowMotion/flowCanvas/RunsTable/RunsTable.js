@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import LogDetails from "@ZAPComponents/LogDetails";
-import { getDuration } from "@ZAPUtils/helper";
-import { __, sprintf } from "@wordpress/i18n";
+import { formatLabel, getDuration } from "@ZAPUtils/helper";
+import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { statusStyle } from "../../../helper";
 import { nodeLogsRunDetails } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlowLogs";
@@ -38,7 +38,7 @@ const RunsTable = ({
     setLoading(false);
   };
   useEffect(() => {
-    if (activeDrawer !== "logs") return;
+    if (activeDrawer !== "logs") {return;}
     handleRefresh(currentPage, itemPerPage);
     const interval = setInterval(() => {
       handleRefresh(currentPage, itemPerPage);
@@ -59,14 +59,14 @@ const RunsTable = ({
   }, {
     name: __('Trigger', 'zaplane'),
     cell: row => row.trigger ? <span className="block" title={row.trigger.label || ""}>
-          {sprintf(__("Trigger %d", "zaplane"), row.trigger.number)}
+          {`${__("Trigger", "zaplane")} ${row.trigger.number}`}
           {row.trigger.label ? <span className="text-[var(--zaplane-font-secondary-color)]">{` · ${row.trigger.label}`}</span> : null}
         </span> : <span className="text-[var(--zaplane-font-secondary-color)]">—</span>,
     textAlign: "start"
   }, {
     name: __('Status', 'zaplane'),
     cell: row => <span style={statusStyle(row.status)} className="inline-block px-2 py-0.5 rounded-md text-xs capitalize">
-          {__(row.status, "zaplane")}
+          {formatLabel(row.status)}
         </span>,
   }, {
     name: __('Duration', 'zaplane'),
@@ -84,7 +84,7 @@ const RunsTable = ({
     name: __('Action', 'zaplane'),
     cell: row => <div className="flex flex-row items-center gap-1 justify-center">
           <ZAPTooltip content={__("Details", 'zaplane')}>
-            <button type="button" aria-label={sprintf(__('View details for run %s', 'zaplane'), row.id)} onClick={() => {
+            <button type="button" aria-label={__('View details', 'zaplane')} onClick={() => {
           setActiveRunId(row.id);
           setDrawerOpen(true);
           dispatch(nodeLogsRunDetails(row.id));
@@ -93,7 +93,7 @@ const RunsTable = ({
             </button>
           </ZAPTooltip>
           <ZAPTooltip content={__("Re-Try", 'zaplane')}>
-            <button type="button" aria-label={sprintf(__('Retry run %s', 'zaplane'), row.id)} onClick={() => dispatch(getSingleRun(row.id))} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)]">
+            <button type="button" aria-label={__('Retry run', 'zaplane')} onClick={() => dispatch(getSingleRun(row.id))} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)]">
               <ReExcutionIcon height="20px" width="20px" />
             </button>
           </ZAPTooltip>
