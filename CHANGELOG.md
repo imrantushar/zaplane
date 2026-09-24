@@ -21,6 +21,25 @@ All notable changes to Zaplane are documented here. This project adheres to
 - Improved the overall admin UI consistency for logs and recent-run views across narrower screens.
 - Normalized project lint configuration and cleaned up repeated styling issues to keep the release baseline healthy.
 
+### Added
+- Added ZenCommunity Core + Pro integration with 32 triggers and 34 actions.
+- Added automation support for community members, profiles, spaces, posts, comments, reactions, polls, and events.
+- Added ZenCommunity Pro support for private messaging, group messaging, and support ticket workflows.
+- Added dynamic field selectors for spaces, users, roles, events, posts, and ticket settings.
+
+### Improved
+- Improved permission handling for member-triggered, admin-owned workflows.
+- Improved action error handling to stop downstream steps when an action fails.
+- Improved compatibility with background workflow execution.
+
+### Fixed
+- Fixed trigger detection and payload handling across supported ZenCommunity events.
+- Fixed action failure states being incorrectly treated as successful workflow runs.
+- Fixed sender identity handling in automated messaging.
+
+### Testing
+- Validated all 32 triggers and 34 actions, including destructive operations using database transactions and rollbacks to preserve test data.
+
 ## [1.3.1] - 2026-09-20
 
 ### Removed
