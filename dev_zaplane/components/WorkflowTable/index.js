@@ -6,7 +6,7 @@ import ListTable from "@ZAPComponents/ListTable";
 import { route_path, API, namespace } from "@ZAPUtils/helper";
 import { showNotification } from "@ZAPRedux/Slices/notificationSlice/notificationSlice";
 import { downloadJSON, statusOptions } from "./helper";
-import { deleteWorkFlow, getWorkFlow, updateWorkFlowStatus } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
+import { deleteWorkFlow, getWorkFlow, updateWorkFlowStatus, updateWorkFlowTitle } from "@ZAPRedux/Slices/workFlowSlice/actions/workFlow";
 import { exportWorkflows } from "@ZAPRedux/Slices/workFlowSlice/actions/ExportImport";
 import { getFolderWorkflows } from "@ZAPRedux/Slices/folderSlice/folderSlice";
 import StatusOptions from "@ZAPComponents/StatusOptions";
@@ -19,10 +19,12 @@ import FolderCell from "@ZAPComponents/FolderCell";
 import SubTopBar from "@ZAPComponents/SubTopBar";
 import CreateWorkflowModal from "@ZAPComponents/CreateWorkflowModal";
 import SaveAsRecipeModal from "@ZAPComponents/SaveAsRecipeModal";
+import WPModal from "@ZAPComponents/Modal/WPModal";
+import ZAPInput from "@ZAPComponents/ZAPInput";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LiaEditSolid } from "react-icons/lia";
 import { TbFileExport } from "react-icons/tb";
-import { FiLayers, FiPlay } from "react-icons/fi";
+import { FiEdit3, FiLayers, FiPlay } from "react-icons/fi";
 import { HistoryIcon } from "@ZAPUtils/icons";
 import WorkflowsLogs from "@ZAPContainers/BackendDashboard/pages/workflows/WorkflowsLogs";
 import ImportWorkflow from "@ZAPContainers/BackendDashboard/pages/workflows/workFlowMotion/ImportWorkflow";
@@ -60,6 +62,10 @@ const WorkflowTable = ({
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [recipeModalOpen, setRecipeModalOpen] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
+  const [renameWorkflow, setRenameWorkflow] = useState(null);
+  const [renameTitle, setRenameTitle] = useState("");
+  const [renaming, setRenaming] = useState(false);
   const handleRefresh = useCallback(async (page = 1, per_page = activePerPage ?? 10) => {
     setLoading(true);
     if (isFolder) {
@@ -141,6 +147,47 @@ const WorkflowTable = ({
     setRecipeModalOpen(false);
     setSelectedWorkflow(null);
   };
+  const handleOpenRename = row => {
+    setRenameWorkflow(row);
+    setRenameTitle(row?.title || "");
+    setRenameModalOpen(true);
+  };
+  const handleCloseRename = () => {
+    if (renaming) {
+      return;
+    }
+    setRenameModalOpen(false);
+    setRenameWorkflow(null);
+    setRenameTitle("");
+  };
+  const handleRename = async () => {
+    const title = renameTitle.trim();
+    if (!renameWorkflow?.id || !title || title === renameWorkflow?.title) {
+      return;
+    }
+
+    setRenaming(true);
+    try {
+      const result = await dispatch(updateWorkFlowTitle({
+        id: renameWorkflow.id,
+        title
+      }));
+
+      if (result?.payload?.id) {
+        dispatch(showNotification({
+          message: __("Workflow renamed successfully.", "zaplane"),
+          isShow: true,
+          type: "success"
+        }));
+        await handleRefresh(activePage, activePerPage);
+        setRenameModalOpen(false);
+        setRenameWorkflow(null);
+        setRenameTitle("");
+      }
+    } finally {
+      setRenaming(false);
+    }
+  };
   const handleOpenDrawer = id => {
     setActiveRunId(id);
     setDrawerOpen(true);
@@ -207,6 +254,11 @@ const WorkflowTable = ({
       type: "button",
       onClick: () => navigateToEdit(row.id)
     }, {
+      label: __("Rename", "zaplane"),
+      icon: <FiEdit3 />,
+      type: "button",
+      onClick: () => handleOpenRename(row)
+    }, {
       label: __("Delete", "zaplane"),
       icon: <RiDeleteBin6Line />,
       type: "button",
@@ -262,6 +314,49 @@ const WorkflowTable = ({
       {showHeader && <CreateWorkflowModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} id={folderId} onNavigateToEdit={onNavigateToEdit} />}
 
       <SaveAsRecipeModal isOpen={recipeModalOpen} onClose={handleCloseRecipe} workflowId={selectedWorkflow?.id} defaultTitle={selectedWorkflow?.title} />
+
+      <WPModal
+        title={__("Rename Workflow", "zaplane")}
+        isOpen={renameModalOpen}
+        onRequestClose={handleCloseRename}
+        size="small"
+      >
+        <form
+          className="flex flex-col gap-6"
+          onSubmit={event => {
+            event.preventDefault();
+            handleRename();
+          }}
+        >
+          <ZAPInput
+            placeholder={__("Enter workflow name", "zaplane")}
+            label={__("Workflow name", "zaplane")}
+            value={renameTitle}
+            onChange={event => setRenameTitle(event.target.value)}
+          />
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              style={primaryBtn}
+              disabled={
+                renaming ||
+                !renameTitle.trim() ||
+                renameTitle.trim() === renameWorkflow?.title
+              }
+            >
+              {renaming ? __("Renaming…", "zaplane") : __("Rename", "zaplane")}
+            </button>
+            <button
+              type="button"
+              onClick={handleCloseRename}
+              disabled={renaming}
+              className="rounded-[4px] border border-[var(--zaplane-border-color)] bg-transparent px-4 py-2 text-[13px] font-medium text-[var(--zaplane-font-color)] hover:bg-[var(--zaplane-secondary-color)] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {__("Cancel", "zaplane")}
+            </button>
+          </div>
+        </form>
+      </WPModal>
     </>;
 };
 export default WorkflowTable;

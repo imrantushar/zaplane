@@ -20,6 +20,17 @@ body[class*="_page_zaplane"] #wpbody-content {
     background: var(--zaplane-body-background);
 }
 
+// Hide the page scrollbar on every Zaplane screen without disabling scrolling.
+// Keep nested table, drawer and editor scrollbars unchanged.
+html:has(#zaplane-app),
+body:has(#zaplane-app) {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        width: 0;
+    }
+}
+
 // Smooth page transition when switching between admin menu routes.
 .zaplane-route {
     animation: zaplane-route-in 0.28s ease;

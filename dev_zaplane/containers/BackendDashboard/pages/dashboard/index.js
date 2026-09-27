@@ -23,11 +23,11 @@ export default function Dashboard() {
     dispatch(deshboardSumary());
   }, [dispatch]);
   return (
-    <PageLayout 
-      title="Dashboard" 
+    <PageLayout
+      title="Dashboard"
       actions={
-        <button 
-          onClick={() => setIsModalOpen(true)} 
+        <button
+          onClick={() => setIsModalOpen(true)}
           style={primaryBtn}
         >
           {__("Create New Workflow", "zaplane")}
@@ -38,14 +38,14 @@ export default function Dashboard() {
         <Teaser screen="dashboard" />
 
         <OverviewSection />
-        
+
         <TotalExecutions />
-        
-        <div className="flex gap-6 items-start">
-          <div className="w-[35%]">
+
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(360px,0.95fr)_minmax(0,1.7fr)] xl:items-stretch">
+          <div className="min-w-0 h-full">
             <ExecutedFlows />
           </div>
-          <div className="w-[65%]">
+          <div className="min-w-0 h-full">
             <RecentLogs data={data} />
           </div>
         </div>

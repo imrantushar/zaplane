@@ -107,3 +107,12 @@
         }
     }
 }
+
+
+.zaplane-table__footer-right { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+.zaplane-table__footer-pagination-pages { min-width: 0; max-width: 100%; }
+.zaplane-table__footer-pagination-per-page { flex-wrap: wrap; }
+@media (max-width: 600px) {
+    .zaplane-table__footer { padding: 8px 0; }
+    .zaplane-table__footer-right { width: 100%; justify-content: center; }
+}
