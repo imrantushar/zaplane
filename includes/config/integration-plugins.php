@@ -80,6 +80,7 @@ return [
 	'kadenceblocks'       => [ 'kadence-blocks/kadence-blocks.php' ],
 	'spectra'             => [ 'ultimate-addons-for-gutenberg/ultimate-addons-for-gutenberg.php' ],
 	'coblocks'            => [ 'coblocks/class-coblocks.php' ],
+	'wpmapblock'          => [ 'wp-map-block/wp-map-block.php' ],
 
 	// --- Content / dev tooling ---
 	'advancecustomfields' => [ 'advanced-custom-fields/acf.php' ],
