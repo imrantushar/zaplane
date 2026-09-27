@@ -22,6 +22,8 @@ class Zencommunity extends IntegrationBase {
 	public static function get_slug(): string { return 'zencommunity'; }
 	public static function get_name(): string { return 'ZenCommunity'; }
 
+	public static function get_icon(): string { return 'zencommunity.svg'; }
+
 	private static function available(): bool {
 		return class_exists( Group::class ) && class_exists( Feed::class ) && class_exists( Profile::class );
 	}
