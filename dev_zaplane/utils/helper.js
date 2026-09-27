@@ -123,7 +123,7 @@ export const getDuration = (start, end) => {
 
   return `${secs}s`;
 };
-export const formatDateTime = (dateString) => {
+export const formatDateTime = (dateString, monthFormat = "long") => {
   if (!dateString) return { date: "", time: "" };
 
   const safeDate = dateString.replace(" ", "T");
@@ -134,7 +134,7 @@ export const formatDateTime = (dateString) => {
   return {
     date: dateObj.toLocaleDateString("en-US", {
       year: "numeric",
-      month: "long",
+      month: monthFormat,
       day: "2-digit",
     }),
     time: dateObj.toLocaleTimeString("en-US", {

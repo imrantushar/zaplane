@@ -68,7 +68,7 @@ const RecentLogs = ({
       const {
         date,
         time
-      } = formatDateTime(row.started_at);
+      } = formatDateTime(row.started_at, "short");
       return <div className="flex min-w-[170px] flex-col items-center justify-center gap-1 whitespace-nowrap text-center">
             <ZAPLabel label={date} type={"simple"} lineHeight="20px" />
             <span className="zaplane-sub-title text-[var(--zaplane-text-muted)]">
