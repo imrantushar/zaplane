@@ -3,3 +3,17 @@
     padding: 6px;
     border-radius: 50%;
 }
+
+
+@media (max-width: 782px) {
+    .zaplane-topbar {
+        top: 46px !important;
+        height: auto !important;
+        min-height: 72px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+}
+@media (max-width: 600px) {
+    .zaplane-topbar { top: 0 !important; }
+}
