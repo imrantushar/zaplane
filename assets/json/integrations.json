@@ -1,6 +1,6 @@
 {
     "version": "1.3.2",
-    "generated_at": "2026-09-27 06:27:12",
+    "generated_at": "2026-09-27 11:33:12",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -4925,10 +4925,1058 @@
                 }
             }
         },
+        "gemboards": {
+            "slug": "gemboards",
+            "name": "GemBoards",
+            "icon": "gemboards.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
+            "triggers": {
+                "project_created": {
+                    "label": "Project Created",
+                    "hook": "gemboards/project/after/object_save",
+                    "key": "project_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "project_updated": {
+                    "label": "Project Updated",
+                    "hook": "gemboards/project/updated",
+                    "key": "project_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "project_deleted": {
+                    "label": "Project Deleted",
+                    "hook": "gemboards/project/deleted",
+                    "key": "project_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "board_created": {
+                    "label": "Board Created",
+                    "hook": "gemboards/board/after/object_save",
+                    "key": "board_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "board_updated": {
+                    "label": "Board Updated",
+                    "hook": "gemboards/board/updated",
+                    "key": "board_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "board_deleted": {
+                    "label": "Board Deleted",
+                    "hook": "gemboards/board/deleted",
+                    "key": "board_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "column_created": {
+                    "label": "Column Created",
+                    "hook": "gemboards/column/after/object_save",
+                    "key": "column_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "column_updated": {
+                    "label": "Column Updated",
+                    "hook": "gemboards/column/updated",
+                    "key": "column_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "column_deleted": {
+                    "label": "Column Deleted",
+                    "hook": "gemboards/column/deleted",
+                    "key": "column_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "card_created": {
+                    "label": "Card Created",
+                    "hook": "gemboards/card/created",
+                    "key": "card_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "card_updated": {
+                    "label": "Card Updated",
+                    "hook": "gemboards/card/updated",
+                    "key": "card_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "card_moved": {
+                    "label": "Card Moved to Another Stage",
+                    "hook": "gemboards/card/moved",
+                    "key": "card_moved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "card_archived": {
+                    "label": "Card Archived",
+                    "hook": "gemboards/card/archived",
+                    "key": "card_archived",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "card_restored": {
+                    "label": "Card Restored",
+                    "hook": "gemboards/card/restored",
+                    "key": "card_restored",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "card_deleted": {
+                    "label": "Card Deleted",
+                    "hook": "gemboards/card/deleted",
+                    "key": "card_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "card_user_assigned": {
+                    "label": "User Assigned to Card",
+                    "hook": "gemboards/card/user_assigned",
+                    "key": "card_user_assigned",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "card_user_removed": {
+                    "label": "User Removed from Card",
+                    "hook": "gemboards/card/user_removed",
+                    "key": "card_user_removed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attachment_added": {
+                    "label": "Attachment Added to Card",
+                    "hook": "gemboards/task/attachment/created",
+                    "key": "attachment_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "attachment_removed": {
+                    "label": "Attachment Removed from Card",
+                    "hook": "gemboards/task/attachment/deleted",
+                    "key": "attachment_removed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_project": {
+                    "label": "Create Project",
+                    "key": "create_project",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Project Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "owner_id",
+                            "label": "Owner",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "users",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "label": "Color (hex)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_project": {
+                    "label": "Update Project",
+                    "key": "update_project",
+                    "schema": [
+                        {
+                            "key": "project_id",
+                            "label": "Project",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "projects",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "Project Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "project_status",
+                            "label": "Status (active/archived)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "color",
+                            "label": "Color (hex)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_project": {
+                    "label": "Get Project Details",
+                    "key": "get_project",
+                    "schema": [
+                        {
+                            "key": "project_id",
+                            "label": "Project",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "projects",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_projects": {
+                    "label": "Search Projects",
+                    "key": "search_projects",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search text",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_board": {
+                    "label": "Create Board",
+                    "key": "create_board",
+                    "schema": [
+                        {
+                            "key": "project_id",
+                            "label": "Project",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "projects",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "Board Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "board_type",
+                            "label": "Board Type",
+                            "type": "text",
+                            "required": false,
+                            "default": "kanban",
+                            "help": "Use kanban. Scrum requires GemBoards Pro."
+                        },
+                        {
+                            "key": "owner_id",
+                            "label": "Owner",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "users",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "icon_color",
+                            "label": "Icon Color (hex)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "is_private",
+                            "label": "Private board",
+                            "type": "checkbox",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_board": {
+                    "label": "Update Board",
+                    "key": "update_board",
+                    "schema": [
+                        {
+                            "key": "board_id",
+                            "label": "Board",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "boards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "Board Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "board_type",
+                            "label": "Board Type",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "board_status",
+                            "label": "Status (active/archived)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "icon_color",
+                            "label": "Icon Color (hex)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "is_private",
+                            "label": "Private board",
+                            "type": "checkbox",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_board": {
+                    "label": "Get Board Details",
+                    "key": "get_board",
+                    "schema": [
+                        {
+                            "key": "board_id",
+                            "label": "Board",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "boards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_boards": {
+                    "label": "Search Boards",
+                    "key": "search_boards",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search text",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "project_id",
+                            "label": "Limit to Project",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "projects",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "archive_board": {
+                    "label": "Archive Board",
+                    "key": "archive_board",
+                    "schema": [
+                        {
+                            "key": "board_id",
+                            "label": "Board",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "boards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "restore_board": {
+                    "label": "Restore Board",
+                    "key": "restore_board",
+                    "schema": [
+                        {
+                            "key": "board_id",
+                            "label": "Board",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "boards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_column": {
+                    "label": "Create Stage / Column",
+                    "key": "create_column",
+                    "schema": [
+                        {
+                            "key": "board_id",
+                            "label": "Board",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "boards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "Stage / Column Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "color",
+                            "label": "Color (hex)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "sort_order",
+                            "label": "Sort Order",
+                            "type": "number",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_column": {
+                    "label": "Update Stage / Column",
+                    "key": "update_column",
+                    "schema": [
+                        {
+                            "key": "column_id",
+                            "label": "Stage / Column",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "columns",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "Stage / Column Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "color",
+                            "label": "Color (hex)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "sort_order",
+                            "label": "Sort Order",
+                            "type": "number",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_column": {
+                    "label": "Get Stage / Column Details",
+                    "key": "get_column",
+                    "schema": [
+                        {
+                            "key": "column_id",
+                            "label": "Stage / Column",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "columns",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_columns": {
+                    "label": "Search Stages / Columns",
+                    "key": "search_columns",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search text",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "board_id",
+                            "label": "Limit to Board",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "boards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_card": {
+                    "label": "Create Card",
+                    "key": "create_card",
+                    "schema": [
+                        {
+                            "key": "board_id",
+                            "label": "Board",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "boards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "column_id",
+                            "label": "Stage / Column",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "columns",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "Card Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "due_date",
+                            "label": "Due Date (YYYY-MM-DD)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "story_point",
+                            "label": "Story Point",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "priority",
+                            "label": "Priority term ID or slug",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "labels",
+                            "label": "Label IDs/slugs (comma separated)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "assignees",
+                            "label": "User IDs (comma separated)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_card": {
+                    "label": "Update Card",
+                    "key": "update_card",
+                    "schema": [
+                        {
+                            "key": "card_id",
+                            "label": "Card",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "cards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "Card Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "due_date",
+                            "label": "Due Date (YYYY-MM-DD)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "story_point",
+                            "label": "Story Point",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "priority",
+                            "label": "Priority term ID or slug",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "labels",
+                            "label": "Label IDs/slugs (comma separated)",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_card": {
+                    "label": "Get Card Details",
+                    "key": "get_card",
+                    "schema": [
+                        {
+                            "key": "card_id",
+                            "label": "Card",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "cards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_cards": {
+                    "label": "Search Cards",
+                    "key": "search_cards",
+                    "schema": [
+                        {
+                            "key": "search",
+                            "label": "Search text",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "board_id",
+                            "label": "Limit to Board",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "boards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "column_id",
+                            "label": "Limit to Stage / Column",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "columns",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "move_card": {
+                    "label": "Move Card to Stage",
+                    "key": "move_card",
+                    "schema": [
+                        {
+                            "key": "card_id",
+                            "label": "Card",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "cards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "column_id",
+                            "label": "Destination Stage / Column",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "columns",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "archive_card": {
+                    "label": "Archive Card",
+                    "key": "archive_card",
+                    "schema": [
+                        {
+                            "key": "card_id",
+                            "label": "Card",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "cards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "restore_card": {
+                    "label": "Restore Card",
+                    "key": "restore_card",
+                    "schema": [
+                        {
+                            "key": "card_id",
+                            "label": "Card",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "cards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_card": {
+                    "label": "Delete Card",
+                    "key": "delete_card",
+                    "schema": [
+                        {
+                            "key": "card_id",
+                            "label": "Card",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "cards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assign_user": {
+                    "label": "Assign User to Card",
+                    "key": "assign_user",
+                    "schema": [
+                        {
+                            "key": "card_id",
+                            "label": "Card",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "cards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "users",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_user": {
+                    "label": "Remove User from Card",
+                    "key": "remove_user",
+                    "schema": [
+                        {
+                            "key": "card_id",
+                            "label": "Card",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "cards",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "gemboards",
+                                "query": "users",
+                                "select": [
+                                    "name",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
         "zencommunity": {
             "slug": "zencommunity",
             "name": "ZenCommunity",
-            "icon": "",
+            "icon": "zencommunity.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
@@ -34444,1054 +35492,6 @@
                             "label": "Job Title",
                             "placeholder": "Marketing Manager",
                             "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            }
-        },
-        "gemboards": {
-            "slug": "gemboards",
-            "name": "GemBoards",
-            "icon": "gemboards.svg",
-            "category": "app",
-            "requires_connection": false,
-            "auth_type": "none",
-            "supports_webhook": false,
-            "webhook_route": "",
-            "webhook_setup": [],
-            "docs_url": {
-                "trigger": "",
-                "action": ""
-            },
-            "triggers": {
-                "project_created": {
-                    "label": "Project Created",
-                    "hook": "gemboards/project/after/object_save",
-                    "key": "project_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "project_updated": {
-                    "label": "Project Updated",
-                    "hook": "gemboards/project/updated",
-                    "key": "project_updated",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "project_deleted": {
-                    "label": "Project Deleted",
-                    "hook": "gemboards/project/deleted",
-                    "key": "project_deleted",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "board_created": {
-                    "label": "Board Created",
-                    "hook": "gemboards/board/after/object_save",
-                    "key": "board_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "board_updated": {
-                    "label": "Board Updated",
-                    "hook": "gemboards/board/updated",
-                    "key": "board_updated",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "board_deleted": {
-                    "label": "Board Deleted",
-                    "hook": "gemboards/board/deleted",
-                    "key": "board_deleted",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "column_created": {
-                    "label": "Column Created",
-                    "hook": "gemboards/column/after/object_save",
-                    "key": "column_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "column_updated": {
-                    "label": "Column Updated",
-                    "hook": "gemboards/column/updated",
-                    "key": "column_updated",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "column_deleted": {
-                    "label": "Column Deleted",
-                    "hook": "gemboards/column/deleted",
-                    "key": "column_deleted",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "card_created": {
-                    "label": "Card Created",
-                    "hook": "gemboards/card/created",
-                    "key": "card_created",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "card_updated": {
-                    "label": "Card Updated",
-                    "hook": "gemboards/card/updated",
-                    "key": "card_updated",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "card_moved": {
-                    "label": "Card Moved to Another Stage",
-                    "hook": "gemboards/card/moved",
-                    "key": "card_moved",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "card_archived": {
-                    "label": "Card Archived",
-                    "hook": "gemboards/card/archived",
-                    "key": "card_archived",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "card_restored": {
-                    "label": "Card Restored",
-                    "hook": "gemboards/card/restored",
-                    "key": "card_restored",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "card_deleted": {
-                    "label": "Card Deleted",
-                    "hook": "gemboards/card/deleted",
-                    "key": "card_deleted",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "card_user_assigned": {
-                    "label": "User Assigned to Card",
-                    "hook": "gemboards/card/user_assigned",
-                    "key": "card_user_assigned",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "card_user_removed": {
-                    "label": "User Removed from Card",
-                    "hook": "gemboards/card/user_removed",
-                    "key": "card_user_removed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "attachment_added": {
-                    "label": "Attachment Added to Card",
-                    "hook": "gemboards/task/attachment/created",
-                    "key": "attachment_added",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "attachment_removed": {
-                    "label": "Attachment Removed from Card",
-                    "hook": "gemboards/task/attachment/deleted",
-                    "key": "attachment_removed",
-                    "schema": [],
-                    "outputs": [
-                        "main"
-                    ]
-                }
-            },
-            "actions": {
-                "create_project": {
-                    "label": "Create Project",
-                    "key": "create_project",
-                    "schema": [
-                        {
-                            "key": "title",
-                            "label": "Project Title",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "owner_id",
-                            "label": "Owner",
-                            "type": "select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "users",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "label": "Color (hex)",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_project": {
-                    "label": "Update Project",
-                    "key": "update_project",
-                    "schema": [
-                        {
-                            "key": "project_id",
-                            "label": "Project",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "projects",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "title",
-                            "label": "Project Title",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "project_status",
-                            "label": "Status (active/archived)",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "color",
-                            "label": "Color (hex)",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_project": {
-                    "label": "Get Project Details",
-                    "key": "get_project",
-                    "schema": [
-                        {
-                            "key": "project_id",
-                            "label": "Project",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "projects",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "search_projects": {
-                    "label": "Search Projects",
-                    "key": "search_projects",
-                    "schema": [
-                        {
-                            "key": "search",
-                            "label": "Search text",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_board": {
-                    "label": "Create Board",
-                    "key": "create_board",
-                    "schema": [
-                        {
-                            "key": "project_id",
-                            "label": "Project",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "projects",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "title",
-                            "label": "Board Title",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "board_type",
-                            "label": "Board Type",
-                            "type": "text",
-                            "required": false,
-                            "default": "kanban",
-                            "help": "Use kanban. Scrum requires GemBoards Pro."
-                        },
-                        {
-                            "key": "owner_id",
-                            "label": "Owner",
-                            "type": "select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "users",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "icon_color",
-                            "label": "Icon Color (hex)",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "is_private",
-                            "label": "Private board",
-                            "type": "checkbox",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_board": {
-                    "label": "Update Board",
-                    "key": "update_board",
-                    "schema": [
-                        {
-                            "key": "board_id",
-                            "label": "Board",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "boards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "title",
-                            "label": "Board Title",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "board_type",
-                            "label": "Board Type",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "board_status",
-                            "label": "Status (active/archived)",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "icon_color",
-                            "label": "Icon Color (hex)",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "is_private",
-                            "label": "Private board",
-                            "type": "checkbox",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_board": {
-                    "label": "Get Board Details",
-                    "key": "get_board",
-                    "schema": [
-                        {
-                            "key": "board_id",
-                            "label": "Board",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "boards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "search_boards": {
-                    "label": "Search Boards",
-                    "key": "search_boards",
-                    "schema": [
-                        {
-                            "key": "search",
-                            "label": "Search text",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "project_id",
-                            "label": "Limit to Project",
-                            "type": "select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "projects",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "archive_board": {
-                    "label": "Archive Board",
-                    "key": "archive_board",
-                    "schema": [
-                        {
-                            "key": "board_id",
-                            "label": "Board",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "boards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "restore_board": {
-                    "label": "Restore Board",
-                    "key": "restore_board",
-                    "schema": [
-                        {
-                            "key": "board_id",
-                            "label": "Board",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "boards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_column": {
-                    "label": "Create Stage / Column",
-                    "key": "create_column",
-                    "schema": [
-                        {
-                            "key": "board_id",
-                            "label": "Board",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "boards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "title",
-                            "label": "Stage / Column Title",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "color",
-                            "label": "Color (hex)",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "sort_order",
-                            "label": "Sort Order",
-                            "type": "number",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_column": {
-                    "label": "Update Stage / Column",
-                    "key": "update_column",
-                    "schema": [
-                        {
-                            "key": "column_id",
-                            "label": "Stage / Column",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "columns",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "title",
-                            "label": "Stage / Column Title",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "color",
-                            "label": "Color (hex)",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "sort_order",
-                            "label": "Sort Order",
-                            "type": "number",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_column": {
-                    "label": "Get Stage / Column Details",
-                    "key": "get_column",
-                    "schema": [
-                        {
-                            "key": "column_id",
-                            "label": "Stage / Column",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "columns",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "search_columns": {
-                    "label": "Search Stages / Columns",
-                    "key": "search_columns",
-                    "schema": [
-                        {
-                            "key": "search",
-                            "label": "Search text",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "board_id",
-                            "label": "Limit to Board",
-                            "type": "select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "boards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "create_card": {
-                    "label": "Create Card",
-                    "key": "create_card",
-                    "schema": [
-                        {
-                            "key": "board_id",
-                            "label": "Board",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "boards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "column_id",
-                            "label": "Stage / Column",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "columns",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "title",
-                            "label": "Card Title",
-                            "type": "text",
-                            "required": true
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "due_date",
-                            "label": "Due Date (YYYY-MM-DD)",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "story_point",
-                            "label": "Story Point",
-                            "type": "number",
-                            "required": false
-                        },
-                        {
-                            "key": "priority",
-                            "label": "Priority term ID or slug",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "labels",
-                            "label": "Label IDs/slugs (comma separated)",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "assignees",
-                            "label": "User IDs (comma separated)",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "update_card": {
-                    "label": "Update Card",
-                    "key": "update_card",
-                    "schema": [
-                        {
-                            "key": "card_id",
-                            "label": "Card",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "cards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "title",
-                            "label": "Card Title",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "description",
-                            "label": "Description",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "due_date",
-                            "label": "Due Date (YYYY-MM-DD)",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "story_point",
-                            "label": "Story Point",
-                            "type": "number",
-                            "required": false
-                        },
-                        {
-                            "key": "priority",
-                            "label": "Priority term ID or slug",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "labels",
-                            "label": "Label IDs/slugs (comma separated)",
-                            "type": "text",
-                            "required": false
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "get_card": {
-                    "label": "Get Card Details",
-                    "key": "get_card",
-                    "schema": [
-                        {
-                            "key": "card_id",
-                            "label": "Card",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "cards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "search_cards": {
-                    "label": "Search Cards",
-                    "key": "search_cards",
-                    "schema": [
-                        {
-                            "key": "search",
-                            "label": "Search text",
-                            "type": "text",
-                            "required": false
-                        },
-                        {
-                            "key": "board_id",
-                            "label": "Limit to Board",
-                            "type": "select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "boards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "column_id",
-                            "label": "Limit to Stage / Column",
-                            "type": "select",
-                            "required": false,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "columns",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "move_card": {
-                    "label": "Move Card to Stage",
-                    "key": "move_card",
-                    "schema": [
-                        {
-                            "key": "card_id",
-                            "label": "Card",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "cards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "column_id",
-                            "label": "Destination Stage / Column",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "columns",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "archive_card": {
-                    "label": "Archive Card",
-                    "key": "archive_card",
-                    "schema": [
-                        {
-                            "key": "card_id",
-                            "label": "Card",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "cards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "restore_card": {
-                    "label": "Restore Card",
-                    "key": "restore_card",
-                    "schema": [
-                        {
-                            "key": "card_id",
-                            "label": "Card",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "cards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "delete_card": {
-                    "label": "Delete Card",
-                    "key": "delete_card",
-                    "schema": [
-                        {
-                            "key": "card_id",
-                            "label": "Card",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "cards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "assign_user": {
-                    "label": "Assign User to Card",
-                    "key": "assign_user",
-                    "schema": [
-                        {
-                            "key": "card_id",
-                            "label": "Card",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "cards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "users",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": [
-                        "main"
-                    ]
-                },
-                "remove_user": {
-                    "label": "Remove User from Card",
-                    "key": "remove_user",
-                    "schema": [
-                        {
-                            "key": "card_id",
-                            "label": "Card",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "cards",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
-                        },
-                        {
-                            "key": "user_id",
-                            "label": "User",
-                            "type": "select",
-                            "required": true,
-                            "dynamic": {
-                                "integration": "gemboards",
-                                "query": "users",
-                                "select": [
-                                    "name",
-                                    "label"
-                                ]
-                            }
                         }
                     ],
                     "outputs": [
