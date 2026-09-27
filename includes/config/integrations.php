@@ -381,6 +381,10 @@ $zaplane_registry = [
 		'file'  => 'trello.php',
 		'class' => \Zaplane\Integrations\Trello::class,
 	],
+	'gemboards'               => [
+		'file'  => 'gemboards.php',
+		'class' => \Zaplane\Integrations\Gemboards::class,
+	],
 	'gembooking'              => [
 		'file'  => 'gembooking.php',
 		'class' => \Zaplane\Integrations\Gembooking::class,
@@ -393,6 +397,7 @@ $zaplane_priority = [
 	'gemcrm',
 	'ablocks',
 	'gembooking',
+	'gemboards',
 	'zencommunity',
 ];
 
