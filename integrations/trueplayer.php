@@ -1,13 +1,4 @@
 <?php
-/**
- * TruePlayer integration for Zaplane.
- *
- * Triggers are wired to hooks that TruePlayer 1.6.0 really fires:
- *  - trueplayer/event/{name} (Events::emit) for viewer/quiz/subscriber events.
- *  - WordPress core post hooks for media (tp_video) and playlist (tp_playlist).
- *
- * @package Zaplane\Integrations
- */
 
 namespace Zaplane\Integrations;
 
@@ -17,15 +8,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
-/**
- * Class Trueplayer
- */
 class Trueplayer extends IntegrationBase {
 
 	const VIDEO_META    = '_trueplayer_config';
 	const PLAYLIST_META = '_trueplayer_playlist';
 	const PLAYLIST_TYPE = 'tp_playlist';
-	const SOURCE_TYPES  = [ 'self', 'youtube', 'vimeo', 'url' ];
+	const SOURCE_TYPES  = [ 'self', 'youtube', 'vimeo', 'url', 'bunny', 'bunnyStorage', 'gumlet', 'gumletStorage', 'mux', 'hls' ];
 	const STATUSES      = [ 'publish', 'draft', 'private', 'pending' ];
 
 	public static function get_slug(): string {
@@ -43,11 +31,6 @@ class Trueplayer extends IntegrationBase {
 	private static function active(): bool {
 		return defined( 'TRUEPLAYER_VERSION' ) || class_exists( '\TruePlayer' );
 	}
-
-	/*
-	 ---------------------------------------------------------------------
-	 * Triggers
-	 ------------------------------------------------------------------- */
 
 	public static function get_triggers(): array {
 		$event = static function ( string $label, string $name ): array {
@@ -152,13 +135,6 @@ class Trueplayer extends IntegrationBase {
 		return [];
 	}
 
-	/**
-	 * Build the trigger output, or return false to skip this workflow.
-	 *
-	 * @param array $node Trigger node.
-	 * @param array $args Hook arguments.
-	 * @return array|false
-	 */
 	public static function resolve_trigger( array $node, array $args ) {
 		$event = (string) ( $node['event'] ?? ( $node['data']['event'] ?? '' ) );
 
@@ -213,9 +189,6 @@ class Trueplayer extends IntegrationBase {
 		return $out;
 	}
 
-	/**
-	 * Handle save_post_{type}: ( $post_id, $post, $update ).
-	 */
 	private static function resolve_post_save( string $event, array $args ) {
 		$post   = $args[1] ?? null;
 		$update = ! empty( $args[2] );
@@ -248,9 +221,6 @@ class Trueplayer extends IntegrationBase {
 			: self::playlist_payload( $post );
 	}
 
-	/**
-	 * Handle before_delete_post: ( $post_id, $post ).
-	 */
 	private static function resolve_post_delete( string $event, array $args ) {
 		$post_id = (int) ( $args[0] ?? 0 );
 		$post    = $args[1] ?? get_post( $post_id );
@@ -435,11 +405,6 @@ class Trueplayer extends IntegrationBase {
 		return $samples[ $trigger ] ?? $viewer;
 	}
 
-	/*
-	 ---------------------------------------------------------------------
-	 * Actions
-	 ------------------------------------------------------------------- */
-
 	public static function get_actions(): array {
 		return [
 			'create_media'         => [ 'label' => 'Create Media' ],
@@ -514,10 +479,16 @@ class Trueplayer extends IntegrationBase {
 
 	private static function source_options(): array {
 		return [
-			'self'    => 'Self-hosted / Media Library',
-			'youtube' => 'YouTube',
-			'vimeo'   => 'Vimeo',
-			'url'     => 'Direct URL',
+			'self'          => 'Self-hosted (media library)',
+			'youtube'       => 'YouTube',
+			'vimeo'         => 'Vimeo',
+			'url'           => 'External URL (mp4/webm)',
+			'bunny'         => 'Bunny.net Stream',
+			'bunnyStorage'  => 'Bunny.net Storage (file)',
+			'gumlet'        => 'Gumlet Stream',
+			'gumletStorage' => 'Gumlet (upload a file)',
+			'mux'           => 'Mux',
+			'hls'           => 'HLS stream (.m3u8)',
 		];
 	}
 
@@ -552,9 +523,15 @@ class Trueplayer extends IntegrationBase {
 					self::select( 'source_type', 'Source Type', self::source_options(), false, 'self' ),
 					self::field(
 						'source_url',
-						'Source URL / Video ID',
+						'Source URL / ID',
 						true,
-						[ 'placeholder' => 'https://example.com/video.mp4' ]
+						[ 'help' => 'Self-hosted: URL or attachment ID. YouTube/Vimeo: URL or ID. Bunny Stream: video GUID. Mux: playback ID. Gumlet: asset ID. Others: full URL.' ]
+					),
+					self::field(
+						'pull_zone',
+						'Bunny Pull Zone (Bunny Stream only)',
+						false,
+						[ 'placeholder' => 'vz-xxxx.b-cdn.net' ]
 					),
 					self::field(
 						'tags',
@@ -570,7 +547,8 @@ class Trueplayer extends IntegrationBase {
 					self::field( 'media_id', 'Media ID', true ),
 					self::field( 'title', 'New Title' ),
 					self::select( 'source_type', 'Source Type', self::source_options() ),
-					self::field( 'source_url', 'Source URL / Video ID' ),
+					self::field( 'source_url', 'Source URL / ID' ),
+					self::field( 'pull_zone', 'Bunny Pull Zone (Bunny Stream only)' ),
 					self::field(
 						'tags',
 						'Tags (comma-separated, replaces all)',
@@ -950,11 +928,6 @@ class Trueplayer extends IntegrationBase {
 		return $samples[ $action ] ?? [ 'success' => true ];
 	}
 
-	/*
-	 ---------------------------------------------------------------------
-	 * Execution
-	 ------------------------------------------------------------------- */
-
 	public static function execute_node( array $node, array $input ): array {
 		if ( ! self::active() ) {
 			return self::error_output( 'TruePlayer plugin is not active.' );
@@ -1026,8 +999,6 @@ class Trueplayer extends IntegrationBase {
 		return self::error_output( 'Unknown action: ' . $action );
 	}
 
-	/* ---------- Shared helpers ---------- */
-
 	private static function video_type(): string {
 		return defined( 'TRUEPLAYER_VIDEO_POST_TYPE' ) ? TRUEPLAYER_VIDEO_POST_TYPE : 'tp_video';
 	}
@@ -1065,27 +1036,76 @@ class Trueplayer extends IntegrationBase {
 		return array_values( array_unique( array_filter( array_map( 'absint', explode( ',', (string) $value ) ) ) ) );
 	}
 
-	/**
-	 * Same rules as TruePlayer's own controller: URLs are escaped, YouTube and
-	 * Vimeo ids pass through as ids. Returns '' when the source is unusable.
-	 */
-	private static function clean_source( string $type, string $raw ): string {
-		$raw = trim( $raw );
+	private static function build_source( string $type, string $raw, string $pull_zone = '' ) {
+		$raw    = trim( $raw );
+		$is_url = (bool) preg_match( '#^(?:https?:)?//#i', $raw );
+		$url    = $is_url ? esc_url_raw( $raw, [ 'http', 'https' ] ) : '';
+		$is_id  = (bool) preg_match( '/^[\w-]{1,128}$/', $raw );
+
 		if ( '' === $raw ) {
-			return '';
+			return 'Source URL / ID is required.';
 		}
-		if ( preg_match( '#^(?:https?:)?//#i', $raw ) ) {
-			return esc_url_raw( $raw, [ 'http', 'https' ] );
+
+		switch ( $type ) {
+			case 'self':
+				if ( ctype_digit( $raw ) ) {
+					$att = wp_get_attachment_url( (int) $raw );
+					return $att ? [ 'src' => $att ] : 'Media library attachment not found.';
+				}
+				return '' !== $url ? [ 'src' => $url ] : 'Self-hosted needs a media URL or attachment ID.';
+
+			case 'url':
+			case 'hls':
+			case 'bunnyStorage':
+				return '' !== $url ? [ 'src' => $url ] : 'A full http(s) URL is required for this source.';
+
+			case 'youtube':
+			case 'vimeo':
+				if ( '' !== $url ) {
+					return [ 'src' => $url ];
+				}
+				return $is_id ? [ 'src' => $raw ] : 'Enter a valid video URL or ID.';
+
+			case 'bunny':
+				if ( '' !== $url ) {
+					return [ 'src' => $url ];
+				}
+				if ( ! $is_id ) {
+					return 'Enter the Bunny video ID (GUID) or a full playlist URL.';
+				}
+				$zone = preg_replace( '#^https?://#i', '', rtrim( $pull_zone, '/' ) );
+				if ( '' === $zone || ! preg_match( '/^[A-Za-z0-9.-]+$/', $zone ) ) {
+					return 'Bunny Stream needs a valid Pull Zone host (e.g. vz-xxxx.b-cdn.net).';
+				}
+				return [
+					'pullZone' => $zone,
+					'videoId'  => $raw,
+				];
+
+			case 'mux':
+				if ( '' !== $url ) {
+					return [ 'src' => $url ];
+				}
+				return $is_id ? [ 'playbackId' => $raw ] : 'Enter a valid Mux playback ID or a signed .m3u8 URL.';
+
+			case 'gumlet':
+			case 'gumletStorage':
+				if ( '' !== $url ) {
+					return [ 'src' => $url ];
+				}
+				return $is_id ? [ 'assetId' => $raw ] : 'Enter a valid Gumlet asset ID or a full URL.';
 		}
-		if ( in_array( $type, [ 'youtube', 'vimeo' ], true ) && preg_match( '/^[\w-]{1,64}$/', $raw ) ) {
-			return $raw;
-		}
-		return '';
+
+		return 'Unsupported source type.';
 	}
 
-	/**
-	 * Resolve a WordPress user into a TruePlayer subject, or null.
-	 */
+	private static function source_allowed( string $type ): bool {
+		if ( ! class_exists( '\TruePlayer\Pro' ) || ! \TruePlayer\Pro::is_premium_source( $type ) ) {
+			return true;
+		}
+		return \TruePlayer\Pro::active();
+	}
+
 	private static function resolve_subject( array $c ) {
 		$user_id = (int) ( $c['user_id'] ?? 0 );
 		if ( $user_id < 1 ) {
@@ -1101,8 +1121,6 @@ class Trueplayer extends IntegrationBase {
 		return new \TruePlayer\Subject( 'user', $user_id );
 	}
 
-	/* ---------- Media ---------- */
-
 	private static function action_create_media( array $c ): array {
 		$title = sanitize_text_field( (string) ( $c['title'] ?? '' ) );
 		if ( '' === $title ) {
@@ -1113,9 +1131,12 @@ class Trueplayer extends IntegrationBase {
 		if ( ! in_array( $type, self::SOURCE_TYPES, true ) ) {
 			$type = 'self';
 		}
-		$src = self::clean_source( $type, (string) ( $c['source_url'] ?? '' ) );
-		if ( '' === $src ) {
-			return self::error_output( 'A valid source URL (or YouTube/Vimeo ID) is required.' );
+		if ( ! self::source_allowed( $type ) ) {
+			return self::error_output( 'This source type requires TruePlayer Pro.' );
+		}
+		$built = self::build_source( $type, (string) ( $c['source_url'] ?? '' ), (string) ( $c['pull_zone'] ?? '' ) );
+		if ( is_string( $built ) ) {
+			return self::error_output( $built );
 		}
 
 		$id = wp_insert_post(
@@ -1130,10 +1151,7 @@ class Trueplayer extends IntegrationBase {
 			return self::error_output( $id->get_error_message() );
 		}
 
-		$source = [
-			'type' => $type,
-			'src'  => $src,
-		];
+		$source = array_merge( [ 'type' => $type ], $built );
 		$poster = esc_url_raw( trim( (string) ( $c['poster'] ?? '' ) ), [ 'http', 'https' ] );
 		if ( '' !== $poster ) {
 			$source['poster'] = $poster;
@@ -1187,12 +1205,15 @@ class Trueplayer extends IntegrationBase {
 				if ( ! in_array( $type, self::SOURCE_TYPES, true ) ) {
 					$type = (string) ( $config['source']['type'] ?? 'self' );
 				}
-				$src = self::clean_source( $type, $src_raw );
-				if ( '' === $src ) {
-					return self::error_output( 'Invalid source URL or ID.' );
+				if ( ! self::source_allowed( $type ) ) {
+					return self::error_output( 'This source type requires TruePlayer Pro.' );
 				}
-				$config['source']['type'] = $type;
-				$config['source']['src']  = $src;
+				$built = self::build_source( $type, $src_raw, (string) ( $c['pull_zone'] ?? '' ) );
+				if ( is_string( $built ) ) {
+					return self::error_output( $built );
+				}
+				$keep             = isset( $config['source']['poster'] ) ? [ 'poster' => $config['source']['poster'] ] : [];
+				$config['source'] = array_merge( [ 'type' => $type ], $built, $keep );
 			}
 			if ( '' !== $poster ) {
 				$config['source']['poster'] = esc_url_raw( $poster, [ 'http', 'https' ] );
@@ -1256,8 +1277,6 @@ class Trueplayer extends IntegrationBase {
 			]
 		);
 	}
-
-	/* ---------- Playlists ---------- */
 
 	private static function action_create_playlist( array $c ): array {
 		$title = sanitize_text_field( (string) ( $c['title'] ?? '' ) );
@@ -1390,8 +1409,6 @@ class Trueplayer extends IntegrationBase {
 		);
 	}
 
-	/* ---------- Progress ---------- */
-
 	private static function progress_guard( array $c ) {
 		$video_id = (int) ( $c['video_id'] ?? 0 );
 		if ( ! self::is_video( $video_id ) ) {
@@ -1519,8 +1536,6 @@ class Trueplayer extends IntegrationBase {
 		);
 	}
 
-	/* ---------- Analytics ---------- */
-
 	private static function action_get_analytics( int $video_id ): array {
 		if ( ! self::is_video( $video_id ) ) {
 			return self::error_output( 'Video not found.' );
@@ -1636,8 +1651,6 @@ class Trueplayer extends IntegrationBase {
 		);
 	}
 
-	/* ---------- Subscribers ---------- */
-
 	private static function action_add_subscriber( array $c ): array {
 		$email = sanitize_email( (string) ( $c['email'] ?? '' ) );
 		if ( ! is_email( $email ) ) {
@@ -1676,8 +1689,6 @@ class Trueplayer extends IntegrationBase {
 			]
 		);
 	}
-
-	/* ---------- Webhook / HTTP ---------- */
 
 	private static function decode_json_field( $value ): array {
 		if ( is_array( $value ) ) {
@@ -1811,8 +1822,6 @@ class Trueplayer extends IntegrationBase {
 			],
 		];
 	}
-
-	/* ---------- Output helpers ---------- */
 
 	protected static function success_output( array $data ): array {
 		return [

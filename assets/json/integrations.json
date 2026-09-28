@@ -1,6 +1,6 @@
 {
     "version": "1.3.2",
-    "generated_at": "2026-09-28 10:02:35",
+    "generated_at": "2026-09-28 11:15:07",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -6265,7 +6265,7 @@
                             "options": [
                                 {
                                     "value": "self",
-                                    "label": "Self-hosted / Media Library"
+                                    "label": "Self-hosted (media library)"
                                 },
                                 {
                                     "value": "youtube",
@@ -6277,17 +6277,48 @@
                                 },
                                 {
                                     "value": "url",
-                                    "label": "Direct URL"
+                                    "label": "External URL (mp4/webm)"
+                                },
+                                {
+                                    "value": "bunny",
+                                    "label": "Bunny.net Stream"
+                                },
+                                {
+                                    "value": "bunnyStorage",
+                                    "label": "Bunny.net Storage (file)"
+                                },
+                                {
+                                    "value": "gumlet",
+                                    "label": "Gumlet Stream"
+                                },
+                                {
+                                    "value": "gumletStorage",
+                                    "label": "Gumlet (upload a file)"
+                                },
+                                {
+                                    "value": "mux",
+                                    "label": "Mux"
+                                },
+                                {
+                                    "value": "hls",
+                                    "label": "HLS stream (.m3u8)"
                                 }
                             ],
                             "default": "self"
                         },
                         {
                             "key": "source_url",
-                            "label": "Source URL / Video ID",
+                            "label": "Source URL / ID",
                             "type": "expression",
                             "required": true,
-                            "placeholder": "https://example.com/video.mp4"
+                            "help": "Self-hosted: URL or attachment ID. YouTube/Vimeo: URL or ID. Bunny Stream: video GUID. Mux: playback ID. Gumlet: asset ID. Others: full URL."
+                        },
+                        {
+                            "key": "pull_zone",
+                            "label": "Bunny Pull Zone (Bunny Stream only)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "vz-xxxx.b-cdn.net"
                         },
                         {
                             "key": "tags",
@@ -6331,7 +6362,7 @@
                             "options": [
                                 {
                                     "value": "self",
-                                    "label": "Self-hosted / Media Library"
+                                    "label": "Self-hosted (media library)"
                                 },
                                 {
                                     "value": "youtube",
@@ -6343,13 +6374,43 @@
                                 },
                                 {
                                     "value": "url",
-                                    "label": "Direct URL"
+                                    "label": "External URL (mp4/webm)"
+                                },
+                                {
+                                    "value": "bunny",
+                                    "label": "Bunny.net Stream"
+                                },
+                                {
+                                    "value": "bunnyStorage",
+                                    "label": "Bunny.net Storage (file)"
+                                },
+                                {
+                                    "value": "gumlet",
+                                    "label": "Gumlet Stream"
+                                },
+                                {
+                                    "value": "gumletStorage",
+                                    "label": "Gumlet (upload a file)"
+                                },
+                                {
+                                    "value": "mux",
+                                    "label": "Mux"
+                                },
+                                {
+                                    "value": "hls",
+                                    "label": "HLS stream (.m3u8)"
                                 }
                             ]
                         },
                         {
                             "key": "source_url",
-                            "label": "Source URL / Video ID",
+                            "label": "Source URL / ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "pull_zone",
+                            "label": "Bunny Pull Zone (Bunny Stream only)",
                             "type": "expression",
                             "required": false
                         },
