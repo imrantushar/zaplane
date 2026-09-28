@@ -156,7 +156,7 @@ const Logs = () => {
     </button> : <span className="text-[var(--zaplane-text-muted)]">—</span>,
     textAlign: "start"
   }, {
-    name: <span className="zaplane-label ml-[-33px]">
+    name: <span className="zaplane-label">
       {__("Created At", "zaplane")}
     </span>,
     cell: row => {
@@ -166,7 +166,7 @@ const Logs = () => {
       } = formatDateTime(row.started_at);
       return <div className="flex flex-col">
         <ZAPLabel label={date} type={"simple"} />
-        <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
+        <span className="zaplane-sub-title text-[var(--zaplane-text-muted)]">
           {time}
         </span>
       </div>;

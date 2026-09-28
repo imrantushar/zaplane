@@ -112,7 +112,87 @@
 .zaplane-table__footer-right { flex-wrap: wrap; min-width: 0; max-width: 100%; }
 .zaplane-table__footer-pagination-pages { min-width: 0; max-width: 100%; }
 .zaplane-table__footer-pagination-per-page { flex-wrap: wrap; }
+
+.zaplane-table__scroll {
+    width: 100%;
+    max-width: 100%;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+}
+
+@media (max-width: 900px) {
+    .zaplane-table {
+        padding: 16px;
+        min-width: 0;
+    }
+
+    .zaplane-table__sub-header {
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .zaplane-table__sub-header-left {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .zaplane-table-sub-header-tabs {
+        width: 100%;
+        max-width: 100%;
+        gap: 16px;
+        overflow-x: auto;
+        white-space: nowrap;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+    }
+
+    .zaplane-table-sub-header-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .zaplane-table-sub-header-tabs .tab {
+        flex: 0 0 auto;
+    }
+
+    .zaplane-table--logs-table table {
+        min-width: 940px;
+    }
+
+    .zaplane-table--connection-table table {
+        min-width: 760px;
+    }
+}
+
 @media (max-width: 600px) {
-    .zaplane-table__footer { padding: 8px 0; }
-    .zaplane-table__footer-right { width: 100%; justify-content: center; }
+    .zaplane-table {
+        padding: 12px;
+    }
+
+    .zaplane-table__sub-header {
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+    }
+
+    .zaplane-table__empty-header {
+        display: none;
+    }
+
+    .zaplane-table__empty-state {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .zaplane-table__footer {
+        padding: 8px 0;
+        justify-content: center;
+    }
+
+    .zaplane-table__footer-label {
+        text-align: center;
+    }
+
+    .zaplane-table__footer-right {
+        width: 100%;
+        justify-content: center;
+    }
 }

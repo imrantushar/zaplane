@@ -8,14 +8,19 @@
     top: 0;
     width: 100% !important;
 }
+.zaplane-admin-content,
+.zaplane-route {
+    width: 100%;
+    min-width: 0;
+}
+
 .zaplane-page-content {
     max-width: calc(1280px - 30px);
     width: 100%;
+    min-width: 0;
     margin: 0 auto 24px auto;
     padding: 0 15px;
     box-sizing: border-box;
-    // min-height: 100vh;
-
 }
 .zaplane-icon{
     font-size: 20px;
@@ -24,8 +29,13 @@
     background: var(--zaplane-second-primary);
     color: var(--zaplane-primary) !important;
 }
-.react-flow {
-    position: fixed !important;
+// React Flow must stay inside its own canvas. A global fixed position made
+// the editor escape the Zaplane container and caused mobile horizontal overflow.
+.zaplane_flowcanvas .react-flow {
+    position: relative !important;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
 }
 
 .zaplane-select {
@@ -405,5 +415,82 @@
     .zaplane-page-content {
         max-width: calc(1120px - 30px);
         padding: 0 15px;
+    }
+}
+
+@media screen and (max-width: 782px) {
+    // WP normally clears its desktop admin-menu offset here. Enforce it on
+    // Zaplane screens as some admin themes/custom menus keep the 160px margin.
+    body[class*="_page_zaplane"] #wpcontent,
+    body[class*="_page_zaplane"] #wpfooter {
+        margin-left: 0 !important;
+    }
+
+    body[class*="_page_zaplane"] #wpbody,
+    body[class*="_page_zaplane"] #wpbody-content,
+    #zaplane-app.zaplane-scope {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    #zaplane-app.zaplane-scope {
+        overflow-x: clip;
+    }
+
+    .zaplane-page-content {
+        max-width: none !important;
+        width: 100%;
+        padding-inline: 16px !important;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .zaplane-sub-top-header {
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+
+    .zaplane-sub-top-header__title,
+    .zaplane-sub-top-header__content {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .zaplane-sub-top-header__content {
+        justify-content: flex-start;
+    }
+
+    .zaplane-sub-top-header__content > * {
+        max-width: 100%;
+    }
+
+    .zaplane-responsive-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .zaplane-responsive-actions .zaplane-search-component {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+
+    .zaplane-responsive-actions > button {
+        flex: 1 1 auto;
+        justify-content: center;
+        white-space: nowrap;
+    }
+}
+
+.zaplane-email-builder-shell {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overscroll-behavior-x: contain;
+}
+
+@media screen and (max-width: 480px) {
+    .zaplane-page-content {
+        padding-inline: 12px !important;
     }
 }

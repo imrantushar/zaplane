@@ -1,4 +1,23 @@
 
+.zaplane_flowcanvas {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: calc(100dvh - 32px);
+    overflow: hidden;
+    box-sizing: border-box !important;
+}
+
+.zaplane_flowcanvas .react-flow {
+    max-width: 100%;
+    box-sizing: border-box !important;
+}
+
+.zaplane_flowcanvas > div {
+    min-width: 0;
+    max-width: 100%;
+}
+
 .zaplane-canvas-controls {
     gap: 5px;
     margin-top: 40px;
@@ -21,11 +40,13 @@
 
 .zaplane-canvas-layout-icon {
     width: 60px;
-    margin: 0px 0 10px 15px;
+    margin: 0;
     gap: 5px;
     cursor: pointer;
     position: absolute;
-    z-index: 999;
+    top: 8px;
+    left: 8px;
+    z-index: 9;
 }
 .zaplane-table--history-table,.zaplane-table--version-table{
     padding: 0 !important;
@@ -164,4 +185,72 @@
   white-space: nowrap;
   pointer-events: none;
   z-index: 20;
+}
+
+@media (max-width: 782px) {
+  .zaplane_flowcanvas {
+    height: calc(100dvh - 46px);
+  }
+
+  .zaplane-flow-toolbar {
+    width: 100%;
+    max-width: 100%;
+    gap: 8px !important;
+  }
+
+  .zaplane-flow-toolbar > * {
+    flex: 0 0 auto;
+  }
+
+  .zaplane-flow-breadcrumb {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .zaplane-flow-title {
+    max-width: min(42vw, 180px) !important;
+  }
+}
+@media (max-width: 600px) {
+  .zaplane_flowcanvas {
+    height: calc(100dvh - 46px);
+  }
+
+  .zaplane-flow-secondary-action,
+  .zaplane-flow-listening > span:first-child {
+    display: none !important;
+  }
+
+  .zaplane-flow-test {
+    width: 36px;
+    min-width: 36px;
+    padding-inline: 0 !important;
+    justify-content: center;
+  }
+
+  .zaplane-flow-test > span {
+    display: none;
+  }
+
+  .zaplane-flow-status-select {
+    width: 112px;
+    min-width: 96px;
+  }
+
+  .zaplane-flow-update {
+    padding-inline: 14px !important;
+  }
+
+  .zaplane-canvas-controls {
+    margin-top: 44px;
+  }
+}
+
+@media (max-width: 360px) {
+  // WordPress' 320px admin breakpoint leaves React Flow's own bottom-right
+  // attribution a few pixels outside the clipped app surface. Pull only that
+  // fixed UI affordance inward; the canvas itself remains fully pannable.
+  .zaplane_flowcanvas .react-flow__attribution {
+    right: 8px;
+  }
 }

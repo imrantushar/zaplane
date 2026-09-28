@@ -67,8 +67,10 @@ body[class*="_page_zaplane"] #wpcontent{
     padding: 0;
     background: var(--zaplane-body-background);
 }
+// Keep React Flow constrained by its Zaplane canvas instead of pinning it
+// to the viewport. The scoped sizing lives in _classLibrary.scss.
 .react-flow{
-    position: fixed !important;
+    min-width: 0;
 }
 .zaplane-select {
     &--width-full {

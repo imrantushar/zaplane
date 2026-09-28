@@ -1,5 +1,8 @@
 .zaplane-search-component {
 	position: relative;
+	width: 100%;
+	max-width: 320px;
+	min-width: 0;
 	background: var(--zaplane-background);
 	input.zaplane-search-component__input {
 		height: 38px;
@@ -45,4 +48,10 @@
 		}
 	}
 	
+}
+
+@media (max-width: 600px) {
+	.zaplane-search-component {
+		max-width: none;
+	}
 }

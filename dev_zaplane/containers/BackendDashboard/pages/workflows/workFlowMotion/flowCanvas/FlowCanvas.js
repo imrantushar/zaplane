@@ -206,7 +206,7 @@ export default function FlowCanvas({
   return <div ref={containerRef}
     transition="margin-right 0.4s ease"
     className={`zaplane_flowcanvas flex-[1]${dragging ? " is-connecting" : ""}`}
-    style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 32px)' }}>
+    style={{ display: 'flex', flexDirection: 'column' }}>
 
     <FlowTopBar workFlow={workFlow} isFullscreen={isFullscreen} toggleFullscreen={() => toggleFullscreenMode(containerRef, isFullscreen, setIsFullscreen)} id={id} values={values} setFieldValue={setFieldValue} handleSubmit={handleSubmit} activeDrawer={activeDrawer} setActiveDrawer={setActiveDrawer} isFlowDirty={isFlowDirty} onNavigateBack={onNavigateBack} renderTopBar={renderTopBar} />
 

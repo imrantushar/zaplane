@@ -204,14 +204,16 @@ const ListTable = props => {
 					<TableSkeleton />
 				</div> : <>
 					{copyDataArr.length === 0 ? <>
-							<table className="min-w-full">
-								<TableHeader data={data} visibleColumn={visibleColumn} copyDataArr={copyDataArr} selectAllRow={selectAllRow} isCheckboxColumnVisible={isCheckboxColumnVisible} />
-							</table>
+							<div className="zaplane-table__scroll zaplane-table__empty-header overflow-x-auto">
+								<table className="min-w-full">
+									<TableHeader data={data} visibleColumn={visibleColumn} copyDataArr={copyDataArr} selectAllRow={selectAllRow} isCheckboxColumnVisible={isCheckboxColumnVisible} />
+								</table>
+							</div>
 		
-							<div ref={bodyRef}>
+							<div className="zaplane-table__empty-state" ref={bodyRef}>
 								<CustomTableMessage title={__('No Data Available!!!', 'zaplane')} subText={noDataText} />
 							</div>
-						</> : <div className="overflow-x-auto">
+						</> : <div className="zaplane-table__scroll overflow-x-auto">
 							<table className="min-w-full border-collapse">
 								<TableHeader data={data} visibleColumn={visibleColumn} copyDataArr={copyDataArr} selectAllRow={selectAllRow} isCheckboxColumnVisible={isCheckboxColumnVisible} />
 		

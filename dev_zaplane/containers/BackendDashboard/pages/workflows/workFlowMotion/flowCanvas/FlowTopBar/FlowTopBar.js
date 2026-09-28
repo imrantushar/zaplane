@@ -121,7 +121,7 @@ export default function FlowTopBar({
   const activeToolbarButtonStyle = {
     border: "1px solid var(--zaplane-primary)",
   };
-  const rightActions = <div className="flex items-center gap-3">
+  const rightActions = <div className="zaplane-flow-toolbar flex items-center gap-3 min-w-0">
     {warnings.length > 0 && (
       <div className="relative">
         <button
@@ -153,7 +153,9 @@ export default function FlowTopBar({
           dispatch(startApiCountdown(120));
           dispatch(workflowNodeListiner(id));
         }}
-        className="flex items-center gap-2 h-9 px-4 bg-[var(--zaplane-second-primary)] text-[var(--zaplane-primary)] font-medium rounded-[4px] hover:opacity-90 transition-all"
+        title={__("Test Flow Once", "zaplane")}
+        aria-label={__("Test Flow Once", "zaplane")}
+        className="zaplane-flow-test flex items-center gap-2 h-9 px-4 bg-[var(--zaplane-second-primary)] text-[var(--zaplane-primary)] font-medium rounded-[4px] hover:opacity-90 transition-all whitespace-nowrap"
       >
         <CiPlay1 className="text-lg" />
         <span>{__("Test Flow Once", "zaplane")}</span>
@@ -161,7 +163,9 @@ export default function FlowTopBar({
     ) : (
       <button
         onClick={() => dispatch(workflowNodeListinerStop(id))}
-        className="flex items-center gap-2 h-9 px-4 bg-red-50 text-[var(--zaplane-danger)] font-medium rounded-[4px] hover:bg-red-100 transition-all"
+        title={__("Stop", "zaplane")}
+        aria-label={__("Stop", "zaplane")}
+        className="zaplane-flow-test flex items-center gap-2 h-9 px-4 bg-red-50 text-[var(--zaplane-danger)] font-medium rounded-[4px] hover:bg-red-100 transition-all whitespace-nowrap"
       >
         <LiaStopCircleSolid className="text-xl" />
         <span>{__("Stop", "zaplane")}</span>
@@ -169,7 +173,7 @@ export default function FlowTopBar({
     )}
 
     {apiRequestRunning && (
-      <div className="flex items-center gap-2">
+      <div className="zaplane-flow-listening flex items-center gap-2">
         <span className="text-[13px] font-medium text-[var(--zaplane-font-secondary-color)]">
           {__("Listening…", "zaplane")}
         </span>
@@ -183,7 +187,7 @@ export default function FlowTopBar({
       <button
         onClick={toggleFullscreen}
         style={outlineBtn}
-        className="mt-[4px]"
+        className="zaplane-flow-secondary-action mt-[4px]"
       >
         {isFullscreen ? <LuMinimize size={18} /> : <LuFullscreen size={18} />}
       </button>
@@ -199,7 +203,7 @@ export default function FlowTopBar({
         <button
           onClick={() => setActiveDrawer("logs")}
           style={activeDrawer === "logs" ? activeToolbarButtonStyle : toolbarButtonStyle}
-          className={`h-9 px-4 border rounded-[4px] text-sm font-medium transition-all ${activeDrawer === 'logs'
+          className={`zaplane-flow-secondary-action h-9 px-4 border rounded-[4px] text-sm font-medium transition-all ${activeDrawer === 'logs'
             ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
             : 'border-[var(--zaplane-border-color)] text-[var(--zaplane-font-secondary-color)] hover:bg-[var(--zaplane-secondary-color)] hover:border-[var(--zaplane-border-color)]'
             }`}
@@ -248,7 +252,7 @@ export default function FlowTopBar({
           <button
             onClick={() => setActiveDrawer("history")}
             style={activeDrawer === "history" ? activeToolbarButtonStyle : toolbarButtonStyle}
-            className={`flex items-center justify-center w-9 h-9 border rounded-[4px] transition-all ${activeDrawer === 'history'
+            className={`zaplane-flow-secondary-action flex items-center justify-center w-9 h-9 border rounded-[4px] transition-all ${activeDrawer === 'history'
               ? 'bg-[var(--zaplane-second-primary)] border-[var(--zaplane-primary)] text-[var(--zaplane-primary)]'
               : 'border-[var(--zaplane-border-color)] text-[var(--zaplane-font-secondary-color)] hover:bg-[var(--zaplane-secondary-color)] hover:border-[var(--zaplane-border-color)]'
               }`}
@@ -269,7 +273,7 @@ export default function FlowTopBar({
       isClearable={false}
       isSearchable={false}
       placeholder="Select status"
-      className="zaplane-select"
+      className="zaplane-select zaplane-flow-status-select"
       classNamePrefix="zaplane-select"
       formatOptionLabel={(opt) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -282,7 +286,7 @@ export default function FlowTopBar({
     <button
       disabled={!isFlowDirty}
       onClick={handleSubmit}
-      className="h-9 px-6 bg-[var(--zaplane-primary)] hover:opacity-90 active:scale-[0.98] text-white font-semibold rounded-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      className="zaplane-flow-update h-9 px-6 bg-[var(--zaplane-primary)] hover:opacity-90 active:scale-[0.98] text-white font-semibold rounded-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
     >
       {__("Update", "zaplane")}
     </button>
@@ -298,7 +302,21 @@ export default function FlowTopBar({
         </button>
       }
       items={[{
-        label: "Export",
+        label: isFullscreen ? __("Exit full screen", "zaplane") : __("Full screen", "zaplane"),
+        icon: isFullscreen ? LuMinimize : LuFullscreen,
+        onClick: toggleFullscreen
+      }, {
+        label: __("Logs", "zaplane"),
+        icon: TfiReload,
+        onClick: () => setActiveDrawer("logs")
+      }, {
+        label: __("History", "zaplane"),
+        icon: LucideHistory,
+        onClick: () => setActiveDrawer("history")
+      }, {
+        type: "divider"
+      }, {
+        label: __("Export", "zaplane"),
         icon: FiDownload,
         onClick: handleExport
       }]}
@@ -315,7 +333,7 @@ export default function FlowTopBar({
     });
   }
   return <TopBar leftContent={() => (
-    <div className="flex items-center gap-3">
+    <div className="zaplane-flow-breadcrumb flex items-center gap-3 min-w-0">
       <div className="w-10 h-10 rounded-full bg-[var(--zaplane-second-primary)] flex items-center justify-center shadow-inner">
         <img
           src={`${plugin_root_url}assets/images/zaplane.svg`}
@@ -359,7 +377,7 @@ export default function FlowTopBar({
         <button
           type="button"
           onClick={() => setIsEditingTitle(true)}
-          className="m-0 text-[14px] font-semibold text-[var(--zaplane-font-color)] truncate cursor-pointer max-w-[240px] hover:bg-[var(--zaplane-secondary-color)] px-2 py-1 rounded transition-colors"
+          className="zaplane-flow-title m-0 text-[14px] font-semibold text-[var(--zaplane-font-color)] truncate cursor-pointer max-w-[240px] hover:bg-[var(--zaplane-secondary-color)] px-2 py-1 rounded transition-colors"
         >
           {currentTitle}
         </button>

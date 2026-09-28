@@ -96,7 +96,7 @@ const ConnectionTable = ({ onEdit }) => {
     // columnWidth: "120px",
     textAlign: "center"
   }, {
-    name: <span className="zaplane-label ml-[-32px]">
+    name: <span className="zaplane-label">
                     {__("Created At", "zaplane")}
                 </span>,
     cell: row => {
@@ -106,7 +106,7 @@ const ConnectionTable = ({ onEdit }) => {
       } = formatDateTime(row.created_at);
       return <div className="text-center flex flex-col items-center">
                         <ZAPLabel label={date} type={"simple"} />
-                        <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
+                        <span className="zaplane-sub-title text-[var(--zaplane-text-muted)]">
                             {__(time, 'zaplane')}
                         </span>
                     </div>;
@@ -114,7 +114,7 @@ const ConnectionTable = ({ onEdit }) => {
     // columnWidth: "160px",
     textAlign: "center"
   }, {
-    name: <span className="zaplane-label ml-[-32px]">
+    name: <span className="zaplane-label">
                     {__("Updated At", "zaplane")}
                 </span>,
     cell: row => {
@@ -124,7 +124,7 @@ const ConnectionTable = ({ onEdit }) => {
       } = formatDateTime(row.updated_at);
       return <div className="text-center flex flex-col items-center">
                         <ZAPLabel label={date} type={"simple"} />
-                        <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
+                        <span className="zaplane-sub-title text-[var(--zaplane-text-muted)]">
                             {__(time, 'zaplane')}
                         </span>
                     </div>;
