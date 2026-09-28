@@ -1,6 +1,6 @@
 {
     "version": "1.3.2",
-    "generated_at": "2026-09-24 13:33:36",
+    "generated_at": "2026-09-28 10:02:35",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -5928,6 +5928,1290 @@
                             "label": "User ID",
                             "type": "number",
                             "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "trueplayer": {
+            "slug": "trueplayer",
+            "name": "TruePlayer",
+            "icon": "trueplayer.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
+            "triggers": {
+                "media_created": {
+                    "label": "Media Created",
+                    "hook": "save_post_tp_video",
+                    "accepted_args": 3,
+                    "key": "media_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "media_updated": {
+                    "label": "Media Updated",
+                    "hook": "save_post_tp_video",
+                    "accepted_args": 3,
+                    "key": "media_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "media_deleted": {
+                    "label": "Media Deleted",
+                    "hook": "before_delete_post",
+                    "accepted_args": 2,
+                    "key": "media_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "playlist_created": {
+                    "label": "Playlist Created",
+                    "hook": "save_post_tp_playlist",
+                    "accepted_args": 3,
+                    "key": "playlist_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "playlist_updated": {
+                    "label": "Playlist Updated",
+                    "hook": "save_post_tp_playlist",
+                    "accepted_args": 3,
+                    "key": "playlist_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "playlist_deleted": {
+                    "label": "Playlist Deleted",
+                    "hook": "before_delete_post",
+                    "accepted_args": 2,
+                    "key": "playlist_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "video_started": {
+                    "label": "Video Started",
+                    "hook": "trueplayer/event/view.started",
+                    "accepted_args": 1,
+                    "key": "video_started",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "video_watched": {
+                    "label": "Video Watched",
+                    "hook": "trueplayer/event/view.completed",
+                    "accepted_args": 1,
+                    "key": "video_watched",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "video_completed": {
+                    "label": "Video Completed",
+                    "hook": "trueplayer/event/view.completed",
+                    "accepted_args": 1,
+                    "key": "video_completed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "video_percentage": {
+                    "label": "Video Reached Percentage",
+                    "hook": "trueplayer/event/progress.milestone",
+                    "accepted_args": 1,
+                    "key": "video_percentage",
+                    "schema": [
+                        {
+                            "key": "percent",
+                            "label": "Milestone",
+                            "type": "select",
+                            "required": false,
+                            "default": "",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Any milestone"
+                                },
+                                {
+                                    "value": "25",
+                                    "label": "25%"
+                                },
+                                {
+                                    "value": "50",
+                                    "label": "50%"
+                                },
+                                {
+                                    "value": "75",
+                                    "label": "75%"
+                                },
+                                {
+                                    "value": "100",
+                                    "label": "100%"
+                                }
+                            ],
+                            "help": "TruePlayer fires milestones at 25, 50, 75 and 100 percent. Leave on \"Any\" to run on all of them."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_percentage": {
+                    "label": "User Watched Specific Percentage",
+                    "hook": "trueplayer/event/progress.milestone",
+                    "accepted_args": 1,
+                    "key": "user_percentage",
+                    "schema": [
+                        {
+                            "key": "percent",
+                            "label": "Milestone",
+                            "type": "select",
+                            "required": false,
+                            "default": "",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Any milestone"
+                                },
+                                {
+                                    "value": "25",
+                                    "label": "25%"
+                                },
+                                {
+                                    "value": "50",
+                                    "label": "50%"
+                                },
+                                {
+                                    "value": "75",
+                                    "label": "75%"
+                                },
+                                {
+                                    "value": "100",
+                                    "label": "100%"
+                                }
+                            ],
+                            "help": "TruePlayer fires milestones at 25, 50, 75 and 100 percent. Leave on \"Any\" to run on all of them."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "milestone_reached": {
+                    "label": "Watch Milestone Reached",
+                    "hook": "trueplayer/event/progress.milestone",
+                    "accepted_args": 1,
+                    "key": "milestone_reached",
+                    "schema": [
+                        {
+                            "key": "percent",
+                            "label": "Milestone",
+                            "type": "select",
+                            "required": false,
+                            "default": "",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Any milestone"
+                                },
+                                {
+                                    "value": "25",
+                                    "label": "25%"
+                                },
+                                {
+                                    "value": "50",
+                                    "label": "50%"
+                                },
+                                {
+                                    "value": "75",
+                                    "label": "75%"
+                                },
+                                {
+                                    "value": "100",
+                                    "label": "100%"
+                                }
+                            ],
+                            "help": "TruePlayer fires milestones at 25, 50, 75 and 100 percent. Leave on \"Any\" to run on all of them."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "checkpoint_passed": {
+                    "label": "Checkpoint Passed",
+                    "hook": "trueplayer/event/checkpoint.passed",
+                    "accepted_args": 1,
+                    "key": "checkpoint_passed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "checkpoint_failed": {
+                    "label": "Checkpoint Failed",
+                    "hook": "trueplayer/event/checkpoint.failed",
+                    "accepted_args": 1,
+                    "key": "checkpoint_failed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_passed": {
+                    "label": "Quiz Passed",
+                    "hook": "trueplayer/event/quiz.passed",
+                    "accepted_args": 1,
+                    "key": "quiz_passed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_failed": {
+                    "label": "Quiz Failed",
+                    "hook": "trueplayer/event/quiz.failed",
+                    "accepted_args": 1,
+                    "key": "quiz_failed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "video_locked": {
+                    "label": "Video Locked",
+                    "hook": "trueplayer/event/video.locked",
+                    "accepted_args": 1,
+                    "key": "video_locked",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "video_unlocked": {
+                    "label": "Video Unlocked",
+                    "hook": "trueplayer/event/video.unlocked",
+                    "accepted_args": 1,
+                    "key": "video_unlocked",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "subscriber_added": {
+                    "label": "Subscriber Added",
+                    "hook": "trueplayer/event/subscriber.added",
+                    "accepted_args": 1,
+                    "key": "subscriber_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "email_captured": {
+                    "label": "Email Captured",
+                    "hook": "trueplayer/event/subscriber.added",
+                    "accepted_args": 1,
+                    "key": "email_captured",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_media": {
+                    "label": "Create Media",
+                    "key": "create_media",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Media Title",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "Lesson 1: Introduction"
+                        },
+                        {
+                            "key": "source_type",
+                            "label": "Source Type",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "self",
+                                    "label": "Self-hosted / Media Library"
+                                },
+                                {
+                                    "value": "youtube",
+                                    "label": "YouTube"
+                                },
+                                {
+                                    "value": "vimeo",
+                                    "label": "Vimeo"
+                                },
+                                {
+                                    "value": "url",
+                                    "label": "Direct URL"
+                                }
+                            ],
+                            "default": "self"
+                        },
+                        {
+                            "key": "source_url",
+                            "label": "Source URL / Video ID",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "https://example.com/video.mp4"
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags (comma-separated)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "Course A, Module 1"
+                        },
+                        {
+                            "key": "poster",
+                            "label": "Poster URL",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_media": {
+                    "label": "Update Media",
+                    "key": "update_media",
+                    "schema": [
+                        {
+                            "key": "media_id",
+                            "label": "Media ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "New Title",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "source_type",
+                            "label": "Source Type",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "self",
+                                    "label": "Self-hosted / Media Library"
+                                },
+                                {
+                                    "value": "youtube",
+                                    "label": "YouTube"
+                                },
+                                {
+                                    "value": "vimeo",
+                                    "label": "Vimeo"
+                                },
+                                {
+                                    "value": "url",
+                                    "label": "Direct URL"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "source_url",
+                            "label": "Source URL / Video ID",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags (comma-separated, replaces all)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Leave empty to keep existing tags."
+                        },
+                        {
+                            "key": "poster",
+                            "label": "Poster URL",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_media": {
+                    "label": "Delete Media",
+                    "key": "delete_media",
+                    "schema": [
+                        {
+                            "key": "media_id",
+                            "label": "Media ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "publish_media": {
+                    "label": "Publish Media",
+                    "key": "publish_media",
+                    "schema": [
+                        {
+                            "key": "media_id",
+                            "label": "Media ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "draft_media": {
+                    "label": "Draft Media",
+                    "key": "draft_media",
+                    "schema": [
+                        {
+                            "key": "media_id",
+                            "label": "Media ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "change_media_status": {
+                    "label": "Change Media Status",
+                    "key": "change_media_status",
+                    "schema": [
+                        {
+                            "key": "media_id",
+                            "label": "Media ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "New Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Publish"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending Review"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_playlist": {
+                    "label": "Create Playlist",
+                    "key": "create_playlist",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Playlist Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "layout",
+                            "label": "Layout",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "sidebar",
+                                    "label": "Sidebar"
+                                },
+                                {
+                                    "value": "grid",
+                                    "label": "Grid"
+                                }
+                            ],
+                            "default": "sidebar"
+                        },
+                        {
+                            "key": "video_ids",
+                            "label": "Video IDs (comma-separated)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "123, 124, 125"
+                        },
+                        {
+                            "key": "autoplay_next",
+                            "label": "Autoplay Next",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "yes",
+                                    "label": "Yes"
+                                },
+                                {
+                                    "value": "no",
+                                    "label": "No"
+                                }
+                            ],
+                            "default": "yes"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_playlist": {
+                    "label": "Update Playlist",
+                    "key": "update_playlist",
+                    "schema": [
+                        {
+                            "key": "playlist_id",
+                            "label": "Playlist ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "New Title",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "layout",
+                            "label": "Layout",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Keep current"
+                                },
+                                {
+                                    "value": "sidebar",
+                                    "label": "Sidebar"
+                                },
+                                {
+                                    "value": "grid",
+                                    "label": "Grid"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "video_ids",
+                            "label": "Video IDs (comma-separated, replaces all)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "autoplay_next",
+                            "label": "Autoplay Next",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Keep current"
+                                },
+                                {
+                                    "value": "yes",
+                                    "label": "Yes"
+                                },
+                                {
+                                    "value": "no",
+                                    "label": "No"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_playlist": {
+                    "label": "Delete Playlist",
+                    "key": "delete_playlist",
+                    "schema": [
+                        {
+                            "key": "playlist_id",
+                            "label": "Playlist ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_to_playlist": {
+                    "label": "Add Media to Playlist",
+                    "key": "add_to_playlist",
+                    "schema": [
+                        {
+                            "key": "playlist_id",
+                            "label": "Playlist ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_from_playlist": {
+                    "label": "Remove Media from Playlist",
+                    "key": "remove_from_playlist",
+                    "schema": [
+                        {
+                            "key": "playlist_id",
+                            "label": "Playlist ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "record_progress": {
+                    "label": "Record Watch Progress",
+                    "key": "record_progress",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "help": "WordPress user ID. Use this or the email below."
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Used when User ID is empty. Must belong to a WordPress user."
+                        },
+                        {
+                            "key": "percent",
+                            "label": "Watch Percent (0-100)",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "75"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reset_progress": {
+                    "label": "Reset Watch Progress",
+                    "key": "reset_progress",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "help": "WordPress user ID. Use this or the email below."
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Used when User ID is empty. Must belong to a WordPress user."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "mark_completed": {
+                    "label": "Mark Video Completed",
+                    "key": "mark_completed",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "help": "WordPress user ID. Use this or the email below."
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Used when User ID is empty. Must belong to a WordPress user."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_watch_progress": {
+                    "label": "Get Watch Progress",
+                    "key": "get_watch_progress",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "help": "WordPress user ID. Use this or the email below."
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Used when User ID is empty. Must belong to a WordPress user."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_viewer_progress": {
+                    "label": "Get Viewer Progress",
+                    "key": "get_viewer_progress",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "help": "WordPress user ID. Use this or the email below."
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Used when User ID is empty. Must belong to a WordPress user."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_media_analytics": {
+                    "label": "Get Media Analytics",
+                    "key": "get_media_analytics",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_video_analytics": {
+                    "label": "Get Video Analytics",
+                    "key": "get_video_analytics",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_viewer_analytics": {
+                    "label": "Get Viewer Analytics",
+                    "key": "get_viewer_analytics",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "help": "WordPress user ID. Use this or the email below."
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "User Email",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Used when User ID is empty. Must belong to a WordPress user."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_watch_time": {
+                    "label": "Get Watch Time",
+                    "key": "get_watch_time",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_completion_rate": {
+                    "label": "Get Completion Rate",
+                    "key": "get_completion_rate",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_watch_heatmap": {
+                    "label": "Get Watch Heatmap",
+                    "key": "get_watch_heatmap",
+                    "schema": [
+                        {
+                            "key": "video_id",
+                            "label": "Video ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_email_capture": {
+                    "label": "Send Email Capture",
+                    "key": "send_email_capture",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "video_id",
+                            "label": "Video ID (optional)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "provider",
+                            "label": "Provider",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "wp_mail",
+                                    "label": "Email notification (wp_mail)"
+                                },
+                                {
+                                    "value": "gemcrm",
+                                    "label": "GemCRM"
+                                },
+                                {
+                                    "value": "mailchimp",
+                                    "label": "Mailchimp"
+                                }
+                            ],
+                            "default": "wp_mail"
+                        },
+                        {
+                            "key": "lists",
+                            "label": "List IDs (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_subscriber": {
+                    "label": "Add Subscriber",
+                    "key": "add_subscriber",
+                    "schema": [
+                        {
+                            "key": "email",
+                            "label": "Email",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "video_id",
+                            "label": "Video ID (optional)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "provider",
+                            "label": "Provider",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "wp_mail",
+                                    "label": "Email notification (wp_mail)"
+                                },
+                                {
+                                    "value": "gemcrm",
+                                    "label": "GemCRM"
+                                },
+                                {
+                                    "value": "mailchimp",
+                                    "label": "Mailchimp"
+                                }
+                            ],
+                            "default": "wp_mail"
+                        },
+                        {
+                            "key": "lists",
+                            "label": "List IDs (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "tags",
+                            "label": "Tags (comma-separated)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "trigger_webhook": {
+                    "label": "Trigger Webhook",
+                    "key": "trigger_webhook",
+                    "schema": [
+                        {
+                            "key": "url",
+                            "label": "Webhook URL",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "event_name",
+                            "label": "Event Name",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "video.completed",
+                            "help": "Sent as the X-TruePlayer-Event header."
+                        },
+                        {
+                            "key": "payload",
+                            "label": "JSON Payload",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{\"video_id\": 123}",
+                            "help": "Leave empty to send the previous step output."
+                        },
+                        {
+                            "key": "secret",
+                            "label": "Signing Secret (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Adds X-TruePlayer-Signature: sha256=<hmac>."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_webhook": {
+                    "label": "Send Webhook",
+                    "key": "send_webhook",
+                    "schema": [
+                        {
+                            "key": "url",
+                            "label": "Webhook URL",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "event_name",
+                            "label": "Event Name",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "video.completed",
+                            "help": "Sent as the X-TruePlayer-Event header."
+                        },
+                        {
+                            "key": "payload",
+                            "label": "JSON Payload",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{\"video_id\": 123}",
+                            "help": "Leave empty to send the previous step output."
+                        },
+                        {
+                            "key": "secret",
+                            "label": "Signing Secret (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Adds X-TruePlayer-Signature: sha256=<hmac>."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_json_payload": {
+                    "label": "Send JSON Payload",
+                    "key": "send_json_payload",
+                    "schema": [
+                        {
+                            "key": "url",
+                            "label": "Webhook URL",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "event_name",
+                            "label": "Event Name",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "video.completed",
+                            "help": "Sent as the X-TruePlayer-Event header."
+                        },
+                        {
+                            "key": "payload",
+                            "label": "JSON Payload",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{\"video_id\": 123}",
+                            "help": "Leave empty to send the previous step output."
+                        },
+                        {
+                            "key": "secret",
+                            "label": "Signing Secret (optional)",
+                            "type": "expression",
+                            "required": false,
+                            "help": "Adds X-TruePlayer-Signature: sha256=<hmac>."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "call_rest_api": {
+                    "label": "Call REST API",
+                    "key": "call_rest_api",
+                    "schema": [
+                        {
+                            "key": "url",
+                            "label": "API URL",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "method",
+                            "label": "HTTP Method",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "GET",
+                                    "label": "GET"
+                                },
+                                {
+                                    "value": "POST",
+                                    "label": "POST"
+                                },
+                                {
+                                    "value": "PUT",
+                                    "label": "PUT"
+                                },
+                                {
+                                    "value": "PATCH",
+                                    "label": "PATCH"
+                                },
+                                {
+                                    "value": "DELETE",
+                                    "label": "DELETE"
+                                }
+                            ],
+                            "default": "GET"
+                        },
+                        {
+                            "key": "headers",
+                            "label": "Headers (JSON)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{\"Authorization\": \"Bearer token\"}"
+                        },
+                        {
+                            "key": "query",
+                            "label": "Query String",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "page=1&limit=10"
+                        },
+                        {
+                            "key": "body",
+                            "label": "Body (JSON)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_api_data": {
+                    "label": "Get API Data",
+                    "key": "get_api_data",
+                    "schema": [
+                        {
+                            "key": "url",
+                            "label": "API URL",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "headers",
+                            "label": "Headers (JSON)",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{\"Authorization\": \"Bearer token\"}"
+                        },
+                        {
+                            "key": "query",
+                            "label": "Query String",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "page=1&limit=10"
                         }
                     ],
                     "outputs": [
