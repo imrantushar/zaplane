@@ -163,7 +163,7 @@ trait ActionsTrait{
 		];
 
 		if ( empty( $media_url ) ) {
-			throw new \Exception( 'Telegram: ' . ( $label_map[ $field ] ?? $field . ' URL' ) . ' is required' );
+			throw new \Exception( esc_html( 'Telegram: ' . ( $label_map[ $field ] ?? $field . ' URL' ) . ' is required' ) );
 		}
 
 		$payload = [

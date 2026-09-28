@@ -121,6 +121,7 @@ export const updateWorkFlowStatus = createAsyncThunk(
 					type: 'error',
 				})
 			);
+			return thunkAPI.rejectWithValue(e);
 		}
 	}
 )

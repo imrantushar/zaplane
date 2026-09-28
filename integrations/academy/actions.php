@@ -222,17 +222,12 @@ trait AcademyActions {
             if ( $enrollment && ! $active && 'cancel' !== $enrollment->enrolled_status ) {
                 throw new \RuntimeException( 'Enrollment is pending or order-managed.' );
             }
-            $old_user = get_current_user_id();
-            try {
-                wp_set_current_user( $user_id );
-                if ( 'enroll-course' === $action ) {
-                    $id = \Academy\Helper::do_enroll( $course_id, $user_id );
-                    if ( ! $id || is_wp_error( $id ) ) { throw new \RuntimeException( 'Academy enrollment failed.' ); }
-                } else {
-                    \Academy\Helper::cancel_course_enroll( $course_id, $user_id );
-                }
-            } finally {
-                wp_set_current_user( $old_user );
+            // Both helpers take the student explicitly; the step never runs as them.
+            if ( 'enroll-course' === $action ) {
+                $id = \Academy\Helper::do_enroll( $course_id, $user_id );
+                if ( ! $id || is_wp_error( $id ) ) { throw new \RuntimeException( 'Academy enrollment failed.' ); }
+            } else {
+                \Academy\Helper::cancel_course_enroll( $course_id, $user_id );
             }
             $after = self::enrollment( $course_id, $user_id );
             if ( ( 'enroll-course' === $action && ( ! $after || 'completed' !== $after->enrolled_status ) ) ||

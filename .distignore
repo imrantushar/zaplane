@@ -19,6 +19,7 @@
 .claude
 .codex
 .editorconfig
+.stylelintrc.js
 .vscode
 .idea
 

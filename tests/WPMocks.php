@@ -1508,7 +1508,13 @@ namespace {
 
 	if ( ! function_exists( 'get_current_user_id' ) ) {
 		function get_current_user_id(): int {
-			return 1;
+			return (int) ( $GLOBALS['zaplane_test_current_user'] ?? 1 );
+		}
+	}
+
+	if ( ! function_exists( 'rest_get_url_prefix' ) ) {
+		function rest_get_url_prefix(): string {
+			return 'wp-json';
 		}
 	}
 

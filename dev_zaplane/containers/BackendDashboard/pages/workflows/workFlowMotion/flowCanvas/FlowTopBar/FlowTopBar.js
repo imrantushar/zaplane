@@ -69,10 +69,15 @@ export default function FlowTopBar({
     const updateStatusAndTitle = async () => {
       try {
         if (values?.status && values.status !== workFlow.workflow.status) {
-          await dispatch(updateWorkFlowStatus({
+          const result = await dispatch(updateWorkFlowStatus({
             id,
             status: values.status
           }));
+          // Refused (e.g. a webhook-started workflow with a site-admin action):
+          // put the switch back so it matches the saved status.
+          if (updateWorkFlowStatus.rejected.match(result)) {
+            setFieldValue("status", workFlow.workflow.status);
+          }
         }
         if (values?.title && values.title !== workFlow.workflow.title) {
           await dispatch(updateWorkFlowTitle({
@@ -86,7 +91,7 @@ export default function FlowTopBar({
       }
     };
     updateStatusAndTitle();
-  }, [values?.status, values?.title, workFlow, dispatch, id]);
+  }, [values?.status, values?.title, workFlow, dispatch, id, setFieldValue]);
   //listiner
   // useEffect(() => {
   //   if (activeDrawer !== "logs") return;

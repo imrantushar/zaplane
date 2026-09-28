@@ -11,6 +11,7 @@ use Zaplane\Framework\Classes\TriggerNodes;
 use Zaplane\Framework\Exceptions\WorkflowException;
 use Zaplane\Framework\Exceptions\IntegrationException;
 use Zaplane\Framework\Models\Option;
+use Zaplane\Mcp\RemotePolicy;
 use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Models\WorkflowVersion;
@@ -504,6 +505,15 @@ class Automation {
 				$node = $this->inject_credentials( $node );
 				$output = $integration::execute_node( $node, $resolveData );
 			} else {
+				// A site-administration action never runs in a workflow another
+				// service can start, whatever the workflow's status or origin.
+				if ( RemotePolicy::is_restricted( $app, (string) ( $node['data']['event'] ?? '' ) ) ) {
+					$remote = RemotePolicy::remote_triggers( $graph );
+					if ( ! empty( $remote ) ) {
+						throw new \RuntimeException( esc_html( RemotePolicy::remote_message( [ $app . '/' . $node['data']['event'] ] ) ) );
+					}
+				}
+
 				$integration = $this->container->get( 'integrations' )->get( $app );
 				if ( ! $integration ) {
 					throw IntegrationException::notFound( $node['data']['app'] );

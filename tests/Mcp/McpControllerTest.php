@@ -22,6 +22,7 @@ class McpControllerTest extends TestCase {
 		// These tests are about dispatch, so they run as somebody who may — the
 		// gate itself is tested on its own, below.
 		$GLOBALS['zaplane_test_caps'] = [ 'manage_options' ];
+		unset( $GLOBALS['zaplane_test_current_user'] );
 	}
 
 	private function enableFeature( bool $on = true ): void {
@@ -203,6 +204,9 @@ class McpControllerTest extends TestCase {
 		$issued     = TokenStore::issue( 'Client', TokenStore::DEFAULT_SCOPES, 42 );
 		$controller = new McpController();
 
+		// What authenticate_bearer() resolved on determine_current_user.
+		$GLOBALS['zaplane_test_current_user'] = 42;
+
 		$GLOBALS['zaplane_test_caps'] = [ 'manage_options' ];
 		$this->assertTrue( $controller->check_bearer( $this->request( [], $issued['token'] ) ) );
 
@@ -212,20 +216,53 @@ class McpControllerTest extends TestCase {
 	}
 
 	/**
-	 * The token's user becomes the current user, which is what makes the
-	 * capability question meaningful and the audit trail true.
+	 * The token's user is resolved on `determine_current_user`, the filter core
+	 * resolves application passwords on — only for the MCP endpoint.
 	 *
 	 * @test
 	 */
-	public function the_token_s_user_becomes_the_current_user(): void {
+	public function the_token_s_user_is_resolved_on_determine_current_user(): void {
+		$issued = TokenStore::issue( 'Client', TokenStore::DEFAULT_SCOPES, 4242 );
+		\Zaplane\Tests\WPMocks::setUser( 4242, [ 'ID' => 4242, 'user_login' => 'owner' ] );
+
+		$_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $issued['token'];
+
+		try {
+			$_SERVER['REQUEST_URI'] = '/wp-json/zaplane/v1/mcp';
+			$this->assertSame( 4242, McpController::authenticate_bearer( false ) );
+
+			// A user already resolved (cookie, application password) is left alone.
+			$this->assertSame( 7, McpController::authenticate_bearer( 7 ) );
+
+			// Any other route is not this filter's business.
+			$_SERVER['REQUEST_URI'] = '/wp-json/wp/v2/users';
+			$this->assertFalse( McpController::authenticate_bearer( false ) );
+
+			// Nor is a token that does not resolve.
+			$_SERVER['REQUEST_URI']        = '/wp-json/zaplane/v1/mcp';
+			$_SERVER['HTTP_AUTHORIZATION'] = 'Bearer zpl_nope.nope';
+			$this->assertFalse( McpController::authenticate_bearer( false ) );
+		} finally {
+			unset( $_SERVER['HTTP_AUTHORIZATION'], $_SERVER['REQUEST_URI'] );
+		}
+	}
+
+	/**
+	 * The permission callback never switches the user. A request that is not
+	 * already running as the token's user is refused.
+	 *
+	 * @test
+	 */
+	public function a_token_is_refused_when_the_request_runs_as_someone_else(): void {
 		$issued = TokenStore::issue( 'Client', TokenStore::DEFAULT_SCOPES, 4242 );
 
-		$GLOBALS['zaplane_test_caps'] = [ 'manage_options' ];
-		unset( $GLOBALS['zaplane_test_current_user'] );
+		$GLOBALS['zaplane_test_caps']         = [ 'manage_options' ];
+		$GLOBALS['zaplane_test_current_user'] = 1;
 
-		( new McpController() )->check_bearer( $this->request( [], $issued['token'] ) );
+		$result = ( new McpController() )->check_bearer( $this->request( [], $issued['token'] ) );
 
-		$this->assertSame( 4242, $GLOBALS['zaplane_test_current_user'] ?? 0 );
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 1, get_current_user_id() );
 	}
 
 	/**
