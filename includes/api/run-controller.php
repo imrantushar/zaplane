@@ -548,7 +548,7 @@ class RunController extends WP_REST_Controller {
 					throw new \Exception( 'Integration not found: ' . ( $targetNode['data']['app'] ?? 'unknown' ) );
 				}
 
-				$targetNode = $this->resolveNodeConfig( $targetNode, $effectiveInput );
+				$targetNode = $this->resolveNodeConfig( $targetNode, $effectiveInput, $integration );
 
 				// Resolve {{...}} against the full accumulated test context above, but
 				// hand execute_node only the node's own input — the same bag it gets
@@ -618,24 +618,32 @@ class RunController extends WP_REST_Controller {
 		}//end try
 	}
 
-	private function resolveNodeConfig( array $node, array $data ): array {
+	private function resolveNodeConfig( array $node, array $data, $integration = null ): array {
 		if ( ! isset( $node['data']['config'] ) || ! is_array( $node['data']['config'] ) ) {
 			return $node;
 		}
 
-		$node['data']['config'] = $this->resolveConfigValues( $node['data']['config'], $data );
+		$literal = ( null === $integration || ! method_exists( $integration, 'get_literal_config_keys' ) )
+			? []
+			: (array) $integration::get_literal_config_keys();
+
+		$node['data']['config'] = $this->resolveConfigValues( $node['data']['config'], $data, $literal );
 
 		return $node;
 	}
 
-	private function resolveConfigValues( $value, array $data ) {
+	private function resolveConfigValues( $value, array $data, array $literal_keys = [] ) {
 		if ( is_string( $value ) ) {
 			return Expression::evaluate( $value, $data );
 		}
 
 		if ( is_array( $value ) ) {
 			foreach ( $value as $k => $v ) {
-				$value[ $k ] = $this->resolveConfigValues( $v, $data );
+				// A literal key holds source code, so its string value is passed
+				// through untouched instead of being merge-tag resolved.
+				$value[ $k ] = ( is_string( $v ) && in_array( (string) $k, $literal_keys, true ) )
+					? $v
+					: $this->resolveConfigValues( $v, $data );
 			}
 			return $value;
 		}

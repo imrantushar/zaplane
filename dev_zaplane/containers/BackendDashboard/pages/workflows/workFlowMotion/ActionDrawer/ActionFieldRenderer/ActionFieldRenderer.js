@@ -348,6 +348,36 @@ const ActionFieldRenderer = ({
       );
     }
 
+    // Raw code: monospace, verbatim, never run through the {{ }} merge engine
+    // (see IntegrationBase::get_literal_config_keys). Snippets read upstream
+    // data from $input / input instead of merge tags.
+    case "code":
+      return (
+        <div>
+          <label className="zaplane-label">{__(field.label, "zaplane")}{field.required && <span style={{ color: 'red', marginLeft: '2px' }}>*</span>}</label>
+          <textarea
+            value={value || ""}
+            onChange={(e) => { setFieldValue(field.key, e.target.value); clearError(); }}
+            // Tab would move focus away mid-snippet; insert indent instead.
+            onKeyDown={(e) => {
+              if (e.key !== "Tab") return;
+              e.preventDefault();
+              document.execCommand("insertText", false, "    ");
+            }}
+            placeholder={field.placeholder || ""}
+            spellCheck={false}
+            rows={field.rows || 12}
+            style={{ width: "100%", fontFamily: "Consolas, Menlo, Monaco, monospace", fontSize: "13px", lineHeight: 1.5, tabSize: 4, padding: "10px", borderRadius: "6px", border: "1px solid var(--zaplane-border-color)", resize: "vertical", boxSizing: "border-box", color: "var(--zaplane-font-secondary-color)", backgroundColor: "var(--zaplane-bg-color, transparent)" }}
+          />
+          {field.help && (
+            <span className="text-[13px] text-[var(--zaplane-text-muted)] leading-relaxed mt-0.5">
+              {__(field.help, "zaplane")}
+            </span>
+          )}
+          <ErrorMsg />
+        </div>
+      );
+
     case "json":
       return (
         <div>

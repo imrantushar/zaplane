@@ -1,6 +1,6 @@
 {
     "version": "1.3.2",
-    "generated_at": "2026-09-23 15:32:13",
+    "generated_at": "2026-09-28 12:03:51",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -31292,6 +31292,105 @@
                                 "destination": "file"
                             },
                             "help": "Name of the generated file. A \u201c.csv\u201d extension is added automatically if missing."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "custom-code-execution": {
+            "slug": "custom-code-execution",
+            "name": "Custom Code Execution",
+            "icon": "code",
+            "category": "tool",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "triggers": [],
+            "actions": {
+                "execute_php": {
+                    "label": "Execute PHP Code",
+                    "key": "execute_php",
+                    "schema": [
+                        {
+                            "key": "code",
+                            "label": "PHP Code",
+                            "type": "code",
+                            "required": true,
+                            "placeholder": "return \"Hello \" . $input[\"name\"];",
+                            "help": "PHP code to run. The leading <?php tag is optional. Previous steps' data is available as $input (array), the node settings as $config (array). The return value becomes this step's output."
+                        },
+                        {
+                            "key": "timeout",
+                            "label": "Timeout (seconds)",
+                            "type": "number",
+                            "required": false,
+                            "default": 10,
+                            "help": "Maximum execution time in seconds (default: 10, max: 30)."
+                        },
+                        {
+                            "key": "memory_limit",
+                            "label": "Memory Limit (MB)",
+                            "type": "number",
+                            "required": false,
+                            "default": 128,
+                            "help": "Maximum memory in MB (default: 128, max: 512)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "execute_js": {
+                    "label": "Execute JavaScript Code",
+                    "key": "execute_js",
+                    "schema": [
+                        {
+                            "key": "code",
+                            "label": "JavaScript Code",
+                            "type": "code",
+                            "language": "javascript",
+                            "required": true,
+                            "placeholder": "return \"Hello \" + input.name;",
+                            "help": "JavaScript to run with the server's Node.js runtime. Input data is available as \"input\" object; async/await is supported. The return value will be the output. Node.js must be installed on the server."
+                        },
+                        {
+                            "key": "timeout",
+                            "label": "Timeout (seconds)",
+                            "type": "number",
+                            "required": false,
+                            "default": 10,
+                            "help": "Maximum execution time in seconds (default: 10, max: 30)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "execute_nodejs": {
+                    "label": "Execute Node.js Code",
+                    "key": "execute_nodejs",
+                    "schema": [
+                        {
+                            "key": "code",
+                            "label": "Node.js Code",
+                            "type": "code",
+                            "language": "nodejs",
+                            "required": true,
+                            "placeholder": "return \"Hello \" + input.name;",
+                            "help": "Node.js code to run with the server's node binary. Input data is available as \"input\" object; async/await is supported. The return value will be the output. Node.js must be installed on the server."
+                        },
+                        {
+                            "key": "timeout",
+                            "label": "Timeout (seconds)",
+                            "type": "number",
+                            "required": false,
+                            "default": 10,
+                            "help": "Maximum execution time in seconds (default: 10, max: 30). The process is terminated when it is exceeded."
                         }
                     ],
                     "outputs": [

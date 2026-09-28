@@ -128,6 +128,18 @@ abstract class IntegrationBase {
 		return [];
 	}
 
+	/**
+	 * Config keys whose values must reach `execute_node()` byte-for-byte, with
+	 * no `{{ ... }}` merge-tag resolution. For an integration that stores source
+	 * code in a field, a token found inside that code is code, not a placeholder
+	 * — resolving it would rewrite the snippet before it ran.
+	 *
+	 * @return string[] Top-level config keys.
+	 */
+	public static function get_literal_config_keys(): array {
+		return [];
+	}
+
 
 
 	public static function get_output_ports(): array {
