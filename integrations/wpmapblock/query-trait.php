@@ -32,7 +32,10 @@ trait QueryTrait {
 			if ( '' !== $search && false === stripos( $label, $search ) ) {
 				continue;
 			}
-			$out[] = [ 'value' => (string) $post->ID, 'label' => $label ];
+			$out[] = [
+				'value' => (string) $post->ID,
+				'label' => $label
+			];
 		}
 
 		return $out;
@@ -58,7 +61,10 @@ trait QueryTrait {
 			if ( '' !== $search && false === stripos( $label, $search ) ) {
 				continue;
 			}
-			$out[] = [ 'value' => (string) ( $marker['id'] ?? '' ), 'label' => $label ];
+			$out[] = [
+				'value' => (string) ( $marker['id'] ?? '' ),
+				'label' => $label
+			];
 			if ( count( $out ) >= $limit ) {
 				break;
 			}
@@ -99,7 +105,10 @@ trait QueryTrait {
 			if ( isset( $type->labels->singular_name ) && $type->labels->singular_name ) {
 				$label = (string) $type->labels->singular_name;
 			}
-			$out[] = [ 'value' => $name, 'label' => $label ];
+			$out[] = [
+				'value' => $name,
+				'label' => $label
+			];
 		}
 		return $out;
 	}

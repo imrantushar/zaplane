@@ -1,6 +1,6 @@
 {
     "version": "1.3.2",
-    "generated_at": "2026-09-27 08:25:57",
+    "generated_at": "2026-09-27 11:01:18",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -5947,8 +5947,8 @@
             "webhook_route": "",
             "webhook_setup": [],
             "docs_url": {
-                "trigger": "https://zaplane.app/docs/wp-map-block/",
-                "action": "https://zaplane.app/docs/wp-map-block/"
+                "trigger": "",
+                "action": ""
             },
             "triggers": {
                 "map_created": {
@@ -6204,10 +6204,113 @@
                         "main"
                     ]
                 },
-                "location_updated": {
-                    "label": "Post Map Location Saved",
+                "map_refreshed": {
+                    "label": "Map Data Refreshed",
+                    "hook": "rest_request_after_callbacks",
+                    "key": "map_refreshed",
+                    "schema": [
+                        {
+                            "key": "map_id",
+                            "label": "Map",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "maps",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "The refresh endpoint carries no map id, so this matches maps whose stored data sources are exactly the ones being previewed. Leave empty to match every refresh."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "map_data_imported": {
+                    "label": "Map Data Imported",
                     "hook": [
-                        "added_post_meta",
+                        "rest_request_before_callbacks",
+                        "rest_request_after_callbacks"
+                    ],
+                    "key": "map_data_imported",
+                    "schema": [
+                        {
+                            "key": "map_id",
+                            "label": "Map",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "maps",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Fires when a REST write changes a map's marker list \u2014 the path the editor's Import button takes. Leave empty to match every map."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "rest_map_updated": {
+                    "label": "Map Data Updated via REST",
+                    "hook": "rest_request_after_callbacks",
+                    "key": "rest_map_updated",
+                    "schema": [
+                        {
+                            "key": "map_id",
+                            "label": "Map",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "maps",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to match any map."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "location_created": {
+                    "label": "Location Created",
+                    "hook": "added_post_meta",
+                    "key": "location_created",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Only post type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to match every post type."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "location_updated": {
+                    "label": "Location Updated",
+                    "hook": [
+                        "update_post_meta",
                         "updated_post_meta"
                     ],
                     "key": "location_updated",
@@ -6217,7 +6320,6 @@
                             "label": "Only post type",
                             "type": "select",
                             "required": false,
-                            "help": "Leave empty to match every post type.",
                             "dynamic": {
                                 "integration": "wpmapblock",
                                 "query": "geo_post_types",
@@ -6225,7 +6327,164 @@
                                     "value",
                                     "label"
                                 ]
-                            }
+                            },
+                            "help": "Leave empty to match every post type."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "location_deleted": {
+                    "label": "Location Deleted",
+                    "hook": "before_delete_post",
+                    "key": "location_deleted",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Only post type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to match every post type."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "location_published": {
+                    "label": "Location Published",
+                    "hook": [
+                        "transition_post_status",
+                        "added_post_meta"
+                    ],
+                    "key": "location_published",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Only post type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to match every post type."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "location_status_changed": {
+                    "label": "Location Status Changed",
+                    "hook": "transition_post_status",
+                    "key": "location_status_changed",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Only post type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to match every post type."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "store_created": {
+                    "label": "Store Created",
+                    "hook": "added_post_meta",
+                    "key": "store_created",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Only post type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to match every post type."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "store_updated": {
+                    "label": "Store Updated",
+                    "hook": [
+                        "update_post_meta",
+                        "updated_post_meta"
+                    ],
+                    "key": "store_updated",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Only post type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to match every post type."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "store_deleted": {
+                    "label": "Store Deleted",
+                    "hook": "before_delete_post",
+                    "key": "store_deleted",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Only post type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to match every post type."
                         }
                     ],
                     "outputs": [
@@ -7357,6 +7616,1096 @@
                             "type": "number",
                             "required": false,
                             "help": "Defaults to 1."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_location": {
+                    "label": "Create Location",
+                    "description": "Create a post and give it the coordinates WP Map Block plots it from.",
+                    "key": "create_location",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Store actions only accept a type a store-locator map actually lists."
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Content",
+                            "type": "textarea",
+                            "required": false,
+                            "help": "HTML is allowed."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                }
+                            ],
+                            "help": "Defaults to published."
+                        },
+                        {
+                            "key": "lat",
+                            "label": "Latitude",
+                            "type": "text",
+                            "required": true,
+                            "help": "Decimal degrees, e.g. 23.780573."
+                        },
+                        {
+                            "key": "lng",
+                            "label": "Longitude",
+                            "type": "text",
+                            "required": true,
+                            "help": "Decimal degrees, e.g. 90.407067."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_location": {
+                    "label": "Update Location",
+                    "description": "Change a location's title, content, status or coordinates.",
+                    "key": "update_location",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Location",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_posts",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "New Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "content",
+                            "label": "New Content",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "lat",
+                            "label": "Latitude",
+                            "type": "text",
+                            "required": false,
+                            "help": "Send either half on its own to move only that coordinate."
+                        },
+                        {
+                            "key": "lng",
+                            "label": "Longitude",
+                            "type": "text",
+                            "required": false,
+                            "help": "Send either half on its own to move only that coordinate."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_location": {
+                    "label": "Delete Location",
+                    "description": "Permanently delete a location's post.",
+                    "key": "delete_location",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Location",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_posts",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "publish_location": {
+                    "label": "Publish Location",
+                    "description": "Move a location into the `publish` status so it appears on maps.",
+                    "key": "publish_location",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Location",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_posts",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unpublish_location": {
+                    "label": "Unpublish Location",
+                    "description": "Move a location back to `draft`, taking it off front-end maps.",
+                    "key": "unpublish_location",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Location",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_posts",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_location_status": {
+                    "label": "Change Location Status",
+                    "description": "Set a location to any WordPress post status WordPress will accept.",
+                    "key": "set_location_status",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Location",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_posts",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                },
+                                {
+                                    "value": "future",
+                                    "label": "Scheduled"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_location": {
+                    "label": "Get Location",
+                    "description": "Read one location's status, permalink and coordinates.",
+                    "key": "get_location",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Location",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_posts",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "search_locations": {
+                    "label": "Search Locations",
+                    "description": "Keyword search across locations, matching WP Map Block's own `?q=` search.",
+                    "key": "search_locations",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Only this post type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to search every post type WP Map Block can plot."
+                        },
+                        {
+                            "key": "query",
+                            "label": "Contains",
+                            "type": "text",
+                            "required": false,
+                            "help": "Case-insensitive match against title and content, the same way WP Map Block's own ?q= search works."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Maximum Results",
+                            "type": "number",
+                            "required": false,
+                            "help": "Defaults to 50."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "filter_locations": {
+                    "label": "Filter Locations",
+                    "description": "Filter locations by post type, status, taxonomy or distance from a centre.",
+                    "key": "filter_locations",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Only this post type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to include every post type WP Map Block can plot."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                },
+                                {
+                                    "value": "any",
+                                    "label": "Any status"
+                                }
+                            ],
+                            "help": "Defaults to published."
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "text",
+                            "required": false,
+                            "help": "e.g. category or product_cat. Needs a term slug too."
+                        },
+                        {
+                            "key": "term",
+                            "label": "Term Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "e.g. dhaka. Needs a taxonomy too."
+                        },
+                        {
+                            "key": "near_lat",
+                            "label": "Centre Latitude",
+                            "type": "text",
+                            "required": false,
+                            "help": "Nearest first, and the basis for the radius. Needs a centre longitude too."
+                        },
+                        {
+                            "key": "near_lng",
+                            "label": "Centre Longitude",
+                            "type": "text",
+                            "required": false,
+                            "help": "Nearest first, and the basis for the radius. Needs a centre latitude too."
+                        },
+                        {
+                            "key": "radius",
+                            "label": "Radius (km)",
+                            "type": "number",
+                            "required": false,
+                            "help": "Only with a centre. Leave empty for every distance, sorted nearest first."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Maximum Results",
+                            "type": "number",
+                            "required": false,
+                            "help": "Defaults to 50."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_store": {
+                    "label": "Create Store",
+                    "description": "Create a location in a post type that a store-locator map actually lists.",
+                    "key": "create_store",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Store actions only accept a type a store-locator map actually lists."
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "content",
+                            "label": "Content",
+                            "type": "textarea",
+                            "required": false,
+                            "help": "HTML is allowed."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                }
+                            ],
+                            "help": "Defaults to published."
+                        },
+                        {
+                            "key": "lat",
+                            "label": "Latitude",
+                            "type": "text",
+                            "required": true,
+                            "help": "Decimal degrees, e.g. 23.780573."
+                        },
+                        {
+                            "key": "lng",
+                            "label": "Longitude",
+                            "type": "text",
+                            "required": true,
+                            "help": "Decimal degrees, e.g. 90.407067."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_store": {
+                    "label": "Update Store",
+                    "description": "Change a store's title, status or coordinates.",
+                    "key": "update_store",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Location",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_posts",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "title",
+                            "label": "New Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "content",
+                            "label": "New Content",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "pending",
+                                    "label": "Pending review"
+                                },
+                                {
+                                    "value": "private",
+                                    "label": "Private"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "lat",
+                            "label": "Latitude",
+                            "type": "text",
+                            "required": false,
+                            "help": "Send either half on its own to move only that coordinate."
+                        },
+                        {
+                            "key": "lng",
+                            "label": "Longitude",
+                            "type": "text",
+                            "required": false,
+                            "help": "Send either half on its own to move only that coordinate."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_store": {
+                    "label": "Delete Store",
+                    "description": "Permanently delete a store's post.",
+                    "key": "delete_store",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Location",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_posts",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "refresh_map_data": {
+                    "label": "Refresh Map Data",
+                    "description": "Re-resolve a map's dynamic sources and report what it now renders.",
+                    "key": "refresh_map_data",
+                    "schema": [
+                        {
+                            "key": "map_id",
+                            "label": "Map",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "maps",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Maximum Markers",
+                            "type": "number",
+                            "required": false,
+                            "help": "Caps the marker list returned. Defaults to 200."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "sync_dynamic_data": {
+                    "label": "Sync Dynamic Map Data",
+                    "description": "Add a post type source to a map, and optionally drop sources whose data has gone away.",
+                    "key": "sync_dynamic_data",
+                    "schema": [
+                        {
+                            "key": "map_id",
+                            "label": "Map",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "maps",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type Source to Add",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "geo_post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "help": "Leave empty to only reconcile what the map already lists."
+                        },
+                        {
+                            "key": "prune",
+                            "label": "Drop Sources Whose Data Is Gone",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "yes",
+                                    "label": "Yes"
+                                },
+                                {
+                                    "value": "no",
+                                    "label": "No"
+                                }
+                            ],
+                            "help": "Removes post type and listing sources that no longer resolve. Off by default so an automation cannot quietly delete one."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_map_settings": {
+                    "label": "Update Map Settings",
+                    "description": "Change a map's nested settings: clustering, heatmap, store locator, directory, directions and popups.",
+                    "key": "update_map_settings",
+                    "schema": [
+                        {
+                            "key": "map_id",
+                            "label": "Map",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "maps",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "clustering_radius",
+                            "label": "Clustering Radius",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "clustering_max_zoom",
+                            "label": "Clustering Max Zoom",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "heatmap_radius",
+                            "label": "Heatmap Radius",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "heatmap_intensity",
+                            "label": "Heatmap Intensity",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "store_locator_radius",
+                            "label": "Store Locator Radius",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "store_locator_unit",
+                            "label": "Store Locator Unit",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "km",
+                                    "label": "Kilometres"
+                                },
+                                {
+                                    "value": "mi",
+                                    "label": "Miles"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "store_locator_placeholder",
+                            "label": "Store Locator Placeholder",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "directory_width",
+                            "label": "Directory Width",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "directory_layout",
+                            "label": "Directory Layout",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "side",
+                                    "label": "Side panel"
+                                },
+                                {
+                                    "value": "bottom",
+                                    "label": "Bottom sheet"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "directory_position",
+                            "label": "Directory Position",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "left",
+                                    "label": "Left"
+                                },
+                                {
+                                    "value": "right",
+                                    "label": "Right"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "directions_service",
+                            "label": "Directions Service",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "google",
+                                    "label": "Google Directions"
+                                },
+                                {
+                                    "value": "osm",
+                                    "label": "OpenStreetMap Nominatim"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "popup_max_width",
+                            "label": "Popup Max Width",
+                            "type": "number",
+                            "required": false
+                        },
+                        {
+                            "key": "popup_theme",
+                            "label": "Popup Theme",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "light",
+                                    "label": "Light"
+                                },
+                                {
+                                    "value": "dark",
+                                    "label": "Dark"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "popup_preset",
+                            "label": "Popup Preset",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "card",
+                                    "label": "Card"
+                                },
+                                {
+                                    "value": "overlay",
+                                    "label": "Overlay"
+                                },
+                                {
+                                    "value": "compact",
+                                    "label": "Compact"
+                                },
+                                {
+                                    "value": "minimal",
+                                    "label": "Minimal"
+                                },
+                                {
+                                    "value": "classic",
+                                    "label": "Classic"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "popup_cta_label",
+                            "label": "Popup Call to Action Label",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_marker_settings": {
+                    "label": "Update Marker Settings",
+                    "description": "Change the map-wide marker animation and draggable defaults every marker inherits.",
+                    "key": "update_marker_settings",
+                    "schema": [
+                        {
+                            "key": "map_id",
+                            "label": "Map",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "maps",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "animation",
+                            "label": "Marker Animation",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "none",
+                                    "label": "None"
+                                },
+                                {
+                                    "value": "bounce",
+                                    "label": "Bounce"
+                                },
+                                {
+                                    "value": "drop",
+                                    "label": "Drop"
+                                },
+                                {
+                                    "value": "pulse",
+                                    "label": "Pulse"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "draggable",
+                            "label": "Markers Are Draggable",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "yes",
+                                    "label": "Yes"
+                                },
+                                {
+                                    "value": "no",
+                                    "label": "No"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_map_center": {
+                    "label": "Set Map Center",
+                    "description": "Set the map's centre coordinates and, optionally, its zoom level.",
+                    "key": "set_map_center",
+                    "schema": [
+                        {
+                            "key": "map_id",
+                            "label": "Map",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "maps",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "lat",
+                            "label": "Latitude",
+                            "type": "text",
+                            "required": true,
+                            "help": "Decimal degrees, e.g. 23.8103."
+                        },
+                        {
+                            "key": "lng",
+                            "label": "Longitude",
+                            "type": "text",
+                            "required": true,
+                            "help": "Decimal degrees, e.g. 90.4125."
+                        },
+                        {
+                            "key": "zoom",
+                            "label": "Zoom Level",
+                            "type": "number",
+                            "required": false,
+                            "help": "0 to 24. Leave empty to keep the current zoom."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_map_provider": {
+                    "label": "Set Map Provider",
+                    "description": "Switch the map's provider, optionally storing an API key for it.",
+                    "key": "set_map_provider",
+                    "schema": [
+                        {
+                            "key": "map_id",
+                            "label": "Map",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "maps",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "provider",
+                            "label": "Map Provider",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "value": "openstreetmap",
+                                    "label": "OpenStreetMap"
+                                },
+                                {
+                                    "value": "google",
+                                    "label": "Google Maps (API key)"
+                                },
+                                {
+                                    "value": "mapbox",
+                                    "label": "Mapbox (Pro)"
+                                },
+                                {
+                                    "value": "maptiler",
+                                    "label": "MapTiler (Pro)"
+                                },
+                                {
+                                    "value": "openfreemap",
+                                    "label": "OpenFreeMap (Pro)"
+                                },
+                                {
+                                    "value": "stadia",
+                                    "label": "Stadia Maps (Pro)"
+                                },
+                                {
+                                    "value": "esri",
+                                    "label": "Esri / ArcGIS (Pro)"
+                                },
+                                {
+                                    "value": "carto",
+                                    "label": "CARTO (Pro)"
+                                },
+                                {
+                                    "value": "azure",
+                                    "label": "Azure Maps (Pro)"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "api_key",
+                            "label": "Provider API Key",
+                            "type": "password",
+                            "required": false,
+                            "help": "Leave empty to keep the key already saved on the map."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_rest_map_data": {
+                    "label": "Get REST Map Data",
+                    "description": "Read the map document WP Map Block's own REST endpoint returns, with the provider key redacted.",
+                    "key": "get_rest_map_data",
+                    "schema": [
+                        {
+                            "key": "map_id",
+                            "label": "Map",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "wpmapblock",
+                                "query": "maps",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
                         }
                     ],
                     "outputs": [

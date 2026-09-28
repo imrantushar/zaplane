@@ -164,7 +164,7 @@ trait Helper {
 			unset( $target );
 
 			$changed[] = $key;
-		}
+		}//end foreach
 
 		return $document;
 	}
@@ -249,14 +249,257 @@ trait Helper {
 		return $markers;
 	}
 
+	private static function location_sources(): array {
+		$sources = null;
+
+		if ( function_exists( 'wpmb_get_listing_sources' ) ) {
+			$sources = wpmb_get_listing_sources();
+		} elseif ( class_exists( '\WPMapBlock\Integrations\Manager' ) ) {
+			$sources = \WPMapBlock\Integrations\Manager::all();
+		}
+
+		return is_array( $sources ) ? $sources : [];
+	}
+
+	private static function source_index(): array {
+		if ( null !== self::$source_index ) {
+			return self::$source_index;
+		}
+
+		$index   = [
+			'all' => [],
+			'store' => []
+		];
+		$listing = self::location_sources();
+
+		foreach ( $listing as $source ) {
+			$post_type = is_array( $source ) ? trim( (string) ( $source['post_type'] ?? '' ) ) : '';
+			if ( '' !== $post_type ) {
+				$index['all'][ $post_type ] = true;
+			}
+		}
+
+		$maps = function_exists( 'get_posts' )
+			? get_posts( [
+				'post_type'        => self::MAP_POST_TYPE,
+				'post_status'      => 'any',
+				'numberposts'      => -1,
+				'suppress_filters' => false,
+			] )
+			: [];
+
+		foreach ( (array) $maps as $entry ) {
+			$map_id = $entry instanceof \WP_Post ? (int) $entry->ID : (int) $entry;
+			if ( $map_id <= 0 ) {
+				continue;
+			}
+
+			$document = self::read_config( $map_id );
+			$is_store = ! empty( $document['storeLocator']['enabled'] );
+
+			foreach ( self::list_of( $document, 'dataSources' ) as $data_source ) {
+				$type      = (string) ( $data_source['type'] ?? '' );
+				$post_type = '';
+
+				if ( 'cpt' === $type ) {
+					$post_type = trim( (string) ( $data_source['postType'] ?? '' ) );
+				} elseif ( 'listing' === $type ) {
+					$source_id = (string) ( $data_source['source'] ?? '' );
+					if ( isset( $listing[ $source_id ] ) && is_array( $listing[ $source_id ] ) ) {
+						$post_type = trim( (string) ( $listing[ $source_id ]['post_type'] ?? '' ) );
+					}
+				}
+
+				if ( '' === $post_type ) {
+					continue;
+				}
+
+				$index['all'][ $post_type ] = true;
+				if ( $is_store ) {
+					$index['store'][ $post_type ] = true;
+				}
+			}//end foreach
+		}//end foreach
+
+		self::$source_index = $index;
+
+		return $index;
+	}
+
 	private static function is_location_enabled( string $post_type ): bool {
-		if ( ! function_exists( 'get_option' ) ) {
+		return '' !== $post_type && isset( self::source_index()['all'][ $post_type ] );
+	}
+
+	private static function store_post_types(): array {
+		return array_keys( self::source_index()['store'] );
+	}
+
+	private static function flush_source_index(): void {
+		self::$source_index = null;
+	}
+
+	private static function has_coordinates( int $post_id ): bool {
+		if ( $post_id <= 0 || ! function_exists( 'get_post_meta' ) ) {
 			return false;
 		}
-		$settings = get_option( 'wpmb_settings', [] );
-		$enabled  = is_array( $settings ) && isset( $settings['locations'] ) ? (array) $settings['locations'] : [];
+		$lat = (float) get_post_meta( $post_id, self::LAT_META, true );
+		$lng = (float) get_post_meta( $post_id, self::LNG_META, true );
 
-		return empty( $enabled ) ? false : in_array( $post_type, array_map( 'strval', $enabled ), true );
+		return ! empty( $lat ) && ! empty( $lng );
+	}
+
+	private static function is_location_post( $post ): bool {
+		if ( ! $post instanceof \WP_Post ) {
+			return false;
+		}
+		if ( in_array( $post->post_type, [ 'revision', 'attachment', self::MAP_POST_TYPE ], true ) ) {
+			return false;
+		}
+
+		return self::has_coordinates( (int) $post->ID );
+	}
+
+	private static function is_store_location( $post ): bool {
+		return self::is_location_post( $post )
+			&& isset( self::source_index()['store'][ (string) $post->post_type ] );
+	}
+
+	private static function location_payload( $post, array $extra = [] ): array {
+		$post_id = (int) $post->ID;
+
+		return array_merge(
+			[
+				'post_id'    => $post_id,
+				'post_title' => (string) $post->post_title,
+				'post_type'  => (string) $post->post_type,
+				'status'     => (string) $post->post_status,
+				'permalink'  => (string) get_permalink( $post_id ),
+				'lat'        => (float) get_post_meta( $post_id, self::LAT_META, true ),
+				'lng'        => (float) get_post_meta( $post_id, self::LNG_META, true ),
+			],
+			$extra
+		);
+	}
+
+	private static function require_location( $post_id ) {
+		$post_id = (int) $post_id;
+		if ( $post_id <= 0 ) {
+			throw new \InvalidArgumentException( 'A valid post ID is required.' );
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post instanceof \WP_Post ) {
+			throw new \InvalidArgumentException( 'That post does not exist.' );
+		}
+		if ( in_array( $post->post_type, [ 'revision', 'attachment', self::MAP_POST_TYPE ], true ) ) {
+			throw new \InvalidArgumentException( 'That post is not a location.' );
+		}
+
+		return $post;
+	}
+
+	private static function require_store_location( $post_id ) {
+		$post = self::require_location( $post_id );
+
+		if ( ! isset( self::source_index()['store'][ (string) $post->post_type ] ) ) {
+			throw new \InvalidArgumentException(
+				sprintf(
+					'No store-locator map lists "%s". Turn the store locator on for a map with that data source, or use the location actions instead.',
+					(string) $post->post_type
+				)
+			);
+		}
+
+		return $post;
+	}
+
+	private static function require_store_post_type( string $post_type ): string {
+		if ( '' === $post_type ) {
+			throw new \InvalidArgumentException( 'A post type is required.' );
+		}
+		if ( isset( self::source_index()['store'][ $post_type ] ) ) {
+			return $post_type;
+		}
+
+		$available = self::store_post_types();
+		throw new \InvalidArgumentException(
+			$available
+				? sprintf( 'No store-locator map lists "%s". Store post types are: %s.', $post_type, implode( ', ', $available ) )
+				: sprintf( 'No map has the store locator switched on with a dynamic source yet, so "%s" is not a store post type.', $post_type )
+		);
+	}
+
+	private static function write_coordinates( int $post_id, $lat, $lng ): void {
+		self::$location_writes[ $post_id ] = [
+			'lat' => null === $lat ? (float) get_post_meta( $post_id, self::LAT_META, true ) : (float) $lat,
+			'lng' => null === $lng ? (float) get_post_meta( $post_id, self::LNG_META, true ) : (float) $lng,
+		];
+
+		try {
+			if ( null !== $lat ) {
+				update_post_meta( $post_id, self::LAT_META, trim( (string) $lat ) );
+			}
+			if ( null !== $lng ) {
+				update_post_meta( $post_id, self::LNG_META, trim( (string) $lng ) );
+			}
+		} finally {
+			unset( self::$location_writes[ $post_id ] );
+		}
+	}
+
+	private static function current_pair( int $post_id ): array {
+		return [
+			'lat' => (float) get_post_meta( $post_id, self::LAT_META, true ),
+			'lng' => (float) get_post_meta( $post_id, self::LNG_META, true ),
+		];
+	}
+
+	private static function pair_key( array $pair ): string {
+		return sprintf( '%.9F|%.9F', (float) ( $pair['lat'] ?? 0 ), (float) ( $pair['lng'] ?? 0 ) );
+	}
+
+	private static function location_state_key( array $filter, string $scope, int $post_id ): string {
+		$encoded = is_string( wp_json_encode( $filter ) ) ? wp_json_encode( $filter ) : '';
+
+		return $scope . '|' . $encoded . '|' . $post_id;
+	}
+
+	private static function intended_pair( int $post_id ): ?array {
+		if ( isset( self::$location_writes[ $post_id ] ) && is_array( self::$location_writes[ $post_id ] ) ) {
+			return self::$location_writes[ $post_id ];
+		}
+
+		return self::posted_pair( $post_id );
+	}
+
+	private static function posted_pair( int $post_id ): ?array {
+		foreach ( [ 'wpmb_location_nonce', 'post_ID', 'wpmb_lat', 'wpmb_lng' ] as $key ) {
+			if ( ! isset( $_POST[ $key ] ) || ! is_scalar( $_POST[ $key ] ) ) {
+				return null;
+			}
+		}
+		foreach ( [ 'sanitize_key', 'sanitize_text_field', 'wp_unslash', 'wp_verify_nonce' ] as $function ) {
+			if ( ! function_exists( $function ) ) {
+				return null;
+			}
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified right here, exactly as Location_Meta::save() does.
+		if ( (int) $_POST['post_ID'] !== $post_id ) {
+			return null;
+		}
+		if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['wpmb_location_nonce'] ) ), 'wpmb_location' ) ) {
+			return null;
+		}
+
+		$lat = (float) sanitize_text_field( wp_unslash( $_POST['wpmb_lat'] ) );
+		$lng = (float) sanitize_text_field( wp_unslash( $_POST['wpmb_lng'] ) );
+		// phpcs:enable
+
+		return ( ! empty( $lat ) && ! empty( $lng ) ) ? [
+			'lat' => $lat,
+			'lng' => $lng
+		] : null;
 	}
 
 	private static function id_from( array $config, string $key ): int {
@@ -296,5 +539,17 @@ trait Helper {
 			return $default;
 		}
 		return max( 1, min( 500, (int) $context['limit'] ) );
+	}
+
+	private static function haversine_km( float $lat1, float $lng1, float $lat2, float $lng2 ): float {
+		$earth  = 6371.0088;
+		$to_rad = M_PI / 180;
+
+		$d_lat = ( $lat2 - $lat1 ) * $to_rad;
+		$d_lng = ( $lng2 - $lng1 ) * $to_rad;
+		$a     = sin( $d_lat / 2 ) ** 2
+			+ cos( $lat1 * $to_rad ) * cos( $lat2 * $to_rad ) * sin( $d_lng / 2 ) ** 2;
+
+		return $earth * 2 * atan2( sqrt( $a ), sqrt( 1 - $a ) );
 	}
 }

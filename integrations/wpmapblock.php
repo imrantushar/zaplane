@@ -25,6 +25,16 @@ class Wpmapblock extends IntegrationBase {
 	private const LNG_META = '_wpmb_lng';
 	private const REST_NS = 'wpmb/v1';
 	private static array $baseline = [];
+	/** Post types WP Map Block plots, split into every type and store-locator types. */
+	private static ?array $source_index = null;
+	/** The coordinate pair a write is heading for, published by our own location actions. */
+	private static array $location_writes = [];
+	/** The pair as it stood before a save started — what tells a real edit from a no-op. */
+	private static array $location_prev = [];
+	/** The last pair reported per post, so the second half of a save is not reported twice. */
+	private static array $location_seen = [];
+	/** Marker count before a REST write, so an import can be told from an ordinary save. */
+	private static array $import_baseline = [];
 
 	public static function get_slug(): string {
 		return 'wpmapblock';
@@ -43,51 +53,105 @@ class Wpmapblock extends IntegrationBase {
 		// without the outgoing document there is no diff to report.
 		$marker_hooks = [ 'update_post_meta', 'updated_post_meta' ];
 
+		// A location is a post with both `_wpmb_lat` and `_wpmb_lng`. The
+		// pre-write hook is the no-op guard; the post-write hook is the report.
+		$location_save_hooks = [ 'update_post_meta', 'updated_post_meta' ];
+
 		return [
-			'map_created'        => [
+			'map_created'            => [
 				'label' => 'Map Created',
 				'hook' => 'added_post_meta',
 			],
-			'map_updated'        => [
+			'map_updated'            => [
 				'label' => 'Map Updated',
 				'hook' => 'updated_post_meta',
 			],
-			'map_status_changed' => [
+			'map_status_changed'     => [
 				'label' => 'Map Activated or Deactivated',
 				'hook' => 'transition_post_status',
 			],
-			'map_deleted'        => [
+			'map_deleted'            => [
 				'label' => 'Map Deleted',
 				'hook' => 'before_delete_post',
 			],
 
-			'marker_added'       => [
+			'marker_added'           => [
 				'label' => 'Marker Added',
 				'hook' => $marker_hooks,
 			],
-			'marker_updated'     => [
+			'marker_updated'         => [
 				'label' => 'Marker Updated',
 				'hook' => $marker_hooks,
 			],
-			'marker_moved'       => [
+			'marker_moved'           => [
 				'label' => 'Marker Moved',
 				'hook' => $marker_hooks,
 			],
-			'marker_removed'     => [
+			'marker_removed'         => [
 				'label' => 'Marker Removed',
 				'hook' => $marker_hooks,
 			],
-			'map_viewed'         => [
+			'map_viewed'             => [
 				'label' => 'Map Viewed on the Front End',
 				'hook' => 'wpmb/render/config',
 			],
-			'map_searched'       => [
+			'map_searched'           => [
 				'label' => 'Map Searched by a Visitor',
 				'hook' => 'rest_request_before_callbacks',
 			],
-			'location_updated'   => [
-				'label' => 'Post Map Location Saved',
-				'hook' => [ 'added_post_meta', 'updated_post_meta' ],
+			// WP Map Block re-resolves dynamic sources through this one route and
+			// reports after it, so a request that failed `can_edit()` is visible
+			// as a WP_Error rather than a refresh that never happened.
+			'map_refreshed'          => [
+				'label' => 'Map Data Refreshed',
+				'hook' => 'rest_request_after_callbacks',
+			],
+			// The count before the write has to be taken before the permission
+			// check runs, and the result read after the callback.
+			'map_data_imported'      => [
+				'label' => 'Map Data Imported',
+				'hook' => [ 'rest_request_before_callbacks', 'rest_request_after_callbacks' ],
+			],
+			'rest_map_updated'       => [
+				'label' => 'Map Data Updated via REST',
+				'hook' => 'rest_request_after_callbacks',
+			],
+
+			'location_created'       => [
+				'label' => 'Location Created',
+				'hook' => 'added_post_meta',
+			],
+			'location_updated'       => [
+				'label' => 'Location Updated',
+				'hook' => $location_save_hooks,
+			],
+			'location_deleted'       => [
+				'label' => 'Location Deleted',
+				'hook' => 'before_delete_post',
+			],
+			// Published means "visitors can now see it", so it covers a status
+			// transition into publish and coordinates arriving on a post that is
+			// already published.
+			'location_published'     => [
+				'label' => 'Location Published',
+				'hook' => [ 'transition_post_status', 'added_post_meta' ],
+			],
+			'location_status_changed' => [
+				'label' => 'Location Status Changed',
+				'hook' => 'transition_post_status',
+			],
+
+			'store_created'          => [
+				'label' => 'Store Created',
+				'hook' => 'added_post_meta',
+			],
+			'store_updated'          => [
+				'label' => 'Store Updated',
+				'hook' => $location_save_hooks,
+			],
+			'store_deleted'          => [
+				'label' => 'Store Deleted',
+				'hook' => 'before_delete_post',
 			],
 		];
 	}
@@ -110,11 +174,34 @@ class Wpmapblock extends IntegrationBase {
 			'add_data_source'   => [ 'Add Dynamic Data Source', 'Attach a post type, listing, GeoJSON or REST source to a map.' ],
 			'set_post_location' => [ 'Set Post Map Location', 'Write the `_wpmb_lat` / `_wpmb_lng` coordinates WP Map Block lists posts from.' ],
 			'geocode_address'   => [ 'Get Coordinates for an Address', 'Geocode a street address to latitude/longitude using OpenStreetMap Nominatim.' ],
+
+			'create_location'       => [ 'Create Location', 'Create a post and give it the coordinates WP Map Block plots it from.' ],
+			'update_location'       => [ 'Update Location', 'Change a location\'s title, content, status or coordinates.' ],
+			'delete_location'       => [ 'Delete Location', 'Permanently delete a location\'s post.' ],
+			'publish_location'      => [ 'Publish Location', 'Move a location into the `publish` status so it appears on maps.' ],
+			'unpublish_location'    => [ 'Unpublish Location', 'Move a location back to `draft`, taking it off front-end maps.' ],
+			'set_location_status'   => [ 'Change Location Status', 'Set a location to any WordPress post status WordPress will accept.' ],
+			'get_location'          => [ 'Get Location', 'Read one location\'s status, permalink and coordinates.' ],
+			'search_locations'      => [ 'Search Locations', 'Keyword search across locations, matching WP Map Block\'s own `?q=` search.' ],
+			'filter_locations'      => [ 'Filter Locations', 'Filter locations by post type, status, taxonomy or distance from a centre.' ],
+			'create_store'          => [ 'Create Store', 'Create a location in a post type that a store-locator map actually lists.' ],
+			'update_store'          => [ 'Update Store', 'Change a store\'s title, status or coordinates.' ],
+			'delete_store'          => [ 'Delete Store', 'Permanently delete a store\'s post.' ],
+			'refresh_map_data'      => [ 'Refresh Map Data', 'Re-resolve a map\'s dynamic sources and report what it now renders.' ],
+			'sync_dynamic_data'     => [ 'Sync Dynamic Map Data', 'Add a post type source to a map, and optionally drop sources whose data has gone away.' ],
+			'update_map_settings'   => [ 'Update Map Settings', 'Change a map\'s nested settings: clustering, heatmap, store locator, directory, directions and popups.' ],
+			'update_marker_settings' => [ 'Update Marker Settings', 'Change the map-wide marker animation and draggable defaults every marker inherits.' ],
+			'set_map_center'        => [ 'Set Map Center', 'Set the map\'s centre coordinates and, optionally, its zoom level.' ],
+			'set_map_provider'      => [ 'Set Map Provider', 'Switch the map\'s provider, optionally storing an API key for it.' ],
+			'get_rest_map_data'     => [ 'Get REST Map Data', 'Read the map document WP Map Block\'s own REST endpoint returns, with the provider key redacted.' ],
 		];
 
 		$out = [];
 		foreach ( $defs as $key => $def ) {
-			$out[ $key ] = [ 'label' => $def[0], 'description' => $def[1] ];
+			$out[ $key ] = [
+				'label' => $def[0],
+				'description' => $def[1]
+			];
 		}
 		return $out;
 	}
@@ -142,20 +229,22 @@ class Wpmapblock extends IntegrationBase {
 			return [];
 		}
 
-		if ( 'location_updated' === $trigger ) {
+		// Location and store triggers watch posts, not maps, so their only
+		// filter is which post type to accept.
+		if ( 0 === strpos( $trigger, 'location_' ) || 0 === strpos( $trigger, 'store_' ) ) {
 			return [
-				self::field( 'post_type', 'Only post type', 'select', false, [
-					'help'    => 'Leave empty to match every post type.',
-					'dynamic' => [
-						'integration' => 'wpmapblock',
-						'query'       => 'geo_post_types',
-						'select'      => [ 'value', 'label' ],
-					],
-				] ),
+				self::post_type_select( 'post_type', 'Only post type', false, 'Leave empty to match every post type.' ),
 			];
 		}
 
-		$fields = [ self::map_select( 'map_id', false ) ];
+		$help = '';
+		if ( 'map_refreshed' === $trigger ) {
+			$help = 'The refresh endpoint carries no map id, so this matches maps whose stored data sources are exactly the ones being previewed. Leave empty to match every refresh.';
+		} elseif ( 'map_data_imported' === $trigger ) {
+			$help = 'Fires when a REST write changes a map\'s marker list — the path the editor\'s Import button takes. Leave empty to match every map.';
+		}
+
+		$fields = [ self::map_select( 'map_id', false, 'Map', $help ) ];
 
 		if ( 'map_searched' === $trigger ) {
 			$fields[] = self::field( 'query', 'Only searches containing', 'text', false, [
@@ -197,9 +286,27 @@ class Wpmapblock extends IntegrationBase {
 			case 'map_searched':
 				return self::trigger_map_searched( $filter, $args );
 
+			case 'map_refreshed':
+				return self::trigger_map_refreshed( $filter, $args );
+
+			case 'map_data_imported':
+				return self::trigger_map_data_imported( $filter, $args );
+
+			case 'rest_map_updated':
+				return self::trigger_rest_map_updated( $filter, $args );
+
+			case 'location_created':
 			case 'location_updated':
-				return self::trigger_location_saved( $filter, $args );
-		}
+			case 'location_deleted':
+			case 'location_published':
+			case 'location_status_changed':
+				return self::trigger_location_event( $event, $filter, $args );
+
+			case 'store_created':
+			case 'store_updated':
+			case 'store_deleted':
+				return self::trigger_location_event( 'location_' . substr( $event, 6 ), $filter, $args, 'store' );
+		}//end switch
 
 		return false;
 	}
@@ -220,7 +327,7 @@ class Wpmapblock extends IntegrationBase {
 			'center_lng'      => isset( $center['lng'] ) ? (float) $center['lng'] : 0.0,
 			'zoom'            => isset( $view['zoom'] ) ? (int) $view['zoom'] : 10,
 			'markers_count'   => count( self::markers_of( $document ) ),
-			'categories_count'=> count( self::list_of( $document, 'categories' ) ),
+			'categories_count' => count( self::list_of( $document, 'categories' ) ),
 			'shortcode'       => '[wp_map id="' . $map_id . '"]',
 			'has_api_key'     => '' !== (string) ( $document['providerOptions']['apiKey'] ?? '' ),
 			'modified'        => (string) ( $post->post_modified_gmt ?? '' ),
@@ -311,6 +418,10 @@ class Wpmapblock extends IntegrationBase {
 		// inside marker content is eaten on the way to the database.
 		$slashed = function_exists( 'wp_slash' ) ? wp_slash( $json ) : $json;
 		update_post_meta( $map_id, self::CONFIG_META, $slashed );
+
+		// A map's config is where the location post types and the store
+		// locator live, so the cached index is only safe to reuse until now.
+		self::flush_source_index();
 	}
 
 	/** @return array<int,array<string,mixed>> */
@@ -416,12 +527,17 @@ class Wpmapblock extends IntegrationBase {
 
 	private static function field( string $key, string $label, string $type, bool $required, array $extra = [] ): array {
 		return array_merge(
-			[ 'key' => $key, 'label' => $label, 'type' => $type, 'required' => $required ],
+			[
+				'key' => $key,
+				'label' => $label,
+				'type' => $type,
+				'required' => $required
+			],
 			$extra
 		);
 	}
 
-	private static function map_select( string $key, bool $required, string $label = 'Map' ): array {
+	private static function map_select( string $key, bool $required, string $label = 'Map', string $help = '' ): array {
 		$extra = [
 			'dynamic' => [
 				'integration' => 'wpmapblock',
@@ -430,11 +546,33 @@ class Wpmapblock extends IntegrationBase {
 			],
 		];
 
-		if ( ! $required ) {
+		if ( '' !== $help ) {
+			$extra['help'] = $help;
+		} elseif ( ! $required ) {
 			$extra['help'] = 'Leave empty to match any map.';
 		}
 
 		return self::field( $key, $label, 'select', $required, $extra );
+	}
+
+	private static function post_type_select( string $key, string $label = 'Post Type', bool $required = true, string $help = '' ): array {
+		return self::with_help( self::field( $key, $label, 'select', $required, [
+			'dynamic' => [
+				'integration' => 'wpmapblock',
+				'query'       => 'geo_post_types',
+				'select'      => [ 'value', 'label' ],
+			],
+		] ), $help );
+	}
+
+	private static function post_select( string $key, string $label = 'Post', string $help = '' ): array {
+		return self::with_help( self::field( $key, $label, 'select', true, [
+			'dynamic' => [
+				'integration' => 'wpmapblock',
+				'query'       => 'geo_posts',
+				'select'      => [ 'value', 'label' ],
+			],
+		] ), $help );
 	}
 
 	private static function marker_select( string $key, string $label ): array {
@@ -459,8 +597,14 @@ class Wpmapblock extends IntegrationBase {
 	private static function toggle( string $key, string $label, string $help = '' ): array {
 		return self::with_help( self::field( $key, $label, 'select', false, [
 			'options' => [
-				[ 'value' => 'yes', 'label' => 'Yes' ],
-				[ 'value' => 'no', 'label' => 'No' ],
+				[
+					'value' => 'yes',
+					'label' => 'Yes'
+				],
+				[
+					'value' => 'no',
+					'label' => 'No'
+				],
 			],
 		] ), $help );
 	}
@@ -483,13 +627,34 @@ class Wpmapblock extends IntegrationBase {
 				return [
 					self::text_field( 'title', 'Map Title', true ),
 					self::select_field( 'preset', 'Start From', [
-						[ 'value' => '', 'label' => 'Blank map' ],
-						[ 'value' => 'store_locator', 'label' => 'Store Locator' ],
-						[ 'value' => 'real_estate', 'label' => 'Real Estate' ],
-						[ 'value' => 'food_guide', 'label' => 'Food Guide' ],
-						[ 'value' => 'travel_guide', 'label' => 'Travel Guide' ],
-						[ 'value' => 'heatmap', 'label' => 'Heatmap' ],
-						[ 'value' => 'global_vector', 'label' => 'Global Vector' ],
+						[
+							'value' => '',
+							'label' => 'Blank map'
+						],
+						[
+							'value' => 'store_locator',
+							'label' => 'Store Locator'
+						],
+						[
+							'value' => 'real_estate',
+							'label' => 'Real Estate'
+						],
+						[
+							'value' => 'food_guide',
+							'label' => 'Food Guide'
+						],
+						[
+							'value' => 'travel_guide',
+							'label' => 'Travel Guide'
+						],
+						[
+							'value' => 'heatmap',
+							'label' => 'Heatmap'
+						],
+						[
+							'value' => 'global_vector',
+							'label' => 'Global Vector'
+						],
 					] ),
 					self::select_field( 'provider', 'Map Provider', self::provider_options() ),
 					self::text_field( 'center_lat', 'Centre Latitude', false, 'Decimal degrees. Leave empty to keep the preset\'s centre.' ),
@@ -508,15 +673,36 @@ class Wpmapblock extends IntegrationBase {
 					self::text_field( 'width', 'Map Width', false, 'Any CSS width, e.g. 100% or 640px.' ),
 					self::field( 'height', 'Map Height', 'number', false ),
 					self::select_field( 'map_type', 'Map Type', [
-						[ 'value' => 'roadmap', 'label' => 'Roadmap' ],
-						[ 'value' => 'satellite', 'label' => 'Satellite' ],
-						[ 'value' => 'hybrid', 'label' => 'Hybrid' ],
-						[ 'value' => 'terrain', 'label' => 'Terrain' ],
+						[
+							'value' => 'roadmap',
+							'label' => 'Roadmap'
+						],
+						[
+							'value' => 'satellite',
+							'label' => 'Satellite'
+						],
+						[
+							'value' => 'hybrid',
+							'label' => 'Hybrid'
+						],
+						[
+							'value' => 'terrain',
+							'label' => 'Terrain'
+						],
 					] ),
 					self::select_field( 'theme', 'Theme', [
-						[ 'value' => 'light', 'label' => 'Light' ],
-						[ 'value' => 'dark', 'label' => 'Dark' ],
-						[ 'value' => 'auto', 'label' => 'Auto (follow the visitor)' ],
+						[
+							'value' => 'light',
+							'label' => 'Light'
+						],
+						[
+							'value' => 'dark',
+							'label' => 'Dark'
+						],
+						[
+							'value' => 'auto',
+							'label' => 'Auto (follow the visitor)'
+						],
 					] ),
 					self::toggle( 'clustering', 'Marker Clustering' ),
 					self::toggle( 'store_locator', 'Store Locator', 'Only rendered where the store locator capability is unlocked.' ),
@@ -533,8 +719,14 @@ class Wpmapblock extends IntegrationBase {
 				return [
 					self::map_select( 'map_id', true ),
 					self::select_field( 'status', 'Status', [
-						[ 'value' => 'active', 'label' => 'Active (publish)' ],
-						[ 'value' => 'inactive', 'label' => 'Inactive (draft)' ],
+						[
+							'value' => 'active',
+							'label' => 'Active (publish)'
+						],
+						[
+							'value' => 'inactive',
+							'label' => 'Inactive (draft)'
+						],
 					], true ),
 				];
 
@@ -588,8 +780,14 @@ class Wpmapblock extends IntegrationBase {
 				return [
 					self::map_select( 'map_id', true ),
 					self::select_field( 'mode', 'Import Mode', [
-						[ 'value' => 'append', 'label' => 'Append to existing markers' ],
-						[ 'value' => 'replace', 'label' => 'Replace all markers' ],
+						[
+							'value' => 'append',
+							'label' => 'Append to existing markers'
+						],
+						[
+							'value' => 'replace',
+							'label' => 'Replace all markers'
+						],
 					], false, 'Defaults to append.' ),
 					self::field( 'data', 'Markers (JSON array or CSV)', 'textarea', true, [
 						'help' => 'A JSON array of markers, or CSV with a header row: lat,lng,title,content,link,image,category.',
@@ -600,10 +798,22 @@ class Wpmapblock extends IntegrationBase {
 				return [
 					self::map_select( 'map_id', true ),
 					self::select_field( 'type', 'Source Type', [
-						[ 'value' => 'cpt', 'label' => 'Posts / custom post type' ],
-						[ 'value' => 'listing', 'label' => 'Registered listing source' ],
-						[ 'value' => 'geojson', 'label' => 'GeoJSON file' ],
-						[ 'value' => 'rest', 'label' => 'REST endpoint' ],
+						[
+							'value' => 'cpt',
+							'label' => 'Posts / custom post type'
+						],
+						[
+							'value' => 'listing',
+							'label' => 'Registered listing source'
+						],
+						[
+							'value' => 'geojson',
+							'label' => 'GeoJSON file'
+						],
+						[
+							'value' => 'rest',
+							'label' => 'REST endpoint'
+						],
 					], true ),
 					self::text_field( 'label', 'Label' ),
 					self::field( 'post_type', 'Post Type', 'select', false, [
@@ -646,7 +856,280 @@ class Wpmapblock extends IntegrationBase {
 					] ),
 					self::number_field( 'limit', 'Maximum Results', false, 'Defaults to 1.' ),
 				];
-		}
+
+			case 'create_location':
+			case 'create_store':
+				return [
+					self::post_type_select( 'post_type', 'Post Type', true, 'Store actions only accept a type a store-locator map actually lists.' ),
+					self::text_field( 'title', 'Title', true ),
+					self::field( 'content', 'Content', 'textarea', false, [
+						'help' => 'HTML is allowed.',
+					] ),
+					self::select_field( 'status', 'Status', [
+						[
+							'value' => 'publish',
+							'label' => 'Published'
+						],
+						[
+							'value' => 'draft',
+							'label' => 'Draft'
+						],
+						[
+							'value' => 'pending',
+							'label' => 'Pending review'
+						],
+						[
+							'value' => 'private',
+							'label' => 'Private'
+						],
+					], false, 'Defaults to published.' ),
+					self::text_field( 'lat', 'Latitude', true, 'Decimal degrees, e.g. 23.780573.' ),
+					self::text_field( 'lng', 'Longitude', true, 'Decimal degrees, e.g. 90.407067.' ),
+				];
+
+			case 'update_location':
+			case 'update_store':
+				return [
+					self::post_select( 'post_id', 'Location' ),
+					self::text_field( 'title', 'New Title', false ),
+					self::field( 'content', 'New Content', 'textarea', false ),
+					self::select_field( 'status', 'Status', [
+						[
+							'value' => 'publish',
+							'label' => 'Published'
+						],
+						[
+							'value' => 'draft',
+							'label' => 'Draft'
+						],
+						[
+							'value' => 'pending',
+							'label' => 'Pending review'
+						],
+						[
+							'value' => 'private',
+							'label' => 'Private'
+						],
+					] ),
+					self::text_field( 'lat', 'Latitude', false, 'Send either half on its own to move only that coordinate.' ),
+					self::text_field( 'lng', 'Longitude', false, 'Send either half on its own to move only that coordinate.' ),
+				];
+
+			case 'delete_location':
+			case 'delete_store':
+			case 'get_location':
+			case 'publish_location':
+			case 'unpublish_location':
+				return [ self::post_select( 'post_id', 'Location' ) ];
+
+			case 'set_location_status':
+				return [
+					self::post_select( 'post_id', 'Location' ),
+					self::select_field( 'status', 'Status', [
+						[
+							'value' => 'publish',
+							'label' => 'Published'
+						],
+						[
+							'value' => 'draft',
+							'label' => 'Draft'
+						],
+						[
+							'value' => 'pending',
+							'label' => 'Pending review'
+						],
+						[
+							'value' => 'private',
+							'label' => 'Private'
+						],
+						[
+							'value' => 'future',
+							'label' => 'Scheduled'
+						],
+					], true ),
+				];
+
+			case 'search_locations':
+				return [
+					self::post_type_select( 'post_type', 'Only this post type', false, 'Leave empty to search every post type WP Map Block can plot.' ),
+					self::text_field( 'query', 'Contains', false, 'Case-insensitive match against title and content, the same way WP Map Block\'s own ?q= search works.' ),
+					self::number_field( 'limit', 'Maximum Results', false, 'Defaults to 50.' ),
+				];
+
+			case 'filter_locations':
+				return [
+					self::post_type_select( 'post_type', 'Only this post type', false, 'Leave empty to include every post type WP Map Block can plot.' ),
+					self::select_field( 'status', 'Status', [
+						[
+							'value' => 'publish',
+							'label' => 'Published'
+						],
+						[
+							'value' => 'draft',
+							'label' => 'Draft'
+						],
+						[
+							'value' => 'pending',
+							'label' => 'Pending review'
+						],
+						[
+							'value' => 'private',
+							'label' => 'Private'
+						],
+						[
+							'value' => 'any',
+							'label' => 'Any status'
+						],
+					], false, 'Defaults to published.' ),
+					self::text_field( 'taxonomy', 'Taxonomy', false, 'e.g. category or product_cat. Needs a term slug too.' ),
+					self::text_field( 'term', 'Term Slug', false, 'e.g. dhaka. Needs a taxonomy too.' ),
+					self::text_field( 'near_lat', 'Centre Latitude', false, 'Nearest first, and the basis for the radius. Needs a centre longitude too.' ),
+					self::text_field( 'near_lng', 'Centre Longitude', false, 'Nearest first, and the basis for the radius. Needs a centre latitude too.' ),
+					self::number_field( 'radius', 'Radius (km)', false, 'Only with a centre. Leave empty for every distance, sorted nearest first.' ),
+					self::number_field( 'limit', 'Maximum Results', false, 'Defaults to 50.' ),
+				];
+
+			case 'refresh_map_data':
+				return [
+					self::map_select( 'map_id', true ),
+					self::number_field( 'limit', 'Maximum Markers', false, 'Caps the marker list returned. Defaults to 200.' ),
+				];
+
+			case 'sync_dynamic_data':
+				return [
+					self::map_select( 'map_id', true ),
+					self::post_type_select( 'post_type', 'Post Type Source to Add', false, 'Leave empty to only reconcile what the map already lists.' ),
+					self::toggle( 'prune', 'Drop Sources Whose Data Is Gone', 'Removes post type and listing sources that no longer resolve. Off by default so an automation cannot quietly delete one.' ),
+				];
+
+			case 'update_map_settings':
+				return [
+					self::map_select( 'map_id', true ),
+					self::field( 'clustering_radius', 'Clustering Radius', 'number', false ),
+					self::field( 'clustering_max_zoom', 'Clustering Max Zoom', 'number', false ),
+					self::field( 'heatmap_radius', 'Heatmap Radius', 'number', false ),
+					self::field( 'heatmap_intensity', 'Heatmap Intensity', 'number', false ),
+					self::field( 'store_locator_radius', 'Store Locator Radius', 'number', false ),
+					self::select_field( 'store_locator_unit', 'Store Locator Unit', [
+						[
+							'value' => 'km',
+							'label' => 'Kilometres'
+						],
+						[
+							'value' => 'mi',
+							'label' => 'Miles'
+						],
+					] ),
+					self::text_field( 'store_locator_placeholder', 'Store Locator Placeholder' ),
+					self::field( 'directory_width', 'Directory Width', 'number', false ),
+					self::select_field( 'directory_layout', 'Directory Layout', [
+						[
+							'value' => 'side',
+							'label' => 'Side panel'
+						],
+						[
+							'value' => 'bottom',
+							'label' => 'Bottom sheet'
+						],
+					] ),
+					self::select_field( 'directory_position', 'Directory Position', [
+						[
+							'value' => 'left',
+							'label' => 'Left'
+						],
+						[
+							'value' => 'right',
+							'label' => 'Right'
+						],
+					] ),
+					self::select_field( 'directions_service', 'Directions Service', [
+						[
+							'value' => 'google',
+							'label' => 'Google Directions'
+						],
+						[
+							'value' => 'osm',
+							'label' => 'OpenStreetMap Nominatim'
+						],
+					] ),
+					self::field( 'popup_max_width', 'Popup Max Width', 'number', false ),
+					self::select_field( 'popup_theme', 'Popup Theme', [
+						[
+							'value' => 'light',
+							'label' => 'Light'
+						],
+						[
+							'value' => 'dark',
+							'label' => 'Dark'
+						],
+					] ),
+					self::select_field( 'popup_preset', 'Popup Preset', [
+						[
+							'value' => 'card',
+							'label' => 'Card'
+						],
+						[
+							'value' => 'overlay',
+							'label' => 'Overlay'
+						],
+						[
+							'value' => 'compact',
+							'label' => 'Compact'
+						],
+						[
+							'value' => 'minimal',
+							'label' => 'Minimal'
+						],
+						[
+							'value' => 'classic',
+							'label' => 'Classic'
+						],
+					] ),
+					self::text_field( 'popup_cta_label', 'Popup Call to Action Label' ),
+				];
+
+			case 'update_marker_settings':
+				return [
+					self::map_select( 'map_id', true ),
+					self::select_field( 'animation', 'Marker Animation', [
+						[
+							'value' => 'none',
+							'label' => 'None'
+						],
+						[
+							'value' => 'bounce',
+							'label' => 'Bounce'
+						],
+						[
+							'value' => 'drop',
+							'label' => 'Drop'
+						],
+						[
+							'value' => 'pulse',
+							'label' => 'Pulse'
+						],
+					] ),
+					self::toggle( 'draggable', 'Markers Are Draggable' ),
+				];
+
+			case 'set_map_center':
+				return [
+					self::map_select( 'map_id', true ),
+					self::text_field( 'lat', 'Latitude', true, 'Decimal degrees, e.g. 23.8103.' ),
+					self::text_field( 'lng', 'Longitude', true, 'Decimal degrees, e.g. 90.4125.' ),
+					self::number_field( 'zoom', 'Zoom Level', false, '0 to 24. Leave empty to keep the current zoom.' ),
+				];
+
+			case 'set_map_provider':
+				return [
+					self::map_select( 'map_id', true ),
+					self::select_field( 'provider', 'Map Provider', self::provider_options(), true ),
+					self::with_help( self::field( 'api_key', 'Provider API Key', 'password', false ), 'Leave empty to keep the key already saved on the map.' ),
+				];
+
+			case 'get_rest_map_data':
+				return [ self::map_select( 'map_id', true ) ];
+		}//end switch
 
 		return [];
 	}
@@ -671,10 +1154,22 @@ class Wpmapblock extends IntegrationBase {
 				],
 			] ),
 			self::select_field( 'icon_type', 'Icon', [
-				[ 'value' => 'default', 'label' => 'Default pin' ],
-				[ 'value' => 'color', 'label' => 'Coloured pin' ],
-				[ 'value' => 'image', 'label' => 'Custom image' ],
-				[ 'value' => 'preset', 'label' => 'Preset icon' ],
+				[
+					'value' => 'default',
+					'label' => 'Default pin'
+				],
+				[
+					'value' => 'color',
+					'label' => 'Coloured pin'
+				],
+				[
+					'value' => 'image',
+					'label' => 'Custom image'
+				],
+				[
+					'value' => 'preset',
+					'label' => 'Preset icon'
+				],
 			] ),
 			self::text_field( 'icon_color', 'Icon Colour', false, 'Hex, e.g. #006bff. Used by the coloured pin.' ),
 			self::text_field( 'icon_url', 'Icon Image URL' ),
@@ -697,7 +1192,10 @@ class Wpmapblock extends IntegrationBase {
 
 		$out = [];
 		foreach ( $providers as $provider ) {
-			$out[] = [ 'value' => $provider[0], 'label' => $provider[1] ];
+			$out[] = [
+				'value' => $provider[0],
+				'label' => $provider[1]
+			];
 		}
 		return $out;
 	}
@@ -744,7 +1242,22 @@ class Wpmapblock extends IntegrationBase {
 			'image'    => '',
 			'link'     => 'https://example.com/stores/flagship',
 			'category' => 'flagship',
-			'icon'     => [ 'type' => 'color', 'preset' => '', 'url' => '', 'color' => '#006bff' ],
+			'icon'     => [
+				'type' => 'color',
+				'preset' => '',
+				'url' => '',
+				'color' => '#006bff'
+			],
+		];
+
+		$location = [
+			'post_id'    => 42,
+			'post_title' => 'Flagship Store',
+			'post_type'  => 'product',
+			'status'     => 'publish',
+			'permalink'  => 'https://example.com/product/flagship-store/',
+			'lat'        => 23.780573,
+			'lng'        => 90.407067,
 		];
 
 		switch ( $trigger ) {
@@ -753,7 +1266,10 @@ class Wpmapblock extends IntegrationBase {
 				return array_merge( $map, [ 'config' => self::sample_config() ] );
 
 			case 'map_status_changed':
-				return array_merge( $map, [ 'previous_status' => 'draft', 'new_status' => 'publish' ] );
+				return array_merge( $map, [
+					'previous_status' => 'draft',
+					'new_status' => 'publish'
+				] );
 
 			case 'map_deleted':
 				return array_merge( $map, [ 'deleted' => true ] );
@@ -761,13 +1277,25 @@ class Wpmapblock extends IntegrationBase {
 			case 'marker_added':
 			case 'marker_updated':
 			case 'marker_removed':
-				return array_merge( $map, [ 'change' => $trigger, 'marker' => $marker, 'markers' => [ $marker ] ] );
+				return array_merge( $map, [
+					'change' => $trigger,
+					'marker' => $marker,
+					'markers' => [ $marker ]
+				] );
 
 			case 'marker_moved':
 				return array_merge( $map, [
 					'change'  => $trigger,
-					'marker'  => array_merge( $marker, [ 'previous_lat' => 23.746100, 'previous_lng' => 90.391200 ] ),
-					'markers' => [ array_merge( $marker, [ 'previous_lat' => 23.746100, 'previous_lng' => 90.391200 ] ) ],
+					'marker'  => array_merge( $marker, [
+						'previous_lat' => 23.746100,
+						'previous_lng' => 90.391200
+					] ),
+					'markers' => [
+						array_merge( $marker, [
+							'previous_lat' => 23.746100,
+							'previous_lng' => 90.391200
+						] )
+					],
 				] );
 
 			case 'map_viewed':
@@ -780,18 +1308,61 @@ class Wpmapblock extends IntegrationBase {
 					'source' => 'store_locator',
 				] );
 
+			case 'location_created':
+			case 'store_created':
+				return $location;
+
 			case 'location_updated':
+			case 'store_updated':
+				return array_merge( $location, [ 'changed_field' => '_wpmb_lat' ] );
+
+			case 'location_deleted':
+			case 'store_deleted':
+				return array_merge( $location, [ 'deleted' => true ] );
+
+			case 'location_published':
+				return array_merge( $location, [
+					'previous_status' => 'draft',
+					'new_status' => 'publish'
+				] );
+
+			case 'location_status_changed':
+				return array_merge( $location, [
+					'previous_status' => 'publish',
+					'new_status' => 'draft'
+				] );
+
+			case 'map_refreshed':
 				return [
-					'post_id'       => 42,
-					'post_title'    => 'Flagship Store',
-					'post_type'     => 'product',
-					'status'        => 'publish',
-					'permalink'     => 'https://example.com/product/flagship-store/',
-					'lat'           => 23.780573,
-					'lng'           => 90.407067,
-					'changed_field' => '_wpmb_lat',
+					'route'              => '/wpmb/v1/dynamic-preview',
+					'map_ids'            => [ 128 ],
+					'data_sources_count' => 1,
+					'data_sources'       => [
+						[
+							'id' => 'ds_4b9c1f02',
+							'type' => 'cpt',
+							'label' => 'Stores',
+							'postType' => 'product'
+						],
+					],
+					'post_types'         => [ 'product' ],
+					'refreshed_at'       => '2026-09-27T10:15:00+00:00',
 				];
-		}
+
+			case 'map_data_imported':
+				return array_merge( $map, [
+					'imported' => 4,
+					'incoming_count' => 8,
+					'origin' => 'rest'
+				] );
+
+			case 'rest_map_updated':
+				return array_merge( $map, [
+					'origin'  => 'rest',
+					'route'   => '/wpmb/v1/maps/128',
+					'changed' => [ 'provider', 'view' ],
+				] );
+		}//end switch
 
 		return [];
 	}
@@ -822,22 +1393,51 @@ class Wpmapblock extends IntegrationBase {
 			'image'    => '',
 			'link'     => 'https://example.com/stores/flagship',
 			'category' => 'flagship',
-			'icon'     => [ 'type' => 'color', 'preset' => '', 'url' => '', 'color' => '#006bff' ],
+			'icon'     => [
+				'type' => 'color',
+				'preset' => '',
+				'url' => '',
+				'color' => '#006bff'
+			],
+		];
+
+		$location = [
+			'post_id'    => 42,
+			'post_title' => 'Flagship Store',
+			'post_type'  => 'product',
+			'status'     => 'publish',
+			'permalink'  => 'https://example.com/product/flagship-store/',
+			'lat'        => 23.780573,
+			'lng'        => 90.407067,
 		];
 
 		switch ( $action ) {
 			case 'create_map':
 			case 'update_map':
-				return array_merge( [ 'success' => true, 'changed' => [ 'provider' ] ], $map, [ 'config' => self::sample_config() ] );
+				return array_merge( [
+					'success' => true,
+					'changed' => [ 'provider' ]
+				], $map, [ 'config' => self::sample_config() ] );
 
 			case 'duplicate_map':
-				return array_merge( [ 'success' => true, 'source_map_id' => 127 ], $map, [ 'config' => self::sample_config() ] );
+				return array_merge( [
+					'success' => true,
+					'source_map_id' => 127
+				], $map, [ 'config' => self::sample_config() ] );
 
 			case 'set_map_status':
-				return array_merge( [ 'success' => true, 'changed' => true, 'previous_status' => 'draft', 'new_status' => 'publish' ], $map );
+				return array_merge( [
+					'success' => true,
+					'changed' => true,
+					'previous_status' => 'draft',
+					'new_status' => 'publish'
+				], $map );
 
 			case 'delete_map':
-				return array_merge( [ 'success' => true, 'deleted' => true ], $map );
+				return array_merge( [
+					'success' => true,
+					'deleted' => true
+				], $map );
 
 			case 'get_map':
 				return array_merge( [ 'success' => true ], $map, [ 'config' => self::sample_config() ] );
@@ -865,14 +1465,30 @@ class Wpmapblock extends IntegrationBase {
 				];
 
 			case 'add_marker':
-				return [ 'success' => true, 'map_id' => 128, 'marker' => $marker, 'markers_count' => 5 ];
+				return [
+					'success' => true,
+					'map_id' => 128,
+					'marker' => $marker,
+					'markers_count' => 5
+				];
 
 			case 'update_marker':
 			case 'move_marker':
-				return [ 'success' => true, 'map_id' => 128, 'marker' => $marker, 'markers_count' => 4 ];
+				return [
+					'success' => true,
+					'map_id' => 128,
+					'marker' => $marker,
+					'markers_count' => 4
+				];
 
 			case 'delete_marker':
-				return [ 'success' => true, 'deleted' => true, 'map_id' => 128, 'marker' => $marker, 'markers_count' => 3 ];
+				return [
+					'success' => true,
+					'deleted' => true,
+					'map_id' => 128,
+					'marker' => $marker,
+					'markers_count' => 3
+				];
 
 			case 'import_markers':
 				return [
@@ -930,7 +1546,172 @@ class Wpmapblock extends IntegrationBase {
 						],
 					],
 				];
-		}
+
+			case 'create_location':
+			case 'create_store':
+				return array_merge( [ 'success' => true ], $location );
+
+			case 'update_location':
+			case 'update_store':
+				return array_merge( [
+					'success' => true,
+					'changed' => [ 'title', 'coordinates' ]
+				], $location );
+
+			case 'delete_location':
+			case 'delete_store':
+				return array_merge( [
+					'success' => true,
+					'deleted' => true
+				], $location );
+
+			case 'get_location':
+				return array_merge( [ 'success' => true ], $location );
+
+			case 'publish_location':
+				return array_merge( [
+					'success' => true,
+					'changed' => true,
+					'previous_status' => 'draft',
+					'new_status' => 'publish'
+				], $location );
+
+			case 'unpublish_location':
+				return array_merge( [
+					'success' => true,
+					'changed' => true,
+					'previous_status' => 'publish',
+					'new_status' => 'draft'
+				], $location );
+
+			case 'set_location_status':
+				return array_merge( [
+					'success' => true,
+					'changed' => true,
+					'previous_status' => 'draft',
+					'new_status' => 'publish'
+				], $location );
+
+			case 'search_locations':
+				return [
+					'success'   => true,
+					'query'     => 'flagship',
+					'post_type' => 'product',
+					'total'     => 1,
+					'count'     => 1,
+					'items'     => [ $location ],
+				];
+
+			case 'filter_locations':
+				return [
+					'success'   => true,
+					'post_type' => 'product',
+					'status'    => 'publish',
+					'taxonomy'  => 'product_cat',
+					'term'      => 'dhaka',
+					'near_lat'  => 23.8103,
+					'near_lng'  => 90.4125,
+					'radius_km' => 25.0,
+					'total'     => 1,
+					'count'     => 1,
+					'items'     => [ array_merge( $location, [ 'distance_km' => 4.612 ] ) ],
+				];
+
+			case 'refresh_map_data':
+				return [
+					'success'               => true,
+					'map_id'                => 128,
+					'data_sources_count'    => 1,
+					'data_sources'          => [
+						[
+							'id' => 'ds_4b9c1f02',
+							'type' => 'cpt',
+							'label' => 'Stores',
+							'postType' => 'product'
+						],
+					],
+					'post_types'            => [ 'product' ],
+					'markers_count'         => 6,
+					'static_markers_count'  => 2,
+					'dynamic_markers_count' => 4,
+					'categories_count'      => 2,
+					'markers'               => [ $marker ],
+					'refreshed_at'          => '2026-09-27T10:15:00+00:00',
+				];
+
+			case 'sync_dynamic_data':
+				$source = [
+					'id'       => 'ds_9a1e77c4',
+					'type'     => 'cpt',
+					'label'    => 'Products',
+					'url'      => '',
+					'source'   => '',
+					'postType' => 'product',
+					'latMeta'  => '_wpmb_lat',
+					'lngMeta'  => '_wpmb_lng',
+					'limit'    => 100,
+				];
+
+				return [
+					'success'            => true,
+					'map_id'             => 128,
+					'pruned'             => false,
+					'changed'            => true,
+					'added'              => [ $source ],
+					'removed'            => [],
+					'data_sources'       => [ $source ],
+					'data_sources_count' => 1,
+					'markers_count'      => 6,
+				];
+
+			case 'update_map_settings':
+				return array_merge(
+					[
+						'success' => true,
+						'changed' => [ 'clustering_radius', 'popup_theme' ]
+					],
+					$map,
+					[ 'config' => self::sample_config() ]
+				);
+
+			case 'update_marker_settings':
+				return [
+					'success'        => true,
+					'map_id'         => 128,
+					'changed'        => [ 'animation' ],
+					'marker_options' => [
+						'animation' => 'drop',
+						'draggable' => false
+					],
+					'markers_count'  => 4,
+				];
+
+			case 'set_map_center':
+				return array_merge( [
+					'success' => true,
+					'changed' => [ 'center_lat', 'center_lng' ]
+				], $map );
+
+			case 'set_map_provider':
+				return array_merge( [
+					'success' => true,
+					'changed' => [ 'provider', 'api_key' ]
+				], $map );
+
+			case 'get_rest_map_data':
+				return [
+					'success'      => true,
+					'id'           => 128,
+					'map_id'       => 128,
+					'title'        => 'Store Locator',
+					'status'       => 'active',
+					'provider'     => 'openstreetmap',
+					'shortcode'    => '[wp_map id="128"]',
+					'modified'     => '2026-09-27T10:15:00+00:00',
+					'markersCount' => 4,
+					'config'       => self::sample_config(),
+				];
+		}//end switch
 
 		return [];
 	}
@@ -940,16 +1721,26 @@ class Wpmapblock extends IntegrationBase {
 			'version'    => 3,
 			'provider'   => 'openstreetmap',
 			'view'       => [
-				'center' => [ 'lat' => 23.8103, 'lng' => 90.4125 ],
+				'center' => [
+					'lat' => 23.8103,
+					'lng' => 90.4125
+				],
 				'zoom'   => 11,
 			],
-			'size'       => [ 'width' => '100%', 'height' => 480 ],
+			'size'       => [
+				'width' => '100%',
+				'height' => 480
+			],
 			'mapType'    => 'roadmap',
-			'clustering' => [ 'enabled' => true, 'radius' => 50, 'maxZoom' => 14 ],
+			'clustering' => [
+				'enabled' => true,
+				'radius' => 50,
+				'maxZoom' => 14
+			],
 			'markers'    => [],
 			'categories' => [],
 			'shapes'     => [],
-			'dataSources'=> [],
+			'dataSources' => [],
 		];
 	}
 }

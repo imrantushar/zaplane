@@ -355,10 +355,26 @@ class WorkflowAuthor {
 			$data['label'] = (string) $capability['label'];
 		}
 
-		// The engine matches a fired WordPress hook back to the trigger node, so
-		// this has to be the manifest's hook, not whatever the caller guessed.
+		// The engine matches fired WordPress hooks back to the trigger node.
+		// Preserve every declared hook so multi-hook triggers are not reduced to
+		// the first hook.
 		if ( 'trigger' === $type && ! empty( $capability['hook'] ) ) {
+			$hooks = array_values(
+				array_unique(
+					array_filter(
+						(array) $capability['hook'],
+						static function ( $hook ) {
+							return is_string( $hook ) && '' !== $hook;
+						}
+					)
+				)
+			);
 			$data['hook'] = Catalog::primary_hook( $capability );
+			if ( count( $hooks ) > 1 ) {
+				$data['hooks'] = $hooks;
+			} else {
+				unset( $data['hooks'] );
+			}
 		}
 
 		return $data;

@@ -194,7 +194,24 @@ class Query {
 	 * @return string[]
 	 */
 	private static function resolve_hooks( array $node ): array {
-		$hook = $node['data']['hook'] ?? null;
+		$hook = $node['data']['hooks'] ?? ( $node['data']['hook'] ?? null );
+
+		// Older workflow versions persisted only the primary hook. If that hook
+		// belongs to a multi-hook manifest, restore the complete declaration so
+		// those existing workflows keep firing without requiring a re-save.
+		if ( ! isset( $node['data']['hooks'] ) && is_string( $hook ) && '' !== $hook ) {
+			$app   = strtolower( $node['data']['app'] ?? '' );
+			$event = $node['data']['event'] ?? '';
+			if ( $app && $event ) {
+				$integration = IntegrationLoader::get( $app );
+				if ( $integration ) {
+					$declared = $integration::get_triggers()[ $event ]['hook'] ?? null;
+					if ( is_array( $declared ) && in_array( $hook, $declared, true ) ) {
+						$hook = $declared;
+					}
+				}
+			}
+		}
 
 		if ( ! $hook ) {
 			$app   = strtolower( $node['data']['app'] ?? '' );
