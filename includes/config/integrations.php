@@ -121,6 +121,10 @@ $zaplane_registry = [
 		'file'  => 'formatter.php',
 		'class' => \Zaplane\Integrations\Formatter::class,
 	],
+	'custom-code-execution' => [
+		'file'  => 'custom-code-execution.php',
+		'class' => \Zaplane\Integrations\CustomCodeExecution::class,
+	],
 	'mcp-client'          => [
 		'file'  => 'mcpclient.php',
 		'class' => \Zaplane\Integrations\Mcpclient::class,
