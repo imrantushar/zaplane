@@ -72,6 +72,9 @@ return [
 	'masterstudy'         => [ 'masterstudy-lms-learning-management-system/masterstudy-lms-learning-management-system.php' ],
 	'academy'             => [ 'academy/academy.php' ],
 
+	// --- Video / Media ---
+	'trueplayer'          => [ 'trueplayer/trueplayer.php' ],
+
 	// --- Page builders / blocks ---
 	'elementor'           => [ 'elementor/elementor.php' ],
 	'beaverbuilder'       => [ 'beaver-builder-lite-version/fl-builder.php' ],

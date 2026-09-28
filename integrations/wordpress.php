@@ -1111,9 +1111,11 @@ class Wordpress extends IntegrationBase {
 
 	public static function resolve_trigger( array $node, array $args ) {
 
-		$config = $node['config'] ?? [];
+		$config = $node['config'] ?? ( $node['data']['config'] ?? [] );
 
-		switch ( $node['event'] ) {
+		$event = (string) ( $node['event'] ?? ( $node['data']['event'] ?? '' ) );
+
+		switch ( $event ) {
 			case 'publish_post':
 			case 'delete_post':
 			case 'untrashed_post':

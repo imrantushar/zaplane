@@ -385,6 +385,10 @@ $zaplane_registry = [
 		'file'  => 'gembooking.php',
 		'class' => \Zaplane\Integrations\Gembooking::class,
 	],
+	'trueplayer'              => [
+		'file'  => 'trueplayer.php',
+		'class' => \Zaplane\Integrations\Trueplayer::class,
+	],
 ];
 
 $zaplane_priority = [
@@ -394,6 +398,7 @@ $zaplane_priority = [
 	'ablocks',
 	'gembooking',
 	'zencommunity',
+	'trueplayer',
 ];
 
 $zaplane_priority_items = [];
