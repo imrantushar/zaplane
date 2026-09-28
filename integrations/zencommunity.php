@@ -168,9 +168,10 @@ class Zencommunity extends IntegrationBase {
 			if ( ! $sender || ! $receiver || ! $message_id ) { return false; }
 			global $wpdb;
 			$table = $wpdb->prefix . 'zenc_messages';
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- ZenCommunity's own table; must see the message just sent.
 			$first = (int) $wpdb->get_var( $wpdb->prepare(
-				"SELECT MIN(id) FROM {$table} WHERE group_id IS NULL AND ((sender_id = %d AND receiver_id = %d) OR (sender_id = %d AND receiver_id = %d))",
-				$sender, $receiver, $receiver, $sender
+				'SELECT MIN(id) FROM %i WHERE group_id IS NULL AND ((sender_id = %d AND receiver_id = %d) OR (sender_id = %d AND receiver_id = %d))',
+				$table, $sender, $receiver, $receiver, $sender
 			) );
 			return $first === $message_id ? self::payload( [ 'message_id' => $message_id,
 				'user_id' => $sender, 'receiver_id' => $receiver, 'message' => $message ] ) : false;
@@ -244,6 +245,7 @@ class Zencommunity extends IntegrationBase {
 					'user_id' => absint( $args[2] ?? 0 ), 'parent_id' => $parent_id, 'comment' => $args[5] ?? [] ] );
 			case 'comment_updated':
 				// ZenCommunity calls edit_comment() internally while first creating a comment.
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace -- Control flow, not debugging: the caller is the only signal that this edit is part of a create.
 				foreach ( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 12 ) as $frame ) {
 					if ( ( $frame['function'] ?? '' ) === 'comment' && ( $frame['class'] ?? '' ) === Feed::class ) { return false; }
 				}
@@ -411,7 +413,9 @@ class Zencommunity extends IntegrationBase {
 			$run = \Zaplane\Models\Run::find( absint( $node['_run_id'] ) );
 			$stored = is_array( $run->trigger_data ?? null ) ? $run->trigger_data : [];
 			$actor = absint( $stored['__wp_user_id'] ?? 0 );
-			if ( $actor && ! get_userdata( $actor ) ) { $actor = 0; }
+			if ( $actor && ! get_userdata( $actor ) ) {
+				$actor = 0;
+			}
 		}
 		// A community member may fire an administrator-owned automation. For
 		// privileged actions, authorize the trusted workflow owner, not the member
@@ -593,7 +597,9 @@ class Zencommunity extends IntegrationBase {
 						'global_roles' => array_keys( RoleManager::get_global_roles_by_user_id( $uid ) ) ] );
 				case 'create_post':
 					if ( ! $gid || ! $uid || ! get_userdata( $uid ) || ! Group::exists( $gid ) || empty( $values['content'] ) ) { throw new \InvalidArgumentException( 'Valid space, author and content required.' ); }
-					if ( ! $is_admin && $actor !== $uid ) { throw new \InvalidArgumentException( 'Cannot post as another user.' ); }
+					if ( ! $is_admin && $actor !== $uid ) {
+						throw new \InvalidArgumentException( 'Cannot post as another user.' );
+					}
 					$id = Feed::create( $gid, [ 'title' => (string) ( $values['title'] ?? '' ), 'content' => (string) $values['content'], 'type' => 'post' ], $uid );
 					return self::ok( [ 'feed_id' => $id, 'group_id' => $gid, 'user_id' => $uid ] );
 				case 'update_post':
@@ -612,7 +618,9 @@ class Zencommunity extends IntegrationBase {
 				case 'add_comment':
 				case 'add_reply':
 					if ( ! $fid || ! $uid || ! get_userdata( $uid ) || empty( $values['content'] ) || ( 'add_reply' === $action && ! $cid ) ) { throw new \InvalidArgumentException( 'Post, author, content and optional parent comment required.' ); }
-					if ( ! $is_admin && $actor !== $uid ) { throw new \InvalidArgumentException( 'Cannot comment as another user.' ); }
+					if ( ! $is_admin && $actor !== $uid ) {
+						throw new \InvalidArgumentException( 'Cannot comment as another user.' );
+					}
 					$created = Feed::comment( $fid, $uid, [ 'content' => (string) $values['content'] ], 'add_reply' === $action ? $cid : null );
 					return self::ok( [ 'feed_id' => $fid, 'comment_id' => absint( $created['id'] ?? 0 ), 'comment' => $created ] );
 				case 'delete_comment':
@@ -622,7 +630,9 @@ class Zencommunity extends IntegrationBase {
 				case 'add_reaction':
 					$type = sanitize_key( (string) ( $values['reaction_type'] ?? '' ) );
 					if ( ! $fid || ! $uid || ! get_userdata( $uid ) || ! in_array( $type, [ 'like', 'love', 'haha', 'wow', 'sad', 'angry', 'bookmark', 'upvote', 'downvote' ], true ) ) { throw new \InvalidArgumentException( 'Valid post, user and reaction required.' ); }
-					if ( ! $is_admin && $actor !== $uid ) { throw new \InvalidArgumentException( 'Cannot react as another user.' ); }
+					if ( ! $is_admin && $actor !== $uid ) {
+						throw new \InvalidArgumentException( 'Cannot react as another user.' );
+					}
 					if ( in_array( $type, Feed::get_reaction( $uid, $fid ) ?? [], true ) ) { return self::ok( [ 'feed_id' => $fid, 'user_id' => $uid, 'reaction_type' => $type, 'already_exists' => true ] ); }
 					Feed::react( $fid, $type, $uid );
 					return self::ok( [ 'feed_id' => $fid, 'user_id' => $uid, 'reaction_type' => $type ] );
@@ -668,7 +678,9 @@ class Zencommunity extends IntegrationBase {
 				case 'set_rsvp':
 				case 'cancel_rsvp':
 					if ( ! $eid || ! $uid || ! get_userdata( $uid ) ) { throw new \InvalidArgumentException( 'Valid event and user required.' ); }
-					if ( ! $is_admin && $actor !== $uid ) { throw new \InvalidArgumentException( 'Cannot RSVP as another user.' ); }
+					if ( ! $is_admin && $actor !== $uid ) {
+						throw new \InvalidArgumentException( 'Cannot RSVP as another user.' );
+					}
 					if ( 'cancel_rsvp' === $action ) { Event::remove_rsvp( $eid, $uid ); }
 					else {
 						$status = (string) ( $values['status'] ?? '' );

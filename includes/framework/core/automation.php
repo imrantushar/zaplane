@@ -521,7 +521,7 @@ class Automation {
 				$node = $this->inject_credentials( $node );
 				$node = $this->resolveNodeConfig( $node, $resolveData );
 				$output = $integration::execute_node( $node, $input );
-			}
+			}//end if
 
 			if ( isset( $output['status'] ) && 'delayed' === $output['status'] ) {
 				$nodeRun->status = 'delayed';

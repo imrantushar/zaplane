@@ -225,7 +225,9 @@ trait AcademyActions {
             // Both helpers take the student explicitly; the step never runs as them.
             if ( 'enroll-course' === $action ) {
                 $id = \Academy\Helper::do_enroll( $course_id, $user_id );
-                if ( ! $id || is_wp_error( $id ) ) { throw new \RuntimeException( 'Academy enrollment failed.' ); }
+                if ( ! $id || is_wp_error( $id ) ) {
+                    throw new \RuntimeException( 'Academy enrollment failed.' );
+                }
             } else {
                 \Academy\Helper::cancel_course_enroll( $course_id, $user_id );
             }

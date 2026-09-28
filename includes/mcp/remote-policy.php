@@ -133,6 +133,8 @@ class RemotePolicy {
 	 *
 	 * The Catch Webhook trigger, and any integration that receives provider
 	 * webhooks, polls an outside API or signs in to an outside account.
+	 *
+	 * @param string $app Integration slug of the trigger.
 	 */
 	public static function is_remote_trigger_app( string $app ): bool {
 		$app = strtolower( $app );
