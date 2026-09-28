@@ -168,9 +168,10 @@ class Zencommunity extends IntegrationBase {
 			if ( ! $sender || ! $receiver || ! $message_id ) { return false; }
 			global $wpdb;
 			$table = $wpdb->prefix . 'zenc_messages';
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- ZenCommunity's own table; must see the message just sent.
 			$first = (int) $wpdb->get_var( $wpdb->prepare(
-				"SELECT MIN(id) FROM {$table} WHERE group_id IS NULL AND ((sender_id = %d AND receiver_id = %d) OR (sender_id = %d AND receiver_id = %d))",
-				$sender, $receiver, $receiver, $sender
+				'SELECT MIN(id) FROM %i WHERE group_id IS NULL AND ((sender_id = %d AND receiver_id = %d) OR (sender_id = %d AND receiver_id = %d))',
+				$table, $sender, $receiver, $receiver, $sender
 			) );
 			return $first === $message_id ? self::payload( [ 'message_id' => $message_id,
 				'user_id' => $sender, 'receiver_id' => $receiver, 'message' => $message ] ) : false;
@@ -244,6 +245,7 @@ class Zencommunity extends IntegrationBase {
 					'user_id' => absint( $args[2] ?? 0 ), 'parent_id' => $parent_id, 'comment' => $args[5] ?? [] ] );
 			case 'comment_updated':
 				// ZenCommunity calls edit_comment() internally while first creating a comment.
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace -- Control flow, not debugging: the caller is the only signal that this edit is part of a create.
 				foreach ( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 12 ) as $frame ) {
 					if ( ( $frame['function'] ?? '' ) === 'comment' && ( $frame['class'] ?? '' ) === Feed::class ) { return false; }
 				}
@@ -380,7 +382,7 @@ class Zencommunity extends IntegrationBase {
 	private static function fail( string $message, array $input = [] ): array {
 		// Zaplane marks returned outputs as completed. Throw so the engine records
 		// a failed node/run and cannot route this error down a success edge.
-		throw new \RuntimeException( $message );
+		throw new \RuntimeException( esc_html( $message ) );
 	}
 
 	private static function member_status( int $user_id, int $group_id ): string {
@@ -403,19 +405,16 @@ class Zencommunity extends IntegrationBase {
 		$fid = absint( $values['feed_id'] ?? 0 );
 		$cid = absint( $values['comment_id'] ?? 0 );
 		$eid = absint( $values['event_id'] ?? 0 );
-		// Async jobs do not have the request cookie; recover the trusted user
-		// captured by Zaplane at trigger time, never from user-editable config.
+		// The user this step acts for. Async jobs have no request cookie, so it is
+		// the user Zaplane captured at trigger time — never user-editable config.
+		// The session is never switched to them: every call below names its user.
 		$actor = get_current_user_id();
-		$restore_actor = 0;
-		$hydrated_actor = false;
 		if ( ! $actor && ! empty( $node['_run_id'] ) ) {
 			$run = \Zaplane\Models\Run::find( absint( $node['_run_id'] ) );
 			$stored = is_array( $run->trigger_data ?? null ) ? $run->trigger_data : [];
 			$actor = absint( $stored['__wp_user_id'] ?? 0 );
-			if ( $actor && get_userdata( $actor ) ) {
-				$restore_actor = get_current_user_id();
-				wp_set_current_user( $actor );
-				$hydrated_actor = true;
+			if ( $actor && ! get_userdata( $actor ) ) {
+				$actor = 0;
 			}
 		}
 		// A community member may fire an administrator-owned automation. For
@@ -432,14 +431,11 @@ class Zencommunity extends IntegrationBase {
 			$owner_workflow = $owner_run ? \Zaplane\Models\Workflow::find( absint( $owner_run->workflow_id ) ) : null;
 			$owner_id = absint( $owner_workflow->user_id ?? 0 );
 			if ( $owner_id && user_can( $owner_id, 'manage_options' ) ) {
-				if ( ! $hydrated_actor ) { $restore_actor = get_current_user_id(); }
-				wp_set_current_user( $owner_id );
 				$actor = $owner_id;
-				$hydrated_actor = true;
 			}
 		}
-		if ( ! $actor || ( ! user_can( $actor, 'manage_options' ) && ! in_array( $action, $member_actions, true ) ) ) {
-			if ( $hydrated_actor ) { wp_set_current_user( $restore_actor ); }
+		$is_admin = $actor && user_can( $actor, 'manage_options' );
+		if ( ! $actor || ( ! $is_admin && ! in_array( $action, $member_actions, true ) ) ) {
 			return self::fail( 'Authorized WordPress user required for this action.', $input );
 		}
 		try {
@@ -454,7 +450,7 @@ class Zencommunity extends IntegrationBase {
 						|| ( 'send_group_message' === $action && ! $gid ) ) {
 						throw new \InvalidArgumentException( 'Valid sender, recipient/chat and message required.' );
 					}
-					if ( ! user_can( $actor, 'manage_options' ) && $sender !== $actor ) {
+					if ( ! $is_admin && $sender !== $actor ) {
 						throw new \InvalidArgumentException( 'Cannot send a message as another user.' );
 					}
 					$model = 'send_private_message' === $action
@@ -512,7 +508,7 @@ class Zencommunity extends IntegrationBase {
 						if ( ! $author || ! get_userdata( $author ) || empty( $values['content'] ) ) {
 							throw new \InvalidArgumentException( 'Reply author and nonempty content required.' );
 						}
-						if ( 'reply_ticket' === $action && ! user_can( $actor, 'manage_options' ) && $author !== $actor ) {
+						if ( 'reply_ticket' === $action && ! $is_admin && $author !== $actor ) {
 							throw new \InvalidArgumentException( 'Cannot reply as another user.' );
 						}
 						$conversation = $ticket_model::conversation( $ticket_id, $author, [
@@ -601,7 +597,9 @@ class Zencommunity extends IntegrationBase {
 						'global_roles' => array_keys( RoleManager::get_global_roles_by_user_id( $uid ) ) ] );
 				case 'create_post':
 					if ( ! $gid || ! $uid || ! get_userdata( $uid ) || ! Group::exists( $gid ) || empty( $values['content'] ) ) { throw new \InvalidArgumentException( 'Valid space, author and content required.' ); }
-					if ( $actor && ! current_user_can( 'manage_options' ) && $actor !== $uid ) { throw new \InvalidArgumentException( 'Cannot post as another user.' ); }
+					if ( ! $is_admin && $actor !== $uid ) {
+						throw new \InvalidArgumentException( 'Cannot post as another user.' );
+					}
 					$id = Feed::create( $gid, [ 'title' => (string) ( $values['title'] ?? '' ), 'content' => (string) $values['content'], 'type' => 'post' ], $uid );
 					return self::ok( [ 'feed_id' => $id, 'group_id' => $gid, 'user_id' => $uid ] );
 				case 'update_post':
@@ -620,7 +618,9 @@ class Zencommunity extends IntegrationBase {
 				case 'add_comment':
 				case 'add_reply':
 					if ( ! $fid || ! $uid || ! get_userdata( $uid ) || empty( $values['content'] ) || ( 'add_reply' === $action && ! $cid ) ) { throw new \InvalidArgumentException( 'Post, author, content and optional parent comment required.' ); }
-					if ( $actor && ! current_user_can( 'manage_options' ) && $actor !== $uid ) { throw new \InvalidArgumentException( 'Cannot comment as another user.' ); }
+					if ( ! $is_admin && $actor !== $uid ) {
+						throw new \InvalidArgumentException( 'Cannot comment as another user.' );
+					}
 					$created = Feed::comment( $fid, $uid, [ 'content' => (string) $values['content'] ], 'add_reply' === $action ? $cid : null );
 					return self::ok( [ 'feed_id' => $fid, 'comment_id' => absint( $created['id'] ?? 0 ), 'comment' => $created ] );
 				case 'delete_comment':
@@ -630,7 +630,9 @@ class Zencommunity extends IntegrationBase {
 				case 'add_reaction':
 					$type = sanitize_key( (string) ( $values['reaction_type'] ?? '' ) );
 					if ( ! $fid || ! $uid || ! get_userdata( $uid ) || ! in_array( $type, [ 'like', 'love', 'haha', 'wow', 'sad', 'angry', 'bookmark', 'upvote', 'downvote' ], true ) ) { throw new \InvalidArgumentException( 'Valid post, user and reaction required.' ); }
-					if ( $actor && ! current_user_can( 'manage_options' ) && $actor !== $uid ) { throw new \InvalidArgumentException( 'Cannot react as another user.' ); }
+					if ( ! $is_admin && $actor !== $uid ) {
+						throw new \InvalidArgumentException( 'Cannot react as another user.' );
+					}
 					if ( in_array( $type, Feed::get_reaction( $uid, $fid ) ?? [], true ) ) { return self::ok( [ 'feed_id' => $fid, 'user_id' => $uid, 'reaction_type' => $type, 'already_exists' => true ] ); }
 					Feed::react( $fid, $type, $uid );
 					return self::ok( [ 'feed_id' => $fid, 'user_id' => $uid, 'reaction_type' => $type ] );
@@ -665,6 +667,10 @@ class Zencommunity extends IntegrationBase {
 					if ( 'create_event' === $action ) {
 						if ( empty( $fields['title'] ) || empty( $fields['start_at'] ) ) { throw new \InvalidArgumentException( 'Title and start time required.' ); }
 						$eid = Event::create( $gid, $fields );
+						// The model credits the signed-in user; credit the user this step acts for.
+						if ( $eid && get_current_user_id() !== $actor ) {
+							Event::ins()->qb()->where( 'evt.id', '=', $eid )->update( [ 'user_id' => $actor ] );
+						}
 						// The model does not dispatch this hook; ZenCommunity's REST controller does.
 						do_action( 'zencommunity/event/created', $eid, $gid, $fields );
 					} else { if ( ! $fields ) { throw new \InvalidArgumentException( 'No event changes provided.' ); } Event::update( $eid, $fields ); }
@@ -672,7 +678,9 @@ class Zencommunity extends IntegrationBase {
 				case 'set_rsvp':
 				case 'cancel_rsvp':
 					if ( ! $eid || ! $uid || ! get_userdata( $uid ) ) { throw new \InvalidArgumentException( 'Valid event and user required.' ); }
-					if ( $actor && ! current_user_can( 'manage_options' ) && $actor !== $uid ) { throw new \InvalidArgumentException( 'Cannot RSVP as another user.' ); }
+					if ( ! $is_admin && $actor !== $uid ) {
+						throw new \InvalidArgumentException( 'Cannot RSVP as another user.' );
+					}
 					if ( 'cancel_rsvp' === $action ) { Event::remove_rsvp( $eid, $uid ); }
 					else {
 						$status = (string) ( $values['status'] ?? '' );
@@ -683,8 +691,6 @@ class Zencommunity extends IntegrationBase {
 			}
 		} catch ( \Throwable $e ) {
 			return self::fail( $e->getMessage(), $input );
-		} finally {
-			if ( $hydrated_actor ) { wp_set_current_user( $restore_actor ); }
 		}
 		return self::fail( 'ZenCommunity operation was not implemented.', $input );
 	}

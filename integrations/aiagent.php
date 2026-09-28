@@ -437,6 +437,12 @@ class Aiagent extends IntegrationBase {
 				continue;
 			}
 
+			// What the model asks for is shaped by text from outside the site, so
+			// it is never handed an action that administers the site.
+			if ( \Zaplane\Mcp\RemotePolicy::is_restricted( $app, $event ) ) {
+				continue;
+			}
+
 			$instance = \Zaplane\Framework\Core\IntegrationLoader::get( $app );
 			if ( ! $instance ) {
 				continue;

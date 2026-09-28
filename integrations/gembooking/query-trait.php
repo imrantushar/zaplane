@@ -196,8 +196,8 @@ trait QueryTrait
 
 		$table = $wpdb->prefix . 'gembk_package_purchases';
 
-		$sql = "SELECT id, package_id, user_id, email, status FROM {$table} ORDER BY id DESC LIMIT 100";
-		$rows = $wpdb->get_results( $sql, ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- GemBooking's own table, read for a picker.
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT id, package_id, user_id, email, status FROM %i ORDER BY id DESC LIMIT %d', $table, 100 ), ARRAY_A );
 
 		if ( ! is_array( $rows ) ) {
 			return [];

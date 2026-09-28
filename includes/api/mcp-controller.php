@@ -382,11 +382,10 @@ class McpController extends WP_REST_Controller {
 			return false;
 		}
 
-		// Act as whoever the token belongs to, and hold them to what they can
-		// actually do. Without this the token's user was decoration: no user was
-		// ever set, no capability was ever checked, and every token — including
-		// one issued to somebody who has since been demoted or deleted — carried
-		// the same authority as an administrator's.
+		// The request must be running as whoever the token belongs to (resolved
+		// by authenticate_bearer(), or by core for an application password), and
+		// they are held to what they can actually do: a token issued to somebody
+		// since demoted or deleted carries nothing.
 		if ( ! self::assume( $token ) ) {
 			return new \WP_Error(
 				'zaplane_mcp_forbidden',
@@ -423,13 +422,12 @@ class McpController extends WP_REST_Controller {
 	}
 
 	/**
-	 * Become the token's user, and say whether they may act at all.
+	 * Confirm the request runs as the token's user, and say whether they may act.
 	 *
-	 * An application password has already been authenticated by core, so the
-	 * current user is set and this only re-asks the capability. A bearer token
-	 * has authenticated nobody — the request arrives with no user — so the
-	 * recorded one is applied here, which is what makes the capability question
-	 * meaningful and the audit trail true.
+	 * The user is never switched here. Core resolves an application password,
+	 * and authenticate_bearer() resolves a Zaplane token, both on
+	 * `determine_current_user`; anything else — no user, or a different one —
+	 * is refused.
 	 *
 	 * Zaplane asks `manage_options` of everyone on every one of its screens.
 	 * A token cannot be a way around that, so it is asked here too, on every
@@ -441,11 +439,61 @@ class McpController extends WP_REST_Controller {
 	private static function assume( array $token ): bool {
 		$user_id = (int) ( $token['user_id'] ?? 0 );
 
-		if ( $user_id > 0 && get_current_user_id() !== $user_id ) {
-			wp_set_current_user( $user_id );
+		if ( $user_id <= 0 || get_current_user_id() !== $user_id ) {
+			return false;
 		}
 
 		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * Resolve the user a Zaplane MCP bearer token belongs to, on the same
+	 * `determine_current_user` filter core resolves application passwords on.
+	 *
+	 * Only for a request to this plugin's MCP endpoint that carries a `zpl_`
+	 * bearer and no other credential. TokenStore::resolve() checks the secret
+	 * against its stored hash and the token's expiry, so an unknown, expired or
+	 * revoked token resolves nobody. No auth cookie is set: the user holds for
+	 * this one request, and check_bearer() still asks manage_options of them.
+	 *
+	 * @param int|false $user_id The user resolved so far.
+	 * @return int|false
+	 */
+	public static function authenticate_bearer( $user_id ) {
+		if ( ! empty( $user_id ) || ! self::enabled() || ! self::is_mcp_request() ) {
+			return $user_id;
+		}
+
+		$presented = self::bearer_value( self::authorization_header_from_server() );
+
+		if ( 0 !== strpos( $presented, 'zpl_' ) ) {
+			return $user_id;
+		}
+
+		$token = TokenStore::resolve( $presented );
+		$owner = (int) ( $token['user_id'] ?? 0 );
+
+		return ( $owner > 0 && get_userdata( $owner ) ) ? $owner : $user_id;
+	}
+
+	/**
+	 * Whether this request is for the MCP endpoint, read before the REST server
+	 * has parsed it (pretty and plain permalinks).
+	 */
+	private static function is_mcp_request(): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Routing only; nothing is changed.
+		if ( isset( $_GET['rest_route'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Routing only; nothing is changed.
+			$route = sanitize_text_field( wp_unslash( (string) $_GET['rest_route'] ) );
+		} else {
+			$uri    = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['REQUEST_URI'] ) ) : '';
+			$path   = (string) wp_parse_url( $uri, PHP_URL_PATH );
+			$prefix = '/' . trim( rest_get_url_prefix(), '/' ) . '/';
+			$pos    = strpos( $path, $prefix );
+			$route  = false === $pos ? '' : substr( $path, $pos + strlen( $prefix ) - 1 );
+		}
+
+		return '/zaplane/v1/mcp' === untrailingslashit( $route );
 	}
 
 	/**
@@ -852,14 +900,23 @@ class McpController extends WP_REST_Controller {
 		$header = (string) $request->get_header( 'authorization' );
 
 		if ( '' === $header ) {
-			foreach ( [ 'HTTP_AUTHORIZATION', 'REDIRECT_HTTP_AUTHORIZATION' ] as $key ) {
-				if ( ! empty( $_SERVER[ $key ] ) ) {
-					$header = sanitize_text_field( wp_unslash( (string) $_SERVER[ $key ] ) );
-					break;
-				}
+			$header = self::authorization_header_from_server();
+		}
+
+		return self::bearer_value( $header );
+	}
+
+	private static function authorization_header_from_server(): string {
+		foreach ( [ 'HTTP_AUTHORIZATION', 'REDIRECT_HTTP_AUTHORIZATION' ] as $key ) {
+			if ( ! empty( $_SERVER[ $key ] ) ) {
+				return sanitize_text_field( wp_unslash( (string) $_SERVER[ $key ] ) );
 			}
 		}
 
+		return '';
+	}
+
+	private static function bearer_value( string $header ): string {
 		if ( 0 !== stripos( $header, 'bearer ' ) ) {
 			return '';
 		}

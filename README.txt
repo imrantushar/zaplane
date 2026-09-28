@@ -4,7 +4,7 @@ Tags: automation, workflow, woocommerce, marketing automation, crm
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -276,6 +276,13 @@ The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `compo
 
 == Changelog ==
 
+= 1.3.3 =
+**Security**
+* A workflow that another service starts — a Catch Webhook URL, a provider webhook, or a trigger from a connected outside account — can no longer run actions that administer the site: activating or deactivating plugins, creating, changing or deleting users, changing roles and capabilities, and changing site options. Such a workflow cannot be activated, the editor explains why, and the step is refused if one runs anyway. The same actions still work in workflows started by something that happens on the site.
+* An AI Agent is never given those actions as tools.
+* The Academy and ZenCommunity steps no longer switch the signed-in user while they run; they act for the user they name.
+* MCP access tokens now sign in through WordPress's own authentication filter, the one application passwords use, instead of switching the user inside the endpoint.
+
 = 1.3.2 =
 **Security**
 * An AI client connected through the MCP server can no longer reach actions that administer the site: activating or deactivating plugins, creating, changing or deleting users, changing roles and capabilities, and changing site options. It cannot add them to a workflow, or read, edit, activate, test or run a workflow that uses them.
@@ -386,6 +393,9 @@ The PHP library in `vendor/` (Action Scheduler) is managed with Composer; `compo
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.3.3 =
+Workflows started by a webhook or an outside service can no longer run actions that administer the site.
 
 = 1.3.2 =
 MCP clients can no longer use actions that administer the site, and PHP 7.4 compatibility is fixed.

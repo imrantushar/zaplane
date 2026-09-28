@@ -541,6 +541,7 @@ class GraphTester {
 	 * @return mixed
 	 */
 	private static function resolve_quietly( string $raw, array $context ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler -- Scoped to one evaluation and restored in finally; warnings become findings.
 		set_error_handler( fn() => true );
 
 		try {

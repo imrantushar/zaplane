@@ -27,6 +27,8 @@ class API implements ModuleInterface {
 
 	public function register_hooks(): void {
 		add_action( 'rest_api_init', [ $this, 'register_route' ] );
+		// After core's cookie and application-password checks (priority 20).
+		add_filter( 'determine_current_user', [ \Zaplane\API\McpController::class, 'authenticate_bearer' ], 30 );
 	}
 	public function register_route() {
 		( new \Zaplane\API\IntegrationsController( $this->container ) )->register_routes();

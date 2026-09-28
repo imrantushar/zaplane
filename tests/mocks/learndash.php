@@ -129,6 +129,6 @@ if ( ! function_exists( 'current_time' ) ) {
 if ( ! function_exists( 'get_current_user_id' ) ) {
     function get_current_user_id()
     {
-        return 1;
+        return (int) ( $GLOBALS['zaplane_test_current_user'] ?? 1 );
     }
 }

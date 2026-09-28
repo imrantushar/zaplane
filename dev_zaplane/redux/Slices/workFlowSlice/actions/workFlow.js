@@ -10,6 +10,15 @@ import {
 } from '@ZAPUtils/helper';
 import { showNotification } from '../../notificationSlice/notificationSlice';
 
+// A readable message from a failed request. The notification renders its
+// message as text, so an Error object there crashes the whole screen.
+const requestErrorMessage = (e, fallback) => {
+	const body = e?.response?.data;
+	const candidates = [body?.data, body?.data?.message, body?.message, e];
+	const text = candidates.find((value) => typeof value === 'string' && value !== '');
+	return text || fallback;
+};
+
 export const createWorkflows = createAsyncThunk(
 	'zaplane/createWorkflows',
 	async (payload, thunkAPI) => {
@@ -114,13 +123,15 @@ export const updateWorkFlowStatus = createAsyncThunk(
 			});
 			return payload;
 		} catch (e) {
+			const message = requestErrorMessage(e, __('The workflow status could not be changed.', 'zaplane'));
 			thunkAPI.dispatch(
 				showNotification({
-					message: e,
+					message,
 					isShow: true,
 					type: 'error',
 				})
 			);
+			return thunkAPI.rejectWithValue(message);
 		}
 	}
 )
@@ -136,7 +147,7 @@ export const updateWorkFlowTitle = createAsyncThunk(
 		} catch (e) {
 			thunkAPI.dispatch(
 				showNotification({
-					message: e,
+					message: requestErrorMessage(e, __('The workflow title could not be changed.', 'zaplane')),
 					isShow: true,
 					type: 'error',
 				})

@@ -15,6 +15,7 @@ use Zaplane\Models\Run;
 use Zaplane\Models\NodeRun;
 use Zaplane\Utils\VariableExtractor;
 use Zaplane\Framework\Core\IntegrationLoader;
+use Zaplane\Mcp\RemotePolicy;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -294,7 +295,7 @@ class WorkflowsController extends WP_REST_Controller {
 		$graph = $request->get_json_params();
 		$data  = (array) $response->get_data();
 
-		$data['warnings'] = TriggerAdvisor::warnings( is_array( $graph ) ? $graph : [] );
+		$data['warnings'] = $this->warnings( is_array( $graph ) ? $graph : [] );
 		$response->set_data( $data );
 
 		return $response;
@@ -502,8 +503,31 @@ class WorkflowsController extends WP_REST_Controller {
 			] : null,
 			'graph' => $graph,
 			'test_outputs' => $testOutputs,
-			'warnings' => TriggerAdvisor::warnings( $graph ),
+			'warnings' => $this->warnings( $graph ),
 		]);
+	}
+
+	/**
+	 * What the editor shows about a graph: the trigger advice, plus any site
+	 * administration action that a remotely-started workflow will refuse to run.
+	 *
+	 * @param array<string,mixed> $graph
+	 * @return array<int,array<string,string>>
+	 */
+	private function warnings( array $graph ): array {
+		$warnings = TriggerAdvisor::warnings( $graph );
+		$refused  = RemotePolicy::remote_violations( $graph );
+
+		if ( ! empty( $refused ) ) {
+			$warnings[] = [
+				'code'    => 'remote_admin_action',
+				'where'   => 'workflow',
+				'node_id' => '',
+				'message' => RemotePolicy::remote_message( $refused ),
+			];
+		}
+
+		return $warnings;
 	}
 
 	public function list_versions( $request ) {
@@ -561,6 +585,13 @@ class WorkflowsController extends WP_REST_Controller {
 
 		if ( ! $version ) {
 			return new WP_Error( 'invalid_version', 'Version not found', [ 'status' => 404 ] );
+		}
+
+		$workflow = Workflow::find( $workflowId );
+		$refused  = ( $workflow && $workflow->isActive() ) ? RemotePolicy::remote_violations( $version->getGraph() ) : [];
+
+		if ( ! empty( $refused ) ) {
+			return new WP_Error( 'remote_admin_action', RemotePolicy::remote_message( $refused ), [ 'status' => 400 ] );
 		}
 
 		WorkflowVersion::where( 'workflow_id', $workflowId )->update( [ 'is_active' => 0 ] );

@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-3.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Zaplane 1.3.2\n"
+"Project-Id-Version: Zaplane 1.3.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/zaplane\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-24T13:31:02+00:00\n"
+"POT-Creation-Date: 2026-09-28T10:42:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: zaplane\n"
@@ -17,7 +17,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #: zaplane.php
 #: includes/admin/menu.php:74
-#: includes/api/mcp-controller.php:576
+#: includes/api/mcp-controller.php:624
 #: dev_zaplane/containers/BackendDashboard/AdminMenu/index.js:19
 #: dev_zaplane/containers/BackendDashboard/AdminMenu/index.js:42
 msgid "Zaplane"
@@ -43,39 +43,39 @@ msgstr ""
 msgid "https://kodezen.com"
 msgstr ""
 
-#: includes/ajax/workflows.php:59
+#: includes/ajax/workflows.php:60
 msgid "ID and status are required"
 msgstr ""
 
-#: includes/ajax/workflows.php:63
+#: includes/ajax/workflows.php:64
 msgid "Invalid status value"
 msgstr ""
 
-#: includes/ajax/workflows.php:69
-#: includes/ajax/workflows.php:113
-#: includes/ajax/workflows.php:153
-#: includes/ajax/workflows.php:175
+#: includes/ajax/workflows.php:70
+#: includes/ajax/workflows.php:123
+#: includes/ajax/workflows.php:163
+#: includes/ajax/workflows.php:185
 msgid "Workflow not found"
 msgstr ""
 
-#: includes/ajax/workflows.php:99
+#: includes/ajax/workflows.php:109
 msgid "Status updated successfully"
 msgstr ""
 
-#: includes/ajax/workflows.php:107
-#: includes/ajax/workflows.php:169
+#: includes/ajax/workflows.php:117
+#: includes/ajax/workflows.php:179
 msgid "Workflow ID is required"
 msgstr ""
 
-#: includes/ajax/workflows.php:138
+#: includes/ajax/workflows.php:148
 msgid "Workflow duplicated successfully"
 msgstr ""
 
-#: includes/ajax/workflows.php:147
+#: includes/ajax/workflows.php:157
 msgid "ID and title are required"
 msgstr ""
 
-#: includes/ajax/workflows.php:162
+#: includes/ajax/workflows.php:172
 msgid "Title updated successfully"
 msgstr ""
 
@@ -143,137 +143,137 @@ msgstr ""
 msgid "Untitled workflow"
 msgstr ""
 
-#: includes/api/mcp-controller.php:393
+#: includes/api/mcp-controller.php:392
 msgid "This credential belongs to an account that cannot manage this site."
 msgstr ""
 
 #. translators: 1: calls allowed per minute, 2: seconds until the window resets.
-#: includes/api/mcp-controller.php:412
+#: includes/api/mcp-controller.php:411
 #, php-format
 msgid "Rate limit reached: %1$d calls per minute. Retry in %2$d seconds."
 msgstr ""
 
-#: includes/api/mcp-controller.php:457
+#: includes/api/mcp-controller.php:505
 msgid "The MCP endpoint accepts POST. It has no event stream to open and no session to end."
 msgstr ""
 
-#: includes/api/mcp-controller.php:541
+#: includes/api/mcp-controller.php:589
 msgid "That client is not registered."
 msgstr ""
 
-#: includes/api/mcp-controller.php:570
+#: includes/api/mcp-controller.php:618
 msgid "Application passwords are switched off on this site. Connect through the sign-in flow instead."
 msgstr ""
 
-#: includes/api/mcp-controller.php:591
+#: includes/api/mcp-controller.php:639
 msgid "That connection is not one made here."
 msgstr ""
 
-#: includes/api/mcp-controller.php:640
+#: includes/api/mcp-controller.php:688
 msgid "AI access module is on"
 msgstr ""
 
-#: includes/api/mcp-controller.php:643
+#: includes/api/mcp-controller.php:691
 msgid "AI access module is off"
 msgstr ""
 
-#: includes/api/mcp-controller.php:645
+#: includes/api/mcp-controller.php:693
 msgid "Every request is refused before the credential is even looked at, so any client reports a sign-in failure. Turn it on under Settings → Modules."
 msgstr ""
 
-#: includes/api/mcp-controller.php:655
+#: includes/api/mcp-controller.php:703
 msgid "Endpoint — not checked while the module is off"
 msgstr ""
 
-#: includes/api/mcp-controller.php:656
+#: includes/api/mcp-controller.php:704
 msgid "Sign-in discovery — not checked while the module is off"
 msgstr ""
 
-#: includes/api/mcp-controller.php:660
+#: includes/api/mcp-controller.php:708
 msgid "Address is reachable from the internet"
 msgstr ""
 
-#: includes/api/mcp-controller.php:663
+#: includes/api/mcp-controller.php:711
 msgid "Address cannot be reached from the internet"
 msgstr ""
 
-#: includes/api/mcp-controller.php:665
+#: includes/api/mcp-controller.php:713
 msgid "Hosted connectors such as claude.ai and ChatGPT look this address up from their own servers, so a development hostname never arrives and they report that they could not sign in. Clients running on this machine are unaffected."
 msgstr ""
 
-#: includes/api/mcp-controller.php:669
+#: includes/api/mcp-controller.php:717
 msgid "Application passwords are available"
 msgstr ""
 
-#: includes/api/mcp-controller.php:672
+#: includes/api/mcp-controller.php:720
 msgid "Application passwords are switched off"
 msgstr ""
 
-#: includes/api/mcp-controller.php:674
+#: includes/api/mcp-controller.php:722
 msgid "A security plugin or a site filter has disabled them. Connect with an issued token or through OAuth instead."
 msgstr ""
 
 #. translators: %d: number of credentials.
-#: includes/api/mcp-controller.php:680
+#: includes/api/mcp-controller.php:728
 #, php-format
 msgid "%d credential issued"
 msgid_plural "%d credentials issued"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/api/mcp-controller.php:683
+#: includes/api/mcp-controller.php:731
 msgid "No credentials issued yet"
 msgstr ""
 
-#: includes/api/mcp-controller.php:685
+#: includes/api/mcp-controller.php:733
 msgid "Nothing is connected. Issue a token below, use a WordPress application password, or let a hosted connector sign in."
 msgstr ""
 
-#: includes/api/mcp-controller.php:717
+#: includes/api/mcp-controller.php:765
 msgid "The endpoint could not be reached from this site"
 msgstr ""
 
-#: includes/api/mcp-controller.php:719
+#: includes/api/mcp-controller.php:767
 msgid "a certificate this server does not trust will also read like this. A hosted connector refuses an untrusted certificate outright."
 msgstr ""
 
 #. translators: %d: HTTP status code.
-#: includes/api/mcp-controller.php:730
+#: includes/api/mcp-controller.php:778
 #, php-format
 msgid "The endpoint answered %d, not 401"
 msgstr ""
 
-#: includes/api/mcp-controller.php:732
+#: includes/api/mcp-controller.php:780
 msgid "An unauthenticated call should be refused with 401. Another status usually means a security plugin, firewall or cache is answering before WordPress does."
 msgstr ""
 
-#: includes/api/mcp-controller.php:739
+#: includes/api/mcp-controller.php:787
 msgid "The refusal carries no pointer to the sign-in service"
 msgstr ""
 
-#: includes/api/mcp-controller.php:741
+#: includes/api/mcp-controller.php:789
 msgid "Hosted connectors follow that pointer to discover OAuth; without it they report that this server does not implement it. Something is stripping response headers."
 msgstr ""
 
-#: includes/api/mcp-controller.php:745
+#: includes/api/mcp-controller.php:793
 msgid "Endpoint answers and advertises how to sign in"
 msgstr ""
 
 #. translators: %s: the well-known document name.
-#: includes/api/mcp-controller.php:759
+#: includes/api/mcp-controller.php:807
 #, php-format
 msgid "/.well-known/%s is not being served"
 msgstr ""
 
-#: includes/api/mcp-controller.php:761
+#: includes/api/mcp-controller.php:809
 msgid "A hosted connector reads these two documents before it can sign in. Some hosts serve /.well-known/ from disk, which shadows them; a static-cache plugin can do the same."
 msgstr ""
 
-#: includes/api/mcp-controller.php:766
+#: includes/api/mcp-controller.php:814
 msgid "Sign-in discovery documents are being served"
 msgstr ""
 
-#: includes/api/mcp-controller.php:817
+#: includes/api/mcp-controller.php:865
 msgid "Application password"
 msgstr ""
 
@@ -286,7 +286,7 @@ msgid "Recipe not found."
 msgstr ""
 
 #. translators: %d: the trigger's number on the canvas
-#: includes/api/workflows-controller.php:886
+#: includes/api/workflows-controller.php:917
 #: includes/authoring/trigger-advisor.php:219
 #: includes/authoring/trigger-advisor.php:366
 #: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/customNode/CustomNode.js:182
@@ -294,7 +294,7 @@ msgstr ""
 msgid "Trigger %d"
 msgstr ""
 
-#: includes/api/workflows-controller.php:920
+#: includes/api/workflows-controller.php:951
 msgid "Trigger (whichever fired)"
 msgstr ""
 
@@ -393,7 +393,7 @@ msgid "Folders"
 msgstr ""
 
 #: includes/config/menu.php:50
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:207
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:212
 msgid "Logs"
 msgstr ""
 
@@ -581,6 +581,12 @@ msgstr ""
 
 #: includes/mcp/oauth/server.php:544
 msgid "Cannot connect"
+msgstr ""
+
+#. translators: %s: comma-separated list of actions, e.g. "wordpress/create_user"
+#: includes/mcp/remote-policy.php:213
+#, php-format
+msgid "%s administers this site (plugins, users, roles, capabilities or settings), so it cannot run in a workflow that another service starts — a webhook, or a trigger from a connected outside account. Start this workflow from something that happens on this site instead."
 msgstr ""
 
 #: includes/modules/abandoned-cart/abandoned-cart-module.php:109
@@ -2285,7 +2291,7 @@ msgstr ""
 
 #: dev_zaplane/containers/BackendDashboard/pages/Folders/FolderCard.js:98
 #: dev_zaplane/containers/BackendDashboard/pages/recipes/RecipeCard.js:124
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:287
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:292
 msgid "Update"
 msgstr ""
 
@@ -3491,47 +3497,47 @@ msgstr ""
 msgid "Horizontal layout"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:131
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:136
 msgid "Things to check in this workflow's triggers"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:139
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:144
 msgid "Check your triggers"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:140
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:145
 msgid "As of the last save."
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:159
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:164
 msgid "Test Flow Once"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:167
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:172
 msgid "Stop"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:174
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:179
 msgid "Listening…"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:193
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:198
 msgid "Log History"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:224
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:229
 msgid "Refresh"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:234
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:239
 msgid "Replay"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:241
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:246
 msgid "Version History"
 msgstr ""
 
-#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:340
+#: dev_zaplane/containers/BackendDashboard/pages/workflows/workFlowMotion/flowCanvas/FlowTopBar/FlowTopBar.js:345
 msgid "Flows"
 msgstr ""
 

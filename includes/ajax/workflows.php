@@ -5,6 +5,7 @@ namespace Zaplane\Ajax;
 use Zaplane\Framework\Classes\AbstractAjaxHandler;
 use Zaplane\Models\Workflow;
 use Zaplane\Models\WorkflowVersion;
+use Zaplane\Mcp\RemotePolicy;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -67,6 +68,15 @@ class Workflows extends AbstractAjaxHandler {
 
 		if ( ! $workflow ) {
 			return new \WP_Error( 'not_found', __( 'Workflow not found', 'zaplane' ), [ 'code' => 404 ] );
+		}
+
+		if ( 'active' === $status ) {
+			$version = WorkflowVersion::where( 'workflow_id', $id )->where( 'is_active', 1 )->first();
+			$refused = $version ? RemotePolicy::remote_violations( $version->getGraph() ) : [];
+
+			if ( ! empty( $refused ) ) {
+				return new \WP_Error( 'remote_admin_action', RemotePolicy::remote_message( $refused ), [ 'code' => 400 ] );
+			}
 		}
 
 		$previousStatus  = $workflow->status;
