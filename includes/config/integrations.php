@@ -385,6 +385,10 @@ $zaplane_registry = [
 		'file'  => 'gembooking.php',
 		'class' => \Zaplane\Integrations\Gembooking::class,
 	],
+	'wpmapblock'              => [
+		'file'  => 'wpmapblock.php',
+		'class' => \Zaplane\Integrations\Wpmapblock::class,
+	],
 ];
 
 $zaplane_priority = [
@@ -394,6 +398,7 @@ $zaplane_priority = [
 	'ablocks',
 	'gembooking',
 	'zencommunity',
+	'wpmapblock',
 ];
 
 $zaplane_priority_items = [];
