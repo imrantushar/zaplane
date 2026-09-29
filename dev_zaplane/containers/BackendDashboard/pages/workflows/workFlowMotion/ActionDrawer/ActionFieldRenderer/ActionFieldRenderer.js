@@ -367,10 +367,10 @@ const ActionFieldRenderer = ({
             placeholder={field.placeholder || ""}
             spellCheck={false}
             rows={field.rows || 12}
-            style={{ width: "100%", fontFamily: "Consolas, Menlo, Monaco, monospace", fontSize: "13px", lineHeight: 1.5, tabSize: 4, padding: "10px", borderRadius: "6px", border: "1px solid var(--zaplane-border-color)", resize: "vertical", boxSizing: "border-box", color: "var(--zaplane-font-secondary-color)", backgroundColor: "var(--zaplane-bg-color, transparent)" }}
+            style={{ width: "100%", fontFamily: "Consolas, Menlo, Monaco, monospace", fontSize: "13px", lineHeight: 1.6, tabSize: 4, padding: "14px 16px", borderRadius: "6px", border: "1px solid var(--zaplane-border-color)", resize: "vertical", boxSizing: "border-box", color: "var(--zaplane-font-secondary-color)", backgroundColor: "var(--zaplane-bg-color, transparent)", marginTop: "6px" }}
           />
           {field.help && (
-            <span className="text-[13px] text-[var(--zaplane-text-muted)] leading-relaxed mt-0.5">
+            <span className="block text-[13px] text-[var(--zaplane-text-muted)] leading-relaxed mt-1.5">
               {__(field.help, "zaplane")}
             </span>
           )}
