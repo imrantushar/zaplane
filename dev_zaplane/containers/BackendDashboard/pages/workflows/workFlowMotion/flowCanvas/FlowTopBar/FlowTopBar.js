@@ -391,5 +391,5 @@ export default function FlowTopBar({
         </button>
       )}
     </div>
-  )} rightContent={() => rightActions} topBarStyles={{ paddingLeft: '12px', paddingRight: '12px' }} />;
+  )} rightContent={() => rightActions} topBarStyles={{ top: '0px', paddingLeft: '12px', paddingRight: '12px' }} />;
 }

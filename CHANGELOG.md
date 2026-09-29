@@ -12,6 +12,8 @@ All notable changes to Zaplane are documented here. This project adheres to
 - Fixed the workflow editor header spacing and Status control clipping; secondary workflow actions now move into the 3-dot menu on narrower screens so Status and Update remain visible.
 - Fixed Connections and Folders mobile headers so the title and primary action stay on one compact row.
 - Fixed Business Knowledge mobile responsiveness: primary action stays visible, secondary actions move into the 3-dot menu, filters fit without clipping, and search uses the full row.
+- Removed the extra WordPress admin-bar-sized blank strip above the workflow editor header at desktop and responsive widths.
+- Reworked the workflow canvas controls into compact, aligned floating tool groups with consistent button sizing, spacing, borders, hover states, and mobile positioning.
 - Resolved the duplicate `handle_incoming()` method that caused a PHP critical error.
 - Fixed the dashboard login/reload flow so it loads normally again.
 - Corrected the Log History horizontal scrollbar and responsive layout issues.

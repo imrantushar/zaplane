@@ -19,34 +19,52 @@
 }
 
 .zaplane-canvas-controls {
-    gap: 5px;
-    margin-top: 40px;
+    top: 64px !important;
+    left: 16px !important;
+    margin: 0 !important;
+    gap: 2px;
+    padding: 4px;
+    border: 1px solid var(--zaplane-border-color);
+    border-radius: 8px;
+    background: var(--zaplane-background);
+    box-shadow: 0 4px 14px rgba(16, 24, 40, 0.08);
+    overflow: hidden;
 }
 
-.react-flow__controls-button {
-    background: var(--zaplane-background);
-    border-radius: 5px;
-    transition: all 0.2s ease;
+.zaplane_flowcanvas .react-flow__controls-button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent;
+    color: var(--zaplane-font-color);
+    transition: background 0.15s ease, color 0.15s ease;
 
     &.zaplane-layout-active {
-        background: var(--zaplane-primary);
-        color: var(--zaplane-background);
+        background: var(--zaplane-second-primary);
+        color: var(--zaplane-primary);
     }
 
     &:not(.zaplane-layout-active):hover {
-        background: var(--zaplane-background);
+        background: var(--zaplane-secondary-color);
     }
 }
 
 .zaplane-canvas-layout-icon {
-    width: 60px;
+    width: auto;
     margin: 0;
-    gap: 5px;
+    gap: 2px;
+    padding: 4px;
     cursor: pointer;
     position: absolute;
-    top: 8px;
-    left: 8px;
+    top: 16px;
+    left: 16px;
     z-index: 9;
+    border: 1px solid var(--zaplane-border-color);
+    border-radius: 8px;
+    background: var(--zaplane-background);
+    box-shadow: 0 4px 14px rgba(16, 24, 40, 0.08);
 }
 .zaplane-table--history-table,.zaplane-table--version-table{
     padding: 0 !important;
@@ -323,5 +341,25 @@
   .zaplane-flow-update {
     padding-inline: 12px !important;
     font-size: 13px;
+  }
+}
+
+
+/* The workflow editor already starts below WordPress' admin bar. Applying the
+   admin-bar height again as the sticky offset creates a visible empty strip. */
+.zaplane_flowcanvas .zaplane-topbar {
+  top: 0 !important;
+}
+
+
+@media (max-width: 600px) {
+  .zaplane-canvas-controls {
+    top: 60px !important;
+    left: 12px !important;
+  }
+
+  .zaplane-canvas-layout-icon {
+    top: 12px;
+    left: 12px;
   }
 }
