@@ -1,6 +1,6 @@
 {
     "version": "1.3.3",
-    "generated_at": "2026-09-28 10:42:30",
+    "generated_at": "2026-09-29 05:12:38",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -5930,6 +5930,42 @@
                             "required": true
                         }
                     ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "gameengine": {
+            "slug": "gameengine",
+            "name": "GameEngine",
+            "icon": "gameengine.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "docs_url": {
+                "trigger": "",
+                "action": ""
+            },
+            "triggers": {
+                "location_created": {
+                    "label": "Location Created",
+                    "hook": "wpforms_process_complete",
+                    "key": "location_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "location_created": {
+                    "label": "Location Create",
+                    "key": "location_created",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
