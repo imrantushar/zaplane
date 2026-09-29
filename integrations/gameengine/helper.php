@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 trait Helper {
 
-    private static function resolve_points_event( string $event, array $config, array $args ) {
+	private static function resolve_points_event( string $event, array $config, array $args ) {
 		$user_id       = (int) ( $args[0] ?? 0 );
 		$points        = (int) ( $args[1] ?? 0 );
 		$context       = (string) ( $args[2] ?? '' );
@@ -119,7 +119,7 @@ trait Helper {
 		return $payload;
 	}
 
-    private static function respond( array $data ): array {
+	private static function respond( array $data ): array {
 		return [
 			'port' => 'main',
 			'data' => $data,
@@ -133,13 +133,12 @@ trait Helper {
 		] );
 	}
 
-    private static function user_from_config( array $config ): int {
+	private static function user_from_config( array $config ): int {
 		$user_id = (int) ( $config['user_id'] ?? 0 );
 
 		return $user_id > 0 ? $user_id : get_current_user_id();
 	}
 
-	 */
 	private static function user_payload( int $user_id ): ?array {
 		$user = get_userdata( $user_id );
 
@@ -173,9 +172,6 @@ trait Helper {
 		return is_array( $row ) ? $row : [];
 	}
 
-	/**
-	 * A balance in one point type, or the grand total when no type is named.
-	 */
 	private static function balance( int $user_id, int $point_type_id = 0 ): int {
 		if ( $user_id <= 0 || ! class_exists( '\GameEngine\Classes\PointsManager' ) ) {
 			return 0;
@@ -222,10 +218,6 @@ trait Helper {
 		return array_map( 'array_filter', (array) \GameEngine\Classes\PointsManager::get_point_types() );
 	}
 
-	/**
-	 * The other member of a transfer, read from the description GameEngine
-	 * writes ("Transferred 100 points to user #7").
-	 */
 	private static function transfer_counterparty( array $log ): int {
 		$description = (string) ( $log['description'] ?? '' );
 		if ( preg_match( '/user #(\d+)/', $description, $matches ) ) {
@@ -235,10 +227,6 @@ trait Helper {
 		return 0;
 	}
 
-	/**
-	 * The payout method, read from the description Pro writes
-	 * ("Payout request for 10 $ via paypal.").
-	 */
 	private static function payout_method_from_description( string $description ): string {
 		if ( preg_match( '/\bvia (.+?)\.?$/', $description, $matches ) ) {
 			return trim( $matches[1] );
@@ -259,7 +247,6 @@ trait Helper {
 		return self::table_title( 'gameengine_rewards', $reward_id );
 	}
 
-	/** Title column of a GameEngine content row, empty when it can't be read. */
 	private static function table_title( string $table, int $id ): string {
 		if ( $id <= 0 ) {
 			return '';
@@ -272,16 +259,13 @@ trait Helper {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$title = $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- one of three fixed plugin tables, no user input.
 			$wpdb->prepare( "SELECT title FROM {$wpdb->prefix}{$table} WHERE id = %d", $id )
 		);
 
 		return $title ? (string) $title : '';
 	}
 
-	/**
-	 * A level's position in the ladder — GameEngine orders levels by priority
-	 * then minimum points rather than storing a number.
-	 */
 	private static function level_number( int $level_id ): int {
 		if ( $level_id <= 0 ) {
 			return 0;

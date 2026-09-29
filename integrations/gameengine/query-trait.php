@@ -8,18 +8,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 trait QueryTrait {
 
-    public static function query_point_types( $query = null ): array {
+	public static function query_point_types( $query = null ): array {
 		if ( class_exists( '\GameEngine\Classes\PointsManager' ) ) {
-			$items = [];
-			foreach ( (array) \GameEngine\Classes\PointsManager::get_point_types() as $row ) {
-				$row   = (array) $row;
-				$items[] = [
-					'value' => (int) ( $row['id'] ?? 0 ),
-					'label' => (string) ( $row['plural_name'] ?? ( $row['name'] ?? ( $row['slug'] ?? '' ) ) ),
-				];
-			}
-
-			return $items;
+			// plural_name is optional — a type saved with only a name (or only
+			// a slug) still has to read as something, so fall back the same
+			// way GameEngine's own get_point_type_label() does.
+			return self::pairs_from_rows(
+				\GameEngine\Classes\PointsManager::get_point_types(),
+				'plural_name',
+				'id',
+				[ 'name', 'slug' ]
+			);
 		}
 
 		global $wpdb;
@@ -143,6 +142,105 @@ trait QueryTrait {
 		return $items;
 	}
 
+	public static function query_events( $query = null ): array {
+		if ( ! class_exists( '\GameEngine\Classes\TriggerRegistry' ) ) {
+			return [];
+		}
+
+		$items = [];
+		foreach ( (array) \GameEngine\Classes\TriggerRegistry::get_all_triggers() as $key => $config ) {
+			$config  = (array) $config;
+			$items[] = [
+				'value' => (string) $key,
+				'label' => (string) ( $config['label'] ?? $key ),
+			];
+		}
+
+		return $items;
+	}
+
+	public static function query_badges( $query = null ): array {
+		$posts = get_posts( [
+			'post_type'      => 'ge_badge',
+			'post_status'    => 'publish',
+			'posts_per_page' => 200,
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+		] );
+
+		$items = [];
+		foreach ( (array) $posts as $post ) {
+			$items[] = [
+				'value' => (int) $post->ID,
+				'label' => $post->post_title,
+			];
+		}
+
+		return $items;
+	}
+
+	public static function query_logs( $query = null ): array {
+		global $wpdb;
+		if ( ! isset( $wpdb->prefix ) ) {
+			return [];
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results(
+			"SELECT id, message, trigger_key FROM {$wpdb->prefix}gameengine_logs ORDER BY id DESC LIMIT 200",
+			ARRAY_A
+		);
+
+		$items = [];
+		foreach ( (array) $rows as $row ) {
+			$row   = (array) $row;
+			$id    = (int) ( $row['id'] ?? 0 );
+			$label = (string) ( $row['message'] ?? '' );
+
+			if ( '' === $label ) {
+				$label = (string) ( $row['trigger_key'] ?? '' );
+			}
+
+			$items[] = [
+				'value' => $id,
+				'label' => sprintf( '#%d — %s', $id, '' !== $label ? $label : 'log entry' ),
+			];
+		}//end foreach
+
+		return $items;
+	}
+
+	public static function query_wheels( $query = null ): array {
+		return self::crud_pairs( 'gameengine_lucky_wheels', 'name' );
+	}
+
+	public static function query_seasons( $query = null ): array {
+		return self::crud_pairs( 'gameengine_pro_seasons', 'name' );
+	}
+
+	public static function query_webhooks( $query = null ): array {
+		return self::crud_pairs( 'gameengine_pro_webhooks', 'name' );
+	}
+
+	private static function crud_pairs( string $table, string $column ): array {
+		if ( ! self::pro_active() ) {
+			return [];
+		}
+
+		global $wpdb;
+		if ( ! isset( $wpdb->prefix ) ) {
+			return [];
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results(
+			"SELECT id, {$column} AS label FROM {$wpdb->prefix}{$table} ORDER BY id DESC LIMIT 200",
+			ARRAY_A
+		);
+
+		return self::pairs_from_rows( $rows, 'label', 'id', [] );
+	}
+
 	private static function pairs_from_rows( $rows, string $label_key, string $value_key, array $label_fallback = [] ): array {
 		$items = [];
 
@@ -159,11 +257,19 @@ trait QueryTrait {
 				}
 			}
 
+			$value = (int) ( $row[ $value_key ] ?? 0 );
+
+			// A blank row would render as an untickable option, so name it
+			// after its id rather than leaving the label empty.
+			if ( '' === $label && $value > 0 ) {
+				$label = '#' . $value;
+			}
+
 			$items[] = [
-				'value' => (int) ( $row[ $value_key ] ?? 0 ),
+				'value' => $value,
 				'label' => $label,
 			];
-		}
+		}//end foreach
 
 		return $items;
 	}

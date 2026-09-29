@@ -828,8 +828,24 @@ namespace {
 			protected array $body_params = [];
 			protected array $json_params = [];
 			protected string $body = '';
+			protected string $method;
+			protected string $route;
 
-			public function __construct( string $method = 'GET', string $route = '' ) {}
+			// Core reads the request path and verb to pick a route, and the
+			// GameEngine CRUD triggers read them to tell one endpoint from
+			// another, so both have to survive construction.
+			public function __construct( string $method = 'GET', string $route = '' ) {
+				$this->method = $method;
+				$this->route  = $route;
+			}
+
+			public function get_method(): string {
+				return strtoupper( $this->method );
+			}
+
+			public function get_route(): string {
+				return $this->route;
+			}
 
 			public function set_param( string $key, $value ): void {
 				$this->params[ $key ] = $value;

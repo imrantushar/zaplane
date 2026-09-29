@@ -7,7 +7,7 @@ use Zaplane\Tests\WPMocks;
 
 /**
  * GameEngine integration: payload shapes, context gates (checkout, transfer,
- * expiry, payout, referral), config filters, the 21-action dispatch and the
+ * expiry, payout, referral), config filters, the 28-action dispatch and the
  * Pro capability gate.
  *
  * The GameEngine managers are doubled in tests/mocks/gameengine.php; Pro is
@@ -98,6 +98,13 @@ class GameengineTest extends IntegrationTestCase {
 			'create_payout'      => [ 'user_id' => 2, 'points' => 100, 'method' => 'paypal', 'account' => 'me@example.com' ],
 			'update_payout'      => [ 'payout_id' => 9, 'status' => 'approved' ],
 			'approve_payout'     => [ 'payout_id' => 9 ],
+			'reject_payout'      => [ 'payout_id' => 9 ],
+			'get_payout'         => [ 'payout_id' => 9 ],
+			'get_profile'        => [ 'user_id' => 2 ],
+			'get_leaderboard'    => [ 'limit' => 5 ],
+			'get_leaderboard_position' => [ 'user_id' => 2 ],
+			'trigger_event'      => [ 'trigger_key' => 'user_register', 'user_id' => 2 ],
+			'get_activity_logs'  => [ 'user_id' => 2, 'limit' => 5 ],
 		];
 	}
 
@@ -648,8 +655,141 @@ class GameengineTest extends IntegrationTestCase {
 		$this->assertSame( 450, $result['data']['balance'] );
 	}
 
+	public function test_reject_payout_refunds_and_get_payout_reads_the_row(): void {
+		global $wpdb;
+		$this->activate_pro();
+
+		$wpdb->setTable( 'row', [
+			'id'         => 7,
+			'user_id'    => 2,
+			'points'     => 80,
+			'amount'     => 8,
+			'method'     => 'bank',
+			'status'     => 'approved',
+			'notes'      => 'Hold on to this one',
+			'created_at' => '2026-01-01 09:00:00',
+		] );
+
+		$read = Gameengine::execute_node( $this->makeActionNode( 'get_payout', [ 'payout_id' => 7 ] ), [] );
+
+		$this->assertTrue( $read['data']['success'] );
+		$this->assertSame( 7, $read['data']['payout_id'] );
+		$this->assertSame( 2, $read['data']['user_id'] );
+		$this->assertSame( 'approved', $read['data']['status'] );
+		$this->assertSame( 80, $read['data']['points'] );
+		$this->assertSame( 'bank', $read['data']['method'] );
+
+		$rejected = Gameengine::execute_node( $this->makeActionNode( 'reject_payout', [ 'payout_id' => 7 ] ), [] );
+
+		$this->assertTrue( $rejected['data']['success'] );
+		$this->assertSame( 'approved', $rejected['data']['previous_status'] );
+		$this->assertSame( 'rejected', $rejected['data']['status'] );
+		$this->assertTrue( $rejected['data']['refunded'] );
+		$this->assertSame( 580, ( new \GameEngine\Classes\PointsManager() )->get_grand_total( 2 ) );
+		$this->assertCount( 1, \Zaplane_Ge_ProHelper_Stub::$refunds );
+	}
+
+	public function test_profile_leaderboard_and_activity_log_reads(): void {
+		( new \GameEngine\Classes\LevelsManager() )->award( 2, 2, 'zaplane' );
+		( new \GameEngine\Classes\AchievementsManager() )->award( 2, 3, 'zaplane' );
+
+		$profile = Gameengine::execute_node( $this->makeActionNode( 'get_profile', [ 'user_id' => 2 ] ), [] );
+
+		$this->assertTrue( $profile['data']['success'] );
+		$this->assertSame( 2, $profile['data']['user']['user_id'] );
+		$this->assertSame( 500, $profile['data']['balance'] );
+		$this->assertSame( 2, $profile['data']['level_id'] );
+		$this->assertSame( 'Apprentice', $profile['data']['level'] );
+		$this->assertSame( 'Apprentice', $profile['data']['rank'] );
+		$this->assertSame( 1, $profile['data']['achievement_count'] );
+		$this->assertSame( 1, $profile['data']['point_type_balances'][0]['point_type_id'] );
+		$this->assertSame( 500, $profile['data']['point_type_balances'][0]['balance'] );
+
+		\GameEngine\Classes\LeaderboardManager::$rows = [ [
+			'position'           => 1,
+			'user_id'            => 2,
+			'name'               => 'testuser',
+			'total_points'       => 500,
+			'achievements_count' => 1,
+			'top_level'          => 'Apprentice',
+		] ];
+
+		$board = Gameengine::execute_node( $this->makeActionNode( 'get_leaderboard', [ 'limit' => 5 ] ), [] );
+
+		$this->assertTrue( $board['data']['success'] );
+		$this->assertSame( 1, $board['data']['count'] );
+		$this->assertSame( 1, $board['data']['entries'][0]['position'] );
+		$this->assertSame( 500, $board['data']['entries'][0]['total_points'] );
+
+		\GameEngine\Classes\LeaderboardManager::$position = [
+			'position'     => 4,
+			'total_points' => 500,
+		];
+
+		$place = Gameengine::execute_node( $this->makeActionNode( 'get_leaderboard_position', [ 'user_id' => 2 ] ), [] );
+
+		$this->assertTrue( $place['data']['success'] );
+		$this->assertTrue( $place['data']['placed'] );
+		$this->assertSame( 4, $place['data']['position'] );
+
+		// A member with no positive standing simply does not place — that is a
+		// result the workflow can branch on, not a failure.
+		\GameEngine\Classes\LeaderboardManager::$position = null;
+		$absent = Gameengine::execute_node( $this->makeActionNode( 'get_leaderboard_position', [ 'user_id' => 2 ] ), [] );
+		$this->assertTrue( $absent['data']['success'] );
+		$this->assertFalse( $absent['data']['placed'] );
+
+		global $wpdb;
+		$wpdb->setTable( 'results', [ [
+			'id'             => 512,
+			'user_id'        => 2,
+			'trigger_key'    => 'user_register',
+			'status'         => 'success',
+			'points_awarded' => 50,
+			'message'        => 'Awarded 50 points.',
+			'created_at'     => '2026-01-01 09:00:00',
+		] ] );
+
+		$logs = Gameengine::execute_node( $this->makeActionNode( 'get_activity_logs', [ 'limit' => 5 ] ), [] );
+
+		$this->assertTrue( $logs['data']['success'] );
+		$this->assertSame( 1, $logs['data']['count'] );
+		$this->assertSame( 'user_register', $logs['data']['logs'][0]['trigger_key'] );
+		$this->assertSame( 50, $logs['data']['logs'][0]['points_awarded'] );
+		$this->assertSame( 'success', $logs['data']['logs'][0]['status'] );
+	}
+
+	public function test_trigger_event_runs_the_registered_event_for_the_member(): void {
+		$result = Gameengine::execute_node( $this->makeActionNode( 'trigger_event', [
+			'trigger_key' => 'user_register',
+			'user_id'     => 2,
+		] ), [] );
+
+		$this->assertTrue( $result['data']['success'] );
+		$this->assertSame( 'user_register', $result['data']['trigger_key'] );
+		$this->assertSame( 'User Registration', $result['data']['label'] );
+		$this->assertSame( 500, $result['data']['balance_before'] );
+		$this->assertSame( 500, $result['data']['balance_after'] );
+		$this->assertSame( 0, $result['data']['balance_delta'] );
+
+		$runs = \GameEngine\Classes\Triggers::$runs;
+		$this->assertCount( 1, $runs );
+		$this->assertSame( 'user_register', $runs[0]['trigger_key'] );
+		$this->assertSame( 2, $runs[0]['user_id'] );
+		$this->assertSame( [ 2 ], $runs[0]['hook_args'] );
+
+		// An event GameEngine does not know cannot be run.
+		$unknown = Gameengine::execute_node( $this->makeActionNode( 'trigger_event', [
+			'trigger_key' => 'not_an_event',
+			'user_id'     => 2,
+		] ), [] );
+
+		$this->assertFalse( $unknown['data']['success'] );
+		$this->assertCount( 1, \GameEngine\Classes\Triggers::$runs );
+	}
+
 	/* ------------------------------------------------------------------
-	 * Manifest plumbing: queries, seeds, sample configs
+	 * Manifest plumbing: dynamic queries behind the schema selects
 	 * ------------------------------------------------------------------ */
 
 	public function test_dynamic_query_references_resolve(): void {
@@ -683,6 +823,19 @@ class GameengineTest extends IntegrationTestCase {
 			Gameengine::query_point_types()
 		);
 
+		// A type with no plural_name still has to read as something — the
+		// label falls back to its name, the way GameEngine's own
+		// get_point_type_label() does, instead of rendering blank.
+		$saved_types = \GameEngine\Classes\PointsManager::$point_types;
+		\GameEngine\Classes\PointsManager::$point_types = [ [
+			'id'          => 7,
+			'name'        => 'Bits',
+			'plural_name' => '',
+			'slug'        => 'bits',
+		] ];
+		$this->assertSame( [ [ 'value' => 7, 'label' => 'Bits' ] ], Gameengine::query_point_types() );
+		\GameEngine\Classes\PointsManager::$point_types = $saved_types;
+
 		global $wpdb;
 		$wpdb->setTable( 'results', [ [ 'id' => 3, 'title' => 'First Steps' ] ] );
 		$this->assertSame( [ [ 'value' => 3, 'label' => 'First Steps' ] ], Gameengine::query_achievements() );
@@ -699,72 +852,12 @@ class GameengineTest extends IntegrationTestCase {
 		$GLOBALS['zaplane_get_posts'] = [ (object) [ 'ID' => 7, 'post_title' => 'Secret Page' ] ];
 		$this->assertSame( [ [ 'value' => 7, 'label' => 'Secret Page' ] ], Gameengine::query_posts() );
 		unset( $GLOBALS['zaplane_get_posts'] );
-	}
 
-	public function test_seedable_and_testable_lists_point_at_registered_capabilities(): void {
-		$triggers = Gameengine::get_triggers();
-		foreach ( Gameengine::get_seedable_triggers() as $event ) {
-			$this->assertArrayHasKey( $event, $triggers, "Seedable trigger '{$event}' is not registered" );
-		}
-
-		$actions = Gameengine::get_actions();
-		foreach ( Gameengine::get_testable_actions() as $event ) {
-			$this->assertArrayHasKey( $event, $actions, "Testable action '{$event}' is not registered" );
-			$this->assertIsArray( Gameengine::get_sample_action_config( $event ), "Action '{$event}' has no sample config" );
-		}
-	}
-
-	public function test_seed_trigger_args_returns_positional_hook_arguments(): void {
-		$points = Gameengine::seed_trigger_args( 'points_awarded' );
-		$this->assertIsArray( $points );
-		$this->assertSame( 1, $points[0] );
-		$this->assertSame( 25, $points[1] );
-		$this->assertSame( 'zaplane_seed', $points[2] );
-		$this->assertSame( 1, $points[4] );
-
-		global $wpdb;
-		$wpdb->tables['var'] = 3;
-		$achievement = Gameengine::seed_trigger_args( 'specific_achievement' );
-		$this->assertIsArray( $achievement );
-		$this->assertSame( 3, $achievement[1] );
-
-		// Seeding again when the award is already held still yields usable
-		// args (without a fresh award id).
-		$again = Gameengine::seed_trigger_args( 'specific_achievement' );
-		$this->assertIsArray( $again );
-		$this->assertSame( 3, $again[1] );
-		$this->assertSame( 0, $again[2] );
-
-		// A member with an empty balance is topped up so the sample
-		// deduction has points to move — and the reward seed that follows
-		// tops up to its cost the same way.
-		\GameEngine\Classes\PointsManager::set_total( 1, 0, 1 );
-		$deducted = Gameengine::seed_trigger_args( 'points_deducted' );
-		$this->assertIsArray( $deducted );
-		$this->assertSame( 'zaplane_seed', $deducted[2] );
-
-		$wpdb->tables['var'] = 2;
-		$level = Gameengine::seed_trigger_args( 'specific_level' );
-		$this->assertIsArray( $level );
-		$this->assertSame( 2, $level[1] );
-
-		$wpdb->setTable( 'row', [ 'id' => 4, 'cost_points' => 500 ] );
-		$reward = Gameengine::seed_trigger_args( 'reward_redeemed' );
-		$this->assertIsArray( $reward );
-		$this->assertSame( 4, $reward[1] );
-		$this->assertSame( 500, $reward[2] );
-
-		// The suite has no WooCommerce, so post_type_exists('shop_coupon')
-		// is false and the coupon seed declines (the recipe tester skips it
-		// the same way on a site without WooCommerce).
-		$this->assertNull( Gameengine::seed_trigger_args( 'coupon_generated' ) );
-
-		// Events without real seed data stay out of the recipe tester.
-		$this->assertNull( Gameengine::seed_trigger_args( 'payout_requested' ) );
-
-		// No member to seed for means no arguments.
-		wp_set_current_user( 0 );
-		$this->assertNull( Gameengine::seed_trigger_args( 'points_awarded' ) );
+		// The trigger_event select lists GameEngine's own registry keys.
+		$this->assertSame(
+			[ [ 'value' => 'user_register', 'label' => 'User Registration' ] ],
+			Gameengine::query_events()
+		);
 	}
 
 	/** Open the Pro gate for this (isolated) test process. */

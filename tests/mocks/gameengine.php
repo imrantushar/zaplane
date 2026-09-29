@@ -231,6 +231,81 @@ namespace GameEngine\Classes {
 			}
 		}
 	}
+
+	if ( ! class_exists( 'GameEngine\Classes\LeaderboardManager' ) ) {
+
+		class LeaderboardManager {
+
+			/** @var array<int,array<string,mixed>> the rows get_rows() answers with */
+			public static $rows = [];
+
+			/** @var array{position:int,total_points:int}|null a member's standing */
+			public static $position = null;
+
+			public static function resolve_range( $slug ) {
+				return [
+					'start' => null,
+					'end'   => null,
+				];
+			}
+
+			public static function get_rows( $args = [] ) {
+				return self::$rows;
+			}
+
+			public static function get_user_position( $user_id, $args = [] ) {
+				return self::$position;
+			}
+		}
+	}
+
+	if ( ! class_exists( 'GameEngine\Classes\TriggerRegistry' ) ) {
+
+		class TriggerRegistry {
+
+			/** @var array<string,array<string,mixed>> event key => registry config */
+			public static $triggers = [
+				'user_register' => [
+					'label' => 'User Registration',
+					'hook'  => 'user_register',
+				],
+			];
+
+			public static function get( $key ) {
+				return self::$triggers[ (string) $key ] ?? null;
+			}
+
+			public static function get_all_triggers() {
+				return self::$triggers;
+			}
+
+			public static function get_actions( $config ) {
+				return [ 'award', 'deduct' ];
+			}
+		}
+	}
+
+	if ( ! class_exists( 'GameEngine\Classes\Triggers' ) ) {
+
+		/**
+		 * Stand-in for the rule engine. It records each run instead of reading
+		 * the requirements table, so a test can assert the action handed it the
+		 * right event and member.
+		 */
+		class Triggers {
+
+			/** @var array<int,array<string,mixed>> every execute() call so far */
+			public static $runs = [];
+
+			public function execute( $trigger_key, $config, $hook_args ) {
+				self::$runs[] = [
+					'trigger_key' => (string) $trigger_key,
+					'user_id'     => (int) call_user_func_array( $config['get_user_id'], (array) $hook_args ),
+					'hook_args'   => array_values( (array) $hook_args ),
+				];
+			}
+		}
+	}
 }
 
 namespace GameEngine\Addons\RewardsStore {

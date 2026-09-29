@@ -1,6 +1,6 @@
 {
     "version": "1.3.3",
-    "generated_at": "2026-09-29 08:01:55",
+    "generated_at": "2026-09-29 11:59:35",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -6173,17 +6173,7 @@
                     "description": "When the Rewards Marketplace issues a GE- coupon (needs WooCommerce).",
                     "requires_addon": "GameEngine Pro",
                     "key": "coupon_generated",
-                    "schema": [
-                        {
-                            "key": "prefix",
-                            "label": "Coupon Code Prefix",
-                            "type": "text",
-                            "required": false,
-                            "default": "GE-",
-                            "placeholder": "GE-",
-                            "help": "Only coupons whose code starts with this prefix fire the trigger. GameEngine marketplace coupons use GE-."
-                        }
-                    ],
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -6418,6 +6408,299 @@
                             "help": "Only fire when at least this many points moved."
                         }
                     ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "point_system_created": {
+                    "label": "Point System created",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a point system is created in GameEngine.",
+                    "key": "point_system_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "point_system_updated": {
+                    "label": "Point System updated",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a point system is changed in GameEngine.",
+                    "key": "point_system_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "point_system_deleted": {
+                    "label": "Point System deleted",
+                    "hook": [
+                        "rest_pre_dispatch",
+                        "rest_post_dispatch"
+                    ],
+                    "description": "When a point system is removed in GameEngine.",
+                    "key": "point_system_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "achievement_created": {
+                    "label": "Achievement created",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a achievement is created in GameEngine.",
+                    "key": "achievement_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "achievement_updated": {
+                    "label": "Achievement updated",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a achievement is changed in GameEngine.",
+                    "key": "achievement_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "achievement_deleted": {
+                    "label": "Achievement deleted",
+                    "hook": [
+                        "rest_pre_dispatch",
+                        "rest_post_dispatch"
+                    ],
+                    "description": "When a achievement is removed in GameEngine.",
+                    "key": "achievement_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "level_created": {
+                    "label": "Level created",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a level is created in GameEngine.",
+                    "key": "level_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "level_updated": {
+                    "label": "Level updated",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a level is changed in GameEngine.",
+                    "key": "level_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "level_deleted": {
+                    "label": "Level deleted",
+                    "hook": [
+                        "rest_pre_dispatch",
+                        "rest_post_dispatch"
+                    ],
+                    "description": "When a level is removed in GameEngine.",
+                    "key": "level_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "badge_created": {
+                    "label": "Badge created",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a badge is created in GameEngine.",
+                    "key": "badge_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "badge_updated": {
+                    "label": "Badge updated",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a badge is changed in GameEngine.",
+                    "key": "badge_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "badge_deleted": {
+                    "label": "Badge deleted",
+                    "hook": [
+                        "rest_pre_dispatch",
+                        "rest_post_dispatch"
+                    ],
+                    "description": "When a badge is removed in GameEngine.",
+                    "key": "badge_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "log_created": {
+                    "label": "Log created",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a log is created in GameEngine.",
+                    "key": "log_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "log_updated": {
+                    "label": "Log updated",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a log is changed in GameEngine.",
+                    "key": "log_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reward_created": {
+                    "label": "Reward created",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a reward is created in GameEngine.",
+                    "key": "reward_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reward_updated": {
+                    "label": "Reward updated",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a reward is changed in GameEngine.",
+                    "key": "reward_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reward_deleted": {
+                    "label": "Reward deleted",
+                    "hook": [
+                        "rest_pre_dispatch",
+                        "rest_post_dispatch"
+                    ],
+                    "description": "When a reward is removed in GameEngine.",
+                    "key": "reward_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wheel_created": {
+                    "label": "Lucky Wheel created",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a lucky wheel is created in GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "wheel_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wheel_updated": {
+                    "label": "Lucky Wheel updated",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a lucky wheel is changed in GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "wheel_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "wheel_deleted": {
+                    "label": "Lucky Wheel deleted",
+                    "hook": [
+                        "rest_pre_dispatch",
+                        "rest_post_dispatch"
+                    ],
+                    "description": "When a lucky wheel is removed in GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "wheel_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "season_created": {
+                    "label": "Season created",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a season is created in GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "season_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "season_updated": {
+                    "label": "Season updated",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a season is changed in GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "season_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "season_deleted": {
+                    "label": "Season deleted",
+                    "hook": [
+                        "rest_pre_dispatch",
+                        "rest_post_dispatch"
+                    ],
+                    "description": "When a season is removed in GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "season_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "webhook_created": {
+                    "label": "Webhook created",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a webhook is created in GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "webhook_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "webhook_updated": {
+                    "label": "Webhook updated",
+                    "hook": "rest_post_dispatch",
+                    "description": "When a webhook is changed in GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "webhook_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "webhook_deleted": {
+                    "label": "Webhook deleted",
+                    "hook": [
+                        "rest_pre_dispatch",
+                        "rest_post_dispatch"
+                    ],
+                    "description": "When a webhook is removed in GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "webhook_deleted",
+                    "schema": [],
                     "outputs": [
                         "main"
                     ]
@@ -7196,6 +7479,2493 @@
                                 ]
                             },
                             "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reject_payout": {
+                    "label": "Reject Payout Request",
+                    "description": "Reject a withdrawal and refund the deducted points.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "reject_payout",
+                    "schema": [
+                        {
+                            "key": "payout_id",
+                            "label": "Payout ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "payouts_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_payout": {
+                    "label": "Get Payout Request",
+                    "description": "Read one withdrawal request back.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "get_payout",
+                    "schema": [
+                        {
+                            "key": "payout_id",
+                            "label": "Payout ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "payouts_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_profile": {
+                    "label": "Get Gamification Profile",
+                    "description": "Read a member balances, level, rank and achievement tally.",
+                    "key": "get_profile",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_leaderboard": {
+                    "label": "Get Leaderboard",
+                    "description": "List a ranked page of members for a point type and window.",
+                    "key": "get_leaderboard",
+                    "schema": [
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": ""
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Rows",
+                            "type": "number",
+                            "required": false,
+                            "default": 10
+                        },
+                        {
+                            "key": "time_range",
+                            "label": "Time Window",
+                            "type": "select",
+                            "required": false,
+                            "default": "all_time",
+                            "options": [
+                                {
+                                    "value": "all_time",
+                                    "label": "All time"
+                                },
+                                {
+                                    "value": "today",
+                                    "label": "Today"
+                                },
+                                {
+                                    "value": "this_week",
+                                    "label": "This week"
+                                },
+                                {
+                                    "value": "this_month",
+                                    "label": "This month"
+                                },
+                                {
+                                    "value": "this_year",
+                                    "label": "This year"
+                                },
+                                {
+                                    "value": "last_30_days",
+                                    "label": "Last 30 days"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_leaderboard_position": {
+                    "label": "Get Leaderboard Position",
+                    "description": "Read where one member stands on the leaderboard.",
+                    "key": "get_leaderboard_position",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": ""
+                        },
+                        {
+                            "key": "time_range",
+                            "label": "Time Window",
+                            "type": "select",
+                            "required": false,
+                            "default": "all_time",
+                            "options": [
+                                {
+                                    "value": "all_time",
+                                    "label": "All time"
+                                },
+                                {
+                                    "value": "today",
+                                    "label": "Today"
+                                },
+                                {
+                                    "value": "this_week",
+                                    "label": "This week"
+                                },
+                                {
+                                    "value": "this_month",
+                                    "label": "This month"
+                                },
+                                {
+                                    "value": "this_year",
+                                    "label": "This year"
+                                },
+                                {
+                                    "value": "last_30_days",
+                                    "label": "Last 30 days"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "trigger_event": {
+                    "label": "Trigger GameEngine Event",
+                    "description": "Run a registered GameEngine event and its saved rules for a member.",
+                    "key": "trigger_event",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "trigger_key",
+                            "label": "GameEngine Event",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "events_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true,
+                            "help": "The event whose saved rules run for the member."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_activity_logs": {
+                    "label": "Get Activity Logs",
+                    "description": "List the GameEngine activity log entries.",
+                    "key": "get_activity_logs",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "Leave empty to include every member."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Entries",
+                            "type": "number",
+                            "required": false,
+                            "default": 20
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "",
+                            "options": [
+                                {
+                                    "value": "",
+                                    "label": "Any"
+                                },
+                                {
+                                    "value": "success",
+                                    "label": "Success"
+                                },
+                                {
+                                    "value": "failed",
+                                    "label": "Failed"
+                                },
+                                {
+                                    "value": "skipped",
+                                    "label": "Skipped"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_point_system": {
+                    "label": "Create Point System",
+                    "description": "Add a new point system to GameEngine.",
+                    "key": "create_point_system",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "plural_name",
+                            "label": "Plural Name",
+                            "type": "text",
+                            "required": false,
+                            "help": "Shown in the points history. Falls back to the name."
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the name when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "publish",
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_point_system": {
+                    "label": "Update Point System",
+                    "description": "Change an existing point system.",
+                    "key": "update_point_system",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Point System",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "plural_name",
+                            "label": "Plural Name",
+                            "type": "text",
+                            "required": false,
+                            "help": "Shown in the points history. Falls back to the name."
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the name when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_point_system": {
+                    "label": "Delete Point System",
+                    "description": "Remove a point system from GameEngine.",
+                    "key": "delete_point_system",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Point System",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "plural_name",
+                            "label": "Plural Name",
+                            "type": "text",
+                            "required": false,
+                            "help": "Shown in the points history. Falls back to the name."
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the name when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_achievement": {
+                    "label": "Create Achievement",
+                    "description": "Add a new achievement to GameEngine.",
+                    "key": "create_achievement",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "category",
+                            "label": "Category",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "badge_image",
+                            "label": "Badge Image URL",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "congratulations_message",
+                            "label": "Congratulations Message",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "secret_achievement",
+                            "label": "Secret Achievement",
+                            "type": "select",
+                            "required": false,
+                            "default": 0,
+                            "options": [
+                                {
+                                    "value": 0,
+                                    "label": "Visible"
+                                },
+                                {
+                                    "value": 1,
+                                    "label": "Hidden until earned"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "max_earnings_per_user",
+                            "label": "Max Earnings per User",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": 0,
+                            "help": "0 allows unlimited earnings."
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the title when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "publish",
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_achievement": {
+                    "label": "Update Achievement",
+                    "description": "Change an existing achievement.",
+                    "key": "update_achievement",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Achievement",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "achievements_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "category",
+                            "label": "Category",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "badge_image",
+                            "label": "Badge Image URL",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "congratulations_message",
+                            "label": "Congratulations Message",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "secret_achievement",
+                            "label": "Secret Achievement",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": 0,
+                                    "label": "Visible"
+                                },
+                                {
+                                    "value": 1,
+                                    "label": "Hidden until earned"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "max_earnings_per_user",
+                            "label": "Max Earnings per User",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "help": "0 allows unlimited earnings."
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the title when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_achievement": {
+                    "label": "Delete Achievement",
+                    "description": "Remove a achievement from GameEngine.",
+                    "key": "delete_achievement",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Achievement",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "achievements_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "category",
+                            "label": "Category",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "badge_image",
+                            "label": "Badge Image URL",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "congratulations_message",
+                            "label": "Congratulations Message",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "secret_achievement",
+                            "label": "Secret Achievement",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": 0,
+                                    "label": "Visible"
+                                },
+                                {
+                                    "value": 1,
+                                    "label": "Hidden until earned"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "max_earnings_per_user",
+                            "label": "Max Earnings per User",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "help": "0 allows unlimited earnings."
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the title when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_level": {
+                    "label": "Create Level",
+                    "description": "Add a new level to GameEngine.",
+                    "key": "create_level",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "category",
+                            "label": "Category",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "icon",
+                            "label": "Icon",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "color",
+                            "label": "Color",
+                            "type": "text",
+                            "required": false,
+                            "help": "Hex value, e.g. #6c5ce7."
+                        },
+                        {
+                            "key": "priority",
+                            "label": "Priority",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "point_type_id",
+                            "label": "Point Type",
+                            "type": "select",
+                            "format": "int",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "max_points",
+                            "label": "Maximum Points",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the title when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "publish",
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_level": {
+                    "label": "Update Level",
+                    "description": "Change an existing level.",
+                    "key": "update_level",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "levels_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "category",
+                            "label": "Category",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "icon",
+                            "label": "Icon",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "color",
+                            "label": "Color",
+                            "type": "text",
+                            "required": false,
+                            "help": "Hex value, e.g. #6c5ce7."
+                        },
+                        {
+                            "key": "priority",
+                            "label": "Priority",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "point_type_id",
+                            "label": "Point Type",
+                            "type": "select",
+                            "format": "int",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "max_points",
+                            "label": "Maximum Points",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the title when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_level": {
+                    "label": "Delete Level",
+                    "description": "Remove a level from GameEngine.",
+                    "key": "delete_level",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "levels_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "category",
+                            "label": "Category",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "icon",
+                            "label": "Icon",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "color",
+                            "label": "Color",
+                            "type": "text",
+                            "required": false,
+                            "help": "Hex value, e.g. #6c5ce7."
+                        },
+                        {
+                            "key": "priority",
+                            "label": "Priority",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "point_type_id",
+                            "label": "Point Type",
+                            "type": "select",
+                            "format": "int",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "max_points",
+                            "label": "Maximum Points",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the title when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_badge": {
+                    "label": "Create Badge",
+                    "description": "Add a new badge to GameEngine.",
+                    "key": "create_badge",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "icon",
+                            "label": "Icon",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "icon_type",
+                            "label": "Icon Type",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "dashicon",
+                                    "label": "Dashicon"
+                                },
+                                {
+                                    "value": "image",
+                                    "label": "Image"
+                                },
+                                {
+                                    "value": "emoji",
+                                    "label": "Emoji"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "shape",
+                            "label": "Shape",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "circle",
+                                    "label": "Circle"
+                                },
+                                {
+                                    "value": "square",
+                                    "label": "Square"
+                                },
+                                {
+                                    "value": "shield",
+                                    "label": "Shield"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "color",
+                            "label": "Color",
+                            "type": "text",
+                            "required": false,
+                            "help": "Hex value, e.g. #6366f1."
+                        },
+                        {
+                            "key": "border_color",
+                            "label": "Border Color",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "text_color",
+                            "label": "Text Color",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_badge": {
+                    "label": "Update Badge",
+                    "description": "Change an existing badge.",
+                    "key": "update_badge",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Badge",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "badges_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "icon",
+                            "label": "Icon",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "icon_type",
+                            "label": "Icon Type",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "dashicon",
+                                    "label": "Dashicon"
+                                },
+                                {
+                                    "value": "image",
+                                    "label": "Image"
+                                },
+                                {
+                                    "value": "emoji",
+                                    "label": "Emoji"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "shape",
+                            "label": "Shape",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "circle",
+                                    "label": "Circle"
+                                },
+                                {
+                                    "value": "square",
+                                    "label": "Square"
+                                },
+                                {
+                                    "value": "shield",
+                                    "label": "Shield"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "color",
+                            "label": "Color",
+                            "type": "text",
+                            "required": false,
+                            "help": "Hex value, e.g. #6366f1."
+                        },
+                        {
+                            "key": "border_color",
+                            "label": "Border Color",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "text_color",
+                            "label": "Text Color",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_badge": {
+                    "label": "Delete Badge",
+                    "description": "Remove a badge from GameEngine.",
+                    "key": "delete_badge",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Badge",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "badges_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "icon",
+                            "label": "Icon",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "icon_type",
+                            "label": "Icon Type",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "dashicon",
+                                    "label": "Dashicon"
+                                },
+                                {
+                                    "value": "image",
+                                    "label": "Image"
+                                },
+                                {
+                                    "value": "emoji",
+                                    "label": "Emoji"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "shape",
+                            "label": "Shape",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "circle",
+                                    "label": "Circle"
+                                },
+                                {
+                                    "value": "square",
+                                    "label": "Square"
+                                },
+                                {
+                                    "value": "shield",
+                                    "label": "Shield"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "color",
+                            "label": "Color",
+                            "type": "text",
+                            "required": false,
+                            "help": "Hex value, e.g. #6366f1."
+                        },
+                        {
+                            "key": "border_color",
+                            "label": "Border Color",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "text_color",
+                            "label": "Text Color",
+                            "type": "text",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_log": {
+                    "label": "Create Log",
+                    "description": "Add a new log to GameEngine.",
+                    "key": "create_log",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "format": "int",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to log against nobody."
+                        },
+                        {
+                            "key": "trigger_key",
+                            "label": "Trigger Key",
+                            "type": "text",
+                            "required": false,
+                            "default": "zaplane"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "success",
+                            "options": [
+                                {
+                                    "value": "success",
+                                    "label": "Success"
+                                },
+                                {
+                                    "value": "failed",
+                                    "label": "Failed"
+                                },
+                                {
+                                    "value": "skipped",
+                                    "label": "Skipped"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "points_awarded",
+                            "label": "Points Awarded",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "meta",
+                            "label": "Meta (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_log": {
+                    "label": "Update Log",
+                    "description": "Change an existing log.",
+                    "key": "update_log",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Log",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "logs_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "format": "int",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to log against nobody."
+                        },
+                        {
+                            "key": "trigger_key",
+                            "label": "Trigger Key",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "success",
+                                    "label": "Success"
+                                },
+                                {
+                                    "value": "failed",
+                                    "label": "Failed"
+                                },
+                                {
+                                    "value": "skipped",
+                                    "label": "Skipped"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "points_awarded",
+                            "label": "Points Awarded",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "meta",
+                            "label": "Meta (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_log": {
+                    "label": "Delete Log",
+                    "description": "Remove a log from GameEngine.",
+                    "key": "delete_log",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Log",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "logs_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "format": "int",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to log against nobody."
+                        },
+                        {
+                            "key": "trigger_key",
+                            "label": "Trigger Key",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "success",
+                                    "label": "Success"
+                                },
+                                {
+                                    "value": "failed",
+                                    "label": "Failed"
+                                },
+                                {
+                                    "value": "skipped",
+                                    "label": "Skipped"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "points_awarded",
+                            "label": "Points Awarded",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "meta",
+                            "label": "Meta (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_reward": {
+                    "label": "Create Reward",
+                    "description": "Add a new reward to GameEngine.",
+                    "key": "create_reward",
+                    "schema": [
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "image",
+                            "label": "Image URL",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "cost_points",
+                            "label": "Cost (points)",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "point_type_id",
+                            "label": "Point Type",
+                            "type": "select",
+                            "format": "int",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "stock",
+                            "label": "Stock",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": -1,
+                            "help": "-1 is unlimited."
+                        },
+                        {
+                            "key": "limit_per_user",
+                            "label": "Limit per User",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": 0,
+                            "help": "0 allows unlimited redemptions."
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the title when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "publish",
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_reward": {
+                    "label": "Update Reward",
+                    "description": "Change an existing reward.",
+                    "key": "update_reward",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Reward",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "rewards_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "image",
+                            "label": "Image URL",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "cost_points",
+                            "label": "Cost (points)",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "point_type_id",
+                            "label": "Point Type",
+                            "type": "select",
+                            "format": "int",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "stock",
+                            "label": "Stock",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "help": "-1 is unlimited."
+                        },
+                        {
+                            "key": "limit_per_user",
+                            "label": "Limit per User",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "help": "0 allows unlimited redemptions."
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the title when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_reward": {
+                    "label": "Delete Reward",
+                    "description": "Remove a reward from GameEngine.",
+                    "key": "delete_reward",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Reward",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "rewards_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "title",
+                            "label": "Title",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "image",
+                            "label": "Image URL",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "cost_points",
+                            "label": "Cost (points)",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "point_type_id",
+                            "label": "Point Type",
+                            "type": "select",
+                            "format": "int",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "stock",
+                            "label": "Stock",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "help": "-1 is unlimited."
+                        },
+                        {
+                            "key": "limit_per_user",
+                            "label": "Limit per User",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "help": "0 allows unlimited redemptions."
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug",
+                            "type": "text",
+                            "required": false,
+                            "help": "Derived from the title when left empty."
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_wheel": {
+                    "label": "Create Lucky Wheel",
+                    "description": "Add a new lucky wheel to GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "create_wheel",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "spin_cost",
+                            "label": "Spin Cost",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "daily_limit",
+                            "label": "Daily Limit",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": 0,
+                            "help": "0 allows unlimited spins."
+                        },
+                        {
+                            "key": "cooldown_timer",
+                            "label": "Cooldown (seconds)",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "key": "slices",
+                            "label": "Slices (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false,
+                            "help": "The prize slices shown on the wheel."
+                        },
+                        {
+                            "key": "settings",
+                            "label": "Settings (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "publish",
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_wheel": {
+                    "label": "Update Lucky Wheel",
+                    "description": "Change an existing lucky wheel.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "update_wheel",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Lucky Wheel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "wheels_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "spin_cost",
+                            "label": "Spin Cost",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "daily_limit",
+                            "label": "Daily Limit",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "help": "0 allows unlimited spins."
+                        },
+                        {
+                            "key": "cooldown_timer",
+                            "label": "Cooldown (seconds)",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "slices",
+                            "label": "Slices (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false,
+                            "help": "The prize slices shown on the wheel."
+                        },
+                        {
+                            "key": "settings",
+                            "label": "Settings (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_wheel": {
+                    "label": "Delete Lucky Wheel",
+                    "description": "Remove a lucky wheel from GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "delete_wheel",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Lucky Wheel",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "wheels_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "spin_cost",
+                            "label": "Spin Cost",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "daily_limit",
+                            "label": "Daily Limit",
+                            "type": "number",
+                            "format": "int",
+                            "required": false,
+                            "help": "0 allows unlimited spins."
+                        },
+                        {
+                            "key": "cooldown_timer",
+                            "label": "Cooldown (seconds)",
+                            "type": "number",
+                            "format": "int",
+                            "required": false
+                        },
+                        {
+                            "key": "slices",
+                            "label": "Slices (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false,
+                            "help": "The prize slices shown on the wheel."
+                        },
+                        {
+                            "key": "settings",
+                            "label": "Settings (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "publish",
+                                    "label": "Published"
+                                },
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_season": {
+                    "label": "Create Season",
+                    "description": "Add a new season to GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "create_season",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "start_date",
+                            "label": "Start Date",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "2026-12-01"
+                        },
+                        {
+                            "key": "end_date",
+                            "label": "End Date",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "2027-02-28"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "draft",
+                            "options": [
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "active",
+                                    "label": "Active"
+                                },
+                                {
+                                    "value": "completed",
+                                    "label": "Completed"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_season": {
+                    "label": "Update Season",
+                    "description": "Change an existing season.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "update_season",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Season",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "seasons_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "start_date",
+                            "label": "Start Date",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "2026-12-01"
+                        },
+                        {
+                            "key": "end_date",
+                            "label": "End Date",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "2027-02-28"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "active",
+                                    "label": "Active"
+                                },
+                                {
+                                    "value": "completed",
+                                    "label": "Completed"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_season": {
+                    "label": "Delete Season",
+                    "description": "Remove a season from GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "delete_season",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Season",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "seasons_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "start_date",
+                            "label": "Start Date",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "2026-12-01"
+                        },
+                        {
+                            "key": "end_date",
+                            "label": "End Date",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "2027-02-28"
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": "draft",
+                                    "label": "Draft"
+                                },
+                                {
+                                    "value": "active",
+                                    "label": "Active"
+                                },
+                                {
+                                    "value": "completed",
+                                    "label": "Completed"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_webhook": {
+                    "label": "Create Webhook",
+                    "description": "Add a new webhook to GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "create_webhook",
+                    "schema": [
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": true
+                        },
+                        {
+                            "key": "url",
+                            "label": "URL",
+                            "type": "text",
+                            "required": true,
+                            "placeholder": "https://example.com/gameengine-hook"
+                        },
+                        {
+                            "key": "events",
+                            "label": "Events (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false,
+                            "help": "The GameEngine event keys this endpoint subscribes to."
+                        },
+                        {
+                            "key": "secret",
+                            "label": "Signing Secret",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "active",
+                            "label": "Active",
+                            "type": "select",
+                            "format": "int",
+                            "required": false,
+                            "default": 1,
+                            "options": [
+                                {
+                                    "value": 1,
+                                    "label": "Active"
+                                },
+                                {
+                                    "value": 0,
+                                    "label": "Paused"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_webhook": {
+                    "label": "Update Webhook",
+                    "description": "Change an existing webhook.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "update_webhook",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Webhook",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "webhooks_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "url",
+                            "label": "URL",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "https://example.com/gameengine-hook"
+                        },
+                        {
+                            "key": "events",
+                            "label": "Events (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false,
+                            "help": "The GameEngine event keys this endpoint subscribes to."
+                        },
+                        {
+                            "key": "secret",
+                            "label": "Signing Secret",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "active",
+                            "label": "Active",
+                            "type": "select",
+                            "format": "int",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": 1,
+                                    "label": "Active"
+                                },
+                                {
+                                    "value": 0,
+                                    "label": "Paused"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_webhook": {
+                    "label": "Delete Webhook",
+                    "description": "Remove a webhook from GameEngine.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "delete_webhook",
+                    "schema": [
+                        {
+                            "key": "id",
+                            "label": "Webhook",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "webhooks_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "url",
+                            "label": "URL",
+                            "type": "text",
+                            "required": false,
+                            "placeholder": "https://example.com/gameengine-hook"
+                        },
+                        {
+                            "key": "events",
+                            "label": "Events (JSON)",
+                            "type": "textarea",
+                            "format": "json",
+                            "required": false,
+                            "help": "The GameEngine event keys this endpoint subscribes to."
+                        },
+                        {
+                            "key": "secret",
+                            "label": "Signing Secret",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "active",
+                            "label": "Active",
+                            "type": "select",
+                            "format": "int",
+                            "required": false,
+                            "options": [
+                                {
+                                    "value": 1,
+                                    "label": "Active"
+                                },
+                                {
+                                    "value": 0,
+                                    "label": "Paused"
+                                }
+                            ]
                         }
                     ],
                     "outputs": [

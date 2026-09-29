@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 trait ActionsTrait {
 
-    private static function action_award_points( array $config, array $input ): array {
+	private static function action_award_points( array $config, array $input ): array {
 		$user_id = self::user_from_config( $config );
 		$points  = (int) ( $config['points'] ?? 0 );
 
@@ -243,6 +243,9 @@ trait ActionsTrait {
 	/**
 	 * Assign a level — shared by assign_level, change_level and assign_rank
 	 * (GameEngine keeps ranks as levels).
+	 *
+	 * @param array $config
+	 * @param array $input
 	 */
 	private static function action_assign_level( array $config, array $input ): array {
 		$user_id  = self::user_from_config( $config );
@@ -281,17 +284,32 @@ trait ActionsTrait {
 		] );
 	}
 
-	/** Moving a user to another level is the same grant GameEngine makes. */
+	/**
+	 * Moving a user to another level is the same grant GameEngine makes.
+	 *
+	 * @param array $config
+	 * @param array $input
+	 */
 	private static function action_change_level( array $config, array $input ): array {
 		return self::action_assign_level( $config, $input );
 	}
 
-	/** Ranks are levels in GameEngine, so assigning one reuses the grant. */
+	/**
+	 * Ranks are levels in GameEngine, so assigning one reuses the grant.
+	 *
+	 * @param array $config
+	 * @param array $input
+	 */
 	private static function action_assign_rank( array $config, array $input ): array {
 		return self::action_assign_level( $config, $input );
 	}
 
-	/** The current rank is the current level. */
+	/**
+	 * The current rank is the current level.
+	 *
+	 * @param array $config
+	 * @param array $input
+	 */
 	private static function action_get_rank( array $config, array $input ): array {
 		return self::action_get_level( $config, $input );
 	}
@@ -427,6 +445,9 @@ trait ActionsTrait {
 	 * The same two-leg move the Pro transfer controller makes: take from the
 	 * sender, give to the recipient, refund the sender if the second leg fails,
 	 * then record the transfer for the daily-limit tables.
+	 *
+	 * @param array $config
+	 * @param array $input
 	 */
 	private static function action_transfer_points( array $config, array $input ): array {
 		$sender_id      = (int) ( $config['sender_id'] ?? 0 );
@@ -538,10 +559,6 @@ trait ActionsTrait {
 		] );
 	}
 
-	/**
-	 * The same rules the Pro payout REST endpoint enforces: only pending or
-	 * approved requests move, and rejecting refunds the deducted points.
-	 */
 	private static function action_update_payout( array $config, array $input ): array {
 		$payout_id = (int) ( $config['payout_id'] ?? 0 );
 		$status    = sanitize_key( (string) ( $config['status'] ?? '' ) );
@@ -560,7 +577,7 @@ trait ActionsTrait {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$payout = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $payout_id ),
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}gameengine_pro_payouts WHERE id = %d", $payout_id ),
 			ARRAY_A
 		);
 
@@ -601,5 +618,240 @@ trait ActionsTrait {
 		$config['status'] = 'approved';
 
 		return self::action_update_payout( $config, $input );
+	}
+
+	private static function action_reject_payout( array $config, array $input ): array {
+		$config['status'] = 'rejected';
+
+		return self::action_update_payout( $config, $input );
+	}
+
+	private static function action_get_payout( array $config, array $input ): array {
+		$payout_id = (int) ( $config['payout_id'] ?? 0 );
+
+		if ( $payout_id <= 0 ) {
+			return self::action_error( 'A payout ID is required.' );
+		}
+
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->prefix}gameengine_pro_payouts WHERE id = %d",
+				$payout_id
+			),
+			ARRAY_A
+		);
+
+		if ( ! $row ) {
+			return self::action_error( 'Payout request not found.' );
+		}
+
+		$row = (array) $row;
+
+		return self::action_success( [
+			'payout_id'  => (int) ( $row['id'] ?? 0 ),
+			'user_id'    => (int) ( $row['user_id'] ?? 0 ),
+			'points'     => (int) ( $row['points'] ?? 0 ),
+			'amount'     => (float) ( $row['amount'] ?? 0 ),
+			'method'     => (string) ( $row['method'] ?? '' ),
+			'status'     => (string) ( $row['status'] ?? '' ),
+			'notes'      => (string) ( $row['notes'] ?? '' ),
+			'created_at' => (string) ( $row['created_at'] ?? '' ),
+		] );
+	}
+
+	private static function action_get_profile( array $config, array $input ): array {
+		$user_id = self::user_from_config( $config );
+		$user    = $user_id > 0 ? self::user_payload( $user_id ) : null;
+
+		if ( ! $user ) {
+			return self::action_error( 'A valid user is required.' );
+		}
+
+		$level   = ( new \GameEngine\Classes\LevelsManager() )->get_current_level( $user_id );
+		$level_id = isset( $level->id ) ? (int) $level->id : 0;
+
+		$achievements = (array) ( new \GameEngine\Classes\AchievementsManager() )
+			->get_user_achievements( $user_id );
+
+		$balances = [];
+		foreach ( self::point_types() as $type ) {
+			$type_id    = (int) ( $type['id'] ?? 0 );
+			$balances[] = [
+				'point_type_id' => $type_id,
+				'point_type'    => (string) ( $type['slug'] ?? '' ),
+				'balance'       => self::balance( $user_id, $type_id ),
+			];
+		}
+
+		return self::action_success( [
+			'user_id'             => $user_id,
+			'user'                => $user,
+			'balance'             => self::balance( $user_id ),
+			'point_type_balances' => $balances,
+			'level_id'            => $level_id,
+			'level'               => $level_id ? (string) $level->title : '',
+			'rank_id'             => $level_id,
+			'rank'                => $level_id ? (string) $level->title : '',
+			'achievement_count'   => count( $achievements ),
+		] );
+	}
+
+	private static function leaderboard_args( array $config ): array {
+		$args = [
+			'point_type_id' => self::point_type_id_from_config( $config ),
+			'limit'         => max( 1, min( 100, (int) ( $config['limit'] ?? 10 ) ) ),
+		];
+
+		$range = sanitize_key( (string) ( $config['time_range'] ?? '' ) );
+		if ( '' !== $range && class_exists( '\GameEngine\Classes\LeaderboardManager' ) ) {
+			$window       = \GameEngine\Classes\LeaderboardManager::resolve_range( $range );
+			$args['start'] = $window['start'] ?? null;
+			$args['end']   = $window['end'] ?? null;
+		}
+
+		return $args;
+	}
+
+	private static function action_get_leaderboard( array $config, array $input ): array {
+		if ( ! class_exists( '\GameEngine\Classes\LeaderboardManager' ) ) {
+			return self::action_error( 'The GameEngine leaderboard is not available.' );
+		}
+
+		$args = self::leaderboard_args( $config );
+		$rows = \GameEngine\Classes\LeaderboardManager::get_rows( $args );
+
+		$entries = [];
+		foreach ( (array) $rows as $row ) {
+			$row        = (array) $row;
+			$entries[]  = [
+				'position'           => (int) ( $row['position'] ?? 0 ),
+				'user_id'            => (int) ( $row['user_id'] ?? 0 ),
+				'name'               => (string) ( $row['name'] ?? '' ),
+				'total_points'       => (int) ( $row['total_points'] ?? 0 ),
+				'achievements_count' => (int) ( $row['achievements_count'] ?? 0 ),
+				'top_level'          => (string) ( $row['top_level'] ?? '-' ),
+			];
+		}
+
+		return self::action_success( [
+			'point_type_id' => (int) ( $args['point_type_id'] ?? 0 ),
+			'limit'         => (int) ( $args['limit'] ?? 10 ),
+			'count'         => count( $entries ),
+			'entries'       => $entries,
+		] );
+	}
+
+	private static function action_get_leaderboard_position( array $config, array $input ): array {
+		if ( ! class_exists( '\GameEngine\Classes\LeaderboardManager' ) ) {
+			return self::action_error( 'The GameEngine leaderboard is not available.' );
+		}
+
+		$user_id = self::user_from_config( $config );
+		if ( $user_id <= 0 ) {
+			return self::action_error( 'A valid user is required.' );
+		}
+
+		$args  = self::leaderboard_args( $config );
+		$place = \GameEngine\Classes\LeaderboardManager::get_user_position( $user_id, $args );
+
+		return self::action_success( [
+			'user_id'       => $user_id,
+			'placed'        => ! empty( $place ),
+			'position'      => (int) ( $place['position'] ?? 0 ),
+			'total_points'  => (int) ( $place['total_points'] ?? 0 ),
+			'point_type_id' => (int) ( $args['point_type_id'] ?? 0 ),
+		] );
+	}
+
+	private static function action_get_activity_logs( array $config, array $input ): array {
+		$limit   = max( 1, min( 100, (int) ( $config['limit'] ?? 20 ) ) );
+		$user_id = (int) ( $config['user_id'] ?? 0 );
+		$status  = sanitize_key( (string) ( $config['status'] ?? '' ) );
+
+		global $wpdb;
+
+		$clause = [];
+		$values = [];
+
+		if ( $user_id > 0 ) {
+			$clause[] = 'user_id = %d';
+			$values[] = $user_id;
+		}
+
+		if ( in_array( $status, [ 'success', 'failed', 'skipped' ], true ) ) {
+			$clause[] = 'status = %s';
+			$values[] = $status;
+		}
+
+		$sql = 'SELECT id, user_id, trigger_key, status, points_awarded, message, created_at'
+			. " FROM {$wpdb->prefix}gameengine_logs";
+
+		if ( $clause ) {
+			$sql .= ' WHERE ' . implode( ' AND ', $clause );
+		}
+
+		$sql .= ' ORDER BY id DESC LIMIT %d';
+		$values[] = $limit;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $values ), ARRAY_A );
+
+		$logs = [];
+		foreach ( (array) $rows as $row ) {
+			$row    = (array) $row;
+			$logs[] = [
+				'log_id'         => (int) ( $row['id'] ?? 0 ),
+				'user_id'        => (int) ( $row['user_id'] ?? 0 ),
+				'trigger_key'    => (string) ( $row['trigger_key'] ?? '' ),
+				'status'         => (string) ( $row['status'] ?? '' ),
+				'points_awarded' => (int) ( $row['points_awarded'] ?? 0 ),
+				'message'        => (string) ( $row['message'] ?? '' ),
+				'created_at'     => (string) ( $row['created_at'] ?? '' ),
+			];
+		}
+
+		return self::action_success( [
+			'user_id' => $user_id,
+			'limit'   => $limit,
+			'count'   => count( $logs ),
+			'logs'    => $logs,
+		] );
+	}
+
+	private static function action_trigger_event( array $config, array $input ): array {
+		$user_id     = self::user_from_config( $config );
+		$trigger_key = sanitize_key( (string) ( $config['trigger_key'] ?? '' ) );
+
+		if ( $user_id <= 0 || '' === $trigger_key ) {
+			return self::action_error( 'A valid user and GameEngine event are required.' );
+		}
+
+		if ( ! class_exists( '\GameEngine\Classes\Triggers' ) || ! class_exists( '\GameEngine\Classes\TriggerRegistry' ) ) {
+			return self::action_error( 'The GameEngine trigger engine is not available.' );
+		}
+
+		$event = \GameEngine\Classes\TriggerRegistry::get( $trigger_key );
+		if ( ! is_array( $event ) ) {
+			return self::action_error( "'" . $trigger_key . "' is not a registered GameEngine event." );
+		}
+
+		$event['get_user_id'] = static function () use ( $user_id ) {
+			return $user_id;
+		};
+
+		$before = self::balance( $user_id );
+		( new \GameEngine\Classes\Triggers() )->execute( $trigger_key, $event, [ $user_id ] );
+		$after  = self::balance( $user_id );
+
+		return self::action_success( [
+			'trigger_key'    => $trigger_key,
+			'label'          => (string) ( $event['label'] ?? $trigger_key ),
+			'user_id'        => $user_id,
+			'balance_before' => $before,
+			'balance_after'  => $after,
+			'balance_delta'  => $after - $before,
+		] );
 	}
 }

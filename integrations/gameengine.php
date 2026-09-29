@@ -7,12 +7,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Integrations\Gameengine\ActionsTrait;
+use Zaplane\Integrations\Gameengine\CrudTrait;
 use Zaplane\Integrations\Gameengine\QueryTrait;
 use Zaplane\Integrations\Gameengine\Helper;
 
 class Gameengine extends IntegrationBase {
 
-    use ActionsTrait;
+	use ActionsTrait;
+	use CrudTrait;
 	use QueryTrait;
 	use Helper;
 
@@ -28,7 +30,7 @@ class Gameengine extends IntegrationBase {
 		return 'gameengine.svg';
 	}
 
-    public static function get_docs_url(): array {
+	public static function get_docs_url(): array {
 		return [
 			'trigger' => 'https://zaplane.app/docs/gameengine/',
 			'action'  => 'https://zaplane.app/docs/gameengine/',
@@ -143,7 +145,7 @@ class Gameengine extends IntegrationBase {
 			] ),
 		];
 
-		return $triggers;
+		return array_merge( $triggers, self::crud_triggers() );
 	}
 
 	public static function get_trigger_config_schema( string $trigger ): array {
@@ -230,19 +232,6 @@ class Gameengine extends IntegrationBase {
 					],
 				];
 
-			case 'coupon_generated':
-				return [
-					[
-						'key'        => 'prefix',
-						'label'      => 'Coupon Code Prefix',
-						'type'       => 'text',
-						'required'   => false,
-						'default'    => 'GE-',
-						'placeholder' => 'GE-',
-						'help'       => 'Only coupons whose code starts with this prefix fire the trigger. GameEngine marketplace coupons use GE-.',
-					],
-				];
-
 			case 'points_transferred':
 				return [
 					[
@@ -289,6 +278,12 @@ class Gameengine extends IntegrationBase {
 	public static function resolve_trigger( array $node, array $args ) {
 		$event  = (string) ( $node['event'] ?? ( $node['data']['event'] ?? '' ) );
 		$config = (array) ( $node['config'] ?? ( $node['data']['config'] ?? [] ) );
+
+		// GameEngine's own admin API writes its content tables without firing
+		// a hook, so the CRUD triggers watch that API dispatch instead.
+		if ( null !== self::crud_event_entity( $event ) ) {
+			return self::resolve_crud_event( $event, $config, $args );
+		}
 
 		switch ( $event ) {
 
@@ -608,9 +603,13 @@ class Gameengine extends IntegrationBase {
 			],
 		];
 
-		return $samples[ $event ] ?? [];
+		if ( isset( $samples[ $event ] ) ) {
+			return $samples[ $event ];
+		}
+
+		return self::crud_sample( $event ) ?? [];
 	}
-    
+
 	public static function get_actions(): array {
 		$actions = [
 			'award_points'       => [
@@ -697,12 +696,46 @@ class Gameengine extends IntegrationBase {
 				'label'       => 'Approve Payout Request',
 				'description' => 'Approve a pending withdrawal.',
 			] ),
+			'reject_payout'      => self::pro_meta( [
+				'label'       => 'Reject Payout Request',
+				'description' => 'Reject a withdrawal and refund the deducted points.',
+			] ),
+			'get_payout'         => self::pro_meta( [
+				'label'       => 'Get Payout Request',
+				'description' => 'Read one withdrawal request back.',
+			] ),
+			'get_profile'        => [
+				'label'       => 'Get Gamification Profile',
+				'description' => 'Read a member balances, level, rank and achievement tally.',
+			],
+			'get_leaderboard'    => [
+				'label'       => 'Get Leaderboard',
+				'description' => 'List a ranked page of members for a point type and window.',
+			],
+			'get_leaderboard_position' => [
+				'label'       => 'Get Leaderboard Position',
+				'description' => 'Read where one member stands on the leaderboard.',
+			],
+			'trigger_event'      => [
+				'label'       => 'Trigger GameEngine Event',
+				'description' => 'Run a registered GameEngine event and its saved rules for a member.',
+			],
+			'get_activity_logs'  => [
+				'label'       => 'Get Activity Logs',
+				'description' => 'List the GameEngine activity log entries.',
+			],
 		];
 
-		return $actions;
+		return array_merge( $actions, self::crud_actions() );
 	}
 
 	public static function get_action_config_schema( string $action ): array {
+		$crud_schema = self::crud_action_schema( $action );
+
+		if ( null !== $crud_schema ) {
+			return $crud_schema;
+		}
+
 		$user_field = [
 			'key'         => 'user_id',
 			'label'       => 'User ID',
@@ -759,6 +792,52 @@ class Gameengine extends IntegrationBase {
 				'select'      => [ 'value', 'label' ],
 			],
 			'required' => true,
+		];
+
+		$payout_field = [
+			'key'      => 'payout_id',
+			'label'    => 'Payout ID',
+			'type'     => 'select',
+			'dynamic'  => [
+				'integration' => 'gameengine',
+				'query'       => 'payouts_query',
+				'select'      => [ 'value', 'label' ],
+			],
+			'required' => true,
+		];
+
+		$time_range_field = [
+			'key'      => 'time_range',
+			'label'    => 'Time Window',
+			'type'     => 'select',
+			'required' => false,
+			'default'  => 'all_time',
+			'options'  => [
+				[
+					'value' => 'all_time',
+					'label' => 'All time'
+				],
+				[
+					'value' => 'today',
+					'label' => 'Today'
+				],
+				[
+					'value' => 'this_week',
+					'label' => 'This week'
+				],
+				[
+					'value' => 'this_month',
+					'label' => 'This month'
+				],
+				[
+					'value' => 'this_year',
+					'label' => 'This year'
+				],
+				[
+					'value' => 'last_30_days',
+					'label' => 'Last 30 days'
+				],
+			],
 		];
 
 		switch ( $action ) {
@@ -1062,17 +1141,7 @@ class Gameengine extends IntegrationBase {
 
 			case 'update_payout':
 				return [
-					[
-						'key'      => 'payout_id',
-						'label'    => 'Payout ID',
-						'type'     => 'select',
-						'dynamic'  => [
-							'integration' => 'gameengine',
-							'query'       => 'payouts_query',
-							'select'      => [ 'value', 'label' ],
-						],
-						'required' => true,
-					],
+					$payout_field,
 					[
 						'key'      => 'status',
 						'label'    => 'New Status',
@@ -1101,17 +1170,91 @@ class Gameengine extends IntegrationBase {
 				];
 
 			case 'approve_payout':
+			case 'reject_payout':
+			case 'get_payout':
+				return [ $payout_field ];
+
+			case 'get_profile':
+				return [ $user_field ];
+
+			case 'get_leaderboard':
 				return [
+					$point_type_field,
 					[
-						'key'      => 'payout_id',
-						'label'    => 'Payout ID',
+						'key'      => 'limit',
+						'label'    => 'Rows',
+						'type'     => 'number',
+						'required' => false,
+						'default'  => 10,
+					],
+					$time_range_field,
+				];
+
+			case 'get_leaderboard_position':
+				return [
+					$user_field,
+					$point_type_field,
+					$time_range_field,
+				];
+
+			case 'trigger_event':
+				return [
+					$user_field,
+					[
+						'key'      => 'trigger_key',
+						'label'    => 'GameEngine Event',
 						'type'     => 'select',
 						'dynamic'  => [
 							'integration' => 'gameengine',
-							'query'       => 'payouts_query',
+							'query'       => 'events_query',
 							'select'      => [ 'value', 'label' ],
 						],
 						'required' => true,
+						'help'     => 'The event whose saved rules run for the member.',
+					],
+				];
+
+			case 'get_activity_logs':
+				return [
+					[
+						'key'         => 'user_id',
+						'label'       => 'User ID',
+						'type'        => 'expression',
+						'required'    => false,
+						'placeholder' => '{{trigger.user.user_id}}',
+						'help'        => 'Leave empty to include every member.',
+					],
+					[
+						'key'      => 'limit',
+						'label'    => 'Entries',
+						'type'     => 'number',
+						'required' => false,
+						'default'  => 20,
+					],
+					[
+						'key'      => 'status',
+						'label'    => 'Status',
+						'type'     => 'select',
+						'required' => false,
+						'default'  => '',
+						'options'  => [
+							[
+								'value' => '',
+								'label' => 'Any'
+							],
+							[
+								'value' => 'success',
+								'label' => 'Success'
+							],
+							[
+								'value' => 'failed',
+								'label' => 'Failed'
+							],
+							[
+								'value' => 'skipped',
+								'label' => 'Skipped'
+							],
+						],
 					],
 				];
 		}//end switch
@@ -1294,9 +1437,100 @@ class Gameengine extends IntegrationBase {
 				'points'          => 1000,
 				'refunded'        => false,
 			],
+			'reject_payout'      => [
+				'success'         => true,
+				'payout_id'       => 11,
+				'previous_status' => 'approved',
+				'status'          => 'rejected',
+				'user_id'         => 42,
+				'points'          => 1000,
+				'refunded'        => true,
+			],
+			'get_payout'         => [
+				'success'    => true,
+				'payout_id'  => 11,
+				'user_id'    => 42,
+				'points'     => 1000,
+				'amount'     => 10,
+				'method'     => 'paypal',
+				'status'     => 'pending',
+				'notes'      => '',
+				'created_at' => '2026-01-01 09:00:00',
+			],
+			'get_profile'        => [
+				'success'             => true,
+				'user_id'             => 42,
+				'balance'             => 1300,
+				'point_type_balances' => [
+					[
+						'point_type_id' => 1,
+						'point_type'    => 'points',
+						'balance'       => 1300,
+					],
+				],
+				'level_id'          => 3,
+				'level'             => 'Adept',
+				'rank_id'           => 3,
+				'rank'              => 'Adept',
+				'achievement_count' => 2,
+			],
+			'get_leaderboard'    => [
+				'success'       => true,
+				'point_type_id' => 1,
+				'limit'         => 10,
+				'count'         => 2,
+				'entries'       => [
+					[
+						'position'           => 1,
+						'user_id'            => 42,
+						'name'               => 'Jane Doe',
+						'total_points'       => 1300,
+						'achievements_count' => 2,
+						'top_level'          => 'Adept',
+					],
+				],
+			],
+			'get_leaderboard_position' => [
+				'success'       => true,
+				'user_id'       => 42,
+				'placed'        => true,
+				'position'      => 3,
+				'total_points'  => 1300,
+				'point_type_id' => 1,
+			],
+			'trigger_event'      => [
+				'success'        => true,
+				'trigger_key'    => 'publish_post',
+				'label'          => 'Post Published',
+				'user_id'        => 42,
+				'balance_before' => 1250,
+				'balance_after'  => 1300,
+				'balance_delta'  => 50,
+			],
+			'get_activity_logs'  => [
+				'success' => true,
+				'user_id' => 42,
+				'limit'   => 20,
+				'count'   => 1,
+				'logs'    => [
+					[
+						'log_id'         => 512,
+						'user_id'        => 42,
+						'trigger_key'    => 'publish_post',
+						'status'         => 'success',
+						'points_awarded' => 50,
+						'message'        => 'Awarded 50 points.',
+						'created_at'     => '2026-01-01 09:00:00',
+					],
+				],
+			],
 		];
 
-		return $samples[ $action ] ?? [];
+		if ( isset( $samples[ $action ] ) ) {
+			return $samples[ $action ];
+		}
+
+		return self::crud_sample( $action ) ?? [];
 	}
 
 	public static function execute_node( array $node, array $input ): array {
@@ -1312,7 +1546,18 @@ class Gameengine extends IntegrationBase {
 			return self::action_error( 'The GameEngine plugin is not active.' );
 		}
 
-		$pro_actions = [ 'generate_coupon', 'transfer_points', 'create_payout', 'update_payout', 'approve_payout' ];
+		$pro_actions = array_merge(
+			[
+				'generate_coupon',
+				'transfer_points',
+				'create_payout',
+				'update_payout',
+				'approve_payout',
+				'reject_payout',
+				'get_payout',
+			],
+			self::crud_pro_actions()
+		);
 		if ( in_array( $event, $pro_actions, true ) && ! self::pro_active() ) {
 			return self::action_error( 'This GameEngine action requires the GameEngine Pro plugin.' );
 		}
@@ -1320,7 +1565,7 @@ class Gameengine extends IntegrationBase {
 		return static::$method( $config, $input );
 	}
 
-    public static function get_dynamic_queries(): array {
+	public static function get_dynamic_queries(): array {
 		return [
 			'point_types_query'   => [ self::class, 'query_point_types' ],
 			'achievements_query'  => [ self::class, 'query_achievements' ],
@@ -1328,6 +1573,12 @@ class Gameengine extends IntegrationBase {
 			'rewards_query'       => [ self::class, 'query_rewards' ],
 			'payouts_query'       => [ self::class, 'query_payouts' ],
 			'posts_query'         => [ self::class, 'query_posts' ],
+			'events_query'        => [ self::class, 'query_events' ],
+			'badges_query'        => [ self::class, 'query_badges' ],
+			'logs_query'          => [ self::class, 'query_logs' ],
+			'wheels_query'        => [ self::class, 'query_wheels' ],
+			'seasons_query'       => [ self::class, 'query_seasons' ],
+			'webhooks_query'      => [ self::class, 'query_webhooks' ],
 		];
 	}
 
