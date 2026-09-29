@@ -6,6 +6,12 @@ All notable changes to Zaplane are documented here. This project adheres to
 ## [Unreleased]
 
 ### Fixed
+- Fixed the Email Templates create button shrinking and wrapping at desktop, tablet, and responsive breakpoints.
+- Restored the Custom Apps and Business Knowledge screens instead of showing a disabled-feature placeholder, and enabled both modules by default.
+- Kept the shared Zaplane header on one row at tablet/mobile widths and compacted secondary header controls on smaller screens.
+- Fixed the workflow editor header spacing and Status control clipping; secondary workflow actions now move into the 3-dot menu on narrower screens so Status and Update remain visible.
+- Fixed Connections and Folders mobile headers so the title and primary action stay on one compact row.
+- Fixed Business Knowledge mobile responsiveness: primary action stays visible, secondary actions move into the 3-dot menu, filters fit without clipping, and search uses the full row.
 - Resolved the duplicate `handle_incoming()` method that caused a PHP critical error.
 - Fixed the dashboard login/reload flow so it loads normally again.
 - Corrected the Log History horizontal scrollbar and responsive layout issues.

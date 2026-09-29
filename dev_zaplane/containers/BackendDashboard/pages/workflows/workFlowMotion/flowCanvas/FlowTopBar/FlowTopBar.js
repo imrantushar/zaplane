@@ -121,6 +121,11 @@ export default function FlowTopBar({
   const activeToolbarButtonStyle = {
     border: "1px solid var(--zaplane-primary)",
   };
+  const startTestFlow = () => {
+    dispatch(startApiCountdown(120));
+    dispatch(workflowNodeListiner(id));
+  };
+  const stopTestFlow = () => dispatch(workflowNodeListinerStop(id));
   const rightActions = <div className="zaplane-flow-toolbar flex items-center gap-3 min-w-0">
     {warnings.length > 0 && (
       <div className="relative">
@@ -149,10 +154,7 @@ export default function FlowTopBar({
     )}
     {!apiRequestRunning ? (
       <button
-        onClick={() => {
-          dispatch(startApiCountdown(120));
-          dispatch(workflowNodeListiner(id));
-        }}
+        onClick={startTestFlow}
         title={__("Test Flow Once", "zaplane")}
         aria-label={__("Test Flow Once", "zaplane")}
         className="zaplane-flow-test flex items-center gap-2 h-9 px-4 bg-[var(--zaplane-second-primary)] text-[var(--zaplane-primary)] font-medium rounded-[4px] hover:opacity-90 transition-all whitespace-nowrap"
@@ -162,7 +164,7 @@ export default function FlowTopBar({
       </button>
     ) : (
       <button
-        onClick={() => dispatch(workflowNodeListinerStop(id))}
+        onClick={stopTestFlow}
         title={__("Stop", "zaplane")}
         aria-label={__("Stop", "zaplane")}
         className="zaplane-flow-test flex items-center gap-2 h-9 px-4 bg-red-50 text-[var(--zaplane-danger)] font-medium rounded-[4px] hover:bg-red-100 transition-all whitespace-nowrap"
@@ -302,6 +304,12 @@ export default function FlowTopBar({
         </button>
       }
       items={[{
+        label: apiRequestRunning ? __("Stop test", "zaplane") : __("Test Flow Once", "zaplane"),
+        icon: apiRequestRunning ? LiaStopCircleSolid : CiPlay1,
+        onClick: apiRequestRunning ? stopTestFlow : startTestFlow
+      }, {
+        type: "divider"
+      }, {
         label: isFullscreen ? __("Exit full screen", "zaplane") : __("Full screen", "zaplane"),
         icon: isFullscreen ? LuMinimize : LuFullscreen,
         onClick: toggleFullscreen
@@ -383,5 +391,5 @@ export default function FlowTopBar({
         </button>
       )}
     </div>
-  )} rightContent={() => rightActions} />;
+  )} rightContent={() => rightActions} topBarStyles={{ paddingLeft: '12px', paddingRight: '12px' }} />;
 }

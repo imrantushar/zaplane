@@ -1,0 +1,72 @@
+.zaplane-knowledge-actions__mobile {
+  display: none;
+}
+
+.zaplane-knowledge-filters {
+  min-width: 0;
+}
+
+.zaplane-knowledge-filter {
+  flex: 0 0 auto;
+  min-width: 0 !important;
+}
+
+.zaplane-knowledge-filter--business {
+  width: 220px;
+}
+
+.zaplane-knowledge-filter--source {
+  width: 180px;
+}
+
+.zaplane-knowledge-search {
+  flex: 1 1 240px;
+  min-width: 180px;
+  max-width: 320px;
+}
+
+@media (max-width: 600px) {
+  .zaplane-knowledge-actions__desktop {
+    display: none !important;
+  }
+
+  .zaplane-knowledge-actions__mobile {
+    display: flex;
+  }
+
+  .zaplane-knowledge-actions__mobile > button {
+    height: 32px !important;
+    padding-inline: 10px !important;
+    font-size: 12px !important;
+  }
+
+  .zaplane-knowledge-filters {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px !important;
+    width: 100%;
+  }
+
+  .zaplane-knowledge-filter--business,
+  .zaplane-knowledge-filter--source {
+    width: auto;
+    min-width: 0 !important;
+  }
+
+  .zaplane-knowledge-search {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+@media (max-width: 390px) {
+  .zaplane-knowledge-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .zaplane-knowledge-search {
+    grid-column: auto;
+  }
+}

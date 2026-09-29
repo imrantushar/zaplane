@@ -26,7 +26,8 @@ const PageLayout = ({
   children,
   isLoading,
   skeleton: Skeleton,
-  topBarStyles = {}
+  topBarStyles = {},
+  inlineActionsOnMobile = false
 }) => {
   if (isLoading && Skeleton) {
     return <Skeleton />;
@@ -51,7 +52,7 @@ const PageLayout = ({
                         {renderBreadcrumbs()}
                     </>} />
             
-            <SubTopBar heading={__(displayHeading, "zaplane")}>
+            <SubTopBar heading={__(displayHeading, "zaplane")} inlineOnMobile={inlineActionsOnMobile}>
                 {actions}
             </SubTopBar>
 

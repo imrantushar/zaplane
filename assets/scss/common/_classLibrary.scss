@@ -447,13 +447,11 @@
 
 @media screen and (max-width: 600px) {
     .zaplane-sub-top-header {
-        align-items: stretch !important;
-        gap: 12px !important;
+        gap: 10px !important;
     }
 
     .zaplane-sub-top-header__title,
     .zaplane-sub-top-header__content {
-        width: 100%;
         min-width: 0;
     }
 
@@ -461,22 +459,46 @@
         justify-content: flex-start;
     }
 
-    .zaplane-sub-top-header__content > * {
-        max-width: 100%;
+    .zaplane-sub-top-header--inline-mobile {
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+    }
+
+    .zaplane-sub-top-header--inline-mobile .zaplane-sub-top-header__title {
+        flex: 1 1 auto;
+        width: auto;
+        white-space: nowrap;
+        font-size: 17px !important;
+        line-height: 24px !important;
+    }
+
+    .zaplane-sub-top-header--inline-mobile .zaplane-sub-top-header__content {
+        flex: 0 0 auto;
+        width: auto;
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+    }
+
+    .zaplane-sub-top-header--inline-mobile .zaplane-sub-top-header__content button {
+        height: 32px !important;
+        padding-inline: 10px !important;
+        font-size: 12px !important;
     }
 
     .zaplane-responsive-actions {
         width: 100%;
-        flex-wrap: wrap;
+        min-width: 0;
+        flex-wrap: nowrap !important;
     }
 
     .zaplane-responsive-actions .zaplane-search-component {
-        flex: 1 1 100%;
+        flex: 1 1 auto;
+        min-width: 0;
         max-width: none;
     }
 
     .zaplane-responsive-actions > button {
-        flex: 1 1 auto;
+        flex: 0 0 auto;
         justify-content: center;
         white-space: nowrap;
     }

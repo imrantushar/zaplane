@@ -14,48 +14,54 @@
 @media (max-width: 782px) {
     .zaplane-topbar {
         top: 46px !important;
-        height: auto !important;
-        min-height: 72px;
-        flex-wrap: wrap;
-        gap: 12px;
-        padding: 12px 16px !important;
-        margin-bottom: 24px !important;
+        height: 64px !important;
+        min-height: 64px;
+        flex-wrap: nowrap !important;
+        gap: 8px;
+        padding: 10px 12px !important;
+        margin-bottom: 20px !important;
     }
 
     .zaplane-topbar__left {
         flex: 1 1 auto;
         min-width: 0;
+        flex-wrap: nowrap !important;
+        overflow: hidden;
     }
 
     .zaplane-topbar__middle {
-        flex: 1 1 100%;
-        width: 100%;
+        flex: 0 1 auto;
+        min-width: 0;
     }
 
     .zaplane-topbar__right {
-        flex: 0 1 auto;
-        max-width: 100%;
+        flex: 0 0 auto;
+        min-width: 0;
+        max-width: none;
+    }
+
+    .zaplane-topbar-default-actions {
+        gap: 8px !important;
     }
 }
 
 @media (max-width: 600px) {
     .zaplane-topbar {
         top: 0 !important;
-        align-items: flex-start !important;
-        padding: 10px 12px !important;
+        height: 58px !important;
+        min-height: 58px;
+        padding: 8px 10px !important;
+        margin-bottom: 16px !important;
     }
 
-    .zaplane-topbar__left {
-        width: 100%;
-        flex: 1 1 100%;
-        flex-wrap: nowrap !important;
-        overflow: hidden;
+    .zaplane-help-button {
+        width: 36px;
+        min-width: 36px;
+        padding: 0 !important;
+        justify-content: center;
     }
 
-    .zaplane-topbar__right {
-        width: 100%;
-        flex: 1 1 100%;
-        justify-content: flex-end;
-        overflow: visible;
+    .zaplane-help-button__label {
+        display: none;
     }
 }

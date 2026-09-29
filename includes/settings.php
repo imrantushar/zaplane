@@ -144,7 +144,7 @@ class Settings {
 				'key'         => 'custom_apps',
 				'title'       => __( 'Custom Apps', 'zaplane' ),
 				'description' => __( 'Build your own integrations from the UI — any external REST API, or hooks on this site. When off, the Custom Apps menu is hidden.', 'zaplane' ),
-				'default'     => false,
+				'default'     => true,
 				'menu'        => 'custom-apps',
 				'panel'       => '',
 				// Custom apps are user-defined, so the slugs are resolved at runtime
@@ -157,7 +157,7 @@ class Settings {
 				'key'         => 'knowledge',
 				'title'       => __( 'Business Knowledge', 'zaplane' ),
 				'description' => __( 'A searchable knowledge base the AI Agent can answer from. Sync any post type — products, docs, policies. When off, the Business Knowledge menu is hidden.', 'zaplane' ),
-				'default'     => false,
+				'default'     => true,
 				'menu'        => 'knowledge',
 				'panel'       => '',
 				'apps'        => [ 'knowledge' ],

@@ -2,6 +2,8 @@ import { useEffect, useState, useCallback } from "react";
 import { __ } from "@wordpress/i18n";
 import { FiEdit2, FiTrash2, FiX } from "react-icons/fi";
 import PageLayout from "@ZAPComponents/PageLayout";
+import ZAPMenu from "@ZAPComponents/ZapMenu";
+import "./styles.scss";
 import Search from "@ZAPComponents/Search";
 import ListTable from "@ZAPComponents/ListTable";
 import OptionMenu from "@ZAPComponents/OptionMenu";
@@ -389,21 +391,45 @@ const KnowledgePage = () => {
     },
   ];
 
+  const mobileActionItems = [
+    {
+      label: __("Semantic Search", "zaplane"),
+      onClick: openEmbed,
+    },
+    {
+      label: syncing ? __("Working...", "zaplane") : __("Sync Content", "zaplane"),
+      onClick: openSync,
+    },
+    {
+      label: __("FAQ Builder", "zaplane"),
+      onClick: openFaq,
+    },
+  ];
+
   const actions = (
-    <div className="flex items-center gap-2">
-      <button type="button" style={outlineBtn} onClick={openEmbed}>
-        {__("Semantic Search", "zaplane")}
-        {embedStatus.enabled ? " ✓" : ""}
-      </button>
-      <button type="button" style={outlineBtn} onClick={openSync} disabled={syncing}>
-        {syncing ? __("Working...", "zaplane") : __("Sync Content", "zaplane")}
-      </button>
-      <button type="button" style={outlineBtn} onClick={openFaq}>
-        {__("FAQ Builder", "zaplane")}
-      </button>
-      <button type="button" style={primaryBtn} onClick={openAdd}>
-        {__("Add Entry", "zaplane")}
-      </button>
+    <div className="zaplane-knowledge-actions flex items-center gap-2">
+      <div className="zaplane-knowledge-actions__desktop flex items-center gap-2">
+        <button type="button" style={outlineBtn} onClick={openEmbed}>
+          {__("Semantic Search", "zaplane")}
+          {embedStatus.enabled ? " ✓" : ""}
+        </button>
+        <button type="button" style={outlineBtn} onClick={openSync} disabled={syncing}>
+          {syncing ? __("Working...", "zaplane") : __("Sync Content", "zaplane")}
+        </button>
+        <button type="button" style={outlineBtn} onClick={openFaq}>
+          {__("FAQ Builder", "zaplane")}
+        </button>
+        <button type="button" style={primaryBtn} onClick={openAdd}>
+          {__("Add Entry", "zaplane")}
+        </button>
+      </div>
+
+      <div className="zaplane-knowledge-actions__mobile items-center gap-2">
+        <button type="button" style={primaryBtn} onClick={openAdd}>
+          {__("Add Entry", "zaplane")}
+        </button>
+        <ZAPMenu isIcon items={mobileActionItems} />
+      </div>
     </div>
   );
 
@@ -411,6 +437,7 @@ const KnowledgePage = () => {
     <PageLayout
       title={__("Business Knowledge", "zaplane")}
       heading={__("Business Knowledge", "zaplane")}
+      inlineActionsOnMobile
       actions={actions}
     >
       <ListTable
@@ -419,8 +446,8 @@ const KnowledgePage = () => {
         isRowSelectable={false}
         showSubHeader
         subHeaderComponent={
-          <div className="flex items-center gap-3 w-full">
-            <div className="min-w-[220px]">
+          <div className="zaplane-knowledge-filters flex items-center gap-3 w-full">
+            <div className="zaplane-knowledge-filter zaplane-knowledge-filter--business min-w-[220px]">
               <ZAPSelect
                 options={businessOptions}
                 value={business}
@@ -429,7 +456,7 @@ const KnowledgePage = () => {
                 isClearable
               />
             </div>
-            <div className="min-w-[180px]">
+            <div className="zaplane-knowledge-filter zaplane-knowledge-filter--source min-w-[180px]">
               <ZAPSelect
                 options={sourceOptions}
                 value={source}
@@ -438,7 +465,7 @@ const KnowledgePage = () => {
                 isClearable
               />
             </div>
-            <Search placeholder={__("Search knowledge...", "zaplane")} onSearchHandler={setSearch} debounce={500} />
+            <Search custom="zaplane-knowledge-search" placeholder={__("Search knowledge...", "zaplane")} onSearchHandler={setSearch} debounce={500} />
           </div>
         }
         showColumnFilter={false}

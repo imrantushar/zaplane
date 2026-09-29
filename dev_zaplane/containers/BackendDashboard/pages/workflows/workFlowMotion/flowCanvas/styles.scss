@@ -254,3 +254,74 @@
     right: 8px;
   }
 }
+
+
+/* Responsive workflow toolbar: keep breadcrumb, Status, Update and overflow
+   on one row; move secondary actions into the overflow menu. */
+.zaplane-flow-status-select {
+  width: 116px;
+  min-width: 116px;
+  flex: 0 0 116px;
+}
+
+.zaplane-flow-toolbar {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .zaplane-flow-test,
+  .zaplane-flow-secondary-action,
+  .zaplane-flow-listening {
+    display: none !important;
+  }
+
+  .zaplane-flow-toolbar {
+    width: auto !important;
+    max-width: none !important;
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 782px) {
+  .zaplane-flow-toolbar {
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  .zaplane-flow-breadcrumb {
+    width: auto !important;
+    flex: 1 1 auto;
+    overflow: hidden;
+    gap: 8px !important;
+  }
+
+  .zaplane-flow-breadcrumb > div:first-child {
+    width: 34px !important;
+    height: 34px !important;
+    flex: 0 0 34px;
+  }
+
+  .zaplane-flow-title {
+    max-width: min(24vw, 150px) !important;
+    padding-inline: 4px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .zaplane-flow-test,
+  .zaplane-flow-secondary-action,
+  .zaplane-flow-listening {
+    display: none !important;
+  }
+
+  .zaplane-flow-status-select {
+    width: 104px;
+    min-width: 104px;
+    flex: 0 0 104px;
+  }
+
+  .zaplane-flow-update {
+    padding-inline: 12px !important;
+    font-size: 13px;
+  }
+}

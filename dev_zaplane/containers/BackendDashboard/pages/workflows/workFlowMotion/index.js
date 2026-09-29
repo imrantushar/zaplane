@@ -80,11 +80,11 @@ export default function Workflows({
     setInitialHash(currentHash);
   };
   return <ReactFlowProvider>
-      <div hight='100vh' className="flex">
+      <div hight='100vh' className="flex min-w-0 w-full">
         <Formik enableReinitialize initialValues={{
         nodeClick: false
       }} onSubmit={onSubmitHandler}>
-          {({}) => <div className="flex-[1]">
+          {({}) => <div className="flex-[1] min-w-0 w-full">
               <NavigationBlocker when={isFlowDirty} />
               <FlowCanvas setNodes={setNodes} setEdges={setEdges} onEdgesChange={onEdgesChange} onNodesChange={onNodesChange} nodes={nodes} edges={edges} getNewNodeId={getNewNodeId} workFlow={workFlow} id={id} isFlowDirty={isFlowDirty} canvasLayout={canvasLayout} setCanvasLayOut={setCanvasLayOut} onNavigateBack={onNavigateBack} renderTopBar={renderTopBar} />
             </div>}

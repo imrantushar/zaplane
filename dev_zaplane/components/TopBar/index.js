@@ -36,13 +36,13 @@ const ThemeToggle = () => {
 const TopBar = ({
 	title = '',
 	render = () => null,
-	rightContent = () => <div className="flex items-center gap-3">
+	rightContent = () => <div className="zaplane-topbar-default-actions flex items-center gap-3">
 		<ThemeToggle />
-		<button className='flex items-center gap-2' style={outlineBtn} onClick={() => {
+		<button className='zaplane-help-button flex items-center gap-2' style={outlineBtn} onClick={() => {
 			window.open('https://zaplane.app/docs/', '_blank');
 		}}>
 			<FiHelpCircle color='var(--zaplane-font-color)' />
-			{__("Help", "zaplane")}
+			<span className="zaplane-help-button__label">{__("Help", "zaplane")}</span>
 		</button>
 	</div>,
 	middleContent = () => null,

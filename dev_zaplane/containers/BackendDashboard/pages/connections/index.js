@@ -40,6 +40,7 @@ const Connections = () => {
     return <PageLayout
         title="Connections"
         heading="Connections"
+        inlineActionsOnMobile
         actions={
             <button
                 style={primaryBtn}
