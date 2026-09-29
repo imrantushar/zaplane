@@ -56,7 +56,7 @@ class CustomCodeExecution extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'code';
+		return 'custom-code-execution.svg';
 	}
 
 	public static function get_category(): string {

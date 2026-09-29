@@ -1,6 +1,6 @@
 {
     "version": "1.3.2",
-    "generated_at": "2026-09-28 12:03:51",
+    "generated_at": "2026-09-29 04:30:39",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -31303,7 +31303,7 @@
         "custom-code-execution": {
             "slug": "custom-code-execution",
             "name": "Custom Code Execution",
-            "icon": "code",
+            "icon": "custom-code-execution.svg",
             "category": "tool",
             "requires_connection": false,
             "auth_type": "none",
@@ -31322,7 +31322,7 @@
                             "type": "code",
                             "required": true,
                             "placeholder": "return \"Hello \" . $input[\"name\"];",
-                            "help": "PHP code to run. The leading <?php tag is optional. Previous steps' data is available as $input (array), the node settings as $config (array). The return value becomes this step's output."
+                            "help": "PHP code to run. The leading <?php tag is optional. Previous steps' data is available as $input (array) and the node settings as $config (array). The return value becomes this step's output."
                         },
                         {
                             "key": "timeout",
@@ -31353,10 +31353,9 @@
                             "key": "code",
                             "label": "JavaScript Code",
                             "type": "code",
-                            "language": "javascript",
                             "required": true,
                             "placeholder": "return \"Hello \" + input.name;",
-                            "help": "JavaScript to run with the server's Node.js runtime. Input data is available as \"input\" object; async/await is supported. The return value will be the output. Node.js must be installed on the server."
+                            "help": "JavaScript to run with the server's Node.js binary. Previous steps' data is available as the input object and async/await is supported. The return value becomes this step's output. Node.js must be installed on the server."
                         },
                         {
                             "key": "timeout",
@@ -31364,7 +31363,7 @@
                             "type": "number",
                             "required": false,
                             "default": 10,
-                            "help": "Maximum execution time in seconds (default: 10, max: 30)."
+                            "help": "Maximum execution time in seconds (default: 10, max: 30). The process is terminated when it is exceeded."
                         }
                     ],
                     "outputs": [
@@ -31377,12 +31376,11 @@
                     "schema": [
                         {
                             "key": "code",
-                            "label": "Node.js Code",
+                            "label": "JavaScript Code",
                             "type": "code",
-                            "language": "nodejs",
                             "required": true,
                             "placeholder": "return \"Hello \" + input.name;",
-                            "help": "Node.js code to run with the server's node binary. Input data is available as \"input\" object; async/await is supported. The return value will be the output. Node.js must be installed on the server."
+                            "help": "JavaScript to run with the server's Node.js binary. Previous steps' data is available as the input object and async/await is supported. The return value becomes this step's output. Node.js must be installed on the server."
                         },
                         {
                             "key": "timeout",
