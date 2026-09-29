@@ -31,20 +31,10 @@ class CustomCodeExecution extends IntegrationBase {
 	 * rather than just the snippet.
 	 */
 	private const PHP_BLOCKED_KEYWORDS = '/\b(include|include_once|require|require_once|exit|die)\b/i';
-
-	/** The backtick shell-execution operator. */
 	private const PHP_BLOCKED_BACKTICKS = '/`[^`]*`/';
-
-	/** Node.js: exec-family calls and host reach (scanned with strings stripped). */
 	private const NODE_BLOCKED_CALLS = '/\beval\s*\(|\bFunction\s*\(|\bprocess\s*\.|\bexec\s*\(|\bspawn\s*\(|\bfork\s*\(/i';
-
-	/** Node.js: modules that reach the OS or spawn (module names live in strings, so this is scanned with comments stripped only). */
 	private const NODE_BLOCKED_MODULES = '/\brequire\s*\(\s*["\'](child_process|fs|net|http|https|http2|dgram|cluster|worker_threads|vm|os|dns|tls)["\']\s*\)/i';
-
-	/** Wall-clock budget for the where/which lookup, in seconds. */
 	private const RESOLVE_TIMEOUT = 3;
-
-	/** Poll interval for reading child-process pipes, in microseconds. */
 	private const POLL_INTERVAL_USEC = 20000;
 
 	public static function get_slug(): string {
@@ -186,10 +176,6 @@ class CustomCodeExecution extends IntegrationBase {
 				throw new \Exception( 'Unknown execution type: ' . $event );
 		}
 	}
-
-	// =========================================================================
-	// PHP EXECUTION
-	// =========================================================================
 
 	private static function execute_php_code( string $code, array $input, array $config, int $timeout ): array {
 		$source = self::strip_php_open_tag( $code );
@@ -409,10 +395,6 @@ class CustomCodeExecution extends IntegrationBase {
 
 		return $scannable;
 	}
-
-	// =========================================================================
-	// JAVASCRIPT EXECUTION (NODE.JS RUNTIME)
-	// =========================================================================
 
 	private static function execute_javascript_code( string $code, array $input, int $timeout ): array {
 		if ( ! \function_exists( 'proc_open' ) ) {
@@ -663,10 +645,6 @@ class CustomCodeExecution extends IntegrationBase {
 
 		return (string) preg_replace( $pattern, '', $code );
 	}
-
-	// =========================================================================
-	// RESPONSE HELPERS
-	// =========================================================================
 
 	private static function clamp( int $value, int $min, int $max ): int {
 		return max( $min, min( $max, $value ) );
