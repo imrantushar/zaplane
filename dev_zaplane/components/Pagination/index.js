@@ -114,14 +114,14 @@ const Pagination = ({
       }} height="auto" minWidth="auto" padding="6px" onClick={() => {
         handlePageChange(1);
       }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent disabled:opacity-40 disabled:cursor-not-allowed">
-						<IoIosArrowBack style={{width:"16px", height:"16px"}} />
+						<HiChevronDoubleLeft style={{width:"16px", height:"16px"}} />
 					</button>
 					<button disabled={!canGoPrev} aria-label="Previous page" borderWidth="1px" _hover={{
         bg: 'var(--zaplane-secondary-color)'
       }} height="auto" minWidth="auto" padding="6px" onClick={() => {
         handlePageChange(page - 1);
       }} className="text-[var(--zaplane-font-color)] border-[var(--zaplane-border-color)] bg-transparent disabled:opacity-40 disabled:cursor-not-allowed">
-						<HiChevronDoubleLeft style={{width:"16px", height:"16px"}} />
+						<IoIosArrowBack style={{width:"16px", height:"16px"}} />
 					</button>
 				</>}
 			{pageNumbers.length > 0 && <ul className="zaplane-pagination-list">
