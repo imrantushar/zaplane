@@ -28,6 +28,14 @@ class Typeform extends IntegrationBase {
 		return 'typeform.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/typeform/',
+			'action'  => 'https://zaplane.app/docs/typeform/',
+		];
+	}
+
 	public static function requires_connection(): bool {
 		return true;
 	}

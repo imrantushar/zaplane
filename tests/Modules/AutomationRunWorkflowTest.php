@@ -239,6 +239,59 @@ class AutomationRunWorkflowTest extends TestCase {
 
 	// ── run_workflow: full abandoned-cart graph ───────────────────────────────
 
+	// ── run_workflow: choosing the trigger ────────────────────────────────────
+
+	public function test_starts_from_the_named_trigger(): void {
+		$this->setupSequence(
+			[],
+			[ 'graph_json' => $this->graphJson( [ $this->triggerNode(), $this->triggerNode( [ 'id' => '2' ] ) ] ) ]
+		);
+
+		$this->automation->run_workflow( 1, [], '2' );
+
+		global $wpdb;
+		$this->assertSame( 2, $wpdb->tables['wp_zaplane_runs'][0]['start_node_key'] );
+	}
+
+	public function test_defaults_to_the_manual_trigger_when_the_workflow_has_one(): void {
+		$manual = [
+			'id'   => '2',
+			'type' => 'trigger',
+			'data' => [ 'app' => 'manual', 'event' => 'run_manually', 'label' => 'Manual' ],
+		];
+
+		$this->setupSequence( [], [ 'graph_json' => $this->graphJson( [ $this->triggerNode(), $manual ] ) ] );
+
+		$this->automation->run_workflow( 1, [] );
+
+		global $wpdb;
+		$this->assertSame( 2, $wpdb->tables['wp_zaplane_runs'][0]['start_node_key'] );
+	}
+
+	public function test_defaults_to_the_first_trigger_without_a_manual_one(): void {
+		$this->setupSequence(
+			[],
+			[ 'graph_json' => $this->graphJson( [ $this->triggerNode(), $this->triggerNode( [ 'id' => '2' ] ) ] ) ]
+		);
+
+		$this->automation->run_workflow( 1, [] );
+
+		global $wpdb;
+		$this->assertSame( 1, $wpdb->tables['wp_zaplane_runs'][0]['start_node_key'] );
+	}
+
+	public function test_returns_false_when_the_named_node_is_not_a_trigger(): void {
+		$this->setupSequence(
+			[],
+			[ 'graph_json' => $this->graphJson( [
+				$this->triggerNode(),
+				[ 'id' => '2', 'type' => 'action', 'data' => [ 'app' => 'gemcrm', 'event' => 'send_email' ] ],
+			] ) ]
+		);
+
+		$this->assertFalse( $this->automation->run_workflow( 1, [], '2' ) );
+	}
+
 	public function test_works_with_full_abandoned_cart_workflow_graph(): void {
 		$nodes = [
 			$this->triggerNode(),

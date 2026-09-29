@@ -24,6 +24,14 @@ class ContactForm extends IntegrationBase {
 		return 'contact-form-7.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/contact-form/',
+			'action'  => 'https://zaplane.app/docs/contact-form/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { __ } from "@wordpress/i18n";
 import { useDispatch, useSelector } from "react-redux";
 import { LuFolderOpen, LuFolderPlus, LuMinus } from "react-icons/lu";
@@ -20,6 +20,7 @@ const FolderCell = ({
   const [modalOpen, setModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [creating, setCreating] = useState(false);
+  const creatingRef = useRef(false);
   const [assigning, setAssigning] = useState(false);
   const selectedFolder = allFolders.find(f => f.id === row?.folder_id);
   useEffect(() => {
@@ -66,7 +67,8 @@ const FolderCell = ({
   };
   const handleCreateFolder = async () => {
     const trimmed = folderName.trim();
-    if (!trimmed) return;
+    if (creatingRef.current || !trimmed) return;
+    creatingRef.current = true;
     setCreating(true);
     try {
       const res = await dispatch(createFolder({
@@ -82,6 +84,7 @@ const FolderCell = ({
         dispatch(getWorkFlow());
       }
     } finally {
+      creatingRef.current = false;
       setCreating(false);
       setFolderName("");
       setModalOpen(false);
@@ -134,25 +137,47 @@ const FolderCell = ({
     </button>} />}
 
     <WPModal isOpen={modalOpen} title={__("Create Folder", "zaplane")} onRequestClose={() => {
+      if (creating) return;
       setModalOpen(false);
       setFolderName("");
-    }} shouldCloseOnClickOutside size="medium" suffix="create-folder">
+    }} shouldCloseOnClickOutside={!creating} size="medium" suffix="create-folder">
       <div className="flex flex-col gap-4">
         <span className="zaplane-label mb-4">
           {__("Streamline your workflows by organizing them into folders.", "zaplane")}
         </span>
 
         <input placeholder={__("Folder Name", "zaplane")} value={folderName} onChange={e => setFolderName(e.target.value)} onKeyDown={e => {
-          if (e.key === "Enter") handleCreateFolder();
-          if (e.key === "Escape") {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleCreateFolder();
+          }
+          if (e.key === "Escape" && !creating) {
             setModalOpen(false);
             setFolderName("");
           }
         }} autoFocus className="zaplane-input mb-5" />
 
         <div className="flex flex-row items-center gap-3">
-          <button style={primaryBtn} disabled={!folderName.trim()} onClick={handleCreateFolder}>
-            {__("Create", "zaplane")}
+          <button
+            style={{
+              ...primaryBtn,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              opacity: !folderName.trim() || creating ? 0.6 : 1,
+              cursor: !folderName.trim() || creating ? "not-allowed" : "pointer"
+            }}
+            disabled={!folderName.trim() || creating}
+            onClick={handleCreateFolder}
+          >
+            {creating && (
+              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
+            {creating ? __("Creating...", "zaplane") : __("Create", "zaplane")}
           </button>
         </div>
       </div>

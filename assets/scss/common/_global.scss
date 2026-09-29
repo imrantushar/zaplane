@@ -63,12 +63,14 @@
 // #wpcontent to position:relative), so it sits outside #wpbody-content's own
 // box and shows WP core's light background through unless #wpcontent itself
 // is themed too.
-#wpcontent{
+body[class*="_page_zaplane"] #wpcontent{
     padding: 0;
     background: var(--zaplane-body-background);
 }
+// Keep React Flow constrained by its Zaplane canvas instead of pinning it
+// to the viewport. The scoped sizing lives in _classLibrary.scss.
 .react-flow{
-    position: fixed !important;
+    min-width: 0;
 }
 .zaplane-select {
     &--width-full {
@@ -337,6 +339,10 @@ input.zaplane-checkbox:hover {
 .zaplane-textarea {
     font-weight: 400;
     color: var(--zaplane-font-secondary-color);
+}
+
+.zaplane-textarea {
+    padding: 8px 12px !important;
 }
 
 // ── Themed form controls (dark-mode-aware) ────────────────────────────────

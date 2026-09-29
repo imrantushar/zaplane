@@ -41,8 +41,9 @@ const SampleValues = ({ fields = [], values, onChange }) => {
 				<TextInput
 					key={f.key}
 					label={`${f.label || f.key} (test)`}
-					value={values[f.key] || ''}
+					value={values[f.key] ?? ''}
 					onChange={(v) => onChange({ ...values, [f.key]: v })}
+					type={f.type === 'password' ? 'password' : 'text'}
 				/>
 			))}
 		</div>
@@ -51,7 +52,9 @@ const SampleValues = ({ fields = [], values, onChange }) => {
 
 const ActionCard = ({ action, update, remove, manifest, kind }) => {
 	const [sample, setSample] = useState({});
+	const [credentialSample, setCredentialSample] = useState({});
 	const isLocal = kind === 'local';
+	const authFields = !isLocal && Array.isArray(manifest?.auth?.fields) ? manifest.auth.fields : [];
 
 	const addOutput = (path) => {
 		const key = path.split('.').pop();
@@ -111,12 +114,22 @@ const ActionCard = ({ action, update, remove, manifest, kind }) => {
 				<>
 					<SubLabel className="mt-4">{__('Test', 'zaplane')}</SubLabel>
 					<SampleValues fields={action.fields || []} values={sample} onChange={setSample} />
+					{authFields.length > 0 && (
+						<>
+							<SubLabel>{__('Authentication values (test only)', 'zaplane')}</SubLabel>
+							<SampleValues
+								fields={authFields}
+								values={credentialSample}
+								onChange={setCredentialSample}
+							/>
+						</>
+					)}
 					<TestPanel
 						getPayload={() => ({
 							manifest: { base_url: manifest.base_url, auth: manifest.auth },
 							request: action.request || {},
 							config: sample,
-							credentials: {},
+							credentials: credentialSample,
 						})}
 						onPick={addOutput}
 					/>

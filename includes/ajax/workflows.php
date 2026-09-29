@@ -43,8 +43,7 @@ class Workflows extends AbstractAjaxHandler {
 
 			'get_workflow_stats' => [
 				'callback' => [ $this, 'getStats' ],
-				'capability' => '',
-				'allow_visitor_action' => true,
+				'capability' => 'manage_options',
 				'fields' => [
 					'workflow_id' => 'absint',
 				],

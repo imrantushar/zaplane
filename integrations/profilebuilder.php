@@ -23,6 +23,14 @@ class Profilebuilder extends IntegrationBase {
 		return 'profilebuilder.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/profile-builder/',
+			'action'  => 'https://zaplane.app/docs/profile-builder/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 

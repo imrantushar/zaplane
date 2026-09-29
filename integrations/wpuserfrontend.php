@@ -22,6 +22,14 @@ class Wpuserfrontend extends IntegrationBase {
 		return 'wp-user-frontend.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/wp-user-frontend/',
+			'action'  => 'https://zaplane.app/docs/wp-user-frontend/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'post_form_submission' => [
@@ -64,7 +72,7 @@ class Wpuserfrontend extends IntegrationBase {
 			'user_login'   => 'janedoe',
 			'user_email'   => 'jane@example.com',
 			'nickname'     => 'janedoe',
-			'avatar_url'   => 'https://www.gravatar.com/avatar/0123456789abcdef?s=96&d=mm&r=g',
+			'avatar_url'   => 'https://example.com/avatar.png',
 			'display_name' => 'Jane Doe',
 			'user_roles'   => [ 'subscriber' ],
 		];

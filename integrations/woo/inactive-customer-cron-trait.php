@@ -65,6 +65,7 @@ trait InactiveCustomerCronTrait {
 			foreach ( $customers as $customer_data ) {
 				foreach ( $day_workflows as $trigger ) {
 					$workflow_id = (int) $trigger['workflow_id'];
+					$node_id     = (string) ( $trigger['id'] ?? '' );
 					$user_id     = (int) ( $customer_data['user_id'] ?? 0 );
 					$email       = $customer_data['email'] ?? '';
 
@@ -72,7 +73,7 @@ trait InactiveCustomerCronTrait {
 						continue;
 					}
 
-					if ( self::inactive_already_triggered( $user_id, $email, $workflow_id, $days ) ) {
+					if ( self::inactive_already_triggered( $user_id, $email, $workflow_id, $node_id, $days ) ) {
 						continue;
 					}
 
@@ -94,9 +95,9 @@ trait InactiveCustomerCronTrait {
 						'list_ids'   => $list_ids,
 					] );
 
-					$automation->run_workflow( $workflow_id, $payload );
+					$automation->run_workflow( $workflow_id, $payload, $node_id );
 
-					self::mark_inactive_triggered( $user_id, $email, $workflow_id );
+					self::mark_inactive_triggered( $user_id, $email, $workflow_id, $node_id );
 				}//end foreach
 			}//end foreach
 		}//end foreach
@@ -141,11 +142,8 @@ trait InactiveCustomerCronTrait {
 			return;
 		}
 
-		$existing   = \GemCrm\Database\Models\Contact::index( [
-			'email' => $email,
-			'per_page' => 1
-		], null );
-		$contact_id = (int) ( $existing['records'][0]['id'] ?? 0 );
+		$existing   = self::find_gemcrm_contact_by_email( $email );
+		$contact_id = (int) ( $existing['id'] ?? 0 );
 		if ( ! $contact_id ) {
 			return;
 		}
@@ -216,12 +214,20 @@ trait InactiveCustomerCronTrait {
 		return $result;
 	}
 
-	private static function inactive_already_triggered( int $user_id, string $email, int $workflow_id, int $days ): bool {
-		$meta_key = '_zaplane_inactive_trigger_' . $workflow_id;
+	/**
+	 * Whether this trigger already fired for the customer within its window.
+	 *
+	 * Each inactive-customer trigger keeps its own record, so a 30-day and a
+	 * 90-day trigger in one workflow don't hold each other back. The record used
+	 * to be per workflow; that one still counts until it ages out, so an update
+	 * doesn't message everyone again.
+	 */
+	private static function inactive_already_triggered( int $user_id, string $email, int $workflow_id, string $node_id, int $days ): bool {
+		$last_fired = self::inactive_last_fired( $user_id, $email, $workflow_id . '_' . $node_id );
 
-		$last_fired = $user_id > 0
-			? (int) get_user_meta( $user_id, $meta_key, true )
-			: (int) get_option( 'zaplane_inactive_guest_' . md5( $email ) . '_' . $workflow_id, 0 );
+		if ( ! $last_fired ) {
+			$last_fired = self::inactive_last_fired( $user_id, $email, (string) $workflow_id );
+		}
 
 		if ( ! $last_fired ) {
 			return false;
@@ -230,13 +236,19 @@ trait InactiveCustomerCronTrait {
 		return ( time() - $last_fired ) < ( $days * DAY_IN_SECONDS );
 	}
 
-	private static function mark_inactive_triggered( int $user_id, string $email, int $workflow_id ): void {
-		$meta_key = '_zaplane_inactive_trigger_' . $workflow_id;
+	private static function inactive_last_fired( int $user_id, string $email, string $scope ): int {
+		return $user_id > 0
+			? (int) get_user_meta( $user_id, '_zaplane_inactive_trigger_' . $scope, true )
+			: (int) get_option( 'zaplane_inactive_guest_' . md5( $email ) . '_' . $scope, 0 );
+	}
+
+	private static function mark_inactive_triggered( int $user_id, string $email, int $workflow_id, string $node_id ): void {
+		$scope = $workflow_id . '_' . $node_id;
 
 		if ( $user_id > 0 ) {
-			update_user_meta( $user_id, $meta_key, time() );
+			update_user_meta( $user_id, '_zaplane_inactive_trigger_' . $scope, time() );
 		} else {
-			update_option( 'zaplane_inactive_guest_' . md5( $email ) . '_' . $workflow_id, time(), 'no' );
+			update_option( 'zaplane_inactive_guest_' . md5( $email ) . '_' . $scope, time(), 'no' );
 		}
 	}
 
@@ -250,11 +262,7 @@ trait InactiveCustomerCronTrait {
 			return 0;
 		}
 
-		$existing = \GemCrm\Database\Models\Contact::index( [
-			'email' => $email,
-			'per_page' => 1
-		], null );
-		$contact  = $existing['records'][0] ?? null;
+		$contact  = self::find_gemcrm_contact_by_email( $email );
 
 		if ( $contact ) {
 			return (int) ( $contact['id'] ?? 0 );
@@ -291,5 +299,25 @@ trait InactiveCustomerCronTrait {
 				\GemCrm\Database\Models\ListModel::attach_single( $contact_id, $list_id );
 			}
 		}
+	}
+
+	/**
+	 * The GemCRM contact with this email address, or null. Contact::index()
+	 * was used for this, but its sanitizer drops the unknown 'email' key, so
+	 * it returned the newest contact — tags went on the wrong person and the
+	 * customer was matched to someone else's contact id.
+	 */
+	private static function find_gemcrm_contact_by_email( string $email ): ?array {
+		if ( '' === $email || ! class_exists( \GemCrm\Database\Utils\QueryBuilder::class ) ) {
+			return null;
+		}
+
+		$contact = \GemCrm\Database\Utils\QueryBuilder::ins()
+			->select( [ 'id', 'email', 'status' ] )
+			->from( 'gemcrm_contacts' )
+			->where( 'email', '=', $email )
+			->first();
+
+		return empty( $contact ) ? null : $contact;
 	}
 }

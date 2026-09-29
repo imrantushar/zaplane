@@ -9,7 +9,7 @@ class WhatsappTest extends IntegrationTestCase {
 	private array $credentials = [
 		'access_token'    => 'EAAtest1234567890',
 		'phone_number_id' => '1234567890',
-		'api_version'     => 'v19.0',
+		'api_version'     => 'v26.0',
 	];
 
 	protected function getIntegrationClass(): string {

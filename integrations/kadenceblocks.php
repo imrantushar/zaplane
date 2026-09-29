@@ -20,6 +20,14 @@ class Kadenceblocks extends IntegrationBase {
 		return 'kadence-block.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/kadence-blocks/',
+			'action'  => 'https://zaplane.app/docs/kadence-blocks/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'kadence_blocks_advanced_form_submission' => [

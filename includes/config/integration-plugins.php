@@ -47,6 +47,7 @@ return [
 	// --- CRM / marketing ---
 	'fluentcrm'           => [ 'fluent-crm/fluent-crm.php' ],
 	'gemcrm'              => [ 'gemcrm/gemcrm.php' ],
+	'gembooking'          => [ 'gembooking/gembooking.php' ],
 	'groundhogg'          => [ 'groundhogg/groundhogg.php' ],
 
 	// --- Email / payments ---
@@ -90,6 +91,7 @@ return [
 	// --- Community / events / gamification ---
 	'ultimatemember'      => [ 'ultimate-member/ultimate-member.php' ],
 	'buddyboss'           => [ 'buddyboss-platform/bp-loader.php' ],
+	'zencommunity'        => [ 'zencommunity/zencommunity.php' ],
 	// Every eventscalendar trigger is an Event Tickets hook (event_tickets_*,
 	// tribe_tickets_*), which ships in the separate Event Tickets plugin — not
 	// in The Events Calendar. Declaring only the latter meant the dependency

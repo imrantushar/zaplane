@@ -63,11 +63,41 @@ if [ ! -d node_modules ]; then
 fi
 npm run build
 
+# ── 2b. Rebuild the integrations manifest ────────────────────────────────────
+# assets/json/integrations.json is a build artifact of `wp zaplane build:integration`,
+# not something PHP regenerates at runtime — the dashboard reads this static file
+# (merged live only with runtime-registered Custom Apps), so any action/trigger
+# added to an integration class since the last manifest build is invisible in the
+# UI even though the PHP code is correct and deployed. See IntegrationManifest.
+if command -v wp >/dev/null 2>&1; then
+  echo "🗺  Rebuilding integrations.json manifest…"
+  wp zaplane build:integration
+elif [ -f "$REPO_ROOT/../wp-cli-nightly.phar" ]; then
+  php "$REPO_ROOT/../wp-cli-nightly.phar" zaplane build:integration
+else
+  echo "❌ wp-cli not found — cannot rebuild integrations.json. Aborting: shipping a stale manifest silently hides new actions/triggers."
+  exit 1
+fi
+
 # ── 3. Production Composer deps (no dev) ─────────────────────────────────────
 PROD_VENDOR=0
 if command -v composer >/dev/null 2>&1; then
   echo "📦 Installing production Composer dependencies (--no-dev)…"
-  composer install --no-dev --optimize-autoloader --classmap-authoritative --no-interaction
+  # --prefer-dist (the default) pulls package zips from GitHub's REST API, which
+  # has a strict anonymous rate limit (60 req/hour) separate from git's own auth —
+  # a fully git-authenticated machine can still hit it. Retry with --prefer-source
+  # on failure: that does an actual `git clone` per package, reusing whatever git
+  # credentials already work here, no Composer-specific GitHub token needed.
+  if ! composer install --no-dev --optimize-autoloader --classmap-authoritative --no-interaction; then
+    echo "⚠️  composer install --no-dev failed (often a GitHub API rate limit, not a real error)."
+    echo "   Retrying with --prefer-source (git clone via your existing git auth)…"
+    if ! composer install --no-dev --optimize-autoloader --classmap-authoritative --no-interaction --prefer-source; then
+      echo "❌ composer install still failed after the --prefer-source retry."
+      echo "   Restoring dev vendor/ before exiting so the working tree isn't left half-broken…"
+      composer install --no-interaction || echo "⚠️  run 'composer install' manually to restore dev deps."
+      exit 1
+    fi
+  fi
   PROD_VENDOR=1
 else
   echo "⚠️  composer not found — packaging vendor/ as-is (may include dev packages)."

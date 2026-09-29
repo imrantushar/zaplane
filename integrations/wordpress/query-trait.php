@@ -3,6 +3,10 @@ namespace Zaplane\Integrations\Wordpress;
 
 use Zaplane\Traits\ActionResponseTrait;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait QueryTrait {
 
 

@@ -312,7 +312,7 @@ class GoogleMeet extends IntegrationBase {
 			'client_id'     => [
 				'type'        => 'text',
 				'label'       => 'Client ID',
-				'placeholder' => 'xxxx.apps.googleusercontent.com',
+				'placeholder' => 'Your OAuth 2.0 client ID',
 				'required'    => true,
 				'help'        => 'From Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs.',
 			],
@@ -402,7 +402,7 @@ class GoogleMeet extends IntegrationBase {
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( isset( $body['error'] ) ) {
-			throw new \Exception( $body['error_description'] ?? $body['error'] );
+			throw new \Exception( esc_html( (string) ( $body['error_description'] ?? $body['error'] ) ) );
 		}
 
 		return [
@@ -531,11 +531,11 @@ class GoogleMeet extends IntegrationBase {
 				'createRequest' => [
 					'requestId'             => sprintf(
 						'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-						mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
-						mt_rand( 0, 0xffff ),
-						mt_rand( 0, 0x0fff ) | 0x4000,
-						mt_rand( 0, 0x3fff ) | 0x8000,
-						mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
+						wp_rand( 0, 0xffff ), wp_rand( 0, 0xffff ),
+						wp_rand( 0, 0xffff ),
+						wp_rand( 0, 0x0fff ) | 0x4000,
+						wp_rand( 0, 0x3fff ) | 0x8000,
+						wp_rand( 0, 0xffff ), wp_rand( 0, 0xffff ), wp_rand( 0, 0xffff )
 					),
 					'conferenceSolutionKey' => [ 'type' => 'hangoutsMeet' ],
 				],

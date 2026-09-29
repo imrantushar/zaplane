@@ -1,5 +1,67 @@
+.zaplane-topbar {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box !important;
+}
+
 .zaplane-topbar-logo {
     background: #E2E0FF;
     padding: 6px;
     border-radius: 50%;
+}
+
+
+@media (max-width: 782px) {
+    .zaplane-topbar {
+        top: 46px !important;
+        height: 64px !important;
+        min-height: 64px;
+        flex-wrap: nowrap !important;
+        gap: 8px;
+        padding: 10px 12px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .zaplane-topbar__left {
+        flex: 1 1 auto;
+        min-width: 0;
+        flex-wrap: nowrap !important;
+        overflow: hidden;
+    }
+
+    .zaplane-topbar__middle {
+        flex: 0 1 auto;
+        min-width: 0;
+    }
+
+    .zaplane-topbar__right {
+        flex: 0 0 auto;
+        min-width: 0;
+        max-width: none;
+    }
+
+    .zaplane-topbar-default-actions {
+        gap: 8px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .zaplane-topbar {
+        top: 0 !important;
+        height: 58px !important;
+        min-height: 58px;
+        padding: 8px 10px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .zaplane-help-button {
+        width: 36px;
+        min-width: 36px;
+        padding: 0 !important;
+        justify-content: center;
+    }
+
+    .zaplane-help-button__label {
+        display: none;
+    }
 }

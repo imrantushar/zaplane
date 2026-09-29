@@ -22,6 +22,14 @@ class Essentialblocks extends IntegrationBase {
 		return 'essentialblocks.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/essential-blocks/',
+			'action'  => 'https://zaplane.app/docs/essential-blocks/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'eb_form_submit_before_email' => [

@@ -21,8 +21,8 @@ class AddKnowledgeFulltext extends Migration {
 		global $wpdb;
 		$table = Knowledge::getTable();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
-		$exists = $wpdb->get_var( "SHOW INDEX FROM {$table} WHERE Key_name = 'kb_fulltext'" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- A migration; the table name is escaped by %i.
+		$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW INDEX FROM %i WHERE Key_name = %s', $table, 'kb_fulltext' ) );
 		if ( $exists ) {
 			return;
 		}
@@ -30,15 +30,15 @@ class AddKnowledgeFulltext extends Migration {
 		// FULLTEXT requires InnoDB (MySQL 5.6+) or MyISAM. Guarded so a failure
 		// (e.g. unsupported engine) doesn't abort the migration batch.
 		$suppress = $wpdb->suppress_errors( true );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
-		$wpdb->query( "ALTER TABLE {$table} ADD FULLTEXT kb_fulltext (title, content)" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- A migration; the table name is escaped by %i.
+		$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD FULLTEXT kb_fulltext (title, content)', $table ) );
 		$wpdb->suppress_errors( $suppress );
 	}
 
 	public function down(): void {
 		global $wpdb;
 		$table = Knowledge::getTable();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
-		$wpdb->query( "ALTER TABLE {$table} DROP INDEX kb_fulltext" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- A migration; the table name is escaped by %i.
+		$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i DROP INDEX kb_fulltext', $table ) );
 	}
 }

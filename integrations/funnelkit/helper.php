@@ -9,23 +9,10 @@ trait Helper {
 
 	private static function resolve_funnelkit_trigger( string $event, array $args, array $config ) {
 		switch ( $event ) {
-			case 'woofunnels_loaded':
-				return self::resolve_generic_trigger_payload(
-					$event,
-					$args,
-					[
-						'path' => (string) ( $args[0] ?? '' ),
-					]
-				);
-
-			case 'core_modules_loaded':
-			case 'loaded':
-			case 'importing_completed':
 			case 'container':
 			case 'container_top':
 			case 'container_bottom':
 			case 'wp_footer':
-			case 'checkout_loaded':
 			case 'template_body_top':
 			case 'template_container_top':
 			case 'template_container_bottom':
@@ -132,9 +119,21 @@ trait Helper {
 				);
 
 			case 'funnel_ended':
+				$first_id     = self::resolve_funnel_id_from_value( $args[0] ?? null );
+				$second_id    = self::resolve_funnel_id_from_value( $args[1] ?? null );
+				$first_step   = self::resolve_step_id_from_value( $args[0] ?? null );
+				$second_step  = self::resolve_step_id_from_value( $args[1] ?? null );
 				$current_step = self::normalize_payload_value( $args[0] ?? [] );
-				$step_id      = self::resolve_step_id_from_value( $args[0] ?? null );
-				$funnel_id    = self::resolve_funnel_id_from_value( $args[1] ?? null );
+				$step_id      = $first_step;
+				$funnel_id    = $second_id;
+
+				// FunnelKit versions have emitted both (step, funnel) and
+				// (funnel, step) for this lifecycle hook.
+				if ( $first_id > 0 && $second_step > 0 && 0 === $second_id ) {
+					$funnel_id    = $first_id;
+					$step_id      = $second_step;
+					$current_step = self::normalize_payload_value( $args[1] ?? [] );
+				}
 				if ( $funnel_id <= 0 ) {
 					$funnel_id = self::resolve_funnel_id_from_step( $step_id );
 				}
@@ -485,14 +484,21 @@ trait Helper {
 		);
 	}
 
-	private static function action_current_filter( array $input ): array {
-		$hook_name = function_exists( 'current_filter' ) ? (string) current_filter() : '';
+	private static function action_current_filter( array $config, array $input ): array {
+		$hook_name = trim( (string) ( $config['hook_name'] ?? '' ) );
+		if ( '' === $hook_name ) {
+			return self::action_error( 'Hook name is required', $input );
+		}
+
+		do_action( $hook_name );
+		$current = function_exists( 'current_filter' ) ? (string) current_filter() : '';
 
 		return self::action_success(
 			array_merge(
 				$input,
 				[
 					'hook'       => $hook_name,
+					'current'    => $current,
 					'event_time' => current_time( 'mysql' ),
 				]
 			)

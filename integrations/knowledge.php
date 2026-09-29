@@ -316,7 +316,8 @@ class Knowledge extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$total = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table} WHERE business_key = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"SELECT COUNT(*) FROM %i WHERE business_key = %s",
+				$table,
 				$key
 			)
 		);
@@ -335,7 +336,8 @@ class Knowledge extends IntegrationBase {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT id, title, content, embedding FROM {$table} WHERE business_key = %s ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+					"SELECT id, title, content, embedding, source FROM %i WHERE business_key = %s ORDER BY id DESC LIMIT %d",
+					$table,
 					$key,
 					$scan
 				),
@@ -384,6 +386,14 @@ class Knowledge extends IntegrationBase {
 					$final = $kw_norm;
 				}
 
+				// A hand-authored FAQ answering this exact question should
+				// usually outrank an incidental mention buried in a synced
+				// product description — a small, filterable boost, not a hard
+				// filter (so a strong content match can still win).
+				if ( 'faq' === ( $row['source'] ?? '' ) ) {
+					$final *= (float) apply_filters( 'zaplane_knowledge_faq_boost', 1.15 );
+				}
+
 				if ( $final > 0 ) {
 					$scored[] = [
 						'score' => $final,
@@ -408,8 +418,9 @@ class Knowledge extends IntegrationBase {
 			$content   = (string) ( $row['content'] ?? '' );
 			$blocks[]  = ( '' !== $title ? $title . ":\n" : '' ) . $content;
 			$matches[] = [
-				'id'    => (int) $row['id'],
-				'title' => $title,
+				'id'     => (int) $row['id'],
+				'title'  => $title,
+				'source' => (string) ( $row['source'] ?? '' ),
 			];
 		}
 
@@ -472,6 +483,11 @@ class Knowledge extends IntegrationBase {
 	 * Generic content sync: mirror any WordPress post type into a business's
 	 * knowledge. Each post becomes one entry (title + assembled body). Works for
 	 * posts, pages, products, docs, or any registered CPT.
+	 *
+	 * A `post_id` in $config re-syncs just that one post instead of querying the
+	 * whole post type — used by the auto-sync-on-save hook so an edit doesn't
+	 * re-walk the entire catalog. Pruning and profile-remembering are skipped in
+	 * that mode (see below).
 	 */
 	public static function action_sync_content( string $key, array $config, array $input ): array {
 		$post_type = sanitize_key( (string) ( $config['post_type'] ?? '' ) );
@@ -491,25 +507,30 @@ class Knowledge extends IntegrationBase {
 		if ( '' === $status ) {
 			$status = 'publish';
 		}
-		$limit = (int) ( $config['limit'] ?? 0 );
+		$limit          = (int) ( $config['limit'] ?? 0 );
+		$single_post_id = (int) ( $config['post_id'] ?? 0 );
 
-		$ids = get_posts(
-			[
-				'post_type'      => $post_type,
-				'post_status'    => $status,
-				'posts_per_page' => $limit > 0 ? $limit : -1,
-				'fields'         => 'ids',
-				'orderby'        => 'ID',
-				'order'          => 'ASC',
-			]
-		);
+		if ( $single_post_id > 0 ) {
+			$ids = [ $single_post_id ];
+		} else {
+			$ids = get_posts(
+				[
+					'post_type'      => $post_type,
+					'post_status'    => $status,
+					'posts_per_page' => $limit > 0 ? $limit : -1,
+					'fields'         => 'ids',
+					'orderby'        => 'ID',
+					'order'          => 'ASC',
+				]
+			);
+		}
 
 		$source      = self::source_for( $post_type );
 		$synced      = 0;
 		$synced_refs = [];
 		foreach ( (array) $ids as $pid ) {
 			$post = get_post( (int) $pid );
-			if ( ! $post ) {
+			if ( ! $post || ( $single_post_id > 0 && $post->post_type !== $post_type ) ) {
 				continue;
 			}
 
@@ -527,12 +548,27 @@ class Knowledge extends IntegrationBase {
 		}//end foreach
 
 		// Prune deleted items: drop any entry from this source not seen in this
-		// run. Only on a full sync (limit 0) so a partial sync can't wipe items
-		// beyond the limit; entries from other sources (manual, etc.) are untouched.
+		// run. Only on a full sync (limit 0, not a single-post resync) so a
+		// partial sync can't wipe items beyond the limit; entries from other
+		// sources (manual, etc.) are untouched.
 		$pruned = 0;
 		$prune  = ( 'no' !== ( $config['prune'] ?? 'yes' ) );
-		if ( $prune && $limit <= 0 ) {
+		if ( $prune && $limit <= 0 && 0 === $single_post_id ) {
 			$pruned = self::prune_source( $key, $source, $synced_refs );
+		}
+
+		// Remember this as the sync profile for the post type, so the auto-sync
+		// hook knows what settings to reuse when a post of this type is saved.
+		// Skipped for a single-post resync (that's already following a profile).
+		if ( 0 === $single_post_id ) {
+			self::remember_sync_profile( $key, $post_type, $config );
+		}
+
+		// New/changed rows above were left unembedded (bulk syncs don't embed
+		// inline). Queue a background batch instead of requiring a manual
+		// "Backfill now" click.
+		if ( $synced > 0 && KnowledgeEmbeddings::enabled() ) {
+			\Zaplane\Modules\KnowledgeAutomation\KnowledgeAutomationModule::queue_embedding( $key );
 		}
 
 		return self::respond(
@@ -544,6 +580,87 @@ class Knowledge extends IntegrationBase {
 					'pruned'    => $pruned,
 					'post_type' => $post_type,
 				]
+			)
+		);
+	}
+
+	/** Option storing, per business+post type, the sync settings to reuse for auto-sync-on-save. */
+	private const SYNC_PROFILES_OPTION = 'zaplane_knowledge_sync_profiles';
+
+	/**
+	 * Persist the settings a manual (or storeengine) sync just used, so the
+	 * auto-sync-on-save hook can reproduce the same entry shape for a single
+	 * edited post without the caller re-specifying everything.
+	 *
+	 * @param array<string,mixed> $config
+	 */
+	private static function remember_sync_profile( string $key, string $post_type, array $config ): void {
+		$profiles = get_option( self::SYNC_PROFILES_OPTION, [] );
+		if ( ! is_array( $profiles ) ) {
+			$profiles = [];
+		}
+
+		$profiles[ $key . '::' . $post_type ] = [
+			'business_key'    => $key,
+			'post_type'       => $post_type,
+			'post_status'     => (string) ( $config['post_status'] ?? 'publish' ),
+			'include_excerpt' => ( 'no' === ( $config['include_excerpt'] ?? 'yes' ) ) ? 'no' : 'yes',
+			'include_content' => ( 'no' === ( $config['include_content'] ?? 'yes' ) ) ? 'no' : 'yes',
+			'meta_keys'       => (string) ( $config['meta_keys'] ?? '' ),
+			'taxonomies'      => (string) ( $config['taxonomies'] ?? '' ),
+		];
+
+		update_option( self::SYNC_PROFILES_OPTION, $profiles, false );
+	}
+
+	/**
+	 * Sync profiles registered for a given post type (a post type can be synced
+	 * into more than one business). Used by the auto-sync-on-save hook.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	public static function sync_profiles_for_post_type( string $post_type ): array {
+		$profiles = get_option( self::SYNC_PROFILES_OPTION, [] );
+		if ( ! is_array( $profiles ) ) {
+			return [];
+		}
+		return array_values( array_filter( $profiles, static fn( $p ) => is_array( $p ) && ( $p['post_type'] ?? '' ) === $post_type ) );
+	}
+
+	/**
+	 * Whether a post in $status belongs in a business under this sync profile.
+	 *
+	 * @param array<string,mixed> $profile
+	 */
+	public static function profile_accepts_status( array $profile, string $status ): bool {
+		$wanted = sanitize_key( (string) ( $profile['post_status'] ?? 'publish' ) );
+		if ( '' === $wanted ) {
+			$wanted = 'publish';
+		}
+		if ( 'any' === $wanted ) {
+			return ! in_array( $status, [ 'trash', 'auto-draft', 'inherit' ], true );
+		}
+		return $status === $wanted;
+	}
+
+	/**
+	 * Remove the synced knowledge entry that referenced a post — from one
+	 * business, or from every business it was synced into when none is given.
+	 * Manual/FAQ entries are untouched (they're never sourced from a post).
+	 */
+	public static function forget_synced_post( int $post_id, string $post_type, string $business_key = '' ): void {
+		$ref = self::ref_for( $post_type, $post_id );
+		global $wpdb;
+		$table = KnowledgeModel::getTable();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM %i WHERE source = %s AND ref_id = %s AND (%s = '' OR business_key = %s)",
+				$table,
+				self::source_for( $post_type ),
+				$ref,
+				$business_key,
+				$business_key
 			)
 		);
 	}
@@ -689,7 +806,8 @@ class Knowledge extends IntegrationBase {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			return (int) $wpdb->query(
 				$wpdb->prepare(
-					"DELETE FROM {$table} WHERE business_key = %s AND source = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+					"DELETE FROM %i WHERE business_key = %s AND source = %s",
+					$table,
 					$key,
 					$source
 				)
@@ -697,12 +815,12 @@ class Knowledge extends IntegrationBase {
 		}
 
 		$placeholders = implode( ',', array_fill( 0, count( $keep_refs ), '%s' ) );
-		$params       = array_merge( [ $key, $source ], $keep_refs );
+		$params       = array_merge( [ $table, $key, $source ], $keep_refs );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->query(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- placeholder count is dynamic; $params supplies exactly count($keep_refs)+2 values to match.
-				"DELETE FROM {$table} WHERE business_key = %s AND source = %s AND ref_id NOT IN ({$placeholders})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name and placeholder count generated internally.
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- placeholder count is dynamic; $params supplies exactly count($keep_refs)+3 values to match.
+				"DELETE FROM %i WHERE business_key = %s AND source = %s AND ref_id NOT IN ({$placeholders})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholder count generated internally.
 				$params
 			)
 		);
@@ -790,7 +908,8 @@ class Knowledge extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$deleted = $wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM {$table} WHERE business_key = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"DELETE FROM %i WHERE business_key = %s",
+				$table,
 				$key
 			)
 		);
@@ -835,7 +954,8 @@ class Knowledge extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, title, content FROM {$table} WHERE business_key = %s AND ( embedding IS NULL OR embedding = '' ) ORDER BY id ASC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"SELECT id, title, content FROM %i WHERE business_key = %s AND ( embedding IS NULL OR embedding = '' ) ORDER BY id ASC LIMIT %d",
+				$table,
 				$key,
 				$limit
 			),
@@ -869,7 +989,8 @@ class Knowledge extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$remaining = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table} WHERE business_key = %s AND ( embedding IS NULL OR embedding = '' )", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"SELECT COUNT(*) FROM %i WHERE business_key = %s AND ( embedding IS NULL OR embedding = '' )",
+				$table,
 				$key
 			)
 		);
@@ -917,7 +1038,8 @@ class Knowledge extends IntegrationBase {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, title, content, embedding FROM {$table} WHERE business_key = %s AND MATCH(title, content) AGAINST (%s IN BOOLEAN MODE) LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name resolved internally.
+				"SELECT id, title, content, embedding, source FROM %i WHERE business_key = %s AND MATCH(title, content) AGAINST (%s IN BOOLEAN MODE) LIMIT %d",
+				$table,
 				$key,
 				$boolean,
 				$limit

@@ -17,6 +17,19 @@ export const getBranchNodes = (startId,edges) => {
     return branch;
 };
 
+/**
+ * The next `count` node ids for a canvas: numeric strings continuing from the
+ * highest id already on it.
+ */
+export const nextNodeIds = (nodes = [], count = 1) => {
+    const highest = nodes.reduce((max, node) => {
+        const id = parseInt(node?.id, 10);
+        return Number.isFinite(id) && id > max ? id : max;
+    }, 0);
+
+    return Array.from({ length: count }, (_, index) => String(highest + index + 1));
+};
+
 export const createActionNode = ({
     nodes,
     edges,
@@ -47,7 +60,9 @@ export const createActionNode = ({
         if (!sourceNode) return;
     }
 
-    const newNodeId = getNewNodeId();
+    // New ids continue from the highest id on the canvas. The page's counter is
+    // not seeded from a loaded graph, so it could hand out an id a saved node has.
+    const [newNodeId, trueNodeId, falseNodeId] = nextNodeIds(nodes, 3);
     // A "target" sub-handle (AI Agent tools/memory/model) places the new node
     // BELOW the anchor; everything else places it to the side/below as usual.
     const isSubInput = port?.type === "target";
@@ -111,8 +126,6 @@ export const createActionNode = ({
 
     // Condition node support
     if (actionData.app === "condition") {
-        const trueNodeId = getNewNodeId();
-        const falseNodeId = getNewNodeId();
         const extraLRSpace = 80;
 
         const trueNode = {

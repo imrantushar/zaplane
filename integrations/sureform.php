@@ -23,6 +23,14 @@ class Sureform extends IntegrationBase {
 		return 'sureform.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/sure-form/',
+			'action'  => 'https://zaplane.app/docs/sure-form/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'submit_form' => [

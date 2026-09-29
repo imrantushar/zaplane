@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import WPPopover from "@ZAPComponents/Popaver/WPPopover";
 import ZAPTab from "@ZAPComponents/Tab";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import { formatVariableKey, getContextVariableGroups, insertVariableIntoGroup } from "./helper";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { LuChevronDown } from "react-icons/lu";
@@ -107,6 +107,15 @@ export default function VariablePopover({
                             {" : "}
                             {__(v.sample, "zaplane")}
                           </span>
+
+                          {Array.isArray(v.only_from) && v.only_from.length > 0 && (
+                            <span
+                              className="ml-2 shrink-0 rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-700"
+                              title={sprintf(__("Only %s provides this field. It's empty when another trigger fires.", "zaplane"), v.only_from.join(", "))}
+                            >
+                              {__("Not every trigger", "zaplane")}
+                            </span>
+                          )}
                         </div>
                       ))
                     ) : (

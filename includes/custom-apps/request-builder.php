@@ -33,7 +33,10 @@ class RequestBuilder {
 		self::apply_auth( $manifest['auth'] ?? [], $context, $headers, $query );
 
 		if ( ! empty( $query ) ) {
-			$url = add_query_arg( array_map( 'rawurlencode', array_map( 'strval', $query ) ), $url );
+			// add_query_arg() performs URL encoding itself. Pre-encoding values
+			// here turns spaces, slashes, and other reserved characters into
+			// double-encoded values on the wire.
+			$url = add_query_arg( array_map( 'strval', $query ), $url );
 		}
 
 		return [

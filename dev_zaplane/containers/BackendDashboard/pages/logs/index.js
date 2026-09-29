@@ -11,12 +11,13 @@ import LogDetails from "@ZAPComponents/LogDetails";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import ListTable from "@ZAPComponents/ListTable";
 import ZAPMenu from "@ZAPComponents/ZapMenu";
-import { formatDateTime, formatLabel, getDuration, plugin_root_url, route_path } from "@ZAPUtils/helper";
+import { API, formatDateTime, formatLabel, getDuration, namespace, plugin_root_url, route_path } from "@ZAPUtils/helper";
 import { isAbsoluteIcon, resolveIconFilename } from "@ZAPComponents/ZAPIconGroup/ZAPIconGroup";
 import { statusStyle } from "../workflows/helper";
 import { HistoryIcon } from "@ZAPUtils/icons";
 import ZAPLabel from "@ZAPComponents/Labels/ZAPLabel";
 import PageLayout from "@ZAPComponents/PageLayout";
+import AiAccessLog from "./AiAccessLog";
 
 const FALLBACK_APP_ICON = `${plugin_root_url}assets/images/button.svg`;
 
@@ -38,17 +39,28 @@ const Logs = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const goEditWorkflow = workflowId => {
-    if (!workflowId) return;
+    if (!workflowId) {return;}
     navigate(`${route_path}admin.php?page=zaplane-workflows&action=edit&id=${workflowId}`);
   };
   const [activeRunId, setActiveRunId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selection, setSelection] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
+  // Workflow runs and AI client activity are both history, and both belong on
+  // the page people already open to find out what happened.
+  const [view, setView] = useState('runs');
+  // Bumped after clearing, so the child reloads without owning the button.
+  const [auditVersion, setAuditVersion] = useState(0);
+
+  const handleClearAudit = async () => {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(__("Clear the AI access log? This cannot be undone.", "zaplane"))) {return;}
+    await API.delete(`${namespace}mcp/audit`);
+    setAuditVersion(v => v + 1);
+  };
   const {
     data = [],
     currentPage,
-    perPage,
     itemPerPage,
     totalItems
   } = useSelector(state => state.logs || {});
@@ -67,7 +79,7 @@ const Logs = () => {
   }, []);
   const handleStatusFilter = status => {
     setStatusFilter(status);
-    handleRefresh(1, perPage, status);
+    handleRefresh(1, itemPerPage, status);
   };
   const statusFilterOptions = [{
     label: __("All statuses", "zaplane"),
@@ -83,10 +95,10 @@ const Logs = () => {
     value: "running"
   }];
   const handlePageChange = newPage => {
-    handleRefresh(newPage, perPage);
+    handleRefresh(newPage, itemPerPage);
   };
   const handlePerPageChange = itemsPerPage => {
-    handleRefresh(currentPage, itemsPerPage);
+    handleRefresh(1, itemsPerPage);
   };
   const handleClearLogs = async () => {
     // eslint-disable-next-line no-alert
@@ -95,27 +107,27 @@ const Logs = () => {
     }
     const result = await dispatch(clearRuns());
     if (!result?.error) {
-      handleRefresh(1, perPage);
+      handleRefresh(1, itemPerPage);
     }
   };
   const handleDeleteRow = async row => {
-    if (!row?.id) return;
+    if (!row?.id) {return;}
     // eslint-disable-next-line no-alert
     if (!window.confirm(__("Are you sure you want to delete this log?", "zaplane"))) {
       return;
     }
     const result = await dispatch(deleteRun(row.id));
     if (!result?.error) {
-      handleRefresh(currentPage, perPage);
+      handleRefresh(currentPage, itemPerPage);
     }
   };
   const handleDeleteSelected = async () => {
-    if (!selection.length) return;
+    if (!selection.length) {return;}
     await Promise.all(
       selection.map(row => row?.id).filter(Boolean).map(id => dispatch(deleteRun(id)))
     );
     setSelection([]);
-    handleRefresh(currentPage, perPage);
+    handleRefresh(currentPage, itemPerPage);
   };
   const columns = [{
     name: <span>
@@ -133,7 +145,7 @@ const Logs = () => {
     name: <span>
       {__("Action", "zaplane")}
     </span>,
-    cell: row => <ZAPLabel label={__(formatLabel(row?.node?.event), 'zaplane')} type={"simple"} />,
+    cell: row => <ZAPLabel label={formatLabel(row?.node?.event)} type={"simple"} />,
     textAlign: "start"
   }, {
     name: <span>
@@ -144,7 +156,7 @@ const Logs = () => {
     </button> : <span className="text-[var(--zaplane-text-muted)]">—</span>,
     textAlign: "start"
   }, {
-    name: <span className="zaplane-label ml-[-33px]">
+    name: <span className="zaplane-label">
       {__("Created At", "zaplane")}
     </span>,
     cell: row => {
@@ -154,8 +166,8 @@ const Logs = () => {
       } = formatDateTime(row.started_at);
       return <div className="flex flex-col">
         <ZAPLabel label={date} type={"simple"} />
-        <span className="zaplane-sub-title ml-[-38px] text-var(--zaplane-text-muted)">
-          {__(time, 'zaplane')}
+        <span className="zaplane-sub-title text-[var(--zaplane-text-muted)]">
+          {time}
         </span>
       </div>;
     },
@@ -163,7 +175,7 @@ const Logs = () => {
     textAlign: "center"
   }, {
     name: <span>
-      {__("DURATION", "zaplane")}
+      {__("Duration", "zaplane")}
     </span>,
     cell: row => <ZAPLabel label={getDuration(row.started_at, row.finished_at)} type={"simple"} />
     // columnWidth: "150px",
@@ -179,7 +191,12 @@ const Logs = () => {
     </span>,
     cell: row => {
       const style = statusStyle(row.status);
-      const label = row.status === 'completed' ? __("Success", "zaplane") : row.status === 'failed' ? __("Failed", "zaplane") : formatLabel(row.status);
+      let label = formatLabel(row.status);
+      if (row.status === 'completed') {
+        label = __("Success", "zaplane");
+      } else if (row.status === 'failed') {
+        label = __("Failed", "zaplane");
+      }
       return <div className="flex justify-center">
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium capitalize" style={style}>
           <span className="w-[6px] h-[6px] rounded-full" style={{ background: style.color }} />
@@ -226,15 +243,43 @@ const Logs = () => {
       title="Logs" 
       heading="Logs" 
       actions={
-        <Button 
-          label={__("Clear logs", "zaplane")} 
-          size="sm" 
-          suffix=" p-[8px]" 
-          preset="transparent"
-          border='gray'
-          onClick={handleClearLogs} 
-          isDisabled={loading || data.length === 0} />
+        view === 'runs' ? (
+          <Button 
+            label={__("Clear logs", "zaplane")} 
+            size="sm" 
+            suffix=" p-[8px]" 
+            preset="transparent"
+            border='gray'
+            onClick={handleClearLogs} 
+            isDisabled={loading || data.length === 0} />
+        ) : (
+          <Button
+            label={__("Clear activity", "zaplane")}
+            size="sm"
+            suffix=" p-[8px]"
+            preset="transparent"
+            border='gray'
+            onClick={handleClearAudit} />
+        )
       }>
+        <div className="zaplane-table-sub-header-tabs mb-4">
+          {[
+            { value: 'runs', label: __("Workflow runs", "zaplane") },
+            { value: 'ai', label: __("AI access", "zaplane") },
+          ].map(opt => (
+            <span
+              key={opt.value}
+              role="presentation"
+              className={`tab ${opt.value === view ? 'is-active' : ''}`}
+              onClick={() => setView(opt.value)}
+            >
+              {opt.label}
+            </span>
+          ))}
+        </div>
+
+        {view === 'ai' ? <AiAccessLog reloadKey={auditVersion} /> : (
+        <>
         <ListTable
           columns={columns}
           isRowSelectable={true}
@@ -255,19 +300,20 @@ const Logs = () => {
             </div>
           }
           showColumnFilter={false}
-          showPagination={totalItems > itemPerPage}
+          showPagination={totalItems > 0}
           noDataText={__("No logs found", "zaplane")} 
           totalItems={totalItems} 
           dataFetchingStatus={loading} 
           suffix="logs-table" 
           currentPageNumber={currentPage} 
-          perPage={perPage} 
           rowsPerPage={itemPerPage} 
           onChangePage={handlePageChange}
           onChangeItemsPerPage={handlePerPageChange}
           getSelectRowValue={rows => setSelection(rows || [])}
         />
         <ZAPActionBar selection={selection} onDelete={handleDeleteSelected} onClose={() => setSelection([])} />
+        </>
+        )}
         <ZAPDrawer
           open={drawerOpen} 
           arrowClose 

@@ -145,18 +145,6 @@ class Mailchimp extends IntegrationBase {
 		return [];
 	}
 
-	public static function get_trigger_config_schema( string $trigger ): array {
-		return [
-			[
-				'key'         => 'list_id',
-				'label'       => 'Audience/List ID',
-				'type'        => 'text',
-				'placeholder' => 'a6b5da1054',
-				'help'        => 'Optional. Only continue if the webhook came from this Mailchimp audience.',
-			],
-		];
-	}
-
 	/**
 	 * =====================================================
 	 * DYNAMIC DATA QUERIES (API)
@@ -180,10 +168,7 @@ class Mailchimp extends IntegrationBase {
 			return static::$method( $node, $input );
 		}
 
-		return [
-			'port' => 'main',
-			'data' => $input,
-		];
+		throw new \Exception( 'Unknown Mailchimp action: ' . esc_html( $action ) );
 	}
 
 	public static function resolve_trigger( array $node, array $args ) {
@@ -193,14 +178,10 @@ class Mailchimp extends IntegrationBase {
 			return false;
 		}
 
-		$config = self::get_node_config_data( $node );
-		$list_id_filter = trim( (string) ( $config['list_id'] ?? '' ) );
-
-		if ( '' !== $list_id_filter ) {
-			$list_id = (string) ( $payload['mailchimp_list_id'] ?? ( $payload['data']['list_id'] ?? '' ) );
-			if ( $list_id_filter !== $list_id ) {
-				return false;
-			}
+		$event = self::resolve_trigger_event( $node );
+		$payload_event = (string) ( $payload['mailchimp_event_name'] ?? '' );
+		if ( '' !== $event && '' !== $payload_event && $event !== $payload_event ) {
+			return false;
 		}
 
 		return $payload;
@@ -482,12 +463,12 @@ class Mailchimp extends IntegrationBase {
 		$type = sanitize_key( (string) ( $body['type'] ?? '' ) );
 
 		$map = [
-			'subscribe'   => 'subscribed',
-			'unsubscribe' => 'unsubscribed',
-			'profile'     => 'profile_updated',
-			'cleaned'     => 'cleaned',
-			'upemail'     => 'email_changed',
-			'campaign'    => 'campaign_sent',
+			'subscribe'    => 'subscribed',
+			'unsubscribe'  => 'unsubscribed',
+			'profile'      => 'profile_updated',
+			'cleaned'      => 'cleaned',
+			'upemail'      => 'email_changed',
+			'campaign'     => 'campaign_sent',
 		];
 
 		$event = $map[ $type ] ?? null;
@@ -512,7 +493,7 @@ class Mailchimp extends IntegrationBase {
 			'data'                  => $data,
 			'mailchimp_event'       => $type,
 			'mailchimp_event_name'  => $event,
-			'mailchimp_member_id'   => (string) ( $data['id'] ?? '' ),
+			'mailchimp_member_id'   => (string) ( $data['id'] ?? ( $data['new_id'] ?? '' ) ),
 			'mailchimp_list_id'     => (string) ( $data['list_id'] ?? '' ),
 			'mailchimp_email'       => (string) ( $data['email'] ?? '' ),
 			'mailchimp_old_email'   => (string) ( $data['old_email'] ?? '' ),
@@ -520,7 +501,7 @@ class Mailchimp extends IntegrationBase {
 			'mailchimp_email_type'  => (string) ( $data['email_type'] ?? '' ),
 			'mailchimp_reason'      => (string) ( $data['reason'] ?? '' ),
 			'mailchimp_action'      => (string) ( $data['action'] ?? '' ),
-			'mailchimp_campaign_id' => (string) ( $data['campaign_id'] ?? '' ),
+			'mailchimp_campaign_id' => (string) ( $data['campaign_id'] ?? ( $data['id'] ?? '' ) ),
 			'mailchimp_merges'      => is_array( $data['merges'] ?? null ) ? $data['merges'] : [],
 		];
 
@@ -969,16 +950,36 @@ class Mailchimp extends IntegrationBase {
 
 	private static function resolve_action( array $node ): string {
 		if ( isset( $node['config']['action'] ) && is_string( $node['config']['action'] ) ) {
-			return $node['config']['action'];
+			return sanitize_key( $node['config']['action'] );
+		}
+
+		if ( isset( $node['event'] ) && is_string( $node['event'] ) ) {
+			return sanitize_key( $node['event'] );
+		}
+
+		if ( isset( $node['action'] ) && is_string( $node['action'] ) ) {
+			return sanitize_key( $node['action'] );
 		}
 
 		$data = $node['data'] ?? [];
 		if ( isset( $data['event'] ) && is_string( $data['event'] ) ) {
-			return $data['event'];
+			return sanitize_key( $data['event'] );
 		}
 
 		if ( isset( $data['action'] ) && is_string( $data['action'] ) ) {
-			return $data['action'];
+			return sanitize_key( $data['action'] );
+		}
+
+		return '';
+	}
+
+	private static function resolve_trigger_event( array $node ): string {
+		if ( isset( $node['data']['event'] ) && is_string( $node['data']['event'] ) ) {
+			return sanitize_key( $node['data']['event'] );
+		}
+
+		if ( isset( $node['event'] ) && is_string( $node['event'] ) ) {
+			return sanitize_key( $node['event'] );
 		}
 
 		return '';
@@ -988,16 +989,16 @@ class Mailchimp extends IntegrationBase {
 		$body = $request->get_body_params();
 
 		if ( empty( $body ) ) {
-			$raw = $request->get_body();
-			if ( is_string( $raw ) && '' !== $raw ) {
-				parse_str( $raw, $body );
+			$json = $request->get_json_params();
+			if ( is_array( $json ) && ! empty( $json ) ) {
+				$body = $json;
 			}
 		}
 
 		if ( empty( $body ) ) {
-			$json = $request->get_json_params();
-			if ( is_array( $json ) ) {
-				$body = $json;
+			$raw = $request->get_body();
+			if ( is_string( $raw ) && '' !== $raw ) {
+				parse_str( $raw, $body );
 			}
 		}
 
@@ -1016,6 +1017,12 @@ class Mailchimp extends IntegrationBase {
 
 		if ( isset( $node['config'] ) && is_array( $node['config'] ) && ! isset( $node['config']['action'] ) ) {
 			return $node['config'];
+		}
+
+		if ( isset( $node['config'] ) && is_array( $node['config'] ) ) {
+			$config = $node['config'];
+			unset( $config['action'] );
+			return $config;
 		}
 
 		return [];

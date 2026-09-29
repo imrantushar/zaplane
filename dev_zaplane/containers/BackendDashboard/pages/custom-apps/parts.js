@@ -34,11 +34,11 @@ export const TextInput = ({ label, value, onChange, placeholder, help, type = 't
 	</Labeled>
 );
 
-export const TextArea = ({ label, value, onChange, placeholder, help, rows = 4 }) => (
+export const TextArea = ({ label, value, onChange, placeholder, help, rows = 4, style }) => (
 	<Labeled label={label} help={help}>
 		<textarea
 			className="zaplane-textarea"
-			style={{ fontFamily: 'var(--zaplane-font-mono, monospace)' }}
+			style={{ fontFamily: 'var(--zaplane-font-mono, monospace)', ...style }}
 			rows={rows}
 			value={value ?? ''}
 			placeholder={placeholder}

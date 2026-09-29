@@ -127,18 +127,20 @@ class TokenStoreTest extends TestCase {
 	}
 
 	/**
+	 * A token from before scoping was stored in plain text, held every scope and
+	 * belonged to nobody. It is refused, and deleted the first time it is shown.
+	 *
 	 * @test
 	 */
-	public function a_pre_scoping_token_keeps_working_with_every_scope(): void {
+	public function a_pre_scoping_token_is_refused_and_removed(): void {
 		update_option( 'zaplane_mcp_token', 'legacy-secret-value' );
 
-		$resolved = TokenStore::resolve( 'legacy-secret-value' );
-
-		$this->assertNotNull( $resolved );
-		$this->assertSame( TokenStore::ALL_SCOPES, $resolved['scopes'] );
-		$this->assertTrue( $resolved['legacy'] );
-
 		$this->assertNull( TokenStore::resolve( 'not-the-legacy-value' ) );
+		$this->assertSame( 'legacy-secret-value', get_option( 'zaplane_mcp_token', '' ), 'A wrong guess must not delete it' );
+
+		$this->assertNull( TokenStore::resolve( 'legacy-secret-value' ) );
+		$this->assertSame( '', (string) get_option( 'zaplane_mcp_token', '' ) );
+		$this->assertFalse( TokenStore::has_any() );
 	}
 
 	/**
@@ -157,5 +159,111 @@ class TokenStoreTest extends TestCase {
 	 */
 	public function an_unnamed_token_still_gets_a_label(): void {
 		$this->assertSame( 'MCP client', TokenStore::issue( '   ' )['name'] );
+	}
+
+	/**
+	 * Holding `run` used to mean holding it over every workflow on the site.
+	 *
+	 * @test
+	 */
+	public function a_token_can_be_limited_to_particular_workflows(): void {
+		$issued = TokenStore::issue( 'Scoped', [ 'read', 'run' ], 1, [ 'workflows' => [ 3, 1, 3 ] ] );
+
+		$this->assertSame( [ 1, 3 ], $issued['workflows'], 'deduplicated and ordered' );
+
+		$record = TokenStore::resolve( $issued['token'] );
+		$this->assertTrue( TokenStore::may_run( $record, 1 ) );
+		$this->assertTrue( TokenStore::may_run( $record, 3 ) );
+		$this->assertFalse( TokenStore::may_run( $record, 2 ) );
+		$this->assertFalse( TokenStore::may_run( $record, 0 ), 'a missing workflow_id is not a wildcard' );
+	}
+
+	/**
+	 * Naming none keeps the old meaning, so nothing issued before this narrows
+	 * underneath whoever was using it.
+	 *
+	 * @test
+	 */
+	public function naming_no_workflows_still_means_all_of_them(): void {
+		$issued = TokenStore::issue( 'Unscoped', [ 'read', 'run' ], 1 );
+		$record = TokenStore::resolve( $issued['token'] );
+
+		$this->assertSame( [], $issued['workflows'] );
+		$this->assertTrue( TokenStore::may_run( $record, 1 ) );
+		$this->assertTrue( TokenStore::may_run( $record, 9999 ) );
+
+		// A record predating the field behaves the same.
+		$this->assertTrue( TokenStore::may_run( [ 'scopes' => [ 'run' ] ], 42 ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function workflow_ids_are_cleaned_before_they_are_stored(): void {
+		$this->assertSame( [ 2, 7 ], TokenStore::sanitize_workflows( [ '7', 2, 0, -4, 'x', 7 ] ) );
+		$this->assertSame( [], TokenStore::sanitize_workflows( [] ) );
+	}
+
+	/**
+	 * The stamp goes on the token that was used, not on whatever now sits where
+	 * it used to. This took an array index captured while verifying, and a
+	 * revoke in between shifts every later record down one.
+	 *
+	 * @test
+	 */
+	public function last_used_lands_on_the_token_that_was_used(): void {
+		$first  = TokenStore::issue( 'First' );
+		$second = TokenStore::issue( 'Second' );
+		$third  = TokenStore::issue( 'Third' );
+
+		// The record in front of it goes away, shifting the rest down.
+		TokenStore::revoke( $first['id'] );
+
+		TokenStore::resolve( $third['token'] );
+
+		foreach ( TokenStore::all() as $row ) {
+			if ( $third['id'] === $row['id'] ) {
+				$this->assertNotNull( $row['last_used_at'], 'The used token should be stamped' );
+			}
+
+			if ( $second['id'] === $row['id'] ) {
+				$this->assertNull( $row['last_used_at'], 'A token nobody used must not be stamped' );
+			}
+		}
+	}
+
+	/**
+	 * A token that expired with no refresh token can never be used again, so it
+	 * goes. One still holding a refresh token is not dead — it is waiting to be
+	 * renewed — and dropping it would end a working connection.
+	 *
+	 * @test
+	 */
+	public function issuing_clears_out_tokens_that_can_never_be_used_again(): void {
+		$dead  = TokenStore::issue( 'Lapsed', TokenStore::DEFAULT_SCOPES, 0, [ 'expires_in' => 1 ] );
+		$alive = TokenStore::issue( 'Lapsed but renewable', TokenStore::DEFAULT_SCOPES, 0, [ 'expires_in' => 1, 'with_refresh' => true ] );
+
+		$this->ageOut( $dead['id'] );
+		$this->ageOut( $alive['id'] );
+
+		TokenStore::issue( 'Something new' );
+
+		$ids = array_column( TokenStore::all(), 'id' );
+
+		$this->assertNotContains( $dead['id'], $ids );
+		$this->assertContains( $alive['id'], $ids, 'A refresh token is a way back; the record has to stay' );
+	}
+
+	/** Push a token's expiry well past the grace period. */
+	private function ageOut( string $id ): void {
+		$records = get_option( 'zaplane_mcp_tokens', [] );
+
+		foreach ( $records as $i => $record ) {
+			if ( $id === ( $record['id'] ?? '' ) ) {
+				$records[ $i ]['expires_at'] = time() - ( 30 * DAY_IN_SECONDS );
+			}
+		}
+
+		update_option( 'zaplane_mcp_tokens', $records, false );
 	}
 }

@@ -249,9 +249,10 @@ class Mcpclient extends IntegrationBase {
 			$headers['Mcp-Session-Id'] = $session;
 		}
 
-		$response = wp_remote_post(
+		$response = \Zaplane\HttpGuard::request(
 			$url,
 			[
+				'method'  => 'POST',
 				'headers' => $headers,
 				'body'    => wp_json_encode( $payload ),
 				'timeout' => 60,

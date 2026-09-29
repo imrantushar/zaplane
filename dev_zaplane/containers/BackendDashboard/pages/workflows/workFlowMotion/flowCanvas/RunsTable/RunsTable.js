@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import LogDetails from "@ZAPComponents/LogDetails";
-import { getDuration } from "@ZAPUtils/helper";
+import { formatLabel, getDuration } from "@ZAPUtils/helper";
 import { __ } from "@wordpress/i18n";
 import ZAPDrawer from "@ZAPComponents/Drawer";
 import { statusStyle } from "../../../helper";
@@ -10,6 +10,7 @@ import { getRunWorkFlow, getSingleRun } from "@ZAPRedux/Slices/workFlowSlice/act
 import ListTable from "@ZAPComponents/ListTable";
 import { HistoryIcon, ReExcutionIcon } from "@ZAPUtils/icons";
 import ZAPTooltip from "@ZAPComponents/ZAPTooltip";
+import './styles.scss';
 const RunsTable = ({
   id,
   activeDrawer,
@@ -20,7 +21,6 @@ const RunsTable = ({
   const {
     runs = [],
     currentPage,
-    perPage,
     totalItems,
     itemPerPage
   } = useSelector(state => state.workflows);
@@ -38,7 +38,7 @@ const RunsTable = ({
     setLoading(false);
   };
   useEffect(() => {
-    if (activeDrawer !== "logs") return;
+    if (activeDrawer !== "logs") {return;}
     handleRefresh(currentPage, itemPerPage);
     const interval = setInterval(() => {
       handleRefresh(currentPage, itemPerPage);
@@ -46,24 +46,30 @@ const RunsTable = ({
     return () => clearInterval(interval);
   }, [currentPage, itemPerPage, activeDrawer]);
   const handlePageChange = newPage => {
-    handleRefresh(newPage, perPage);
+    handleRefresh(newPage, itemPerPage);
   };
   const handlePerPageChange = itemsPerPage => {
-    handleRefresh(currentPage, itemsPerPage);
+    handleRefresh(1, itemsPerPage);
   };
   const columns = [{
     name: __('Run ID', 'zaplane'),
-    cell: row => <span>{__(row.id, "zaplane")}</span>,
+    cell: row => <span>{row.id}</span>,
     // columnWidth: "180px",
     textAlign: "center"
   }, {
-    name: __('Status', 'zaplane'),
-    cell: row => <span textTransform="capitalize" style={statusStyle(row.status)} className="px-2 py-0.5 rounded-md text-[xs]">
-          {__(row.status, "zaplane")}
-        </span>,
-    columnWidth: "100px"
+    name: __('Trigger', 'zaplane'),
+    cell: row => row.trigger ? <span className="block" title={row.trigger.label || ""}>
+          {`${__("Trigger", "zaplane")} ${row.trigger.number}`}
+          {row.trigger.label ? <span className="text-[var(--zaplane-font-secondary-color)]">{` · ${row.trigger.label}`}</span> : null}
+        </span> : <span className="text-[var(--zaplane-font-secondary-color)]">—</span>,
+    textAlign: "start"
   }, {
-    name: __('DURATION', 'zaplane'),
+    name: __('Status', 'zaplane'),
+    cell: row => <span style={statusStyle(row.status)} className="inline-block px-2 py-0.5 rounded-md text-xs capitalize">
+          {formatLabel(row.status)}
+        </span>,
+  }, {
+    name: __('Duration', 'zaplane'),
     cell: row => <span>
           {getDuration(row.started_at, row.finished_at)}
         </span>
@@ -78,18 +84,18 @@ const RunsTable = ({
     name: __('Action', 'zaplane'),
     cell: row => <div className="flex flex-row items-center gap-1 justify-center">
           <ZAPTooltip content={__("Details", 'zaplane')}>
-            <div onClick={() => {
+            <button type="button" aria-label={__('View details', 'zaplane')} onClick={() => {
           setActiveRunId(row.id);
           setDrawerOpen(true);
           dispatch(nodeLogsRunDetails(row.id));
         }} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)]">
               <HistoryIcon height="20px" width="20px" />
-            </div>
+            </button>
           </ZAPTooltip>
           <ZAPTooltip content={__("Re-Try", 'zaplane')}>
-            <div onClick={() => dispatch(getSingleRun(row.id))} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)]">
+            <button type="button" aria-label={__('Retry run', 'zaplane')} onClick={() => dispatch(getSingleRun(row.id))} className="flex px-[8px] py-[4px] justify-center items-center rounded-[2.917px] border border-[var(--zaplane-border-color)] text-[var(--zaplane-font-color)]">
               <ReExcutionIcon height="20px" width="20px" />
-            </div>
+            </button>
           </ZAPTooltip>
 
 
@@ -98,22 +104,23 @@ const RunsTable = ({
     textAlign: "center"
   }];
   return <>
+      <div className="zaplane-run-history">
       <ListTable 
-      columns={columns} 
+      columns={columns.map(column => ({ ...column, cell: row => <><span className="zaplane-run-history__label">{column.name}</span><div className="zaplane-run-history__value">{column.cell(row)}</div></> }))}
       isRowSelectable={false}
        data={runs} 
        showSubHeader={false} 
        showColumnFilter={false} 
-       showPagination={totalItems >= 10} 
+       showPagination={totalItems > 0}
        noDataText={__("No history found", "zaplane")} 
        totalItems={totalItems} 
        dataFetchingStatus={loading} 
-       suffix="history-table" 
+       suffix="workflow-run-history"
        currentPageNumber={currentPage} 
-       perPage={perPage} 
        rowsPerPage={itemPerPage} 
        onChangePage={handlePageChange} 
        onChangeItemsPerPage={handlePerPageChange} />
+      </div>
       <ZAPDrawer open={drawerOpen} arrowClose={true} onClose={() => {
       setDrawerOpen(false);
       setActiveRunId(null);

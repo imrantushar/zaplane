@@ -62,7 +62,7 @@ const ActivateButton = ({ label, busy, onClick, subtle }) => (
     type="button"
     onClick={onClick}
     disabled={busy}
-    className={`inline-flex shrink-0 items-center justify-center rounded-[4px] px-3 py-1.5 text-[12px] font-semibold transition-opacity ${
+    className={`inline-flex w-full sm:w-auto shrink-0 items-center justify-center rounded-[4px] px-3 py-1.5 text-[12px] font-semibold transition-opacity ${
       busy ? 'cursor-wait opacity-60' : 'cursor-pointer hover:opacity-90'
     }`}
     style={
@@ -127,7 +127,7 @@ const Teaser = ({ screen, app, onActivated }) => {
 
     return (
       <Shell>
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-4">
           <div className="min-w-0 flex-1">
             <div className="text-[14px] font-semibold text-[var(--zaplane-font-color)]">{data.title}</div>
             <p className="mb-0 mt-1 text-[13px] leading-[1.55] text-[var(--zaplane-font-secondary-color)]">{data.body}</p>
@@ -145,7 +145,7 @@ const Teaser = ({ screen, app, onActivated }) => {
 
   return (
     <Shell onDismiss={dismiss}>
-      <div className="flex items-center gap-2 pr-6">
+      <div className="flex flex-wrap items-center gap-2 pr-6">
         <span
           className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
           style={{ background: TINT.accent, color: 'var(--zaplane-primary)' }}
@@ -168,7 +168,7 @@ const Teaser = ({ screen, app, onActivated }) => {
         {remaining.map(module => (
           <div
             key={module.key}
-            className="flex items-start justify-between gap-4 py-3"
+            className="flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-3 sm:gap-4 py-3"
             style={{ borderBottom: `1px solid ${TINT.rule}` }}
           >
             <div className="min-w-0">

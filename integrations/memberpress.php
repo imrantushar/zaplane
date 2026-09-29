@@ -22,6 +22,14 @@ class Memberpress extends IntegrationBase {
 		return 'memberpress.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/memberpress-2/',
+			'action'  => 'https://zaplane.app/docs/action-memberpress/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'member_added' => [

@@ -22,6 +22,14 @@ class Weforms extends IntegrationBase {
 		return 'weforms.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/weforms/',
+			'action'  => 'https://zaplane.app/docs/weforms/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'weforms_entry_submission' => [

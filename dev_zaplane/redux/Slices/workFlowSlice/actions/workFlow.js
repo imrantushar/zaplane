@@ -3,9 +3,6 @@ import { __ } from '@wordpress/i18n';
 
 import {
 	API,
-	current_user_can,
-	current_user_id,
-	is_admin,
 	handleSliceSuccess,
 	handleSliceError,
 	namespace,
@@ -59,7 +56,7 @@ export const updateWorkFlow = createAsyncThunk(
 				namespace + "workflows/" + parseInt(id),
 				payload
 			);
-			handleSliceSuccess(thunkAPI, __('Updated workflow Successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI, __('Updated workflow Successfully', 'zaplane'));
 			return res.data;
 		} catch (e) {
 			handleSliceError(thunkAPI, e)

@@ -36,13 +36,13 @@ const ThemeToggle = () => {
 const TopBar = ({
 	title = '',
 	render = () => null,
-	rightContent = () => <div className="flex items-center gap-3">
+	rightContent = () => <div className="zaplane-topbar-default-actions flex items-center gap-3">
 		<ThemeToggle />
-		<button className='flex items-center gap-2' style={outlineBtn} onClick={() => {
+		<button className='zaplane-help-button flex items-center gap-2' style={outlineBtn} onClick={() => {
 			window.open('https://zaplane.app/docs/', '_blank');
 		}}>
 			<FiHelpCircle color='var(--zaplane-font-color)' />
-			{__("Help")}
+			<span className="zaplane-help-button__label">{__("Help", "zaplane")}</span>
 		</button>
 	</div>,
 	middleContent = () => null,
@@ -52,15 +52,17 @@ const TopBar = ({
 	// if (!is_admin) return null;
 	return <React.Fragment>
 		<div style={{ position: 'sticky', top: '32px', zIndex: 999, height: '72px', width: '100%', borderBottom: '1px solid var(--zaplane-border-color)', background: 'var(--zaplane-background)', ...topBarStyles }} className="zaplane-topbar flex justify-between items-center px-6 py-4 mb-[32px]">
-			<div className="flex items-center flex-wrap gap-3">
+			<div className="zaplane-topbar__left flex items-center flex-wrap gap-3 min-w-0">
 				{render()}
 				{title ? <ZAPLabel label={title} fontSize="md" fontWeight="medium" /> : null}
 				{leftContent()}
 			</div>
 
-			{middleContent()}
+			<div className="zaplane-topbar__middle min-w-0">
+				{middleContent()}
+			</div>
 
-			<div className="flex items-center gap-2">
+			<div className="zaplane-topbar__right flex items-center gap-2 min-w-0">
 				{rightContent()}
 			</div>
 		</div>

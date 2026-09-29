@@ -69,7 +69,7 @@ export const HandlerEditor = ({ handler = {}, onChange }) => {
 					onChange={(v) => patch({ callable: v })}
 					placeholder="my_plugin_create_thing"
 					help={__(
-						'Any callable plugin/WordPress function. If it doesn’t exist the action fails cleanly (no fatal); a few dangerous functions like exec/system are blocked.',
+						'Runs only a function that code on this site has allowed with the zaplane_custom_app_callables filter. Anything else fails cleanly without running.',
 						'zaplane'
 					)}
 					mono

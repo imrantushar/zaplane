@@ -82,8 +82,8 @@ class Migrator {
 	protected function getRanMigrations(): array {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_col( "SELECT migration FROM {$this->migrationsTable}" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema bookkeeping; there is nothing to cache and no API for it.
+		$results = $wpdb->get_col( $wpdb->prepare( 'SELECT migration FROM %i', $this->migrationsTable ) );
 
 		return $results ? $results : [];
 	}
@@ -91,10 +91,8 @@ class Migrator {
 	protected function getNextBatchNumber(): int {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$batch = $wpdb->get_var(
-			"SELECT MAX(batch) FROM {$this->migrationsTable}" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is set internally, not user input.
-		);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema bookkeeping; there is nothing to cache and no API for it.
+		$batch = $wpdb->get_var( $wpdb->prepare( 'SELECT MAX(batch) FROM %i', $this->migrationsTable ) );
 
 		return ( null !== $batch ? $batch : 0 ) + 1;
 	}

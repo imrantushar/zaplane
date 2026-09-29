@@ -1,6 +1,10 @@
 <?php
 namespace Zaplane\Integrations\Easydigitaldownload;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait DiscountActionsTrait {
 
 	protected static function action_create_discount( array $config, array $input ): array {

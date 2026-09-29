@@ -3,6 +3,10 @@ namespace Zaplane\Integrations\Wordpress;
 
 use Zaplane\Traits\ActionResponseTrait;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait TaxonomyActionsTrait {
 
 	private static function get_taxonomy_from_config( array $config ): string {

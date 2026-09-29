@@ -14,8 +14,21 @@
 // #wpbody-content is the WP-core wrapper around #zaplane-app (it also holds
 // #wpfooter below it). Without this, dark mode leaves a white margin/footer
 // strip showing through around the app on the Zaplane screen.
-#wpbody-content {
+// Scoped to Zaplane's own screens (toplevel_page_zaplane, zaplane_page_*),
+// so no other admin screen is restyled even if this file were loaded there.
+body[class*="_page_zaplane"] #wpbody-content {
     background: var(--zaplane-body-background);
+}
+
+// Hide the page scrollbar on every Zaplane screen without disabling scrolling.
+// Keep nested table, drawer and editor scrollbars unchanged.
+html:has(#zaplane-app),
+body:has(#zaplane-app) {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        width: 0;
+    }
 }
 
 // Smooth page transition when switching between admin menu routes.

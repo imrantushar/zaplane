@@ -22,6 +22,14 @@ class Ablocks extends IntegrationBase {
 		return 'ablocks.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/ablocks/',
+			'action'  => 'https://zaplane.app/docs/ablocks/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'form_submitted' => [

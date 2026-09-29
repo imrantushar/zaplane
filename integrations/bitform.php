@@ -24,6 +24,14 @@ class Bitform extends IntegrationBase {
 		return 'bit-form-new-icon.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/bit-form/',
+			'action'  => 'https://zaplane.app/docs/bit-form/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'submit_form' => [

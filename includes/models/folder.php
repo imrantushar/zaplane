@@ -16,11 +16,15 @@ class Folder extends Model {
 	protected static array $fillable = [
 		'title',
 		'created_by',
+		'recipe_id',
+		'setup',
 	];
 
 	protected static array $casts = [
 		'id'         => 'integer',
 		'created_by' => 'integer',
+		'recipe_id'  => 'integer',
+		'setup'      => 'json',
 	];
 
 	// -------------------------------------------------------------------------
@@ -29,6 +33,13 @@ class Folder extends Model {
 
 	public function workflows(): Collection {
 		return Workflow::where( 'folder_id', $this->id )->orderBy( 'id', 'desc' )->get();
+	}
+
+	/**
+	 * The group recipe this folder was set up from, if it was and the recipe still exists.
+	 */
+	public function recipe(): ?Recipe {
+		return $this->recipe_id ? Recipe::find( (int) $this->recipe_id ) : null;
 	}
 
 	// -------------------------------------------------------------------------
@@ -51,10 +62,23 @@ class Folder extends Model {
 	// -------------------------------------------------------------------------
 
 	public function toResponse(): array {
+		$source = null;
+
+		if ( $this->recipe_id ) {
+			$recipe = $this->recipe();
+			$setup  = is_array( $this->setup ) ? $this->setup : [];
+
+			$source = [
+				'id'    => (int) $this->recipe_id,
+				'title' => $recipe ? (string) $recipe->title : (string) ( $setup['recipe_title'] ?? '' ),
+			];
+		}
+
 		return [
 			'id'             => $this->id,
 			'title'          => $this->title,
 			'workflow_count' => Workflow::where( 'folder_id', $this->id )->count(),
+			'recipe'         => $source,
 			'created_by'     => $this->created_by,
 			'created_at'     => $this->created_at,
 			'updated_at'     => $this->updated_at,

@@ -4,6 +4,10 @@ namespace Zaplane\Integrations;
 use Zaplane\Framework\Classes\IntegrationBase;
 use Zaplane\Framework\Classes\Scheduler;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class Delay extends IntegrationBase {
 
 	public static function get_slug(): string {

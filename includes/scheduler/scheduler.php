@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Fires schedule-triggered workflows. A recurring Action Scheduler tick runs
  * every minute, finds active workflows whose trigger is the Schedule app, and
- * runs the ones that are due — tracking last-run per workflow.
+ * runs the ones that are due — tracking when each schedule trigger last ran.
  */
 class Scheduler {
 
@@ -42,27 +42,51 @@ class Scheduler {
 		}
 
 		foreach ( Query::get_active_workflows_for_event( self::HOOK ) as $trigger ) {
-			$wf_id  = (int) ( $trigger['workflow_id'] ?? 0 );
-			$config = $trigger['graph_node']['data']['config'] ?? [];
-			if ( ! $wf_id ) {
+			$wf_id   = (int) ( $trigger['workflow_id'] ?? 0 );
+			$node_id = (string) ( $trigger['id'] ?? '' );
+			$config  = $trigger['graph_node']['data']['config'] ?? [];
+			if ( ! $wf_id || '' === $node_id ) {
 				continue;
 			}
 
-			if ( ! self::is_due( $wf_id, (array) $config ) ) {
+			if ( ! self::is_due( self::last_run( $wf_id, $node_id ), (array) $config ) ) {
 				continue;
 			}
 
+			// Start from this schedule, not the workflow's default trigger: a
+			// schedule can sit alongside other triggers in the same workflow.
 			zaplane_run_workflow( $wf_id, [
 				'timestamp' => current_time( 'mysql' ),
 				'unix'      => time(),
-			] );
+			], $node_id );
 
-			update_option( self::LAST_OPT . $wf_id, time(), false );
+			self::mark_run( $wf_id, $node_id, time() );
 		}
 	}
 
-	private static function is_due( int $wf_id, array $config ): bool {
-		$last      = (int) get_option( self::LAST_OPT . $wf_id, 0 );
+	/**
+	 * When a schedule trigger last fired, as a Unix time, or 0 if it never has.
+	 *
+	 * Each schedule trigger keeps its own clock, so two schedules in one workflow
+	 * don't hold each other back. There used to be one clock per workflow. It is
+	 * read as a fallback, so updating doesn't fire every scheduled workflow at once.
+	 */
+	public static function last_run( int $wf_id, string $node_id ): int {
+		$last = (int) get_option( self::LAST_OPT . $wf_id . '_' . $node_id, 0 );
+
+		return $last ? $last : (int) get_option( self::LAST_OPT . $wf_id, 0 );
+	}
+
+	/**
+	 * Record that a schedule trigger fired. Once a trigger has its own clock the
+	 * old per-workflow one is removed, so it can't hold back a schedule added later.
+	 */
+	public static function mark_run( int $wf_id, string $node_id, int $time ): void {
+		update_option( self::LAST_OPT . $wf_id . '_' . $node_id, $time, false );
+		delete_option( self::LAST_OPT . $wf_id );
+	}
+
+	private static function is_due( int $last, array $config ): bool {
 		$now       = time();
 		$frequency = $config['frequency'] ?? 'every_minutes';
 

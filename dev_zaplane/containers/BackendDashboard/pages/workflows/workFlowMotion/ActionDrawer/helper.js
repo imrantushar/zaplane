@@ -48,14 +48,15 @@ export const getSelectedActionFields = (mode, selectedItem, actionType, isTrigge
   return integration.actions?.[actionType]?.schema || [];
 };
 
-// Filter fields based on depends_on conditions.
+// Filter fields based on depends_on and show_if conditions.
 
 export const getVisibleFields = (fields, values) => {
   return fields.filter((f) => {
-    if (!f.depends_on) return true;
+    const condition = f.show_if || f.depends_on;
+    if (!condition) return true;
     // A dependency value may be a single value or a list of accepted values,
     // e.g. depends_on: { operation: ['truncate', 'substring', 'pad'] }.
-    return Object.entries(f.depends_on).every(([k, v]) =>
+    return Object.entries(condition).every(([k, v]) =>
       Array.isArray(v) ? v.includes(values[k]) : values[k] === v
     );
   });
@@ -75,6 +76,8 @@ export const buildContinuePayload = (selectedItem, values, visibleFields) => {
     ...(selectedItem.mode && { mode: selectedItem.mode }),
     ...(values.hook && { hook: values.hook }),
     ...(values.connection_id && { connection_id: values.connection_id }),
+    // Set only by a trigger's field matching; null clears a match.
+    ...(values.field_map !== undefined && { field_map: values.field_map }),
   };
 };
 

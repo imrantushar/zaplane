@@ -28,6 +28,14 @@ class Jotform extends IntegrationBase {
 		return 'jotform.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/jotform/',
+			'action'  => 'https://zaplane.app/docs/action-jotform/',
+		];
+	}
+
 	public static function requires_connection(): bool {
 		return true;
 	}

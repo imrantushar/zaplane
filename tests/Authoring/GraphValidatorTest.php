@@ -185,7 +185,7 @@ class GraphValidatorTest extends TestCase {
 	/**
 	 * @test
 	 */
-	public function it_requires_exactly_one_trigger(): void {
+	public function it_requires_at_least_one_trigger(): void {
 		$noTrigger                    = $this->validGraph();
 		$noTrigger['nodes'][0]['type'] = 'action';
 		$noTrigger['nodes'][0]['data']['event'] = 'update_order_status';
@@ -197,14 +197,41 @@ class GraphValidatorTest extends TestCase {
 		$report = GraphValidator::check( $noTrigger );
 		$this->assertFalse( $report['valid'] );
 		$this->assertReportMentions( $report, 'no trigger node' );
+	}
 
-		$twoTriggers                     = $this->validGraph();
-		$twoTriggers['nodes'][1]['type'] = 'trigger';
-		$twoTriggers['nodes'][1]['data']['event'] = 'product_purchased';
+	/**
+	 * @test
+	 */
+	public function it_accepts_a_workflow_that_starts_from_several_triggers(): void {
+		$graph            = $this->validGraph();
+		$graph['nodes'][] = [
+			'id'       => '3',
+			'type'     => 'trigger',
+			'position' => [
+				'x' => 80,
+				'y' => 360,
+			],
+			'data'     => [
+				'app'    => 'storeengine',
+				'event'  => 'product_purchased',
+				'config' => [],
+			],
+		];
+		$graph['edges'][] = [
+			'id'     => 'e3-2',
+			'source' => '3',
+			'target' => '2',
+		];
 
-		$report = GraphValidator::check( $twoTriggers );
-		$this->assertFalse( $report['valid'] );
-		$this->assertReportMentions( $report, 'only one is allowed' );
+		$report = GraphValidator::check( $graph );
+
+		$this->assertTrue( $report['valid'], implode( ' | ', $this->messages( $report ) ) );
+
+		// Advisory, not blocking: the two triggers are identical, and the step reads
+		// {{1.order_id}}, which trigger 3 does not match to trigger 1.
+		$codes = array_column( $report['warnings'], 'code' );
+		$this->assertContains( 'trigger_duplicate', $codes );
+		$this->assertContains( 'trigger_field_gap', $codes );
 	}
 
 	/**

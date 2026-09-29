@@ -59,9 +59,8 @@ phpunit and phpcs are gone from `vendor/` until you reinstall. The old `build.sh
 restored them from an EXIT trap; this does not, because a release build should
 leave the tree in the state it packaged. `npm run dist:dev` keeps them.
 
-**`vendor/` ships, and must.** `.distignore` deliberately does not exclude it: the
-StoreEngine licensing SDK resolves its own critical path through
-`vendor/autoload.php`, and a zip without it cannot self-update. The zip step is
+**`vendor/` ships, and must.** `.distignore` deliberately does not exclude it:
+`zaplane.php` requires `vendor/autoload.php` and Action Scheduler from it. The zip step is
 written in Node partly for this reason — `wp dist-archive` drops
 `vendor/autoload.php` when the tree contains symlinks. There is a guard: the build
 refuses to package a `vendor/` that still holds dev packages (`zip.strictVendor`).

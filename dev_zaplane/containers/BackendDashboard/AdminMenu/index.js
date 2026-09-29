@@ -47,13 +47,6 @@ const AdminMenu = () => {
 						{ __( 'zaplane', 'zaplane' ) }
 					</li>
 					{ Object.entries( adminmenu ).map( ( [ key, item ], index ) => {
-						if (
-							[ 'zaplane-get-pro', 'zaplane-license' ].includes(
-								key
-							)
-						) {
-							return null;
-						}
 						const menuItemClassName =
 							index === 0 ? 'wp-first-item ' : '';
 						return (
@@ -79,30 +72,6 @@ const AdminMenu = () => {
 							</MenuItem>
 						);
 					} ) }
-					{/* <>
-						{ is_pro ? (
-							<li
-								className={
-									page === 'Zaplane-license' ? 'current' : ''
-								}
-							>
-								<a href="admin.php?page=Zaplane-license">
-									{ __( 'License', 'Zaplane' ) }
-								</a>
-							</li>
-						) : (
-							<li
-								className={
-									page === 'Zaplane-get-pro' ? 'current' : ''
-								}
-							>
-								<a href="admin.php?page=Zaplane-get-pro">
-									<span className="dashicons dashicons-awards Zaplane-blue-color"></span>{ ' ' }
-									{ __( 'Get Pro', 'Zaplane' ) }
-								</a>
-							</li>
-						) }
-					</> */}
 				</ul>
 		</React.Fragment>
 	);

@@ -24,6 +24,14 @@ class Ninjaform extends IntegrationBase {
 		return 'ninjaform.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/ninja-forms/',
+			'action'  => 'https://zaplane.app/docs/ninja-forms/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'process_ninja_form' => [

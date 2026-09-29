@@ -22,7 +22,7 @@ Before connecting WhatsApp you need:
 |---|---|
 | **Access Token** | Meta for Developers → Your App → WhatsApp → API Setup → "Temporary access token" (testing) or create a System User token for production |
 | **Phone Number ID** | Meta for Developers → Your App → WhatsApp → API Setup → Phone numbers list |
-| **API Version** | Default is `v19.0`. Change only if Meta requires a newer version. |
+| **API Version** | Optional. Defaults to `v26.0` — see [Meta Graph API Version](meta-graph-version.md). Set one only if Meta asks you to pin a version. |
 
 ---
 
@@ -33,7 +33,7 @@ Before connecting WhatsApp you need:
 3. Fill in the connection fields:
    - **Access Token** — your permanent or temporary Bearer token
    - **Phone Number ID** — the numeric ID of your sender phone number
-   - **API Version** *(optional)* — defaults to `v19.0`
+   - **API Version** *(optional)* — leave blank to use `v26.0`
 4. Click **Test Connection** to verify.
 5. Save the connection.
 
@@ -197,6 +197,7 @@ The Meta WhatsApp Business Cloud API enforces rate limits at the phone number le
 
 ## Resources
 
+- [Meta Graph API Version](meta-graph-version.md) — which version Zaplane calls, and how to pin another
 - [Meta WhatsApp Business Cloud API Documentation](https://developers.facebook.com/docs/whatsapp/cloud-api)
 - [Message Templates Guide](https://developers.facebook.com/docs/whatsapp/message-templates)
 - [Meta for Developers Console](https://developers.facebook.com)

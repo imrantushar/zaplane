@@ -24,7 +24,6 @@ const Button = ( {
 	style = {},
 	suffix = '',
 	target = '',
-	isPro = true,
 	id,
 	prefix = '',
 } ) => {
@@ -90,11 +89,6 @@ const Button = ( {
 					</>
 				) }
 				{ iconPosition === 'right' && icon }
-				{ ! isPro && (
-					<span className="zaplane-pro-badge">
-						{ __( 'PRO', 'zaplane' ) }
-					</span>
-				) }
 			</a>
 		);
 	}
@@ -127,11 +121,6 @@ const Button = ( {
 				</>
 			) }
 			{ iconPosition === 'right' && ! isLoading && icon }
-			{ ! isPro && (
-				<span className="zaplane-pro-badge">
-					{ __( 'PRO', 'zaplane' ) }
-				</span>
-			) }
 		</button>
 	);
 };

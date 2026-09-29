@@ -1,4 +1,4 @@
-import { useQuery, settings } from '@ZAPUtils/helper';
+import { useQuery } from '@ZAPUtils/helper';
 import React, { useEffect } from 'react';
 
 import CreateWorkflows from './pages/workflows';
@@ -19,18 +19,6 @@ import CustomApps from './pages/custom-apps';
 
 
 
-const featureEnabled = key => settings?.features?.[key] !== false;
-
-const FeatureDisabled = ({ name }) => (
-	<div className="flex flex-col items-center justify-center py-24 text-center">
-		<h3 className="text-[18px] font-semibold text-[var(--zaplane-font-color)]">
-			{name} {__('is turned off', 'zaplane')}
-		</h3>
-		<p className="mt-2 text-[14px] text-[var(--zaplane-font-secondary-color)]">
-			{__('Enable it from Zaplane Settings to use this feature.', 'zaplane')}
-		</p>
-	</div>
-);
 
 const renderSwitch = (page, id, action, path) => {
 
@@ -47,12 +35,10 @@ const renderSwitch = (page, id, action, path) => {
 		case 'zaplane-connections':
 			return <Connections />;
 		case 'zaplane-custom-apps':
-			if (!featureEnabled('custom_apps')) return <FeatureDisabled name={__('Custom Apps', 'zaplane')} />;
 			return <CustomApps id={id} action={action} />;
 		case 'zaplane-recipes':
 			return <RecipesPage />;
 		case 'zaplane-knowledge':
-			if (!featureEnabled('knowledge')) return <FeatureDisabled name={__('Business Knowledge', 'zaplane')} />;
 			return <KnowledgePage />;
 		case 'zaplane-email-templates':
 			if (action || id) {

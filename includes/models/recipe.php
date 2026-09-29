@@ -10,9 +10,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Recipe extends Model {
 
+	/** A recipe that creates one workflow. Its blueprint is a single workflow's. */
+	const TYPE_WORKFLOW = 'workflow';
+
+	/** A recipe that sets up several workflows in a folder. See RecipeGroupBuilder. */
+	const TYPE_GROUP = 'group';
+
 	protected static string $table = 'recipes';
 
 	protected static array $fillable = [
+		'type',
+		'slug',
 		'title',
 		'description',
 		'thumbnail_id',
@@ -40,6 +48,10 @@ class Recipe extends Model {
 		return is_array( $decoded ) ? $decoded : [];
 	}
 
+	public function isGroup(): bool {
+		return self::TYPE_GROUP === $this->type;
+	}
+
 	// -------------------------------------------------------------------------
 	// Thumbnail helpers
 	// -------------------------------------------------------------------------
@@ -57,8 +69,10 @@ class Recipe extends Model {
 	// -------------------------------------------------------------------------
 
 	public function toResponse(): array {
-		return [
+		$response = [
 			'id'                => $this->id,
+			'type'              => $this->isGroup() ? self::TYPE_GROUP : self::TYPE_WORKFLOW,
+			'slug'              => $this->slug,
 			'title'             => $this->title,
 			'description'       => $this->description,
 			'thumbnail_id'      => $this->thumbnail_id,
@@ -68,5 +82,20 @@ class Recipe extends Model {
 			'created_at'        => $this->created_at,
 			'updated_at'        => $this->updated_at,
 		];
+
+		if ( $this->isGroup() ) {
+			$response['workflows'] = [];
+
+			foreach ( (array) ( $this->getBlueprint()['workflows'] ?? [] ) as $workflow ) {
+				if ( is_array( $workflow ) && ! empty( $workflow['key'] ) ) {
+					$response['workflows'][] = [
+						'key'   => (string) $workflow['key'],
+						'title' => (string) ( $workflow['title'] ?? $workflow['key'] ),
+					];
+				}
+			}
+		}
+
+		return $response;
 	}
 }

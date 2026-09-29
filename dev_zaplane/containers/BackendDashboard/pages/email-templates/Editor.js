@@ -84,7 +84,7 @@ const EmailTemplateEditor = ({ id }) => {
       ]}
       heading={isNew ? __("New Template", "zaplane") : title || __("Edit Template", "zaplane")}
       actions={
-        <div className="flex items-center gap-3">
+        <div className="zaplane-responsive-actions flex items-center gap-3 min-w-0">
           <button style={outlineBtn} onClick={() => navigate(listUrl)}>
             {__("Back", "zaplane")}
           </button>
@@ -110,7 +110,7 @@ const EmailTemplateEditor = ({ id }) => {
           />
         </div>
 
-        <div className="rounded-xl border border-[var(--zaplane-border-color)] overflow-hidden bg-[var(--zaplane-background)]">
+        <div className="zaplane-email-builder-shell rounded-xl border border-[var(--zaplane-border-color)] overflow-x-auto overflow-y-hidden bg-[var(--zaplane-background)]">
           <EmbEmailBuilder
             key={builderKey}
             source={content}

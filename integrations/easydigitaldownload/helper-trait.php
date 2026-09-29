@@ -2,6 +2,10 @@
 
 namespace Zaplane\Integrations\Easydigitaldownload;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait HelperTrait {
 
 	protected static function normalize_prefixed_status( string $status, string $prefix ): string {

@@ -1,31 +1,70 @@
 
-.zaplane-canvas-controls {
-    gap: 5px;
-    margin-top: 40px;
+.zaplane_flowcanvas {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: calc(100dvh - 32px);
+    overflow: hidden;
+    box-sizing: border-box !important;
 }
 
-.react-flow__controls-button {
+.zaplane_flowcanvas .react-flow {
+    max-width: 100%;
+    box-sizing: border-box !important;
+}
+
+.zaplane_flowcanvas > div {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.zaplane-canvas-controls {
+    top: 64px !important;
+    left: 16px !important;
+    margin: 0 !important;
+    gap: 2px;
+    padding: 4px;
+    border: 1px solid var(--zaplane-border-color);
+    border-radius: 8px;
     background: var(--zaplane-background);
-    border-radius: 5px;
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(16, 24, 40, 0.08);
+    overflow: hidden;
+}
+
+.zaplane_flowcanvas .react-flow__controls-button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent;
+    color: var(--zaplane-font-color);
+    transition: background 0.15s ease, color 0.15s ease;
 
     &.zaplane-layout-active {
-        background: var(--zaplane-primary);
-        color: var(--zaplane-background);
+        background: var(--zaplane-second-primary);
+        color: var(--zaplane-primary);
     }
 
     &:not(.zaplane-layout-active):hover {
-        background: var(--zaplane-background);
+        background: var(--zaplane-secondary-color);
     }
 }
 
 .zaplane-canvas-layout-icon {
-    width: 60px;
-    margin: 0px 0 10px 15px;
-    gap: 5px;
+    width: auto;
+    margin: 0;
+    gap: 2px;
+    padding: 4px;
     cursor: pointer;
     position: absolute;
-    z-index: 999;
+    top: 16px;
+    left: 16px;
+    z-index: 9;
+    border: 1px solid var(--zaplane-border-color);
+    border-radius: 8px;
+    background: var(--zaplane-background);
+    box-shadow: 0 4px 14px rgba(16, 24, 40, 0.08);
 }
 .zaplane-table--history-table,.zaplane-table--version-table{
     padding: 0 !important;
@@ -106,4 +145,221 @@
 .zaplane-node-remove:focus-visible {
   outline: 2px solid var(--zaplane-primary);
   outline-offset: 2px;
+}
+
+/* Connecting two steps. Each 8px handle dot gets a bigger invisible grab area and
+   grows while it's in play, and a line snaps to it from nearby (connectionRadius).
+   While a line is dragged, every card that can take it is outlined, the one under
+   the pointer fills in, and the rest fade: dropping anywhere on a card connects
+   it, so nobody has to aim for the dot. `scale` rather than `transform`, which
+   React Flow already uses to centre the handle. */
+.zaplane-handle {
+  transition: scale 0.12s ease, box-shadow 0.12s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -9px;
+    border-radius: 50%;
+  }
+}
+
+.zaplane-custom-node-wrapper:hover .zaplane-handle,
+.react-flow__handle.connectingfrom,
+.react-flow__handle.connectingto {
+  scale: 1.5;
+}
+
+.react-flow__handle.connectingto.valid {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--zaplane-primary) 30%, transparent);
+}
+
+.zaplane-node-body.is-drop-target {
+  border-color: color-mix(in srgb, var(--zaplane-primary) 45%, transparent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--zaplane-primary) 12%, transparent);
+}
+
+.zaplane-custom-node-wrapper:hover .zaplane-node-body.is-drop-target {
+  border-color: var(--zaplane-primary) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--zaplane-primary) 26%, transparent);
+}
+
+.is-connecting .zaplane-node-body:not(.is-drop-target):not(.is-drag-source) {
+  opacity: 0.55;
+}
+
+.zaplane-drop-hint {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--zaplane-primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
+}
+
+@media (max-width: 782px) {
+  .zaplane_flowcanvas {
+    height: calc(100dvh - 46px);
+  }
+
+  .zaplane-flow-toolbar {
+    width: 100%;
+    max-width: 100%;
+    gap: 8px !important;
+  }
+
+  .zaplane-flow-toolbar > * {
+    flex: 0 0 auto;
+  }
+
+  .zaplane-flow-breadcrumb {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .zaplane-flow-title {
+    max-width: min(42vw, 180px) !important;
+  }
+}
+@media (max-width: 600px) {
+  .zaplane_flowcanvas {
+    height: calc(100dvh - 46px);
+  }
+
+  .zaplane-flow-secondary-action,
+  .zaplane-flow-listening > span:first-child {
+    display: none !important;
+  }
+
+  .zaplane-flow-test {
+    width: 36px;
+    min-width: 36px;
+    padding-inline: 0 !important;
+    justify-content: center;
+  }
+
+  .zaplane-flow-test > span {
+    display: none;
+  }
+
+  .zaplane-flow-status-select {
+    width: 112px;
+    min-width: 96px;
+  }
+
+  .zaplane-flow-update {
+    padding-inline: 14px !important;
+  }
+
+  .zaplane-canvas-controls {
+    margin-top: 44px;
+  }
+}
+
+@media (max-width: 360px) {
+  // WordPress' 320px admin breakpoint leaves React Flow's own bottom-right
+  // attribution a few pixels outside the clipped app surface. Pull only that
+  // fixed UI affordance inward; the canvas itself remains fully pannable.
+  .zaplane_flowcanvas .react-flow__attribution {
+    right: 8px;
+  }
+}
+
+
+/* Responsive workflow toolbar: keep breadcrumb, Status, Update and overflow
+   on one row; move secondary actions into the overflow menu. */
+.zaplane-flow-status-select {
+  width: 116px;
+  min-width: 116px;
+  flex: 0 0 116px;
+}
+
+.zaplane-flow-toolbar {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .zaplane-flow-test,
+  .zaplane-flow-secondary-action,
+  .zaplane-flow-listening {
+    display: none !important;
+  }
+
+  .zaplane-flow-toolbar {
+    width: auto !important;
+    max-width: none !important;
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 782px) {
+  .zaplane-flow-toolbar {
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  .zaplane-flow-breadcrumb {
+    width: auto !important;
+    flex: 1 1 auto;
+    overflow: hidden;
+    gap: 8px !important;
+  }
+
+  .zaplane-flow-breadcrumb > div:first-child {
+    width: 34px !important;
+    height: 34px !important;
+    flex: 0 0 34px;
+  }
+
+  .zaplane-flow-title {
+    max-width: min(24vw, 150px) !important;
+    padding-inline: 4px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .zaplane-flow-test,
+  .zaplane-flow-secondary-action,
+  .zaplane-flow-listening {
+    display: none !important;
+  }
+
+  .zaplane-flow-status-select {
+    width: 104px;
+    min-width: 104px;
+    flex: 0 0 104px;
+  }
+
+  .zaplane-flow-update {
+    padding-inline: 12px !important;
+    font-size: 13px;
+  }
+}
+
+
+/* The workflow editor already starts below WordPress' admin bar. Applying the
+   admin-bar height again as the sticky offset creates a visible empty strip. */
+.zaplane_flowcanvas .zaplane-topbar {
+  top: 0 !important;
+}
+
+
+@media (max-width: 600px) {
+  .zaplane-canvas-controls {
+    top: 60px !important;
+    left: 12px !important;
+  }
+
+  .zaplane-canvas-layout-icon {
+    top: 12px;
+    left: 12px;
+  }
 }

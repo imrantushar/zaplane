@@ -50,7 +50,7 @@ const WhatsNew = () => {
           <path d="M8 6v8" />
         </g>
       </svg>
-      {__("What's New")}
+      {__("What's New", "zaplane")}
     </button>
   } title={__("What's New", "zaplane")} size="sm">
     <div>

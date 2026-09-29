@@ -1,11 +1,13 @@
 import { sprintf, __ } from "@wordpress/i18n";
+import { BookOpen } from "lucide-react";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
 
 const DrawerSearchList = ({
   searchList,
   setMode,
   setSelectedItem,
-  setSearch
+  setSearch,
+  isTrigger
 }) => {
   if (!searchList?.length)
     return (
@@ -16,7 +18,9 @@ const DrawerSearchList = ({
 
   return (
     <div className="flex flex-col gap-1">
-      {searchList.map((item) => (
+      {searchList.map((item) => {
+        const docsUrl = isTrigger ? item?.docs_url?.trigger : item?.docs_url?.action;
+        return (
         <button
           key={`${item.type}-${item.id}`}
           onClick={() => {
@@ -33,7 +37,19 @@ const DrawerSearchList = ({
             </span>
           </div>
 
-          <div className="flex items-center pr-2">
+          <div className="flex items-center gap-3 pr-2">
+            {docsUrl && (
+              <a
+                href={docsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={__("View docs", "zaplane")}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center text-[var(--zaplane-font-secondary-color)] hover:text-[var(--zaplane-primary-color)]"
+              >
+                <BookOpen size={14} />
+              </a>
+            )}
             <span className="zaplane-label text-[var(--zaplane-font-secondary-color)]">
               {item.type === "tools"
                 ? __("Tool", "zaplane")
@@ -41,7 +57,8 @@ const DrawerSearchList = ({
             </span>
           </div>
         </button>
-      ))}
+        );
+      })}
     </div>
   );
 };

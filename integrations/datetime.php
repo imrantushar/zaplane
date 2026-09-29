@@ -309,6 +309,7 @@ class DateTime_Tool extends IntegrationBase {
 		$human = ( $ts <= $now )
 			/* translators: %s is a human-readable time span, e.g. "2 hours". */
 			? sprintf( __( '%s ago', 'zaplane' ), $diff )
+			/* translators: %s is a human-readable time span, e.g. "2 hours". */
 			: sprintf( __( 'in %s', 'zaplane' ), $diff );
 
 		return [

@@ -34,6 +34,14 @@ class Surecart extends IntegrationBase {
 		return 'surecart.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/surecart/',
+			'action'  => 'https://zaplane.app/docs/action-surecart/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'purchase_created' => [

@@ -33,6 +33,14 @@ class Manual extends IntegrationBase {
 		return 'manual.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/manual/',
+			'action'  => 'https://zaplane.app/docs/manual/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'run_manually' => [ 'label' => 'Run Manually' ],

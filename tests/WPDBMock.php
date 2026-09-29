@@ -40,10 +40,18 @@ class WPDBMock {
 			'args'  => $args,
 		];
 
+		// Like core, a single array argument holds every value.
+		if ( 1 === count( $args ) && is_array( $args[0] ) ) {
+			$args = $args[0];
+		}
+
 		$i      = 0;
-		$result = preg_replace_callback( '/%[sd]/', function ( $m ) use ( $args, &$i ) {
+		$result = preg_replace_callback( '/%[sdi]/', function ( $m ) use ( $args, &$i ) {
 			$val = $args[ $i ] ?? '';
 			$i++;
+			if ( '%i' === $m[0] ) {
+				return '`' . str_replace( '`', '``', (string) $val ) . '`';
+			}
 			return is_string( $val ) ? "'" . addslashes( $val ) . "'" : $val;
 		}, $query );
 

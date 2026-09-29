@@ -4,120 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "abd2396fa416039f0970f277d6e8234e",
+    "content-hash": "1a746f26ed4cb7fc78d762c8ac2f2561",
     "packages": [
         {
-            "name": "storeengine/wordpress-sdk",
-            "version": "v1.5.6",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:imrantushar/storeengine-sdk-for-wordpress.git",
-                "reference": "c2fd07992ea0fb79d9b64d4398c55e234a0922af"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/imrantushar/storeengine-sdk-for-wordpress/zipball/c2fd07992ea0fb79d9b64d4398c55e234a0922af",
-                "reference": "c2fd07992ea0fb79d9b64d4398c55e234a0922af",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.1"
-            },
-            "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-                "phpcompatibility/php-compatibility": "^9.3",
-                "phpcompatibility/phpcompatibility-wp": "^2.1",
-                "phpstan/extension-installer": "^1.4",
-                "squizlabs/php_codesniffer": "^3.9",
-                "szepeviktor/phpstan-wordpress": "^2.0",
-                "wp-coding-standards/wpcs": "^3.0"
-            },
-            "type": "library",
-            "extra": {
-                "scripts-description": {
-                    "phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
-                    "phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier",
-                    "phpstan": "Analyze code with static analyser"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "init.php"
-                ]
-            },
-            "scripts": {
-                "phpcs": [
-                    "Composer\\Config::disableProcessTimeout",
-                    "phpcs -p -s --colors"
-                ],
-                "phpcs-pre-commit": [
-                    "Composer\\Config::disableProcessTimeout",
-                    "phpcs -s -p -n"
-                ],
-                "phpcbf": [
-                    "Composer\\Config::disableProcessTimeout",
-                    "phpcbf -p"
-                ],
-                "phpcs:ci": [
-                    "Composer\\Config::disableProcessTimeout",
-                    "phpcs --standard=phpcompat.xml -p -s --colors"
-                ],
-                "phpstan": [
-                    "./vendor/bin/phpstan analyse phpstan.neon --memory-limit 2G"
-                ]
-            },
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Kodezen Limited",
-                    "email": "support@kodezen.com",
-                    "role": "Maintainer"
-                },
-                {
-                    "name": "Kudratullah",
-                    "email": "hi@kudratullah.dev",
-                    "role": "Lead Developer"
-                }
-            ],
-            "description": "Official StoreEngine SDK for WordPress licensing and telemetry insights.",
-            "homepage": "https://storeengine.pro",
-            "keywords": [
-                "insights",
-                "license",
-                "plugin",
-                "sdk",
-                "storeengine",
-                "theme",
-                "wordpress",
-                "wordpress-plugin",
-                "wordpress-theme"
-            ],
-            "support": {
-                "source": "https://github.com/imrantushar/storeengine-sdk-for-wordpress",
-                "issues": "https://github.com/imrantushar/storeengine-sdk-for-wordpress/issues"
-            },
-            "funding": [
-                {
-                    "type": "custom",
-                    "url": "https://storeengine.pro"
-                }
-            ],
-            "time": "2026-08-26T06:42:31+00:00"
-        },
-        {
             "name": "woocommerce/action-scheduler",
-            "version": "3.9.3",
+            "version": "4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/woocommerce/action-scheduler.git",
-                "reference": "c58cdbab17651303d406cd3b22cf9d75c71c986c"
+                "reference": "40a3df93a251590c58717b91b1049a13410e2ac4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/woocommerce/action-scheduler/zipball/c58cdbab17651303d406cd3b22cf9d75c71c986c",
-                "reference": "c58cdbab17651303d406cd3b22cf9d75c71c986c",
+                "url": "https://api.github.com/repos/woocommerce/action-scheduler/zipball/40a3df93a251590c58717b91b1049a13410e2ac4",
+                "reference": "40a3df93a251590c58717b91b1049a13410e2ac4",
                 "shasum": ""
             },
             "require": {
@@ -125,16 +25,20 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^8.5",
-                "woocommerce/woocommerce-sniffs": "0.1.0",
+                "sirbrillig/phpcs-changed": "^2.11",
+                "woocommerce/woocommerce-sniffs": "^1.0.1",
                 "wp-cli/wp-cli": "~2.5.0",
                 "yoast/phpunit-polyfills": "^2.0"
             },
             "type": "wordpress-plugin",
             "extra": {
                 "scripts-description": {
+                    "lint": "Run phpcs against PHP files with unstaged changes",
                     "test": "Run unit tests",
                     "phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
-                    "phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier"
+                    "phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier",
+                    "lint-branch": "Run phpcs against PHP files changed on the current branch compared to its base branch",
+                    "lint-staged": "Run phpcs against PHP files with staged changes"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -145,9 +49,9 @@
             "homepage": "https://actionscheduler.org/",
             "support": {
                 "issues": "https://github.com/woocommerce/action-scheduler/issues",
-                "source": "https://github.com/woocommerce/action-scheduler/tree/3.9.3"
+                "source": "https://github.com/woocommerce/action-scheduler/tree/4.1.0"
             },
-            "time": "2025-07-15T09:32:30+00:00"
+            "time": "2026-08-05T21:19:48+00:00"
         }
     ],
     "packages-dev": [

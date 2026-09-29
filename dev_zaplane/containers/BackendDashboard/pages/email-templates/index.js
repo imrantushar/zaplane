@@ -34,7 +34,7 @@ const EmailTemplatesPage = () => {
       title="Email Templates"
       isLoading={loading}
       actions={
-        <div className="flex items-center gap-3">
+        <div className="zaplane-responsive-actions flex items-center gap-3 min-w-0">
           <Search placeholder={__("Search templates...", "zaplane")} onSearchHandler={setSearchTerm} />
           <button style={primaryBtn} onClick={createNew}>
             {__("New Template", "zaplane")}

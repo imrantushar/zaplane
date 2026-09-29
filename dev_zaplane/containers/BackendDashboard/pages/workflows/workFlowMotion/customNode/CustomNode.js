@@ -4,9 +4,9 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaPlus } from "react-icons/fa";
 import FloatingEdge from "../floatingEdge/FloatingEdge";
 import { __, sprintf } from "@wordpress/i18n";
-import { formatLabel, integrations } from "@ZAPUtils/helper";
+import { formatLabel } from "@ZAPUtils/helper";
 import ZAPIcon from "@ZAPComponents/ZAPIcon";
-import { CATEGORY_LABELS, hueMix, nodeCategory, nodeHue } from "./helper";
+import { CATEGORY_LABELS, getNodePorts, hueMix, nodeCategory, nodeHue } from "./helper";
 
 const addPortBtnStyle = {
   display: "inline-flex",
@@ -24,29 +24,12 @@ const addPortBtnStyle = {
   flexShrink: 0,
 };
 
-// Ports (output branches) declared by the node's action in the manifest, e.g.
-// router → path_1..fallback, condition → true/false, iterator → loop/done.
-const getNodePorts = (data) => {
-  const integ = integrations?.apps?.[data?.app] || integrations?.tools?.[data?.app];
-  const outputs = integ?.actions?.[data?.event]?.outputs || [];
-  // "main" is the implicit single output — not a branch.
-  const branches = outputs.filter((p) => p && p !== "main");
-
-  // Router: one path per configured route (+ fallback), derived from the
-  // dynamic `routes` repeater. A fresh router still shows one path to build on.
-  if (data?.app === "router") {
-    const routes = Array.isArray(data?.config?.routes) ? data.config.routes : [];
-    const active = Array.from({ length: Math.max(1, routes.length) }, (_, i) => `path_${i + 1}`);
-    return [...active, "fallback"];
-  }
-
-  return branches;
-};
 export default function CustomNode({
   id,
   data,
   canvasLayout,
-  nodes
+  nodes,
+  connecting
 }) {
   const [hovered, setHovered] = useState(false);
   const {
@@ -74,7 +57,17 @@ export default function CustomNode({
   const node = nodes.find(n => n.id === id);
   const hasPort = node?.port === undefined;
   const isTrigger = data?.action === "trigger";
-  const canRemove = isTrigger ? !isSelectApp : hasPort;
+  // A workflow can start from several triggers. Each shows its number, and one
+  // can be deleted while another remains; the last one can only be reset.
+  const triggerIds = nodes.filter(n => n.data?.action === "trigger").map(n => n.id);
+  const triggerNumber = isTrigger && triggerIds.length > 1 ? triggerIds.indexOf(id) + 1 : 0;
+  const canDeleteTrigger = isTrigger && triggerIds.length > 1;
+  const isLastTrigger = isTrigger && triggerIds[triggerIds.length - 1] === id;
+  const canRemove = isTrigger ? canDeleteTrigger || !isSelectApp : hasPort;
+  // While a line is being dragged, the cards that can take it are outlined, and
+  // dropping anywhere on one connects it (see onConnectEnd in FlowCanvas).
+  const isDragSource = connecting?.nodeId === id;
+  const acceptsDrop = !!connecting && !isDragSource && !!connecting.accepts?.(id);
 
   const category = nodeCategory(data);
   const hue = nodeHue(data);
@@ -108,11 +101,11 @@ export default function CustomNode({
       {canRemove && (
         <button
           type="button"
-          aria-label={isTrigger ? __("Reset trigger", "zaplane") : __("Delete step", "zaplane")}
-          title={isTrigger ? __("Reset trigger", "zaplane") : __("Delete step", "zaplane")}
+          aria-label={canDeleteTrigger ? __("Delete trigger", "zaplane") : isTrigger ? __("Reset trigger", "zaplane") : __("Delete step", "zaplane")}
+          title={canDeleteTrigger ? __("Delete trigger", "zaplane") : isTrigger ? __("Reset trigger", "zaplane") : __("Delete step", "zaplane")}
           onClick={e => {
             e.stopPropagation();
-            if (isTrigger) {
+            if (isTrigger && !canDeleteTrigger) {
               data?.resetTrigger(id);
             } else {
               data?.deleteNode(id);
@@ -134,6 +127,11 @@ export default function CustomNode({
         </button>
       )}
 
+      {/* DROP HINT — over a card that a dragged line can join. */}
+      {acceptsDrop && hovered && (
+        <span className="zaplane-drop-hint">{__("Drop to connect", "zaplane")}</span>
+      )}
+
       {/* NODE BODY */}
       <div
         style={{
@@ -150,11 +148,11 @@ export default function CustomNode({
           transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
         }}
         onClick={data.onOpenDrawer}
-        className="zaplane-node-body"
+        className={`zaplane-node-body${acceptsDrop ? " is-drop-target" : ""}${isDragSource ? " is-drag-source" : ""}`}
       >
         {/* TARGET HANDLE */}
         {data?.action !== "trigger" && (
-          <Handle 
+          <Handle className="zaplane-handle" 
             type="target" 
             position={isLR ? Position.Left : Position.Top} 
             style={handleStyle} 
@@ -180,7 +178,9 @@ export default function CustomNode({
             }}
           >
             <span style={{ width: 5, height: 5, borderRadius: '50%', background: hue, display: 'block' }} />
-            {__(CATEGORY_LABELS[category], "zaplane")}
+            {triggerNumber
+              ? sprintf(__("Trigger %d", "zaplane"), triggerNumber)
+              : __(CATEGORY_LABELS[category], "zaplane")}
         </div>
 
         {/* NODE CONTENT */}
@@ -233,7 +233,7 @@ export default function CustomNode({
 
         {/* SOURCE HANDLES — one connectable, labelled handle per output branch */}
         {isSubNode ? (
-          <Handle type="source" id="sub_out" position={Position.Top} style={{ ...handleStyle, background: "var(--zaplane-cat-ai)" }} />
+          <Handle className="zaplane-handle" type="source" id="sub_out" position={Position.Top} style={{ ...handleStyle, background: "var(--zaplane-cat-ai)" }} />
         ) : isMultiPort ? (
           ports.map((port, i) => {
             // Fixed spacing centred on the node so ports never overlap, however
@@ -246,7 +246,7 @@ export default function CustomNode({
             const portHasEdge = edges.some((e) => e.source === id && e.sourceHandle === port);
             return (
               <div key={port}>
-                <Handle
+                <Handle className="zaplane-handle"
                   type="source"
                   id={port}
                   position={isLR ? Position.Right : Position.Bottom}
@@ -288,7 +288,7 @@ export default function CustomNode({
             );
           })
         ) : (
-          <Handle
+          <Handle className="zaplane-handle"
             type="source"
             position={isLR ? Position.Right : Position.Bottom}
             style={handleStyle}
@@ -306,7 +306,7 @@ export default function CustomNode({
             const connected = edges.some((e) => e.target === id && e.targetHandle === sp.id);
             return (
               <div key={sp.id}>
-                <Handle
+                <Handle className="zaplane-handle"
                   type="target"
                   id={sp.id}
                   position={Position.Bottom}
@@ -373,6 +373,42 @@ export default function CustomNode({
             );
           })}
       </div>
+
+      {/* ADD TRIGGER — on the last trigger, once it has an app picked. Another
+          trigger can start the same flow; whichever fires starts a run. */}
+      {isLastTrigger && !isSelectApp && (
+        <button
+          type="button"
+          className="zaplane-add-trigger nodrag nopan"
+          title={__("Add another trigger that starts this workflow", "zaplane")}
+          onClick={e => {
+            e.stopPropagation();
+            data?.addTrigger?.();
+          }}
+          style={{
+            position: "absolute",
+            ...(isLR
+              ? { top: "100%", left: "50%", transform: "translateX(-50%)", marginTop: 12 }
+              : { left: "100%", top: "50%", transform: "translateY(-50%)", marginLeft: 12 }),
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 5,
+            padding: "3px 10px",
+            borderRadius: 999,
+            border: "1px dashed var(--zaplane-cat-trigger)",
+            background: "var(--zaplane-background)",
+            color: "var(--zaplane-font-secondary-color)",
+            fontSize: 11,
+            fontWeight: 500,
+            whiteSpace: "nowrap",
+            cursor: "pointer",
+            zIndex: 5,
+          }}
+        >
+          <FaPlus size={8} />
+          {__("Add trigger", "zaplane")}
+        </button>
+      )}
 
       {/* ADD NODE BUTTON — single-output nodes get the inline "+"; multi-port
           nodes are wired by dragging from each branch handle. */}

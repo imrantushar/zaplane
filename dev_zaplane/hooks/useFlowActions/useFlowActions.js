@@ -1,7 +1,7 @@
 import { useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { getLayoutedElements } from "./utils/dagreLayout";
 import { useCallback } from "react";
-import { createActionNode, getBranchNodes } from "./utils/helper";
+import { createActionNode, getBranchNodes, nextNodeIds } from "./utils/helper";
 
 export const useFlowActions = ({
     nodes,
@@ -47,6 +47,37 @@ export const useFlowActions = ({
                     : n
             )
         );
+    };
+
+    // Add another trigger. It joins the steps the trigger it was added from leads
+    // to, so either one starts the same flow, and the trigger picker opens for it.
+    const addTrigger = (fromNodeId) => {
+        const triggers = nodes.filter((n) => n.data?.action === "trigger");
+        const from = nodes.find((n) => n.id === fromNodeId) || triggers[triggers.length - 1];
+        if (!from) return;
+
+        const [id] = nextNodeIds(nodes, 1);
+        const position = canvasLayout === "LR"
+            ? { x: from.position.x, y: Math.max(...triggers.map((n) => n.position.y)) + 140 }
+            : { x: Math.max(...triggers.map((n) => n.position.x)) + 300, y: from.position.y };
+
+        const node = {
+            id,
+            type: "custom",
+            position,
+            data: { icon: "plus", app: "Select an app", action: "trigger", config: {} },
+        };
+
+        const joined = edges
+            .filter((e) => e.source === from.id && !e.sourceHandle)
+            .map((e) => ({ id: `e${id}-${e.target}`, source: id, target: e.target, type: "custom" }));
+
+        setNodes((nds) => [...nds, node]);
+        if (joined.length) {
+            setEdges((eds) => [...eds, ...joined]);
+        }
+
+        openDrawerForNode(node);
     };
 
     const deleteNode = (nodeId) => {
@@ -130,6 +161,7 @@ export const useFlowActions = ({
         updateNodeData,
         deleteNode,
         resetTrigger,
+        addTrigger,
         handleAddAction,
         onAddNode,
         openDrawerForNode,

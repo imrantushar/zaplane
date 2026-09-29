@@ -104,4 +104,70 @@ class StoreEngineTest extends IntegrationTestCase
         $this->assertEquals( 999, $result['deleted_note_id'] );
         $this->assertEquals( 'Old note content', $result['deleted_note'] );
     }
+
+    public function test_order_status_update_names_both_statuses(): void
+    {
+        $node = $this->makeTriggerNode('order_status_update');
+        new \Storeengine_Order(302, ['customer_email' => 'john@example.com', 'customer_name' => 'John Doe']);
+
+        $result = Storeengine::resolve_trigger( $node, [ 302, 'on_hold', 'processing', null ] );
+
+        $this->assertSame( 'on_hold', $result['old_status'] );
+        $this->assertNotSame( '', $result['old_status_label'] );
+        $this->assertNotSame( '', $result['new_status_label'] );
+        $this->assertFalse( $result['during_checkout'] );
+        $this->assertSame( 'John', $result['first_name'] );
+    }
+
+    public function test_order_item_shipped_carries_the_shipment(): void
+    {
+        $node = $this->makeTriggerNode('order_item_shipped');
+        new \Storeengine_Order(301, [
+            'customer_email' => 'john@example.com',
+            'customer_name' => 'John Doe',
+            'total' => 20,
+            'currency' => 'USD',
+            'items' => [
+                ['product_id' => 7, 'name' => 'Mug', 'quantity' => 2, 'total' => 20],
+            ],
+        ]);
+
+        $shipment = ['courier' => 'Express Courier', 'tracking_number' => 'EC1', 'tracking_url' => 'https://example.com/track/EC1'];
+        $result   = Storeengine::resolve_trigger( $node, [ 301, 44, 0, $shipment, 'on_the_way' ] );
+
+        $this->assertSame( 'on_the_way', $result['shipment_status'] );
+        $this->assertNotSame( '', $result['shipment_status_label'] );
+        $this->assertSame( 'Express Courier', $result['courier'] );
+        $this->assertSame( 'EC1', $result['tracking_number'] );
+        $this->assertSame( 'https://example.com/track/EC1', $result['tracking_url'] );
+        $this->assertSame( 'Mug × 2', $result['items_summary'] );
+        $this->assertStringContainsString( '20', $result['total_formatted'] );
+    }
+
+    public function test_subscription_renewal_payment_failed_links_to_the_renewal_payment(): void
+    {
+        $node = $this->makeTriggerNode('subscription_renewal_payment_failed');
+        $subscription = new class {
+            public function get_id() { return 9; }
+            public function get_status() { return 'on_hold'; }
+            public function get_total() { return '49.00'; }
+            public function get_currency() { return 'USD'; }
+            public function get_billing_email() { return 'john@example.com'; }
+            public function get_billing_first_name() { return 'John'; }
+            public function get_billing_last_name() { return 'Doe'; }
+        };
+        $renewal = new class {
+            public function get_id() { return 120; }
+            public function get_checkout_payment_url() { return 'https://example.com/checkout/order-pay/120/?pay_for_order=true&key=abc'; }
+        };
+
+        $result = Storeengine::resolve_trigger( $node, [ $subscription, $renewal ] );
+
+        $this->assertSame( 9, $result['subscription_id'] );
+        $this->assertSame( 120, $result['renewal_order_id'] );
+        $this->assertSame( 'https://example.com/checkout/order-pay/120/?pay_for_order=true&key=abc', $result['payment_url'] );
+        $this->assertSame( 'John', $result['first_name'] );
+        $this->assertSame( 'John Doe', $result['customer_name'] );
+        $this->assertSame( 'john@example.com', $result['customer_email'] );
+    }
 }

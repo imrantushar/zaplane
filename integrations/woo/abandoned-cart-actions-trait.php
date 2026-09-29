@@ -185,8 +185,8 @@ trait AbandonedCartActionsTrait {
 		foreach ( $statuses as $st ) {
 			$st_where  = $where . ' AND status = %s';
 			$st_params = array_merge( $params, [ $st ] );
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$row            = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) as cnt, COALESCE(SUM(total),0) as revenue FROM {$table} WHERE {$st_where}", ...$st_params ), ARRAY_A );
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $st_where is fixed fragments whose placeholders $st_params fills.
+			$row            = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) as cnt, COALESCE(SUM(total),0) as revenue FROM %i WHERE {$st_where}", $table, ...$st_params ), ARRAY_A );
 			$summary[ $st ] = [
 				'count'   => (int) ( $row['cnt'] ?? 0 ),
 				'revenue' => (float) ( $row['revenue'] ?? 0 ),

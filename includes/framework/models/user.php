@@ -75,15 +75,28 @@ class User extends WpModel {
 		return static::where( 'user_login', $login )->first();
 	}
 
+	/**
+	 * Every administrator, through core's own role query.
+	 *
+	 * This read the capabilities meta directly once, with the role matched by a
+	 * LIKE. get_users() asks core the same question, which knows about the
+	 * multisite prefix and about roles whose name merely contains
+	 * "administrator", and assembles no SQL here.
+	 *
+	 * @return array<int,self>
+	 */
 	public static function admins(): array {
-		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom admin role query.
-		$adminIds = $wpdb->get_col(
-			"SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '{$wpdb->prefix}capabilities' AND meta_value LIKE '%administrator%'"
+		$adminIds = get_users(
+			[
+				'role'   => 'administrator',
+				'fields' => 'ID',
+			]
 		);
+
 		if ( empty( $adminIds ) ) {
 			return [];
 		}
-		return static::whereIn( 'ID', $adminIds )->get();
+
+		return static::whereIn( 'ID', array_map( 'intval', $adminIds ) )->get();
 	}
 }

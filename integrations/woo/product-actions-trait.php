@@ -288,6 +288,47 @@ trait ProductActionsTrait {
 		return self::respond( [ 'product' => self::build_product_payload( $product ) ] );
 	}
 
+	/**
+	 * Live product lookup by name/SKU keyword — meant to be wired onto an AI
+	 * Agent's Tools sub-handle so the model can pull exact, current price/stock
+	 * instead of relying on a cached Business Knowledge snippet (which can lag
+	 * behind a price change until the next sync).
+	 */
+	private static function action_get_product( array $config, array $input ): array {
+		$query = trim( (string) ( $config['query'] ?? '' ) );
+		if ( '' === $query ) {
+			return self::error( 'A product name or keyword is required.' );
+		}
+
+		$limit  = max( 1, min( 5, (int) ( $config['limit'] ?? 1 ) ) );
+		$result = self::query_products( [
+			'limit'  => $limit,
+			'status' => 'publish',
+			's'      => $query,
+		] );
+
+		if ( empty( $result['items'] ) ) {
+			return self::respond( [
+				'found'    => false,
+				'products' => [],
+			] );
+		}
+
+		$products = array_map(
+			static fn( $product ) => self::build_product_payload( $product, [
+				'stock_quantity' => $product->get_stock_quantity(),
+				'stock_status'   => $product->get_stock_status(),
+			] ),
+			$result['items']
+		);
+
+		return self::respond( [
+			'found'    => true,
+			'product'  => $products[0],
+			'products' => $products,
+		] );
+	}
+
 	private static function action_update_product_stock( array $config, array $input ): array {
 		$error = '';
 		$product = self::require_product_from_config( $config, $error );

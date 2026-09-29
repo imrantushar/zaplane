@@ -24,7 +24,7 @@ class IntegrationManifest {
 	 * Some integrations put a full webhook URL in a `copy` field for the user to
 	 * paste into the provider. Built with rest_url(), that URL belongs to the
 	 * machine that ran the build — the shipped catalogue carried
-	 * `http://kodezen.local/...` for Fillout, Jotform and Typeform, so every
+	 * `http://example.test/...` for Fillout, Jotform and Typeform, so every
 	 * customer was told to paste a developer's laptop address into their form.
 	 * The build swaps the host out for this token and each site swaps its own
 	 * back in, the same way webhook_route is kept host-free.
@@ -86,6 +86,7 @@ class IntegrationManifest {
 			// ZaplaneGlobal.rest_url at render time.
 			'webhook_route'       => $class::supports_webhook() ? $class::get_webhook_route() : '',
 			'webhook_setup'       => $class::supports_webhook() ? array_values( $class::get_webhook_setup_fields() ) : [],
+			'docs_url'            => $class::get_docs_url(),
 			'triggers'            => [],
 			'actions'             => [],
 		];

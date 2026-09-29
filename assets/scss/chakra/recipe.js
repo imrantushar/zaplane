@@ -9,6 +9,12 @@ export const primaryBtn = {
     padding: "2px 14px",
     borderRadius : "4px",
     height: "36px",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    whiteSpace: "nowrap",
+    lineHeight: "1.2",
 }
 
 export const secondPrimaryBtn = {

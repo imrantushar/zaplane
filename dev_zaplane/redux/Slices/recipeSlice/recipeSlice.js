@@ -8,9 +8,11 @@ export const getRecipes = createAsyncThunk(
   "zaplane/getRecipes",
   async (args = {}, thunkAPI) => {
     try {
-      const query = {};
+      // The page searches and filters what it has, so it asks for every recipe
+      // the API will give at once rather than the first page of 20.
+      const query = { per_page: args.per_page || 100 };
       if (args.page) query.page = args.page;
-      if (args.per_page) query.per_page = args.per_page;
+      if (args.type) query.type = args.type;
  
       const res = await API.get(`${namespace}recipes`, { params: query });
       return {

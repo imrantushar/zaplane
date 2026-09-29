@@ -22,6 +22,14 @@ class Learndash extends IntegrationBase {
 		return 'learndash-icon.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/learndash/',
+			'action'  => 'https://zaplane.app/docs/learndash/',
+		];
+	}
+
 	public static function get_triggers(): array {
 		return [
 			'user_enroll_course' => [
@@ -489,7 +497,7 @@ class Learndash extends IntegrationBase {
 			'user_email'   => 'jane.doe@example.com',
 			'nickname'     => 'janedoe',
 			'display_name' => 'Jane Doe',
-			'avatar_url'   => 'https://www.gravatar.com/avatar/a1b2c3d4',
+			'avatar_url'   => 'https://example.com/avatar.png',
 			'user_roles'   => [ 'subscriber' ],
 		];
 

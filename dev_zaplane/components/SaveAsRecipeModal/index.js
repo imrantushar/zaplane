@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { __ } from "@wordpress/i18n";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import WPModal from "@ZAPComponents/Modal/WPModal";
 import { primaryBtn } from "../../../assets/scss/chakra/recipe";
 import ZAPInput from "@ZAPComponents/ZAPInput";
@@ -13,10 +13,6 @@ const SaveAsRecipeModal = ({
   defaultTitle = ""
 }) => {
   const dispatch = useDispatch();
-  const {
-    folders,
-    loadingFolders
-  } = useSelector(state => state.recipes);
   const [title, setTitle] = useState(defaultTitle);
   const [description, setDescription] = useState("");
   const [thumbnailId, setThumbnailId] = useState(null);

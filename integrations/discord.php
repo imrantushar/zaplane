@@ -522,6 +522,7 @@ class Discord extends IntegrationBase {
 				if ( isset( $dm_channel['error'] ) || empty( $dm_channel['id'] ) ) {
 					return self::error(
 						sprintf(
+							/* translators: %s: the error Discord returned. */
 							esc_html__( 'Failed to open DM channel: %s', 'zaplane' ),
 							$dm_channel['error'] ?? 'No channel id returned'
 						),

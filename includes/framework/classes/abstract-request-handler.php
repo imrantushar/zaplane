@@ -39,7 +39,7 @@ abstract class AbstractRequestHandler {
 
 
 	protected function is_ajax_action(): bool {
-		return $this->is_ajax || str_starts_with( current_action(), 'wp_ajax_' );
+		return $this->is_ajax || \Zaplane\Utils\Helper::starts_with( (string) current_action(), 'wp_ajax_' );
 	}
 
 
@@ -188,14 +188,14 @@ abstract class AbstractRequestHandler {
 	protected function sanitize_value( $value, $type ) {
 
 		$decode_type = null;
-		if ( is_string( $type ) && str_contains( $type, '|' ) ) {
+		if ( is_string( $type ) && \Zaplane\Utils\Helper::contains( $type, '|' ) ) {
 			list($decode_type, $type) = explode( '|', $type, 2 );
 		}
 
 		if ( is_array( $type ) ) {
 			$value = wp_unslash( $value );
 
-			if ( is_string( $value ) && ( str_starts_with( $value, '[' ) || str_starts_with( $value, '{' ) ) ) {
+			if ( is_string( $value ) && ( \Zaplane\Utils\Helper::starts_with( $value, '[' ) || \Zaplane\Utils\Helper::starts_with( $value, '{' ) ) ) {
 				$value = json_decode( $value, true );
 			}
 
@@ -298,12 +298,8 @@ abstract class AbstractRequestHandler {
 
 
 	protected function maybe_decode( $value, string $type ) {
-		if ( in_array( $type, [ 'serialize', 'unserialize', 'php' ], true ) ) {
-			return maybe_unserialize( $value );
-		}
-
 		if ( in_array( $type, [ 'json', 'array', 'object' ], true ) ) {
-			if ( is_string( $value ) && ( str_starts_with( $value, '[' ) || str_starts_with( $value, '{' ) ) ) {
+			if ( is_string( $value ) && ( \Zaplane\Utils\Helper::starts_with( $value, '[' ) || \Zaplane\Utils\Helper::starts_with( $value, '{' ) ) ) {
 				return json_decode( $value, 'array' === $type );
 			}
 		}

@@ -1,6 +1,10 @@
 <?php
 namespace Zaplane\Integrations\Easydigitaldownload;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 trait PaymentActionsTrait {
 
 	protected static function action_update_payment_status( array $config, array $input ): array {

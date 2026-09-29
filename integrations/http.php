@@ -3,6 +3,10 @@ namespace Zaplane\Integrations;
 
 use Zaplane\Framework\Classes\IntegrationBase;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class Http extends IntegrationBase {
 
 
@@ -20,6 +24,14 @@ class Http extends IntegrationBase {
 
 	public static function get_icon(): string {
 		return 'http-request';
+	}
+
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/webhooks-api-requests-guide/',
+			'action'  => 'https://zaplane.app/docs/webhooks-api-requests-guide/',
+		];
 	}
 
 	public static function get_actions(): array {
@@ -254,7 +266,7 @@ class Http extends IntegrationBase {
 			$headers['Content-Type'] = 'application/json';
 		}
 
-		$response = wp_remote_request($url, [
+		$response = \Zaplane\HttpGuard::request( $url, [
 			'method'  => $c['method'] ?? 'GET',
 			'headers' => $headers,
 			'body'    => $body,

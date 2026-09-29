@@ -3,9 +3,6 @@ import { __ } from '@wordpress/i18n';
 
 import {
 	API,
-	current_user_can,
-	current_user_id,
-	is_admin,
 	handleSliceSuccess,
 	handleSliceError,
 	namespace,
@@ -21,7 +18,7 @@ export const getSingleRunDetails = createAsyncThunk(
 				namespace + `runs/${parseInt(runId)}`
 			);
 
-			handleSliceSuccess(thunkAPI, __('Run details fetched successfully', 'workflow'));
+			handleSliceSuccess(thunkAPI, __('Run details fetched successfully', 'zaplane'));
 
 			return res.data;
 			// {
@@ -72,7 +69,7 @@ export const retryNodeRun = createAsyncThunk(
 
       thunkAPI.dispatch(
         showNotification({
-          message: __('Node retried and queued successfully', 'workflow'),
+          message: __('Node retried and queued successfully', 'zaplane'),
           isShow: true,
           type: 'success',
         })
@@ -97,7 +94,7 @@ export const clearRuns = createAsyncThunk(
 
       thunkAPI.dispatch(
         showNotification({
-          message: __('Logs cleared successfully', 'workflow'),
+          message: __('Logs cleared successfully', 'zaplane'),
           isShow: true,
           type: 'success',
         })
@@ -118,7 +115,7 @@ export const deleteRun = createAsyncThunk(
 
       thunkAPI.dispatch(
         showNotification({
-          message: __('Log deleted successfully', 'workflow'),
+          message: __('Log deleted successfully', 'zaplane'),
           isShow: true,
           type: 'success',
         })

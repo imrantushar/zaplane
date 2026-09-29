@@ -64,6 +64,14 @@ class FluentCart extends IntegrationBase {
 		return 'fluent-cart.svg';
 	}
 
+	/** @inheritDoc */
+	public static function get_docs_url(): array {
+		return [
+			'trigger' => 'https://zaplane.app/docs/fluentcart/',
+			'action'  => 'https://zaplane.app/docs/action-fluentcart/',
+		];
+	}
+
 	public static function get_introduction(): string {
 		return self::INTRODUCTION;
 	}

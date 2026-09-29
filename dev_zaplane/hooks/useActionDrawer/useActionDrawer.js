@@ -76,6 +76,8 @@ export const useActionDrawer = ({
     if (node.data.config) {
       Object.entries(node.data.config).forEach(([k, v]) => setFieldValue(k, v));
     }
+    // A trigger matching its fields to another trigger, in a workflow with several.
+    if (node.data.field_map !== undefined) setFieldValue("field_map", node.data.field_map);
   }, [open, node?.data, values.nodeClick, source]);
 
   // ── Reset step + form when opened via "add" ──

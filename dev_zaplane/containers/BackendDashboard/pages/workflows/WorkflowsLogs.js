@@ -20,7 +20,6 @@ const WorkflowsLogs = ({
   const {
     runs = [],
     currentPage,
-    perPage,
     totalItems,
     itemPerPage
   } = useSelector(state => state.workflows);
@@ -36,8 +35,8 @@ const WorkflowsLogs = ({
   useEffect(() => {
     handleRefresh(currentPage, itemPerPage);
   }, [currentPage, itemPerPage]);
-  const handlePageChange = newPage => handleRefresh(newPage, perPage);
-  const handlePerPageChange = itemsPerPage => handleRefresh(currentPage, itemsPerPage);
+  const handlePageChange = newPage => handleRefresh(newPage, itemPerPage);
+  const handlePerPageChange = itemsPerPage => handleRefresh(1, itemsPerPage);
   const columns = [{
     name: __('Run ID', 'zaplane'),
     cell: row => <span>{row.id}</span>,
@@ -77,7 +76,7 @@ const WorkflowsLogs = ({
     textAlign: "center"
   }];
   return <>
-      <ListTable columns={columns} isRowSelectable={false} data={runs} showSubHeader={false} showColumnFilter={false} showPagination={totalItems >= 10} noDataText={__("No history found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="history-table" currentPageNumber={currentPage} perPage={perPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} />
+      <ListTable columns={columns} isRowSelectable={false} data={runs} showSubHeader={false} showColumnFilter={false} showPagination={totalItems > 0} noDataText={__("No history found", "zaplane")} totalItems={totalItems} dataFetchingStatus={loading} suffix="history-table" currentPageNumber={currentPage} rowsPerPage={itemPerPage} onChangePage={handlePageChange} onChangeItemsPerPage={handlePerPageChange} />
       <ZAPDrawer open={drawerOpen} arrowClose={true} onClose={() => {
       setDrawerOpen(false);
       setActiveRunId(null);

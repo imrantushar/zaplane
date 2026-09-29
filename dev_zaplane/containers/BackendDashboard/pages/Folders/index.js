@@ -20,7 +20,7 @@ const Folders = () => {
   useEffect(() => {
     dispatch(getFolders());
   }, []);
-  return <PageLayout title="Folders" isLoading={isLoading} skeleton={FolderSkeleton} actions={
+  return <PageLayout title="Folders" inlineActionsOnMobile isLoading={isLoading} skeleton={FolderSkeleton} actions={
                 <button 
                     onClick={() => setIsFolderModalOpen(true)} 
                     style={primaryBtn}
