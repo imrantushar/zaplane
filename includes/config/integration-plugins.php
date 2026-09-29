@@ -98,6 +98,11 @@ return [
 	// check passed while none of the hooks existed.
 	'eventscalendar'      => [ 'event-tickets/event-tickets.php', 'the-events-calendar/the-events-calendar.php' ],
 	'gamipress'           => [ 'gamipress/gamipress.php' ],
+	// Only the free plugin is required: every core trigger/action runs on it.
+	// Pro-only events (referrals, seasons, payouts, transfers) are detected at
+	// runtime by class_exists and reported as unavailable there, so declaring
+	// gameengine-pro here would wrongly block recipes on a free-only site.
+	'gameengine'          => [ 'gameengine/gameengine.php' ],
 
 	/*
 	 * Not yet mapped — add the basename here when you write a recipe for one:

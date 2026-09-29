@@ -1,6 +1,6 @@
 {
     "version": "1.3.3",
-    "generated_at": "2026-09-29 05:12:38",
+    "generated_at": "2026-09-29 08:01:55",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -5947,25 +5947,1257 @@
             "webhook_route": "",
             "webhook_setup": [],
             "docs_url": {
-                "trigger": "",
-                "action": ""
+                "trigger": "https://zaplane.app/docs/gameengine/",
+                "action": "https://zaplane.app/docs/gameengine/"
             },
             "triggers": {
-                "location_created": {
-                    "label": "Location Created",
-                    "hook": "wpforms_process_complete",
-                    "key": "location_created",
+                "points_awarded": {
+                    "label": "Points Awarded",
+                    "hook": "gameengine_points_added",
+                    "description": "When a user earns points from any source.",
+                    "key": "points_awarded",
+                    "schema": [
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": "",
+                            "help": "Leave empty to accept every point type."
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "required": false,
+                            "default": 0,
+                            "help": "Only fire when at least this many points moved."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "points_deducted": {
+                    "label": "Points Deducted",
+                    "hook": "gameengine_points_deducted",
+                    "description": "When points are taken from a user balance.",
+                    "key": "points_deducted",
+                    "schema": [
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": "",
+                            "help": "Leave empty to accept every point type."
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "required": false,
+                            "default": 0,
+                            "help": "Only fire when at least this many points moved."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "points_balance_changed": {
+                    "label": "User Points Balance Changed",
+                    "hook": [
+                        "gameengine_points_added",
+                        "gameengine_points_deducted"
+                    ],
+                    "description": "When a balance moves in either direction.",
+                    "key": "points_balance_changed",
+                    "schema": [
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": "",
+                            "help": "Leave empty to accept every point type."
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "required": false,
+                            "default": 0,
+                            "help": "Only fire when at least this many points moved."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "achievement_earned": {
+                    "label": "Achievement Earned",
+                    "hook": "gameengine_achievement_unlocked",
+                    "description": "When a user unlocks any achievement.",
+                    "key": "achievement_earned",
                     "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "specific_achievement": {
+                    "label": "Specific Achievement Earned",
+                    "hook": "gameengine_achievement_unlocked",
+                    "description": "When one chosen achievement is unlocked.",
+                    "key": "specific_achievement",
+                    "schema": [
+                        {
+                            "key": "achievement_id",
+                            "label": "Achievement",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "achievements_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "level_reached": {
+                    "label": "Level Reached",
+                    "hook": "gameengine_level_awarded",
+                    "description": "When a user is awarded any level.",
+                    "key": "level_reached",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "specific_level": {
+                    "label": "Specific Level Reached",
+                    "hook": "gameengine_level_awarded",
+                    "description": "When one chosen level is awarded.",
+                    "key": "specific_level",
+                    "schema": [
+                        {
+                            "key": "level_id",
+                            "label": "Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "levels_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "rank_changed": {
+                    "label": "Rank Changed (Loyalty Tier)",
+                    "hook": "gameengine_pro_tier_changed",
+                    "description": "When a user moves to another loyalty tier \u2014 GameEngine keeps ranks as tiers/levels.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "rank_changed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reward_redeemed": {
+                    "label": "Reward Redeemed",
+                    "hook": "gameengine_reward_redeemed",
+                    "description": "When a user redeems a reward from the Rewards Store.",
+                    "key": "reward_redeemed",
+                    "schema": [
+                        {
+                            "key": "reward_id",
+                            "label": "Reward",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "rewards_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": "",
+                            "help": "Leave empty to accept every reward."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "coupon_generated": {
+                    "label": "Coupon Generated",
+                    "hook": "save_post_shop_coupon",
+                    "description": "When the Rewards Marketplace issues a GE- coupon (needs WooCommerce).",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "coupon_generated",
+                    "schema": [
+                        {
+                            "key": "prefix",
+                            "label": "Coupon Code Prefix",
+                            "type": "text",
+                            "required": false,
+                            "default": "GE-",
+                            "placeholder": "GE-",
+                            "help": "Only coupons whose code starts with this prefix fire the trigger. GameEngine marketplace coupons use GE-."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "points_used_at_checkout": {
+                    "label": "Points Used at Checkout",
+                    "hook": "gameengine_points_deducted",
+                    "description": "When an order is paid fully or partly with points.",
+                    "key": "points_used_at_checkout",
+                    "schema": [
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": "",
+                            "help": "Leave empty to accept every point type."
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "required": false,
+                            "default": 0,
+                            "help": "Only fire when at least this many points moved."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "points_transferred": {
+                    "label": "Points Transferred",
+                    "hook": [
+                        "gameengine_points_added",
+                        "gameengine_points_deducted"
+                    ],
+                    "description": "When a user sends or receives points from another member.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "points_transferred",
+                    "schema": [
+                        {
+                            "key": "direction",
+                            "label": "Direction",
+                            "type": "select",
+                            "required": false,
+                            "default": "any",
+                            "options": [
+                                {
+                                    "value": "any",
+                                    "label": "Any direction"
+                                },
+                                {
+                                    "value": "sent",
+                                    "label": "Sent by the user"
+                                },
+                                {
+                                    "value": "received",
+                                    "label": "Received by the user"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": "",
+                            "help": "Leave empty to accept every point type."
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "required": false,
+                            "default": 0,
+                            "help": "Only fire when at least this many points moved."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "points_expired": {
+                    "label": "Points Expired",
+                    "hook": "gameengine_points_deducted",
+                    "description": "When expiring points are removed from a balance.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "points_expired",
+                    "schema": [
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": "",
+                            "help": "Leave empty to accept every point type."
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "required": false,
+                            "default": 0,
+                            "help": "Only fire when at least this many points moved."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payout_requested": {
+                    "label": "Payout Requested",
+                    "hook": "gameengine_points_deducted",
+                    "description": "When a member submits a withdrawal request (detected from the payout deduction).",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "payout_requested",
+                    "schema": [
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "required": false,
+                            "default": 0,
+                            "help": "Only fire for withdrawals of at least this many points."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "payout_rejected": {
+                    "label": "Payout Rejected",
+                    "hook": "gameengine_points_added",
+                    "description": "When an admin rejects a withdrawal and the points are refunded.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "payout_rejected",
+                    "schema": [
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": "",
+                            "help": "Leave empty to accept every point type."
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "required": false,
+                            "default": 0,
+                            "help": "Only fire when at least this many points moved."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "referral_completed": {
+                    "label": "Referral Completed",
+                    "hook": "gameengine_referral_signup",
+                    "description": "When a referred member signs up.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "referral_completed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "affiliate_reward": {
+                    "label": "Affiliate Reward Earned",
+                    "hook": "gameengine_points_added",
+                    "description": "When a referrer is paid their commission points.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "affiliate_reward",
+                    "schema": [
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": "",
+                            "help": "Leave empty to accept every point type."
+                        },
+                        {
+                            "key": "min_points",
+                            "label": "Minimum Points",
+                            "type": "number",
+                            "required": false,
+                            "default": 0,
+                            "help": "Only fire when at least this many points moved."
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
                 }
             },
             "actions": {
-                "location_created": {
-                    "label": "Location Create",
-                    "key": "location_created",
-                    "schema": [],
+                "award_points": {
+                    "label": "Award Points",
+                    "description": "Add points to a user balance.",
+                    "key": "award_points",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "points",
+                            "label": "Points",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": ""
+                        },
+                        {
+                            "key": "reason",
+                            "label": "Reason",
+                            "type": "text",
+                            "required": false,
+                            "default": "",
+                            "placeholder": "Daily login bonus",
+                            "help": "Stored on the transaction and shown in the points history."
+                        },
+                        {
+                            "key": "context",
+                            "label": "Context",
+                            "type": "text",
+                            "required": false,
+                            "default": "",
+                            "placeholder": "manual_adjustment",
+                            "help": "The reason code GameEngine stores with the transaction. Empty uses manual_adjustment."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "deduct_points": {
+                    "label": "Deduct Points",
+                    "description": "Take points from a user balance.",
+                    "key": "deduct_points",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "points",
+                            "label": "Points",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": ""
+                        },
+                        {
+                            "key": "reason",
+                            "label": "Reason",
+                            "type": "text",
+                            "required": false,
+                            "default": ""
+                        },
+                        {
+                            "key": "context",
+                            "label": "Context",
+                            "type": "text",
+                            "required": false,
+                            "default": "",
+                            "placeholder": "manual_adjustment"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_balance": {
+                    "label": "Set Balance",
+                    "description": "Adjust a balance to an exact value.",
+                    "key": "set_balance",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "points",
+                            "label": "New Balance",
+                            "type": "number",
+                            "required": true,
+                            "help": "The difference is added or deducted as a manual adjustment."
+                        },
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": ""
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_balance": {
+                    "label": "Get Balance",
+                    "description": "Read a user points balance.",
+                    "key": "get_balance",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": ""
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_transactions": {
+                    "label": "Get Transactions",
+                    "description": "List the latest points transactions.",
+                    "key": "get_transactions",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Transactions",
+                            "type": "number",
+                            "required": false,
+                            "default": 10
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "award_achievement": {
+                    "label": "Award Achievement",
+                    "description": "Grant an achievement to a user.",
+                    "key": "award_achievement",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "achievement_id",
+                            "label": "Achievement",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "achievements_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "revoke_achievement": {
+                    "label": "Revoke Achievement",
+                    "description": "Take an achievement back from a user.",
+                    "key": "revoke_achievement",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "achievement_id",
+                            "label": "Achievement",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "achievements_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_achievements": {
+                    "label": "Get Achievements",
+                    "description": "List the achievements a user earned.",
+                    "key": "get_achievements",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assign_level": {
+                    "label": "Assign Level",
+                    "description": "Grant a level to a user.",
+                    "key": "assign_level",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "level_id",
+                            "label": "Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "levels_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "change_level": {
+                    "label": "Change Level",
+                    "description": "Move a user to another level.",
+                    "key": "change_level",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "level_id",
+                            "label": "Level",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "levels_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_level": {
+                    "label": "Get Level",
+                    "description": "Read the current level of a user.",
+                    "key": "get_level",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assign_rank": {
+                    "label": "Assign Rank",
+                    "description": "Grant a rank \u2014 GameEngine keeps ranks as levels.",
+                    "key": "assign_rank",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "rank_id",
+                            "label": "Rank",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "levels_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true,
+                            "help": "GameEngine keeps ranks as levels, so ranks come from the level list."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_rank": {
+                    "label": "Get Rank",
+                    "description": "Read the current rank of a user (level based).",
+                    "key": "get_rank",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "unlock_content": {
+                    "label": "Unlock Content",
+                    "description": "Remove GameEngine restrictions from a post or page.",
+                    "key": "unlock_content",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Content",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "posts_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lock_content": {
+                    "label": "Lock Content",
+                    "description": "Restrict a post or page behind points, an achievement or a level.",
+                    "key": "lock_content",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Content",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "posts_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "restrict_type",
+                            "label": "Restriction",
+                            "type": "select",
+                            "required": true,
+                            "default": "points",
+                            "options": [
+                                {
+                                    "value": "points",
+                                    "label": "Points"
+                                },
+                                {
+                                    "value": "achievement",
+                                    "label": "Achievement"
+                                },
+                                {
+                                    "value": "level",
+                                    "label": "Level"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "restrict_value",
+                            "label": "Required Value",
+                            "type": "expression",
+                            "required": true,
+                            "placeholder": "100",
+                            "help": "Point amount for Points, or the achievement/level ID for the other types."
+                        },
+                        {
+                            "key": "message",
+                            "label": "Lock Message",
+                            "type": "textarea",
+                            "required": false,
+                            "default": "",
+                            "help": "Shown instead of the content. Empty keeps the message saved in the editor."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "generate_coupon": {
+                    "label": "Generate Coupon",
+                    "description": "Issue a marketplace discount coupon (spends the reward cost).",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "generate_coupon",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "amount",
+                            "label": "Discount",
+                            "type": "number",
+                            "required": true,
+                            "help": "Coupon amount \u2014 10 with Percent means 10% off."
+                        },
+                        {
+                            "key": "discount_type",
+                            "label": "Discount Type",
+                            "type": "select",
+                            "required": true,
+                            "default": "percent",
+                            "options": [
+                                {
+                                    "value": "percent",
+                                    "label": "Percent"
+                                },
+                                {
+                                    "value": "fixed_cart",
+                                    "label": "Fixed cart amount"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "points_cost",
+                            "label": "Points Cost",
+                            "type": "number",
+                            "required": true,
+                            "help": "Points taken from the user for the coupon. 0 issues it free."
+                        },
+                        {
+                            "key": "expiry_days",
+                            "label": "Expires In (days)",
+                            "type": "number",
+                            "required": false,
+                            "default": 30
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "redeem_reward": {
+                    "label": "Redeem Reward",
+                    "description": "Redeem a Rewards Store item for a user.",
+                    "key": "redeem_reward",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "reward_id",
+                            "label": "Reward",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "rewards_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "transfer_points": {
+                    "label": "Transfer Points",
+                    "description": "Move points from one member to another.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "transfer_points",
+                    "schema": [
+                        {
+                            "key": "sender_id",
+                            "label": "From User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}"
+                        },
+                        {
+                            "key": "receiver_id",
+                            "label": "To User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}"
+                        },
+                        {
+                            "key": "points",
+                            "label": "Points",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "key": "point_type",
+                            "label": "Point Type",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "point_types_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": false,
+                            "default": ""
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message",
+                            "type": "text",
+                            "required": false,
+                            "default": "",
+                            "help": "Stored on the transfer row the members see in their history."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_payout": {
+                    "label": "Create Payout Request",
+                    "description": "Open a withdrawal request for a user.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "create_payout",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": false,
+                            "placeholder": "{{trigger.user.user_id}}",
+                            "help": "A user ID or an expression. Leave empty to use the current user."
+                        },
+                        {
+                            "key": "points",
+                            "label": "Points",
+                            "type": "number",
+                            "required": true,
+                            "help": "Must satisfy the minimum/maximum withdrawal limits in GameEngine settings."
+                        },
+                        {
+                            "key": "method",
+                            "label": "Method",
+                            "type": "select",
+                            "required": true,
+                            "default": "paypal",
+                            "options": [
+                                {
+                                    "value": "paypal",
+                                    "label": "PayPal"
+                                },
+                                {
+                                    "value": "bank",
+                                    "label": "Bank transfer"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "account",
+                            "label": "Account Details",
+                            "type": "textarea",
+                            "required": false,
+                            "default": "",
+                            "help": "PayPal email or bank details stored with the request."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_payout": {
+                    "label": "Update Payout Status",
+                    "description": "Approve, complete or reject a withdrawal.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "update_payout",
+                    "schema": [
+                        {
+                            "key": "payout_id",
+                            "label": "Payout ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "payouts_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "New Status",
+                            "type": "select",
+                            "required": true,
+                            "default": "approved",
+                            "options": [
+                                {
+                                    "value": "pending",
+                                    "label": "Pending"
+                                },
+                                {
+                                    "value": "approved",
+                                    "label": "Approved"
+                                },
+                                {
+                                    "value": "completed",
+                                    "label": "Paid (completed)"
+                                },
+                                {
+                                    "value": "rejected",
+                                    "label": "Rejected (refunds the points)"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "approve_payout": {
+                    "label": "Approve Payout Request",
+                    "description": "Approve a pending withdrawal.",
+                    "requires_addon": "GameEngine Pro",
+                    "key": "approve_payout",
+                    "schema": [
+                        {
+                            "key": "payout_id",
+                            "label": "Payout ID",
+                            "type": "select",
+                            "dynamic": {
+                                "integration": "gameengine",
+                                "query": "payouts_query",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            },
+                            "required": true
+                        }
+                    ],
                     "outputs": [
                         "main"
                     ]
