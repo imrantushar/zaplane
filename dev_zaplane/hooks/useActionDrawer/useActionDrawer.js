@@ -50,18 +50,24 @@ export const useActionDrawer = ({
   const [search, setSearch] = useState("");
   const [step, setStep] = useState("select");
 
-  // ── Reset on "add" source / pre-populate on "node" source ──
+  // ── Reset when opened through the canvas "add" flow ──
+  // Keep this effect independent from node.data. The canvas can replace the
+  // node object while the drawer is open; reacting to that object here used
+  // to reset the Apps/Tools tab and selected item immediately after the user
+  // clicked them.
   useEffect(() => {
-    if (!open) return;
-
-    if (source === "add") {
+    if (open && source === "add") {
       setMode(null);
       setSelectedItem(null);
       setSearch("");
-      return;
     }
+  }, [open, source]);
 
-    if (!node?.data) return;
+  // ── Pre-populate an existing node ──
+  // This path is intentionally disabled for source="add" so a graph update
+  // cannot overwrite the user's in-progress selection.
+  useEffect(() => {
+    if (!open || source === "add" || !node?.data) return;
 
     const detectedItem = APPS.concat(TOOLS).find(
       i => i.name === node.data.app || i.id === node.data.app
@@ -78,7 +84,7 @@ export const useActionDrawer = ({
     }
     // A trigger matching its fields to another trigger, in a workflow with several.
     if (node.data.field_map !== undefined) setFieldValue("field_map", node.data.field_map);
-  }, [open, node?.data, values.nodeClick, source]);
+  }, [open, source, node?.data, values.nodeClick]);
 
   // ── Reset step + form when opened via "add" ──
   useEffect(() => {

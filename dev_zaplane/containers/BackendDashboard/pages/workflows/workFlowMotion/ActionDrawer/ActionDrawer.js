@@ -240,7 +240,10 @@ const {
       setStep("select");
       setFieldValue("actionType", "");
     }}
-    closeOnOverlayClick
+    // Keep the drawer open while the workflow canvas/Redux state updates.
+    // Headless UI can treat those updates as an outside-dialog interaction;
+    // the X button and Cancel button still provide explicit close controls.
+    closeOnOverlayClick={false}
     title={!mode ? (isTrigger ? __('Add Trigger', 'zaplane') : __('Add Action', 'zaplane')) : selectedItem?.name || __('App', 'zaplane')} placement="end"
     // size={["filter", "condition"].includes(values?.actionType) ? "xl" : "md"}
     footer={<div className="flex items-center justify-end gap-3">
