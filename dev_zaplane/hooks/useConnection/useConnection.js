@@ -45,7 +45,7 @@ const useConnection = () => {
     const appList = useMemo(
         () =>
             Object.values(integrations.apps)
-                .filter((app) => app.requires_connection === true)
+                .filter((app) => app.requires_connection === true || app.connection_optional === true)
                 .map((app) => ({
                     id: app.slug,
                     name: app.name,

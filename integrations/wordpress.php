@@ -18,6 +18,8 @@ use Zaplane\Integrations\Wordpress\OptionActionsTrait;
 use Zaplane\Integrations\Wordpress\MediaActionsTrait;
 use Zaplane\Integrations\Wordpress\CommentActionsTrait;
 use Zaplane\Integrations\Wordpress\QueryTrait;
+use Zaplane\Integrations\Wordpress\RemoteTrait;
+use Zaplane\Integrations\Wordpress\RestWatchTrait;
 use Zaplane\Integrations\Wordpress\Helper;
 
 // phpcs:ignore WordPress.WP.CapitalPDangit.MisspelledClassName -- Kept for backwards compatibility.
@@ -32,6 +34,8 @@ class Wordpress extends IntegrationBase {
 	use MediaActionsTrait;
 	use CommentActionsTrait;
 	use QueryTrait;
+	use RemoteTrait;
+	use RestWatchTrait;
 	use Helper;
 
 	public static function get_slug(): string {
@@ -3370,6 +3374,21 @@ class Wordpress extends IntegrationBase {
 
 		$config = $node['data']['config'] ?? [];
 		$event = $node['data']['event'] ?? '';
+
+		$connection_id = (int) ( $node['data']['connection_id'] ?? 0 );
+		$credentials   = isset( $node['_connection_credentials'] ) && is_array( $node['_connection_credentials'] )
+			? $node['_connection_credentials']
+			: [];
+
+		// A step pointed at a connection must not quietly run against this
+		// site instead: either the credentials arrive or the step says so.
+		if ( $connection_id && empty( $credentials ) ) {
+			return static::error( 'The saved connection for this step could not be loaded.' );
+		}
+
+		if ( ! empty( $credentials['site_url'] ) ) {
+			return static::remote_execute( $event, $config, $credentials, $input );
+		}
 
 		$method = 'action_' . $event;
 

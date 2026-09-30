@@ -27,10 +27,17 @@ class API implements ModuleInterface {
 
 	public function register_hooks(): void {
 		add_action( 'rest_api_init', [ $this, 'register_route' ] );
+		// The pairing notice and its Disconnect link live in wp-admin only.
+		add_action( 'admin_notices', [ \Zaplane\API\RemoteController::class, 'admin_notice' ] );
+		add_action( 'admin_init', [ \Zaplane\API\RemoteController::class, 'handle_revoke' ] );
+		// This site may be the one being watched: bind whatever a paired
+		// controller asked for as soon as hooks can be added.
+		\Zaplane\API\RemoteController::boot();
 		// After core's cookie and application-password checks (priority 20).
 		add_filter( 'determine_current_user', [ \Zaplane\API\McpController::class, 'authenticate_bearer' ], 30 );
 	}
 	public function register_route() {
+		( new \Zaplane\API\RemoteController() )->register_routes();
 		( new \Zaplane\API\IntegrationsController( $this->container ) )->register_routes();
 		( new \Zaplane\API\WorkflowsController( $this->container ) )->register_routes();
 		( new \Zaplane\API\RunController( $this->container ) )->register_routes();
@@ -47,7 +54,6 @@ class API implements ModuleInterface {
 		( new \Zaplane\API\KnowledgeController( $this->container ) )->register_routes();
 		( new \Zaplane\API\McpController( $this->container ) )->register_routes();
 		( new \Zaplane\API\SettingsController( $this->container ) )->register_routes();
-
 
 		register_rest_route('zaplane/v1', '/dynamic', [
 			'methods' => 'POST',

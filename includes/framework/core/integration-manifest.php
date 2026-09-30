@@ -78,6 +78,7 @@ class IntegrationManifest {
 			'icon'                => $class::get_icon(),
 			'category'            => $category,
 			'requires_connection' => $class::requires_connection(),
+			'connection_optional' => $class::connection_optional(),
 			'auth_type'           => $class::get_auth_type(),
 			'supports_webhook'    => $class::supports_webhook(),
 			// Route only, never an absolute URL: this manifest is written to a file

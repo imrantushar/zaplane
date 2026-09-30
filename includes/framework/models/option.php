@@ -47,14 +47,24 @@ class Option extends WpModel {
 
 		if ( $existing ) {
 			$existing->option_value = $serialized;
-			return $existing->save();
+			$saved                  = $existing->save();
+		} else {
+			$saved = (bool) static::create([
+				'option_name' => $name,
+				'option_value' => $serialized,
+				'autoload' => $autoload,
+			]);
 		}
 
-		return (bool) static::create([
-			'option_name' => $name,
-			'option_value' => $serialized,
-			'autoload' => $autoload,
-		]);
+		if ( $saved ) {
+			// The write went straight to the table, so WordPress's cached copy
+			// of the option — runtime, and persistent on sites running an
+			// object cache — still holds the old value until it is dropped.
+			wp_cache_delete( $name, 'options' );
+			wp_cache_delete( 'alloptions', 'options' );
+		}
+
+		return $saved;
 	}
 
 	public static function remove( string $name ): bool {
@@ -62,6 +72,14 @@ class Option extends WpModel {
 		if ( ! $option ) {
 			return false;
 		}
-		return $option->delete();
+
+		$deleted = $option->delete();
+
+		if ( $deleted ) {
+			wp_cache_delete( $name, 'options' );
+			wp_cache_delete( 'alloptions', 'options' );
+		}
+
+		return $deleted;
 	}
 }

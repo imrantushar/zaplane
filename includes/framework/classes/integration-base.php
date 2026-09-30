@@ -342,6 +342,17 @@ abstract class IntegrationBase {
 		return false;
 	}
 
+	/**
+	 * Whether a connection may still be chosen even though it is not required.
+	 *
+	 * An integration like WordPress runs on this site when no connection is
+	 * selected and on the connected site when one is, so its selector shows in
+	 * the workflow editor without ever demanding a pick.
+	 */
+	public static function connection_optional(): bool {
+		return false;
+	}
+
 
 
 	public static function get_auth_type(): string {

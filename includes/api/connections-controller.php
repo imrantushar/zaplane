@@ -356,6 +356,7 @@ class ConnectionsController extends WP_REST_Controller {
 			'app'                 => $app,
 			'auth_type'           => $main_auth_type,
 			'requires_connection' => $integration::requires_connection(),
+			'connection_optional' => $integration::connection_optional(),
 		];
 
 		if ( 'both' === $main_auth_type ) {
