@@ -6,6 +6,7 @@ All notable changes to Zaplane are documented here. This project adheres to
 ## [Unreleased]
 
 ### Fixed
+- Fixed live dynamic selectors so new workflow nodes prefetch their site data immediately instead of depending on a dropdown-open event; failed lookups now settle safely instead of retrying continuously.
 - Resolved the duplicate `handle_incoming()` method that caused a PHP critical error.
 - Fixed the dashboard login/reload flow so it loads normally again.
 - Corrected the Log History horizontal scrollbar and responsive layout issues.
@@ -42,6 +43,7 @@ All notable changes to Zaplane are documented here. This project adheres to
 - Improved compatibility with background workflow execution.
 
 ### Fixed
+- Fixed live dynamic selectors so new workflow nodes prefetch their site data immediately instead of depending on a dropdown-open event; failed lookups now settle safely instead of retrying continuously.
 - Fixed trigger detection and payload handling across supported ZenCommunity events.
 - Fixed action failure states being incorrectly treated as successful workflow runs.
 - Fixed sender identity handling in automated messaging.
@@ -83,6 +85,7 @@ All notable changes to Zaplane are documented here. This project adheres to
   claude.ai and ChatGPT.
 
 ### Fixed
+- Fixed live dynamic selectors so new workflow nodes prefetch their site data immediately instead of depending on a dropdown-open event; failed lookups now settle safely instead of retrying continuously.
 - `select()`, `addSelect()` and `groupBy()` accept an array of columns again;
   passing one nested the array and produced `SELECT \`Array\``, which broke
   `pluck()` and `value()`.
@@ -195,6 +198,7 @@ All notable changes to Zaplane are documented here. This project adheres to
   administrator's, even for a user who was later demoted or deleted.
 
 ### Fixed
+- Fixed live dynamic selectors so new workflow nodes prefetch their site data immediately instead of depending on a dropdown-open event; failed lookups now settle safely instead of retrying continuously.
 - GemCRM Send Email to a contact could reach the wrong contact, and Send Email to a
   list mailed every contact. Both now reach only the chosen recipients, and
   unsubscribed or bounced contacts are skipped.
@@ -723,6 +727,7 @@ Custom Apps, and a dedicated bidirectional Webhook app.
 - Clearer node port / branch handles, and AI Agent sub-node handles, on the canvas.
 
 ### Fixed
+- Fixed live dynamic selectors so new workflow nodes prefetch their site data immediately instead of depending on a dropdown-open event; failed lookups now settle safely instead of retrying continuously.
 - AI and AI Agent no longer appear as trigger options where only actions apply.
 - Custom Apps: trigger firing, empty-label handling, and the stale generic "Custom App" entry leaking into the app picker.
 - Webhook: structured **Body fields** so multi-line/quoted values (e.g. an AI reply) can no longer produce malformed JSON.

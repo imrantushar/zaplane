@@ -54,12 +54,29 @@ export const useDynamicFields = ({
         limit: 20 
       });
 
-      const mapped = Object.values(res || {}).map((i) => ({
-        value: i[field.dynamic.select[0]],
-        label: i[field.dynamic.select[1]],
-      }));
+      const select = Array.isArray(field.dynamic.select)
+        ? field.dynamic.select
+        : ["value", "label"];
+      const valueKey = select[0] || "value";
+      const labelKey = select[1] || "label";
+
+      const mapped = Object.values(res || {})
+        .map((i) => {
+          const optionValue = i?.[valueKey] ?? i?.value ?? i?.name;
+          if (optionValue === undefined || optionValue === null || optionValue === "") {
+            return null;
+          }
+          return {
+            value: optionValue,
+            label: String(i?.[labelKey] ?? i?.label ?? optionValue),
+          };
+        })
+        .filter(Boolean);
 
       setDynamicOptions((p) => ({ ...p, [key]: mapped }));
+    } catch (error) {
+      console.error("Zaplane dynamic option lookup failed", error);
+      setDynamicOptions((p) => ({ ...p, [key]: [] }));
     } finally {
       setLoadingFields((p) => ({ ...p, [key]: false }));
     }
@@ -80,8 +97,9 @@ export const useDynamicFields = ({
   }, [selectedActionFields, values]);
 
   /**
-   * Auto-fetch on edit mode (field already has a saved value).
-   * Runs on actionType change only — for fields without depends_on.
+   * Auto-fetch independent dynamic fields as soon as an action/trigger is
+   * selected. New nodes have no saved field value yet, so waiting for a value
+   * meant their live option lists could stay blank until a menu event happened.
    */
   useEffect(() => {
     if (!selectedItem || !values?.actionType) return;
@@ -90,11 +108,22 @@ export const useDynamicFields = ({
       if (!field.dynamic) return;
       const deps = field.dynamic.depends_on || [];
       if (deps.length > 0) return; // handled by the effect below
-      if (values?.[field.key] && !dynamicOptions[getKey(field)]) {
+
+      const key = getKey(field);
+      const hasOptions = Object.prototype.hasOwnProperty.call(dynamicOptions, key);
+      if (!hasOptions && !loadingFields[key]) {
         fetchDynamicOptions(field);
       }
     });
-  }, [selectedActionFields, values?.actionType]);
+  }, [
+    selectedItem,
+    selectedActionFields,
+    values?.actionType,
+    dynamicOptions,
+    loadingFields,
+    getKey,
+    fetchDynamicOptions,
+  ]);
 
   /**
    * Auto-fetch for fields that have depends_on.
