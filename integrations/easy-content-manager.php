@@ -64,6 +64,10 @@ class EasyContentManager extends IntegrationBase {
 				'label' => 'Item Status Changed',
 				'hook'  => 'transition_post_status',
 			],
+			'item_published'      => [
+				'label' => 'Item Published',
+				'hook'  => 'transition_post_status',
+			],
 			'specific_item_created'  => [
 				'label' => 'Specific Post Type Item Created',
 				'hook'  => 'wp_insert_post',
@@ -71,6 +75,10 @@ class EasyContentManager extends IntegrationBase {
 			'specific_item_updated'  => [
 				'label' => 'Specific Post Type Item Updated',
 				'hook'  => 'post_updated',
+			],
+			'specific_item_published'  => [
+				'label' => 'Specific Post Type Item Published',
+				'hook'  => 'transition_post_status',
 			],
 			'custom_field_updated' => [
 				'label' => 'Custom Field Value Updated',

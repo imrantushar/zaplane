@@ -30,6 +30,8 @@ trait EcmTriggerResolverTrait {
 				return static::ecm_resolve_item_deleted( $args );
 
 			case 'item_status_changed':
+			case 'item_published':
+			case 'specific_item_published':
 				return static::ecm_resolve_item_status( $config, $args, $event );
 
 			case 'custom_field_updated':
@@ -176,6 +178,17 @@ trait EcmTriggerResolverTrait {
 
 		if ( ! $post_id || ! static::ecm_is_managed_item( $post_id ) ) {
 			return false;
+		}
+
+		if ( in_array( $event, [ 'item_published', 'specific_item_published' ], true ) && 'publish' !== $new_status ) {
+			return false;
+		}
+
+		if ( 'specific_item_published' === $event ) {
+			$required = (string) ( $config['post_type'] ?? '' );
+			if ( '' === $required || (string) ( $post->post_type ?? '' ) !== $required ) {
+				return false;
+			}
 		}
 
 		return static::ecm_item_payload(

@@ -14,6 +14,7 @@ trait EcmSchemasTrait {
 		switch ( $trigger ) {
 			case 'specific_item_created':
 			case 'specific_item_updated':
+			case 'specific_item_published':
 				$field            = $post_type_select;
 				$field['required'] = true;
 
@@ -674,6 +675,10 @@ trait EcmSchemasTrait {
 
 			case 'item_status_changed':
 				return array_merge( $item, [ 'new_status' => 'pending', 'old_status' => 'publish' ] );
+
+			case 'item_published':
+			case 'specific_item_published':
+				return array_merge( $item, [ 'new_status' => 'publish', 'old_status' => 'draft' ] );
 
 			case 'custom_field_updated':
 				return array_merge( $item, [ 'meta_key' => 'price', 'value' => '199', 'previous_value' => '149', 'updated_at' => '2026-01-01 12:00:00' ] );
