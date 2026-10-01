@@ -16,7 +16,9 @@ namespace Zaplane\Tests {
 		private static array $postTypes        = [];
 		private static array $roles            = [];
 		private static int   $lastInsertId     = 100;
-		private static array $httpResponses    = [];
+		private static array $httpResponses = [];
+
+		private static array $httpRequests = [];
 		private static array $wcOrders           = [];
 		private static array $scheduledActions   = [];
 		private static array $enqueuedNodeRuns   = [];
@@ -94,6 +96,7 @@ namespace Zaplane\Tests {
 			self::$roles            = [];
 			self::$lastInsertId     = 100;
 			self::$httpResponses    = [];
+			self::$httpRequests     = [];
 			self::$wcOrders         = [];
 			self::$scheduledActions = [];
 			self::$enqueuedNodeRuns = [];
@@ -129,6 +132,26 @@ namespace Zaplane\Tests {
 				'status'  => $status,
 				'headers' => array_change_key_case( $headers ),
 			];
+		}
+
+		/**
+		 * Queue a response whose body is not JSON — a login page, a firewall
+		 * challenge, anything the connected site answered with instead.
+		 */
+		public static function setRawHttpResponse( string $body, int $status = 200 ): void {
+			self::$httpResponses[] = [
+				'body'    => $body,
+				'status'  => $status,
+				'headers' => [],
+			];
+		}
+
+		public static function recordHttpRequest( string $url ): void {
+			self::$httpRequests[] = $url;
+		}
+
+		public static function getHttpRequests(): array {
+			return self::$httpRequests;
 		}
 
 		public static function nextHttpResponse(): ?array {
@@ -690,6 +713,12 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'did_action' ) ) {
+		function did_action( string $hook ): int {
+			return 0;
+		}
+	}
+
 	// ── WP_Error / is_wp_error ────────────────────────────────────────────────
 
 	if ( ! function_exists( 'is_wp_error' ) ) {
@@ -908,6 +937,7 @@ namespace {
 
 	if ( ! function_exists( 'wp_remote_request' ) ) {
 		function wp_remote_request( string $url, array $args = [] ) {
+			WPMocks::recordHttpRequest( $url );
 			$next = WPMocks::nextHttpResponse();
 			if ( $next === null ) {
 				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );
@@ -918,6 +948,7 @@ namespace {
 
 	if ( ! function_exists( 'wp_remote_post' ) ) {
 		function wp_remote_post( string $url, array $args = [] ) {
+			WPMocks::recordHttpRequest( $url );
 			$next = WPMocks::nextHttpResponse();
 			if ( $next === null ) {
 				return new \WP_Error( 'http_request_failed', 'Mock: no HTTP response queued' );

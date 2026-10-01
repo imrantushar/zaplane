@@ -225,6 +225,14 @@ class Automation {
 
 		$args = func_get_args();
 		foreach ( Query::get_active_workflows_for_event( $event ) as $trigger ) {
+			// A trigger bound to a connection listens to the connected site's
+			// events, which arrive through trigger_event_for_connection(). The
+			// same hook firing on this site is this site's event and must not
+			// start that workflow too.
+			if ( (int) ( $trigger['graph_node']['data']['connection_id'] ?? 0 ) > 0 ) {
+				continue;
+			}
+
 			// A Test Trigger listener caught this very event for this trigger. Every
 			// other event runs for real, this trigger's next one included, so a
 			// listener that nobody polls can't hold a trigger back.
@@ -340,6 +348,85 @@ class Automation {
 		foreach ( Query::get_active_workflows_for_event( $event ) as $trigger ) {
 			$this->start_trigger_run( $trigger, $payload );
 		}
+	}
+
+	/**
+	 * The same as trigger_event(), narrowed to the workflows whose trigger is
+	 * bound to one connection.
+	 *
+	 * A connected site answers for a hook the local site may also listen on
+	 * itself. Without this the arrival of a remote payload would start the
+	 * local workflows too, running each one twice from the same event.
+	 *
+	 * @param string              $event          WordPress hook the payload arrived for.
+	 * @param array<string,mixed> $payload        Already-resolved trigger payload.
+	 * @param int                 $connection_id  Connection the payload came in over.
+	 * @return int How many runs were started.
+	 */
+	public function trigger_event_for_connection( string $event, array $payload, int $connection_id ): int {
+		$started = 0;
+
+		if ( $connection_id <= 0 ) {
+			return 0;
+		}
+
+		foreach ( Query::get_active_workflows_for_event( $event ) as $trigger ) {
+			$data = $trigger['graph_node']['data'] ?? [];
+
+			if ( ! is_array( $data ) || (int) ( $data['connection_id'] ?? 0 ) !== $connection_id ) {
+				continue;
+			}
+
+			// A Test Trigger listener waiting on this trigger takes the event
+			// instead — remote events never fire a local hook, so
+			// listener_hook_handler cannot catch them itself.
+			if ( $this->capture_for_listener( (int) $trigger['workflow_id'], (int) $trigger['id'], $payload ) ) {
+				continue;
+			}
+
+			$this->start_trigger_run( $trigger, $payload );
+			++$started;
+		}
+
+		return $started;
+	}
+
+	/**
+	 * Hand a trigger's payload to a Test Trigger listener waiting for it.
+	 *
+	 * The listener state is what the editor's poll reads, and the bargain is
+	 * the same as the local hook path's claim: the event the listener caught
+	 * starts no real run.
+	 *
+	 * @param int                 $workflow_id Workflow the trigger belongs to.
+	 * @param int                 $node_key    Trigger node that fired.
+	 * @param array<string,mixed> $payload     Resolved trigger payload.
+	 * @return bool Whether a listening state took the event.
+	 */
+	private function capture_for_listener( int $workflow_id, int $node_key, array $payload ): bool {
+		$optionName = 'zaplane_listener_state_' . $workflow_id;
+		$state      = Option::get( $optionName );
+
+		if ( ! $state || ! is_array( $state ) || ( $state['status'] ?? '' ) !== 'listening' ) {
+			return false;
+		}
+
+		if ( (int) ( $state['workflow_id'] ?? 0 ) !== $workflow_id ) {
+			return false;
+		}
+
+		if ( ! in_array( $node_key, array_map( 'intval', (array) ( $state['node_keys'] ?? [ $state['node_key'] ?? 0 ] ) ), true ) ) {
+			return false;
+		}
+
+		$state['status']        = 'triggered';
+		$state['data']          = $payload;
+		$state['node_key']      = $node_key;
+		$state['triggered_at']  = current_time( 'mysql' );
+
+		Option::set( $optionName, $state, 'no' );
+
+		return true;
 	}
 
 	/**

@@ -9,7 +9,8 @@ import { primaryBtn } from "../../../../../../../../../assets/scss/chakra/recipe
 const ConnectionSelector = ({
   appSlug,
   values,
-  setFieldValue
+  setFieldValue,
+  optional = false
 }) => {
   const dispatch = useDispatch();
   const {
@@ -44,7 +45,19 @@ const ConnectionSelector = ({
         </components.MenuList>;
   return <>
             <div className="flex flex-col gap-2">
-                <span>{__("Select Connection", "zaplane")}<span className="text-[var(--zaplane-danger)] ml-[2px]">*</span></span>
+                <span>
+                    {optional
+                      ? __("Select Connection (optional)", "zaplane")
+                      : __("Select Connection", "zaplane")}
+                    {!optional && (
+                        <span className="text-[var(--zaplane-danger)] ml-[2px]">*</span>
+                    )}
+                </span>
+                {optional && (
+                    <span className="text-xs text-gray-500" style={{ marginTop: "-6px" }}>
+                        {__("Leave empty to run on this site. Pick a connection to run it on the connected site.", "zaplane")}
+                    </span>
+                )}
                 <Select className="zaplane-select" classNamePrefix="zaplane-select" options={options} value={options?.find(o => o.value === values?.connection_id) || null} onChange={val => { setFieldValue("connection_id", val?.value); if (error) setFieldError("connection_id", undefined); }} placeholder={__("Select a connection", "zaplane")} isClearable components={{
         MenuList: CustomMenuList
       }} />

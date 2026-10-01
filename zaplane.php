@@ -121,6 +121,8 @@ final class Zaplane {
 		// anything reads it (automation boot below, and later REST controllers).
 		\Zaplane\CustomApps\Loader::boot();
 		\Zaplane\CustomApps\Poller::boot();
+		// Collects triggers firing on a connected Zaplane site.
+		\Zaplane\Services\RemoteTriggerBridge::boot();
 
 		// OAuth for the MCP endpoint. Both of these claim front-end URLs — the two
 		// /.well-known/ documents and the consent screen — so they hook parse_request
@@ -167,6 +169,7 @@ final class Zaplane {
 		Gemcrm::unschedule_birthday_cron();
 		\Zaplane\Integrations\Woocommerce::unschedule_inactive_customer_cron();
 		\Zaplane\CustomApps\Poller::unschedule();
+		\Zaplane\Services\RemoteTriggerBridge::unschedule();
 
 		// Action Scheduler's queue runner is on a schedule it registers itself, so
 		// once it stops loading the event cannot be rescheduled and WordPress logs

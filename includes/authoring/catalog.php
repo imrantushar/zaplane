@@ -124,6 +124,7 @@ class Catalog {
 				'name'                => (string) ( $entry['name'] ?? $slug ),
 				'category'            => (string) ( $entry['category'] ?? 'app' ),
 				'requires_connection' => (bool) ( $entry['requires_connection'] ?? false ),
+				'connection_optional' => (bool) ( $entry['connection_optional'] ?? false ),
 				'trigger_count'       => count( (array) ( $entry['triggers'] ?? [] ) ),
 				'action_count'        => count( (array) ( $entry['actions'] ?? [] ) ),
 			];
@@ -172,6 +173,7 @@ class Catalog {
 			'icon'                => (string) ( $entry['icon'] ?? '' ),
 			'category'            => (string) ( $entry['category'] ?? 'app' ),
 			'requires_connection' => (bool) ( $entry['requires_connection'] ?? false ),
+			'connection_optional' => (bool) ( $entry['connection_optional'] ?? false ),
 			'auth_type'           => $entry['auth_type'] ?? 'none',
 			'supports_webhook'    => (bool) ( $entry['supports_webhook'] ?? false ),
 			'triggers'            => self::shape_capabilities( $slug, 'trigger', (array) ( $entry['triggers'] ?? [] ) ),
@@ -386,6 +388,7 @@ class Catalog {
 						'key'      => (string) $key,
 						'label'    => (string) ( $cap['label'] ?? $key ),
 						'requires_connection' => (bool) ( $entry['requires_connection'] ?? false ),
+						'connection_optional' => (bool) ( $entry['connection_optional'] ?? false ),
 					];
 				}
 			}

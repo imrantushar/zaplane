@@ -54,12 +54,14 @@ const SelectTab = ({
             : __("View action docs", "zaplane")}
         </a>
       )}
-      {selectedIntegration?.requires_connection === true && (
+      {(selectedIntegration?.requires_connection === true ||
+        selectedIntegration?.connection_optional === true) && (
         <ConnectionSelector
           appSlug={appSlug}
           values={values}
           setFieldValue={setFieldValue}
           selectedIntegration={selectedIntegration}
+          optional={selectedIntegration?.requires_connection !== true}
         />
       )}
       {/*
