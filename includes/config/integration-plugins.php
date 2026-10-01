@@ -87,6 +87,10 @@ return [
 	'jetengine'           => [ 'jet-engine/jet-engine.php' ],
 	'wpuserfrontend'      => [ 'wp-user-frontend/wp-user-frontend.php' ],
 	'profilebuilder'      => [ 'profile-builder/index.php' ],
+	// QuizPress (Pro) ships under quizpress-premium/quizpress.php; only the free
+	// basename is declared because the recipe tester activates every listed
+	// basename and the two builds are mutually exclusive.
+	'quizpress'           => [ 'quizpress/quizpress.php' ],
 
 	// --- Community / events / gamification ---
 	'ultimatemember'      => [ 'ultimate-member/ultimate-member.php' ],

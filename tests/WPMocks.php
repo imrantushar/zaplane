@@ -1221,6 +1221,17 @@ namespace {
 		}
 	}
 
+	if ( ! function_exists( 'wp_upload_bits' ) ) {
+		function wp_upload_bits( $name, $deprecated = null, $content = null, $time = null ) {
+			return [
+				'file'  => '/uploads/' . $name,
+				'url'   => 'https://example.com/wp-content/uploads/' . $name,
+				'type'  => 'text/plain',
+				'error' => false,
+			];
+		}
+	}
+
 	if ( ! function_exists( 'set_post_thumbnail' ) ) {
 		function set_post_thumbnail( $post, $thumbnail_id ): bool {
 			$post_id = is_object( $post ) ? $post->ID : (int) $post;

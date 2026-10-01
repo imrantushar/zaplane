@@ -28,6 +28,10 @@ All notable changes to Zaplane are documented here. This project adheres to
 - Normalized project lint configuration and cleaned up repeated styling issues to keep the release baseline healthy.
 
 ### Added
+- Added QuizPress integration with 20 triggers and 21 actions.
+- Added QuizPress quiz, attempt, poll, and survey triggers — including score thresholds, reattempt detection, and certificate availability — plus question triggers covering adds, updates, and imports.
+- Added QuizPress actions for quiz and question management, attempt resets, score and result overrides, certificate delivery, CSV import/export, and quiz analytics.
+- Added dynamic QuizPress selectors for quizzes, quiz types, and question types.
 - Added ZenCommunity Core + Pro integration with 32 triggers and 34 actions.
 - Added automation support for community members, profiles, spaces, posts, comments, reactions, polls, and events.
 - Added ZenCommunity Pro support for private messaging, group messaging, and support ticket workflows.

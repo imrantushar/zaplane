@@ -1,6 +1,6 @@
 {
     "version": "1.3.3",
-    "generated_at": "2026-09-28 10:42:30",
+    "generated_at": "2026-10-01 11:59:00",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -5928,6 +5928,1191 @@
                             "label": "User ID",
                             "type": "number",
                             "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "quizpress": {
+            "slug": "quizpress",
+            "name": "QuizPress",
+            "icon": "quizpress.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/trigger-quizpress/",
+                "action": "https://zaplane.app/docs/action-quizpress/"
+            },
+            "triggers": {
+                "quiz_started": {
+                    "label": "Quiz Started",
+                    "hook": "quizpress/api/before_quiz_attempt_start",
+                    "key": "quiz_started",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_attempted": {
+                    "label": "Quiz Attempted",
+                    "hook": "quizpress/api/after_quiz_attempt_start",
+                    "key": "quiz_attempted",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_reattempted": {
+                    "label": "Quiz Reattempted",
+                    "hook": "quizpress/api/after_quiz_attempt_start",
+                    "key": "quiz_reattempted",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_submitted": {
+                    "label": "Quiz Submitted",
+                    "hook": "quizpress/api/after_quiz_attempt_finished",
+                    "key": "quiz_submitted",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_completed": {
+                    "label": "Quiz Completed",
+                    "hook": "quizpress/api/after_quiz_attempt_finished",
+                    "key": "quiz_completed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_score_reached": {
+                    "label": "Quiz Score Reached",
+                    "hook": "quizpress/api/after_quiz_attempt_finished",
+                    "key": "quiz_score_reached",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "score_percent",
+                            "label": "Score Percentage (fire at or above, e.g. 80)",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_passed": {
+                    "label": "Quiz Passed",
+                    "hook": [
+                        "quizpress/frontend/quiz_attempt_status_passed",
+                        "quizpress/quiz_attempt_status_passed"
+                    ],
+                    "key": "quiz_passed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "quiz_failed": {
+                    "label": "Quiz Failed",
+                    "hook": [
+                        "quizpress/frontend/quiz_attempt_status_failed",
+                        "quizpress/quiz_attempt_status_failed"
+                    ],
+                    "key": "quiz_failed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "poll_submitted": {
+                    "label": "Poll Submitted",
+                    "hook": "quizpress/api/after_quiz_attempt_finished",
+                    "key": "poll_submitted",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "poll_answer_selected": {
+                    "label": "Poll Answer Selected",
+                    "hook": "shutdown",
+                    "key": "poll_answer_selected",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "poll_result_updated": {
+                    "label": "Poll Result Updated",
+                    "hook": "quizpress/api/after_quiz_attempt_finished",
+                    "key": "poll_result_updated",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "survey_submitted": {
+                    "label": "Survey Submitted",
+                    "hook": "quizpress/api/after_quiz_attempt_finished",
+                    "key": "survey_submitted",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "survey_completed": {
+                    "label": "Survey Completed",
+                    "hook": "quizpress/api/after_quiz_attempt_finished",
+                    "key": "survey_completed",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "certificate_issued": {
+                    "label": "Certificate Issued",
+                    "hook": "quizpress/frontend/quiz_attempt_status_passed",
+                    "key": "certificate_issued",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "certificate_downloaded": {
+                    "label": "Certificate Downloaded",
+                    "hook": "template_include",
+                    "key": "certificate_downloaded",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty for any quiz)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "lead_captured": {
+                    "label": "Lead Captured",
+                    "hook": "quizpress/after_create_magic_link",
+                    "key": "lead_captured",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_registered": {
+                    "label": "User Registered",
+                    "hook": "user_register",
+                    "key": "user_registered",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "question_added": {
+                    "label": "Question Added",
+                    "hook": "rest_pre_dispatch",
+                    "key": "question_added",
+                    "schema": [
+                        {
+                            "key": "question_type",
+                            "label": "Question Type (leave empty for any type)",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "quizpress",
+                                "query": "question_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "question_updated": {
+                    "label": "Question Updated",
+                    "hook": "rest_pre_dispatch",
+                    "key": "question_updated",
+                    "schema": [
+                        {
+                            "key": "question_type",
+                            "label": "Question Type (leave empty for any type)",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "quizpress",
+                                "query": "question_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "question_imported": {
+                    "label": "Question Imported",
+                    "hook": "shutdown",
+                    "key": "question_imported",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_quiz": {
+                    "label": "Create Quiz",
+                    "key": "create_quiz",
+                    "schema": [
+                        {
+                            "key": "quiz_title",
+                            "label": "Quiz Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "quiz_description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "quiz_type",
+                            "label": "Quiz Type",
+                            "type": "select",
+                            "required": false,
+                            "default": "quiz",
+                            "options": [
+                                {
+                                    "label": "Quiz",
+                                    "value": "quiz"
+                                },
+                                {
+                                    "label": "Exam",
+                                    "value": "exam"
+                                },
+                                {
+                                    "label": "Survey",
+                                    "value": "survey"
+                                },
+                                {
+                                    "label": "Poll",
+                                    "value": "poll"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "quiz_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "draft",
+                            "options": [
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "time_limit",
+                            "label": "Time Limit (0 for no limit)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "time_unit",
+                            "label": "Time Unit",
+                            "type": "select",
+                            "required": false,
+                            "default": "minutes",
+                            "options": [
+                                {
+                                    "label": "Seconds",
+                                    "value": "seconds"
+                                },
+                                {
+                                    "label": "Minutes",
+                                    "value": "minutes"
+                                },
+                                {
+                                    "label": "Hours",
+                                    "value": "hours"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "passing_grade",
+                            "label": "Passing Grade (%)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "max_attempts",
+                            "label": "Max Attempts Allowed (0 for unlimited)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_quiz": {
+                    "label": "Update Quiz",
+                    "key": "update_quiz",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "quiz_title",
+                            "label": "New Title (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "quiz_description",
+                            "label": "New Description (leave empty to keep)",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "quiz_type",
+                            "label": "Quiz Type",
+                            "type": "select",
+                            "required": false,
+                            "default": "quiz",
+                            "options": [
+                                {
+                                    "label": "Quiz",
+                                    "value": "quiz"
+                                },
+                                {
+                                    "label": "Exam",
+                                    "value": "exam"
+                                },
+                                {
+                                    "label": "Survey",
+                                    "value": "survey"
+                                },
+                                {
+                                    "label": "Poll",
+                                    "value": "poll"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "passing_grade",
+                            "label": "New Passing Grade (%) (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_quiz": {
+                    "label": "Delete Quiz",
+                    "key": "delete_quiz",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "force_delete",
+                            "label": "Delete Permanently",
+                            "type": "select",
+                            "required": false,
+                            "default": "no",
+                            "options": [
+                                {
+                                    "label": "No \u2014 move to trash",
+                                    "value": "no"
+                                },
+                                {
+                                    "label": "Yes \u2014 delete permanently",
+                                    "value": "yes"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "publish_quiz": {
+                    "label": "Publish Quiz",
+                    "key": "publish_quiz",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "draft_quiz": {
+                    "label": "Draft Quiz",
+                    "key": "draft_quiz",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reset_quiz_attempt": {
+                    "label": "Reset Quiz Attempt",
+                    "key": "reset_quiz_attempt",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID (leave empty for the run user)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "scope",
+                            "label": "Reset Scope",
+                            "type": "select",
+                            "required": false,
+                            "default": "all",
+                            "options": [
+                                {
+                                    "label": "All attempts of this user",
+                                    "value": "all"
+                                },
+                                {
+                                    "label": "Only the latest attempt",
+                                    "value": "last"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_quiz_score": {
+                    "label": "Set Quiz Score",
+                    "key": "set_quiz_score",
+                    "schema": [
+                        {
+                            "key": "attempt_id",
+                            "label": "Attempt ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "earned_marks",
+                            "label": "Earned Marks",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "set_quiz_result": {
+                    "label": "Set Quiz Result",
+                    "key": "set_quiz_result",
+                    "schema": [
+                        {
+                            "key": "attempt_id",
+                            "label": "Attempt ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "result",
+                            "label": "Result",
+                            "type": "select",
+                            "required": true,
+                            "default": "passed",
+                            "options": [
+                                {
+                                    "label": "Passed",
+                                    "value": "passed"
+                                },
+                                {
+                                    "label": "Failed",
+                                    "value": "failed"
+                                },
+                                {
+                                    "label": "Pending Review",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Expired",
+                                    "value": "expired"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_quiz_analytics": {
+                    "label": "Get Quiz Analytics",
+                    "key": "get_quiz_analytics",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_question": {
+                    "label": "Create Question",
+                    "key": "create_question",
+                    "schema": [
+                        {
+                            "key": "question_title",
+                            "label": "Question Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "question_type",
+                            "label": "Question Type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "quizpress",
+                                "query": "question_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "answers_text",
+                            "label": "Answers (one per line, prefix * for the correct one)",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "question_score",
+                            "label": "Points",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "question_negative_score",
+                            "label": "Negative Marks",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "question_content",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "question_explanation",
+                            "label": "Explanation",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "question_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "publish",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_question": {
+                    "label": "Update Question",
+                    "key": "update_question",
+                    "schema": [
+                        {
+                            "key": "question_id",
+                            "label": "Question ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "question_title",
+                            "label": "New Title (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "question_type",
+                            "label": "Question Type",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "quizpress",
+                                "query": "question_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "answers_text",
+                            "label": "Answers (one per line, prefix * for the correct one)",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "question_score",
+                            "label": "New Points (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "question_explanation",
+                            "label": "New Explanation (leave empty to keep)",
+                            "type": "textarea",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_question": {
+                    "label": "Delete Question",
+                    "key": "delete_question",
+                    "schema": [
+                        {
+                            "key": "question_id",
+                            "label": "Question ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "import_questions": {
+                    "label": "Import Questions",
+                    "key": "import_questions",
+                    "schema": [
+                        {
+                            "key": "source",
+                            "label": "CSV Source",
+                            "type": "select",
+                            "required": true,
+                            "default": "csv_url",
+                            "options": [
+                                {
+                                    "label": "From a URL",
+                                    "value": "csv_url"
+                                },
+                                {
+                                    "label": "Inline CSV text",
+                                    "value": "csv_text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "csv_url",
+                            "label": "CSV File URL",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "csv_text",
+                            "label": "CSV Content",
+                            "type": "textarea",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "export_questions": {
+                    "label": "Export Questions",
+                    "key": "export_questions",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID (leave empty to export all questions)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "generate_certificate": {
+                    "label": "Generate Certificate",
+                    "key": "generate_certificate",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_certificate": {
+                    "label": "Send Certificate",
+                    "key": "send_certificate",
+                    "schema": [
+                        {
+                            "key": "quiz_id",
+                            "label": "Quiz ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_user": {
+                    "label": "Create User",
+                    "key": "create_user",
+                    "schema": [
+                        {
+                            "key": "user_email",
+                            "label": "Email",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_login",
+                            "label": "Username (leave empty to derive from email)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "First Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "Last Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "select",
+                            "required": false,
+                            "default": "subscriber",
+                            "options": [
+                                {
+                                    "label": "Subscriber",
+                                    "value": "subscriber"
+                                },
+                                {
+                                    "label": "Contributor",
+                                    "value": "contributor"
+                                },
+                                {
+                                    "label": "Author",
+                                    "value": "author"
+                                },
+                                {
+                                    "label": "Editor",
+                                    "value": "editor"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "password",
+                            "label": "Password (leave empty to generate)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_user": {
+                    "label": "Update User",
+                    "key": "update_user",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "New Email (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "first_name",
+                            "label": "New First Name (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "last_name",
+                            "label": "New Last Name (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "role",
+                            "label": "New Role (leave empty to keep)",
+                            "type": "select",
+                            "required": false,
+                            "default": "",
+                            "options": [
+                                {
+                                    "label": "\u2014 Keep current \u2014",
+                                    "value": ""
+                                },
+                                {
+                                    "label": "Subscriber",
+                                    "value": "subscriber"
+                                },
+                                {
+                                    "label": "Contributor",
+                                    "value": "contributor"
+                                },
+                                {
+                                    "label": "Author",
+                                    "value": "author"
+                                },
+                                {
+                                    "label": "Editor",
+                                    "value": "editor"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "send_email": {
+                    "label": "Send Email",
+                    "key": "send_email",
+                    "schema": [
+                        {
+                            "key": "to",
+                            "label": "To (email address)",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "subject",
+                            "label": "Subject",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "message",
+                            "label": "Message (HTML allowed)",
+                            "type": "textarea",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_post": {
+                    "label": "Create Post",
+                    "key": "create_post",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "required": false,
+                            "default": "post",
+                            "options": [
+                                {
+                                    "label": "Post",
+                                    "value": "post"
+                                },
+                                {
+                                    "label": "Page",
+                                    "value": "page"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "Content",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "draft",
+                            "options": [
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Pending Review",
+                                    "value": "pending"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_post": {
+                    "label": "Update Post",
+                    "key": "update_post",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Post ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "New Title (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "New Content (leave empty to keep)",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "New Status (leave empty to keep)",
+                            "type": "select",
+                            "required": false,
+                            "default": "",
+                            "options": [
+                                {
+                                    "label": "\u2014 Keep current \u2014",
+                                    "value": ""
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Pending Review",
+                                    "value": "pending"
+                                }
+                            ]
                         }
                     ],
                     "outputs": [

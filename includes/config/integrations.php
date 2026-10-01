@@ -277,6 +277,10 @@ $zaplane_registry = [
 		'file'  => 'profilebuilder.php',
 		'class' => \Zaplane\Integrations\Profilebuilder::class,
 	],
+	'quizpress'           => [
+		'file'  => 'quizpress.php',
+		'class' => \Zaplane\Integrations\Quizpress::class,
+	],
 	'kadenceblocks'       => [
 		'file'  => 'kadenceblocks.php',
 		'class' => \Zaplane\Integrations\Kadenceblocks::class,
@@ -394,6 +398,7 @@ $zaplane_priority = [
 	'ablocks',
 	'gembooking',
 	'zencommunity',
+	'quizpress',
 ];
 
 $zaplane_priority_items = [];

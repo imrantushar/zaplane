@@ -100,6 +100,16 @@ class RemotePolicy {
 			// Suspends or unsuspends any account, administrators included.
 			'update_user_status',
 		],
+		'quizpress'           => [
+			// Creates/edits WordPress accounts — the same site-administration
+			// surface the wordpress integration restricts.
+			'create_user',
+			'update_user',
+			// Deletes quizzes and wipes every attempt recorded on them.
+			'delete_quiz',
+			// Deletes a learner's attempt history.
+			'reset_quiz_attempt',
+		],
 	];
 
 	/**
