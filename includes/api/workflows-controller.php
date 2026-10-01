@@ -455,6 +455,10 @@ class WorkflowsController extends WP_REST_Controller {
 		}
 
 		$version = $workflow->activeVersion();
+		if ( ! $version ) {
+			$version = $workflow->versions()->first();
+		}
+
 		$graph = $version ? $version->getGraph() : [
 			'nodes' => [],
 			'edges' => []

@@ -100,6 +100,16 @@ class RemotePolicy {
 			// Suspends or unsuspends any account, administrators included.
 			'update_user_status',
 		],
+		'easycontentmanager'  => [
+			// Creates/edits WordPress accounts and manages the terms of ECM's
+			// taxonomies — the same site-administration surface the wordpress
+			// integration restricts.
+			'create_user',
+			'update_user',
+			'create_taxonomy_term',
+			'update_taxonomy_term',
+			'delete_taxonomy_term',
+		],
 	];
 
 	/**
