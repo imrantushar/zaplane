@@ -36,7 +36,7 @@ class EasyContentManager extends IntegrationBase {
 	}
 
 	public static function get_icon(): string {
-		return 'easy-content-manager.svg';
+		return 'easycontentmanager.svg';
 	}
 
 	public static function get_docs_url(): array {

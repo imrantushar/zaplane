@@ -1,6 +1,6 @@
 {
     "version": "1.3.3",
-    "generated_at": "2026-10-01 09:42:19",
+    "generated_at": "2026-10-01 12:14:43",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -5939,7 +5939,7 @@
         "easycontentmanager": {
             "slug": "easycontentmanager",
             "name": "Easy Content Manager (ECM)",
-            "icon": "easy-content-manager.svg",
+            "icon": "easycontentmanager.svg",
             "category": "app",
             "requires_connection": false,
             "auth_type": "none",
