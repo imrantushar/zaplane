@@ -273,6 +273,10 @@ $zaplane_registry = [
 		'file'  => 'advance-custom-fields.php',
 		'class' => \Zaplane\Integrations\AdvanceCustomFields::class,
 	],
+	'easycontentmanager'  => [
+		'file'  => 'easy-content-manager.php',
+		'class' => \Zaplane\Integrations\EasyContentManager::class,
+	],
 	'profilebuilder'      => [
 		'file'  => 'profilebuilder.php',
 		'class' => \Zaplane\Integrations\Profilebuilder::class,
@@ -394,6 +398,7 @@ $zaplane_priority = [
 	'ablocks',
 	'gembooking',
 	'zencommunity',
+	'easycontentmanager',
 ];
 
 $zaplane_priority_items = [];

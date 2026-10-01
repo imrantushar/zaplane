@@ -1,6 +1,6 @@
 {
     "version": "1.3.3",
-    "generated_at": "2026-09-28 10:42:30",
+    "generated_at": "2026-10-01 08:56:09",
     "apps": {
         "academy": {
             "slug": "academy",
@@ -5927,6 +5927,1464 @@
                             "key": "user_id",
                             "label": "User ID",
                             "type": "number",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            }
+        },
+        "easycontentmanager": {
+            "slug": "easycontentmanager",
+            "name": "Easy Content Manager (ECM)",
+            "icon": "easy-content-manager.svg",
+            "category": "app",
+            "requires_connection": false,
+            "auth_type": "none",
+            "supports_webhook": false,
+            "webhook_route": "",
+            "webhook_setup": [],
+            "docs_url": {
+                "trigger": "https://zaplane.app/docs/trigger-easy-content-manager/",
+                "action": "https://zaplane.app/docs/action-easy-content-manager/"
+            },
+            "triggers": {
+                "item_created": {
+                    "label": "Item Created",
+                    "hook": "wp_insert_post",
+                    "key": "item_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "item_updated": {
+                    "label": "Item Updated",
+                    "hook": "post_updated",
+                    "key": "item_updated",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "item_deleted": {
+                    "label": "Item Deleted",
+                    "hook": "before_delete_post",
+                    "key": "item_deleted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "item_status_changed": {
+                    "label": "Item Status Changed",
+                    "hook": "transition_post_status",
+                    "key": "item_status_changed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "specific_item_created": {
+                    "label": "Specific Post Type Item Created",
+                    "hook": "wp_insert_post",
+                    "key": "specific_item_created",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type (leave empty for any ECM post type)",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "specific_item_updated": {
+                    "label": "Specific Post Type Item Updated",
+                    "hook": "post_updated",
+                    "key": "specific_item_updated",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type (leave empty for any ECM post type)",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "custom_field_updated": {
+                    "label": "Custom Field Value Updated",
+                    "hook": [
+                        "update_post_meta",
+                        "added_post_meta"
+                    ],
+                    "key": "custom_field_updated",
+                    "schema": [
+                        {
+                            "key": "meta_key",
+                            "label": "Field (leave empty for any ECM field)",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "post_meta_keys",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_created": {
+                    "label": "User Created",
+                    "hook": "user_register",
+                    "key": "user_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "user_meta_updated": {
+                    "label": "User Custom Meta Updated",
+                    "hook": [
+                        "updated_user_meta",
+                        "added_user_meta"
+                    ],
+                    "key": "user_meta_updated",
+                    "schema": [
+                        {
+                            "key": "meta_key",
+                            "label": "Field (leave empty for any ECM user field)",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "user_meta_keys",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "term_created": {
+                    "label": "Taxonomy Term Created",
+                    "hook": "created_term",
+                    "key": "term_created",
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy (leave empty for any ECM taxonomy)",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "taxonomies",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "term_updated": {
+                    "label": "Taxonomy Term Updated",
+                    "hook": "edited_term",
+                    "key": "term_updated",
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy (leave empty for any ECM taxonomy)",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "taxonomies",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "term_deleted": {
+                    "label": "Taxonomy Term Deleted",
+                    "hook": "delete_term",
+                    "key": "term_deleted",
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy (leave empty for any ECM taxonomy)",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "taxonomies",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "frontend_submission_created": {
+                    "label": "Frontend Submission Created",
+                    "hook": "wp_insert_post",
+                    "key": "frontend_submission_created",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "frontend_submission_status_changed": {
+                    "label": "Frontend Submission Status Changed",
+                    "hook": "transition_post_status",
+                    "key": "frontend_submission_status_changed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "review_submitted": {
+                    "label": "Review Submitted",
+                    "hook": "wp_insert_comment",
+                    "key": "review_submitted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "review_approved": {
+                    "label": "Review Approved",
+                    "hook": "transition_comment_status",
+                    "key": "review_approved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "review_rejected": {
+                    "label": "Review Rejected",
+                    "hook": "transition_comment_status",
+                    "key": "review_rejected",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "rating_submitted": {
+                    "label": "Rating Submitted",
+                    "hook": [
+                        "added_comment_meta",
+                        "updated_comment_meta"
+                    ],
+                    "key": "rating_submitted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "claim_submitted": {
+                    "label": "Claim Submitted",
+                    "hook": "rest_pre_dispatch",
+                    "key": "claim_submitted",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "claim_approved": {
+                    "label": "Claim Approved",
+                    "hook": "rest_pre_dispatch",
+                    "key": "claim_approved",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "claim_rejected": {
+                    "label": "Claim Rejected",
+                    "hook": "rest_pre_dispatch",
+                    "key": "claim_rejected",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "bookmark_added": {
+                    "label": "Post Bookmarked",
+                    "hook": [
+                        "update_post_meta",
+                        "added_post_meta"
+                    ],
+                    "key": "bookmark_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "bookmark_removed": {
+                    "label": "Post Bookmark Removed",
+                    "hook": [
+                        "update_post_meta",
+                        "added_post_meta"
+                    ],
+                    "key": "bookmark_removed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "upvote_added": {
+                    "label": "Post Upvoted",
+                    "hook": [
+                        "update_post_meta",
+                        "added_post_meta"
+                    ],
+                    "key": "upvote_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reaction_added": {
+                    "label": "Post Reaction Added",
+                    "hook": [
+                        "update_post_meta",
+                        "added_post_meta"
+                    ],
+                    "key": "reaction_added",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reaction_removed": {
+                    "label": "Post Reaction Removed",
+                    "hook": [
+                        "update_post_meta",
+                        "added_post_meta"
+                    ],
+                    "key": "reaction_removed",
+                    "schema": [],
+                    "outputs": [
+                        "main"
+                    ]
+                }
+            },
+            "actions": {
+                "create_item": {
+                    "label": "Create Item",
+                    "key": "create_item",
+                    "schema": [
+                        {
+                            "key": "item_type",
+                            "label": "Item Type",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "label": "Post",
+                                    "value": "post"
+                                },
+                                {
+                                    "label": "Page",
+                                    "value": "page"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "Title",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "Content",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "post_excerpt",
+                            "label": "Excerpt",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "draft",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Pending Review",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "author_id",
+                            "label": "Author ID (leave empty for the run user)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_item": {
+                    "label": "Update Item",
+                    "key": "update_item",
+                    "schema": [
+                        {
+                            "key": "item_type",
+                            "label": "Item Type",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "label": "Post",
+                                    "value": "post"
+                                },
+                                {
+                                    "label": "Page",
+                                    "value": "page"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "post_title",
+                            "label": "New Title (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "post_content",
+                            "label": "New Content (leave empty to keep)",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "post_excerpt",
+                            "label": "New Excerpt (leave empty to keep)",
+                            "type": "textarea",
+                            "required": false
+                        },
+                        {
+                            "key": "post_status",
+                            "label": "New Status (leave empty to keep)",
+                            "type": "select",
+                            "required": false,
+                            "default": "",
+                            "options": [
+                                {
+                                    "label": "\u2014 Keep current \u2014",
+                                    "value": ""
+                                },
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Pending Review",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_item": {
+                    "label": "Delete Item",
+                    "key": "delete_item",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "item_type",
+                            "label": "Item Type",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                                {
+                                    "label": "Post",
+                                    "value": "post"
+                                },
+                                {
+                                    "label": "Page",
+                                    "value": "page"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "force_delete",
+                            "label": "Delete Permanently",
+                            "type": "select",
+                            "required": false,
+                            "default": "no",
+                            "options": [
+                                {
+                                    "label": "No \u2014 move to trash",
+                                    "value": "no"
+                                },
+                                {
+                                    "label": "Yes \u2014 delete permanently",
+                                    "value": "yes"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_item": {
+                    "label": "Get Item",
+                    "key": "get_item",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "find_item": {
+                    "label": "Find Item",
+                    "key": "find_item",
+                    "schema": [
+                        {
+                            "key": "post_type",
+                            "label": "Post Type",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "post_types",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "search_field",
+                            "label": "Find By",
+                            "type": "select",
+                            "required": false,
+                            "default": "title",
+                            "options": [
+                                {
+                                    "label": "Title contains",
+                                    "value": "title"
+                                },
+                                {
+                                    "label": "Custom field equals",
+                                    "value": "meta"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "Field (when Find By is Custom field)",
+                            "type": "select",
+                            "required": false,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "post_meta_keys",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "search_value",
+                            "label": "Search Value",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "limit",
+                            "label": "Maximum Results",
+                            "type": "text",
+                            "required": false,
+                            "default": "10"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "change_item_status": {
+                    "label": "Change Item Status",
+                    "key": "change_item_status",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": true,
+                            "default": "draft",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Pending Review",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "publish_item": {
+                    "label": "Publish Item",
+                    "key": "publish_item",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "duplicate_item": {
+                    "label": "Duplicate Item",
+                    "key": "duplicate_item",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "new_status",
+                            "label": "Copy Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "draft",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Pending Review",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_custom_field_value": {
+                    "label": "Update Custom Field Value",
+                    "key": "update_custom_field_value",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "Field",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "post_meta_keys",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_custom_field_value": {
+                    "label": "Get Custom Field Value",
+                    "key": "get_custom_field_value",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "Field",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "post_meta_keys",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_multiple_custom_fields": {
+                    "label": "Update Multiple Custom Fields",
+                    "key": "update_multiple_custom_fields",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "fields",
+                            "label": "Fields (one row per field)",
+                            "type": "map",
+                            "help": "Add a row per custom field: key = field name, value = new value.",
+                            "fields": [
+                                {
+                                    "key": "key",
+                                    "label": "Field",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "value",
+                                    "label": "Value",
+                                    "type": "expression"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_user": {
+                    "label": "Create User",
+                    "key": "create_user",
+                    "schema": [
+                        {
+                            "key": "user_login",
+                            "label": "Username",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "Email",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_pass",
+                            "label": "Password (leave empty to generate)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "display_name",
+                            "label": "Display Name",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "role",
+                            "label": "Role",
+                            "type": "text",
+                            "required": false,
+                            "default": "subscriber"
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_user": {
+                    "label": "Update User",
+                    "key": "update_user",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_email",
+                            "label": "New Email (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "display_name",
+                            "label": "New Display Name (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "role",
+                            "label": "New Role (leave empty to keep)",
+                            "type": "text",
+                            "required": false
+                        },
+                        {
+                            "key": "user_pass",
+                            "label": "New Password (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_user_custom_meta": {
+                    "label": "Update User Custom Meta",
+                    "key": "update_user_custom_meta",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "User Field",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "user_meta_keys",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "value",
+                            "label": "Value",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "get_user_custom_meta": {
+                    "label": "Get User Custom Meta",
+                    "key": "get_user_custom_meta",
+                    "schema": [
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "meta_key",
+                            "label": "User Field",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "user_meta_keys",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "create_taxonomy_term": {
+                    "label": "Create Taxonomy Term",
+                    "key": "create_taxonomy_term",
+                    "schema": [
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "taxonomies",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "name",
+                            "label": "Term Name",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "slug",
+                            "label": "Slug (leave empty to generate)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "Description",
+                            "type": "textarea",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "update_taxonomy_term": {
+                    "label": "Update Taxonomy Term",
+                    "key": "update_taxonomy_term",
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "name",
+                            "label": "New Name (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "slug",
+                            "label": "New Slug (leave empty to keep)",
+                            "type": "expression",
+                            "required": false
+                        },
+                        {
+                            "key": "description",
+                            "label": "New Description (leave empty to keep)",
+                            "type": "textarea",
+                            "required": false
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_taxonomy_term": {
+                    "label": "Delete Taxonomy Term",
+                    "key": "delete_taxonomy_term",
+                    "schema": [
+                        {
+                            "key": "term_id",
+                            "label": "Term ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "taxonomies",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "assign_term_to_item": {
+                    "label": "Assign Taxonomy Term to Item",
+                    "key": "assign_term_to_item",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "taxonomies",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "terms",
+                            "label": "Terms (comma-separated names/IDs or array)",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_term_from_item": {
+                    "label": "Remove Taxonomy Term from Item",
+                    "key": "remove_term_from_item",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "taxonomy",
+                            "label": "Taxonomy",
+                            "type": "select",
+                            "required": true,
+                            "dynamic": {
+                                "integration": "easycontentmanager",
+                                "query": "taxonomies",
+                                "select": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "terms",
+                            "label": "Terms (comma-separated names/IDs or array)",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "approve_frontend_submission": {
+                    "label": "Approve Frontend Submission",
+                    "key": "approve_frontend_submission",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reject_frontend_submission": {
+                    "label": "Reject Frontend Submission",
+                    "key": "reject_frontend_submission",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "status",
+                            "label": "Status",
+                            "type": "select",
+                            "required": false,
+                            "default": "draft",
+                            "options": [
+                                {
+                                    "label": "Publish",
+                                    "value": "publish"
+                                },
+                                {
+                                    "label": "Draft",
+                                    "value": "draft"
+                                },
+                                {
+                                    "label": "Pending Review",
+                                    "value": "pending"
+                                },
+                                {
+                                    "label": "Private",
+                                    "value": "private"
+                                }
+                            ]
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "approve_review": {
+                    "label": "Approve Review",
+                    "key": "approve_review",
+                    "schema": [
+                        {
+                            "key": "review_id",
+                            "label": "Review ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reject_review": {
+                    "label": "Reject Review",
+                    "key": "reject_review",
+                    "schema": [
+                        {
+                            "key": "review_id",
+                            "label": "Review ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_review": {
+                    "label": "Delete Review",
+                    "key": "delete_review",
+                    "schema": [
+                        {
+                            "key": "review_id",
+                            "label": "Review ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "approve_claim": {
+                    "label": "Approve Claim",
+                    "key": "approve_claim",
+                    "schema": [
+                        {
+                            "key": "claim_id",
+                            "label": "Claim ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "reject_claim": {
+                    "label": "Reject Claim",
+                    "key": "reject_claim",
+                    "schema": [
+                        {
+                            "key": "claim_id",
+                            "label": "Claim ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "delete_claim": {
+                    "label": "Delete Claim",
+                    "key": "delete_claim",
+                    "schema": [
+                        {
+                            "key": "claim_id",
+                            "label": "Claim ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_bookmark": {
+                    "label": "Add Bookmark",
+                    "key": "add_bookmark",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_bookmark": {
+                    "label": "Remove Bookmark",
+                    "key": "remove_bookmark",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_upvote": {
+                    "label": "Add Upvote",
+                    "key": "add_upvote",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_upvote": {
+                    "label": "Remove Upvote",
+                    "key": "remove_upvote",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "add_reaction": {
+                    "label": "Add Reaction",
+                    "key": "add_reaction",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "reaction",
+                            "label": "Reaction Key",
+                            "type": "text",
+                            "required": true,
+                            "help": "One of the reaction keys configured in ECM (e.g. like, love)."
+                        }
+                    ],
+                    "outputs": [
+                        "main"
+                    ]
+                },
+                "remove_reaction": {
+                    "label": "Remove Reaction",
+                    "key": "remove_reaction",
+                    "schema": [
+                        {
+                            "key": "post_id",
+                            "label": "Item ID",
+                            "type": "expression",
+                            "required": true
+                        },
+                        {
+                            "key": "user_id",
+                            "label": "User ID",
+                            "type": "expression",
                             "required": true
                         }
                     ],

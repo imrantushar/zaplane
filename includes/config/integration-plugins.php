@@ -87,6 +87,7 @@ return [
 	'jetengine'           => [ 'jet-engine/jet-engine.php' ],
 	'wpuserfrontend'      => [ 'wp-user-frontend/wp-user-frontend.php' ],
 	'profilebuilder'      => [ 'profile-builder/index.php' ],
+	'easycontentmanager'  => [ 'easy-content-manager/easy-content-manager.php' ],
 
 	// --- Community / events / gamification ---
 	'ultimatemember'      => [ 'ultimate-member/ultimate-member.php' ],

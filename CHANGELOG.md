@@ -28,6 +28,9 @@ All notable changes to Zaplane are documented here. This project adheres to
 - Normalized project lint configuration and cleaned up repeated styling issues to keep the release baseline healthy.
 
 ### Added
+- Added Easy Content Manager (ECM) integration with 28 triggers and 34 actions.
+- Added ECM item, custom-field, user, and taxonomy-term triggers and actions, plus triggers and actions for the Frontend Submission, Review & Ratings, Claim, Bookmark, Upvote, and Reactions addons.
+- Added dynamic ECM selectors for post types, taxonomies, post-field keys, and user-field keys.
 - Added ZenCommunity Core + Pro integration with 32 triggers and 34 actions.
 - Added automation support for community members, profiles, spaces, posts, comments, reactions, polls, and events.
 - Added ZenCommunity Pro support for private messaging, group messaging, and support ticket workflows.
